@@ -32,9 +32,9 @@ fs.stat(path.resolve(config.publicBase), function(err) {
     fs.mkdir(path.resolve(config.publicBase), function(err) {
       console.log(err);
     });
-
-    minifyDirs();
   }
+
+  minifyDirs();
 });
 
 app.set('port', config.port);

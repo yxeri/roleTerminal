@@ -1,8 +1,5 @@
 'use strict';
 
-const app = require('./app');
-const appConfig = require('./config/appConfig');
-
 const dbConnector = require('./databaseConnector');
 const dbDefaults = require('./config/dbPopDefaults');
 

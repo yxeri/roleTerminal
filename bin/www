@@ -2,6 +2,7 @@
 'use strict';
 
 const debug = require('debug')('roleBase');
+const fs = require('fs');
 const app = require('../app');
 const path = require('path');
 const minifier = require('../minifier.js');
@@ -11,22 +12,34 @@ const server = app.listen(app.get('port'), function() {
 });
 const io = app.io;
 
-minifier.minifyDir(
-  path.resolve(path.join(config.privateBase, config.paths.views)),
-  path.resolve(path.join(config.publicBase, config.paths.views)),
-  'html'
-);
-minifier.minifyDir(
-  path.resolve(path.join(config.privateBase, config.paths.styles)),
-  path.resolve(path.join(config.publicBase, config.paths.styles)),
-  'css'
-);
-minifier.minifyDir(
-  path.resolve(
-    path.join(config.privateBase, config.paths.scripts)),
-  path.resolve(path.join(config.publicBase, config.paths.scripts)),
-  'js'
-);
+function minifyDirs() {
+  minifier.minifyDir(
+    path.resolve(path.join(config.privateBase, config.paths.views)),
+    path.resolve(path.join(config.publicBase, config.paths.views)),
+    'html'
+  );
+  minifier.minifyDir(
+    path.resolve(path.join(config.privateBase, config.paths.styles)),
+    path.resolve(path.join(config.publicBase, config.paths.styles)),
+    'css'
+  );
+  minifier.minifyDir(
+    path.resolve(
+      path.join(config.privateBase, config.paths.scripts)),
+    path.resolve(path.join(config.publicBase, config.paths.scripts)),
+    'js'
+  );
+}
+
+fs.stat(path.resolve(config.publicBase), function(err) {
+  if (err) {
+    fs.mkdir(path.resolve(config.publicBase), function(err) {
+      console.log(err);
+    });
+
+    minifyDirs();
+  }
+});
 
 app.set('port', config.port);
 

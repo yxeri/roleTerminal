@@ -1,0 +1,185 @@
+html {
+    cursor: none;
+}
+
+body {
+    margin: 0;
+    color: #00FF00;
+    background-color: #151e15;
+    font-family: monospace;
+    font-size: 1em;
+    letter-spacing: 0.05em;
+    white-space: pre-wrap;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 1.3;
+    overflow-x: hidden;
+}
+
+li {
+    word-wrap: break-word;
+}
+
+pre {
+    padding: 0;
+    margin: 0;
+}
+
+#marker {
+    /* Needed to hide caret. */
+    color: transparent;
+    width: .8em;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    text-align: center;
+    background-color: #00FF00;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-animation: blinking 1s step-end infinite;
+    animation: blinking 1s step-end infinite;
+}
+
+#marker:focus {
+    outline: 0;
+}
+
+.blinkAnim {
+    -webkit-animation: blinking 1s step-end infinite;
+    animation: blinking 1s step-end infinite;
+}
+
+#mode {
+    margin-right: .7em;
+}
+
+#mode:after {
+    content: '$';
+}
+
+#map {
+    border: dotted 1px;
+}
+
+#map td {
+    margin: 0;
+    padding: .5em;
+    border: dotted 1px;
+}
+
+.logo {
+    white-space: pre;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    word-wrap: normal;
+}
+
+.importantMsg {
+    line-height: 1.1;
+    background-color: #00FF00;
+    color: black;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+}
+
+.large {
+    font-size: 2em;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.feed {
+    padding-left: .5em;
+    padding-right: .5em;
+}
+
+.anon {
+    font-size: 0.2em;
+}
+
+/*
+ * For Android in full screen when the keyboard is shown
+ * Virtual keyboard blocks part of the view
+ */
+.fullscreenKeyboardFix {
+    overflow: scroll;
+    max-height: 50vh;
+}
+
+/*
+ * For Android in full screen when the keyboard isn't shown.
+ * Virtual buttons blocks the input field
+ */
+.fullscreenFix {
+    overflow: scroll;
+    max-height: 93vh;
+}
+
+#hiddenInput {
+    visibility: hidden;
+    border: 0;
+}
+
+@-webkit-keyframes blinking {
+    from {
+        background-color: transparent;
+        color: #00FF00;
+    }
+    50% {
+        background-color: #00FF00;
+    }
+}
+
+@keyframes blinking {
+    from {
+        background-color: transparent;
+        color: #00FF00;
+    }
+    50% {
+        background-color: #00FF00;
+    }
+}
+
+@media (max-height: 768px) and (max-width: 1024px) {
+    body {
+        overflow: scroll;
+    }
+}
+
+@media (max-height: 736px) and (max-width: 414px) {
+    #map {
+        font-size: .6em;
+    }
+
+    #map td {
+        padding: .1em;
+    }
+
+    .logo {
+        font-size: .6em;
+    }
+}
+
+/* PiTft */
+@media (max-height: 240px) {
+    .feed {
+        padding-left: .1em;
+        padding-right: .1em;
+    }
+
+    .logo {
+        font-size: .6em;
+    }
+}

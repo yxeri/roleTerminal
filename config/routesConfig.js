@@ -2,6 +2,14 @@
 
 const config = {};
 
-config.routes = [];
+config.routes = [
+  {
+    sitePath : '/',
+    filePath : './routes/index'
+  }, {
+    sitePath : '*',
+    filePath : './routes/error'
+  }
+];
 
 module.exports = config;

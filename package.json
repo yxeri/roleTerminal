@@ -1,6 +1,6 @@
 {
-  "name": "roleBase",
-  "version": "0.0.1",
+  "name": "roleOOC",
+  "version": "0.11.3",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -13,6 +13,7 @@
     "html-minifier": "^0.7.0",
     "morgan": "~1.0.0",
     "node-minify": "^1.0.2",
-    "socket.io": "^1.3.5"
+    "socket.io": "^1.3.5",
+    "mongoose": "^4.0.4"
   }
 }

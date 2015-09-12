@@ -2,6 +2,7 @@
 'use strict';
 
 const debug = require('debug')('roleOOC');
+const fs = require('fs');
 const app = require('../app');
 const path = require('path');
 const minifier = require('../minifier.js');

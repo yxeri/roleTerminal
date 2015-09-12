@@ -47,33 +47,57 @@ function nodeMinify(inPath, outPath, minifierType) {
   });
 }
 
+function checkDir(path, callback) {
+  fs.stat(path, function(err) {
+    if (err) {
+      fs.mkdir(path, function(err) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        callback(err);
+      });
+    } else {
+      callback(err);
+    }
+  });
+}
+
 //TODO: Proper logging
 function minifyDir(inPath, outPath, extension) {
-  fs.readdir(inPath, function(err, files) {
+  checkDir(outPath, function(err) {
     if (err) {
       console.log(err);
-    } else {
-      files.forEach(function(file) {
-        const fullInPath = path.join(inPath, file);
-        const fullOutPath = path.join(outPath, file);
-
-        if (path.extname(file).substr(1) === extension) {
-          let type = '';
-
-          if (extension === 'html') {
-            htmlMinify(fullInPath, fullOutPath);
-          } else if (extension === 'js') {
-            type = serverConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
-
-            nodeMinify(fullInPath, fullOutPath, type);
-          } else if (extension === 'css') {
-            type = serverConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
-
-            nodeMinify(fullInPath, fullOutPath, type);
-          }
-        }
-      });
+      return;
     }
+
+    fs.readdir(inPath, function(err, files) {
+      if (err) {
+        console.log(err);
+      } else {
+        files.forEach(function(file) {
+          const fullInPath = path.join(inPath, file);
+          const fullOutPath = path.join(outPath, file);
+
+          if (path.extname(file).substr(1) === extension) {
+            let type = '';
+
+            if (extension === 'html') {
+              htmlMinify(fullInPath, fullOutPath);
+            } else if (extension === 'js') {
+              type = serverConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
+
+              nodeMinify(fullInPath, fullOutPath, type);
+            } else if (extension === 'css') {
+              type = serverConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
+
+              nodeMinify(fullInPath, fullOutPath, type);
+            }
+          }
+        });
+      }
+    });
   });
 }
 

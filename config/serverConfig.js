@@ -2,11 +2,16 @@
 
 const config = {};
 
-// Relative to Node application dir
+/*
+ * Base directory for public and private files
+ */
 config.publicBase = 'public';
 config.privateBase = 'private';
 
-// Will be appended to the public/private base path
+/*
+ * Sub directories for public and private files
+ * Will be appended to the base directories
+ */
 config.paths = {
   views : 'views',
   styles : 'styles',
@@ -29,6 +34,10 @@ config.dbName = process.env.DBNAME;
 // Node server port number
 config.port = process.env.PORT || 8888;
 
+/*
+ * Server mode. Options:
+ * prod, dev
+ */
 config.mode = process.env.MODE || 'prod';
 
 module.exports = config;

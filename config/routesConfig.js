@@ -11,5 +11,17 @@ config.routes = [
     filePath : './routes/error.js'
   }
 ];
+/*
+ * Array of route paths
+ * Should contain objects of site and file paths
+ * sitePath : REQUESTPATH
+ * filePath : ROUTEFILE
+ *
+ * Example:
+ * {
+ *   sitePath : '*',
+ *   filePath : './routes/index.js'
+ * }
+ */
 
 module.exports = config;

@@ -23,7 +23,7 @@ function handle(socket) {
   });
 
   socket.on('updateCommand', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.updatecommand.commandName, function(allowed) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.updatecommand.commandName, function(allowErr, allowed) {
       if (allowed) {
         const cmdName = data.cmdName;
         const field = data.field;

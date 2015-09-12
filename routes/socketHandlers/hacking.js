@@ -10,7 +10,7 @@ function handle(socket) {
     const roomNameLower = roomName.toLowerCase();
 
     manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to hack the room. Something is broken');
         return;
       }

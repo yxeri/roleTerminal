@@ -75,7 +75,7 @@ function handle(socket) {
 
   socket.on('createRoom', function(sentRoom) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 
@@ -96,7 +96,7 @@ function handle(socket) {
 
   socket.on('follow', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.follow.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
       data.roomName = data.roomName.toLowerCase();
@@ -157,7 +157,7 @@ function handle(socket) {
 
   socket.on('unfollow', function(room) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.unfollow.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 
@@ -197,7 +197,7 @@ function handle(socket) {
   // Shows all available rooms
   socket.on('listRooms', function() {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 
@@ -229,7 +229,7 @@ function handle(socket) {
 
   socket.on('listUsers', function() {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 
@@ -372,7 +372,7 @@ function handle(socket) {
 
   socket.on('removeRoom', function(roomName) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName, function(allowErr, allowed, user) {
-      if (allowErr, !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 

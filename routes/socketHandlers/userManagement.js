@@ -224,7 +224,7 @@ function handle(socket, io) {
 
   socket.on('logout', function() {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.login.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 

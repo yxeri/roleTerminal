@@ -7,49 +7,63 @@ const logger = require('../../logger');
 
 function handle(socket) {
   socket.on('entities', function() {
-    dbConnector.getAllEntities(function(err, entities) {
-      if (err || entities === null) {
-        logger.sendErrorMsg(logger.ErrorCodes.general, 'Could not retrieve entities');
-      } else {
-        const entityArray = ['Available entities:'];
-
-        for (let i = 0; i < entities.length; i++) {
-          const keyAmount = entities[i].keys.length;
-
-          entityArray.push(
-            entities[i].entityName +
-            ' [' + keyAmount +
-            ' unlocked]'
-          );
-        }
-
-        socket.emit('message', { text : entityArray });
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.uploadkey.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
       }
+
+      dbConnector.getAllEntities(function(err, entities) {
+        if (err || entities === null) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Could not retrieve entities');
+        } else {
+          const entityArray = ['Available entities:'];
+
+          for (let i = 0; i < entities.length; i++) {
+            const keyAmount = entities[i].keys.length;
+
+            entityArray.push(
+              entities[i].entityName + ' [' + keyAmount + ' unlocked]'
+            );
+          }
+
+          socket.emit('message', { text : entityArray });
+        }
+      });
     });
   });
 
   socket.on('verifyKey', function(sentKey) {
-    const keyLower = sentKey.toLowerCase();
-
-    dbConnector.getEncryptionKey(keyLower, function(err, key) {
-      if (err || key === null) {
-        logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to get key. Aborting');
-        socket.emit('commandFail');
-      } else {
-        const data = {};
-
-        data.keyData = key;
-        socket.emit('commandSuccess', data);
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.uploadkey.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
       }
+
+      const keyLower = sentKey.toLowerCase();
+
+      dbConnector.getEncryptionKey(keyLower, function(err, key) {
+        if (err || key === null) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to get key. Aborting');
+          socket.emit('commandFail');
+        } else {
+          const data = {};
+
+          data.keyData = key;
+          socket.emit('commandSuccess', data);
+        }
+      });
     });
   });
 
   socket.on('unlockEntity', function(data) {
-    data.entityName = data.entityName.toLowerCase();
-    data.keyData.key = data.keyData.key.toLowerCase();
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.uploadkey.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
+      }
 
-    dbConnector.unlockEntity(data.keyData.key, data.entityName, data.userName,
-      function(err, entity) {
+      data.entityName = data.entityName.toLowerCase();
+      data.keyData.key = data.keyData.key.toLowerCase();
+
+      dbConnector.unlockEntity(data.keyData.key, data.entityName, data.userName, function(err, entity) {
         if (err || entity === null) {
           logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to unlock entity. Aborting');
           socket.emit('commandFail');
@@ -68,45 +82,49 @@ function handle(socket) {
           socket.emit('importantMsg', message);
         }
       });
+    });
   });
 
   socket.on('addKeys', function(keys) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.addencryptionkeys.commandName, function(allowed) {
-      if (allowed) {
-        for (let i = 0; i < keys.length; i++) {
-          keys[i].key = keys[i].key.toLowerCase();
-        }
-
-        dbConnector.addEncryptionKeys(keys, function(err) {
-          if (err) {
-            logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload keys to the database');
-          } else {
-            socket.emit('message', {
-              text : ['Key has been uploaded to the database']
-            });
-          }
-        });
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.addencryptionkeys.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
       }
+      for (let i = 0; i < keys.length; i++) {
+        keys[i].key = keys[i].key.toLowerCase();
+      }
+
+      dbConnector.addEncryptionKeys(keys, function(err) {
+        if (err) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload keys to the database');
+        } else {
+          socket.emit('message', {
+            text : ['Key has been uploaded to the database']
+          });
+        }
+      });
     });
   });
 
   socket.on('addEntities', function(entities) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.addentities.commandName, function(allowed) {
-      if (allowed) {
-        for (let i = 0; i < entities.length; i++) {
-          entities[i].entityName = entities[i].entityName.toLowerCase();
-        }
-
-        dbConnector.addEntities(entities, function(err) {
-          if (err) {
-            logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload entities to the database');
-          } else {
-            socket.emit('message', {
-              text : ['Entity has been uploaded to the database']
-            });
-          }
-        });
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.addentities.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
       }
+
+      for (let i = 0; i < entities.length; i++) {
+        entities[i].entityName = entities[i].entityName.toLowerCase();
+      }
+
+      dbConnector.addEntities(entities, function(err) {
+        if (err) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload entities to the database');
+        } else {
+          socket.emit('message', {
+            text : ['Entity has been uploaded to the database']
+          });
+        }
+      });
     });
   });
 }

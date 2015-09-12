@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+'use strict';
+
+const debug = require('debug')('roleBase');
+const app = require('../app');
+const path = require('path');
+const minifier = require('../minifier.js');
+const config = require('../config/serverConfig.js');
+const server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+});
+const io = app.io;
+
+minifier.minifyDir(
+  path.resolve(path.join(config.privateBase, config.paths.views)),
+  path.resolve(path.join(config.publicBase, config.paths.views)),
+  'html'
+);
+minifier.minifyDir(
+  path.resolve(path.join(config.privateBase, config.paths.styles)),
+  path.resolve(path.join(config.publicBase, config.paths.styles)),
+  'css'
+);
+minifier.minifyDir(
+  path.resolve(
+    path.join(config.privateBase, config.paths.scripts)),
+  path.resolve(path.join(config.publicBase, config.paths.scripts)),
+  'js'
+);
+
+app.set('port', config.port);
+
+io.attach(server);

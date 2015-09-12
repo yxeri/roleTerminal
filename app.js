@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, serverConfig.publicBase)));
 for (let i = 0; i < routesConfig.routes.length; i++) {
   const route = routesConfig.routes[i];
 
-  app.use(route.sitePath, require(route.filePath)(app.io));
+  app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
 }
 
 function watchPrivate() {

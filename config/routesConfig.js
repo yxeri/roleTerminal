@@ -5,10 +5,10 @@ const config = {};
 config.routes = [
   {
     sitePath : '/',
-    filePath : './routes/index'
+    filePath : './routes/index.js'
   }, {
     sitePath : '*',
-    filePath : './routes/error'
+    filePath : './routes/error.js'
   }
 ];
 

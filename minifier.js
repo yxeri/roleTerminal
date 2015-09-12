@@ -4,13 +4,18 @@ const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier');
 const minifier = require('node-minify');
+const logger = require('./logger');
 const serverConfig = require('./config/serverConfig');
 
+/**
+ * Minifies a HTML file
+ * @param inPath String. Private directory path for the file
+ * @param outPath String. Public directory path for the file
+ */
 function htmlMinify(inPath, outPath) {
   fs.readFile(inPath, 'utf8', function(readError, readFile) {
     if (readError) {
-      //TODO Change to proper logging
-      console.log('ReadError', readError);
+      logger.sendErrorMsg(logger.ErrorCodes.general, 'ReadError', readError);
     } else {
       const minifyConfig = {
         removeComments : true,
@@ -24,14 +29,19 @@ function htmlMinify(inPath, outPath) {
       fs.writeFile(outPath, htmlMinifier.minify(readFile, minifyConfig),
         function(writeError) {
           if (writeError) {
-            //TODO Change to proper logging
-            console.log('WriteError', writeError);
+            logger.sendErrorMsg(logger.ErrorCodes.general, 'WriteError', writeError);
           }
         });
     }
   });
 }
 
+/**
+ * Minifies Javascript or CSS files
+ * @param inPath String. Private directory path for the file
+ * @param outPath String. Public directory path for the file
+ * @param minifierType String. Type of the file, either js or css
+ */
 function nodeMinify(inPath, outPath, minifierType) {
   new minifier.minify({
     type : minifierType,
@@ -39,20 +49,26 @@ function nodeMinify(inPath, outPath, minifierType) {
     fileOut : outPath,
     callback : function(err) {
       if (err) {
-        console.log('Minify error', err);
+        logger.sendErrorMsg(logger.ErrorCodes.general, 'Minify error', err);
       }
 
-      console.log('Minified ' + inPath);
+      logger.sendInfoMsg('Minified ' + inPath);
     }
   });
 }
 
+/**
+ * Checks if the directory on a specific path exists.
+ * Creates it if it doesn't exist
+ * @param path String. Directory path to check
+ * @param callback Function.
+ */
 function checkDir(path, callback) {
   fs.stat(path, function(err) {
     if (err) {
       fs.mkdir(path, function(err) {
         if (err) {
-          console.log(err);
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', err);
           return;
         }
 
@@ -64,7 +80,12 @@ function checkDir(path, callback) {
   });
 }
 
-//TODO: Proper logging
+/**
+ * Goes through a directory and minifies all files with a specific extension
+ * @param inPath String. Private directory path for the file
+ * @param outPath String. Public directory path for the file
+ * @param extension String. Extension of the file
+ */
 function minifyDir(inPath, outPath, extension) {
   checkDir(outPath, function(err) {
     if (err) {
@@ -101,6 +122,11 @@ function minifyDir(inPath, outPath, extension) {
   });
 }
 
+/**
+ * Minifies a file by calling the correct funtion based on its extension
+ * @param filePath String. File path
+ * @param outPath String. Directory path where the minified file will be moved to
+ */
 function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
   let type = '';

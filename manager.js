@@ -1,8 +1,9 @@
 'use strict';
 
-const dbConnector = require('./databaseConnector.js');
-const dbDefaults = require('./config/dbPopDefaults.js');
+const dbConnector = require('./databaseConnector');
+const dbDefaults = require('./config/dbPopDefaults');
 const logger = require('./logger.js');
+const appConfig = require('./config/appConfig');
 
 const messageSort = function(a, b) {
   if (a.time < b.time) {
@@ -13,10 +14,6 @@ const messageSort = function(a, b) {
 
   return 0;
 };
-
-function isTextAllowed(text) {
-  return /^[a-zA-Z0-9]+$/g.test(text);
-}
 
 function getUserById(socketId, callback) {
   dbConnector.getUserById(socketId, function(err, user) {
@@ -76,7 +73,7 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
     if (err || history === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history');
     } else {
-      const maxLines = lines === null || isNaN(lines) ? config.historyLines : lines;
+      const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
       for (let i = 0; i < history.length; i++) {
         const currentHistory = history[i];

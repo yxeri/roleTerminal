@@ -125,7 +125,6 @@ function handle(socket, io) {
         dbConnector.updateUserLocation(user.userName, position, function(err) {
           if (err) {
             logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update location');
-            return;
           }
         });
       }
@@ -202,7 +201,7 @@ function handle(socket, io) {
         dbConnector.authUser(data.userName, data.oldPassword, function(err, user) {
           if (err || user === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password');
-            return
+            return;
           }
 
           dbConnector.updateUserPassword(user.userName, data.newPassword, function(err, user) {

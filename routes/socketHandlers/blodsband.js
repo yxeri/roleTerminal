@@ -71,8 +71,7 @@ function handle(socket) {
           const message = {
             text : [
               'Entity event',
-              'User ' + data.userName + ' has used a key on entity ' +
-              data.entityName,
+              'User ' + data.userName + ' has used a key on entity ' + data.entityName,
               'Organica Re-Education Squads have been deployed'
             ], morse : { local : true }
           };

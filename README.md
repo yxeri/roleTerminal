@@ -1,6 +1,6 @@
-# roleHaven
+# roleOOC
 
-RoleHaven is an initiative to create a platform to be used in-game during LARPs. The first field test will be during 
+roleOOC is an initiative to create a platform to be used in-game during LARPs. The first field test will be during 
 a post-apocalyptic LARP [Blodsband reloaded](http://bbreloaded.se/ooc) played out in Sweden.
 
 Note! This system is meant to be used as a game within a game. Passwords are not stored in a insecure way. This is by design. 

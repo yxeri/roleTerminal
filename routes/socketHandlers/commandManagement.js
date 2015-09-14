@@ -37,7 +37,7 @@ function handle(socket) {
             socket.broadcast.emit('updateCommands', [command]);
           }
         };
-        switch(field) {
+        switch (field) {
           case 'visibility':
             dbConnector.updateCommandVisibility(cmdName, value, callback);
 

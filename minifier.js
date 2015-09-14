@@ -62,20 +62,20 @@ function nodeMinify(inPath, outPath, minifierType) {
 /**
  * Checks if the directory on a specific path exists.
  * Creates it if it doesn't exist
- * @param {string} path Directory path to check
+ * @param {string} dirPath Directory path to check
  * @param {function} callback Callback
  * @returns {undefined} Returns undefined
  */
-function checkDir(path, callback) {
-  fs.stat(path, function(err) {
+function checkDir(dirPath, callback) {
+  fs.stat(dirPath, function(err) {
     if (err) {
-      fs.mkdir(path, function(err) {
-        if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', err);
+      fs.mkdir(dirPath, function(dirErr) {
+        if (dirErr) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', dirErr);
           return;
         }
 
-        callback(err);
+        callback(dirErr);
       });
     } else {
       callback(err);
@@ -97,9 +97,9 @@ function minifyDir(inPath, outPath, extension) {
       return;
     }
 
-    fs.readdir(inPath, function(err, files) {
-      if (err) {
-        console.log(err);
+    fs.readdir(inPath, function(readErr, files) {
+      if (readErr) {
+        console.log(readErr);
       } else {
         files.forEach(function(file) {
           const fullInPath = path.join(inPath, file);

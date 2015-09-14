@@ -36,13 +36,14 @@ function sendErrorMsg(code, text, err) {
 /**
  * Sends an error message to the sent socket and prints it to the log
  * @param {object} socket SocketIO socket
- * @param {object) code Error code
+ * @param {object} code Error code
  * @param {object} text Error message
+ * @param {object} err Error object
  * @returns {undefined} Returns undefined
  */
-function sendSocketErrorMsg(socket, code, text) {
+function sendSocketErrorMsg(socket, code, text, err) {
   socket.emit('message', { text : ['[' + code.num + '] ' + text] });
-  sendErrorMsg(code, text);
+  sendErrorMsg(code, text, err);
 }
 
 function sendInfoMsg(text) {

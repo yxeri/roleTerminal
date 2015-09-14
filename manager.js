@@ -17,18 +17,12 @@ const messageSort = function(a, b) {
 
 function getUserById(socketId, callback) {
   dbConnector.getUserById(socketId, function(err, user) {
-    if (err) {
-    }
-
     callback(err, user);
   });
 }
 
 function getCommand(commandName, callback) {
   dbConnector.getCommand(commandName, function(err, command) {
-    if (err) {
-    }
-
     callback(err, command);
   });
 }
@@ -39,8 +33,9 @@ function userAllowedCommand(socketId, commandName, callback) {
     if (err) {
       callback(err);
     } else {
-      getCommand(commandName, function(err, command) {
-        if (err) {
+      getCommand(commandName, function(cmdErr, command) {
+        if (cmdErr) {
+          callback(cmdErr);
         } else {
           const userLevel = user ? user.accessLevel : 0;
           const commandLevel = command.accessLevel;
@@ -50,7 +45,7 @@ function userAllowedCommand(socketId, commandName, callback) {
           }
         }
 
-        callback(err, isAllowed, user);
+        callback(cmdErr, isAllowed, user);
       });
     }
   };
@@ -60,18 +55,19 @@ function userAllowedCommand(socketId, commandName, callback) {
 
 /**
  *
- * @param rooms Array. History from these rooms will retrieved
- * @param lines Number. Amount of lines returned for each room
- * @param missedMsgs Boolean. If true, only messages that the user missed since being logged in last time are returned
- * @param lastOnline Date. Last time user was online. Used to determine which missed messages to send
- * @param callback Function.
+ * @param {array} rooms History from these rooms will retrieved
+ * @param {int} lines Amount of lines returned for each room
+ * @param {boolean} missedMsgs If true, only messages that the user missed since last login are sent
+ * @param {date} lastOnline Last time user was online. Used to determine which missed messages to send
+ * @param {function} callback Callback
+ * @returns {undefined} Returns undefined
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
   dbConnector.getHistoryFromRooms(rooms, function(err, history) {
     const historyMessages = [];
 
     if (err || history === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history');
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history', err);
     } else {
       const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
@@ -107,9 +103,10 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
 
 /**
  *
- * @param newRoom Object.
- * @param user Object.
- * @param callback Function.
+ * @param {object} newRoom Room name to create
+ * @param {object} user User who added the room
+ * @param {function} callback Callback
+ * @returns {undefined} Returns undefined
  */
 function createRoom(newRoom, user, callback) {
   newRoom.roomName = newRoom.roomName.toLowerCase();
@@ -119,12 +116,12 @@ function createRoom(newRoom, user, callback) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to create room for user ' + user.userName, err);
       callback(err);
     } else {
-      dbConnector.addRoomToUser(user.userName, room.roomName, function(err) {
-        if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add user ' + user.userName + ' to its room');
+      dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
+        if (roomErr) {
+          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add user ' + user.userName + ' to its room', roomErr);
         }
 
-        callback(err, room.roomName);
+        callback(roomErr, room.roomName);
       });
     }
   });

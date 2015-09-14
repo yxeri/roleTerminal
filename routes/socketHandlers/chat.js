@@ -3,7 +3,6 @@
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const dbDefaults = require('../../config/dbPopDefaults');
-const serverConfig = require('../../config/serverConfig');
 const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
 
@@ -42,9 +41,9 @@ function handle(socket) {
         if (newData.message.whisper) {
           const whisperRoom = newData.message.user + dbDefaults.whisper;
 
-          dbConnector.addMsgToHistory(whisperRoom, newData.message, function(err, history) {
-            if (err || history === null) {
-              logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save whisper in senders history', err);
+          dbConnector.addMsgToHistory(whisperRoom, newData.message, function(histErr, foundHistory) {
+            if (histErr || foundHistory === null) {
+              logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save whisper in senders history', histErr);
             }
           });
         }
@@ -75,7 +74,8 @@ function handle(socket) {
   });
 
   socket.on('createRoom', function(sentRoom) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName,
+      function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -107,14 +107,14 @@ function handle(socket) {
       }
       dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
         if (err || room === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName);
+          logger.sendErrorMsg(logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
           return;
         }
         const roomName = room.roomName;
 
-        dbConnector.addRoomToUser(user.userName, roomName, function(err) {
-          if (err) {
-            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + data.roomName);
+        dbConnector.addRoomToUser(user.userName, roomName, function(roomErr) {
+          if (roomErr) {
+            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + data.roomName, roomErr);
             return;
           }
 
@@ -172,21 +172,20 @@ function handle(socket) {
          * That room is for private messaging between users
          */
         if (roomName !== userName) {
-          dbConnector.removeRoomFromUser(userName, roomName,
-            function(err, user) {
-              if (err || user === null) {
-                logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to unfollow room');
-                return;
-              }
+          dbConnector.removeRoomFromUser(userName, roomName, function(err, removedUser) {
+            if (err || removedUser === null) {
+              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to unfollow room');
+              return;
+            }
 
-              socket.broadcast.to(roomName).emit('chatMsg', {
-                text : [userName + ' left ' + roomName],
-                room : roomName
-              });
-              socket.leave(roomName);
-              socket.emit('unfollow', room);
-
+            socket.broadcast.to(roomName).emit('chatMsg', {
+              text : [userName + ' left ' + roomName],
+              room : roomName
             });
+            socket.leave(roomName);
+            socket.emit('unfollow', room);
+
+          });
         }
       } else {
         socket.emit('message',
@@ -204,7 +203,7 @@ function handle(socket) {
 
       dbConnector.getAllRooms(user, function(roomErr, rooms) {
         if (roomErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all room names');
+          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all room names', roomErr);
           return;
         }
 
@@ -314,15 +313,15 @@ function handle(socket) {
         ]
       });
 
-      dbConnector.getOwnedRooms(user, function(err, rooms) {
-        if (err || rooms === null) {
+      dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
+        if (err || ownedRooms === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get owned rooms');
           return;
         }
         let ownedRoomsString = '';
 
-        for (let i = 0; i < rooms.length; i++) {
-          ownedRoomsString += rooms[i].roomName + '\t';
+        for (let i = 0; i < ownedRooms.length; i++) {
+          ownedRoomsString += ownedRooms[i].roomName + '\t';
         }
 
         if (ownedRoomsString.length > 0) {
@@ -372,7 +371,8 @@ function handle(socket) {
   });
 
   socket.on('removeRoom', function(roomName) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName,
+      function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }

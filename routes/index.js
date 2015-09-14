@@ -67,26 +67,23 @@ function handle(io) {
             'User has disconnected. Couldn\'t retrieve user name'
           );
         } else {
-          dbConnector.updateUserSocketId(user.userName, '',
-            function(err, socketUser) {
-              if (err || socketUser === null) {
-                console.log('Failed to reset user socket ID', err);
-              } else {
-                dbConnector.setUserLastOnline(user.userName, new Date(),
-                  function(err, user) {
-                    if (err || user === null) {
-                      console.log('Failed to set last online');
-                    } else {
-                      dbConnector.updateUserOnline(
-                        user.userName, false, function(err, user) {
-                          if (err || user === null) {
-                            console.log('Failed to update online', err);
-                          }
-                        });
+          dbConnector.updateUserSocketId(user.userName, '', function(userErr, socketUser) {
+            if (userErr || socketUser === null) {
+              console.log('Failed to reset user socket ID', userErr);
+            } else {
+              dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
+                if (userOnlineErr || settedUser === null) {
+                  console.log('Failed to set last online');
+                } else {
+                  dbConnector.updateUserOnline(settedUser.userName, false, function(onlineErr, updatedUser) {
+                    if (onlineErr || updatedUser === null) {
+                      console.log('Failed to update online', onlineErr);
                     }
                   });
-              }
-            });
+                }
+              });
+            }
+          });
 
           console.log(socket.id, user.userName, 'has disconnected');
         }
@@ -118,13 +115,13 @@ function handle(io) {
               }
             });
           } else {
-            dbConnector.getUserLocation(user, sentUserName, function(err, user) {
-              if (err || user === null) {
+            dbConnector.getUserLocation(user, sentUserName, function(err, foundUser) {
+              if (err || foundUser === null) {
                 logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
-              } else if (user.position !== undefined) {
-                const userName = user.userName;
+              } else if (foundUser.position !== undefined) {
+                const userName = foundUser.userName;
 
-                locationData[userName] = createUserPosition(user);
+                locationData[userName] = createUserPosition(foundUser);
 
                 socket.emit('locationMsg', locationData);
               } else {
@@ -197,7 +194,7 @@ function handle(io) {
     });
 
     //TODO This should be moved
-    /**
+    /*
      * Updates socket ID on the device in the database and joins the socket
      * to the device room
      */
@@ -210,16 +207,16 @@ function handle(io) {
 
       dbConnector.updateDeviceSocketId(
         deviceId, socketId, user, function(err, device) {
-        if(err || device === null) {
-          const errMsg = 'Failed to update device';
+          if (err || device === null) {
+            const errMsg = 'Failed to update device';
 
-          console.log(errMsg, err);
-        } else {
-          socket.emit('message', {
-            text : ['Device has been updated']
-          });
-        }
-      });
+            console.log(errMsg, err);
+          } else {
+            socket.emit('message', {
+              text : ['Device has been updated']
+            });
+          }
+        });
     });
 
     //TODO This should be moved
@@ -287,38 +284,39 @@ function handle(io) {
     //TODO Sub-command?
     socket.on('listDevices', function() {
       manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowed, user) {
-        if (allowed) {
-          if (user.accessLevel >= 11) {
-            dbConnector.getAllDevices(function(devErr, devices) {
-              if (devErr) {
-                logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all devices', devErr);
-              } else {
-                const allDevices = [];
+        if (!allowed) {
+          return;
+        }
+        if (user.accessLevel >= 11) {
+          dbConnector.getAllDevices(function(devErr, devices) {
+            if (devErr) {
+              logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all devices', devErr);
+            } else {
+              const allDevices = [];
 
-                if (devices.length > 0) {
-                  for (let i = 0; i < devices.length; i++) {
-                    const device = devices[i];
-                    let deviceString = '';
+              if (devices.length > 0) {
+                for (let i = 0; i < devices.length; i++) {
+                  const device = devices[i];
+                  let deviceString = '';
 
-                    deviceString += 'DeviceID: ' + device.deviceId + '\t';
+                  deviceString += 'DeviceID: ' + device.deviceId + '\t';
 
-                    if (device.alias !== device.deviceId) {
-                      deviceString += 'Alias: ' + device.alias + '\t';
-                    }
-
-                    deviceString += 'Last user: ' + device.lastUser;
-                    allDevices.push(deviceString);
+                  if (device.alias !== device.deviceId) {
+                    deviceString += 'Alias: ' + device.alias + '\t';
                   }
 
-                  socket.emit('message', {
-                    text : allDevices
-                  });
+                  deviceString += 'Last user: ' + device.lastUser;
+                  allDevices.push(deviceString);
                 }
+
+                socket.emit('message', {
+                  text : allDevices
+                });
               }
-            });
-          } else {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.unauth, 'You are not allowed to list devices');
-          }
+            }
+          });
+        } else {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.unauth, 'You are not allowed to list devices');
         }
       });
     });

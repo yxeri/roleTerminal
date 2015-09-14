@@ -14,7 +14,7 @@ function handle(socket) {
 
       dbConnector.getAllEntities(function(err, entities) {
         if (err || entities === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Could not retrieve entities');
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Could not retrieve entities', err);
         } else {
           const entityArray = ['Available entities:'];
 
@@ -42,7 +42,7 @@ function handle(socket) {
 
       dbConnector.getEncryptionKey(keyLower, function(err, key) {
         if (err || key === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to get key. Aborting');
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to get key. Aborting', err);
           socket.emit('commandFail');
         } else {
           const data = {};
@@ -65,7 +65,7 @@ function handle(socket) {
 
       dbConnector.unlockEntity(data.keyData.key, data.entityName, data.userName, function(err, entity) {
         if (err || entity === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to unlock entity. Aborting');
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to unlock entity. Aborting', err);
           socket.emit('commandFail');
         } else {
           const message = {
@@ -85,7 +85,8 @@ function handle(socket) {
   });
 
   socket.on('addKeys', function(keys) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.addencryptionkeys.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.addencryptionkeys.commandName,
+      function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -95,7 +96,7 @@ function handle(socket) {
 
       dbConnector.addEncryptionKeys(keys, function(err) {
         if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload keys to the database');
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload keys to the database', err);
         } else {
           socket.emit('message', {
             text : ['Key has been uploaded to the database']
@@ -117,7 +118,7 @@ function handle(socket) {
 
       dbConnector.addEntities(entities, function(err) {
         if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload entities to the database');
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to upload entities to the database', err);
         } else {
           socket.emit('message', {
             text : ['Entity has been uploaded to the database']

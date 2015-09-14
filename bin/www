@@ -11,6 +11,8 @@ const config = require('../config/serverConfig');
 
 /**
  * Minifies all files in the directories with a specific extension
+ *
+ * @returns {undefined} Returns undefined
  */
 function minifyDirs() {
   minifier.minifyDir(
@@ -37,8 +39,8 @@ function minifyDirs() {
  */
 fs.stat(path.resolve(config.publicBase), function(err) {
   if (err) {
-    fs.mkdir(path.resolve(config.publicBase), function(err) {
-      logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', err);
+    fs.mkdir(path.resolve(config.publicBase), function(dirErr) {
+      logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', dirErr);
     });
   }
 

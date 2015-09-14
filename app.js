@@ -16,29 +16,28 @@ let appSpecific;
 /**
  * Watches for files changes in the private directory and adds new changes to public. Used in dev mode
  * Note! fs.watch is unstable. Recursive might only work in OS X
+ *
+ * @returns {undefined} Returns undefined
  */
 function watchPrivate() {
-  try {
-    // fs.watch is unstable. Recursive only works in OS X.
-    fs.watch(serverConfig.privateBase, { persistant : true, recursive : true }, function(triggeredEvent, filePath) {
-      const fullPath = path.join(serverConfig.privateBase, filePath);
+  // fs.watch is unstable. Recursive only works in OS X.
+  fs.watch(serverConfig.privateBase, { persistant : true, recursive : true }, function(triggeredEvent, filePath) {
+    const fullPath = path.join(serverConfig.privateBase, filePath);
 
-      if ((triggeredEvent === 'rename' || triggeredEvent === 'change') &&
-          path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0) {
-        fs.readFile(fullPath, function(err) {
-          if (err) {
-            throw err;
-          }
+    if ((triggeredEvent === 'rename' || triggeredEvent === 'change') &&
+        path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0) {
+      fs.readFile(fullPath, function(err) {
+        if (err) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'fs.watch error. Automatic update of changed files disabled');
+          return;
+        }
 
-          minifier.minifyFile(
-            fullPath, path.join(serverConfig.publicBase, filePath));
-          logger.sendInfoMsg('Event: ' + triggeredEvent + '. File: ' + fullPath);
-        });
-      }
-    });
-  } catch (e) {
-    logger.sendErrorMsg(logger.ErrorCodes.general, 'fs.watch error. Automatic update of changed files disabled');
-  }
+        minifier.minifyFile(
+          fullPath, path.join(serverConfig.publicBase, filePath));
+        logger.sendInfoMsg('Event: ' + triggeredEvent + '. File: ' + fullPath);
+      });
+    }
+  });
 }
 
 try {
@@ -58,7 +57,7 @@ app.io = socketIo();
 // view engine setup
 app.set('views', path.join(__dirname, serverConfig.publicBase, serverConfig.paths.views));
 app.set('view engine', 'html');
-app.engine('html', require('hbs').__express);
+app.engine('html', require('hbs').__express); //eslint-disable-line no-underscore-dangle
 
 app.use(compression());
 

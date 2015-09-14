@@ -8,6 +8,8 @@ const appConfig = require('./config/appConfig');
 
 /**
  * Gets called from app.js. Triggers the app specific code
+ *
+ * @returns {undefined} Returns undefined
  */
 function run() {
   dbConnector.populateDbUsers(dbDefaults.users);

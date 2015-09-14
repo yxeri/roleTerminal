@@ -9,8 +9,9 @@ const serverConfig = require('./config/serverConfig');
 
 /**
  * Minifies a HTML file
- * @param inPath String. Private directory path for the file
- * @param outPath String. Public directory path for the file
+ * @param {string} inPath Private directory path for the file
+ * @param {string} outPath Public directory path for the file
+ * @returns {undefined} Returns undefined
  */
 function htmlMinify(inPath, outPath) {
   fs.readFile(inPath, 'utf8', function(readError, readFile) {
@@ -38,9 +39,10 @@ function htmlMinify(inPath, outPath) {
 
 /**
  * Minifies Javascript or CSS files
- * @param inPath String. Private directory path for the file
- * @param outPath String. Public directory path for the file
- * @param minifierType String. Type of the file, either js or css
+ * @param {string} inPath Private directory path for the file
+ * @param {string} outPath Public directory path for the file
+ * @param {string} minifierType Type of the file, either js or css
+ * @returns {undefined} Returns undefined
  */
 function nodeMinify(inPath, outPath, minifierType) {
   new minifier.minify({
@@ -60,8 +62,9 @@ function nodeMinify(inPath, outPath, minifierType) {
 /**
  * Checks if the directory on a specific path exists.
  * Creates it if it doesn't exist
- * @param path String. Directory path to check
- * @param callback Function.
+ * @param {string} path Directory path to check
+ * @param {function} callback Callback
+ * @returns {undefined} Returns undefined
  */
 function checkDir(path, callback) {
   fs.stat(path, function(err) {
@@ -82,9 +85,10 @@ function checkDir(path, callback) {
 
 /**
  * Goes through a directory and minifies all files with a specific extension
- * @param inPath String. Private directory path for the file
- * @param outPath String. Public directory path for the file
- * @param extension String. Extension of the file
+ * @param {string} inPath Private directory path for the file
+ * @param {string} outPath Public directory path for the file
+ * @param {string} extension Extension of the file
+ * @returns {undefined} Returns undefined
  */
 function minifyDir(inPath, outPath, extension) {
   checkDir(outPath, function(err) {
@@ -124,8 +128,9 @@ function minifyDir(inPath, outPath, extension) {
 
 /**
  * Minifies a file by calling the correct funtion based on its extension
- * @param filePath String. File path
- * @param outPath String. Directory path where the minified file will be moved to
+ * @param {string} filePath File path
+ * @param {string} outPath Directory path where the minified file will be moved to
+ * @returns {undefined} Returns undefined
  */
 function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);

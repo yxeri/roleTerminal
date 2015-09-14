@@ -20,24 +20,24 @@ config.paths = {
 };
 
 // Morgan log level
-config.logLevel = process.env.LOGLEVEL || 'tiny';
+config.logLevel = process.env.LOGLEVEL || 'tiny'; //eslint-disable-line no-process-env
 
 // Database host name
-config.dbHost = process.env.DBHOST || 'localhost';
+config.dbHost = process.env.DBHOST || 'localhost'; //eslint-disable-line no-process-env
 
 // Database port
-config.dbPort = process.env.DBPORT || 27017;
+config.dbPort = process.env.DBPORT || 27017; //eslint-disable-line no-process-env
 
 // Database database name
-config.dbName = process.env.DBNAME;
+config.dbName = process.env.DBNAME; //eslint-disable-line no-process-env
 
 // Node server port number
-config.port = process.env.PORT || 8888;
+config.port = process.env.PORT || 8888; //eslint-disable-line no-process-env
 
 /*
  * Server mode. Options:
  * prod, dev
  */
-config.mode = process.env.MODE || 'prod';
+config.mode = process.env.MODE || 'prod'; //eslint-disable-line no-process-env
 
 module.exports = config;

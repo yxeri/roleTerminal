@@ -24,9 +24,10 @@ var ErrorCodes = {
 
 /**
  * Prints an error message to the log
- * @param code Object. Error code
- * @param text String. Error message
- * @param err Object. Error object
+ * @param {object} code Error code
+ * @param {string} text Error message
+ * @param {object} err Error object
+ * @returns {undefined} Returns undefined
  */
 function sendErrorMsg(code, text, err) {
   console.log('[ERROR]', code.text, text, '- Error:', err);
@@ -34,9 +35,10 @@ function sendErrorMsg(code, text, err) {
 
 /**
  * Sends an error message to the sent socket and prints it to the log
- * @param socket Object. SocketIO socket
- * @param code Object. Error code
- * @param text String. Error message
+ * @param {object} socket SocketIO socket
+ * @param {object) code Error code
+ * @param {object} text Error message
+ * @returns {undefined} Returns undefined
  */
 function sendSocketErrorMsg(socket, code, text) {
   socket.emit('message', { text : ['[' + code.num + '] ' + text] });

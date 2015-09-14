@@ -4,6 +4,7 @@ const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const dbDefaults = require('../../config/dbPopDefaults');
 const serverConfig = require('../../config/serverConfig');
+const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
 
 function handle(socket) {
@@ -349,8 +350,8 @@ function handle(socket) {
           return;
         }
 
-        while (historyMessages.length) {
-          socket.emit('multiMsg', historyMessages.splice(0, serverConfig.chunkLength));
+        while (historyMessages.length > 0) {
+          socket.emit('multiMsg', historyMessages.splice(0, appConfig.chunkLength));
         }
       });
     });

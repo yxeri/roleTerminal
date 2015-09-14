@@ -77,7 +77,7 @@ for (let i = 0; i < routesConfig.routes.length; i++) {
   app.use(route.sitePath, require(route.filePath)(app.io));
 }
 
-if(serverConfig.mode === 'dev') {
+if (serverConfig.mode === 'dev') {
   watchPrivate();
 }
 

@@ -1897,7 +1897,7 @@ var validCmds = {
   },
   updateuser : {
     func : function(phrases) {
-      if(phrases.length > 2) {
+      if (phrases.length > 2) {
         var data = {};
         data.user = phrases[0];
         data.field = phrases[1];
@@ -1930,7 +1930,7 @@ var validCmds = {
   },
   updatecommand : {
     func : function(phrases) {
-      if(phrases.length > 2) {
+      if (phrases.length > 2) {
         var data = {};
         data.cmdName = phrases[0];
         data.field = phrases[1];
@@ -1962,7 +1962,7 @@ var validCmds = {
   },
   updateroom : {
     func : function(phrases) {
-      if(phrases.length > 2) {
+      if (phrases.length > 2) {
         var data = {};
         data.room = phrases[0];
         data.field = phrases[1];
@@ -2135,7 +2135,7 @@ var validCmds = {
   },
   updatedevice : {
     func : function(phrases) {
-      if(phrases.length > 2) {
+      if (phrases.length > 2) {
         var data = {};
         data.deviceId = phrases[0];
         data.field = phrases[1];
@@ -2644,7 +2644,7 @@ function consumeCmdQueue() {
     var data = storedCmd.data;
     var cmdMsg = storedCmd.cmdMsg;
 
-    if(cmdMsg !== undefined) {
+    if (cmdMsg !== undefined) {
       platformCmds.queueMessage(cmdMsg);
     }
 

@@ -441,7 +441,7 @@ function handle(socket, io) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, user) {
-        if(err || user === null) {
+        if (err || user === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update user');
           return;
         }
@@ -451,7 +451,7 @@ function handle(socket, io) {
         });
       };
 
-      switch(field) {
+      switch (field) {
         case 'visibility':
           dbConnector.updateUserVisibility(userName, value, callback);
 

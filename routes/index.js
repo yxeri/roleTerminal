@@ -210,7 +210,7 @@ function handle(io) {
 
       dbConnector.updateDeviceSocketId(
         deviceId, socketId, user, function(err, device) {
-        if(err || device === null) {
+        if (err || device === null) {
           const errMsg = 'Failed to update device';
 
           console.log(errMsg, err);

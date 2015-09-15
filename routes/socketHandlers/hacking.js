@@ -17,7 +17,7 @@ function handle(socket) {
 
       dbConnector.getRoom(roomNameLower, function(err, room) {
         if (err || room === null || user.accessLevel < room.visibility) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Room is not hackable by you or doesn\'t exist');
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Room is not hackable by you or doesn\'t exist', err);
           socket.emit('commandFail');
           return;
         }
@@ -36,13 +36,14 @@ function handle(socket) {
 
         dbConnector.addRoomToUser(userName, roomName, function(err) {
           if (err) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to follow the room');
-          } else {
-            const room = { roomName : roomName };
-
-            socket.join(roomName);
-            socket.emit('follow', room);
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to follow the room', err);
+            return;
           }
+
+          const room = { roomName : roomName };
+
+          socket.join(roomName);
+          socket.emit('follow', room);
         });
       }
     });

@@ -70,19 +70,21 @@ function handle(io) {
           dbConnector.updateUserSocketId(user.userName, '', function(userErr, socketUser) {
             if (userErr || socketUser === null) {
               console.log('Failed to reset user socket ID', userErr);
-            } else {
-              dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
-                if (userOnlineErr || settedUser === null) {
-                  console.log('Failed to set last online');
-                } else {
-                  dbConnector.updateUserOnline(settedUser.userName, false, function(onlineErr, updatedUser) {
-                    if (onlineErr || updatedUser === null) {
-                      console.log('Failed to update online', onlineErr);
-                    }
-                  });
+              return;
+            }
+
+            dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
+              if (userOnlineErr || settedUser === null) {
+                console.log('Failed to set last online');
+                return;
+              }
+
+              dbConnector.updateUserOnline(settedUser.userName, false, function(onlineErr, updatedUser) {
+                if (onlineErr || updatedUser === null) {
+                  console.log('Failed to update online', onlineErr);
                 }
               });
-            }
+            });
           });
 
           console.log(socket.id, user.userName, 'has disconnected');
@@ -92,104 +94,110 @@ function handle(io) {
 
     //TODO This should be moved
     socket.on('locate', function(sentUserName) {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.locate.commandName, function(allowed, user) {
-        if (allowed) {
-          const locationData = {};
+      manager.userAllowedCommand(socket.id, dbDefaults.commands.locate.commandName, function(allowErr, allowed, user) {
+        if (allowErr || !allowed) {
+          return;
+        }
 
-          // Return all user locations
-          if (sentUserName === '*') {
-            dbConnector.getAllUserLocations(user, function(err, users) {
-              if (err || users === null) {
-                logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
-              } else {
-                for (let i = 0; i < users.length; i++) {
-                  const currentUser = users[i];
-                  const userName = currentUser.userName;
+        const locationData = {};
 
-                  if (users[i].position !== undefined) {
-                    locationData[userName] = createUserPosition(currentUser);
-                  }
-                }
+        // Return all user locations
+        if (sentUserName === '*') {
+          dbConnector.getAllUserLocations(user, function(err, users) {
+            if (err || users === null) {
+              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
+              return;
+            }
 
-                socket.emit('locationMsg', locationData);
+            for (let i = 0; i < users.length; i++) {
+              const currentUser = users[i];
+              const userName = currentUser.userName;
+
+              if (users[i].position !== undefined) {
+                locationData[userName] = createUserPosition(currentUser);
               }
-            });
-          } else {
-            dbConnector.getUserLocation(user, sentUserName, function(err, foundUser) {
-              if (err || foundUser === null) {
-                logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
-              } else if (foundUser.position !== undefined) {
-                const userName = foundUser.userName;
+            }
 
-                locationData[userName] = createUserPosition(foundUser);
+            socket.emit('locationMsg', locationData);
+          });
+        } else {
+          //TODO Refactor this
+          dbConnector.getUserLocation(user, sentUserName, function(err, foundUser) {
+            if (err || foundUser === null) {
+              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
+            } else if (foundUser.position !== undefined) {
+              const userName = foundUser.userName;
 
-                socket.emit('locationMsg', locationData);
-              } else {
-                logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Unable to locate ' + sentUserName);
-              }
-            });
-          }
+              locationData[userName] = createUserPosition(foundUser);
+
+              socket.emit('locationMsg', locationData);
+            } else {
+              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Unable to locate ' + sentUserName);
+            }
+          });
         }
       });
     });
 
     //TODO This should be moved
     socket.on('time', function() {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.time.commandName, function(allowed) {
-        if (allowed) {
-          socket.emit('time', new Date());
+      manager.userAllowedCommand(socket.id, dbDefaults.commands.time.commandName, function(allowErr, allowed) {
+        if (allowErr || !allowed) {
+          return;
         }
+
+        socket.emit('time', new Date());
       });
     });
 
     socket.on('weather', function() {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.weather.commandName, function(allowed) {
-        if (allowed) {
-          const lat = appConfig.gameLocation.lat;
-          const lon = appConfig.gameLocation.lon;
-          const hoursAllowed = [0, 4, 8, 12, 16, 20];
-          let url = '';
+      manager.userAllowedCommand(socket.id, dbDefaults.commands.weather.commandName, function(allowErr, allowed) {
+        if (allowErr, !allowed) {
+          return;
+        }
 
-          if (appConfig.gameLocation.country.toLowerCase() === 'sweden') {
-            url = 'http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/' +
-                  'version/1/geopoint/lat/' + lat + '/lon/' + lon + '/data.json';
-          }
+        const lat = appConfig.gameLocation.lat;
+        const lon = appConfig.gameLocation.lon;
+        const hoursAllowed = [0, 4, 8, 12, 16, 20];
+        let url = '';
 
-          http.get(url, function(resp) {
-            let body = '';
+        if (appConfig.gameLocation.country.toLowerCase() === 'sweden') {
+          url = 'http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/' +
+                'version/1/geopoint/lat/' + lat + '/lon/' + lon + '/data.json';
+        }
 
-            resp.on('data', function(chunk) {
-              body += chunk;
-            });
+        http.get(url, function(resp) {
+          let body = '';
 
-            resp.on('end', function() {
-              const response = JSON.parse(body);
-              const times = response.timeseries;
-              const now = new Date();
-              const report = [];
+          resp.on('data', function(chunk) {
+            body += chunk;
+          });
 
-              for (let i = 0; i < times.length; i++) {
-                const weatherRep = generateWeatherReport(times[i]);
+          resp.on('end', function() {
+            const response = JSON.parse(body);
+            const times = response.timeseries;
+            const now = new Date();
+            const report = [];
 
-                if (weatherRep.time > now && hoursAllowed.indexOf(
-                    weatherRep.time.getHours()) > -1) {
+            for (let i = 0; i < times.length; i++) {
+              const weatherRep = generateWeatherReport(times[i]);
+
+              if (weatherRep.time > now && hoursAllowed.indexOf(weatherRep.time.getHours()) > -1) {
+                report.push(weatherRep);
+              } else if (weatherRep.time < now && times[i + 1] && new Date(times[i + 1].validTime) > now) {
+                if (now.getMinutes() > 30) {
+                  report.push(generateWeatherReport(times[i + 1]));
+                } else {
                   report.push(weatherRep);
-                } else if (weatherRep.time < now && times[i + 1] &&
-                           new Date(times[i + 1].validTime) > now) {
-                  if (now.getMinutes() > 30) {
-                    report.push(generateWeatherReport(times[i + 1]));
-                  } else {
-                    report.push(weatherRep);
-                  }
                 }
               }
+            }
 
-              socket.emit('weather', report);
-            });
-          }).on('error', function(err) {
-            console.log('Failed to get weather status', err);
+            socket.emit('weather', report);
           });
-        }
+        }).on('error', function(err) {
+          console.log('Failed to get weather status', err);
+        });
       });
     });
 
@@ -205,58 +213,60 @@ function handle(io) {
 
       socket.join(deviceId + dbDefaults.device);
 
-      dbConnector.updateDeviceSocketId(
-        deviceId, socketId, user, function(err, device) {
-          if (err || device === null) {
-            const errMsg = 'Failed to update device';
+      dbConnector.updateDeviceSocketId(deviceId, socketId, user, function(err, device) {
+        if (err || device === null) {
+          console.log('Failed to update device', err);
+          return;
 
-            console.log(errMsg, err);
-          } else {
-            socket.emit('message', {
-              text : ['Device has been updated']
-            });
-          }
+        }
+
+        socket.emit('message', {
+          text : ['Device has been updated']
         });
+      });
     });
 
     //TODO This should be moved
     socket.on('updateDevice', function(data) {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.updatedevice.commandName, function(allowed) {
-        if (allowed) {
-          const deviceId = data.deviceId;
-          const field = data.field;
-          const value = data.value;
-          const callback = function(err, device) {
-            if (err || device === null) {
-              let errMsg = 'Failed to update device';
+      manager.userAllowedCommand(socket.id, dbDefaults.commands.updatedevice.commandName, function(allowErr, allowed) {
+        if (allowErr || !allowed) {
+          return;
+        }
 
-              if (err && err.code === 11000) {
-                errMsg += '. Alias already exists';
-              }
+        const deviceId = data.deviceId;
+        const field = data.field;
+        const value = data.value;
+        const callback = function(err, device) {
+          if (err || device === null) {
+            let errMsg = 'Failed to update device';
 
-              socket.emit('message', {
-                text : [errMsg]
-              });
-              console.log(errMsg, err);
-            } else {
-              socket.emit('message', {
-                text : ['Device has been updated']
-              });
+            if (err && err.code === 11000) {
+              errMsg += '. Alias already exists';
             }
-          };
 
-          switch (field) {
-            case 'alias':
-              dbConnector.updateDeviceAlias(deviceId, value, callback);
-
-              break;
-            default:
-              socket.emit('message', {
-                text : ['Invalid field. Device doesn\'t have ' + field]
-              });
-
-              break;
+            socket.emit('message', {
+              text : [errMsg]
+            });
+            console.log(errMsg, err);
+            return;
           }
+
+          socket.emit('message', {
+            text : ['Device has been updated']
+          });
+        };
+
+        switch (field) {
+          case 'alias':
+            dbConnector.updateDeviceAlias(deviceId, value, callback);
+
+            break;
+          default:
+            socket.emit('message', {
+              text : ['Invalid field. Device doesn\'t have ' + field]
+            });
+
+            break;
         }
       });
     });
@@ -270,54 +280,56 @@ function handle(io) {
             ]
           });
           socket.emit('commandFail');
-        } else {
-          socket.emit('message', {
-            text : [
-              'Device found in the database'
-            ]
-          });
-          socket.emit('commandSuccess', data);
+          return;
         }
+
+        socket.emit('message', {
+          text : [
+            'Device found in the database'
+          ]
+        });
+        socket.emit('commandSuccess', data);
       });
     });
 
     //TODO Sub-command?
     socket.on('listDevices', function() {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowed, user) {
-        if (!allowed) {
+      manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+        if (allowErr || !allowed) {
+          return;
+        } else if (user.accessLevel < 11) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.unauth, 'You are not allowed to list devices');
           return;
         }
-        if (user.accessLevel >= 11) {
-          dbConnector.getAllDevices(function(devErr, devices) {
-            if (devErr) {
-              logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all devices', devErr);
-            } else {
-              const allDevices = [];
 
-              if (devices.length > 0) {
-                for (let i = 0; i < devices.length; i++) {
-                  const device = devices[i];
-                  let deviceString = '';
+        dbConnector.getAllDevices(function(devErr, devices) {
+          if (devErr) {
+            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all devices', devErr);
+            return;
+          }
 
-                  deviceString += 'DeviceID: ' + device.deviceId + '\t';
+          const allDevices = [];
 
-                  if (device.alias !== device.deviceId) {
-                    deviceString += 'Alias: ' + device.alias + '\t';
-                  }
+          if (devices.length > 0) {
+            for (let i = 0; i < devices.length; i++) {
+              const device = devices[i];
+              let deviceString = '';
 
-                  deviceString += 'Last user: ' + device.lastUser;
-                  allDevices.push(deviceString);
-                }
+              deviceString += 'DeviceID: ' + device.deviceId + '\t';
 
-                socket.emit('message', {
-                  text : allDevices
-                });
+              if (device.alias !== device.deviceId) {
+                deviceString += 'Alias: ' + device.alias + '\t';
               }
+
+              deviceString += 'Last user: ' + device.lastUser;
+              allDevices.push(deviceString);
             }
-          });
-        } else {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.unauth, 'You are not allowed to list devices');
-        }
+
+            socket.emit('message', {
+              text : allDevices
+            });
+          }
+        });
       });
     });
   });

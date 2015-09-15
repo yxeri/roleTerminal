@@ -16,42 +16,45 @@ function handle(socket) {
             'Please try rebooting with "-reboot"'
           ]
         });
-      } else {
-        socket.emit('updateCommands', commands);
+        return;
       }
+
+      socket.emit('updateCommands', commands);
     });
   });
 
   socket.on('updateCommand', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.updatecommand.commandName, function(allowErr, allowed) {
-      if (allowed) {
-        const cmdName = data.cmdName;
-        const field = data.field;
-        const value = data.value;
-        const callback = function(err, command) {
-          if (err || command === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
-          } else {
-            socket.emit('message', { text : ['Command has been updated'] });
-            socket.emit('updateCommands', [command]);
-            socket.broadcast.emit('updateCommands', [command]);
-          }
-        };
-        switch (field) {
-          case 'visibility':
-            dbConnector.updateCommandVisibility(cmdName, value, callback);
+      if (allowErr || !allowed) {
+        return;
+      }
 
-            break;
-          case 'accesslevel':
-            dbConnector.updateCommandAccessLevel(cmdName, value, callback);
-
-            break;
-          default:
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' +
-                                                                          field);
-
-            break;
+      const cmdName = data.cmdName;
+      const field = data.field;
+      const value = data.value;
+      const callback = function(err, command) {
+        if (err || command === null) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
+        } else {
+          socket.emit('message', { text : ['Command has been updated'] });
+          socket.emit('updateCommands', [command]);
+          socket.broadcast.emit('updateCommands', [command]);
         }
+      };
+      switch (field) {
+        case 'visibility':
+          dbConnector.updateCommandVisibility(cmdName, value, callback);
+
+          break;
+        case 'accesslevel':
+          dbConnector.updateCommandAccessLevel(cmdName, value, callback);
+
+          break;
+        default:
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' +
+                                                                        field);
+
+          break;
       }
     });
   });

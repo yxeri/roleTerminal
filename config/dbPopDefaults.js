@@ -125,12 +125,6 @@ config.commands = {
     visibility : 9,
     category : 'advanced'
   },
-  enterroom : {
-    commandName : 'enterroom',
-    accessLevel : 1,
-    visibility : 1,
-    category : 'basic'
-  },
   follow : {
     commandName : 'follow',
     accessLevel : 1,

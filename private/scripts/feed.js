@@ -424,7 +424,7 @@ var validCmds = {
             'Instructions',
             '  You have to prepend commands with "' + cmdChars.join('" or "') +
             '" in chat mode. ' + 'Example: ' + cmdChars[0] +
-            'enterroom',
+            'follow',
             '  Add -help after a command to get instructions' +
             ' on how to use it. Example: ' + cmdChars[0] +
             'uploadkey -help',
@@ -605,54 +605,6 @@ var validCmds = {
     accessLevel : 13,
     clearAfterUse : true,
     category : 'admin'
-  },
-  enterroom : {
-    func : function(phrases) {
-      if (phrases.length > 0) {
-        var room = {};
-        var roomName = phrases[0].toLowerCase();
-        var oldRoomName = platformCmds.getLocalVal('room');
-        var password = '';
-
-        if (phrases.length > 1) {
-          password = phrases[1];
-        }
-
-        if (roomName) {
-          var oldRoom = { roomName : oldRoomName };
-
-          room.roomName = roomName;
-          room.password = password;
-          // Flag that will be used in .on function locally to
-          // show user they have entered
-          room.entered = true;
-
-          validCmds.clear.func();
-
-          if (oldRoomName !== roomName) {
-            socket.emit('unfollow', oldRoom);
-          }
-
-          socket.emit('follow', room);
-        }
-      } else {
-        platformCmds.queueMessage({
-          text : ['You have to specify which room to enter']
-        });
-      }
-    },
-    help : [
-      'Enters a chat room.',
-      'The room has to exist for you to enter it'
-    ],
-    instructions : [
-      ' Usage:',
-      '  enterroom *room name* *optional password*',
-      ' Example:',
-      '  enterroom sector5 banana'
-    ],
-    accessLevel : 13,
-    category : 'basic'
   },
   follow : {
     func : function(phrases) {
@@ -3385,7 +3337,7 @@ function startSocketListeners() {
 
         if (platformCmds.getLocalVal('room')) {
           var room = platformCmds.getLocalVal('room');
-          validCmds.enterroom.func([room]);
+          validCmds.follow.func([room]);
         }
       }
 

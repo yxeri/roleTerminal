@@ -3336,7 +3336,7 @@ function startSocketListeners() {
       if (mode) {
         platformCmds.getCommands().mode.func([mode]);
       } else {
-        platformCmds.getCommands().mode.func(['chat']);
+        platformCmds.getCommands().mode.func(['cmd']);
       }
 
       socket.emit('updateDeviceSocketId', {

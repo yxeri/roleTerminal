@@ -86,6 +86,7 @@ function handle(socket, io) {
       } else if (user === null) {
         socket.emit('disconnectUser');
         socket.join(dbDefaults.rooms.public.roomName);
+        return;
       }
 
       const data = {};

@@ -31,7 +31,8 @@ const userSchema = new mongoose.Schema({
   banned : { type : Boolean, default : false },
   online : { type : Boolean, default : false },
   registerDevice : String,
-  authGroups : [{ type : String, unique : true }]
+  authGroups : [{ type : String, unique : true }],
+  mode : String
 }, { collection : 'users' });
 const roomSchema = new mongoose.Schema({
   roomName : { type : String, unique : true },

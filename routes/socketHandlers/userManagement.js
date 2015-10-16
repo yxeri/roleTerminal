@@ -22,7 +22,8 @@ function handle(socket, io) {
         userName : userName,
         socketId : '',
         password : sentUser.password,
-        registerDevice : sentUser.registerDevice
+        registerDevice : sentUser.registerDevice,
+        mode : dbDefaults.modes.command
       };
 
       if (!appConfig.userVerify) {

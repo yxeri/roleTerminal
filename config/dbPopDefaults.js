@@ -326,4 +326,9 @@ config.commands = {
   }
 };
 
+config.modes = {
+  command : 'cmd',
+  chat : 'chat'
+};
+
 module.exports = config;

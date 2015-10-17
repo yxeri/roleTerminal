@@ -3337,7 +3337,7 @@ function startSocketListeners() {
 
         if (platformCmds.getLocalVal('room')) {
           var room = platformCmds.getLocalVal('room');
-          validCmds.follow.func([room]);
+          validCmds.room.func([room]);
         }
       }
 

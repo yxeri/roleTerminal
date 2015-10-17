@@ -265,7 +265,7 @@ config.commands = {
     authGroup : 'hackers'
   },
   switchroom : {
-    commandName : 'switchroom',
+    commandName : 'room',
     accessLevel : 1,
     visibility : 1,
     category : 'advanced'

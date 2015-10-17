@@ -1763,7 +1763,7 @@ var validCmds = {
     category : 'hacking',
     clearBeforeUse : true
   },
-  switchroom : {
+  room : {
     func : function(phrases) {
       if (phrases.length > 0) {
         var room = {};
@@ -1792,9 +1792,9 @@ var validCmds = {
     ],
     instructions : [
       ' Usage:',
-      '  switchroom *room you are following*',
+      '  room *room you are following*',
       ' Example:',
-      '  switchroom room1'
+      '  room room1'
     ],
     accessLevel : 13,
     category : 'advanced'

@@ -51,7 +51,6 @@
     "block-scoped-var": 2,
     "default-case": 2,
     "consistent-return": 2,
-    "complexity": [2, 3],
     "dot-notation": 2,
     "dot-location": [2, "object"],
     "guard-for-in": 2,

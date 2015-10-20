@@ -477,6 +477,24 @@ function handle(socket, io) {
       }
     });
   });
+
+  socket.on('updateMode', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.mode.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      const userName = user.userName;
+      const value = data;
+
+      dbConnector.updateUserMode(userName, value, function(err, user) {
+        if (err || user === null) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to store new user mode', err);
+          return;
+        }
+      });
+    });
+  });
 }
 
 exports.handle = handle;

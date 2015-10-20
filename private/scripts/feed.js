@@ -731,6 +731,8 @@ var validCmds = {
               ]
             });
           }
+
+          socket.emit('updateMode', newMode);
         } else if (newMode === 'cmd') {
           platformCmds.setMode(newMode);
 
@@ -747,6 +749,8 @@ var validCmds = {
               ]
             });
           }
+
+          socket.emit('updateMode', newMode);
         } else {
           platformCmds.queueMessage({
             text : [newMode + 'is not a valid mode']

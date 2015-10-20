@@ -489,6 +489,19 @@ function updateUserLocation(sentUserName, sentPosition, callback) {
   });
 }
 
+function updateUserMode(userName, mode, callback) {
+  const query = { userName : userName };
+  const update = { mode : mode };
+
+  User.findOneAndUpdate(query, update).lean().exec(function(err) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update mode', err);
+    }
+
+    callback(err);
+  });
+}
+
 function verifyUser(sentUserName, callback) {
   const query = { userName : sentUserName };
   const newVarupdate = { verified : true };
@@ -1085,6 +1098,7 @@ exports.updateUserOnline = updateUserOnline;
 exports.getUserByDevice = getUserByDevice;
 exports.getDevice = getDevice;
 exports.getAllDevices = getAllDevices;
+exports.updateUserMode = updateUserMode;
 
 //Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

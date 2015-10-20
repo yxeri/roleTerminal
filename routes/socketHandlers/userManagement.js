@@ -429,7 +429,7 @@ function handle(socket, io) {
   });
 
   socket.on('updateUser', function(data) {
-    dbConnector.userAllowedCommand(socket.id, dbDefaults.commands.updateuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.updateuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }

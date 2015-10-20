@@ -487,8 +487,8 @@ function handle(socket, io) {
       const userName = user.userName;
       const value = data;
 
-      dbConnector.updateUserMode(userName, value, function(err, user) {
-        if (err || user === null) {
+      dbConnector.updateUserMode(userName, value, function(err) {
+        if (err) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to store new user mode', err);
           return;
         }

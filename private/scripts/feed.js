@@ -3277,15 +3277,16 @@ function startSocketListeners() {
     });
 
     socket.on('login', function(user) {
-      validCmds.clear.func();
+      var mode = user.mode ? user.mode : 'cmd';
 
+      validCmds.clear.func();
       platformCmds.setUser(user.userName);
       platformCmds.setAccessLevel(user.accessLevel);
       platformCmds.queueMessage({
         text : ['Successfully logged in as ' + user.userName]
       });
       printWelcomeMsg();
-      platformCmds.getCommands().mode.func([user.mode]);
+      platformCmds.getCommands().mode.func([mode]);
 
       socket.emit('updateDeviceSocketId', {
         deviceId : platformCmds.getLocalVal('deviceId'),
@@ -3306,7 +3307,9 @@ function startSocketListeners() {
     });
 
     socket.on('reconnectSuccess', function(data) {
-      platformCmds.getCommands().mode.func([data.user.mode], false);
+      var mode = data.user.mode ? data.user.mode : 'cmd';
+
+      platformCmds.getCommands().mode.func([mode], false);
       platformCmds.setAccessLevel(data.user.accessLevel);
 
       socket.emit('updateDeviceSocketId', {

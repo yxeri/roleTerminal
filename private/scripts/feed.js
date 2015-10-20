@@ -712,9 +712,9 @@ var validCmds = {
         var newMode = phrases[0].toLowerCase();
         var cmdChars = platformCmds.getCommandChars();
 
+        //TODO Refactoring. Lots of duplicate code
         if (newMode === 'chat') {
-          platformCmds.setMode('chat');
-          platformCmds.setModeText('[CHAT]');
+          platformCmds.setMode(newMode);
 
           if (verbose === undefined || verbose) {
             platformCmds.queueMessage({
@@ -732,8 +732,7 @@ var validCmds = {
             });
           }
         } else if (newMode === 'cmd') {
-          platformCmds.setMode('cmd');
-          platformCmds.setModeText('[CMD]');
+          platformCmds.setMode(newMode);
 
           if (verbose === undefined || verbose) {
             platformCmds.queueMessage({
@@ -769,6 +768,7 @@ var validCmds = {
       commandChars.join('" or "') + '" ' +
       'Example: ' + commandChars[0] + 'uploadkey',
       '--Cmd mode--',
+      'Chat mode is the default mode',
       'Text written will not be automatically be intepreted as ' +
       'chat messages',
       'You have to use "msg" command to write messages ' +
@@ -3273,8 +3273,6 @@ function startSocketListeners() {
     });
 
     socket.on('login', function(user) {
-      var mode = platformCmds.getMode();
-
       validCmds.clear.func();
 
       platformCmds.setUser(user.userName);
@@ -3283,13 +3281,7 @@ function startSocketListeners() {
         text : ['Successfully logged in as ' + user.userName]
       });
       printWelcomeMsg();
-
-      //TODO Duplicate code
-      if (mode) {
-        platformCmds.getCommands().mode.func([mode]);
-      } else {
-        platformCmds.getCommands().mode.func(['cmd']);
-      }
+      platformCmds.getCommands().mode.func([user.mode]);
 
       socket.emit('updateDeviceSocketId', {
         deviceId : platformCmds.getLocalVal('deviceId'),
@@ -3310,15 +3302,7 @@ function startSocketListeners() {
     });
 
     socket.on('reconnectSuccess', function(data) {
-      var mode = platformCmds.getMode();
-
-      //TODO Duplicate code
-      if (mode) {
-        platformCmds.getCommands().mode.func([mode], false);
-      } else {
-        platformCmds.getCommands().mode.func(['cmd'], false);
-      }
-
+      platformCmds.getCommands().mode.func([data.user.mode], false);
       platformCmds.setAccessLevel(data.user.accessLevel);
 
       socket.emit('updateDeviceSocketId', {

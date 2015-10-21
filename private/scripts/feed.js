@@ -266,11 +266,12 @@ var platformCmds = {
   getFeed : function() {
     return mainFeed;
   },
-  // TODO: Change name to setModeText or similar
   setModeText : function(text) {
-    modeField.textContent = text;
+    modeField.textContent = '[' + text + ']';
   },
-  // TODO: Change name to setModeText or similar
+  clearModeText : function() {
+    modeField.textContent = '';
+  },
   getModeText : function() {
     return modeField.textContent; // String
   },
@@ -2714,6 +2715,12 @@ function specialKeyPress(event) {
           setLeftText(getLeftText(marker).slice(0, -1));
         }
 
+        if (getInputText().length === 1) {
+          platformCmds.clearModeText();
+        } else {
+          changeModeText();
+        }
+
         event.preventDefault();
 
         break;
@@ -2726,6 +2733,8 @@ function specialKeyPress(event) {
             cmdHelper.command === null) {
           autoComplete();
         }
+
+        changeModeText();
 
         event.preventDefault();
 
@@ -2885,6 +2894,7 @@ function specialKeyPress(event) {
 
         resetPrevCmdPointer();
         clearInput();
+        platformCmds.clearModeText();
 
         event.preventDefault();
 
@@ -2898,6 +2908,12 @@ function specialKeyPress(event) {
           setRightText(getRightText(marker).slice(1));
         } else {
           setMarkerText(' ');
+        }
+
+        if (getInputText().length === 0) {
+          platformCmds.clearModeText();
+        } else {
+          changeModeText();
         }
 
         event.preventDefault();
@@ -3017,6 +3033,7 @@ function keyPress(event) {
 
         if (textChar) {
           appendToLeftText(textChar);
+          changeModeText();
         }
 
         if (triggerAutoComplete(getLeftText(marker)) &&
@@ -3030,6 +3047,19 @@ function keyPress(event) {
     event.preventDefault();
   } else {
     event.preventDefault();
+  }
+}
+
+function changeModeText() {
+  var inputText = getInputText();
+  var mode = platformCmds.getMode();
+
+  //TODO msg command text in comparisonshould not be hard coded
+  if ((mode === 'chat' && platformCmds.getCommandChars().indexOf(inputText.charAt(0)) > -1)
+      || (mode === 'cmd' && trimSpace(inputText).split(' ')[0] !== 'msg')) {
+    platformCmds.setModeText('CMD');
+  } else {
+    platformCmds.setModeText('CHAT');
   }
 }
 

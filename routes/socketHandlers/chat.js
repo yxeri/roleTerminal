@@ -108,7 +108,8 @@ function handle(socket) {
       }
       dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
         if (err || room === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
+          logger.sendSocketErrorMsg(
+            socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
           return;
         }
 

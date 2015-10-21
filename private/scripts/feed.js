@@ -2195,7 +2195,7 @@ var validCmds = {
     accessLevel : 13,
     clearAfterUse : true,
     category : 'admin'
-  },
+  }
 };
 
 function getCmdHistory() {

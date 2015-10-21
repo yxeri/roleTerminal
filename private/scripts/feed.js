@@ -3051,15 +3051,17 @@ function keyPress(event) {
 }
 
 function changeModeText() {
-  var inputText = getInputText();
-  var mode = platformCmds.getMode();
+  if (platformCmds.getUser()) {
+      var inputText = getInputText();
+      var mode = platformCmds.getMode();
 
-  //TODO msg command text in comparisonshould not be hard coded
-  if ((mode === 'chat' && platformCmds.getCommandChars().indexOf(inputText.charAt(0)) > -1)
-      || (mode === 'cmd' && trimSpace(inputText).split(' ')[0] !== 'msg')) {
-    platformCmds.setModeText('CMD');
-  } else {
-    platformCmds.setModeText('CHAT');
+      //TODO msg command text in comparisonshould not be hard coded
+      if ((mode === 'chat' && platformCmds.getCommandChars().indexOf(inputText.charAt(0)) > -1)
+          || (mode === 'cmd' && trimSpace(inputText).split(' ')[0] !== 'msg')) {
+        platformCmds.setModeText('CMD');
+      } else {
+        platformCmds.setModeText('CHAT');
+      }
   }
 }
 

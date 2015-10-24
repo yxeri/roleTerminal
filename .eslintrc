@@ -5,7 +5,7 @@
   },
   "rules": {
     "block-scoped-var": 2,
-    "brace-style": [2, "1tbs"],
+    "brace-style": [2, "1tbs", { "allowSingleLine": false }],
     "camelcase": 1,
     "curly": 2,
     "eol-last": 2,
@@ -49,7 +49,6 @@
     "valid-typeof": 2,
     "no-unexpected-multiline": 2,
     "key-spacing": [2, {"beforeColon": true, "afterColon": true}],
-    "block-scoped-var": 2,
     "default-case": 2,
     "consistent-return": 2,
     "dot-notation": 2,
@@ -78,12 +77,14 @@
     "no-throw-literal": 2,
     "no-unused-expressions": 2,
     "vars-on-top": 2,
-    "yoda": 2,
+    "yoda": [2, "always"],
     "strict": [2, "global"],
     "no-shadow": 2,
     "no-undef": 2,
     "no-unused-vars": 2,
     "no-use-before-define": [2, "nofunc"],
+    "accessor-pairs": 2,
+    "consistent-return": 2
   },
   "ecmaFeatures": {
     "blockBindings": true,
@@ -101,7 +102,6 @@
     "no-var": 2,
     "object-shorthand": 2,
     "prefer-const": 2,
-    "prefer-template": 2,
-
+    "prefer-template": 2
   }
 }

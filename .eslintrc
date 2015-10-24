@@ -1,6 +1,7 @@
 {
   "env": {
-    "node": true
+    "node": true,
+    "browser": true
   },
   "rules": {
     "block-scoped-var": 2,

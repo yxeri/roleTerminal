@@ -388,14 +388,26 @@ function authUser(sentUserName, sentPassword, callback) {
   });
 }
 
-function addUser(user, callback) {
-  const newUser = new User(user);
-  const query = { userName : user.userName };
+function getUser(userName, callback) {
+  const query = { userName : userName };
+  const filter = { userName : 1 };
 
-  User.findOne(query).lean().exec(function(err, foundUser) {
+  User.findOne(query, filter).lean().exec(function(err, foundUser) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find user', err);
-    } else if (foundUser === null) {
+    }
+
+    callback(err, foundUser);
+  });
+}
+
+function addUser(user, callback) {
+  const newUser = new User(user);
+
+  getUser(user.userName, function(err, foundUser) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to check if user exists', err);
+    } else if (null === foundUser) {
       newUser.save(function(saveErr, saveUser) {
         if (saveErr) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save user', saveErr);
@@ -1099,6 +1111,7 @@ exports.getUserByDevice = getUserByDevice;
 exports.getDevice = getDevice;
 exports.getAllDevices = getAllDevices;
 exports.updateUserMode = updateUserMode;
+exports.getUser = getUser;
 
 //Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

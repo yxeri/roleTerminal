@@ -11,6 +11,37 @@ function isTextAllowed(text) {
 }
 
 function handle(socket, io) {
+  socket.on('userExists', function(user) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.register.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed || !user || !isTextAllowed(user.userName)) {
+        return;
+      }
+
+      dbConnector.getUser(user.userName, function(err, foundUser) {
+        if (err) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to check if user exists', err);
+          socket.emit('commandFail');
+
+          return;
+        } else if (null !== foundUser) {
+          socket.emit('message', {
+            text : [
+              'User with that name already exists'
+            ]
+          });
+          socket.emit('commandFail');
+
+          return;
+        }
+
+        const data = {};
+        data.freezeStep = true;
+
+        socket.emit('commandSuccess', data);
+      });
+    });
+  });
+
   socket.on('register', function(sentUser) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !sentUser || !isTextAllowed(sentUser.userName)) {
@@ -34,13 +65,15 @@ function handle(socket, io) {
       dbConnector.addUser(userObj, function(err, user) {
         if (err) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to register user', err);
+
           return;
-        } else if (user === null) {
+        } else if (null === user) {
           socket.emit('message', {
             text : [
               userName + ' already exists'
             ]
           });
+
           return;
         }
 

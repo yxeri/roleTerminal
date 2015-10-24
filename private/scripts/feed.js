@@ -693,21 +693,13 @@ var validCmds = {
           cmdHelper.data = data;
           cmdHelper.hideInput = true;
           hideInput(true);
-          queueMessage({
-            text : [
-              'Input a password and press enter',
-              'Your password won\'t appear on the screen as you type it',
-              'Don\'t use whitespaces in your password!',
-              'You can cancel out of the command by typing "exit" or "abort"'
-            ]
-          });
-          setInputStart('password');
+          socket.emit('userExists', cmdHelper.data);
         } else {
           resetCommand(true);
           queueMessage({
             text : [
               'Name has to be 3 to 6 characters long',
-              'The name can only contain letters and numbers (a-z, 0-9. Password can mix upper and lowercase)',
+              'The name can only contain letters and numbers (a-z, 0-9)',
               'Don\'t use whitespace in your name!',
               'e.g. register myname'
             ]
@@ -724,6 +716,18 @@ var validCmds = {
       }
     },
     steps : [
+      function() {
+        queueMessage({
+          text : [
+            'Input a password and press enter',
+            'Your password won\'t appear on the screen as you type it',
+            'Don\'t use whitespaces in your password!',
+            'You can cancel out of the command by typing "exit" or "abort"'
+          ]
+        });
+        setInputStart('password');
+        cmdHelper.onStep++;
+      },
       function(phrases) {
         var password = phrases ? phrases[0] : undefined;
 
@@ -738,7 +742,8 @@ var validCmds = {
         } else {
           queueMessage({
             text : [
-              'Password is too short. It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
+              'Password is too short!',
+              'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
               'Please, input a password and press enter'
             ]
           });
@@ -757,6 +762,7 @@ var validCmds = {
             ]
           });
           socket.emit('register', cmdHelper.data);
+          validCmds[cmdHelper.command].abortFunc();
           resetCommand(false);
         } else {
           queueMessage({
@@ -871,8 +877,8 @@ var validCmds = {
       } else {
         queueMessage({
           text : [
-            'You need to input a user name and password',
-            'Example: login bestname secretpassword'
+            'You need to input a user name',
+            'Example: login bestname '
           ]
         });
       }
@@ -883,9 +889,9 @@ var validCmds = {
     ],
     instructions : [
       ' Usage:',
-      '  login *user name* *password',
+      '  login *user name*',
       ' Example:',
-      '  login user11 banana'
+      '  login user11'
     ],
     clearAfterUse : true,
     accessLevel : 0,
@@ -3390,11 +3396,15 @@ function onLogin(user) {
 }
 
 function onCommandSuccess(data) {
-  cmdHelper.onStep++;
+  if (!data.freezeStep) {
+    cmdHelper.onStep++;
+  }
+
   validCmds[cmdHelper.command].steps[cmdHelper.onStep](data, socket);
 }
 
 function onCommandFail() {
+  validCmds[cmdHelper.command].abortFunc();
   resetCommand(true);
 }
 

@@ -193,7 +193,8 @@ var cmdHelper = {
   onStep : 0,
   command : null,
   keyboardBlocked : false,
-  data : null
+  data : null,
+  hideInput : false
 };
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
@@ -680,40 +681,40 @@ var validCmds = {
   },
   register : {
     func : function(phrases) {
-      var user = {};
+      var data = {};
       var userName;
-      var password;
-      var errorMsg = {
-        text : [
-          'Name has to be 3 to 6 characters long',
-          'Password has to be at least 4 characters',
-          'The name and password can only contain letters and numbers (a-z, 0-9. Password can mix upper and lowercase)',
-          'Don\'t use whitespace in your name or password!',
-          'e.g. register myname apple1'
-        ]
-      };
 
       if (null === getLocalVal('user')) {
-        if (1 < phrases.length) {
-          userName = phrases[0].toLowerCase();
-          password = phrases[1];
+        userName = phrases ? phrases[0] : undefined;
 
-          if (3 <= userName.length && 6 >= userName.length
-              && 4 <= password.length
-              && isTextAllowed(userName)
-              && isTextAllowed(password)
-          ) {
-            user.userName = userName;
-            user.registerDevice = getLocalVal('deviceId');
-            user.password = password;
-            socket.emit('register', user);
-          } else {
-            queueMessage(errorMsg);
-          }
+        if (userName && 3 <= userName.length && 6 >= userName.length && isTextAllowed(userName)) {
+          data.userName = userName;
+          data.registerDevice = getLocalVal('deviceId');
+          cmdHelper.data = data;
+          cmdHelper.hideInput = true;
+          hideInput(true);
+          queueMessage({
+            text : [
+              'Input a password and press enter',
+              'Your password won\'t appear on the screen as you type it',
+              'Don\'t use whitespaces in your password!',
+              'You can cancel out of the command by typing "exit" or "abort"'
+            ]
+          });
+          setInputStart('password');
         } else {
-          queueMessage(errorMsg);
+          resetCommand(true);
+          queueMessage({
+            text : [
+              'Name has to be 3 to 6 characters long',
+              'The name can only contain letters and numbers (a-z, 0-9. Password can mix upper and lowercase)',
+              'Don\'t use whitespace in your name!',
+              'e.g. register myname'
+            ]
+          });
         }
       } else {
+        resetCommand(true);
         queueMessage({
           text : [
             'You have already registered a user',
@@ -721,6 +722,55 @@ var validCmds = {
           ]
         });
       }
+    },
+    steps : [
+      function(phrases) {
+        var password = phrases ? phrases[0] : undefined;
+
+        if (phrases && 3 <= password.length && isTextAllowed(password)) {
+          cmdHelper.data.password = password;
+          queueMessage({
+            text : [
+              'Repeat your password one more time'
+            ]
+          });
+          cmdHelper.onStep++;
+        } else {
+          queueMessage({
+            text : [
+              'Password is too short. It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
+              'Please, input a password and press enter'
+            ]
+          });
+        }
+      },
+      function(phrases) {
+        var password = phrases ? phrases[0] : undefined;
+
+        if (password === cmdHelper.data.password) {
+          queueMessage({
+            text : [
+              'Congratulations, employee #' + Math.floor(Math.random() * 120503),
+              'Welcome to the Organica Oracle department',
+              'You may now login to the system',
+              'Have a productive day!'
+            ]
+          });
+          socket.emit('register', cmdHelper.data);
+          resetCommand(false);
+        } else {
+          queueMessage({
+            text : [
+              'Passwords don\'t match. Please try again',
+              'Input a password and press enter'
+            ]
+          });
+          cmdHelper.onStep--;
+        }
+      }
+    ],
+    abortFunc : function() {
+      hideInput(false);
     },
     help : [
       'Registers your user name on the server and connects it ' +
@@ -731,11 +781,10 @@ var validCmds = {
     ],
     instructions : [
       ' Usage:',
-      '  register *user name* *password*',
+      '  register *user name*',
       ' Example:',
-      '  register myname secure1'
+      '  register myname'
     ],
-    clearAfterUse : true,
     accessLevel : 0,
     category : 'login'
   },
@@ -913,8 +962,7 @@ var validCmds = {
           'Overriding locks..................DONE',
           'Connecting to entity database.....DONE',
           ' ',
-          'You can cancel out of the command by typing "exit" ' +
-          'or "abort"'
+          'You can cancel out of the command by typing "exit" or "abort"'
         ]
       });
       setInputStart('Enter encryption key');
@@ -2109,6 +2157,14 @@ var validCmds = {
   }
 };
 
+function hideInput(hide) {
+  if (hide) {
+    leftText.className += ' hide';
+  } else {
+    leftText.className = '';
+  }
+}
+
 function setLocalVal(name, item) {
   localStorage.setItem(name, item);
 }
@@ -2179,20 +2235,21 @@ function setInputStart(text) {
 }
 
 function resetCommand(aborted) {
-  var cmdObj = cmdHelper;
-
-  cmdObj.command = null;
-  cmdObj.onStep = 0;
-  cmdObj.maxSteps = 0;
-  cmdObj.keyboardBlocked = false;
-  cmdObj.data = null;
-  setInputStart(getLocalVal('room'));
+  var room = getLocalVal('room') ? getLocalVal('room') : 'RAZCMD';
 
   if (aborted) {
     queueMessage({
       text : ['Aborting command']
     });
   }
+
+  cmdHelper.command = null;
+  cmdHelper.onStep = 0;
+  cmdHelper.maxSteps = 0;
+  cmdHelper.keyboardBlocked = false;
+  cmdHelper.data = null;
+  cmdHelper.hideInput = false;
+  setInputStart(room);
 }
 
 function refreshApp() {
@@ -2772,13 +2829,13 @@ function specialKeyPress(event) {
 
               resetCommand(true);
             } else {
-              queueMessage({
-                text : [inputText]
-              });
+              if (!cmdHelper.hideInput) {
+                queueMessage({
+                  text : [inputText]
+                });
+              }
 
-              commands[cmdObj.command].steps[cmdObj.onStep](
-                phrases, socket
-              );
+              commands[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
             }
           } else {
             inputText = getInputText();
@@ -2817,15 +2874,11 @@ function specialKeyPress(event) {
                  */
                 if ('-help' === phrases[1]) {
                   if (command.help) {
-                    helpMsg.text =
-                      helpMsg.text.concat(command.help);
+                    helpMsg.text = helpMsg.text.concat(command.help);
                   }
 
                   if (command.instructions) {
-                    helpMsg.text =
-                      helpMsg.text.concat(
-                        command.instructions
-                      );
+                    helpMsg.text = helpMsg.text.concat(command.instructions);
                   }
 
                   if (0 < helpMsg.text.length) {

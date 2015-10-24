@@ -5,6 +5,61 @@
  * usage of var
  */
 
+var razLogo = {
+  text : [
+    ' ',
+    '   ####',
+    '###############',
+    ' #####  #########                                           ####',
+    '  ####     #######  ########     ###########    ####     ###########',
+    '  ####    ######      #######   ####   #####  ########    ####   #####',
+    '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
+    '  #########        ####    ####     ####   #####     ##############',
+    '  #### ######     ####     #####  ####     #######   ###  ########',
+    '  ####   ######  ##### #### #### ############  #######    ####   ###',
+    ' ######    #############    ################     ###      ####    #####',
+    '########     ########         ###                        ######      #####   ##',
+    '               ###########        ##                                    ###### ',
+    '                    ###############',
+    '                         #####   demos - warez - honey',
+    ' '
+  ],
+    extraClass : 'logo'
+};
+var logo = {
+  text : [
+    '                          ####',
+    '                ####    #########    ####',
+    '               ###########################',
+    '              #############################',
+    '            #######        ##   #  ##########',
+    '      ##########           ##    #  ###  ##########',
+    '     #########             #########   #   #########',
+    '       #####               ##     ########   #####',
+    '     #####                 ##     ##     ##########',
+    '     ####                  ##      ##     #   ######',
+    ' #######                   ##########     ##    ########',
+    '########      Organica     ##       ########     ########',
+    ' ######      Oracle        ##       #      #############',
+    '   ####     Operations     ##       #      ##     ####',
+    '   ####     Center         ##       #      ##    #####',
+    '   ####      Razor         ##       #      ###########',
+    '########      Edition      ##       #########    ########',
+    '########                   ##########      #    #########',
+    ' ########                  ##      ##     ## ###########',
+    '     #####                 ##      ##     ### #####',
+    '       #####               ##     ########   #####',
+    '      #######              ##########   #  ########',
+    '     ###########           ##    ##    # ###########',
+    '      #############        ##    #   #############',
+    '            ################################',
+    '              ############################',
+    '              #######  ##########  #######',
+    '                ###      ######      ###',
+    '                          ####'
+  ],
+    extraClass : 'logo'
+};
 // Timeout between print of rows (milliseconds)
 var rowTimeout = 40;
 /**
@@ -114,71 +169,6 @@ var morseCodes = {
   // Symbolizes space betwen words
   '#' : '#'
 };
-var razLogo = {
-  text : [
-    ' ',
-    '   ####',
-    '###############',
-    ' #####  #########                                     ' +
-    '      ####',
-    '  ####     #######  ########     ###########    ####  ' +
-    '   ###########',
-    '  ####    ######      #######   ####   #####  ########' +
-    '    ####   #####',
-    '  ####  ###         ####  ####        ####  ###    ###' +
-    '### ####   #####',
-    '  #########        ####    ####     ####   #####     #' +
-    '#############',
-    '  #### ######     ####     #####  ####     #######   #' +
-    '##  ########',
-    '  ####   ######  ##### #### #### ############  #######' +
-    '    ####   ###',
-    ' ######    #############    ################     ###  ' +
-    '    ####    #####',
-    '########     ########         ###                     ' +
-    '   ######      #####   ##',
-    '               ###########        ##                  ' +
-    '                  ###### ',
-    '                    ###############',
-    '                         #####   demos - warez - honey',
-    ' '
-  ],
-  extraClass : 'logo'
-};
-var logo = {
-  text : [
-    '                          ####',
-    '                ####    #########    ####',
-    '               ###########################',
-    '              #############################',
-    '            #######        ##   #  ##########',
-    '      ##########           ##    #  ###  ##########',
-    '     #########             #########   #   #########',
-    '       #####               ##     ########   #####',
-    '     #####                 ##     ##     ##########',
-    '     ####                  ##      ##     #   ######',
-    ' #######                   ##########     ##    ########',
-    '########      Organica     ##       ########     ########',
-    ' ######      Oracle        ##       #      #############',
-    '   ####     Operations     ##       #      ##     ####',
-    '   ####     Center         ##       #      ##    #####',
-    '   ####      Razor         ##       #      ###########',
-    '########      Edition      ##       #########    ########',
-    '########                   ##########      #    #########',
-    ' ########                  ##      ##     ## ###########',
-    '     #####                 ##      ##     ### #####',
-    '       #####               ##     ########   #####',
-    '      #######              ##########   #  ########',
-    '     ###########           ##    ##    # ###########',
-    '      #############        ##    #   #############',
-    '            ################################',
-    '              ############################',
-    '              #######  ##########  #######',
-    '                ###      ######      ###',
-    '                          ####'
-  ],
-  extraClass : 'logo'
-};
 /**
  * Stores everything related to the map area
  * The map area will be separated into grids
@@ -205,7 +195,6 @@ var cmdHelper = {
   keyboardBlocked : false,
   data : null
 };
-
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
  * for a longer period of time
@@ -217,7 +206,6 @@ var intervals = {
   printText : null,
   isScreenOff : null
 };
-
 var validCmds = {
   help : {
     func : function(phrases) {
@@ -265,7 +253,7 @@ var validCmds = {
         var hackingCmds = getCommands('hacking');
         var adminCmds = getCommands('admin');
 
-        if (getUser() === null) {
+        if (null === getUser()) {
           queueMessage({
             text : [
               '------------------------------------------------',
@@ -280,32 +268,32 @@ var validCmds = {
           });
         }
 
-        if (basicCmds.length > 1) {
+        if (1 < basicCmds.length) {
           queueMessage({
             text : basicCmds
           });
         }
 
-        if (advancedCmds.length > 1) {
+        if (1 < advancedCmds.length) {
           queueMessage({
             text : advancedCmds
           });
         }
 
-        if (hackingCmds.length > 1) {
+        if (1 < hackingCmds.length) {
           queueMessage({
             text : hackingCmds
           });
         }
 
-        if (adminCmds.length > 1) {
+        if (1 < adminCmds.length) {
           queueMessage({
             text : adminCmds
           });
         }
       }
 
-      if (phrases === undefined || phrases.length === 0) {
+      if (undefined === phrases || 0 === phrases.length) {
         queueMessage({
           text : [
             '--------',
@@ -351,7 +339,7 @@ var validCmds = {
   },
   clear : {
     func : function() {
-      while (mainFeed.childNodes.length > 1) {
+      while (1 < mainFeed.childNodes.length) {
         mainFeed.removeChild(mainFeed.lastChild);
       }
     },
@@ -381,7 +369,7 @@ var validCmds = {
     func : function(phrases) {
       var writtenMsg;
 
-      if (phrases && phrases.length > 0) {
+      if (phrases && 0 < phrases.length) {
         writtenMsg = phrases.join(' ');
 
         socket.emit('chatMsg', {
@@ -436,7 +424,7 @@ var validCmds = {
       function(phrases) {
         var phrase;
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           phrase = phrases.join(' ');
 
           cmdHelper.data.text.push('--- BROADCAST FROM: ' + phrase + ' ---');
@@ -457,13 +445,13 @@ var validCmds = {
         var phrase;
         var dataText;
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           phrase = phrases.join(' ');
 
           cmdHelper.data.text.push(phrase);
         } else {
           cmdHelper.data.text.push('--- END BROADCAST ---');
-          dataText = cmdHelper.data.text !== null ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
+          dataText = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
 
           cmdHelper.onStep++;
 
@@ -479,7 +467,7 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
+        if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
           socket.emit('broadcastMsg', cmdHelper.data);
           resetCommand();
         } else {
@@ -502,7 +490,7 @@ var validCmds = {
     func : function(phrases) {
       var room = {};
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         room.roomName = phrases[0].toLowerCase();
         room.password = phrases[1];
 
@@ -535,7 +523,7 @@ var validCmds = {
       var room = {};
       var roomName;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         roomName = phrases[0].toLowerCase();
 
         if (roomName === getLocalVal('room')) {
@@ -565,14 +553,14 @@ var validCmds = {
     func : function(phrases) {
       var listOption;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         listOption = phrases[0].toLowerCase();
 
-        if (listOption === 'rooms') {
+        if ('rooms' === listOption) {
           socket.emit('listRooms');
-        } else if (listOption === 'users') {
+        } else if ('users' === listOption) {
           socket.emit('listUsers');
-        } else if (listOption === 'devices') {
+        } else if ('devices' === listOption) {
           socket.emit('listDevices');
         } else {
           queueMessage({
@@ -609,11 +597,11 @@ var validCmds = {
       var newMode;
       var cmdChars = commandChars;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         newMode = phrases[0].toLowerCase();
 
         //TODO Refactoring. Lots of duplicate code
-        if (newMode === 'chat') {
+        if ('chat' === newMode) {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
@@ -633,7 +621,7 @@ var validCmds = {
           }
 
           socket.emit('updateMode', newMode);
-        } else if (newMode === 'cmd') {
+        } else if ('cmd' === newMode) {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
@@ -705,13 +693,13 @@ var validCmds = {
         ]
       };
 
-      if (getLocalVal('user') === null) {
-        if (phrases.length > 1) {
+      if (null === getLocalVal('user')) {
+        if (1 < phrases.length) {
           userName = phrases[0].toLowerCase();
           password = phrases[1];
 
-          if (userName.length >= 3 && userName.length <= 6
-              && password.length >= 4
+          if (3 <= userName.length && 6 >= userName.length
+              && 4 <= password.length
               && isTextAllowed(userName)
               && isTextAllowed(password)
           ) {
@@ -766,11 +754,11 @@ var validCmds = {
         ]
       };
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         roomName = phrases[0].toLowerCase();
         password = phrases[1];
 
-        if (roomName.length > 0 && roomName.length < 7
+        if (0 < roomName.length && 6 >= roomName.length
             && isTextAllowed(roomName)
             && isTextAllowed(password)
         ) {
@@ -819,14 +807,14 @@ var validCmds = {
     func : function(phrases) {
       var user = {};
 
-      if (getUser() !== null) {
+      if (null !== getUser()) {
         queueMessage({
           text : [
             'You are already logged in',
             'You have to be logged out to log in'
           ]
         });
-      } else if (phrases.length > 1) {
+      } else if (1 < phrases.length) {
         user.userName = phrases[0].toLowerCase();
         user.password = phrases[1];
 
@@ -873,7 +861,7 @@ var validCmds = {
             'You are not connected to the satellites'
           ]
         });
-      } else if (phrases.length > 0) {
+      } else if (0 < phrases.length) {
         userName = phrases[0].toLowerCase();
 
         socket.emit('locate', userName);
@@ -901,7 +889,7 @@ var validCmds = {
   },
   uploadkey : {
     func : function() {
-      var razLogoToPrint = razLogo !== null ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
+      var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
 
       // TODO: razLogo should be move to DB or other place
       queueMessage(razLogoToPrint);
@@ -949,7 +937,7 @@ var validCmds = {
       function(data) {
         var cmdObj = cmdHelper;
 
-        if (data.keyData !== null) {
+        if (null !== data.keyData) {
           if (data.keyData.reusable || !data.keyData.used) {
             queueMessage({
               text : ['Key has been verified. Proceeding']
@@ -993,13 +981,11 @@ var validCmds = {
         cmdObj.keyboardBlocked = true;
       },
       function(entity) {
-        if (entity !== null) {
+        if (null !== entity) {
           queueMessage({
             text : [
-              'Confirmed. Encryption key has been used on ' +
-              'the entity',
-              entity.entityName + ' now has ' +
-              (entity.keys.length + 1) + ' unlocks',
+              'Confirmed. Encryption key has been used on the entity',
+              entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
               'Thank you for using EHA'
             ]
           });
@@ -1017,10 +1003,8 @@ var validCmds = {
       }
     ],
     help : [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
-      'PRINTING INSTRUCTIONS',
-      'Allows you to input an encryption key and use it to unlock ' +
-      'an entity',
+      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
+      'Allows you to input an encryption key and use it to unlock an entity',
       'You can cancel out of the command by typing "exit" or "abort"'
     ],
     instructions : [
@@ -1041,8 +1025,7 @@ var validCmds = {
     },
     help : [
       'Clears the screen and retrieves chat messages from server',
-      'The amount you send with the command is the amount of messages ' +
-      'that will be returned from each room you follow'
+      'The amount you send with the command is the amount of messages that will be returned from each room you follow'
     ],
     instructions : [
       ' Usage:',
@@ -1064,7 +1047,7 @@ var validCmds = {
       var j;
       var morseCode;
 
-      if (phrases && phrases.length > 0) {
+      if (phrases && 0 < phrases.length) {
         filteredText = phrases.join(' ').toLowerCase();
 
         filteredText = filteredText.replace(/[åä]/g, 'a');
@@ -1082,7 +1065,7 @@ var validCmds = {
           morseCodeText += '   ';
         }
 
-        if (morseCodeText.length > 0) {
+        if (0 < morseCodeText.length) {
           socket.emit('morse', {
             morseCode : morseCodeText,
             local : local
@@ -1106,14 +1089,12 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases && phrases.length > 1) {
+      if (phrases && 1 < phrases.length) {
         data.oldPassword = phrases[0];
         data.newPassword = phrases[1];
         data.userName = getUser();
 
-        if (data.newPassword.length >= 4
-            && data.newPassword.length <= 10
-        ) {
+        if (4 <= data.newPassword.length) {
           socket.emit('changePassword', data);
         } else {
           queueMessage({
@@ -1169,10 +1150,10 @@ var validCmds = {
     func : function(phrases) {
       var userName;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         userName = phrases[0].toLowerCase();
 
-        if (userName === '*') {
+        if ('*' === userName) {
           socket.emit('verifyAllUsers');
         } else {
           socket.emit('verifyUser', userName);
@@ -1204,7 +1185,7 @@ var validCmds = {
     func : function(phrases) {
       var userName;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         userName = phrases[0].toLowerCase();
 
         socket.emit('ban', userName);
@@ -1229,7 +1210,7 @@ var validCmds = {
     func : function(phrases) {
       var userName;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         userName = phrases[0].toLowerCase();
 
         socket.emit('unban', userName);
@@ -1258,7 +1239,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 1) {
+      if (1 < phrases.length) {
         data.message = {};
         data.roomName = phrases[0].toLowerCase();
         data.message.text = [phrases.slice(1).join(' ')];
@@ -1291,10 +1272,10 @@ var validCmds = {
   hackroom : {
     func : function(phrases) {
       var data = {};
-      var razLogoToPrint = razLogo !== null ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
+      var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
       var i;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         data.roomName = phrases[0].toLowerCase();
         data.timesCracked = 0;
         data.timesRequired = 3;
@@ -1488,10 +1469,10 @@ var validCmds = {
       function(phrases) {
         var device;
 
-        if (phrases.length > 0) {
+        if (0 < phrases.length) {
           device = phrases[0];
 
-          if (device.length > 0) {
+          if (0 < device.length) {
             cmdHelper.data.device = device;
             queueMessage({
               text : ['Searching for device...']
@@ -1518,12 +1499,12 @@ var validCmds = {
         var phrase;
         var dataText;
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           phrase = phrases.join(' ');
 
           cmdHelper.data.text.push(phrase);
         } else {
-          dataText = cmdHelper.data.text !== null ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
+          dataText = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
 
           cmdHelper.onStep++;
 
@@ -1540,8 +1521,8 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases.length > 0) {
-          if (phrases[0].toLowerCase() === 'yes') {
+        if (0 < phrases.length) {
+          if ('yes' === phrases[0].toLowerCase()) {
             cmdHelper.onStep++;
 
             queueMessage({
@@ -1557,8 +1538,8 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases.length > 0) {
-          if (phrases[0].toLowerCase() === 'yes') {
+        if (0 < phrases.length) {
+          if ('yes' === phrases[0].toLowerCase()) {
             cmdHelper.data.morse = { local : true };
           }
 
@@ -1695,7 +1676,7 @@ var validCmds = {
       var room = {};
       var roomName;
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         roomName = phrases[0].toLowerCase();
 
         if (roomName) {
@@ -1732,7 +1713,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 0) {
+      if (0 < phrases.length) {
         data.roomName = phrases[0].toLowerCase();
         cmdHelper.data = data;
 
@@ -1754,7 +1735,7 @@ var validCmds = {
     },
     steps : [
       function(phrases) {
-        if (phrases[0].toLowerCase() === 'yes') {
+        if ('yes' === phrases[0].toLowerCase()) {
           socket.emit('removeRoom', cmdHelper.data.roomName);
         }
 
@@ -1780,7 +1761,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 2) {
+      if (2 < phrases.length) {
         data.user = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
@@ -1814,7 +1795,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 2) {
+      if (2 < phrases.length) {
         data.cmdName = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
@@ -1847,7 +1828,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 2) {
+      if (2 < phrases.length) {
         data.room = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
@@ -1901,10 +1882,11 @@ var validCmds = {
       function(phrases) {
         var keyObj = {};
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           keyObj.key = phrases[0];
 
-          if (phrases[1] && phrases[1].toLowerCase() === 'reusable') {
+          //TODO Remove hard coded reusable
+          if (phrases[1] && 'reusable' === phrases[1].toLowerCase()) {
             keyObj.reusable = true;
           }
 
@@ -1920,7 +1902,7 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases[0].toLowerCase() === 'yes') {
+        if ('yes' === phrases[0].toLowerCase()) {
           queueMessage({
             text : ['Uploading new keys...']
           });
@@ -1970,7 +1952,7 @@ var validCmds = {
       function(phrases) {
         var entityObj = {};
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           entityObj.entityName = phrases[0];
 
           cmdHelper.data.entities.push(entityObj);
@@ -1985,7 +1967,7 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases[0].toLowerCase() === 'yes') {
+        if ('yes' === phrases[0].toLowerCase()) {
           queueMessage({
             text : ['Uploading new entities...']
           });
@@ -2021,7 +2003,7 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
 
-      if (phrases.length > 2) {
+      if (2 < phrases.length) {
         data.deviceId = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
@@ -2082,13 +2064,13 @@ var validCmds = {
         var phrase;
         var text = [];
 
-        if (phrases.length > 0 && phrases[0] !== '') {
+        if (0 < phrases.length && '' !== phrases[0]) {
           phrase = phrases.join(' ');
 
           cmdHelper.data.text.push(phrase);
         } else {
           cmdHelper.data.text = text.concat(startText, cmdHelper.data.text);
-          text = cmdHelper.data.text !== null ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : [];
+          text = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : [];
 
           cmdHelper.onStep++;
 
@@ -2105,7 +2087,7 @@ var validCmds = {
         }
       },
       function(phrases) {
-        if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
+        if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
           cmdHelper.data.morse = { local : true };
           socket.emit('importantMsg', cmdHelper.data);
           resetCommand();
@@ -2228,7 +2210,7 @@ function queueCommand(command, data, cmdMsg) {
 function getCmdHistory() {
   var cmdHistory = getLocalVal('cmdHistory');
 
-  if (cmdHistory !== null) {
+  if (null !== cmdHistory) {
     return JSON.parse(getLocalVal('cmdHistory'));
   }
 
@@ -2236,8 +2218,7 @@ function getCmdHistory() {
 }
 
 function pushCmdHistory(cmd) {
-  var cmdHistory = getLocalVal('cmdHistory') !== null ?
-                   JSON.parse(getLocalVal('cmdHistory')) : [];
+  var cmdHistory = null !== getLocalVal('cmdHistory') ? JSON.parse(getLocalVal('cmdHistory')) : [];
 
   cmdHistory.push(cmd);
   setLocalVal('cmdHistory', JSON.stringify(cmdHistory));
@@ -2273,7 +2254,7 @@ function playMorse(morseCode) {
     });
   }
 
-  if (soundQueue.length === 0) {
+  if (0 === soundQueue.length) {
     soundTimeout = 0;
   }
 
@@ -2281,13 +2262,14 @@ function playMorse(morseCode) {
     shouldPlay = false;
     duration = 0;
 
-    if (morseCode[i] === '.') {
+    //TODO Hard coded
+    if ('.' === morseCode[i]) {
       duration = 50;
       shouldPlay = true;
-    } else if (morseCode[i] === '-') {
+    } else if ('-' === morseCode[i]) {
       duration = 150;
       shouldPlay = true;
-    } else if (morseCode[i] === '#') {
+    } else if ('#' === morseCode[i]) {
       duration = 50;
     } else {
       duration = 75;
@@ -2340,16 +2322,7 @@ function generateMap() {
 
   for (xGrid = 0; xGrid < mapHelper.xGridsMax; xGrid++) {
     currentChar = String.fromCharCode(letter.charCodeAt(0) + xGrid);
-
-    //TODO Remove ugly hack necessary for BBR specific map
-    if (currentChar === 'W') {
-      currentChar = 'X';
-    } else if (currentChar === 'X') {
-      currentChar = 'Y';
-    }
-
-    mapHelper.xGrids[currentChar] =
-      mapHelper.leftLong + parseFloat(mapHelper.xSize * xGrid);
+    mapHelper.xGrids[currentChar] = mapHelper.leftLong + parseFloat(mapHelper.xSize * xGrid);
   }
 
   for (yGrid = 0; yGrid < mapHelper.yGridsMax; yGrid++) {
@@ -2462,10 +2435,10 @@ function sendLocationData() {
     }
   }
 
-  if (getUser() !== null && positions.length > 0) {
+  if (null !== getUser() && 0 < positions.length) {
     mostAccuratePos = positions[positions.length - 1];
 
-    for (i = positions.length - 2; i >= 0; i--) {
+    for (i = positions.length - 2; 0 <= i; i--) {
       position = positions[i];
       accuracy = positions[i].coords.accuracy;
 
@@ -2492,11 +2465,13 @@ function sendLocationData() {
 function isScreenOff() {
   var now = (new Date()).getTime();
   var diff = now - lastScreenOff;
+  //TODO Hard coded
   var offBy = diff - 1000;
 
   lastScreenOff = now;
 
-  if (offBy > 10000) {
+  //TODO Hard coded
+  if (10000 < offBy) {
     onReconnect();
   }
 }
@@ -2507,21 +2482,20 @@ function isScreenOff() {
  * @returns {undefined} Returns nothing
  */
 function setIntervals() {
-  if (intervals.printText !== null) {
+  if (null !== intervals.printText) {
     clearInterval(intervals.printText);
   }
 
-  if (intervals.tracking !== null) {
+  if (null !== intervals.tracking) {
     clearTimeout(intervals.tracking);
   }
 
-  if (watchId !== null) {
+  if (null !== watchId) {
     navigator.geolocation.clearWatch(watchId);
   }
 
   // Prints messages from the queue
-  intervals.printText = setInterval(
-    consumeMsgQueue, printIntervalTime, msgQueue);
+  intervals.printText = setInterval(consumeMsgQueue, printIntervalTime, msgQueue);
 
   if (isTracking) {
     // Gets new geolocation data
@@ -2529,7 +2503,7 @@ function setIntervals() {
   }
 
   // Should not be recreated on focus
-  if (intervals.isScreenOff === null) {
+  if (null === intervals.isScreenOff) {
 
     /**
      * Checks time between when JS stopped and started working again
@@ -2613,8 +2587,7 @@ function clearInput() {
 }
 
 function triggerAutoComplete(text) {
-  if (text.charAt(text.length - 1) === ' ' &&
-      text.charAt(text.length - 2) === ' ') {
+  if (' ' === text.charAt(text.length - 1) && ' ' === text.charAt(text.length - 2)) {
     setLeftText(trimSpace(text));
 
     return true;
@@ -2633,7 +2606,7 @@ function consumeCmdQueue() {
   var data;
   var cmdMsg;
 
-  if (cmdQueue.length > 0) {
+  if (0 < cmdQueue.length) {
     storedCmd = cmdQueue.shift();
     command = storedCmd.command;
     data = storedCmd.data;
@@ -2679,11 +2652,10 @@ function autoComplete() {
    * It will not auto-complete flags
    * If chat mode and the command is prepended or normal mode
    */
-  if (phrases.length === 1 && partialCommand.length > 0
-      && (cmdChars.indexOf(sign) >= 0 || (getLocalVal('mode') === 'cmd') || getUser() === null)
-  ) {
+  if (1 === phrases.length && 0 < partialCommand.length
+      && (0 <= cmdChars.indexOf(sign) || ('cmd' === getLocalVal('mode')) || null === getUser())) {
     // Removes prepend sign
-    if (cmdChars.indexOf(sign) >= 0) {
+    if (0 <= cmdChars.indexOf(sign)) {
       partialCommand = partialCommand.slice(1);
     }
 
@@ -2709,10 +2681,10 @@ function autoComplete() {
       }
     }
 
-    if (matched.length === 1) {
+    if (1 === matched.length) {
       cmdIndex = cmdChars.indexOf(sign);
 
-      if (cmdIndex >= 0) {
+      if (0 <= cmdIndex) {
         newText += cmdChars[cmdIndex];
       }
 
@@ -2720,7 +2692,7 @@ function autoComplete() {
 
       clearInput();
       setLeftText(newText);
-    } else if (matched.length > 0) {
+    } else if (0 < matched.length) {
       matched.sort();
 
       for (cmdMatched = 0; cmdMatched < matched.length; cmdMatched++) {
@@ -2731,14 +2703,14 @@ function autoComplete() {
     }
 
     // No input? Show all available commands
-  } else if (partialCommand.length === 0) {
+  } else if (0 === partialCommand.length) {
     validCmds.help.func();
   }
 }
 
 // Needed for arrow and delete keys. They are not detected with keypress
 function specialKeyPress(event) {
-  var keyCode = (typeof event.which === 'number') ? event.which : event.keyCode;
+  var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
   var cmdHistory;
   var cmdObj = cmdHelper;
   var commands = validCmds;
@@ -2760,7 +2732,7 @@ function specialKeyPress(event) {
           setLeftText(getLeftText().slice(0, -1));
         }
 
-        if (getInputText().length === 1) {
+        if (1 === getInputText().length) {
           clearModeText();
         } else {
           changeModeText();
@@ -2774,8 +2746,7 @@ function specialKeyPress(event) {
       case 9:
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked &&
-            cmdHelper.command === null) {
+        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
           autoComplete();
         }
 
@@ -2789,11 +2760,12 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (!cmdObj.keyboardBlocked) {
-          if (cmdObj.command !== null) {
+          if (null !== cmdObj.command) {
             inputText = getInputText();
             phrases = trimSpace(inputText).split(' ');
 
-            if (phrases[0] === 'exit' || phrases[0] === 'abort') {
+            //TODO Hard coded
+            if ('exit' === phrases[0] || 'abort' === phrases[0]) {
               if (commands[cmdObj.command].abortFunc) {
                 commands[cmdObj.command].abortFunc();
               }
@@ -2812,13 +2784,13 @@ function specialKeyPress(event) {
             inputText = getInputText();
             phrases = trimSpace(inputText).split(' ');
 
-            if (phrases[0].length > 0) {
+            if (0 < phrases[0].length) {
               sign = phrases[0].charAt(0);
 
-              if (commandChars.indexOf(sign) >= 0) {
+              if (0 <= commandChars.indexOf(sign)) {
                 commandName = phrases[0].slice(1).toLowerCase();
                 command = commands[commandName];
-              } else if (getLocalVal('mode') === 'cmd' || user === null) {
+              } else if ('cmd' === getLocalVal('mode') || null === user) {
                 commandName = phrases[0].toLowerCase();
                 command = commands[commandName];
               }
@@ -2843,7 +2815,7 @@ function specialKeyPress(event) {
                  * Print the help and instruction parts of
                  * the command
                  */
-                if (phrases[1] === '-help') {
+                if ('-help' === phrases[1]) {
                   if (command.help) {
                     helpMsg.text =
                       helpMsg.text.concat(command.help);
@@ -2856,50 +2828,44 @@ function specialKeyPress(event) {
                       );
                   }
 
-                  if (helpMsg.text.length > 0) {
+                  if (0 < helpMsg.text.length) {
                     queueMessage(helpMsg);
                   }
                 } else {
                   if (command.steps) {
                     cmdObj.command = commandName;
-                    cmdObj.maxSteps =
-                      command.steps.length;
+                    cmdObj.maxSteps = command.steps.length;
                   }
 
                   if (command.clearBeforeUse) {
                     validCmds.clear.func();
                   }
 
-                  queueCommand(
-                    command.func, phrases.splice(1), cmdUsedMsg);
+                  queueCommand(command.func, phrases.splice(1), cmdUsedMsg);
                   startCmdQueue();
                 }
               /**
                * User is logged in and in chat mode
                */
-              } else if (user !== null && getLocalVal('mode') === 'chat' && phrases[0].length > 0) {
-                if (commandChars.indexOf(phrases[0].charAt(0)) < 0) {
+              } else if (null !== user && 'chat' === getLocalVal('mode') && 0 < phrases[0].length) {
+                if (0 > commandChars.indexOf(phrases[0].charAt(0))) {
                   queueCommand(commands.msg.func, phrases);
                   startCmdQueue();
 
                 /**
-                 * User input commandChar but didn\'t write
+                 * User input commandChar but didn't write
                  * a proper command
                  */
                 } else {
                   queueMessage({
-                    text : [
-                      phrases[0] + ': ' +
-                      commandFailText.text
-                    ]
+                    text : [phrases[0] + ': ' + commandFailText.text]
                   });
                 }
-              } else if (user === null) {
+              } else if (null === user) {
                 queueMessage({ text : [phrases.toString()] });
                 queueMessage({
                   text : [
-                    'You must register a new user or login ' +
-                    'with an existing user to gain access to more commands',
+                    'You must register a new user or login with an existing user to gain access to more commands',
                     'Use command register or login',
                     'e.g. register myname 1135',
                     'or login myname 1135'
@@ -2910,10 +2876,9 @@ function specialKeyPress(event) {
                  * Sent command was not found.
                  * Print the failed input
                  */
-              } else if (commandName.length > 0) {
+              } else if (0 < commandName.length) {
                 queueMessage({
-                  text : ['- ' + phrases[0] + ': ' +
-                          commandFailText.text]
+                  text : ['- ' + phrases[0] + ': ' + commandFailText.text]
                 });
               }
             }
@@ -2938,7 +2903,7 @@ function specialKeyPress(event) {
           setMarkerText(' ');
         }
 
-        if (getInputText().length === 0) {
+        if (0 === getInputText().length) {
           clearModeText();
         } else {
           changeModeText();
@@ -2998,9 +2963,8 @@ function specialKeyPress(event) {
 
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked &&
-            cmdHelper.command === null) {
-          if (previousCommandPointer > 0) {
+        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
+          if (0 < previousCommandPointer) {
             clearInput();
             previousCommandPointer--;
             appendToLeftText(cmdHistory[previousCommandPointer]);
@@ -3017,8 +2981,7 @@ function specialKeyPress(event) {
 
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked &&
-            cmdHelper.command === null) {
+        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
           if (previousCommandPointer < cmdHistory.length - 1) {
             clearInput();
             previousCommandPointer++;
@@ -3043,7 +3006,7 @@ function specialKeyPress(event) {
 }
 
 function keyPress(event) {
-  var keyCode = (typeof event.which === 'number') ? event.which : event.keyCode;
+  var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
   var textChar = String.fromCharCode(keyCode);
   //var markerParentsChildren = marker.parentElement.childNodes;
   //var markerLocation;
@@ -3063,7 +3026,7 @@ function keyPress(event) {
           changeModeText();
         }
 
-        if (triggerAutoComplete(getLeftText()) && cmdHelper.command === null) {
+        if (triggerAutoComplete(getLeftText()) && null === cmdHelper.command) {
           autoComplete();
         }
 
@@ -3081,9 +3044,9 @@ function changeModeText() {
   var mode = getMode();
 
   if (getUser() && !cmdHelper.command) {
-      //TODO msg command text in comparisonshould not be hard coded
-      if ((mode === 'chat' && commandChars.indexOf(inputText.charAt(0)) > -1)
-          || (mode === 'cmd' && trimSpace(inputText).split(' ')[0] !== 'msg')
+      //TODO msg command text in comparison should not be hard coded
+      if (('chat' === mode && -1 < commandChars.indexOf(inputText.charAt(0)))
+          || ('cmd' === mode && 'msg' !== trimSpace(inputText).split(' ')[0])
       ) {
         setModeText('CMD');
       } else {
@@ -3120,12 +3083,12 @@ function generateTimeStamp(date, full) {
     newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
 
-  minutes = (newDate.getMinutes() < 10 ? '0' : '') + newDate.getMinutes();
-  hours = (newDate.getHours() < 10 ? '0' : '') + newDate.getHours();
+  minutes = (10 > newDate.getMinutes() ? '0' : '') + newDate.getMinutes();
+  hours = (10 > newDate.getHours() ? '0' : '') + newDate.getHours();
 
   if (full) {
-    month = (newDate.getMonth() < 10 ? '0' : '') + newDate.getMonth();
-    day = (newDate.getDate() < 10 ? '0' : '') + newDate.getDate();
+    month = (10 > newDate.getMonth() ? '0' : '') + newDate.getMonth();
+    day = (10 > newDate.getDate() ? '0' : '') + newDate.getDate();
 
     return day + '/' + month + ' ' + hours + ':' + minutes + ' ';
   }
@@ -3141,8 +3104,7 @@ function generateFullText(sentText, message) {
     text += generateTimeStamp(message.time);
   }
   if (message.roomName) {
-    text += message.roomName !== getLocalVal('room') ?
-            '[' + message.roomName + '] ' : '';
+    text += message.roomName !== getLocalVal('room') ? '[' + message.roomName + '] ' : '';
   }
   if (message.user) {
     text += message.user + ': ';
@@ -3156,7 +3118,7 @@ function generateFullText(sentText, message) {
 function consumeMsgShortQueue() {
   var message;
 
-  if (shortMsgQueue.length > 0) {
+  if (0 < shortMsgQueue.length) {
     message = shortMsgQueue.shift();
 
     printRow(message);
@@ -3167,7 +3129,7 @@ function consumeMsgShortQueue() {
 
 // Prints messages from the queue
 function consumeMsgQueue(messageQueue) {
-  if (!printing && messageQueue.length > 0) {
+  if (!printing && 0 < messageQueue.length) {
     shortMsgQueue = messageQueue.splice(0, msgsPerQueue);
     printing = true;
     consumeMsgShortQueue();
@@ -3181,7 +3143,7 @@ function printRow(message) {
   var span;
   var textNode;
 
-  if (message.text.length > 0) {
+  if (0 < message.text.length) {
     text = message.text.shift();
     fullText = generateFullText(text, message);
 
@@ -3209,53 +3171,52 @@ function printRow(message) {
   }
 }
 
+//TODO Hard coded
 function convertWhisperRoom(roomName) {
-  var convertedRoom = roomName.indexOf('-whisper') >= 0 ? 'WHISPER' : roomName;
+  var convertedRoom = 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
 
   return convertedRoom;
 }
 
+//TODO Hard coded
 function convertDeviceRoom(roomName) {
-  var convertedRoom = roomName.indexOf('-device') >= 0 ? 'DEVICE' : roomName;
+  var convertedRoom = 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
 
   return convertedRoom;
 }
 
+//TODO Hard coded
 function convertImportantRoom(roomName) {
-  var convertedRoom = roomName === 'important' ? 'IMPRTNT' : roomName;
+  var convertedRoom = 'important' === roomName ? 'IMPRTNT' : roomName;
 
   return convertedRoom;
 }
 
+//TODO Hard coded
 function convertBroadcastRoom(roomName) {
-  var convertedRoom = roomName === 'broadcast' ? 'BRODCST' : roomName;
+  var convertedRoom = 'broadcast' === roomName ? 'BRODCST' : roomName;
 
   return convertedRoom;
 }
 
 function printWelcomeMsg() {
-  var logoToPrint = logo !== null ? JSON.parse(JSON.stringify(logo)) : { text : [''] };
-  var razLogoToPrint = razLogo !== null ? JSON.parse(JSON.stringify(razLogo)) : { text : [''] };
+  var logoToPrint = null !== logo ? JSON.parse(JSON.stringify(logo)) : { text : [''] };
+  var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : [''] };
 
   queueMessage(logoToPrint);
   queueMessage({
     text : [
       'Welcome, employee ' + getUser(),
-      'Did you know that you can auto-complete ' +
-      'commands by using ' +
-      'the tab button or writing double spaces?',
-      'Learn this valuable skill to increase ' +
-      'your productivity!',
+      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
+      'Learn this valuable skill to increase your productivity!',
       'May you have a productive day',
-      '## This terminal has been cracked by your friendly ' +
-      'Razor team. Enjoy! ##'
+      '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
     ]
   });
   queueMessage(razLogoToPrint);
   queueMessage({
     text : [
-      '## This terminal has been cracked by your friendly ' +
-      'Razor team. Enjoy! ##'
+      '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
     ]
   });
 }
@@ -3421,12 +3382,10 @@ function onDisconnectUser() {
   var currentUser = getLocalVal('user');
 
   // There is no saved local user. We don't need to print this
-  if (currentUser !== null) {
+  if (null !== currentUser) {
     queueMessage({
       text : [
-        'Didn\'t find user ' +
-        getLocalVal('user') +
-        ' in database',
+        'Didn\'t find user ' + getLocalVal('user') + ' in database',
         'Resetting local configuration'
       ]
     });
@@ -3466,20 +3425,20 @@ function onLocationMsg(locationData) {
       userLoc = locationData[user];
       latitude = userLoc.coords.latitude.toFixed(6);
       longitude = userLoc.coords.longitude.toFixed(6);
-      heading = userLoc.coords.heading !== null ? Math.round(userLoc.coords.heading) : null;
-      accuracy = userLoc.accuracy < 1000 ? Math.ceil(userLoc.accuracy) : 'BAD';
+      heading = null !== userLoc.coords.heading ? Math.round(userLoc.coords.heading) : null;
+      accuracy = 1000 > userLoc.accuracy ? Math.ceil(userLoc.accuracy) : 'BAD';
       mapLoc = locateOnMap(latitude, longitude);
 
       text += 'User: ' + user + '\t';
       text += 'Time: ' + generateTimeStamp(userLoc.locTime, true) + '\t';
       text += 'Location: ' + mapLoc + '\t';
 
-      if (mapLoc !== '---') {
+      if ('---' !== mapLoc) {
         text += 'Accuracy: ' + accuracy + ' meters\t';
 
         text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
 
-        if (heading !== null) {
+        if (null !== heading) {
           text += 'Heading: ' + heading + ' deg.';
         }
       }
@@ -3548,12 +3507,12 @@ function onWeather(report) {
     weatherInst = report[i];
     weatherString = '';
     time = new Date(weatherInst.time);
-    hours = time.getHours() > 9 ? time.getHours() : '0' + time.getHours();
-    day = time.getDate() > 9 ? time.getDate() : '0' + time.getDate();
-    month = time.getMonth() > 9 ? (time.getMonth() + 1) : '0' + (time.getMonth() + 1);
+    hours = 9 < time.getHours() ? time.getHours() : '0' + time.getHours();
+    day = 9 < time.getDate() ? time.getDate() : '0' + time.getDate();
+    month = 9 < time.getMonth() ? (time.getMonth() + 1) : '0' + (time.getMonth() + 1);
     temperature = Math.round(weatherInst.temperature);
     windSpeed = Math.round(weatherInst.gust);
-    precip = weatherInst.precipitation === 0 ? '0.1< ' : weatherInst.precipitation + 'mm ';
+    precip = 0 === weatherInst.precipitation ? '0.1< ' : weatherInst.precipitation + 'mm ';
 
     switch (weatherInst.precipType) {
       // No
@@ -3712,7 +3671,7 @@ function generateDeviceId() {
   var i;
   var randomVal;
 
-  for (i = 0; i < 15; i++) {
+  for (i = 0; 15 > i; i++) {
     randomVal = Math.random() * (randomLength - 1);
     deviceId += randomString[Math.round(randomVal)];
   }

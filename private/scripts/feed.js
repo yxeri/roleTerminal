@@ -860,7 +860,7 @@ var validCmds = {
   },
   login : {
     func : function(phrases) {
-      var user = {};
+      var data = {};
 
       if (null !== getUser()) {
         queueMessage({
@@ -869,11 +869,17 @@ var validCmds = {
             'You have to be logged out to log in'
           ]
         });
-      } else if (1 < phrases.length) {
-        user.userName = phrases[0].toLowerCase();
-        user.password = phrases[1];
-
-        socket.emit('login', user);
+      } else if (0 < phrases.length) {
+        data.userName = phrases[0].toLowerCase();
+        cmdHelper.data = data;
+        cmdHelper.hideInput = true;
+        queueMessage({
+          text : [
+            'Input your password'
+          ]
+        });
+        setInputStart('password');
+        hideInput(true);
       } else {
         queueMessage({
           text : [
@@ -882,6 +888,18 @@ var validCmds = {
           ]
         });
       }
+    },
+    steps : [
+      function(phrases) {
+        cmdHelper.data.password = phrases[0].toLowerCase();
+        socket.emit('login', cmdHelper.data);
+        validCmds[cmdHelper.command].abortFunc();
+        validCmds.clear.func();
+        resetCommand();
+      }
+    ],
+    abortFunc : function() {
+      hideInput(false);
     },
     help : [
       'Logs in as a user on this device',

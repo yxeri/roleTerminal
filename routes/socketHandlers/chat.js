@@ -19,7 +19,7 @@ function handle(socket) {
       newData.message.time = new Date();
 
       dbConnector.addMsgToHistory(roomName, newData.message, function(err, history) {
-        if (err || history === null) {
+        if (err || null === history) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
           return;
@@ -42,7 +42,7 @@ function handle(socket) {
           const whisperRoom = newData.message.user + dbDefaults.whisper;
 
           dbConnector.addMsgToHistory(whisperRoom, newData.message, function(histErr, foundHistory) {
-            if (histErr || foundHistory === null) {
+            if (histErr || null === foundHistory) {
               logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save whisper in senders history', histErr);
             }
           });
@@ -60,7 +60,7 @@ function handle(socket) {
       data.time = new Date();
 
       dbConnector.addMsgToHistory('broadcast', data, function(err, history) {
-        if (err || history === null) {
+        if (err || null === history) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
           return;
         }
@@ -107,7 +107,7 @@ function handle(socket) {
         data.password = '';
       }
       dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
-        if (err || room === null) {
+        if (err || null === room) {
           logger.sendSocketErrorMsg(
             socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
           return;
@@ -125,7 +125,7 @@ function handle(socket) {
             room.entered = true;
           }
 
-          if (socket.rooms.indexOf(roomName) < 0) {
+          if (0 > socket.rooms.indexOf(roomName)) {
             socket.broadcast.to(roomName).emit('chatMsg', {
               text : [
                 user.userName + ' is following ' + roomName
@@ -149,7 +149,7 @@ function handle(socket) {
 
       room.roomName = room.roomName.toLowerCase();
 
-      if (socket.rooms.indexOf(room.roomName) > 0) {
+      if (0 < socket.rooms.indexOf(room.roomName)) {
         socket.emit('follow', room);
       } else {
         socket.emit('message', {
@@ -167,7 +167,7 @@ function handle(socket) {
 
       const roomName = room.roomName.toLowerCase();
 
-      if (socket.rooms.indexOf(roomName) > -1) {
+      if (-1 < socket.rooms.indexOf(roomName)) {
         const userName = user.userName;
 
         /*
@@ -176,7 +176,7 @@ function handle(socket) {
          */
         if (roomName !== userName) {
           dbConnector.removeRoomFromUser(userName, roomName, function(err, removedUser) {
-            if (err || removedUser === null) {
+            if (err || null === removedUser) {
               logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to unfollow room', err);
               return;
             }
@@ -209,7 +209,7 @@ function handle(socket) {
           return;
         }
 
-        if (rooms.length > 0) {
+        if (0 < rooms.length) {
           let roomsString = '';
 
           for (let i = 0; i < rooms.length; i++) {
@@ -236,12 +236,12 @@ function handle(socket) {
       }
 
       dbConnector.getAllUsers(user, function(userErr, users) {
-        if (userErr || users === null) {
+        if (userErr || null === users) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all users', userErr);
           return;
         }
 
-        if (users.length > 0) {
+        if (0 < users.length) {
           let usersString = '';
           let onlineString = '';
 
@@ -288,7 +288,7 @@ function handle(socket) {
         dbDefaults.rooms.broadcast.roomName
       ];
 
-      return hiddenRooms.indexOf(room) >= 0;
+      return 0 <= hiddenRooms.indexOf(room);
     }
 
     manager.userAllowedCommand(socket.id, dbDefaults.commands.myrooms.commandName, function(allowErr, allowed, user) {
@@ -317,7 +317,7 @@ function handle(socket) {
       });
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
-        if (err || ownedRooms === null) {
+        if (err || null === ownedRooms) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get owned rooms', err);
           return;
         }
@@ -328,7 +328,7 @@ function handle(socket) {
           ownedRoomsString += ownedRooms[i].roomName + '\t';
         }
 
-        if (ownedRoomsString.length > 0) {
+        if (0 < ownedRoomsString.length) {
           socket.emit('message', {
             text : [
               'You are owner of the rooms:',
@@ -351,10 +351,11 @@ function handle(socket) {
       manager.getHistory(allRooms, lines, false, new Date(), function(histErr, historyMessages) {
         if (histErr) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to retrieve history', histErr);
+
           return;
         }
 
-        while (historyMessages.length > 0) {
+        while (0 < historyMessages.length) {
           socket.emit('multiMsg', historyMessages.splice(0, appConfig.chunkLength));
         }
       });
@@ -385,7 +386,7 @@ function handle(socket) {
       const roomNameLower = roomName.toLowerCase();
 
       dbConnector.removeRoom(roomNameLower, user, function(err, room) {
-        if (err || room == null) {
+        if (err || null === room) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
           return;
         }
@@ -407,7 +408,7 @@ function handle(socket) {
     };
     const historyFunc = function(roomName, sendFunc) {
       dbConnector.addMsgToHistory(roomName, data, function(err, history) {
-        if (err || history === null) {
+        if (err || null === history) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
           return;
         }
@@ -425,7 +426,7 @@ function handle(socket) {
 
       if (data.device) {
         dbConnector.getDevice(data.device, function(err, device) {
-          if (err || device === null) {
+          if (err || null === device) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message to the device', err);
             return;
           }
@@ -459,7 +460,7 @@ function handle(socket) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, room) {
-        if (err || room === null) {
+        if (err || null === room) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update room', err);
           return;
         }

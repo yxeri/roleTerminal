@@ -64,7 +64,7 @@ function userAllowedCommand(socketId, commandName, callback) {
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
   dbConnector.getHistoryFromRooms(rooms, function(err, history) {
-    const historyMessages = [];
+    let historyMessages = [];
 
     if (err || history === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history', err);

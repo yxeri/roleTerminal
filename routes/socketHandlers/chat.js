@@ -340,7 +340,7 @@ function handle(socket) {
     });
   });
 
-  socket.on('history', function(lines) {
+  socket.on('history', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.history.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -348,7 +348,7 @@ function handle(socket) {
 
       const allRooms = socket.rooms;
 
-      manager.getHistory(allRooms, lines, false, new Date(), function(histErr, historyMessages) {
+      manager.getHistory(allRooms, data.lines, false, new Date(), function(histErr, historyMessages) {
         if (histErr) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to retrieve history', histErr);
 

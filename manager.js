@@ -72,29 +72,23 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
       const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
       for (let i = 0; i < history.length; i++) {
-        const currentHistory = history[i];
+        historyMessages = historyMessages.concat(history[i].messages);
+      }
 
-        if (currentHistory.messages.length > 0) {
-          const messages = currentHistory.messages.slice(-maxLines);
-          const messageLength = messages.length - 1;
+      historyMessages.sort(messageSort);
+      historyMessages = historyMessages.slice(-maxLines);
 
-          for (let j = messageLength; j !== 0; j--) {
-            const message = messages[j];
+      if (missedMsgs) {
+        for (let i = historyMessages.length - 1; 0 < i; i--) {
+          const message = historyMessages[i];
 
-            /*
-             * Pushes all the messages from the room OR only the messages that the user hasn't already seen
-             */
-            if (!missedMsgs || (message !== undefined && lastOnline <= message.time)) {
-              message.roomName = currentHistory.roomName;
-              historyMessages.push(message);
-            }
+          if (lastOnline > message.time) {
+            historyMessages = historyMessages.slice(i + 1);
+
+            break;
           }
         }
       }
-
-      // Above loop pushes in everything in the reverse order.
-      historyMessages.reverse();
-      historyMessages.sort(messageSort);
     }
 
     callback(err, historyMessages);

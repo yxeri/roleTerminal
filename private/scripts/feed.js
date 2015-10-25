@@ -39,12 +39,12 @@ var logo = {
     '     #####                 ##     ##     ##########',
     '     ####                  ##      ##     #   ######',
     ' #######                   ##########     ##    ########',
-    '########      Organica     ##       ########     ########',
-    ' ######      Oracle        ##       #      #############',
-    '   ####     Operations     ##       #      ##     ####',
-    '   ####     Center         ##       #      ##    #####',
-    '   ####      Razor         ##       #      ###########',
-    '########      Edition      ##       #########    ########',
+    '########                   ##       ########     ########',
+    ' ######      Organica      ##       #      #############',
+    '   ####     Oracle         ##       #      ##     ####',
+    '   ####     Operations     ##       #      ##    #####',
+    '   ####      Center        ##       #      ###########',
+    '########                   ##       #########    ########',
     '########                   ##########      #    #########',
     ' ########                  ##      ##     ## ###########',
     '     #####                 ##      ##     ### #####',
@@ -301,19 +301,13 @@ var validCmds = {
             '  Help',
             '--------',
             'Instructions',
-            '  You have to prepend commands with "' + cmdChars.join('" or "') +
-            '" in chat mode. ' + 'Example: ' + cmdChars[0] +
-            'follow',
-            '  Add -help after a command to get instructions' +
-            ' on how to use it. Example: ' + cmdChars[0] +
+            '  Add -help after a command to get instructions on how to use it. Example: ' + cmdChars[0] +
             'uploadkey -help',
             'Shortcuts',
             '  Use page up/down to scroll the view',
             '  Press arrow up/down to go through your previous used commands',
-            '  Pressing tab or space twice will auto-complete any ' +
-            'command you have begun writing.',
-            '  Example: "he" and a tab / double space ' +
-            'will automatically turn into "help"'
+            '  Pressing tab or space twice will auto-complete any command you have begun writing.',
+            '  Example: "he" and a tab / double space will automatically turn into "help"'
           ]
         });
 
@@ -3546,9 +3540,10 @@ function onBan() {
 }
 
 function onLogout() {
-  validCmds.clear.func();
+    validCmds.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
+  printStartMessage();
 }
 
 function onUpdateCommands(commands) {
@@ -3762,6 +3757,25 @@ function generateDeviceId() {
   return deviceId;
 }
 
+function printStartMessage() {
+  var logoToPrint = null !== logo ? JSON.parse(JSON.stringify(logo)) : { text : ['']};
+  queueMessage(logoToPrint);
+  queueMessage({
+    text : [
+      '--------------------------------------------------',
+      'Connecting....Could not establish connection to HQ'.toUpperCase(),
+      'Rerouting....Secondary relay found'.toUpperCase(),
+      'Connecting....Connection established'.toUpperCase(),
+      '--------------------------------------------------',
+      'Welcome to the Oracle of Organica',
+      'Please login to start your productive day!',
+      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
+      'You can also use it to show all available commands!',
+      'Learn this valuable skill to increase your productivity!'
+    ]
+  });
+}
+
 // Sets everything relevant when a user enters the site
 function startBoot() {
   var background = document.getElementById('background');
@@ -3812,6 +3826,7 @@ function startBoot() {
   }
 
   if (!getUser()) {
+    printStartMessage();
     setInputStart('RAZCMD');
     socket.emit('updateDeviceSocketId', {
       deviceId : getLocalVal('deviceId'),

@@ -3336,10 +3336,12 @@ function onMultiMsg(messages) {
   for (i = 0; i < messages.length; i++) {
     message = messages[i];
 
-    message.roomName = convertWhisperRoom(message.roomName);
-    message.roomName = convertDeviceRoom(message.roomName);
-    message.roomName = convertImportantRoom(message.roomName);
-    message.roomName = convertBroadcastRoom(message.roomName);
+    if (message.roomName) {
+      message.roomName = convertWhisperRoom(message.roomName);
+      message.roomName = convertDeviceRoom(message.roomName);
+      message.roomName = convertImportantRoom(message.roomName);
+      message.roomName = convertBroadcastRoom(message.roomName);
+    }
 
     queueMessage(message);
   }

@@ -70,13 +70,13 @@ var msgsPerQueue = 3;
 /**
  * Queue of all the message objects that will be handled and printed
  */
-var msgQueue;
+var msgQueue = [];
 /**
  * Shorter queue of messages that will be processed this loop. Length is
  * based on msgsPerQueue variable
  */
-var shortMsgQueue;
-var cmdQueue;
+var shortMsgQueue = [];
+var cmdQueue = [];
 // True if messages are being processed and printed right now
 var printing = false;
 /**
@@ -115,7 +115,7 @@ var inputStart = document.getElementById('inputStart');
 var modeField = document.getElementById('mode');
 var spacer = document.getElementById('spacer');
 // Socket.io
-var socket;
+var socket = io(); // eslint-disable-line
 // Is geolocation tracking on?
 var isTracking = true;
 var positions = [];
@@ -129,6 +129,10 @@ var soundTimeout = 0;
 var previousCommandPointer;
 var commandTime = 1000;
 var commandUsed = false;
+var dot = '.';
+var dash = '-';
+var morseSeparator = '#';
+//TODO Convert to arrays with amounts pointing to either - or .
 var morseCodes = {
   'a' : '.-',
   'b' : '-...',
@@ -167,7 +171,7 @@ var morseCodes = {
   '9' : '----.',
   '0' : '-----',
   // Symbolizes space betwen words
-  '#' : '#'
+  '#' : morseSeparator
 };
 /**
  * Stores everything related to the map area
@@ -2344,13 +2348,13 @@ function playMorse(morseCode) {
     duration = 0;
 
     //TODO Hard coded
-    if ('.' === morseCode[i]) {
+    if (dot === morseCode[i]) {
       duration = 50;
       shouldPlay = true;
-    } else if ('-' === morseCode[i]) {
+    } else if (dash === morseCode[i]) {
       duration = 150;
       shouldPlay = true;
-    } else if ('#' === morseCode[i]) {
+    } else if (morseSeparator === morseCode[i]) {
       duration = 50;
     } else {
       duration = 75;
@@ -2422,8 +2426,8 @@ function locateOnMap(latitude, longitude) {
   var yGrid;
   var nextYGrid;
 
-  if (longitude >= mapHelper.leftLong && longitude <= mapHelper.rightLong &&
-      latitude <= mapHelper.topLat && latitude >= mapHelper.bottomLat) {
+  if (longitude >= mapHelper.leftLong && longitude <= mapHelper.rightLong
+      && latitude <= mapHelper.topLat && latitude >= mapHelper.bottomLat) {
 
     for (xGrid = 0; xGrid < xKeys.length; xGrid++) {
       nextXGrid = mapHelper.xGrids[xKeys[xGrid + 1]];
@@ -2431,8 +2435,7 @@ function locateOnMap(latitude, longitude) {
       if (longitude < nextXGrid) {
         x = xKeys[xGrid];
         break;
-      } else if (longitude ===
-                 (nextXGrid + parseFloat(mapHelper.xSize))) {
+      } else if (longitude === (nextXGrid + parseFloat(mapHelper.xSize))) {
         x = xKeys[xGrid + 1];
         break;
       }
@@ -2971,7 +2974,6 @@ function specialKeyPress(event) {
         break;
       // Delete
       case 46:
-
         // Remove character from marker and move it right
         if (getRightText()) {
           setMarkerText(getRightText()[0]);
@@ -2989,7 +2991,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       // Page up
       case 33:
         window.scrollBy(0, -window.innerHeight);
@@ -2997,7 +2998,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       //Page down
       case 34:
         window.scrollBy(0, window.innerHeight);
@@ -3005,7 +3005,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       // Left arrow
       case 37:
 
@@ -3019,7 +3018,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       // Right arrow
       case 39:
 
@@ -3033,7 +3031,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       // Up arrow
       case 38:
         cmdHistory = getCmdHistory();
@@ -3051,7 +3048,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-
       // Down arrow
       case 40:
         cmdHistory = getCmdHistory();
@@ -3085,17 +3081,8 @@ function specialKeyPress(event) {
 function keyPress(event) {
   var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
   var textChar = String.fromCharCode(keyCode);
-  //var markerParentsChildren = marker.parentElement.childNodes;
-  //var markerLocation;
 
   if (!keyPressed) {
-    //for (var i = 0; i < markerParentsChildren.length; i++) {
-    //  if (markerParentsChildren[i] === marker) {
-    //    markerLocation = i;
-    //    break;
-    //  }
-    //}
-
     switch (keyCode) {
       default:
         if (textChar) {
@@ -3180,9 +3167,11 @@ function generateFullText(sentText, message) {
   if (message.time && !message.skipTime) {
     text += generateTimeStamp(message.time);
   }
+
   if (message.roomName) {
     text += message.roomName !== getLocalVal('room') ? '[' + message.roomName + '] ' : '';
   }
+
   if (message.user) {
     text += message.user + ': ';
   }
@@ -3546,7 +3535,7 @@ function onBan() {
 }
 
 function onLogout() {
-    validCmds.clear.func();
+  validCmds.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
   printStartMessage();
@@ -3784,12 +3773,6 @@ function printStartMessage() {
 
 // Sets everything relevant when a user enters the site
 function startBoot() {
-  var background = document.getElementById('background');
-
-  msgQueue = [];
-  cmdQueue = [];
-  socket = io(); // eslint-disable-line
-
   socket.emit('getCommands');
 
   // TODO: Move this
@@ -3797,7 +3780,7 @@ function startBoot() {
     setLocalVal('deviceId', generateDeviceId());
   }
 
-  background.addEventListener('click', function(event) {
+  document.getElementById('background').addEventListener('click', function(event) {
     clicked = !clicked;
 
     if (clicked) {

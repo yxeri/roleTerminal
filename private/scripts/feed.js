@@ -2295,15 +2295,11 @@ function queueCommand(command, data, cmdMsg) {
 function getCmdHistory() {
   var cmdHistory = getLocalVal('cmdHistory');
 
-  if (null !== cmdHistory) {
-    return JSON.parse(getLocalVal('cmdHistory'));
-  }
-
-  return [];
+  return null !== cmdHistory ? JSON.parse(getLocalVal('cmdHistory')) : [];
 }
 
 function pushCmdHistory(cmd) {
-  var cmdHistory = null !== getLocalVal('cmdHistory') ? JSON.parse(getLocalVal('cmdHistory')) : [];
+  var cmdHistory = getCmdHistory();
 
   cmdHistory.push(cmd);
   setLocalVal('cmdHistory', JSON.stringify(cmdHistory));
@@ -2312,8 +2308,7 @@ function pushCmdHistory(cmd) {
 function resetPrevCmdPointer() {
   var cmdHistory = getCmdHistory();
 
-  previousCommandPointer =
-    cmdHistory ? cmdHistory.length : 0;
+  previousCommandPointer = cmdHistory ? cmdHistory.length : 0;
 }
 
 // Needed for Android 2.1. trim() is not supported
@@ -2509,8 +2504,6 @@ function sendLocationData() {
             'sent to scour the area'
           ], extraClass : 'importantMsg'
         });
-      } else {
-        console.log(err);
       }
     }, { enableHighAccuracy : true });
 
@@ -2642,8 +2635,7 @@ function setLeftText(text) {
 function appendToLeftText(text) {
   var textNode = document.createTextNode(text);
 
-  document.createTextNode(
-    marker.parentElement.childNodes[0].appendChild(textNode));
+  document.createTextNode(marker.parentElement.childNodes[0].appendChild(textNode));
 }
 
 function setRightText(text) {
@@ -2651,8 +2643,7 @@ function setRightText(text) {
 }
 
 function prependToRightText(sentText) {
-  marker.parentElement.childNodes[2].textContent =
-    sentText + marker.parentElement.childNodes[2].textContent;
+  marker.parentElement.childNodes[2].textContent = sentText + marker.parentElement.childNodes[2].textContent;
 }
 
 function setMarkerText(text) {
@@ -2792,6 +2783,40 @@ function autoComplete() {
   }
 }
 
+function printHelpMsg(command) {
+  var helpMsg = { text : [] };
+
+  if (command.help) {
+    helpMsg.text = helpMsg.text.concat(command.help);
+  }
+
+  if (command.instructions) {
+    helpMsg.text = helpMsg.text.concat(command.instructions);
+  }
+
+  if (0 < helpMsg.text.length) {
+    queueMessage(helpMsg);
+  }
+}
+
+function printUsedCmd(clearAfterUse, inputText) {
+  var cmdUsedMsg;
+
+  /**
+   * Print input if the command shouldn't clear
+   * after use
+   */
+  if (!clearAfterUse) {
+    cmdUsedMsg = {
+      text : [
+        getInputStart() + getModeText() + '$ ' + inputText
+      ]
+    };
+  }
+
+  return cmdUsedMsg;
+}
+
 // Needed for arrow and delete keys. They are not detected with keypress
 function specialKeyPress(event) {
   var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
@@ -2803,8 +2828,6 @@ function specialKeyPress(event) {
   var command = null;
   var commandName;
   var user = getUser();
-  var cmdUsedMsg;
-  var helpMsg = { text : [] };
   var sign;
 
   if (!keyPressed) {
@@ -2884,33 +2907,10 @@ function specialKeyPress(event) {
                 pushCmdHistory(phrases.join(' '));
 
                 /**
-                 * Print input if the command shouldn't clear
-                 * after use
-                 */
-                if (!command.clearAfterUse) {
-                  cmdUsedMsg = {
-                    text : [
-                      getInputStart() + getModeText() + '$ ' + inputText
-                    ]
-                  };
-                }
-
-                /**
-                 * Print the help and instruction parts of
-                 * the command
+                 * Print the help and instruction parts of the command
                  */
                 if ('-help' === phrases[1]) {
-                  if (command.help) {
-                    helpMsg.text = helpMsg.text.concat(command.help);
-                  }
-
-                  if (command.instructions) {
-                    helpMsg.text = helpMsg.text.concat(command.instructions);
-                  }
-
-                  if (0 < helpMsg.text.length) {
-                    queueMessage(helpMsg);
-                  }
+                  printHelpMsg(command);
                 } else {
                   if (command.steps) {
                     cmdObj.command = commandName;
@@ -2921,7 +2921,7 @@ function specialKeyPress(event) {
                     validCmds.clear.func();
                   }
 
-                  queueCommand(command.func, phrases.splice(1), cmdUsedMsg);
+                  queueCommand(command.func, phrases.splice(1), printUsedCmd(command.clearAfterUse, inputText));
                   startCmdQueue();
                 }
               /**

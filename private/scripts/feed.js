@@ -3140,6 +3140,7 @@ function generateTimeStamp(date, full) {
   var hours;
   var month;
   var day;
+  var timeStamp;
 
   // Splitting of date is a fix for NaN on Android 2.*
   if (isNaN(newDate.getMinutes)) {
@@ -3147,17 +3148,18 @@ function generateTimeStamp(date, full) {
     newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
 
-  minutes = (10 > newDate.getMinutes() ? '0' : '') + newDate.getMinutes();
-  hours = (10 > newDate.getHours() ? '0' : '') + newDate.getHours();
+  minutes = beautifyNumber(newDate.getMinutes());
+  hours = beautifyNumber(newDate.getHours());
+  timeStamp = hours + ':' + minutes + ' ';
 
   if (full) {
-    month = (10 > newDate.getMonth() ? '0' : '') + newDate.getMonth();
-    day = (10 > newDate.getDate() ? '0' : '') + newDate.getDate();
+    month = beautifyNumber(newDate.getMonth());
+    day = beautifyNumber(newDate.getDate());
 
-    return day + '/' + month + ' ' + hours + ':' + minutes + ' ';
+    timeStamp = day + '/' + month + ' ' + timeStamp;
   }
 
-  return hours + ':' + minutes + ' ';
+  return timeStamp;
 }
 
 // Adds time stamp and room name to a string from a message if they are set
@@ -3285,6 +3287,10 @@ function printWelcomeMsg() {
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
     ]
   });
+}
+
+function beautifyNumber(number) {
+  return 9 < number ? number : '0' + number;
 }
 
 function onChatMsg(message) {
@@ -3580,9 +3586,9 @@ function onWeather(report) {
     weatherInst = report[i];
     weatherString = '';
     time = new Date(weatherInst.time);
-    hours = 9 < time.getHours() ? time.getHours() : '0' + time.getHours();
-    day = 9 < time.getDate() ? time.getDate() : '0' + time.getDate();
-    month = 9 < time.getMonth() ? (time.getMonth() + 1) : '0' + (time.getMonth() + 1);
+    hours = beautifyNumber(time.getHours());
+    day = beautifyNumber(time.getDate());
+    month = beautifyNumber(time.getMonth());
     temperature = Math.round(weatherInst.temperature);
     windSpeed = Math.round(weatherInst.gust);
     precip = 0 === weatherInst.precipitation ? '0.1< ' : weatherInst.precipitation + 'mm ';

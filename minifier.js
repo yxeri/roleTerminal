@@ -49,6 +49,7 @@ function nodeMinify(inPath, outPath, minifierType) {
     type : minifierType,
     fileIn : inPath,
     fileOut : outPath,
+    options : ['--mangle', '--compress unsafe=true'],
     callback : function(err) {
       if (err) {
         logger.sendErrorMsg(logger.ErrorCodes.general, 'Minify error', err);

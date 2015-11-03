@@ -2175,11 +2175,17 @@ var validCmds = {
   }
 };
 
+function findOneAndReplace(text, find, replaceWith) {
+  return text.replace(new RegExp(find), replaceWith);
+}
+
 function hideInput(hide) {
+  var hideString = ' hide';
+
   if (hide) {
-    leftText.className += ' hide';
+    leftText.className += hideString;
   } else {
-    leftText.className = '';
+    leftText.className = findOneAndReplace(leftText.className, hideString, '');
   }
 }
 
@@ -2308,7 +2314,7 @@ function resetPrevCmdPointer() {
 
 // Needed for Android 2.1. trim() is not supported
 function trimSpace(sentText) {
-  return sentText.replace(/^\s+|\s+$/g, '');
+  return findOneAndReplace(sentText, /^\s+|\s+$/, '');
 }
 
 function setGain(value) {

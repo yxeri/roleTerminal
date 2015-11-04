@@ -45,7 +45,7 @@ function htmlMinify(inPath, outPath) {
  * @returns {undefined} Returns undefined
  */
 function nodeMinify(inPath, outPath, minifierType) {
-  new minifier.minify({
+  new minifier.minify({ // eslint-disable-line
     type : minifierType,
     fileIn : inPath,
     fileOut : outPath,
@@ -109,14 +109,14 @@ function minifyDir(inPath, outPath, extension) {
           if (path.extname(file).substr(1) === extension) {
             let type = '';
 
-            if (extension === 'html') {
+            if ('html' === extension) {
               htmlMinify(fullInPath, fullOutPath);
-            } else if (extension === 'js') {
-              type = serverConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
+            } else if ('js' === extension) {
+              type = 'dev' === serverConfig.mode ? 'no-compress' : 'uglifyjs';
 
               nodeMinify(fullInPath, fullOutPath, type);
-            } else if (extension === 'css') {
-              type = serverConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
+            } else if ('css' === extension) {
+              type = 'dev' === serverConfig.mode ? 'no-compress' : 'sqwish';
 
               nodeMinify(fullInPath, fullOutPath, type);
             }
@@ -137,14 +137,14 @@ function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
   let type = '';
 
-  if (extension === 'html') {
+  if ('html' === extension) {
     htmlMinify(filePath, outPath);
-  } else if (extension === 'js') {
-    type = serverConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
+  } else if ('js' === extension) {
+    type = 'dev' === serverConfig.mode ? 'no-compress' : 'uglifyjs';
 
     nodeMinify(filePath, outPath, type);
-  } else if (extension === 'css') {
-    type = serverConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
+  } else if ('css' === extension) {
+    type = 'dev' === serverConfig.mode ? 'no-compress' : 'sqwish';
 
     nodeMinify(filePath, outPath, type);
   }

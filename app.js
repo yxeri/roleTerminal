@@ -24,8 +24,8 @@ function watchPrivate() {
   fs.watch(serverConfig.privateBase, { persistant : true, recursive : true }, function(triggeredEvent, filePath) {
     const fullPath = path.join(serverConfig.privateBase, filePath);
 
-    if ((triggeredEvent === 'rename' || triggeredEvent === 'change') &&
-        path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0) {
+    if (('rename' === triggeredEvent || 'change' === triggeredEvent)
+        && '.tmp' !== path.extname(fullPath) && 0 > fullPath.indexOf('___')) {
       fs.readFile(fullPath, function(err) {
         if (err) {
           logger.sendErrorMsg(logger.ErrorCodes.general, 'fs.watch error. Automatic update of changed files disabled');
@@ -76,7 +76,7 @@ for (let i = 0; i < routesConfig.routes.length; i++) {
   app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
 }
 
-if (serverConfig.mode === 'dev') {
+if (serverConfig.watchDir) {
   watchPrivate();
 }
 

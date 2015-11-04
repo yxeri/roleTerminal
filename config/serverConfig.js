@@ -45,6 +45,13 @@ config.port = process.env.PORT || 8888;
 config.watchDir = process.env.WATCHDIR || false;
 
 /*
+ * Retrieve socket.io from local server or cdn
+ * Note! Android 2.2 fails when using cdn
+ */
+config.socketPath = 'cdn' === process.env.SOCKETPATH
+  ? 'https://cdn.socket.io/socket.io-1.3.5.js' : '/scripts/socket.io-1.3.5.js';
+
+/*
  * Server mode. Options:
  * prod, dev
  */

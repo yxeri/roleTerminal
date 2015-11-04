@@ -9,6 +9,7 @@ const commandManagement = require('./socketHandlers/commandManagement');
 const hacking = require('./socketHandlers/hacking');
 const manager = require('../manager');
 const appConfig = require('../config/appConfig');
+const serverConfig = require('../config/serverConfig');
 const http = require('http');
 const dbDefaults = require('../config/dbPopDefaults');
 const logger = require('../logger');
@@ -50,7 +51,7 @@ function createUserPosition(user) {
 
 function handle(io) {
   router.get('/', function(req, res) {
-    res.render('index', { title : 'Organica Oracle v4.0' });
+    res.render('index', { title : 'Organica Oracle v4.0', socketPath : serverConfig.socketPath });
   });
 
   io.on('connection', function(socket) {

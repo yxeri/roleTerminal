@@ -18,4 +18,6 @@ config.chunkLength = 10;
 
 config.userVerify = false;
 
+config.title = 'Organica Oracle v4.0';
+
 module.exports = config;

@@ -3354,9 +3354,7 @@ function onReconnect() {
     socket.disconnect();
     socket.connect({ forceNew : true });
 
-    if (user) {
-      socket.emit('updateId', { userName : user });
-    }
+    socket.emit('updateId', { userName : user });
   }
 }
 
@@ -3424,34 +3422,46 @@ function onCommandFail() {
 }
 
 function onReconnectSuccess(data) {
-  var mode = data.user.mode ? data.user.mode : 'cmd';
-  var room = getLocalVal('room');
+  var mode;
+  var room;
 
-  validCmds.mode.func([mode], false);
-  setAccessLevel(data.user.accessLevel);
+  if (!data.anonUser) {
+    mode = data.user.mode ? data.user.mode : 'cmd';
+    room = getLocalVal('room');
 
-  socket.emit('updateDeviceSocketId', {
-    deviceId : getLocalVal('deviceId'),
-    socketId : socket.id,
-    user : getUser()
-  });
+    validCmds.mode.func([mode], false);
+    setAccessLevel(data.user.accessLevel);
 
-  if (!data.firstConnection) {
+    socket.emit('updateDeviceSocketId', {
+      deviceId : getLocalVal('deviceId'),
+      socketId : socket.id,
+      user : getUser()
+    });
+
+    if (!data.firstConnection) {
+      queueMessage({
+        text : ['Re-established connection'],
+        extraClass : 'importantMsg'
+      });
+    } else {
+      printWelcomeMsg();
+
+      if (room) {
+        validCmds.room.func([room]);
+      }
+    }
+
     queueMessage({
-      text : ['Re-established connection'],
-      extraClass : 'importantMsg'
+      text : ['Retrieving missed messages (if any)']
     });
   } else {
-    printWelcomeMsg();
-
-    if (room) {
-      validCmds.room.func([room]);
+    if (!data.firstConnection) {
+      queueMessage({
+        text : ['Re-established connection'],
+        extraClass : 'importantMsg'
+      });
     }
   }
-
-  queueMessage({
-    text : ['Retrieving missed messages (if any)']
-  });
 
   reconnecting = false;
 }

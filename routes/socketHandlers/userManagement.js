@@ -114,36 +114,47 @@ function handle(socket, io) {
 
   //TODO Rename to reflect the function
   socket.on('updateId', function(sentObject) {
-    manager.updateUserSocketId(socket.id, sentObject.userName, function(idErr, user) {
-      if (idErr) {
-        return;
-      } else if (null === user) {
-        socket.emit('disconnectUser');
-        socket.join(dbDefaults.rooms.public.roomName);
-        return;
-      }
-
+    if (null === sentObject.userName) {
+      const publicRoom = dbDefaults.rooms.public.roomName;
       const data = {};
-      const allRooms = user.rooms;
 
+      data.anonUser = true;
       data.firstConnection = sentObject.firstConnection;
-      data.user = user;
 
-      manager.joinRooms(allRooms, socket, sentObject.device);
-
+      socket.join(publicRoom);
       socket.emit('reconnectSuccess', data);
-
-      manager.getHistory(allRooms, Infinity, true, user.lastOnline, function(histErr, missedMessages) {
-        if (histErr) {
+    } else {
+      manager.updateUserSocketId(socket.id, sentObject.userName, function(idErr, user) {
+        if (idErr) {
+          return;
+        } else if (null === user) {
+          socket.emit('disconnectUser');
+          socket.join(dbDefaults.rooms.public.roomName);
           return;
         }
 
-        while (missedMessages.length) {
-          socket.emit('multiMsg', missedMessages.splice(0, appConfig.chunkLength));
-        }
+        const data = {};
+        const allRooms = user.rooms;
 
+        data.firstConnection = sentObject.firstConnection;
+        data.user = user;
+
+        manager.joinRooms(allRooms, socket, sentObject.device);
+
+        socket.emit('reconnectSuccess', data);
+
+        manager.getHistory(allRooms, Infinity, true, user.lastOnline, function(histErr, missedMessages) {
+          if (histErr) {
+            return;
+          }
+
+          while (missedMessages.length) {
+            socket.emit('multiMsg', missedMessages.splice(0, appConfig.chunkLength));
+          }
+
+        });
       });
-    });
+    }
   });
 
   socket.on('updateLocation', function(position) {
@@ -459,6 +470,10 @@ function handle(socket, io) {
         socket.emit('message', { text : [usersString] });
       });
     });
+  });
+
+  socket.on('updateUserTeam', function(data) {
+
   });
 
   socket.on('updateUser', function(data) {

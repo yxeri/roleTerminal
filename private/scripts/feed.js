@@ -314,11 +314,9 @@ var validCmds = {
             '  Example: "he" and a tab / double space will automatically turn into "help"'
           ]
         });
-
-        getAll();
-      } else {
-        getAll();
       }
+
+      getAll();
     },
     help : [
       'Shows a list of available commands',

@@ -210,11 +210,11 @@ function handle(io) {
     socket.on('updateDeviceSocketId', function(data) {
       const deviceId = data.deviceId;
       const socketId = data.socketId;
-      const user = data.user;
+      const userName = data.userName;
 
       socket.join(deviceId + dbDefaults.device);
 
-      dbConnector.updateDeviceSocketId(deviceId, socketId, user, function(err, device) {
+      dbConnector.updateDeviceSocketId(deviceId, socketId, userName, function(err, device) {
         if (err || null === device) {
           console.log('Failed to update device', err);
           return;

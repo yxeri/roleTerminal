@@ -3406,7 +3406,7 @@ function onLogin(user) {
   socket.emit('updateDeviceSocketId', {
     deviceId : getLocalVal('deviceId'),
     socketId : socket.id,
-    user : getUser()
+    userName : getUser()
   });
 
   socket.emit('follow', { roomName : 'public', entered : true });

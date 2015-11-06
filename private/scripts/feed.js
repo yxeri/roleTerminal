@@ -3302,6 +3302,10 @@ function onChatMsg(message) {
 }
 
 function onMessage(message) {
+  if (message.roomName) {
+    message.roomName = convertWhisperRoom(message.roomName);
+  }
+
   queueMessage(message);
 }
 

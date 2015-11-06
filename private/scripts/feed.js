@@ -3174,8 +3174,8 @@ function generateFullText(sentText, message) {
     text += message.roomName !== getLocalVal('room') ? '[' + message.roomName + '] ' : '';
   }
 
-  if (message.user) {
-    text += message.user + ': ';
+  if (message.userName) {
+    text += message.userName + ': ';
   }
 
   text += sentText;

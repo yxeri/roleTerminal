@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
   banned : { type : Boolean, default : false },
   online : { type : Boolean, default : false },
   registerDevice : String,
+  team : String,
   authGroups : [{ type : String, unique : true }],
   mode : String
 }, { collection : 'users' });
@@ -46,7 +47,8 @@ const roomSchema = new mongoose.Schema({
   }],
   admins : [{ type : String, unique : true }],
   bannedUsers : [{ type : String, unique : true }],
-  owner : String
+  owner : String,
+  team : String
 }, { collection : 'rooms' });
 const historySchema = new mongoose.Schema({
   roomName : { type : String, unique : true },
@@ -75,6 +77,11 @@ const deviceSchema = new mongoose.Schema({
   alias : { type : String, unique : true },
   lastUser : String
 }, { collection : 'devices' });
+const teamSchema = new mongoose.Schema({
+  teamName : String,
+  password : String,
+  inviteOnly : Boolean
+}, { collection : 'teams' });
 
 // Blodsband specific schemas
 const entitySchema = new mongoose.Schema({
@@ -95,6 +102,7 @@ const History = mongoose.model('History', historySchema);
 const Command = mongoose.model('Command', commandSchema);
 const SchedEvent = mongoose.model('SchedEvent', schedEventSchema);
 const Device = mongoose.model('Device', deviceSchema);
+const Team = mongoose.model('Team', teamSchema);
 
 // Blodsband specific
 const Entity = mongoose.model('Entity', entitySchema);
@@ -119,6 +127,27 @@ function saveObject(object, objectName, callback) {
     }
 
     callback(saveErr, savedObj);
+  });
+}
+
+function updateUserTeam(userName, value, callback) {
+  const update = { team : value };
+
+  updateUserValue(userName, update, callback);
+}
+
+function addTeam(team, callback) {
+  const newTeam = new Team(team);
+  const query = { teamName : team.teamName };
+
+  Team.findOne(query).lean().exec(function(err, foundTeam) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find a team', err);
+    } else if (null === foundTeam) {
+      saveObject(newTeam, 'team', callback);
+    } else {
+      callback(err, null);
+    }
   });
 }
 

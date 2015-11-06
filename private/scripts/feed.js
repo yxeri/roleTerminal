@@ -3096,11 +3096,9 @@ function keyPress(event) {
 
         break;
     }
-
-    event.preventDefault();
-  } else {
-    event.preventDefault();
   }
+
+  event.preventDefault();
 }
 
 function changeModeText() {
@@ -3110,8 +3108,7 @@ function changeModeText() {
   if (getUser() && !cmdHelper.command) {
       //TODO msg command text in comparison should not be hard coded
       if (('chat' === mode && -1 < commandChars.indexOf(inputText.charAt(0)))
-          || ('cmd' === mode && 'msg' !== trimSpace(inputText).split(' ')[0])
-      ) {
+          || ('cmd' === mode && 'msg' !== trimSpace(inputText).split(' ')[0])) {
         setModeText('CMD');
       } else {
         setModeText('CHAT');

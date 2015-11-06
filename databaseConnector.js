@@ -55,7 +55,8 @@ const historySchema = new mongoose.Schema({
   messages : [{
     text : [String],
     time : Date,
-    user : String
+    userName : String,
+    roomName : String
   }]
 }, { collection : 'histories' });
 const commandSchema = new mongoose.Schema({

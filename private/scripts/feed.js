@@ -374,9 +374,9 @@ var validCmds = {
         socket.emit('chatMsg', {
           message : {
             text : [writtenMsg],
-            user : getUser()
-          },
-          roomName : getLocalVal('room')
+            userName : getUser(),
+            roomName : getLocalVal('room')
+          }
         });
       } else {
         queueMessage({
@@ -1311,9 +1311,9 @@ var validCmds = {
 
       if (1 < phrases.length) {
         data.message = {};
-        data.roomName = phrases[0].toLowerCase();
+        data.message.roomName = phrases[0].toLowerCase();
         data.message.text = [phrases.slice(1).join(' ')];
-        data.message.user = getUser();
+        data.message.userName = getUser();
         data.message.whisper = true;
 
         socket.emit('chatMsg', data);

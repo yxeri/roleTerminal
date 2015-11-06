@@ -5,6 +5,7 @@ const manager = require('../../manager');
 const dbDefaults = require('../../config/dbPopDefaults');
 const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
+const messenger = require('../../messenger');
 
 function handle(socket) {
   socket.on('chatMsg', function(data) {
@@ -13,41 +14,14 @@ function handle(socket) {
         return;
       }
 
-      const newData = data;
-      const roomName = newData.message.whisper ? newData.roomName + dbDefaults.whisper : newData.roomName;
+      data.message.time = new Date();
 
-      newData.message.time = new Date();
-
-      dbConnector.addMsgToHistory(roomName, newData.message, function(err, history) {
-        if (err || null === history) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
-          return;
-        }
-
-        const newMessage = newData.message;
-
-        newMessage.roomName = newData.roomName;
-
-        socket.broadcast.to(roomName).emit('chatMsg', newMessage);
-
-        if (!data.skipSelfMsg) {
-          socket.emit('message', newMessage);
-        }
-
-        /*
-         * Save the sent message in the sender's room history too, if it is a whisper
-         */
-        if (newData.message.whisper) {
-          const whisperRoom = newData.message.user + dbDefaults.whisper;
-
-          dbConnector.addMsgToHistory(whisperRoom, newData.message, function(histErr, foundHistory) {
-            if (histErr || null === foundHistory) {
-              logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save whisper in senders history', histErr);
-            }
-          });
-        }
-      });
+      if (data.message.whisper) {
+        data.message.roomName += dbDefaults.whisper;
+        messenger.sendWhisperMsg(socket, data.message);
+      } else {
+        messenger.sendChatMsg(socket, data.message, data.skipSelfMsg);
+      }
     });
   });
 

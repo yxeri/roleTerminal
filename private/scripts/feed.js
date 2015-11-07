@@ -240,8 +240,7 @@ var validCmds = {
           commandAccessLevel = command.accessLevel;
 
           if ((isNaN(commandAccessLevel) || getAccessLevel() >= commandAccessLevel)
-              && (group === undefined || command.category === group)
-          ) {
+              && (group === undefined || command.category === group)) {
             msg += keys[i];
 
             commandStrings.push(msg);
@@ -809,10 +808,7 @@ var validCmds = {
         roomName = phrases[0].toLowerCase();
         password = phrases[1];
 
-        if (0 < roomName.length && 6 >= roomName.length
-            && isTextAllowed(roomName)
-            && isTextAllowed(password)
-        ) {
+        if (0 < roomName.length && 6 >= roomName.length && isTextAllowed(roomName) && isTextAllowed(password)) {
           room.roomName = roomName;
           room.password = password;
           room.owner = getUser();
@@ -2739,8 +2735,7 @@ function autoComplete() {
         commandAccessLevel = validCmds[commands[i]].accessLevel;
 
         if ((isNaN(commandAccessLevel) || getAccessLevel() >= commandAccessLevel)
-            && partialCommand.charAt(j) === commands[i].charAt(j)
-        ) {
+            && partialCommand.charAt(j) === commands[i].charAt(j)) {
           matches = true;
         } else {
           matches = false;

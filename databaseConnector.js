@@ -80,8 +80,8 @@ const deviceSchema = new mongoose.Schema({
 }, { collection : 'devices' });
 const teamSchema = new mongoose.Schema({
   teamName : String,
-  password : String,
-  inviteOnly : Boolean
+  owner : String,
+  admins : [{type : String, unique : true}]
 }, { collection : 'teams' });
 
 // Blodsband specific schemas
@@ -554,6 +554,19 @@ function getAllDevices(callback) {
     }
 
     callback(err, devices);
+  });
+}
+
+function getTeam(teamName, callback) {
+  const query = { teamName : teamName };
+  const filter = { _id : 0 };
+
+  Team.findOne(query, filter).lean().exec(function(err, team) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get team', err);
+    }
+
+    callback(err, team);
   });
 }
 
@@ -1095,6 +1108,7 @@ exports.updateUserMode = updateUserMode;
 exports.getUser = getUser;
 exports.updateUserTeam = updateUserTeam;
 exports.addTeam = addTeam;
+exports.getTeam = getTeam;
 
 //Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

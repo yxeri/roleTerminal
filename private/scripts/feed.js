@@ -2170,6 +2170,54 @@ var validCmds = {
     accessLevel : 13,
     clearAfterUse : true,
     category : 'admin'
+  },
+  createteam : {
+    func : function(phrases) {
+      var teamName = phrases[0];
+      var data = {};
+      var team = {};
+
+      if (teamName) {
+        team.teamName = teamName;
+        team.owner = getUser();
+        data.team = team;
+
+        socket.emit('createTeam', data);
+      } else {
+        queueMessage({
+          text : ['You have to enter a name']
+        });
+      }
+    },
+    help : [],
+    instructions : [
+
+    ],
+    accessLevel : 13,
+    category : 'basic'
+  },
+  inviteteam : {
+    func : function(phrases) {
+      var data = {};
+      var userName = phrases[0];
+
+      if (userName) {
+        data.userName = userName;
+        socket.emit('inviteToTeam', data);
+      } else {
+        queueMessage({
+          text : [
+            'You are not allowed to invite members to the team or you are not in a team'
+          ]
+        });
+      }
+    },
+    help : [],
+    instructions : [
+
+    ],
+    accessLevel : 13,
+    category : 'basic'
   }
 };
 
@@ -2232,6 +2280,15 @@ function getUser() {
 function setUser(user) {
   setLocalVal('user', user);
 }
+
+function getTeam() {
+  return getLocalVal('team');
+}
+
+function setTeam(team) {
+  setLocalVal('team', team);
+}
+
 function setModeText(text) {
   modeField.textContent = '[' + text + ']';
 }

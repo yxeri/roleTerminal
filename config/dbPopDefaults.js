@@ -323,6 +323,18 @@ config.commands = {
     accessLevel : 11,
     visibility : 11,
     category : 'admin'
+  },
+  inviteteam : {
+    commandName : 'inviteteam',
+    accessLevel : 1,
+    visibility : 1,
+    category : 'admin'
+  },
+  createteam : {
+    commandName : 'createteam',
+    accessLevel : 1,
+    visibility : 1,
+    category : 'admin'
   }
 };
 

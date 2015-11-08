@@ -6,6 +6,7 @@ const chat = require('./socketHandlers/chat');
 const userManagement = require('./socketHandlers/userManagement');
 const dbConnector = require('../databaseConnector');
 const commandManagement = require('./socketHandlers/commandManagement');
+const team = require('./socketHandlers/team');
 const hacking = require('./socketHandlers/hacking');
 const manager = require('../manager');
 const appConfig = require('../config/appConfig');
@@ -58,6 +59,7 @@ function handle(io) {
     userManagement.handle(socket, io);
     chat.handle(socket, io);
     commandManagement.handle(socket, io);
+    team.handle(socket, io);
     hacking.handle(socket, io);
     blodsband.handle(socket, io);
 

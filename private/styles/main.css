@@ -1,3 +1,17 @@
+/*
+Red
+color: #ff0000;
+background-color: #1e1211;
+
+Green
+color: #00FF00;
+background-color: #151e15;
+
+Blue
+color: #0000ff;
+background-color: #14131e;
+*/
+
 html {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -11,7 +25,7 @@ body {
     color: #00FF00;
     background-color: #151e15;
     font-family: monospace;
-    font-size: 1em;
+    font-size: 1.2em;
     letter-spacing: .05em;
     white-space: pre-wrap;
     overflow: hidden;
@@ -28,11 +42,16 @@ ul {
 
 li {
     word-wrap: break-word;
+    padding: 0 .5em 0 .5em;
 }
 
 pre {
     padding: 0;
     margin: 0;
+}
+
+#input {
+    padding: 0 .5em 0 .5em;
 }
 
 #marker {
@@ -53,11 +72,6 @@ pre {
     outline: 0;
 }
 
-.blinkAnim {
-    -webkit-animation: blinking 1s step-end infinite;
-    animation: blinking 1s step-end infinite;
-}
-
 #mode {
     margin-right: .7em;
 }
@@ -66,22 +80,17 @@ pre {
     content: '$';
 }
 
-#map {
-    border: dotted 1px;
-}
-
-#map td {
-    margin: 0;
-    padding: .5em;
-    border: dotted 1px;
-}
-
 #mainFeed li span {
     margin-right: .5em;
 }
 
 #mainFeed li span:last-child {
     margin: 0;
+}
+
+#hiddenInput {
+    visibility: hidden;
+    border: 0;
 }
 
 .logo {
@@ -94,12 +103,12 @@ pre {
 
 .importantMsg {
     line-height: 1.1;
-    background-color: #00FF00;
     color: black;
     font-size: 1.2em;
     text-transform: uppercase;
     font-weight: bold;
     text-align: center;
+    margin: 0 -.5em 0 -.5em;
 }
 
 .large {
@@ -110,17 +119,20 @@ pre {
     font-weight: bold;
 }
 
-.feed {
-    padding-left: .5em;
-    padding-right: .5em;
-}
-
 .anon {
     font-size: 0.2em;
 }
 
 .hide {
     display: none;
+}
+
+.room {
+    font-weight: bold;
+}
+
+.user {
+    font-weight: bold;
 }
 
 .user:after {
@@ -145,11 +157,6 @@ pre {
     max-height: 93vh;
 }
 
-#hiddenInput {
-    visibility: hidden;
-    border: 0;
-}
-
 @-webkit-keyframes blinking {
     from {
         background-color: transparent;
@@ -171,20 +178,12 @@ pre {
 }
 
 @media (max-height: 768px) and (max-width: 1024px) {
-    body {
-        overflow: scroll;
-    }
+    /*body {*/
+        /*overflow: scroll;*/
+    /*}*/
 }
 
 @media (max-height: 736px) and (max-width: 414px) {
-    #map {
-        font-size: .6em;
-    }
-
-    #map td {
-        padding: .1em;
-    }
-
     .logo {
         font-size: .6em;
     }
@@ -199,5 +198,9 @@ pre {
 
     .logo {
         font-size: .6em;
+    }
+
+    .importantMsg {
+        margin: 0 -.1em 0 -.1em;
     }
 }

@@ -3774,17 +3774,22 @@ function isFullscreen() {
  * @returns {undefined} Returns nothing
  */
 function goFullScreen(element) {
+  var background = document.getElementById('background');
+
   if (element.requestFullscreen) {
     element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    background.classList.add('fullscreen');
   } else if (element.webkitRequestFullscreen) {
     element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    background.classList.add('fullscreen');
   } else if (element.mozRequestFullScreen) {
     element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    background.classList.add('fullscreen');
   }
 }
 
 function fullscreenResize(keyboardShown) {
-  var background = document.getElementById('background');
+  var spacer = document.getElementById('spacer');
 
   /**
    * Used for Android when it shows/hides the keyboard
@@ -3792,11 +3797,11 @@ function fullscreenResize(keyboardShown) {
    */
   if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
     if (keyboardShown) {
-      background.classList.add('fullscreenKeyboardFix');
-      background.classList.remove('fullscreenFix');
+      spacer.classList.add('keyboardFix');
+      spacer.classList.remove('fullFix');
     } else {
-      background.classList.remove('fullscreenKeyboardFix');
-      background.classList.add('fullscreenFix');
+      spacer.classList.remove('keyboardFix');
+      spacer.classList.add('fullFix');
     }
 
     scrollView();
@@ -3823,11 +3828,16 @@ function printStartMessage() {
   queueMessage(logoToPrint);
   queueMessage({
     text : [
-      '--------------------------------------------------',
-      'Connecting....Could not establish connection to HQ'.toUpperCase(),
-      'Rerouting....Secondary relay found'.toUpperCase(),
-      'Connecting....Connection established'.toUpperCase(),
-      '--------------------------------------------------',
+      '---',
+      'Connecting... Could not establish connection to HQ',
+      'Rerouting... Secondary relay found',
+      'Connecting... Connection established',
+      '---'
+    ],
+    extraClass : 'upperCase'
+  });
+  queueMessage({
+    text : [
       'Welcome to the Oracle of Organica',
       'Please login to start your productive day!',
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',

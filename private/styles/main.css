@@ -18,12 +18,12 @@ html {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    background-color: #151e15;
 }
 
 body {
     margin: 0;
     color: #00FF00;
-    background-color: #151e15;
     font-family: monospace;
     font-size: 1.2em;
     letter-spacing: .05em;
@@ -48,6 +48,17 @@ li {
 pre {
     padding: 0;
     margin: 0;
+}
+
+#overlay {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    -webkit-box-shadow: inset 0 0 25px 1px #000000;
+    box-shadow: inset 0 0 25px 1px #000000;
 }
 
 #input {
@@ -144,23 +155,29 @@ pre {
  * For Android in full screen when the keyboard is shown
  * Virtual keyboard blocks part of the view
  */
-.fullscreenKeyboardFix {
-    overflow: scroll;
-    max-height: 50vh;
+.keyboardFix {
+    height: 50vh;
 }
 
 /*
  * For Android in full screen when the keyboard isn't shown.
  * Virtual buttons blocks the input field
  */
-.fullscreenFix {
+.fullFix {
+    height: 7vh;
+}
+
+.fullscreen {
     overflow: scroll;
-    max-height: 93vh;
 }
 
 .red {
     color: #ff0000;
     background-color: #1e1211;
+}
+
+.upperCase {
+    text-transform: uppercase;
 }
 
 @-webkit-keyframes blinking {
@@ -183,11 +200,11 @@ pre {
     }
 }
 
-/*@media (max-height: 768px) and (max-width: 1024px) {*/
-    /*body {*/
-        /*overflow: scroll;*/
-    /*}*/
-/*}*/
+@media (max-height: 768px) and (max-width: 1024px) {
+    body {
+        overflow: scroll;
+    }
+}
 
 @media (max-width: 736px) {
     .logo {

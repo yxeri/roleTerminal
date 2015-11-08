@@ -3196,37 +3196,49 @@ function generateTimeStamp(date, full) {
 
   minutes = beautifyNumber(newDate.getMinutes());
   hours = beautifyNumber(newDate.getHours());
-  timeStamp = hours + ':' + minutes + ' ';
+  timeStamp = hours + ':' + minutes;
 
   if (full) {
     month = beautifyNumber(newDate.getMonth());
     day = beautifyNumber(newDate.getDate());
 
-    timeStamp = day + '/' + month + ' ' + timeStamp;
+    timeStamp = ' ' + day + '/' + month + ' ' + timeStamp;
   }
 
   return timeStamp;
 }
 
-// Adds time stamp and room name to a string from a message if they are set
-function generateFullText(sentText, message) {
-  var text = '';
+function generateSpanElement(text, className) {
+  var spanObj = document.createElement('span');
 
-  if (message.time && !message.skipTime) {
-    text += generateTimeStamp(message.time);
+  spanObj.appendChild(document.createTextNode(text));
+
+  if (className) {
+    spanObj.className = className;
   }
 
-  if (message.roomName) {
-    text += message.roomName !== getLocalVal('room') ? '[' + message.roomName + '] ' : '';
+  return spanObj;
+}
+
+// Adds time stamp and room name to a string from a message if they are set
+function generateFullRow(sentText, message) {
+  var rowObj = document.createElement('li');
+
+  if (message.time && !message.skipTime) {
+    rowObj.appendChild(generateSpanElement(generateTimeStamp(message.time), 'timestamp'));
+  }
+
+  if (message.roomName && message.roomName !== getLocalVal('room')) {
+    rowObj.appendChild(generateSpanElement(message.roomName, 'room'));
   }
 
   if (message.userName) {
-    text += message.userName + ': ';
+    rowObj.appendChild(generateSpanElement(message.userName, 'user'));
   }
 
-  text += sentText;
+  rowObj.appendChild(generateSpanElement(sentText));
 
-  return text;
+  return rowObj;
 }
 
 function consumeMsgShortQueue() {
@@ -3252,29 +3264,19 @@ function consumeMsgQueue(messageQueue) {
 
 function printRow(message) {
   var text;
-  var fullText;
   var row;
-  var span;
-  var textNode;
 
   if (0 < message.text.length) {
     text = message.text.shift();
-    fullText = generateFullText(text, message);
-
-    row = document.createElement('li');
-    span = document.createElement('span');
-    textNode = document.createTextNode(fullText);
+    row = generateFullRow(text, message);
 
     if (message.extraClass) {
-      /**
-       * classList doesn't work on older devices,
-       * thus the usage of className
+      /*
+       * classList doesn't work on older devices, thus the usage of className
        */
       row.className += ' ' + message.extraClass;
     }
 
-    span.appendChild(textNode);
-    row.appendChild(span);
     mainFeed.appendChild(row);
 
     scrollView();
@@ -3301,14 +3303,14 @@ function convertDeviceRoom(roomName) {
 
 //TODO Hard coded
 function convertImportantRoom(roomName) {
-  var convertedRoom = 'important' === roomName ? 'IMPRTNT' : roomName;
+  var convertedRoom = 'important' === roomName ? 'IMPORTNT' : roomName;
 
   return convertedRoom;
 }
 
 //TODO Hard coded
 function convertBroadcastRoom(roomName) {
-  var convertedRoom = 'broadcast' === roomName ? 'BRODCST' : roomName;
+  var convertedRoom = 'broadcast' === roomName ? 'BROADCST' : roomName;
 
   return convertedRoom;
 }

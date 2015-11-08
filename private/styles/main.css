@@ -12,7 +12,7 @@ body {
     background-color: #151e15;
     font-family: monospace;
     font-size: 1em;
-    letter-spacing: 0.05em;
+    letter-spacing: .05em;
     white-space: pre-wrap;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
@@ -45,8 +45,6 @@ pre {
     border-radius: 0;
     text-align: center;
     background-color: #00FF00;
-    -webkit-user-select: none;
-    user-select: none;
     -webkit-animation: blinking 1s step-end infinite;
     animation: blinking 1s step-end infinite;
 }
@@ -76,6 +74,14 @@ pre {
     margin: 0;
     padding: .5em;
     border: dotted 1px;
+}
+
+#mainFeed li span {
+    margin-right: .5em;
+}
+
+#mainFeed li span:last-child {
+    margin: 0;
 }
 
 .logo {
@@ -115,6 +121,10 @@ pre {
 
 .hide {
     display: none;
+}
+
+.user:after {
+    content: ':';
 }
 
 /*

@@ -1678,8 +1678,7 @@ var validCmds = {
             'Connecting to ECU.........'
           ]
         });
-        setTimeout(
-          validCmds[cmdObj.command].steps[cmdObj.onStep], 2000);
+        setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 2000);
       },
       function() {
         var cmdObj = cmdHelper;
@@ -2346,7 +2345,7 @@ function queueCommand(command, data, cmdMsg) {
 function getCmdHistory() {
   var cmdHistory = getLocalVal('cmdHistory');
 
-  return null !== cmdHistory ? JSON.parse(getLocalVal('cmdHistory')) : [];
+  return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
 }
 
 function pushCmdHistory(cmd) {

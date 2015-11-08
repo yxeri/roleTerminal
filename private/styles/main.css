@@ -104,6 +104,7 @@ pre {
 .importantMsg {
     line-height: 1.1;
     color: black;
+    background-color: #00FF00;
     font-size: 1.2em;
     text-transform: uppercase;
     font-weight: bold;
@@ -157,6 +158,11 @@ pre {
     max-height: 93vh;
 }
 
+.red {
+    color: #ff0000;
+    background-color: #1e1211;
+}
+
 @-webkit-keyframes blinking {
     from {
         background-color: transparent;
@@ -177,27 +183,28 @@ pre {
     }
 }
 
-@media (max-height: 768px) and (max-width: 1024px) {
+/*@media (max-height: 768px) and (max-width: 1024px) {*/
     /*body {*/
         /*overflow: scroll;*/
     /*}*/
+/*}*/
+
+@media (max-width: 736px) {
+    .logo {
+        font-size: .8em;
+    }
 }
 
-@media (max-height: 736px) and (max-width: 414px) {
+@media (max-width: 414px) {
     .logo {
         font-size: .6em;
     }
 }
 
-/* PiTft */
-@media (max-height: 240px) {
+@media (max-height: 414px) and (max-width: 736px) , (max-height: 736px) and (max-width: 414px) {
     .feed {
         padding-left: .1em;
         padding-right: .1em;
-    }
-
-    .logo {
-        font-size: .6em;
     }
 
     .importantMsg {

@@ -7,7 +7,6 @@
 
 var razLogo = {
   text : [
-    ' ',
     '   ####',
     '###############',
     ' #####  #########                                           ####',
@@ -18,13 +17,12 @@ var razLogo = {
     '  #### ######     ####     #####  ####     #######   ###  ########',
     '  ####   ######  ##### #### #### ############  #######    ####   ###',
     ' ######    #############    ################     ###      ####    #####',
-    '########     ########         ###                        ######      #####   ##',
+    '########     ########        ####                        ######      #####   ##',
     '               ###########        ##                                    ###### ',
     '                    ###############',
-    '                         #####   demos - warez - honey',
-    ' '
+    '                  Razor  #####  Demos - Warez - Honey'
   ],
-    extraClass : 'logo'
+    extraClass : 'logo red'
 };
 var logo = {
   text : [
@@ -3325,16 +3323,16 @@ function printWelcomeMsg() {
       'Welcome, employee ' + getUser(),
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
       'Learn this valuable skill to increase your productivity!',
-      'May you have a productive day',
-      '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
+      'May you have a productive day'
     ]
   });
-  queueMessage(razLogoToPrint);
   queueMessage({
     text : [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
-    ]
+    ],
+    extraClass : 'red'
   });
+  queueMessage(razLogoToPrint);
 }
 
 function beautifyNumber(number) {

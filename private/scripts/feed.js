@@ -112,6 +112,7 @@ var rightText = document.getElementById('rightText');
 var inputStart = document.getElementById('inputStart');
 var modeField = document.getElementById('mode');
 var spacer = document.getElementById('spacer');
+var background = document.getElementById('background');
 // Socket.io
 var socket = io(); // eslint-disable-line
 // Is geolocation tracking on?
@@ -3774,28 +3775,23 @@ function isFullscreen() {
  * @returns {undefined} Returns nothing
  */
 function goFullScreen(element) {
-  var background = document.getElementById('background');
-
   if (element.requestFullscreen) {
     element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    background.classList.add('fullscreen');
   } else if (element.webkitRequestFullscreen) {
     element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    background.classList.add('fullscreen');
   } else if (element.mozRequestFullScreen) {
     element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-    background.classList.add('fullscreen');
   }
 }
 
 function fullscreenResize(keyboardShown) {
-  var spacer = document.getElementById('spacer');
-
   /**
    * Used for Android when it shows/hides the keyboard
    * The soft keyboard will block part of the site without this fix
    */
   if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
+    background.classList.add('fullscreen');
+
     if (keyboardShown) {
       spacer.classList.add('keyboardFix');
       spacer.classList.remove('fullFix');

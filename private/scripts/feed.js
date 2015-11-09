@@ -59,7 +59,7 @@ var logo = {
     extraClass : 'logo'
 };
 // Timeout between print of rows (milliseconds)
-var rowTimeout = 40;
+var rowTimeout = 60;
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMsgQueue
@@ -191,6 +191,7 @@ var mapHelper = {
   yGrids : {}
 };
 var commandFailText = { text : ['command not found'] };
+var defaultInputStart = 'RAZCMD';
 var cmdHelper = {
   maxSteps : 0,
   onStep : 0,
@@ -2260,7 +2261,15 @@ function resetAllLocalVals() {
   setAccessLevel(0);
 
   previousCommandPointer = 0;
-  setInputStart('RAZCMD');
+  setInputStart(defaultInputStart);
+}
+
+function getDeviceId() {
+  return getLocalVal('deviceId');
+}
+
+function setDeviceId(deviceId) {
+  setLocalVal('deviceId', deviceId);
 }
 
 function getAccessLevel() {
@@ -2312,7 +2321,7 @@ function setInputStart(text) {
 }
 
 function resetCommand(aborted) {
-  var room = getLocalVal('room') ? getLocalVal('room') : 'RAZCMD';
+  var room = getLocalVal('room') ? getLocalVal('room') : defaultInputStart;
 
   if (aborted) {
     queueMessage({
@@ -3451,7 +3460,7 @@ function onLogin(user) {
   validCmds.mode.func([mode]);
 
   socket.emit('updateDeviceSocketId', {
-    deviceId : getLocalVal('deviceId'),
+    deviceId : getDeviceId(),
     socketId : socket.id,
     userName : getUser()
   });
@@ -3484,7 +3493,7 @@ function onReconnectSuccess(data) {
     setAccessLevel(data.user.accessLevel);
 
     socket.emit('updateDeviceSocketId', {
-      deviceId : getLocalVal('deviceId'),
+      deviceId : getDeviceId(),
       socketId : socket.id,
       user : getUser()
     });
@@ -3730,7 +3739,7 @@ function onWeather(report) {
 }
 
 function onUpdateDeviceId(newId) {
-  setLocalVal('deviceId', newId);
+  setDeviceId(newId);
 }
 
 function startSocketListeners() {
@@ -3848,8 +3857,8 @@ function startBoot() {
   socket.emit('getCommands');
 
   // TODO: Move this
-  if (!getLocalVal('deviceId')) {
-    setLocalVal('deviceId', generateDeviceId());
+  if (!getDeviceId()) {
+    setDeviceId(generateDeviceId());
   }
 
   document.getElementById('background').addEventListener('click', function(event) {
@@ -3888,9 +3897,9 @@ function startBoot() {
 
   if (!getUser()) {
     printStartMessage();
-    setInputStart('RAZCMD');
+    setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
-      deviceId : getLocalVal('deviceId'),
+      deviceId : getDeviceId(),
       socketId : socket.id,
       user : 'NO_USER_LOGGED_IN'
     });
@@ -3899,7 +3908,7 @@ function startBoot() {
   socket.emit('updateId', {
     userName : getUser(),
     firstConnection : true,
-    device : getLocalVal('deviceId')
+    device : getDeviceId()
   });
 }
 

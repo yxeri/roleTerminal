@@ -9,6 +9,8 @@
 		<title>{{title}}</title>
 	</head>
 	<body>
+		<!-- Required for Android 2.2. Browser will crash if there is only one input field -->
+		<input disabled="true" id="hiddenInput" />
 		<div id="overlay"></div>
 		<div id="background">
 			<ul class="feed" id="mainFeed">
@@ -24,8 +26,6 @@
 			</div>
 			<div id="spacer"><span>&nbsp;</span></div>
 		</div>
-		<!-- Required for Android 2.2. Browser will crash if there is only one input field -->
-		<input disabled="true" id="hiddenInput" />
 		<script src={{socketPath}}></script>
 		<script src="scripts/feed.js" charset="utf-8"></script>
 	</body>

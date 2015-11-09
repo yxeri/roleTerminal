@@ -191,6 +191,7 @@ var mapHelper = {
   yGrids : {}
 };
 var commandFailText = { text : ['command not found'] };
+var abortInfo = { text : ['You can cancel out of the command by typing "exit" or "abort"'] };
 var defaultInputStart = 'RAZCMD';
 var cmdHelper = {
   maxSteps : 0,
@@ -353,7 +354,7 @@ var validCmds = {
           '----------',
           'User name: ' + getUser(),
           'Access level: ' + getAccessLevel(),
-          'Device ID: ' + getLocalVal('deviceId')
+          'Device ID: ' + getDeviceId()
         ]
       });
     },
@@ -372,7 +373,7 @@ var validCmds = {
           message : {
             text : [writtenMsg],
             userName : getUser(),
-            roomName : getLocalVal('room')
+            roomName : getRoom()
           }
         });
       } else {
@@ -408,12 +409,7 @@ var validCmds = {
           'You can also leave it empty and just press enter'
         ]
       });
-      queueMessage({
-        text : [
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"'
-        ]
-      });
+      queueMessage(abortInfo);
       setInputStart('broadcast');
     },
     steps : [
@@ -522,7 +518,7 @@ var validCmds = {
       if (0 < phrases.length) {
         roomName = phrases[0].toLowerCase();
 
-        if (roomName === getLocalVal('room')) {
+        if (roomName === getRoom()) {
           room.exited = true;
         }
 
@@ -679,12 +675,12 @@ var validCmds = {
       var data = {};
       var userName;
 
-      if (null === getLocalVal('user')) {
+      if (null === getUser()) {
         userName = phrases ? phrases[0] : undefined;
 
         if (userName && 3 <= userName.length && 6 >= userName.length && isTextAllowed(userName)) {
           data.userName = userName;
-          data.registerDevice = getLocalVal('deviceId');
+          data.registerDevice = getDeviceId();
           cmdHelper.data = data;
           cmdHelper.hideInput = true;
           hideInput(true);
@@ -705,7 +701,7 @@ var validCmds = {
         queueMessage({
           text : [
             'You have already registered a user',
-            getLocalVal('user') + ' is registered to this device'
+            getUser() + ' is registered to this device'
           ]
         });
       }
@@ -716,10 +712,10 @@ var validCmds = {
           text : [
             'Input a password and press enter',
             'Your password won\'t appear on the screen as you type it',
-            'Don\'t use whitespaces in your password!',
-            'You can cancel out of the command by typing "exit" or "abort"'
+            'Don\'t use whitespaces in your password!'
           ]
         });
+        queueMessage(abortInfo);
         setInputStart('password');
         cmdHelper.onStep++;
       },
@@ -842,7 +838,7 @@ var validCmds = {
       var data = {};
 
       data.userName = getUser();
-      data.device = getLocalVal('deviceId');
+      data.device = getDeviceId();
 
       socket.emit('myRooms', data);
     },
@@ -977,10 +973,10 @@ var validCmds = {
           'Oracle defense systems........DISABLED',
           'Overriding locks..................DONE',
           'Connecting to entity database.....DONE',
-          ' ',
-          'You can cancel out of the command by typing "exit" or "abort"'
+          ' '
         ]
       });
+      queueMessage(abortInfo);
       setInputStart('Enter encryption key');
       socket.emit('entities');
     },
@@ -1068,8 +1064,7 @@ var validCmds = {
     ],
     help : [
       'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
-      'Allows you to input an encryption key and use it to unlock an entity',
-      'You can cancel out of the command by typing "exit" or "abort"'
+      'Allows you to input an encryption key and use it to unlock an entity'
     ],
     instructions : [
       'Follow the on-screen instructions'
@@ -1083,7 +1078,7 @@ var validCmds = {
       var data = {};
 
       data.lines = phrases[0];
-      data.device = getLocalVal('deviceId');
+      data.device = getDeviceId();
 
       socket.emit('history', data);
     },
@@ -1382,11 +1377,12 @@ var validCmds = {
             'Oracle defense systems.......DISABLED',
             'Overriding locks.............DONE',
             'Connecting to database ......DONE',
-            ' ',
-            'You can cancel out of the command by typing ' +
-            '"exit" or "abort"',
-            'Press enter to continue'
+            ' '
           ]
+        });
+        queueMessage(abortInfo);
+        queueMessage({
+          text : ['Press enter to continue']
         });
 
         setInputStart('Start');
@@ -1513,12 +1509,7 @@ var validCmds = {
       data.text = [];
       cmdHelper.data = data;
 
-      queueMessage({
-        text : [
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"'
-        ]
-      });
+      queueMessage(abortInfo);
       queueMessage({
         text : [
           'Do you want to send it to a specific device?',
@@ -1658,12 +1649,9 @@ var validCmds = {
         ],
         extraClass : 'importantMsg'
       });
+      queueMessage(abortInfo);
       queueMessage({
-        text : [
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"',
-          'Press enter to continue'
-        ]
+        text : ['Press Enter to continue']
       });
       setInputStart('Chipper');
     },
@@ -1933,11 +1921,12 @@ var validCmds = {
           '  Add encryption keys',
           '-----------------------',
           'You can add more than one key',
-          'Press enter without any input when you are done',
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"',
-          'Input an encryption key:'
+          'Press enter without any input when you are done'
         ]
+      });
+      queueMessage(abortInfo);
+      queueMessage({
+        text : ['Input an encryption key:']
       });
       setInputStart('Input key');
     },
@@ -2003,12 +1992,10 @@ var validCmds = {
           '  Add entities',
           '-----------------------',
           'You can add more than one entity',
-          'Press enter without any input when you are done',
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"',
-          'Input an entity:'
+          'Press enter without any input when you are done'
         ]
       });
+      queueMessage(abortInfo);
       setInputStart('Input entity');
     },
     steps : [
@@ -2109,12 +2096,7 @@ var validCmds = {
           'with the message'
         ]
       });
-      queueMessage({
-        text : [
-          'You can cancel out of the command by typing ' +
-          '"exit" or "abort"'
-        ]
-      });
+      queueMessage(abortInfo);
       setInputStart('moduleraid');
     },
     steps : [
@@ -2255,9 +2237,9 @@ function queueMessage(message) {
 }
 
 function resetAllLocalVals() {
-  removeLocalVal('cmdHistory');
-  removeLocalVal('room');
-  removeLocalVal('user');
+  removeCmdHistory();
+  removeRoom();
+  removeUser();
   setAccessLevel(0);
 
   previousCommandPointer = 0;
@@ -2270,6 +2252,18 @@ function getDeviceId() {
 
 function setDeviceId(deviceId) {
   setLocalVal('deviceId', deviceId);
+}
+
+function getRoom() {
+  return getLocalVal('room');
+}
+
+function setRoom(room) {
+  setLocalVal('room', room);
+}
+
+function removeRoom() {
+  removeLocalVal('room');
 }
 
 function getAccessLevel() {
@@ -2286,6 +2280,18 @@ function getUser() {
 
 function setUser(user) {
   setLocalVal('user', user);
+}
+
+function removeUser() {
+  removeLocalVal('user');
+}
+
+function setCmdHistory(cmdHistory) {
+  setLocalVal('cmdHistory', JSON.stringify(cmdHistory));
+}
+
+function removeCmdHistory() {
+  removeLocalVal('cmdHistory');
 }
 
 function getTeam() {
@@ -2321,7 +2327,7 @@ function setInputStart(text) {
 }
 
 function resetCommand(aborted) {
-  var room = getLocalVal('room') ? getLocalVal('room') : defaultInputStart;
+  var room = getRoom() ? getRoom() : defaultInputStart;
 
   if (aborted) {
     queueMessage({
@@ -2351,7 +2357,7 @@ function queueCommand(command, data, cmdMsg) {
 }
 
 function getCmdHistory() {
-  var cmdHistory = getLocalVal('cmdHistory');
+  var cmdHistory = getCmdHistory();
 
   return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
 }
@@ -2360,7 +2366,8 @@ function pushCmdHistory(cmd) {
   var cmdHistory = getCmdHistory();
 
   cmdHistory.push(cmd);
-  setLocalVal('cmdHistory', JSON.stringify(cmdHistory));
+
+  setCmdHistory(cmdHistory);
 }
 
 function resetPrevCmdPointer() {
@@ -2786,7 +2793,7 @@ function autoComplete() {
    * If chat mode and the command is prepended or normal mode
    */
   if (1 === phrases.length && 0 < partialCommand.length
-      && (0 <= cmdChars.indexOf(sign) || ('cmd' === getLocalVal('mode')) || null === getUser())) {
+      && (0 <= cmdChars.indexOf(sign) || ('cmd' === getMode()) || null === getUser())) {
     // Removes prepend sign
     if (0 <= cmdChars.indexOf(sign)) {
       partialCommand = partialCommand.slice(1);
@@ -2954,7 +2961,7 @@ function specialKeyPress(event) {
               if (0 <= commandChars.indexOf(sign)) {
                 commandName = phrases[0].slice(1).toLowerCase();
                 command = commands[commandName];
-              } else if ('cmd' === getLocalVal('mode') || null === user) {
+              } else if ('cmd' === getMode() || null === user) {
                 commandName = phrases[0].toLowerCase();
                 command = commands[commandName];
               }
@@ -2984,7 +2991,7 @@ function specialKeyPress(event) {
               /**
                * User is logged in and in chat mode
                */
-              } else if (null !== user && 'chat' === getLocalVal('mode') && 0 < phrases[0].length) {
+              } else if (null !== user && 'chat' === getMode() && 0 < phrases[0].length) {
                 if (0 > commandChars.indexOf(phrases[0].charAt(0))) {
                   queueCommand(commands.msg.func, phrases);
                   startCmdQueue();
@@ -3173,8 +3180,8 @@ function changeModeText() {
   }
 }
 
-function setRoom(roomName) {
-  setLocalVal('room', roomName);
+function setCurrentRoom(roomName) {
+  setRoom(roomName);
   setInputStart(roomName);
   queueMessage({ text : ['Entered ' + roomName] });
 }
@@ -3236,7 +3243,7 @@ function generateFullRow(sentText, message) {
     rowObj.appendChild(generateSpanElement(generateTimeStamp(message.time), 'timestamp'));
   }
 
-  if (message.roomName && message.roomName !== getLocalVal('room')) {
+  if (message.roomName && message.roomName !== getRoom()) {
     rowObj.appendChild(generateSpanElement(message.roomName, 'room'));
   }
 
@@ -3442,7 +3449,7 @@ function onUnfollow(room) {
 
   if (room.exited) {
     setInputStart('public');
-    setLocalVal('room', 'public');
+    setRoom('public');
     socket.emit('follow', { roomName : 'public', entered : true });
   }
 }
@@ -3487,7 +3494,7 @@ function onReconnectSuccess(data) {
 
   if (!data.anonUser) {
     mode = data.user.mode ? data.user.mode : 'cmd';
-    room = getLocalVal('room');
+    room = getRoom();
 
     validCmds.mode.func([mode], false);
     setAccessLevel(data.user.accessLevel);
@@ -3527,13 +3534,13 @@ function onReconnectSuccess(data) {
 }
 
 function onDisconnectUser() {
-  var currentUser = getLocalVal('user');
+  var currentUser = getUser();
 
   // There is no saved local user. We don't need to print this
   if (null !== currentUser) {
     queueMessage({
       text : [
-        'Didn\'t find user ' + getLocalVal('user') + ' in database',
+        'Didn\'t find user ' + getUser() + ' in database',
         'Resetting local configuration'
       ]
     });

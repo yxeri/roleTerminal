@@ -2368,7 +2368,6 @@ function enterRoom(roomName) {
   setRoom(roomName);
   setInputStart(roomName);
   queueMessage({ text : ['Entered ' + roomName] });
-
 }
 
 function resetPrevCmdPointer() {
@@ -3215,6 +3214,14 @@ function generateTimeStamp(date, full) {
   return timeStamp;
 }
 
+function linkUser(element) {
+  setLeftText('whisper ' + element.textContent + ' ');
+}
+
+function linkRoom(element) {
+  validCmds.room.func([element.textContent]);
+}
+
 function generateSpanElement(text, className) {
   var spanObj = document.createElement('span');
 
@@ -3227,6 +3234,20 @@ function generateSpanElement(text, className) {
   return spanObj;
 }
 
+function generateLinkElement(text, className, func) {
+  var spanObj = generateSpanElement(text, className);
+
+  spanObj.className += ' link';
+  spanObj.addEventListener('click', function(event) {
+    func(this);
+    marker.focus();
+    clicked = true;
+    event.stopPropagation();
+  });
+
+  return spanObj;
+}
+
 // Adds time stamp and room name to a string from a message if they are set
 function generateFullRow(sentText, message) {
   var rowObj = document.createElement('li');
@@ -3235,12 +3256,12 @@ function generateFullRow(sentText, message) {
     rowObj.appendChild(generateSpanElement(generateTimeStamp(message.time), 'timestamp'));
   }
 
-  if (message.roomName && message.roomName !== getRoom()) {
-    rowObj.appendChild(generateSpanElement(message.roomName, 'room'));
+  if (message.roomName) {
+    rowObj.appendChild(generateLinkElement(message.roomName, 'room', linkRoom));
   }
 
   if (message.userName) {
-    rowObj.appendChild(generateSpanElement(message.userName, 'user'));
+    rowObj.appendChild(generateLinkElement(message.userName, 'user', linkUser));
   }
 
   rowObj.appendChild(generateSpanElement(sentText));

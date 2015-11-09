@@ -52,6 +52,11 @@ pre {
 }
 
 #marker {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     /* Needed to hide caret. */
     color: transparent;
     width: .8em;
@@ -88,6 +93,10 @@ pre {
 #hiddenInput {
     visibility: hidden;
     border: 0;
+}
+
+.link {
+    font-weight: bold;
 }
 
 .logo {

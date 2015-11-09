@@ -1,17 +1,3 @@
-/*
-Red
-color: #ff0000;
-background-color: #1e1211;
-
-Green
-color: #00FF00;
-background-color: #151e15;
-
-Blue
-color: #0000ff;
-background-color: #14131e;
-*/
-
 html {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -174,6 +160,11 @@ pre {
 .red {
     color: #ff0000;
     background-color: #1e1211;
+}
+
+.blue {
+    color: #0000ff;
+    background-color: #14131e;
 }
 
 .upperCase {

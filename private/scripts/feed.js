@@ -2351,7 +2351,7 @@ function queueCommand(command, data, cmdMsg) {
 }
 
 function getCmdHistory() {
-  var cmdHistory = getCmdHistory();
+  var cmdHistory = getLocalVal('cmdHistory');
 
   return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
 }

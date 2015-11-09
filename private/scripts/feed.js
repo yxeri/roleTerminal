@@ -89,6 +89,9 @@ var clicked = false;
  * Char that is prepended on commands in chat mode
  */
 var commandChars = ['-', '/'];
+var cmdMode = 'cmd';
+var chatMode = 'chat';
+var randomString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
@@ -593,7 +596,7 @@ var validCmds = {
         newMode = phrases[0].toLowerCase();
 
         //TODO Refactoring. Lots of duplicate code
-        if ('chat' === newMode) {
+        if (chatMode === newMode) {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
@@ -613,7 +616,7 @@ var validCmds = {
           }
 
           socket.emit('updateMode', newMode);
-        } else if ('cmd' === newMode) {
+        } else if (cmdMode === newMode) {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
@@ -1339,7 +1342,6 @@ var validCmds = {
         data.timesCracked = 0;
         data.timesRequired = 3;
         data.randomizer = function(length) {
-          var randomString = '23456789abcdefghijkmnpqrstuvwxyz';
           var randomLength = randomString.length;
           var code = '';
           var randomVal;
@@ -1618,8 +1620,8 @@ var validCmds = {
       var data = {};
 
       data.randomizer = function(length) {
-        var randomString = '01';
-        var randomLength = randomString.length;
+        var randomBinary = '01';
+        var randomLength = randomBinary.length;
         var code = '';
         var i;
         var randomVal;
@@ -1627,7 +1629,7 @@ var validCmds = {
         for (i = 0; i < length; i++) {
           randomVal = Math.random() * (randomLength - 1);
 
-          code += randomString[Math.round(randomVal)];
+          code += randomBinary[Math.round(randomVal)];
         }
 
         return code;
@@ -2294,14 +2296,6 @@ function removeCmdHistory() {
   removeLocalVal('cmdHistory');
 }
 
-function getTeam() {
-  return getLocalVal('team');
-}
-
-function setTeam(team) {
-  setLocalVal('team', team);
-}
-
 function setModeText(text) {
   modeField.textContent = '[' + text + ']';
 }
@@ -2407,7 +2401,6 @@ function playMorse(morseCode) {
     shouldPlay = false;
     duration = 0;
 
-    //TODO Hard coded
     if (dot === morseCode[i]) {
       duration = 50;
       shouldPlay = true;
@@ -2457,7 +2450,7 @@ function playMorse(morseCode) {
 //}
 
 function generateMap() {
-  var letter = 'A';
+  var startLetter = 'A';
   var xGrid;
   var yGrid;
   var currentChar;
@@ -2466,7 +2459,7 @@ function generateMap() {
   mapHelper.ySize = (mapHelper.topLat - mapHelper.bottomLat) / parseFloat(mapHelper.yGridsMax);
 
   for (xGrid = 0; xGrid < mapHelper.xGridsMax; xGrid++) {
-    currentChar = String.fromCharCode(letter.charCodeAt(0) + xGrid);
+    currentChar = String.fromCharCode(startLetter.charCodeAt(0) + xGrid);
     mapHelper.xGrids[currentChar] = mapHelper.leftLong + parseFloat(mapHelper.xSize * xGrid);
   }
 
@@ -2743,13 +2736,11 @@ function setCommandUsed(used) {
 function consumeCmdQueue() {
   var storedCmd;
   var command;
-  var data;
   var cmdMsg;
 
   if (0 < cmdQueue.length) {
     storedCmd = cmdQueue.shift();
     command = storedCmd.command;
-    data = storedCmd.data;
     cmdMsg = storedCmd.cmdMsg;
 
     if (cmdMsg !== undefined) {
@@ -2757,7 +2748,7 @@ function consumeCmdQueue() {
     }
 
     setCommandUsed(true);
-    command(data);
+    command(storedCmd.data);
     setTimeout(consumeCmdQueue, commandTime);
   } else {
     setCommandUsed(false);
@@ -2793,7 +2784,7 @@ function autoComplete() {
    * If chat mode and the command is prepended or normal mode
    */
   if (1 === phrases.length && 0 < partialCommand.length
-      && (0 <= cmdChars.indexOf(sign) || ('cmd' === getMode()) || null === getUser())) {
+      && (0 <= cmdChars.indexOf(sign) || (cmdMode === getMode()) || null === getUser())) {
     // Removes prepend sign
     if (0 <= cmdChars.indexOf(sign)) {
       partialCommand = partialCommand.slice(1);
@@ -2961,7 +2952,7 @@ function specialKeyPress(event) {
               if (0 <= commandChars.indexOf(sign)) {
                 commandName = phrases[0].slice(1).toLowerCase();
                 command = commands[commandName];
-              } else if ('cmd' === getMode() || null === user) {
+              } else if (cmdMode === getMode() || null === user) {
                 commandName = phrases[0].toLowerCase();
                 command = commands[commandName];
               }
@@ -2991,7 +2982,7 @@ function specialKeyPress(event) {
               /**
                * User is logged in and in chat mode
                */
-              } else if (null !== user && 'chat' === getMode() && 0 < phrases[0].length) {
+              } else if (null !== user && chatMode === getMode() && 0 < phrases[0].length) {
                 if (0 > commandChars.indexOf(phrases[0].charAt(0))) {
                   queueCommand(commands.msg.func, phrases);
                   startCmdQueue();
@@ -3171,19 +3162,13 @@ function changeModeText() {
 
   if (getUser() && !cmdHelper.command) {
       //TODO msg command text in comparison should not be hard coded
-      if (('chat' === mode && -1 < commandChars.indexOf(inputText.charAt(0)))
-          || ('cmd' === mode && 'msg' !== trimSpace(inputText).split(' ')[0])) {
-        setModeText('CMD');
+      if ((chatMode === mode && -1 < commandChars.indexOf(inputText.charAt(0)))
+          || (cmdMode === mode && 'msg' !== trimSpace(inputText).split(' ')[0])) {
+        setModeText(cmdMode.toUpperCase());
       } else {
-        setModeText('CHAT');
+        setModeText(chatMode.toUpperCase());
       }
   }
-}
-
-function setCurrentRoom(roomName) {
-  setRoom(roomName);
-  setInputStart(roomName);
-  queueMessage({ text : ['Entered ' + roomName] });
 }
 
 function scrollView() {
@@ -3455,7 +3440,7 @@ function onUnfollow(room) {
 }
 
 function onLogin(user) {
-  var mode = user.mode ? user.mode : 'cmd';
+  var mode = user.mode ? user.mode : cmdMode;
 
   validCmds.clear.func();
   setUser(user.userName);
@@ -3493,7 +3478,7 @@ function onReconnectSuccess(data) {
   var room;
 
   if (!data.anonUser) {
-    mode = data.user.mode ? data.user.mode : 'cmd';
+    mode = data.user.mode ? data.user.mode : cmdMode;
     room = getRoom();
 
     validCmds.mode.func([mode], false);
@@ -3821,7 +3806,6 @@ function fullscreenResize(keyboardShown) {
 }
 
 function generateDeviceId() {
-  var randomString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var randomLength = randomString.length;
   var deviceId = '';
   var i;

@@ -3652,7 +3652,7 @@ function onWeather(report) {
     month = beautifyNumber(time.getMonth());
     temperature = Math.round(weatherInst.temperature);
     windSpeed = Math.round(weatherInst.gust);
-    precip = 0 === weatherInst.precipitation ? '0.1< ' : weatherInst.precipitation + 'mm ';
+    precip = 0 === weatherInst.precipitation ? 'Light ' : weatherInst.precipitation + 'mm ';
 
     switch (weatherInst.precipType) {
       // No

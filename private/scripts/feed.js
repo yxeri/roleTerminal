@@ -2364,6 +2364,13 @@ function pushCmdHistory(cmd) {
   setCmdHistory(cmdHistory);
 }
 
+function enterRoom(roomName) {
+  setRoom(roomName);
+  setInputStart(roomName);
+  queueMessage({ text : ['Entered ' + roomName] });
+
+}
+
 function resetPrevCmdPointer() {
   var cmdHistory = getCmdHistory();
 
@@ -3419,7 +3426,7 @@ function onDisconnect() {
 
 function onFollow(room) {
   if (room.entered) {
-    setRoom(room.roomName);
+    enterRoom(room.roomName);
   } else {
     queueMessage({
       text : ['Following ' + room.roomName]
@@ -3433,8 +3440,6 @@ function onUnfollow(room) {
   });
 
   if (room.exited) {
-    setInputStart('public');
-    setRoom('public');
     socket.emit('follow', { roomName : 'public', entered : true });
   }
 }

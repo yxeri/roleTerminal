@@ -108,14 +108,12 @@ pre {
 }
 
 .importantMsg {
-    line-height: 1.1;
-    color: black;
+    color: #151e15;
     background-color: #00FF00;
     font-size: 1.2em;
     text-transform: uppercase;
     font-weight: bold;
     text-align: center;
-    margin: 0 -.5em 0 -.5em;
 }
 
 .large {
@@ -222,9 +220,5 @@ pre {
     .feed {
         padding-left: .1em;
         padding-right: .1em;
-    }
-
-    .importantMsg {
-        margin: 0 -.1em 0 -.1em;
     }
 }

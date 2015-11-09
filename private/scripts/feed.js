@@ -22,7 +22,7 @@ var razLogo = {
     '                    ###############',
     '                  Razor  #####  Demos - Warez - Honey'
   ],
-    extraClass : 'logo red'
+    extraClass : 'logo blue'
 };
 var logo = {
   text : [
@@ -412,7 +412,7 @@ var validCmds = {
           'You can also leave it empty and just press enter'
         ]
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       setInputStart('broadcast');
     },
     steps : [
@@ -446,7 +446,7 @@ var validCmds = {
           cmdHelper.data.text.push(phrase);
         } else {
           cmdHelper.data.text.push('--- END BROADCAST ---');
-          dataText = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
+          dataText = copyString(cmdHelper.data.text);
 
           cmdHelper.onStep++;
 
@@ -718,7 +718,7 @@ var validCmds = {
             'Don\'t use whitespaces in your password!'
           ]
         });
-        queueMessage(abortInfo);
+        queueMessage(copyMessage(abortInfo));
         setInputStart('password');
         cmdHelper.onStep++;
       },
@@ -953,7 +953,7 @@ var validCmds = {
   },
   uploadkey : {
     func : function() {
-      var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
+      var razLogoToPrint = copyMessage(razLogo);
 
       // TODO: razLogo should be move to DB or other place
       queueMessage(razLogoToPrint);
@@ -979,7 +979,7 @@ var validCmds = {
           ' '
         ]
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       setInputStart('Enter encryption key');
       socket.emit('entities');
     },
@@ -1334,7 +1334,7 @@ var validCmds = {
   hackroom : {
     func : function(phrases) {
       var data = {};
-      var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : ['']};
+      var razLogoToPrint = copyMessage(razLogo);
       var i;
 
       if (0 < phrases.length) {
@@ -1382,7 +1382,7 @@ var validCmds = {
             ' '
           ]
         });
-        queueMessage(abortInfo);
+        queueMessage(copyMessage(abortInfo));
         queueMessage({
           text : ['Press enter to continue']
         });
@@ -1511,7 +1511,7 @@ var validCmds = {
       data.text = [];
       cmdHelper.data = data;
 
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       queueMessage({
         text : [
           'Do you want to send it to a specific device?',
@@ -1561,7 +1561,7 @@ var validCmds = {
 
           cmdHelper.data.text.push(phrase);
         } else {
-          dataText = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : '';
+          dataText = copyString(cmdHelper.data.text);
 
           cmdHelper.onStep++;
 
@@ -1651,7 +1651,7 @@ var validCmds = {
         ],
         extraClass : 'importantMsg'
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       queueMessage({
         text : ['Press Enter to continue']
       });
@@ -1926,7 +1926,7 @@ var validCmds = {
           'Press enter without any input when you are done'
         ]
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       queueMessage({
         text : ['Input an encryption key:']
       });
@@ -1997,7 +1997,7 @@ var validCmds = {
           'Press enter without any input when you are done'
         ]
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       setInputStart('Input entity');
     },
     steps : [
@@ -2098,7 +2098,7 @@ var validCmds = {
           'with the message'
         ]
       });
-      queueMessage(abortInfo);
+      queueMessage(copyMessage(abortInfo));
       setInputStart('moduleraid');
     },
     steps : [
@@ -2246,6 +2246,14 @@ function resetAllLocalVals() {
 
   previousCommandPointer = 0;
   setInputStart(defaultInputStart);
+}
+
+function copyString(text) {
+  return null !== text ? JSON.parse(JSON.stringify(text)) : '';
+}
+
+function copyMessage(textObj) {
+  return null !== textObj ? JSON.parse(JSON.stringify(textObj)) : { text : [''] };
 }
 
 function getDeviceId() {
@@ -3344,8 +3352,8 @@ function convertBroadcastRoom(roomName) {
 }
 
 function printWelcomeMsg() {
-  var logoToPrint = null !== logo ? JSON.parse(JSON.stringify(logo)) : { text : [''] };
-  var razLogoToPrint = null !== razLogo ? JSON.parse(JSON.stringify(razLogo)) : { text : [''] };
+  var logoToPrint = copyMessage(logo);
+  var razLogoToPrint = copyMessage(razLogo);
 
   queueMessage(logoToPrint);
   queueMessage({
@@ -3360,7 +3368,7 @@ function printWelcomeMsg() {
     text : [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
     ],
-    extraClass : 'red'
+    extraClass : 'blue'
   });
   queueMessage(razLogoToPrint);
 }
@@ -3846,7 +3854,8 @@ function generateDeviceId() {
 }
 
 function printStartMessage() {
-  var logoToPrint = null !== logo ? JSON.parse(JSON.stringify(logo)) : { text : ['']};
+  var logoToPrint = copyMessage(logo);
+
   queueMessage(logoToPrint);
   queueMessage({
     text : [

@@ -7,6 +7,20 @@ const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
 const messenger = require('../../messenger');
 
+function followRoom(socket, userName, newRoom) {
+  const newRoomName = newRoom.roomName;
+
+  if (0 > socket.rooms.indexOf(newRoomName)) {
+    socket.broadcast.to(newRoomName).emit('chatMsg', {
+      text : [userName + ' is following ' + newRoomName],
+      roomName : newRoomName
+    });
+  }
+
+  socket.join(newRoomName);
+  socket.emit('follow', newRoom);
+}
+
 function handle(socket) {
   socket.on('chatMsg', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.msg.commandName, function(allowErr, allowed) {
@@ -59,12 +73,14 @@ function handle(socket) {
           return;
         }
 
+        const room = {};
+
+        room.roomName = roomName;
+
         socket.emit('message', {
-          text : [
-            'Room has been created'
-          ]
+          text : ['Room has been created']
         });
-        socket.join(roomName);
+        followRoom(socket, user.userName, room);
       });
     });
   });
@@ -99,17 +115,7 @@ function handle(socket) {
             room.entered = true;
           }
 
-          if (0 > socket.rooms.indexOf(roomName)) {
-            socket.broadcast.to(roomName).emit('chatMsg', {
-              text : [
-                user.userName + ' is following ' + roomName
-              ],
-              room : roomName
-            });
-          }
-
-          socket.join(roomName);
-          socket.emit('follow', room);
+          followRoom(socket, user.userName, room);
         });
       });
     });

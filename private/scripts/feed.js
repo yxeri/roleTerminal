@@ -129,6 +129,7 @@ var soundTimeout = 0;
 var previousCommandPointer;
 var commandTime = 1000;
 var commandUsed = false;
+var oldAndroid = false;
 var dot = '.';
 var dash = '-';
 var morseSeparator = '#';
@@ -3110,10 +3111,12 @@ function changeModeText() {
 }
 
 function scrollView() {
-  spacer.scrollIntoView(false);
-
-  // Compatibility fix for Android 2.*
-  //window.scrollTo(0, document.body.scrollHeight);
+  if (!isOldAndroid()) {
+    spacer.scrollIntoView(false);
+  } else {
+    // Compatibility fix for old Android
+    window.scrollTo(0, document.body.scrollHeight);
+  }
 }
 
 // Takes date and returns shorter readable time
@@ -3806,15 +3809,20 @@ function printStartMessage() {
  * Removes some visual effects for better performance on older devices
  */
 function downgrade() {
-  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || /Android\s[0-3]/.test(navigator.userAgent)) {
+  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || isOldAndroid()) {
     document.getElementById('overlay').className = '';
   }
 }
 
+function isOldAndroid() {
+  return /Android\s[0-3]/.test(navigator.userAgent);
+}
+
 // Sets everything relevant when a user enters the site
 function startBoot() {
-  cmdInput.focus();
+  oldAndroid = isOldAndroid();
 
+  cmdInput.focus();
   downgrade();
   socket.emit('getCommands');
 

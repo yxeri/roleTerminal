@@ -109,9 +109,7 @@ var pausePositionTime = 40000;
  * Android 4.1.* would otherwise give JS errors
  */
 var mainFeed = document.getElementById('mainFeed');
-var marker = document.getElementById('marker');
-var leftText = document.getElementById('leftText');
-var rightText = document.getElementById('rightText');
+var cmdInput = document.getElementById('cmdInput');
 var inputStart = document.getElementById('inputStart');
 var modeField = document.getElementById('mode');
 var spacer = document.getElementById('spacer');
@@ -2212,9 +2210,9 @@ function hideInput(hide) {
   var hideString = ' hide';
 
   if (hide) {
-    leftText.className += hideString;
+    cmdInput.className += hideString;
   } else {
-    leftText.className = findOneAndReplace(leftText.className, hideString, '');
+    cmdInput.className = findOneAndReplace(cmdInput.className, hideString, '');
   }
 }
 
@@ -2688,38 +2686,12 @@ function startAudio() {
   }
 }
 
-function getLeftText() {
-  return marker.parentElement.childNodes[0].textContent;
-}
-
-function getRightText() {
-  return marker.parentElement.childNodes[2].textContent;
-}
-
 function getInputText() {
-  return leftText.textContent + marker.value + rightText.textContent;
+  return cmdInput.value;
 }
 
-function setLeftText(text) {
-  marker.parentElement.childNodes[0].textContent = text;
-}
-
-function appendToLeftText(text) {
-  var textNode = document.createTextNode(text);
-
-  document.createTextNode(marker.parentElement.childNodes[0].appendChild(textNode));
-}
-
-function setRightText(text) {
-  marker.parentElement.childNodes[2].textContent = text;
-}
-
-function prependToRightText(sentText) {
-  marker.parentElement.childNodes[2].textContent = sentText + marker.parentElement.childNodes[2].textContent;
-}
-
-function setMarkerText(text) {
-  marker.value = text;
+function setCmdInput(text) {
+  cmdInput.value = text;
 }
 
 function getInputStart() {
@@ -2727,15 +2699,12 @@ function getInputStart() {
 }
 
 function clearInput() {
-  setLeftText('');
-  setRightText('');
-  // Fix for blinking marker
-  setMarkerText(' ');
+  setCmdInput('');
 }
 
-function triggerAutoComplete(text) {
-  if (' ' === text.charAt(text.length - 1) && ' ' === text.charAt(text.length - 2)) {
-    setLeftText(trimSpace(text));
+function triggerAutoComplete(text, textChar) {
+  if (' ' === text.charAt(text.length - 1) && ' ' === textChar) {
+    setCmdInput(trimSpace(text));
 
     return true;
   }
@@ -2835,7 +2804,7 @@ function autoComplete() {
       newText += matched[0] + ' ';
 
       clearInput();
-      setLeftText(newText);
+      setCmdInput(newText);
     } else if (0 < matched.length) {
       matched.sort();
 
@@ -2886,7 +2855,6 @@ function printUsedCmd(clearAfterUse, inputText) {
   return cmdUsedMsg;
 }
 
-// Needed for arrow and delete keys. They are not detected with keypress
 function specialKeyPress(event) {
   var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
   var cmdHistory;
@@ -2903,18 +2871,11 @@ function specialKeyPress(event) {
     switch (keyCode) {
       // Backspace
       case 8:
-        // Remove character to the left of the marker
-        if (getLeftText()) {
-          setLeftText(getLeftText().slice(0, -1));
-        }
-
-        if (1 === getInputText().length) {
+        if (1 >= getInputText().length) {
           clearModeText();
         } else {
           changeModeText();
         }
-
-        event.preventDefault();
 
         break;
 
@@ -3043,14 +3004,6 @@ function specialKeyPress(event) {
         break;
       // Delete
       case 46:
-        // Remove character from marker and move it right
-        if (getRightText()) {
-          setMarkerText(getRightText()[0]);
-          setRightText(getRightText().slice(1));
-        } else {
-          setMarkerText(' ');
-        }
-
         if (0 === getInputText().length) {
           clearModeText();
         } else {
@@ -3074,32 +3027,6 @@ function specialKeyPress(event) {
         event.preventDefault();
 
         break;
-      // Left arrow
-      case 37:
-
-        // Moves the marker one step to the left
-        if (getLeftText()) {
-          prependToRightText(marker.value);
-          setMarkerText(getLeftText().slice(-1));
-          setLeftText(getLeftText().slice(0, -1));
-        }
-
-        event.preventDefault();
-
-        break;
-      // Right arrow
-      case 39:
-
-        // Moves marker one step to the right
-        if (getRightText()) {
-          appendToLeftText(marker.value);
-          setMarkerText(getRightText()[0]);
-          setRightText(getRightText().slice(1));
-        }
-
-        event.preventDefault();
-
-        break;
       // Up arrow
       case 38:
         cmdHistory = getCmdHistory();
@@ -3110,7 +3037,7 @@ function specialKeyPress(event) {
           if (0 < previousCommandPointer) {
             clearInput();
             previousCommandPointer--;
-            appendToLeftText(cmdHistory[previousCommandPointer]);
+            setCmdInput(cmdHistory[previousCommandPointer]);
           }
         }
 
@@ -3127,7 +3054,7 @@ function specialKeyPress(event) {
           if (previousCommandPointer < cmdHistory.length - 1) {
             clearInput();
             previousCommandPointer++;
-            appendToLeftText(cmdHistory[previousCommandPointer]);
+            setCmdInput(cmdHistory[previousCommandPointer]);
           } else if (previousCommandPointer === cmdHistory.length - 1) {
             clearInput();
             previousCommandPointer++;
@@ -3155,19 +3082,18 @@ function keyPress(event) {
     switch (keyCode) {
       default:
         if (textChar) {
-          appendToLeftText(textChar);
           changeModeText();
         }
 
-        if (triggerAutoComplete(getLeftText()) && null === cmdHelper.command) {
+        if (triggerAutoComplete(getInputText(), textChar) && null === cmdHelper.command) {
           autoComplete();
+          // Prevent new whitespace to be printed
+          event.preventDefault();
         }
 
         break;
     }
   }
-
-  event.preventDefault();
 }
 
 function changeModeText() {
@@ -3223,7 +3149,7 @@ function generateTimeStamp(date, full) {
 }
 
 function linkUser(element) {
-  setLeftText('whisper ' + element.textContent + ' ');
+  setCmdInput('whisper ' + element.textContent + ' ');
 }
 
 function linkRoom(element) {
@@ -3248,7 +3174,7 @@ function generateLinkElement(text, className, func) {
   spanObj.className += ' link';
   spanObj.addEventListener('click', function(event) {
     func(this);
-    marker.focus();
+    cmdInput.focus();
     clicked = true;
     event.stopPropagation();
   });
@@ -3884,12 +3810,13 @@ function printStartMessage() {
 function downgrade() {
   if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || /Android\s[0-3]/.test(navigator.userAgent)) {
     document.getElementById('overlay').className = '';
-    document.getElementById('marker').className = '';
   }
 }
 
 // Sets everything relevant when a user enters the site
 function startBoot() {
+  cmdInput.focus();
+
   downgrade();
   socket.emit('getCommands');
 
@@ -3902,14 +3829,14 @@ function startBoot() {
     clicked = !clicked;
 
     if (clicked) {
-      marker.focus();
+      cmdInput.focus();
     } else {
-      marker.blur();
+      cmdInput.blur();
     }
 
     // Set whole document to full screen
-    goFullScreen(document.documentElement);
-    fullscreenResize(clicked);
+    //goFullScreen(document.documentElement);
+    //fullscreenResize(clicked);
 
     event.preventDefault();
   });

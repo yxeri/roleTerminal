@@ -36,6 +36,36 @@ pre {
     margin: 0;
 }
 
+#inputContainer {
+    display: table;
+    width: 99%;
+}
+
+#inputContainer span {
+    display: table-cell;
+}
+
+#inputStart {
+    padding-left: .5em;
+    width: 1px;
+}
+
+#cmdInput {
+    border: 0;
+    font-size: inherit;
+    font-family: inherit;
+    vertical-align: baseline;
+    color: inherit;
+    background-color: transparent;
+    width: 100%;
+    display: table-cell;
+    padding-left: .3em;
+}
+
+#cmdInput:focus {
+    outline: 0
+}
+
 #overlay {
     pointer-events: none;
     position: fixed;
@@ -43,10 +73,6 @@ pre {
     left: 0;
     height: 100%;
     width: 100%;
-}
-
-#input {
-    padding: 0 .5em 0 .5em;
 }
 
 #marker {
@@ -71,7 +97,7 @@ pre {
 }
 
 #mode {
-    margin-right: .7em;
+    width: 1px;
 }
 
 #mode:after {

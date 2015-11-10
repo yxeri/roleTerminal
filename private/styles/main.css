@@ -103,6 +103,7 @@ pre {
 
 .link {
     font-weight: bold;
+    cursor: pointer;
 }
 
 .logo {
@@ -140,6 +141,10 @@ pre {
 
 .room {
     font-weight: bold;
+}
+
+.room:after {
+    content: '>';
 }
 
 .user {

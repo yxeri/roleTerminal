@@ -3878,8 +3878,19 @@ function printStartMessage() {
   });
 }
 
+/*
+ * Removes some visual effects for better performance on older devices
+ */
+function downgrade() {
+  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || /Android\s[0-3]/.test(navigator.userAgent)) {
+    document.getElementById('overlay').className = '';
+    document.getElementById('marker').className = '';
+  }
+}
+
 // Sets everything relevant when a user enters the site
 function startBoot() {
+  downgrade();
   socket.emit('getCommands');
 
   // TODO: Move this
@@ -3905,7 +3916,6 @@ function startBoot() {
 
   startSocketListeners();
   addEventListener('keypress', keyPress);
-
   // Needed for some special keys. They are not detected with keypress
   addEventListener('keydown', specialKeyPress);
   addEventListener('keyup', keyReleased);

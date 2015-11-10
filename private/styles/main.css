@@ -43,8 +43,6 @@ pre {
     left: 0;
     height: 100%;
     width: 100%;
-    -webkit-box-shadow: inset 0 0 25px 1px #000000;
-    box-shadow: inset 0 0 25px 1px #000000;
 }
 
 #input {
@@ -66,8 +64,6 @@ pre {
     border-radius: 0;
     text-align: center;
     background-color: #00FF00;
-    -webkit-animation: blinking 1s step-end infinite;
-    animation: blinking 1s step-end infinite;
 }
 
 #marker:focus {
@@ -93,6 +89,16 @@ pre {
 #hiddenInput {
     visibility: hidden;
     border: 0;
+}
+
+.boxShadow {
+    -webkit-box-shadow: inset 0 0 25px 1px #000000;
+    box-shadow: inset 0 0 25px 1px #000000;
+}
+
+.blinkAnim {
+    -webkit-animation: blinking 1s step-end infinite;
+    animation: blinking 1s step-end infinite;
 }
 
 .link {

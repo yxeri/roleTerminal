@@ -2207,12 +2207,10 @@ function findOneAndReplace(text, find, replaceWith) {
 }
 
 function hideInput(hide) {
-  var hideString = ' hide';
-
   if (hide) {
-    cmdInput.className += hideString;
+    cmdInput.setAttribute('type', 'password');
   } else {
-    cmdInput.className = findOneAndReplace(cmdInput.className, hideString, '');
+    cmdInput.setAttribute('type', 'text');
   }
 }
 

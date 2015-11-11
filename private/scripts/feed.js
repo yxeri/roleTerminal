@@ -2643,7 +2643,7 @@ function setIntervals() {
   // Prints messages from the queue
   intervals.printText = setInterval(consumeMsgQueue, printIntervalTime, msgQueue);
 
-  if (isTracking) {
+  if (isTracking && navigator.geolocation) {
     // Gets new geolocation data
     sendLocationData();
   }

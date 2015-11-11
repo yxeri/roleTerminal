@@ -3841,8 +3841,8 @@ function startBoot() {
     }
 
     // Set whole document to full screen
-    //goFullScreen(document.documentElement);
-    //fullscreenResize(clicked);
+    goFullScreen(document.documentElement);
+    fullscreenResize(clicked);
 
     event.preventDefault();
   });

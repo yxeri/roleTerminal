@@ -2802,6 +2802,33 @@ function combineSequences(cmdName, phrases) {
   return combined;
 }
 
+function expandPartialMatch(cmds, partialMatch, sign) {
+  var i;
+  var j;
+  var cmdChar;
+  var firstCmd = cmds[0];
+  var expanded = '';
+  var matched = true;
+
+  for (i = partialMatch.length; i < firstCmd.length; i++) {
+    cmdChar = firstCmd.charAt(i);
+
+    for (j = 0; j < cmds.length; j++) {
+      if (cmds[j].charAt(i) !== cmdChar) {
+        matched = false;
+
+        break;
+      }
+    }
+
+    if (matched) {
+      expanded += cmdChar;
+    } else {
+      return 0 <= cmdChars.indexOf(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
+    }
+  }
+}
+
 function autoComplete() {
   var phrases = trimSpace(getInputText().toLowerCase()).split(' ');
   var partialCmd = phrases[0];
@@ -2815,8 +2842,6 @@ function autoComplete() {
   var cmdAccesssLvl;
   var newText = '';
   var cmdIndex;
-  var msg = '';
-  var cmdMatched;
 
   /**
    * Auto-complete should only trigger when one phrase is in the input
@@ -2862,13 +2887,8 @@ function autoComplete() {
       clearInput();
       setCmdInput(newText);
     } else if (0 < matched.length) {
-      matched.sort();
-
-      for (cmdMatched = 0; cmdMatched < matched.length; cmdMatched++) {
-        msg += matched[cmdMatched] + '\t';
-      }
-
-      queueMsg({ text : [msg] });
+      setCmdInput(expandPartialMatch(matched, partialCmd, sign));
+      queueMsg({ text : [matched.join('\t')] });
     }
 
     // No input? Show all available commands

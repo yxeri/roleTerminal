@@ -2168,9 +2168,15 @@ var validCmds = {
         });
       }
     },
-    help : [],
+    help : [
+      'Create a new team',
+      'You will be able to invite new members to the team'
+    ],
     instructions : [
-
+      ' Usage:',
+      '  createteam *name*',
+      ' Example:',
+      '  createteam team1'
     ],
     accessLevel : 13,
     category : 'basic'
@@ -2185,15 +2191,19 @@ var validCmds = {
         socket.emit('inviteToTeam', data);
       } else {
         queueMsg({
-          text : [
-            'You are not allowed to invite members to the team or you are not in a team'
-          ]
+          text : ['You are not allowed to invite members to the team or you are not in a team']
         });
       }
     },
-    help : [],
+    help : [
+      'Invites another user to your team',
+      'You have to be the team leader or an team administrator to invite new members'
+    ],
     instructions : [
-
+      ' Usage:',
+      '  inviteteam *user name*',
+      ' Example:',
+      '  inviteteam barry'
     ],
     accessLevel : 13,
     category : 'basic'
@@ -2221,8 +2231,17 @@ var validCmds = {
         });
       }
     },
-    help : [],
-    instructions : [],
+    help : [
+      'Create a new shortcut for a command and sequence',
+      'The shortcut will appear among other commands when you auto-complete',
+      'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"'
+    ],
+    instructions : [
+      ' Usage:',
+      '  alias *alias name* *command name* *sequence*',
+      ' Example:',
+      '  alias hello msg Greetings to all!'
+    ],
     accessLevel : 13,
     category : 'basic'
   }

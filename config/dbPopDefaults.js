@@ -335,6 +335,12 @@ config.commands = {
     accessLevel : 1,
     visibility : 1,
     category : 'admin'
+  },
+  alias : {
+    commandName : 'alias',
+    accessLevel : 1,
+    visibility : 1,
+    category : 'basic'
   }
 };
 

@@ -2200,6 +2200,34 @@ var validCmds = {
     ],
     accessLevel : 13,
     category : 'basic'
+  },
+  alias : {
+    func : function(phrases) {
+      var aliasName = phrases.shift();
+      var sequence = phrases;
+      var aliases = getAliases();
+      var cmdKeys = Object.keys(validCmds);
+
+      if (aliasName && sequence && -1 === cmdKeys.indexOf(aliasName)) {
+        aliases[aliasName] = sequence;
+        setAliases(aliases);
+      } else if (-1 < cmdKeys.indexOf(aliasName)) {
+        queueMessage({
+          text : [aliasName + ' is a built-in command. You may not override built-in commands']
+        });
+      } else {
+        queueMessage({
+          text : [
+            'You have to input a name and sequence',
+            'E.g. alias goodalias msg hello'
+          ]
+        });
+      }
+    },
+    help : [],
+    instructions : [],
+    accessLevel : 13,
+    category : 'basic'
   }
 };
 
@@ -2253,6 +2281,16 @@ function copyMessage(textObj) {
   return null !== textObj ? JSON.parse(JSON.stringify(textObj)) : { text : [''] };
 }
 
+function getAliases() {
+  var aliases = getLocalVal('aliases');
+
+  return null !== aliases ? JSON.parse(aliases) : {};
+}
+
+function setAliases(aliases) {
+  setLocalVal('aliases', JSON.stringify(aliases));
+}
+
 function getDeviceId() {
   return getLocalVal('deviceId');
 }
@@ -2291,6 +2329,12 @@ function setUser(user) {
 
 function removeUser() {
   removeLocalVal('user');
+}
+
+function getCmdHistory() {
+  var cmdHistory = getLocalVal('cmdHistory');
+
+  return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
 }
 
 function setCmdHistory(cmdHistory) {
@@ -2353,12 +2397,6 @@ function queueCommand(command, data, cmdMsg) {
     data : data,
     cmdMsg : cmdMsg
   });
-}
-
-function getCmdHistory() {
-  var cmdHistory = getLocalVal('cmdHistory');
-
-  return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
 }
 
 function pushCmdHistory(cmd) {
@@ -2743,11 +2781,35 @@ function startCmdQueue() {
   }
 }
 
+function getCmdAccessLevel(commandName) {
+  return validCmds[commandName] ? validCmds[commandName].accessLevel : 1;
+}
+
+function getCmd(commandName) {
+  var aliases = getAliases();
+  var cmd;
+
+  if (validCmds[commandName]) {
+    cmd = validCmds[commandName];
+  } else if (aliases[commandName]) {
+    cmd = validCmds[aliases[commandName][0]];
+  }
+
+  return cmd;
+}
+
+function combineSequences(commandName, phrases) {
+  var aliases = getAliases();
+  var combined = aliases[commandName] ? aliases[commandName].concat(phrases.slice(1)) : phrases.slice(1);
+
+  return combined;
+}
+
 function autoComplete() {
   var phrases = trimSpace(getInputText().toLowerCase()).split(' ');
   var partialCommand = phrases[0];
   //TODO Change from Object.keys for compatibility with older Android
-  var commands = Object.keys(validCmds);
+  var commands = Object.keys(validCmds).concat(Object.keys(getAliases()));
   var matched = [];
   var sign = partialCommand.charAt(0);
   var cmdChars = commandChars;
@@ -2776,7 +2838,7 @@ function autoComplete() {
       matches = false;
 
       for (j = 0; j < partialCommand.length; j++) {
-        commandAccessLevel = validCmds[commands[i]].accessLevel;
+        commandAccessLevel = getCmdAccessLevel(commands[i]);
 
         if ((isNaN(commandAccessLevel) || getAccessLevel() >= commandAccessLevel)
             && partialCommand.charAt(j) === commands[i].charAt(j)) {
@@ -2925,11 +2987,11 @@ function specialKeyPress(event) {
 
               if (0 <= commandChars.indexOf(sign)) {
                 commandName = phrases[0].slice(1).toLowerCase();
-                command = commands[commandName];
               } else if (cmdMode === getMode() || null === user) {
                 commandName = phrases[0].toLowerCase();
-                command = commands[commandName];
               }
+
+              command = getCmd(commandName);
 
               if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
                 // Store the command for usage with up/down arrows
@@ -2950,7 +3012,9 @@ function specialKeyPress(event) {
                     validCmds.clear.func();
                   }
 
-                  queueCommand(command.func, phrases.splice(1), printUsedCmd(command.clearAfterUse, inputText));
+                  queueCommand(command.func, combineSequences(commandName, phrases),
+                    printUsedCmd(command.clearAfterUse, inputText)
+                  );
                   startCmdQueue();
                 }
               /**

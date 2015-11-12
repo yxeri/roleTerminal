@@ -129,7 +129,7 @@ var soundTimeout = 0;
 var previousCommandPointer;
 var commandTime = 1000;
 var commandUsed = false;
-var oldAndroid = false;
+var oldAndroid = isOldAndroid();
 var dot = '.';
 var dash = '-';
 var morseSeparator = '#';
@@ -3111,7 +3111,7 @@ function changeModeText() {
 }
 
 function scrollView() {
-  if (!isOldAndroid()) {
+  if (!oldAndroid) {
     spacer.scrollIntoView(false);
   } else {
     // Compatibility fix for old Android
@@ -3809,7 +3809,7 @@ function printStartMessage() {
  * Removes some visual effects for better performance on older devices
  */
 function downgrade() {
-  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || isOldAndroid()) {
+  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid) {
     document.getElementById('overlay').className = '';
   }
 }
@@ -3820,8 +3820,6 @@ function isOldAndroid() {
 
 // Sets everything relevant when a user enters the site
 function startBoot() {
-  oldAndroid = isOldAndroid();
-
   cmdInput.focus();
   downgrade();
   socket.emit('getCommands');

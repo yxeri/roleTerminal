@@ -88,10 +88,10 @@ var clicked = false;
 /**
  * Char that is prepended on commands in chat mode
  */
-var commandChars = ['-', '/'];
+var cmdChars = ['-', '/'];
 var cmdMode = 'cmd';
 var chatMode = 'chat';
-var randomString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+var randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
@@ -126,9 +126,9 @@ var audioCtx;
 var oscillator;
 var gainNode;
 var soundTimeout = 0;
-var previousCommandPointer;
-var commandTime = 1000;
-var commandUsed = false;
+var prevCmdPointer;
+var cmdTime = 1000;
+var cmdUsed = false;
 var oldAndroid = isOldAndroid();
 var dot = '.';
 var dash = '-';
@@ -192,14 +192,14 @@ var mapHelper = {
   xGrids : {},
   yGrids : {}
 };
-var commandFailText = { text : ['command not found'] };
+var cmdFailText = { text : ['command not found'] };
 var abortInfo = { text : ['You can cancel out of the command by typing "exit" or "abort"'] };
 var defaultInputStart = 'RAZCMD';
 var cmdHelper = {
   maxSteps : 0,
   onStep : 0,
   command : null,
-  keyboardBlocked : false,
+  keysBlocked : false,
   data : null,
   hideInput : false
 };
@@ -217,51 +217,49 @@ var intervals = {
 var validCmds = {
   help : {
     func : function(phrases) {
-      var cmdChars = commandChars;
-
       function capitalizeString(text) {
         return text.charAt(0).toUpperCase() + text.slice(1);
       }
 
-      function getCommands(group) {
-        var commands = validCmds;
+      function getCmds(group) {
+        var cmds = validCmds;
         //TODO Change from Object.keys for compatibility with older Android
-        var keys = Object.keys(commands).sort();
-        var commandStrings = [];
+        var keys = Object.keys(cmds).sort();
+        var cmdStrings = [];
         var i;
-        var command;
-        var commandAccessLevel;
+        var cmd;
+        var cmdAccessLvl;
         var msg;
 
         if (group !== undefined) {
-          commandStrings.push(capitalizeString(group) + ' commands:');
+          cmdStrings.push(capitalizeString(group) + ' commands:');
         }
 
         for (i = 0; i < keys.length; i++) {
           msg = '  ';
-          command = commands[keys[i]];
-          commandAccessLevel = command.accessLevel;
+          cmd = cmds[keys[i]];
+          cmdAccessLvl = cmd.accessLevel;
 
-          if ((isNaN(commandAccessLevel) || getAccessLevel() >= commandAccessLevel)
-              && (group === undefined || command.category === group)) {
+          if ((isNaN(cmdAccessLvl) || getAccessLvl() >= cmdAccessLvl)
+              && (group === undefined || cmd.category === group)) {
             msg += keys[i];
 
-            commandStrings.push(msg);
+            cmdStrings.push(msg);
           }
         }
 
-        return commandStrings;
+        return cmdStrings;
       }
 
       function getAll() {
-        var loginCmds = getCommands('login');
-        var basicCmds = getCommands('basic');
-        var advancedCmds = getCommands('advanced');
-        var hackingCmds = getCommands('hacking');
-        var adminCmds = getCommands('admin');
+        var loginCmds = getCmds('login');
+        var basicCmds = getCmds('basic');
+        var advancedCmds = getCmds('advanced');
+        var hackingCmds = getCmds('hacking');
+        var adminCmds = getCmds('admin');
 
         if (null === getUser()) {
-          queueMessage({
+          queueMsg({
             text : [
               '------------------------------------------------',
               'Use register to register a new user',
@@ -270,38 +268,38 @@ var validCmds = {
               '------------------------------------------------'
             ]
           });
-          queueMessage({
+          queueMsg({
             text : loginCmds
           });
         }
 
         if (1 < basicCmds.length) {
-          queueMessage({
+          queueMsg({
             text : basicCmds
           });
         }
 
         if (1 < advancedCmds.length) {
-          queueMessage({
+          queueMsg({
             text : advancedCmds
           });
         }
 
         if (1 < hackingCmds.length) {
-          queueMessage({
+          queueMsg({
             text : hackingCmds
           });
         }
 
         if (1 < adminCmds.length) {
-          queueMessage({
+          queueMsg({
             text : adminCmds
           });
         }
       }
 
       if (undefined === phrases || 0 === phrases.length) {
-        queueMessage({
+        queueMsg({
           text : [
             '--------',
             '  Help',
@@ -349,13 +347,13 @@ var validCmds = {
   },
   whoami : {
     func : function() {
-      queueMessage({
+      queueMsg({
         text : [
           '----------',
           '  Whoami',
           '----------',
           'User name: ' + getUser(),
-          'Access level: ' + getAccessLevel(),
+          'Access level: ' + getAccessLvl(),
           'Device ID: ' + getDeviceId()
         ]
       });
@@ -379,7 +377,7 @@ var validCmds = {
           }
         });
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You forgot to write the message!']
         });
       }
@@ -405,13 +403,13 @@ var validCmds = {
       data.text = [];
       cmdHelper.data = data;
 
-      queueMessage({
+      queueMsg({
         text : [
           'Who is the broadcast from?',
           'You can also leave it empty and just press enter'
         ]
       });
-      queueMessage(copyMessage(abortInfo));
+      queueMsg(copyMsg(abortInfo));
       setInputStart('broadcast');
     },
     steps : [
@@ -426,7 +424,7 @@ var validCmds = {
           cmdHelper.data.text.push('--- BROADCAST ---');
         }
 
-        queueMessage({
+        queueMsg({
           text : [
             'Write a line and press enter',
             'Press enter without any input when you are done ' +
@@ -449,13 +447,13 @@ var validCmds = {
 
           cmdHelper.onStep++;
 
-          queueMessage({
+          queueMsg({
             text : ['Preview of the message:']
           });
-          queueMessage({
+          queueMsg({
             text : dataText
           });
-          queueMessage({
+          queueMsg({
             text : ['Is this OK? "yes" to accept the message']
           });
         }
@@ -463,9 +461,9 @@ var validCmds = {
       function(phrases) {
         if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
           socket.emit('broadcastMsg', cmdHelper.data);
-          resetCommand();
+          resetCmd();
         } else {
-          resetCommand(true);
+          resetCmd(true);
         }
       }
     ],
@@ -490,7 +488,7 @@ var validCmds = {
 
         socket.emit('follow', room);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You have to specify which room to follow and a' +
             'password (if it is protected)'
@@ -528,7 +526,7 @@ var validCmds = {
 
         socket.emit('unfollow', room);
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You have to specify which room to unfollow']
         });
       }
@@ -557,12 +555,12 @@ var validCmds = {
         } else if ('devices' === listOption) {
           socket.emit('listDevices');
         } else {
-          queueMessage({
+          queueMsg({
             text : [listOption + 'is not a valid option']
           });
         }
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You have to input which option you want to list',
             'Available options: users, rooms, devices',
@@ -589,7 +587,6 @@ var validCmds = {
   mode : {
     func : function(phrases, verbose) {
       var newMode;
-      var cmdChars = commandChars;
 
       if (0 < phrases.length) {
         newMode = phrases[0].toLowerCase();
@@ -599,7 +596,7 @@ var validCmds = {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
-            queueMessage({
+            queueMsg({
               text : [
                 '-----------------------',
                 '  Chat mode activated',
@@ -619,7 +616,7 @@ var validCmds = {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
-            queueMessage({
+            queueMsg({
               text : [
                 '--------------------------',
                 '  Command mode activated',
@@ -634,12 +631,12 @@ var validCmds = {
 
           socket.emit('updateMode', newMode);
         } else {
-          queueMessage({
+          queueMsg({
             text : [newMode + 'is not a valid mode']
           });
         }
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'Current mode: ' + getMode()
           ]
@@ -651,8 +648,8 @@ var validCmds = {
       '--Chat mode--',
       'Everything written will be interpreted as chat messages',
       'All commands have to be prepended with "' +
-      commandChars.join('" or "') + '" ' +
-      'Example: ' + commandChars[0] + 'uploadkey',
+      cmdChars.join('" or "') + '" ' +
+      'Example: ' + cmdChars[0] + 'uploadkey',
       '--Cmd mode--',
       'Chat mode is the default mode',
       'Text written will not be automatically be intepreted as ' +
@@ -688,8 +685,8 @@ var validCmds = {
           hideInput(true);
           socket.emit('userExists', cmdHelper.data);
         } else {
-          resetCommand(true);
-          queueMessage({
+          resetCmd(true);
+          queueMsg({
             text : [
               'Name has to be 3 to 6 characters long',
               'The name can only contain letters and numbers (a-z, 0-9)',
@@ -699,8 +696,8 @@ var validCmds = {
           });
         }
       } else {
-        resetCommand(true);
-        queueMessage({
+        resetCmd(true);
+        queueMsg({
           text : [
             'You have already registered a user',
             getUser() + ' is registered to this device'
@@ -710,14 +707,14 @@ var validCmds = {
     },
     steps : [
       function() {
-        queueMessage({
+        queueMsg({
           text : [
             'Input a password and press enter',
             'Your password won\'t appear on the screen as you type it',
             'Don\'t use whitespaces in your password!'
           ]
         });
-        queueMessage(copyMessage(abortInfo));
+        queueMsg(copyMsg(abortInfo));
         setInputStart('password');
         cmdHelper.onStep++;
       },
@@ -726,14 +723,14 @@ var validCmds = {
 
         if (phrases && 3 <= password.length && isTextAllowed(password)) {
           cmdHelper.data.password = password;
-          queueMessage({
+          queueMsg({
             text : [
               'Repeat your password one more time'
             ]
           });
           cmdHelper.onStep++;
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Password is too short!',
               'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
@@ -746,7 +743,7 @@ var validCmds = {
         var password = phrases ? phrases[0] : undefined;
 
         if (password === cmdHelper.data.password) {
-          queueMessage({
+          queueMsg({
             text : [
               'Congratulations, employee #' + Math.floor(Math.random() * 120503),
               'Welcome to the Organica Oracle department',
@@ -756,9 +753,9 @@ var validCmds = {
           });
           socket.emit('register', cmdHelper.data);
           validCmds[cmdHelper.command].abortFunc();
-          resetCommand(false);
+          resetCmd(false);
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Passwords don\'t match. Please try again',
               'Input a password and press enter'
@@ -813,10 +810,10 @@ var validCmds = {
 
           socket.emit('createRoom', room);
         } else {
-          queueMessage(errorMsg);
+          queueMsg(errorMsg);
         }
       } else {
-        queueMessage(errorMsg);
+        queueMsg(errorMsg);
       }
     },
     help : [
@@ -853,7 +850,7 @@ var validCmds = {
       var data = {};
 
       if (null !== getUser()) {
-        queueMessage({
+        queueMsg({
           text : [
             'You are already logged in',
             'You have to be logged out to log in'
@@ -863,7 +860,7 @@ var validCmds = {
         data.userName = phrases[0].toLowerCase();
         cmdHelper.data = data;
         cmdHelper.hideInput = true;
-        queueMessage({
+        queueMsg({
           text : [
             'Input your password'
           ]
@@ -871,7 +868,7 @@ var validCmds = {
         setInputStart('password');
         hideInput(true);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You need to input a user name',
             'Example: login bestname '
@@ -885,7 +882,7 @@ var validCmds = {
         socket.emit('login', cmdHelper.data);
         validCmds[cmdHelper.command].abortFunc();
         validCmds.clear.func();
-        resetCommand();
+        resetCmd();
       }
     ],
     abortFunc : function() {
@@ -918,7 +915,7 @@ var validCmds = {
       var userName;
 
       if (!isTracking) {
-        queueMessage({
+        queueMsg({
           text : [
             'Tracking not available',
             'You are not connected to the satellites'
@@ -952,11 +949,11 @@ var validCmds = {
   },
   uploadkey : {
     func : function() {
-      var razLogoToPrint = copyMessage(razLogo);
+      var razLogoCopy = copyMsg(razLogo);
 
       // TODO: razLogo should be move to DB or other place
-      queueMessage(razLogoToPrint);
-      queueMessage({
+      queueMsg(razLogoCopy);
+      queueMsg({
         text : [
           'Razor proudly presents:',
           'Entity Hacking Access! (EHA)',
@@ -978,7 +975,7 @@ var validCmds = {
           ' '
         ]
       });
-      queueMessage(copyMessage(abortInfo));
+      queueMsg(copyMsg(abortInfo));
       setInputStart('Enter encryption key');
       socket.emit('entities');
     },
@@ -988,12 +985,12 @@ var validCmds = {
         var phrase = phrases.join(' ');
 
         socket.emit('verifyKey', phrase.toLowerCase());
-        queueMessage({
+        queueMsg({
           text : [
             'Verifying key. Please wait...'
           ]
         });
-        cmdObj.keyboardBlocked = true;
+        cmdObj.keysBlocked = true;
         setInputStart('Verifying...');
       },
       function(data) {
@@ -1001,30 +998,30 @@ var validCmds = {
 
         if (null !== data.keyData) {
           if (data.keyData.reusable || !data.keyData.used) {
-            queueMessage({
+            queueMsg({
               text : ['Key has been verified. Proceeding']
             });
             cmdObj.onStep++;
             cmdObj.data = data;
             validCmds[cmdObj.command].steps[cmdObj.onStep](socket);
           } else {
-            queueMessage({
+            queueMsg({
               text : ['Key has already been used. Aborting']
             });
-            resetCommand(true);
+            resetCmd(true);
           }
         } else {
-          queueMessage({
+          queueMsg({
             text : ['The key is invalid. Aborting']
           });
-          resetCommand(true);
+          resetCmd(true);
         }
       },
       function() {
         var cmdObj = cmdHelper;
 
         setInputStart('Enter entity name');
-        cmdObj.keyboardBlocked = false;
+        cmdObj.keysBlocked = false;
         cmdObj.onStep++;
       },
       function(phrases) {
@@ -1035,16 +1032,16 @@ var validCmds = {
         data.entityName = phrase.toLowerCase();
         data.userName = getUser();
         socket.emit('unlockEntity', data);
-        queueMessage({
+        queueMsg({
           text : [
             'Unlocking entity. Please wait...'
           ]
         });
-        cmdObj.keyboardBlocked = true;
+        cmdObj.keysBlocked = true;
       },
       function(entity) {
         if (null !== entity) {
-          queueMessage({
+          queueMsg({
             text : [
               'Confirmed. Encryption key has been used on the entity',
               entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
@@ -1052,7 +1049,7 @@ var validCmds = {
             ]
           });
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Failed',
               'Encryption key could not be used on entity.',
@@ -1061,7 +1058,7 @@ var validCmds = {
           });
         }
 
-        resetCommand(true);
+        resetCmd(true);
       }
     ],
     help : [
@@ -1158,7 +1155,7 @@ var validCmds = {
         if (4 <= data.newPassword.length) {
           socket.emit('changePassword', data);
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'You have to input the old and new password of ' +
               'the user',
@@ -1167,7 +1164,7 @@ var validCmds = {
           });
         }
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You have to input the old and new password of the ' +
             'user',
@@ -1309,7 +1306,7 @@ var validCmds = {
 
         socket.emit('chatMsg', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You forgot to write the message!']
         });
       }
@@ -1333,7 +1330,7 @@ var validCmds = {
   hackroom : {
     func : function(phrases) {
       var data = {};
-      var razLogoToPrint = copyMessage(razLogo);
+      var razLogoCopy = copyMsg(razLogo);
       var i;
 
       if (0 < phrases.length) {
@@ -1341,14 +1338,14 @@ var validCmds = {
         data.timesCracked = 0;
         data.timesRequired = 3;
         data.randomizer = function(length) {
-          var randomLength = randomString.length;
+          var randomLength = randString.length;
           var code = '';
           var randomVal;
 
           for (i = 0; i < length; i++) {
             randomVal = Math.random() * (randomLength - 1);
 
-            code += randomString[Math.round(randomVal)];
+            code += randString[Math.round(randomVal)];
           }
 
           return code.toUpperCase();
@@ -1356,10 +1353,10 @@ var validCmds = {
         cmdHelper.data = data;
 
         // TODO: razLogo should be moved to DB or other place
-        queueMessage(razLogoToPrint);
+        queueMsg(razLogoCopy);
         // TODO: Message about abort should be sent from a common
         // function for all commands
-        queueMessage({
+        queueMsg({
           text : [
             'Razor proudly presents:',
             'Room Access Hacking! (RAH)',
@@ -1381,22 +1378,22 @@ var validCmds = {
             ' '
           ]
         });
-        queueMessage(copyMessage(abortInfo));
-        queueMessage({
+        queueMsg(copyMsg(abortInfo));
+        queueMsg({
           text : ['Press enter to continue']
         });
 
         setInputStart('Start');
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You forgot to input the room name!']
         });
-        resetCommand(true);
+        resetCmd(true);
       }
     },
     steps : [
       function() {
-        queueMessage({
+        queueMsg({
           text : ['Checking room access...']
         });
         socket.emit('roomHackable', cmdHelper.data.roomName);
@@ -1405,7 +1402,7 @@ var validCmds = {
         var cmdObj = cmdHelper;
         var timeout = 18000;
         var timerEnded = function() {
-          queueMessage({
+          queueMsg({
             text : [
               'Your hacking attempt has been detected',
               'Users of the room have been notified of your intrusion'
@@ -1422,10 +1419,10 @@ var validCmds = {
             roomName : cmdObj.data.roomName,
             skipSelfMsg : true
           });
-          resetCommand(true);
+          resetCmd(true);
         };
 
-        queueMessage({
+        queueMsg({
           text : [
             'Activating cracking bot....',
             'Warning. Intrusion defense system activated',
@@ -1437,7 +1434,7 @@ var validCmds = {
         cmdObj.data.code = cmdObj.data.randomizer(10);
         cmdObj.data.timer = setTimeout(timerEnded, timeout);
         cmdObj.onStep++;
-        queueMessage({
+        queueMsg({
           text : ['Sequence: ' + cmdObj.data.code]
         });
       },
@@ -1447,10 +1444,10 @@ var validCmds = {
         var data;
 
         if (phrase.toUpperCase() === cmdObj.data.code) {
-          queueMessage({ text : ['Sequence accepted'] });
+          queueMsg({ text : ['Sequence accepted'] });
           cmdObj.data.timesCracked++;
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Incorrect sequence. Counter measures have been ' +
               'released'
@@ -1460,7 +1457,7 @@ var validCmds = {
 
         if (cmdObj.data.timesCracked < cmdObj.data.timesRequired) {
           cmdObj.data.code = cmdObj.data.randomizer(10);
-          queueMessage({
+          queueMsg({
             text : ['Sequence: ' + cmdObj.data.code]
           });
         } else {
@@ -1471,7 +1468,7 @@ var validCmds = {
 
           clearTimeout(cmdObj.data.timer);
           socket.emit('hackRoom', data);
-          queueMessage(({
+          queueMsg(({
             text : [
               'Cracking complete',
               'Intrusion defense system disabled',
@@ -1479,7 +1476,7 @@ var validCmds = {
               'Thank you for using RAH'
             ]
           }));
-          resetCommand();
+          resetCmd();
         }
       }
     ],
@@ -1510,8 +1507,8 @@ var validCmds = {
       data.text = [];
       cmdHelper.data = data;
 
-      queueMessage(copyMessage(abortInfo));
-      queueMessage({
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
         text : [
           'Do you want to send it to a specific device?',
           'Enter the device ID or alias to send it to a specific device',
@@ -1530,7 +1527,7 @@ var validCmds = {
 
           if (0 < device.length) {
             cmdHelper.data.device = device;
-            queueMessage({
+            queueMsg({
               text : ['Searching for device...']
             });
             socket.emit('verifyDevice', cmdHelper.data);
@@ -1542,7 +1539,7 @@ var validCmds = {
       },
       function() {
         cmdHelper.onStep++;
-        queueMessage({
+        queueMsg({
           text : [
             'Write a line and press enter',
             'Press enter without any input when you are done ' +
@@ -1564,14 +1561,14 @@ var validCmds = {
 
           cmdHelper.onStep++;
 
-          queueMessage({
+          queueMsg({
             text : ['Preview of the message:']
           });
-          queueMessage({
+          queueMsg({
             text : dataText,
             extraClass : 'importantMsg'
           });
-          queueMessage({
+          queueMsg({
             text : ['Is this OK? "yes" to accept the message']
           });
         }
@@ -1581,7 +1578,7 @@ var validCmds = {
           if ('yes' === phrases[0].toLowerCase()) {
             cmdHelper.onStep++;
 
-            queueMessage({
+            queueMsg({
               text : [
                 'Do you want to send it as morse code too? ' +
                 '"yes" to send it as morse too',
@@ -1589,7 +1586,7 @@ var validCmds = {
               ]
             });
           } else {
-            resetCommand(true);
+            resetCmd(true);
           }
         }
       },
@@ -1600,7 +1597,7 @@ var validCmds = {
           }
 
           socket.emit('importantMsg', cmdHelper.data);
-          resetCommand();
+          resetCmd();
         }
       }
     ],
@@ -1619,23 +1616,23 @@ var validCmds = {
       var data = {};
 
       data.randomizer = function(length) {
-        var randomBinary = '01';
-        var randomLength = randomBinary.length;
+        var randBinary = '01';
+        var randLength = randBinary.length;
         var code = '';
         var i;
-        var randomVal;
+        var randVal;
 
         for (i = 0; i < length; i++) {
-          randomVal = Math.random() * (randomLength - 1);
+          randVal = Math.random() * (randLength - 1);
 
-          code += randomBinary[Math.round(randomVal)];
+          code += randBinary[Math.round(randVal)];
         }
 
         return code;
       };
       cmdHelper.data = data;
 
-      queueMessage({
+      queueMsg({
         text : [
           '--------------',
           '- DEACTIVATE -',
@@ -1643,15 +1640,15 @@ var validCmds = {
         ],
         extraClass : 'importantMsg large'
       });
-      queueMessage({
+      queueMsg({
         text : [
           'CONTROL WORD SENT',
           'AWAITING CONFIRMATION'
         ],
         extraClass : 'importantMsg'
       });
-      queueMessage(copyMessage(abortInfo));
-      queueMessage({
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
         text : ['Press Enter to continue']
       });
       setInputStart('Chipper');
@@ -1661,7 +1658,7 @@ var validCmds = {
         var cmdObj = cmdHelper;
 
         cmdObj.onStep++;
-        queueMessage({
+        queueMsg({
           text : [
             'Chipper has been activated',
             'Connecting to ECU.........'
@@ -1672,7 +1669,7 @@ var validCmds = {
       function() {
         var cmdObj = cmdHelper;
         var stopFunc = function() {
-          queueMessage({
+          queueMsg({
             text : [
               'WARNING',
               'CONTROL IS BEING RELEASED',
@@ -1688,7 +1685,7 @@ var validCmds = {
           cmdObj.data.timer = setTimeout(stopFunc, 300000, false);
         }
 
-        queueMessage({
+        queueMsg({
           text : [
             cmdObj.data.randomizer(36)
           ]
@@ -1703,13 +1700,13 @@ var validCmds = {
       clearTimeout(cmdObj.data.printTimer);
       clearTimeout(cmdObj.data.timer);
       validCmds.clear.func();
-      queueMessage({
+      queueMsg({
         text : [
           'Chipper has powered down',
           'Control has been released'
         ]
       });
-      resetCommand();
+      resetCmd();
     },
     help : [
       'Activate chipper function',
@@ -1743,7 +1740,7 @@ var validCmds = {
           socket.emit('switchRoom', room);
         }
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You have to specify which room to switch to']
         });
       }
@@ -1769,7 +1766,7 @@ var validCmds = {
         data.roomName = phrases[0].toLowerCase();
         cmdHelper.data = data;
 
-        queueMessage({
+        queueMsg({
           text : [
             'Do you really want to remove the room?',
             'Confirm by writing "yes"'
@@ -1778,9 +1775,9 @@ var validCmds = {
 
         setInputStart('removeroom');
       } else {
-        resetCommand(true);
+        resetCmd(true);
 
-        queueMessage({
+        queueMsg({
           text : ['You forgot to input the room name']
         });
       }
@@ -1791,7 +1788,7 @@ var validCmds = {
           socket.emit('removeRoom', cmdHelper.data.roomName);
         }
 
-        resetCommand();
+        resetCmd();
       }
     ],
     help : [
@@ -1820,7 +1817,7 @@ var validCmds = {
 
         socket.emit('updateUser', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You need to write a user name, field name and value',
             'Example: updateuser user1 accesslevel 3'
@@ -1854,7 +1851,7 @@ var validCmds = {
 
         socket.emit('updateCommand', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You need to write a command name, field name and value',
             'Example: updatecommand help accesslevel 3'
@@ -1887,7 +1884,7 @@ var validCmds = {
 
         socket.emit('updateRoom', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You need to write a room name, field name and value',
             'Example: updateroom room1 accesslevel 3'
@@ -1916,7 +1913,7 @@ var validCmds = {
       data.keys = [];
       cmdHelper.data = data;
 
-      queueMessage({
+      queueMsg({
         text : [
           '-----------------------',
           '  Add encryption keys',
@@ -1925,8 +1922,8 @@ var validCmds = {
           'Press enter without any input when you are done'
         ]
       });
-      queueMessage(copyMessage(abortInfo));
-      queueMessage({
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
         text : ['Input an encryption key:']
       });
       setInputStart('Input key');
@@ -1945,7 +1942,7 @@ var validCmds = {
 
           cmdHelper.data.keys.push(keyObj);
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Are you sure you want to add the keys?',
               'Write "yes" to accept'
@@ -1956,16 +1953,16 @@ var validCmds = {
       },
       function(phrases) {
         if ('yes' === phrases[0].toLowerCase()) {
-          queueMessage({
+          queueMsg({
             text : ['Uploading new keys...']
           });
           socket.emit('addKeys', cmdHelper.data.keys);
-          resetCommand();
+          resetCmd();
         } else {
-          queueMessage({
+          queueMsg({
             text : ['The keys will not be uploaded']
           });
-          resetCommand(true);
+          resetCmd(true);
         }
       }
     ],
@@ -1987,7 +1984,7 @@ var validCmds = {
       data.entities = [];
       cmdHelper.data = data;
 
-      queueMessage({
+      queueMsg({
         text : [
           '-----------------------',
           '  Add entities',
@@ -1996,7 +1993,7 @@ var validCmds = {
           'Press enter without any input when you are done'
         ]
       });
-      queueMessage(copyMessage(abortInfo));
+      queueMsg(copyMsg(abortInfo));
       setInputStart('Input entity');
     },
     steps : [
@@ -2008,7 +2005,7 @@ var validCmds = {
 
           cmdHelper.data.entities.push(entityObj);
         } else {
-          queueMessage({
+          queueMsg({
             text : [
               'Are you sure you want to add the entities?',
               'Write "yes" to accept'
@@ -2019,16 +2016,16 @@ var validCmds = {
       },
       function(phrases) {
         if ('yes' === phrases[0].toLowerCase()) {
-          queueMessage({
+          queueMsg({
             text : ['Uploading new entities...']
           });
           socket.emit('addEntities', cmdHelper.data.entities);
-          resetCommand();
+          resetCmd();
         } else {
-          queueMessage({
+          queueMsg({
             text : ['The entities will not be uploaded']
           });
-          resetCommand(true);
+          resetCmd(true);
         }
       }
     ],
@@ -2061,7 +2058,7 @@ var validCmds = {
 
         socket.emit('updateDevice', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You need to write a device Id, field name and value',
             'Example: updatedevice 11jfej433 id betteralias'
@@ -2090,14 +2087,14 @@ var validCmds = {
       data.text = [];
       cmdHelper.data = data;
 
-      queueMessage({
+      queueMsg({
         text : [
           'Write a coordinate and press enter',
           'Press enter without any input when you are done ' +
           'with the message'
         ]
       });
-      queueMessage(copyMessage(abortInfo));
+      queueMsg(copyMsg(abortInfo));
       setInputStart('moduleraid');
     },
     steps : [
@@ -2120,14 +2117,14 @@ var validCmds = {
 
           cmdHelper.onStep++;
 
-          queueMessage({
+          queueMsg({
             text : ['Preview of the message:']
           });
-          queueMessage({
+          queueMsg({
             text : text,
             extraClass : 'importantMsg'
           });
-          queueMessage({
+          queueMsg({
             text : ['Is this OK? "yes" to accept the message']
           });
         }
@@ -2136,9 +2133,9 @@ var validCmds = {
         if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
           cmdHelper.data.morse = { local : true };
           socket.emit('importantMsg', cmdHelper.data);
-          resetCommand();
+          resetCmd();
         } else {
-          resetCommand(true);
+          resetCmd(true);
         }
       }
     ],
@@ -2166,7 +2163,7 @@ var validCmds = {
 
         socket.emit('createTeam', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : ['You have to enter a name']
         });
       }
@@ -2187,7 +2184,7 @@ var validCmds = {
         data.userName = userName;
         socket.emit('inviteToTeam', data);
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You are not allowed to invite members to the team or you are not in a team'
           ]
@@ -2212,11 +2209,11 @@ var validCmds = {
         aliases[aliasName] = sequence;
         setAliases(aliases);
       } else if (-1 < cmdKeys.indexOf(aliasName)) {
-        queueMessage({
+        queueMsg({
           text : [aliasName + ' is a built-in command. You may not override built-in commands']
         });
       } else {
-        queueMessage({
+        queueMsg({
           text : [
             'You have to input a name and sequence',
             'E.g. alias goodalias msg hello'
@@ -2231,7 +2228,7 @@ var validCmds = {
   }
 };
 
-function findOneAndReplace(text, find, replaceWith) {
+function findOneReplace(text, find, replaceWith) {
   return text.replace(new RegExp(find), replaceWith);
 }
 
@@ -2259,7 +2256,7 @@ function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
 }
 
-function queueMessage(message) {
+function queueMsg(message) {
   msgQueue.push(message);
 }
 
@@ -2267,9 +2264,9 @@ function resetAllLocalVals() {
   removeCmdHistory();
   removeRoom();
   removeUser();
-  setAccessLevel(0);
+  setAccessLvl(0);
 
-  previousCommandPointer = 0;
+  prevCmdPointer = 0;
   setInputStart(defaultInputStart);
 }
 
@@ -2277,7 +2274,7 @@ function copyString(text) {
   return null !== text ? JSON.parse(JSON.stringify(text)) : '';
 }
 
-function copyMessage(textObj) {
+function copyMsg(textObj) {
   return null !== textObj ? JSON.parse(JSON.stringify(textObj)) : { text : [''] };
 }
 
@@ -2311,11 +2308,11 @@ function removeRoom() {
   removeLocalVal('room');
 }
 
-function getAccessLevel() {
+function getAccessLvl() {
   return parseInt(getLocalVal('accessLevel'));
 }
 
-function setAccessLevel(accessLevel) {
+function setAccessLvl(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
 }
 
@@ -2369,11 +2366,11 @@ function setInputStart(text) {
   inputStart.textContent = text;
 }
 
-function resetCommand(aborted) {
+function resetCmd(aborted) {
   var room = getRoom() ? getRoom() : defaultInputStart;
 
   if (aborted) {
-    queueMessage({
+    queueMsg({
       text : ['Aborting command']
     });
   }
@@ -2381,7 +2378,7 @@ function resetCommand(aborted) {
   cmdHelper.command = null;
   cmdHelper.onStep = 0;
   cmdHelper.maxSteps = 0;
-  cmdHelper.keyboardBlocked = false;
+  cmdHelper.keysBlocked = false;
   cmdHelper.data = null;
   cmdHelper.hideInput = false;
   setInputStart(room);
@@ -2391,9 +2388,9 @@ function refreshApp() {
   window.location.reload();
 }
 
-function queueCommand(command, data, cmdMsg) {
+function queueCmd(cmd, data, cmdMsg) {
   cmdQueue.push({
-    command : command,
+    command : cmd,
     data : data,
     cmdMsg : cmdMsg
   });
@@ -2410,18 +2407,18 @@ function pushCmdHistory(cmd) {
 function enterRoom(roomName) {
   setRoom(roomName);
   setInputStart(roomName);
-  queueMessage({ text : ['Entered ' + roomName] });
+  queueMsg({ text : ['Entered ' + roomName] });
 }
 
 function resetPrevCmdPointer() {
   var cmdHistory = getCmdHistory();
 
-  previousCommandPointer = cmdHistory ? cmdHistory.length : 0;
+  prevCmdPointer = cmdHistory ? cmdHistory.length : 0;
 }
 
 // Needed for Android 2.1. trim() is not supported
 function trimSpace(sentText) {
-  return findOneAndReplace(sentText, /^\s+|\s+$/, '');
+  return findOneReplace(sentText, /^\s+|\s+$/, '');
 }
 
 function setGain(value) {
@@ -2437,7 +2434,7 @@ function playMorse(morseCode) {
     var cleanMorse = morseCode.replace(/#/g, '');
 
     soundQueue.splice(0, timeouts);
-    queueMessage({
+    queueMsg({
       text : ['Morse code message received:  ' + cleanMorse]
     });
   }
@@ -2569,7 +2566,7 @@ function locateOnMap(latitude, longitude) {
  * @param {object} position . -
  * @returns {object} Returns position
  */
-function preparePositionData(position) {
+function preparePosition(position) {
   var preparedPosition = {};
 
   preparedPosition.latitude = position.coords.latitude;
@@ -2582,7 +2579,7 @@ function preparePositionData(position) {
   return preparedPosition; // geolocation
 }
 
-function sendLocationData() {
+function sendLocation() {
   var mostAccuratePos;
   var i;
   var position;
@@ -2592,7 +2589,7 @@ function sendLocationData() {
     var clearingWatch = function() {
       navigator.geolocation.clearWatch(watchId);
       watchId = null;
-      intervals.tracking = setTimeout(sendLocationData, pausePositionTime);
+      intervals.tracking = setTimeout(sendLocation, pausePositionTime);
     };
 
     watchId = navigator.geolocation.watchPosition(function() {
@@ -2603,7 +2600,7 @@ function sendLocationData() {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
         clearTimeout(intervals.tracking);
-        queueMessage({
+        queueMsg({
           text : [
             'Unable to connect to the tracking satellites',
             'Turning off tracking is a major offense',
@@ -2632,7 +2629,7 @@ function sendLocationData() {
     }
 
     positions = [];
-    socket.emit('updateLocation', preparePositionData(mostAccuratePos));
+    socket.emit('updateLocation', preparePosition(mostAccuratePos));
   }
 
   retrievePosition();
@@ -2679,11 +2676,11 @@ function setIntervals() {
   }
 
   // Prints messages from the queue
-  intervals.printText = setInterval(consumeMsgQueue, printIntervalTime, msgQueue);
+  intervals.printText = setInterval(consumeMsgQueue, printIntervalTime);
 
   if (isTracking && navigator.geolocation) {
     // Gets new geolocation data
-    sendLocationData();
+    sendLocation();
   }
 
   // Should not be recreated on focus
@@ -2749,74 +2746,73 @@ function triggerAutoComplete(text, textChar) {
   return false;
 }
 
-function setCommandUsed(used) {
-  commandUsed = used;
+function setCmdUsed(used) {
+  cmdUsed = used;
 }
 
 function consumeCmdQueue() {
   var storedCmd;
-  var command;
+  var cmd;
   var cmdMsg;
 
   if (0 < cmdQueue.length) {
     storedCmd = cmdQueue.shift();
-    command = storedCmd.command;
+    cmd = storedCmd.command;
     cmdMsg = storedCmd.cmdMsg;
 
     if (cmdMsg !== undefined) {
-      queueMessage(cmdMsg);
+      queueMsg(cmdMsg);
     }
 
-    setCommandUsed(true);
-    command(storedCmd.data);
-    setTimeout(consumeCmdQueue, commandTime);
+    setCmdUsed(true);
+    cmd(storedCmd.data);
+    setTimeout(consumeCmdQueue, cmdTime);
   } else {
-    setCommandUsed(false);
+    setCmdUsed(false);
   }
 }
 
 function startCmdQueue() {
-  if (!commandUsed) {
+  if (!cmdUsed) {
     consumeCmdQueue();
   }
 }
 
-function getCmdAccessLevel(commandName) {
-  return validCmds[commandName] ? validCmds[commandName].accessLevel : 1;
+function getCmdAccessLevel(cmdName) {
+  return validCmds[cmdName] ? validCmds[cmdName].accessLevel : 1;
 }
 
-function getCmd(commandName) {
+function getCmd(cmdName) {
   var aliases = getAliases();
   var cmd;
 
-  if (validCmds[commandName]) {
-    cmd = validCmds[commandName];
-  } else if (aliases[commandName]) {
-    cmd = validCmds[aliases[commandName][0]];
+  if (validCmds[cmdName]) {
+    cmd = validCmds[cmdName];
+  } else if (aliases[cmdName]) {
+    cmd = validCmds[aliases[cmdName][0]];
   }
 
   return cmd;
 }
 
-function combineSequences(commandName, phrases) {
+function combineSequences(cmdName, phrases) {
   var aliases = getAliases();
-  var combined = aliases[commandName] ? aliases[commandName].concat(phrases.slice(1)) : phrases.slice(1);
+  var combined = aliases[cmdName] ? aliases[cmdName].concat(phrases.slice(1)) : phrases.slice(1);
 
   return combined;
 }
 
 function autoComplete() {
   var phrases = trimSpace(getInputText().toLowerCase()).split(' ');
-  var partialCommand = phrases[0];
+  var partialCmd = phrases[0];
   //TODO Change from Object.keys for compatibility with older Android
-  var commands = Object.keys(validCmds).concat(Object.keys(getAliases()));
+  var cmds = Object.keys(validCmds).concat(Object.keys(getAliases()));
   var matched = [];
-  var sign = partialCommand.charAt(0);
-  var cmdChars = commandChars;
+  var sign = partialCmd.charAt(0);
   var i;
   var j;
   var matches;
-  var commandAccessLevel;
+  var cmdAccesssLvl;
   var newText = '';
   var cmdIndex;
   var msg = '';
@@ -2827,21 +2823,20 @@ function autoComplete() {
    * It will not auto-complete flags
    * If chat mode and the command is prepended or normal mode
    */
-  if (1 === phrases.length && 0 < partialCommand.length
+  if (1 === phrases.length && 0 < partialCmd.length
       && (0 <= cmdChars.indexOf(sign) || (cmdMode === getMode()) || null === getUser())) {
     // Removes prepend sign
     if (0 <= cmdChars.indexOf(sign)) {
-      partialCommand = partialCommand.slice(1);
+      partialCmd = partialCmd.slice(1);
     }
 
-    for (i = 0; i < commands.length; i++) {
+    for (i = 0; i < cmds.length; i++) {
       matches = false;
 
-      for (j = 0; j < partialCommand.length; j++) {
-        commandAccessLevel = getCmdAccessLevel(commands[i]);
+      for (j = 0; j < partialCmd.length; j++) {
+        cmdAccesssLvl = getCmdAccessLevel(cmds[i]);
 
-        if ((isNaN(commandAccessLevel) || getAccessLevel() >= commandAccessLevel)
-            && partialCommand.charAt(j) === commands[i].charAt(j)) {
+        if ((isNaN(cmdAccesssLvl) || getAccessLvl() >= cmdAccesssLvl) && partialCmd.charAt(j) === cmds[i].charAt(j)) {
           matches = true;
         } else {
           matches = false;
@@ -2851,7 +2846,7 @@ function autoComplete() {
       }
 
       if (matches) {
-        matched.push(commands[i]);
+        matched.push(cmds[i]);
       }
     }
 
@@ -2873,11 +2868,11 @@ function autoComplete() {
         msg += matched[cmdMatched] + '\t';
       }
 
-      queueMessage({ text : [msg] });
+      queueMsg({ text : [msg] });
     }
 
     // No input? Show all available commands
-  } else if (0 === partialCommand.length) {
+  } else if (0 === partialCmd.length) {
     validCmds.help.func();
   }
 }
@@ -2894,7 +2889,7 @@ function printHelpMsg(command) {
   }
 
   if (0 < helpMsg.text.length) {
-    queueMessage(helpMsg);
+    queueMsg(helpMsg);
   }
 }
 
@@ -2907,9 +2902,7 @@ function printUsedCmd(clearAfterUse, inputText) {
    */
   if (!clearAfterUse) {
     cmdUsedMsg = {
-      text : [
-        getInputStart() + getModeText() + '$ ' + inputText
-      ]
+      text : [getInputStart() + getModeText() + '$ ' + inputText]
     };
   }
 
@@ -2920,11 +2913,11 @@ function specialKeyPress(event) {
   var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
   var cmdHistory;
   var cmdObj = cmdHelper;
-  var commands = validCmds;
+  var cmds = validCmds;
   var inputText;
   var phrases;
-  var command = null;
-  var commandName;
+  var cmd = null;
+  var cmdName;
   var user = getUser();
   var sign;
 
@@ -2944,7 +2937,7 @@ function specialKeyPress(event) {
       case 9:
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
+        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
           autoComplete();
         }
 
@@ -2957,26 +2950,26 @@ function specialKeyPress(event) {
       case 13:
         keyPressed = true;
 
-        if (!cmdObj.keyboardBlocked) {
+        if (!cmdObj.keysBlocked) {
           if (null !== cmdObj.command) {
             inputText = getInputText();
             phrases = trimSpace(inputText).split(' ');
 
             //TODO Hard coded
             if ('exit' === phrases[0] || 'abort' === phrases[0]) {
-              if (commands[cmdObj.command].abortFunc) {
-                commands[cmdObj.command].abortFunc();
+              if (cmds[cmdObj.command].abortFunc) {
+                cmds[cmdObj.command].abortFunc();
               }
 
-              resetCommand(true);
+              resetCmd(true);
             } else {
               if (!cmdHelper.hideInput) {
-                queueMessage({
+                queueMsg({
                   text : [inputText]
                 });
               }
 
-              commands[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
+              cmds[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
             }
           } else {
             inputText = getInputText();
@@ -2985,15 +2978,15 @@ function specialKeyPress(event) {
             if (0 < phrases[0].length) {
               sign = phrases[0].charAt(0);
 
-              if (0 <= commandChars.indexOf(sign)) {
-                commandName = phrases[0].slice(1).toLowerCase();
+              if (0 <= cmdChars.indexOf(sign)) {
+                cmdName = phrases[0].slice(1).toLowerCase();
               } else if (cmdMode === getMode() || null === user) {
-                commandName = phrases[0].toLowerCase();
+                cmdName = phrases[0].toLowerCase();
               }
 
-              command = getCmd(commandName);
+              cmd = getCmd(cmdName);
 
-              if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
+              if (cmd && (isNaN(cmd.accessLevel) || getAccessLvl() >= cmd.accessLevel)) {
                 // Store the command for usage with up/down arrows
                 pushCmdHistory(phrases.join(' '));
 
@@ -3001,19 +2994,19 @@ function specialKeyPress(event) {
                  * Print the help and instruction parts of the command
                  */
                 if ('-help' === phrases[1]) {
-                  printHelpMsg(command);
+                  printHelpMsg(cmd);
                 } else {
-                  if (command.steps) {
-                    cmdObj.command = commandName;
-                    cmdObj.maxSteps = command.steps.length;
+                  if (cmd.steps) {
+                    cmdObj.command = cmdName;
+                    cmdObj.maxSteps = cmd.steps.length;
                   }
 
-                  if (command.clearBeforeUse) {
+                  if (cmd.clearBeforeUse) {
                     validCmds.clear.func();
                   }
 
-                  queueCommand(command.func, combineSequences(commandName, phrases),
-                    printUsedCmd(command.clearAfterUse, inputText)
+                  queueCmd(cmd.func, combineSequences(cmdName, phrases),
+                    printUsedCmd(cmd.clearAfterUse, inputText)
                   );
                   startCmdQueue();
                 }
@@ -3021,8 +3014,8 @@ function specialKeyPress(event) {
                * User is logged in and in chat mode
                */
               } else if (null !== user && chatMode === getMode() && 0 < phrases[0].length) {
-                if (0 > commandChars.indexOf(phrases[0].charAt(0))) {
-                  queueCommand(commands.msg.func, phrases);
+                if (0 > cmdChars.indexOf(phrases[0].charAt(0))) {
+                  queueCmd(cmds.msg.func, phrases);
                   startCmdQueue();
 
                 /**
@@ -3030,13 +3023,13 @@ function specialKeyPress(event) {
                  * a proper command
                  */
                 } else {
-                  queueMessage({
-                    text : [phrases[0] + ': ' + commandFailText.text]
+                  queueMsg({
+                    text : [phrases[0] + ': ' + cmdFailText.text]
                   });
                 }
               } else if (null === user) {
-                queueMessage({ text : [phrases.toString()] });
-                queueMessage({
+                queueMsg({ text : [phrases.toString()] });
+                queueMsg({
                   text : [
                     'You must register a new user or login with an existing user to gain access to more commands',
                     'Use command register or login',
@@ -3049,9 +3042,9 @@ function specialKeyPress(event) {
                  * Sent command was not found.
                  * Print the failed input
                  */
-              } else if (0 < commandName.length) {
-                queueMessage({
-                  text : ['- ' + phrases[0] + ': ' + commandFailText.text]
+              } else if (0 < cmdName.length) {
+                queueMsg({
+                  text : ['- ' + phrases[0] + ': ' + cmdFailText.text]
                 });
               }
             }
@@ -3096,11 +3089,11 @@ function specialKeyPress(event) {
 
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
-          if (0 < previousCommandPointer) {
+        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
+          if (0 < prevCmdPointer) {
             clearInput();
-            previousCommandPointer--;
-            setCmdInput(cmdHistory[previousCommandPointer]);
+            prevCmdPointer--;
+            setCmdInput(cmdHistory[prevCmdPointer]);
           }
         }
 
@@ -3113,14 +3106,14 @@ function specialKeyPress(event) {
 
         keyPressed = true;
 
-        if (!cmdHelper.keyboardBlocked && null === cmdHelper.command) {
-          if (previousCommandPointer < cmdHistory.length - 1) {
+        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
+          if (prevCmdPointer < cmdHistory.length - 1) {
             clearInput();
-            previousCommandPointer++;
-            setCmdInput(cmdHistory[previousCommandPointer]);
-          } else if (previousCommandPointer === cmdHistory.length - 1) {
+            prevCmdPointer++;
+            setCmdInput(cmdHistory[prevCmdPointer]);
+          } else if (prevCmdPointer === cmdHistory.length - 1) {
             clearInput();
-            previousCommandPointer++;
+            prevCmdPointer++;
           } else {
             clearInput();
           }
@@ -3165,7 +3158,7 @@ function changeModeText() {
 
   if (getUser() && !cmdHelper.command) {
       //TODO msg command text in comparison should not be hard coded
-      if ((chatMode === mode && -1 < commandChars.indexOf(inputText.charAt(0)))
+      if ((chatMode === mode && -1 < cmdChars.indexOf(inputText.charAt(0)))
           || (cmdMode === mode && 'msg' !== trimSpace(inputText).split(' ')[0])) {
         setModeText(cmdMode.toUpperCase());
       } else {
@@ -3187,7 +3180,7 @@ function scrollView() {
 function generateTimeStamp(date, full) {
   var newDate = new Date(date);
   var splitDate;
-  var minutes;
+  var mins;
   var hours;
   var month;
   var day;
@@ -3199,13 +3192,13 @@ function generateTimeStamp(date, full) {
     newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
 
-  minutes = beautifyNumber(newDate.getMinutes());
-  hours = beautifyNumber(newDate.getHours());
-  timeStamp = hours + ':' + minutes;
+  mins = beautifyNumb(newDate.getMinutes());
+  hours = beautifyNumb(newDate.getHours());
+  timeStamp = hours + ':' + mins;
 
   if (full) {
-    month = beautifyNumber(newDate.getMonth());
-    day = beautifyNumber(newDate.getDate());
+    month = beautifyNumb(newDate.getMonth());
+    day = beautifyNumb(newDate.getDate());
 
     timeStamp = ' ' + day + '/' + month + ' ' + timeStamp;
   }
@@ -3213,15 +3206,15 @@ function generateTimeStamp(date, full) {
   return timeStamp;
 }
 
-function linkUser(element) {
-  setCmdInput('whisper ' + element.textContent + ' ');
+function linkUser(elem) {
+  setCmdInput('whisper ' + elem.textContent + ' ');
 }
 
-function linkRoom(element) {
-  validCmds.room.func([element.textContent]);
+function linkRoom(elem) {
+  validCmds.room.func([elem.textContent]);
 }
 
-function generateSpanElement(text, className) {
+function generateSpan(text, className) {
   var spanObj = document.createElement('span');
 
   spanObj.appendChild(document.createTextNode(text));
@@ -3233,8 +3226,8 @@ function generateSpanElement(text, className) {
   return spanObj;
 }
 
-function generateLinkElement(text, className, func) {
-  var spanObj = generateSpanElement(text, className);
+function generateLink(text, className, func) {
+  var spanObj = generateSpan(text, className);
 
   spanObj.className += ' link';
   spanObj.addEventListener('click', function(event) {
@@ -3252,63 +3245,63 @@ function generateFullRow(sentText, message) {
   var rowObj = document.createElement('li');
 
   if (message.time && !message.skipTime) {
-    rowObj.appendChild(generateSpanElement(generateTimeStamp(message.time), 'timestamp'));
+    rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
   }
 
   if (message.roomName) {
-    rowObj.appendChild(generateLinkElement(message.roomName, 'room', linkRoom));
+    rowObj.appendChild(generateLink(message.roomName, 'room', linkRoom));
   }
 
   if (message.userName) {
-    rowObj.appendChild(generateLinkElement(message.userName, 'user', linkUser));
+    rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
   }
 
-  rowObj.appendChild(generateSpanElement(sentText));
+  rowObj.appendChild(generateSpan(sentText));
 
   return rowObj;
 }
 
 function consumeMsgShortQueue() {
-  var message;
+  var msg;
 
   if (0 < shortMsgQueue.length) {
-    message = shortMsgQueue.shift();
+    msg = shortMsgQueue.shift();
 
-    printRow(message);
+    printRow(msg);
   } else {
     printing = false;
   }
 }
 
 // Prints messages from the queue
-function consumeMsgQueue(messageQueue) {
-  if (!printing && 0 < messageQueue.length) {
-    shortMsgQueue = messageQueue.splice(0, msgsPerQueue);
+function consumeMsgQueue() {
+  if (!printing && 0 < msgQueue.length) {
+    shortMsgQueue = msgQueue.splice(0, msgsPerQueue);
     printing = true;
     consumeMsgShortQueue();
   }
 }
 
-function printRow(message) {
+function printRow(msg) {
   var text;
   var row;
 
-  if (0 < message.text.length) {
-    text = message.text.shift();
-    row = generateFullRow(text, message);
+  if (0 < msg.text.length) {
+    text = msg.text.shift();
+    row = generateFullRow(text, msg);
 
-    if (message.extraClass) {
+    if (msg.extraClass) {
       /*
        * classList doesn't work on older devices, thus the usage of className
        */
-      row.className += ' ' + message.extraClass;
+      row.className += ' ' + msg.extraClass;
     }
 
     mainFeed.appendChild(row);
 
     scrollView();
 
-    setTimeout(printRow, rowTimeout, message);
+    setTimeout(printRow, rowTimeout, msg);
   } else {
     consumeMsgShortQueue();
   }
@@ -3316,38 +3309,38 @@ function printRow(message) {
 
 //TODO Hard coded
 function convertWhisperRoom(roomName) {
-  var convertedRoom = 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
+  var converted = 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
 
-  return convertedRoom;
+  return converted;
 }
 
 //TODO Hard coded
 function convertDeviceRoom(roomName) {
-  var convertedRoom = 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
+  var converted = 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
 
-  return convertedRoom;
+  return converted;
 }
 
 //TODO Hard coded
 function convertImportantRoom(roomName) {
-  var convertedRoom = 'important' === roomName ? 'IMPORTNT' : roomName;
+  var converted = 'important' === roomName ? 'IMPORTNT' : roomName;
 
-  return convertedRoom;
+  return converted;
 }
 
 //TODO Hard coded
 function convertBroadcastRoom(roomName) {
-  var convertedRoom = 'broadcast' === roomName ? 'BROADCST' : roomName;
+  var converted = 'broadcast' === roomName ? 'BROADCST' : roomName;
 
-  return convertedRoom;
+  return converted;
 }
 
 function printWelcomeMsg() {
-  var logoToPrint = copyMessage(logo);
-  var razLogoToPrint = copyMessage(razLogo);
+  var logoCopy = copyMsg(logo);
+  var razLogoCopy = copyMsg(razLogo);
 
-  queueMessage(logoToPrint);
-  queueMessage({
+  queueMsg(logoCopy);
+  queueMsg({
     text : [
       'Welcome, employee ' + getUser(),
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
@@ -3355,69 +3348,67 @@ function printWelcomeMsg() {
       'May you have a productive day'
     ]
   });
-  queueMessage({
+  queueMsg({
     text : [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
     ],
     extraClass : 'blue'
   });
-  queueMessage(razLogoToPrint);
+  queueMsg(razLogoCopy);
 }
 
-function beautifyNumber(number) {
+function beautifyNumb(number) {
   return 9 < number ? number : '0' + number;
 }
 
-function onChatMsg(message) {
-  if (message.roomName) {
-    message.roomName = convertWhisperRoom(message.roomName);
+function onChatMsg(msg) {
+  if (msg.roomName) {
+    msg.roomName = convertWhisperRoom(msg.roomName);
   }
 
-  queueMessage(message);
+  queueMsg(msg);
 }
 
-function onMessage(message) {
-  if (message.roomName) {
-    message.roomName = convertWhisperRoom(message.roomName);
+function onMessage(msg) {
+  if (msg.roomName) {
+    msg.roomName = convertWhisperRoom(msg.roomName);
   }
 
-  queueMessage(message);
+  queueMsg(msg);
 }
 
-function onBroadcastMsg(message) {
-  message.extraClass = 'bold';
+function onBroadcastMsg(msg) {
+  msg.extraClass = 'bold';
 
-  queueMessage(message);
+  queueMsg(msg);
 }
 
 function onImportantMsg(msg) {
-  var message = msg;
+  msg.extraClass = 'importantMsg';
+  msg.skipTime = true;
 
-  message.extraClass = 'importantMsg';
-  message.skipTime = true;
+  queueMsg(msg);
 
-  queueMessage(message);
-
-  if (message.morse) {
-    validCmds.morse.func(message.text.slice(0, 1), message.morse.local);
+  if (msg.morse) {
+    validCmds.morse.func(msg.text.slice(0, 1), msg.morse.local);
   }
 }
 
-function onMultiMsg(messages) {
-  var message;
+function onMultiMsg(msgs) {
+  var msg;
   var i;
 
-  for (i = 0; i < messages.length; i++) {
-    message = messages[i];
+  for (i = 0; i < msgs.length; i++) {
+    msg = msgs[i];
 
-    if (message.roomName) {
-      message.roomName = convertWhisperRoom(message.roomName);
-      message.roomName = convertDeviceRoom(message.roomName);
-      message.roomName = convertImportantRoom(message.roomName);
-      message.roomName = convertBroadcastRoom(message.roomName);
+    if (msg.roomName) {
+      msg.roomName = convertWhisperRoom(msg.roomName);
+      msg.roomName = convertDeviceRoom(msg.roomName);
+      msg.roomName = convertImportantRoom(msg.roomName);
+      msg.roomName = convertBroadcastRoom(msg.roomName);
     }
 
-    queueMessage(message);
+    queueMsg(msg);
   }
 }
 
@@ -3438,7 +3429,7 @@ function onReconnect() {
 }
 
 function onDisconnect() {
-  queueMessage({
+  queueMsg({
     text : ['Lost connection'],
     extraClass : 'importantMsg'
   });
@@ -3448,14 +3439,14 @@ function onFollow(room) {
   if (room.entered) {
     enterRoom(room.roomName);
   } else {
-    queueMessage({
+    queueMsg({
       text : ['Following ' + room.roomName]
     });
   }
 }
 
 function onUnfollow(room) {
-  queueMessage({
+  queueMsg({
     text : ['Stopped following ' + room.roomName]
   });
 
@@ -3469,8 +3460,8 @@ function onLogin(user) {
 
   validCmds.clear.func();
   setUser(user.userName);
-  setAccessLevel(user.accessLevel);
-  queueMessage({
+  setAccessLvl(user.accessLevel);
+  queueMsg({
     text : ['Successfully logged in as ' + user.userName]
   });
   printWelcomeMsg();
@@ -3495,7 +3486,7 @@ function onCommandSuccess(data) {
 
 function onCommandFail() {
   validCmds[cmdHelper.command].abortFunc();
-  resetCommand(true);
+  resetCmd(true);
 }
 
 function onReconnectSuccess(data) {
@@ -3507,7 +3498,7 @@ function onReconnectSuccess(data) {
     room = getRoom();
 
     validCmds.mode.func([mode], false);
-    setAccessLevel(data.user.accessLevel);
+    setAccessLvl(data.user.accessLevel);
 
     socket.emit('updateDeviceSocketId', {
       deviceId : getDeviceId(),
@@ -3516,7 +3507,7 @@ function onReconnectSuccess(data) {
     });
 
     if (!data.firstConnection) {
-      queueMessage({
+      queueMsg({
         text : ['Re-established connection'],
         extraClass : 'importantMsg'
       });
@@ -3528,12 +3519,12 @@ function onReconnectSuccess(data) {
       }
     }
 
-    queueMessage({
+    queueMsg({
       text : ['Retrieving missed messages (if any)']
     });
   } else {
     if (!data.firstConnection) {
-      queueMessage({
+      queueMsg({
         text : ['Re-established connection'],
         extraClass : 'importantMsg'
       });
@@ -3548,7 +3539,7 @@ function onDisconnectUser() {
 
   // There is no saved local user. We don't need to print this
   if (null !== currentUser) {
-    queueMessage({
+    queueMsg({
       text : [
         'Didn\'t find user ' + getUser() + ' in database',
         'Resetting local configuration'
@@ -3564,7 +3555,7 @@ function onMorse(morseCode) {
 }
 
 function onTime(time) {
-  queueMessage({
+  queueMsg({
     text : ['Time: ' + generateTimeStamp(time, true)]
   });
 }
@@ -3608,13 +3599,13 @@ function onLocationMsg(locationData) {
         }
       }
 
-      queueMessage({ text : [text] });
+      queueMsg({ text : [text] });
     }
   }
 }
 
 function onBan() {
-  queueMessage({
+  queueMsg({
     text : [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support ' +
@@ -3631,7 +3622,7 @@ function onLogout() {
   validCmds.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
-  printStartMessage();
+  printStartMsg();
 }
 
 function onUpdateCommands(commands) {
@@ -3673,9 +3664,9 @@ function onWeather(report) {
     weatherInst = report[i];
     weatherString = '';
     time = new Date(weatherInst.time);
-    hours = beautifyNumber(time.getHours());
-    day = beautifyNumber(time.getDate());
-    month = beautifyNumber(time.getMonth());
+    hours = beautifyNumb(time.getHours());
+    day = beautifyNumb(time.getDate());
+    month = beautifyNumb(time.getMonth());
     temperature = Math.round(weatherInst.temperature);
     windSpeed = Math.round(weatherInst.gust);
     precip = 0 === weatherInst.precipitation ? 'Light ' : weatherInst.precipitation + 'mm ';
@@ -3752,14 +3743,14 @@ function onWeather(report) {
     weather.push(weatherString);
   }
 
-  queueMessage({ text : weather });
+  queueMsg({ text : weather });
 }
 
 function onUpdateDeviceId(newId) {
   setDeviceId(newId);
 }
 
-function startSocketListeners() {
+function startSocket() {
   if (socket) {
     socket.on('chatMsg', onChatMsg);
     socket.on('message', onMessage);
@@ -3831,24 +3822,24 @@ function fullscreenResize(keyboardShown) {
 }
 
 function generateDeviceId() {
-  var randomLength = randomString.length;
+  var randomLength = randString.length;
   var deviceId = '';
   var i;
   var randomVal;
 
   for (i = 0; 15 > i; i++) {
     randomVal = Math.random() * (randomLength - 1);
-    deviceId += randomString[Math.round(randomVal)];
+    deviceId += randString[Math.round(randomVal)];
   }
 
   return deviceId;
 }
 
-function printStartMessage() {
-  var logoToPrint = copyMessage(logo);
+function printStartMsg() {
+  var logoToPrint = copyMsg(logo);
 
-  queueMessage(logoToPrint);
-  queueMessage({
+  queueMsg(logoToPrint);
+  queueMsg({
     text : [
       '---',
       'Connecting... Could not establish connection to HQ',
@@ -3858,7 +3849,7 @@ function printStartMessage() {
     ],
     extraClass : 'upperCase'
   });
-  queueMessage({
+  queueMsg({
     text : [
       'Welcome to the Oracle of Organica',
       'Please login to start your productive day!',
@@ -3909,7 +3900,7 @@ function startBoot() {
     event.preventDefault();
   });
 
-  startSocketListeners();
+  startSocket();
   addEventListener('keypress', keyPress);
   // Needed for some special keys. They are not detected with keypress
   addEventListener('keydown', specialKeyPress);
@@ -3922,12 +3913,12 @@ function startBoot() {
   startAudio();
 
   // TODO: Move this
-  if (!getAccessLevel()) {
-    setAccessLevel(0);
+  if (!getAccessLvl()) {
+    setAccessLvl(0);
   }
 
   if (!getUser()) {
-    printStartMessage();
+    printStartMsg();
     setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
       deviceId : getDeviceId(),

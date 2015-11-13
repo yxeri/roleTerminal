@@ -92,6 +92,7 @@ var cmdChars = ['-', '/'];
 var cmdMode = 'cmd';
 var chatMode = 'chat';
 var randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+var randBinary = '01';
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
@@ -259,13 +260,14 @@ var validCmds = {
         var adminCmds = getCmds('admin');
 
         if (null === getUser()) {
+
           queueMsg({
             text : [
-              '------------------------------------------------',
-              'Use register to register a new user',
-              'Use login to log in to an existing user',
-              'You have to log in to access most of the system',
-              '------------------------------------------------'
+              createLine(49),
+              ' Use register to register a new user',
+              ' Use login to log in to an existing user',
+              ' You have to log in to access most of the system',
+              createLine(49)
             ]
           });
           queueMsg({
@@ -300,10 +302,7 @@ var validCmds = {
 
       if (undefined === phrases || 0 === phrases.length) {
         queueMsg({
-          text : [
-            '--------',
-            '  Help',
-            '--------',
+          text : createCmdStart('help').concat([
             'Instructions',
             '  Add -help after a command to get instructions on how to use it. Example: ' + cmdChars[0] +
             'uploadkey -help',
@@ -312,7 +311,7 @@ var validCmds = {
             '  Press arrow up/down to go through your previous used commands',
             '  Pressing tab or space twice will auto-complete any command you have begun writing.',
             '  Example: "he" and a tab / double space will automatically turn into "help"'
-          ]
+          ])
         });
       }
 
@@ -347,16 +346,11 @@ var validCmds = {
   },
   whoami : {
     func : function() {
-      queueMsg({
-        text : [
-          '----------',
-          '  Whoami',
-          '----------',
-          'User name: ' + getUser(),
-          'Access level: ' + getAccessLvl(),
-          'Device ID: ' + getDeviceId()
-        ]
-      });
+      var data = {};
+      data.device = {};
+      data.device.deviceId = getDeviceId();
+
+      socket.emit('whoAmI', data);
     },
     help : ['Shows the current user'],
     accessLevel : 13,
@@ -419,9 +413,9 @@ var validCmds = {
         if (0 < phrases.length && '' !== phrases[0]) {
           phrase = phrases.join(' ');
 
-          cmdHelper.data.text.push('--- BROADCAST FROM: ' + phrase + ' ---');
+          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast from: ' + phrase));
         } else {
-          cmdHelper.data.text.push('--- BROADCAST ---');
+          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast'));
         }
 
         queueMsg({
@@ -442,7 +436,7 @@ var validCmds = {
 
           cmdHelper.data.text.push(phrase);
         } else {
-          cmdHelper.data.text.push('--- END BROADCAST ---');
+          cmdHelper.data.text.push(createLine(10));
           dataText = copyString(cmdHelper.data.text);
 
           cmdHelper.onStep++;
@@ -587,6 +581,7 @@ var validCmds = {
   mode : {
     func : function(phrases, verbose) {
       var newMode;
+      var cmdString;
 
       if (0 < phrases.length) {
         newMode = phrases[0].toLowerCase();
@@ -596,18 +591,13 @@ var validCmds = {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
+            cmdString = 'Chat mode activated';
             queueMsg({
-              text : [
-                '-----------------------',
-                '  Chat mode activated',
-                '-----------------------',
-                'Prepend commands with "' + cmdChars.join('" or "') +
-                '", e.g. ' + '"' + cmdChars[0] +
-                'uploadkey"',
-                'Everything else written and sent ' +
-                'will be intepreted' +
-                'as a chat message'
-              ]
+              text : createCmdStart(cmdString).concat([
+                'Prepend commands with "' + cmdChars.join('" or "') + '", e.g. ' + '"' + cmdChars[0] + 'uploadkey"',
+                'Everything else written and sent will be intepreted as a chat message',
+                createCmdEnd(cmdString.length)
+              ])
             });
           }
 
@@ -616,16 +606,13 @@ var validCmds = {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
+            cmdString = 'Command mode activated';
             queueMsg({
-              text : [
-                '--------------------------',
-                '  Command mode activated',
-                '--------------------------',
-                'Commands can be used without "' +
-                cmdChars[0] + '"',
-                'You have to use command "msg" ' +
-                'to send messages'
-              ]
+              text : createCmdStart(cmdString).concat([
+                'Commands can be used without "' + cmdChars[0] + '"',
+                'You have to use command "msg" to send messages',
+                createCmdEnd(cmdString.length)
+              ])
             });
           }
 
@@ -637,9 +624,7 @@ var validCmds = {
         }
       } else {
         queueMsg({
-          text : [
-            'Current mode: ' + getMode()
-          ]
+          text : ['Current mode: ' + getMode()]
         });
       }
     },
@@ -1331,25 +1316,11 @@ var validCmds = {
     func : function(phrases) {
       var data = {};
       var razLogoCopy = copyMsg(razLogo);
-      var i;
 
       if (0 < phrases.length) {
         data.roomName = phrases[0].toLowerCase();
         data.timesCracked = 0;
         data.timesRequired = 3;
-        data.randomizer = function(length) {
-          var randomLength = randString.length;
-          var code = '';
-          var randomVal;
-
-          for (i = 0; i < length; i++) {
-            randomVal = Math.random() * (randomLength - 1);
-
-            code += randString[Math.round(randomVal)];
-          }
-
-          return code.toUpperCase();
-        };
         cmdHelper.data = data;
 
         // TODO: razLogo should be moved to DB or other place
@@ -1431,7 +1402,7 @@ var validCmds = {
           ]
         });
         setInputStart('Verify seq');
-        cmdObj.data.code = cmdObj.data.randomizer(10);
+        cmdObj.data.code = createRandString(randString, 10, true);
         cmdObj.data.timer = setTimeout(timerEnded, timeout);
         cmdObj.onStep++;
         queueMsg({
@@ -1456,7 +1427,7 @@ var validCmds = {
         }
 
         if (cmdObj.data.timesCracked < cmdObj.data.timesRequired) {
-          cmdObj.data.code = cmdObj.data.randomizer(10);
+          cmdObj.data.code = createRandString(randString, 10, true);
           queueMsg({
             text : ['Sequence: ' + cmdObj.data.code]
           });
@@ -1613,30 +1584,11 @@ var validCmds = {
   },
   chipper : {
     func : function() {
-      var data = {};
-
-      data.randomizer = function(length) {
-        var randBinary = '01';
-        var randLength = randBinary.length;
-        var code = '';
-        var i;
-        var randVal;
-
-        for (i = 0; i < length; i++) {
-          randVal = Math.random() * (randLength - 1);
-
-          code += randBinary[Math.round(randVal)];
-        }
-
-        return code;
-      };
-      cmdHelper.data = data;
-
       queueMsg({
         text : [
-          '--------------',
+          createLine(14),
           '- DEACTIVATE -',
-          '--------------'
+          createLine(14)
         ],
         extraClass : 'importantMsg large'
       });
@@ -1686,9 +1638,7 @@ var validCmds = {
         }
 
         queueMsg({
-          text : [
-            cmdObj.data.randomizer(36)
-          ]
+          text : [createRandString(randBinary, 36)]
         });
 
         cmdObj.data.printTimer = setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 250);
@@ -1914,13 +1864,10 @@ var validCmds = {
       cmdHelper.data = data;
 
       queueMsg({
-        text : [
-          '-----------------------',
-          '  Add encryption keys',
-          '-----------------------',
+        text : createCmdStart('Add encryption keys').concat([
           'You can add more than one key',
           'Press enter without any input when you are done'
-        ]
+        ])
       });
       queueMsg(copyMsg(abortInfo));
       queueMsg({
@@ -1985,13 +1932,10 @@ var validCmds = {
       cmdHelper.data = data;
 
       queueMsg({
-        text : [
-          '-----------------------',
-          '  Add entities',
-          '-----------------------',
+        text : createCmdStart('Add entities').concat([
           'You can add more than one entity',
           'Press enter without any input when you are done'
-        ]
+        ])
       });
       queueMsg(copyMsg(abortInfo));
       setInputStart('Input entity');
@@ -2297,6 +2241,25 @@ function copyMsg(textObj) {
   return null !== textObj ? JSON.parse(JSON.stringify(textObj)) : { text : [''] };
 }
 
+function createRandString(selection, length, upperCase) {
+  var randLength = selection.length;
+  var result = '';
+  var randVal;
+  var i;
+
+  for (i = 0; i < length; i++) {
+    randVal = Math.random() * (randLength - 1);
+
+    result += selection[Math.round(randVal)];
+  }
+
+  if (upperCase) {
+    return result.toUpperCase();
+  }
+
+  return result;
+}
+
 function getAliases() {
   var aliases = getLocalVal('aliases');
 
@@ -2576,7 +2539,7 @@ function locateOnMap(latitude, longitude) {
     return x + '' + y;
   }
 
-  return '---';
+  return createLine(3);
 }
 
 /**
@@ -2816,9 +2779,8 @@ function getCmd(cmdName) {
 
 function combineSequences(cmdName, phrases) {
   var aliases = getAliases();
-  var combined = aliases[cmdName] ? aliases[cmdName].concat(phrases.slice(1)) : phrases.slice(1);
 
-  return combined;
+  return aliases[cmdName] ? aliases[cmdName].concat(phrases.slice(1)) : phrases.slice(1);
 }
 
 function expandPartialMatch(cmds, partialMatch, sign) {
@@ -3346,32 +3308,49 @@ function printRow(msg) {
   }
 }
 
+function createLine(length) {
+  var line = '';
+  var i;
+
+  for (i = 0; i < length; i++) {
+    line += '-';
+  }
+
+  return line;
+}
+
+function createCmdStart(cmdName) {
+  var length = cmdName.length + 2;
+
+  return [
+    createLine(length),
+    ' ' + cmdName.toUpperCase(),
+    createLine(length)
+  ];
+}
+
+function createCmdEnd(length) {
+  return createLine(length + 2);
+}
+
 //TODO Hard coded
 function convertWhisperRoom(roomName) {
-  var converted = 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
-
-  return converted;
+  return 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
 }
 
 //TODO Hard coded
 function convertDeviceRoom(roomName) {
-  var converted = 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
-
-  return converted;
+  return 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
 }
 
 //TODO Hard coded
 function convertImportantRoom(roomName) {
-  var converted = 'important' === roomName ? 'IMPORTNT' : roomName;
-
-  return converted;
+  return 'important' === roomName ? 'IMPORTNT' : roomName;
 }
 
 //TODO Hard coded
 function convertBroadcastRoom(roomName) {
-  var converted = 'broadcast' === roomName ? 'BROADCST' : roomName;
-
-  return converted;
+  return 'broadcast' === roomName ? 'BROADCST' : roomName;
 }
 
 function printWelcomeMsg() {
@@ -3630,7 +3609,6 @@ function onLocationMsg(locationData) {
 
       if ('---' !== mapLoc) {
         text += 'Accuracy: ' + accuracy + ' meters\t';
-
         text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
 
         if (null !== heading) {
@@ -3789,6 +3767,21 @@ function onUpdateDeviceId(newId) {
   setDeviceId(newId);
 }
 
+function onWhoami(data) {
+  var team = data.user.team ? data.user.team : '';
+  var text = createCmdStart('whoami');
+
+  text = text.concat([
+    'User: ' + data.user.userName,
+    'Access level: ' + data.user.accessLevel,
+    'Team: ' + team,
+    'Device ID: ' + data.device.deviceId,
+    createCmdEnd(text[0].length)
+  ]);
+
+  queueMsg({ text : text });
+}
+
 function startSocket() {
   if (socket) {
     socket.on('chatMsg', onChatMsg);
@@ -3813,6 +3806,7 @@ function startSocket() {
     socket.on('updateCommands', onUpdateCommands);
     socket.on('weather', onWeather);
     socket.on('updateDeviceId', onUpdateDeviceId);
+    socket.on('whoAmI', onWhoami);
   }
 }
 
@@ -3876,15 +3870,16 @@ function generateDeviceId() {
 
 function printStartMsg() {
   var logoToPrint = copyMsg(logo);
+  var randRelay = createRandString(randString, 4, true);
 
   queueMsg(logoToPrint);
   queueMsg({
     text : [
-      '---',
+      createLine(50),
       'Connecting... Could not establish connection to HQ',
-      'Rerouting... Secondary relay found',
-      'Connecting... Connection established',
-      '---'
+      'Rerouting... Secondary relay ' + randRelay + ' found',
+      'Connecting to relay ' + randRelay + '... Connection established',
+      createLine(50)
     ],
     extraClass : 'upperCase'
   });

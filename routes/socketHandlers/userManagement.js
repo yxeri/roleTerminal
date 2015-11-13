@@ -543,6 +543,21 @@ function handle(socket, io) {
       });
     });
   });
+
+  socket.on('whoAmI', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.whoami.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      data.user = {};
+      data.user.userName = user.userName;
+      data.user.accessLevel = user.accessLevel;
+      data.user.team = user.team;
+
+      socket.emit('whoAmI', data);
+    });
+  });
 }
 
 exports.handle = handle;

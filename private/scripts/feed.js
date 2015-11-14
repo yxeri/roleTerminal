@@ -22,7 +22,7 @@ var razLogo = {
     '                    ###############',
     '                  Razor  #####  Demos - Warez - Honey'
   ],
-    extraClass : 'logo blue'
+    extraClass : 'logo'
 };
 var logo = {
   text : [
@@ -3369,8 +3369,7 @@ function printWelcomeMsg() {
   queueMsg({
     text : [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
-    ],
-    extraClass : 'blue'
+    ]
   });
   queueMsg(razLogoCopy);
 }
@@ -3900,6 +3899,7 @@ function printStartMsg() {
 function downgrade() {
   if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid) {
     document.getElementById('overlay').className = '';
+    document.getElementById('html').className = '';
   }
 }
 
@@ -3909,7 +3909,6 @@ function isOldAndroid() {
 
 // Sets everything relevant when a user enters the site
 function startBoot() {
-  cmdInput.focus();
   downgrade();
   socket.emit('getCommands');
 

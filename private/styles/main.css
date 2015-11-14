@@ -5,11 +5,13 @@ html {
     -ms-user-select: none;
     user-select: none;
     background-color: #151e15;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
     margin: 0;
     color: #00FF00;
+    text-shadow: 1px 1px 4px #008700;
     font-family: monospace;
     font-size: 1.2em;
     letter-spacing: .05em;
@@ -142,6 +144,7 @@ pre {
 
 .importantMsg {
     color: #151e15;
+    text-shadow: none;
     background-color: #00FF00;
     font-size: 1.2em;
     text-transform: uppercase;
@@ -197,38 +200,14 @@ pre {
     overflow: scroll;
 }
 
-.red {
-    color: #ff0000;
-    background-color: #1e1211;
-}
-
-.blue {
-    color: #0000ff;
-    background-color: #14131e;
-}
-
 .upperCase {
     text-transform: uppercase;
 }
 
-@-webkit-keyframes blinking {
-    from {
-        background-color: transparent;
-        color: #00FF00;
-    }
-    50% {
-        background-color: #00FF00;
-    }
-}
-
-@keyframes blinking {
-    from {
-        background-color: transparent;
-        color: #00FF00;
-    }
-    50% {
-        background-color: #00FF00;
-    }
+.brightnessAnim {
+    opacity: 1;
+    -webkit-animation: brightness 12s linear infinite 2s;
+    animation: brightness 12s linear infinite 2s;
 }
 
 @media (max-height: 768px) and (max-width: 1024px) {
@@ -253,5 +232,59 @@ pre {
     .feed {
         padding-left: .1em;
         padding-right: .1em;
+    }
+}
+
+@-webkit-keyframes brightness {
+    from {
+        opacity: 1;
+        background-color: #151e15;
+    }
+    2% {
+        opacity: .5;
+        background-color: #101910;
+    }
+    4% {
+        opacity: .9;
+        background-color: #131d13;
+    }
+    6% {
+        opacity: .6;
+        background-color: #111a11;
+    }
+    8% {
+        opacity: .8;
+        background-color: #141c14;
+    }
+    20% {
+        opacity: 1;
+        background-color: #151e15;
+    }
+}
+
+@keyframes brightness {
+    from {
+        opacity: 1;
+        background-color: #151e15;
+    }
+    2% {
+        opacity: .5;
+        background-color: #101910;
+    }
+    4% {
+        opacity: .9;
+        background-color: #131d13;
+    }
+    6% {
+        opacity: .6;
+        background-color: #111a11;
+    }
+    8% {
+        opacity: .8;
+        background-color: #141c14;
+    }
+    20% {
+        opacity: 1;
+        background-color: #151e15;
     }
 }

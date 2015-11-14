@@ -3897,7 +3897,7 @@ function printStartMsg() {
  * Removes some visual effects for better performance on older devices
  */
 function downgrade() {
-  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid) {
+  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid || /Vita/.test(navigator.userAgent)) {
     document.getElementById('overlay').className = '';
     document.getElementById('html').className = '';
   }

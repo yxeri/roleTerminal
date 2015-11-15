@@ -11,7 +11,7 @@ function followRoom(socket, userName, newRoom) {
   const newRoomName = newRoom.roomName;
 
   if (0 > socket.rooms.indexOf(newRoomName)) {
-    socket.broadcast.to(newRoomName).emit('chatMsg', {
+    socket.broadcast.to(newRoomName).emit('message', {
       text : [userName + ' is following ' + newRoomName],
       roomName : newRoomName
     });
@@ -161,7 +161,7 @@ function handle(socket) {
               return;
             }
 
-            socket.broadcast.to(roomName).emit('chatMsg', {
+            socket.broadcast.to(roomName).emit('message', {
               text : [userName + ' left ' + roomName],
               room : roomName
             });

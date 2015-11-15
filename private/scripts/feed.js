@@ -3307,26 +3307,6 @@ function createCmdEnd(length) {
   return createLine(length + 2);
 }
 
-//TODO Hard coded
-function convertWhisperRoom(roomName) {
-  return 0 <= roomName.indexOf('-whisper') ? 'WHISPER' : roomName;
-}
-
-//TODO Hard coded
-function convertDeviceRoom(roomName) {
-  return 0 <= roomName.indexOf('-device') ? 'DEVICE' : roomName;
-}
-
-//TODO Hard coded
-function convertImportantRoom(roomName) {
-  return 'important' === roomName ? 'IMPORTNT' : roomName;
-}
-
-//TODO Hard coded
-function convertBroadcastRoom(roomName) {
-  return 'broadcast' === roomName ? 'BROADCST' : roomName;
-}
-
 function printWelcomeMsg() {
   var logoCopy = copyMsg(logo);
   var razLogoCopy = copyMsg(razLogo);
@@ -3352,17 +3332,9 @@ function beautifyNumb(number) {
   return 9 < number ? number : '0' + number;
 }
 
-function onChatMsg(msg) {
-  if (msg.roomName) {
-    msg.roomName = convertWhisperRoom(msg.roomName);
-  }
-
-  queueMsg(msg);
-}
-
 function onMessage(msg) {
-  if (msg.roomName) {
-    msg.roomName = convertWhisperRoom(msg.roomName);
+  if (msg.roomName && 0 <= msg.roomName.indexOf('-whisper')) {
+    msg.roomName = 'WHISPER';
   }
 
   queueMsg(msg);
@@ -3393,10 +3365,15 @@ function onMultiMsg(msgs) {
     msg = msgs[i];
 
     if (msg.roomName) {
-      msg.roomName = convertWhisperRoom(msg.roomName);
-      msg.roomName = convertDeviceRoom(msg.roomName);
-      msg.roomName = convertImportantRoom(msg.roomName);
-      msg.roomName = convertBroadcastRoom(msg.roomName);
+      if (0 <= msg.roomName.indexOf('-whisper')) {
+        msg.roomName = 'WHISPER';
+      } else if (0 <= msg.roomName.indexOf('-device')) {
+        msg.roomName = 'DEVICE';
+      } else if ('important' === msg.roomName) {
+        msg.roomName = 'IMPORTNT';
+      } else if ('broadcast' === msg.roomName) {
+        msg.roomName = 'BROADCST';
+      }
     }
 
     queueMsg(msg);
@@ -3757,7 +3734,6 @@ function onWhoami(data) {
 
 function startSocket() {
   if (socket) {
-    socket.on('chatMsg', onChatMsg);
     socket.on('message', onMessage);
     socket.on('broadcastMsg', onBroadcastMsg);
     socket.on('importantMsg', onImportantMsg);

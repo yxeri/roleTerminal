@@ -218,49 +218,30 @@ var intervals = {
 var validCmds = {
   help : {
     func : function(phrases) {
-      function capitalizeString(text) {
-        return text.charAt(0).toUpperCase() + text.slice(1);
-      }
-
-      function getCmds(group) {
-        var cmds = validCmds;
+      function getCmds() {
+        var cmds = [];
         //TODO Change from Object.keys for compatibility with older Android
-        var keys = Object.keys(cmds).sort();
-        var cmdStrings = [];
+        var keys = Object.keys(validCmds);
         var i;
         var cmd;
         var cmdAccessLvl;
-        var msg;
-
-        if (group !== undefined) {
-          cmdStrings.push(capitalizeString(group) + ' commands:');
-        }
 
         for (i = 0; i < keys.length; i++) {
-          msg = '  ';
-          cmd = cmds[keys[i]];
+          cmd = validCmds[keys[i]];
           cmdAccessLvl = cmd.accessLevel;
 
-          if ((isNaN(cmdAccessLvl) || getAccessLvl() >= cmdAccessLvl)
-              && (group === undefined || cmd.category === group)) {
-            msg += keys[i];
-
-            cmdStrings.push(msg);
+          if (isNaN(cmdAccessLvl) || getAccessLvl() >= cmdAccessLvl) {
+            cmds.push(keys[i]);
           }
         }
 
-        return cmdStrings;
+        return cmds.concat(Object.keys(getAliases())).sort();
       }
 
       function getAll() {
-        var loginCmds = getCmds('login');
-        var basicCmds = getCmds('basic');
-        var advancedCmds = getCmds('advanced');
-        var hackingCmds = getCmds('hacking');
-        var adminCmds = getCmds('admin');
+        var allCmds = getCmds();
 
         if (null === getUser()) {
-
           queueMsg({
             text : [
               createLine(49),
@@ -270,34 +251,11 @@ var validCmds = {
               createLine(49)
             ]
           });
-          queueMsg({
-            text : loginCmds
-          });
         }
 
-        if (1 < basicCmds.length) {
-          queueMsg({
-            text : basicCmds
-          });
-        }
-
-        if (1 < advancedCmds.length) {
-          queueMsg({
-            text : advancedCmds
-          });
-        }
-
-        if (1 < hackingCmds.length) {
-          queueMsg({
-            text : hackingCmds
-          });
-        }
-
-        if (1 < adminCmds.length) {
-          queueMsg({
-            text : adminCmds
-          });
-        }
+        queueMsg({
+          text : allCmds
+        });
       }
 
       if (undefined === phrases || 0 === phrases.length) {

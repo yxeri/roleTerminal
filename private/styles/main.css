@@ -206,8 +206,8 @@ pre {
 
 .brightnessAnim {
     opacity: 1;
-    -webkit-animation: brightness 12s linear infinite 2s;
-    animation: brightness 12s linear infinite 2s;
+    -webkit-animation: brightness 20s linear infinite 10s;
+    animation: brightness 20s linear infinite 10s;
 }
 
 @media (max-height: 768px) and (max-width: 1024px) {
@@ -240,23 +240,23 @@ pre {
         opacity: 1;
         background-color: #151e15;
     }
-    2% {
+    1% {
         opacity: .5;
         background-color: #101910;
     }
-    4% {
+    2% {
         opacity: .9;
         background-color: #131d13;
     }
-    6% {
+    3% {
         opacity: .6;
         background-color: #111a11;
     }
-    8% {
+    4% {
         opacity: .8;
         background-color: #141c14;
     }
-    20% {
+    30% {
         opacity: 1;
         background-color: #151e15;
     }
@@ -267,23 +267,23 @@ pre {
         opacity: 1;
         background-color: #151e15;
     }
-    2% {
+    1% {
         opacity: .5;
         background-color: #101910;
     }
-    4% {
+    2% {
         opacity: .9;
         background-color: #131d13;
     }
-    6% {
-        opacity: .6;
-        background-color: #111a11;
+    3% {
+        opacity: .1;
+        background-color: #0a150a;
     }
-    8% {
-        opacity: .8;
+    4% {
+        opacity: .7;
         background-color: #141c14;
     }
-    20% {
+    30% {
         opacity: 1;
         background-color: #151e15;
     }

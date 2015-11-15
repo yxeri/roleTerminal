@@ -93,6 +93,11 @@ var cmdMode = 'cmd';
 var chatMode = 'chat';
 var randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
 var randBinary = '01';
+var hideRooms = [
+  'broadcast',
+  'important',
+  'whisper'
+];
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
@@ -3204,13 +3209,22 @@ function generateLink(text, className, func) {
 // Adds time stamp and room name to a string from a message if they are set
 function generateFullRow(sentText, message) {
   var rowObj = document.createElement('li');
+  var roomName = message.roomName;
+  var roomElem;
 
   if (message.time && !message.skipTime) {
     rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
   }
 
-  if (message.roomName) {
-    rowObj.appendChild(generateLink(message.roomName, 'room', linkRoom));
+  if (roomName) {
+    // If room is one of the system ones, not meant for direct messaging
+    if (-1 < hideRooms.indexOf(roomName.toLowerCase())) {
+      roomElem = generateSpan(roomName);
+    } else {
+      roomElem = generateLink(roomName, 'room', linkRoom);
+    }
+
+    rowObj.appendChild(roomElem);
   }
 
   if (message.userName) {

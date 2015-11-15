@@ -2303,7 +2303,7 @@ function getMode() {
 
 // TODO: Change name to setInputStartText or similar
 function setInputStart(text) {
-  inputStart.textContent = text;
+  inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
 function resetCmd(aborted) {

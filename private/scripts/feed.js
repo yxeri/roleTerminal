@@ -3006,6 +3006,8 @@ function specialKeyPress(event) {
                   text : ['- ' + phrases[0] + ': ' + cmdFailText.text]
                 });
               }
+            } else {
+              queueMsg(printUsedCmd(false, ' '));
             }
           }
         }

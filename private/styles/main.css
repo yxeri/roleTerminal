@@ -100,6 +100,7 @@ pre {
 }
 
 .boxShadow {
+    z-index: 1;
     -webkit-box-shadow: inset 0 0 25px 1px #000000;
     box-shadow: inset 0 0 25px 1px #000000;
 }
@@ -213,53 +214,44 @@ pre {
 @-webkit-keyframes brightness {
     from {
         opacity: 1;
-        background-color: #151e15;
     }
     1% {
         opacity: .5;
-        background-color: #101910;
     }
     2% {
         opacity: .9;
-        background-color: #131d13;
     }
     3% {
-        opacity: .6;
-        background-color: #111a11;
+        opacity: .1;
     }
     4% {
-        opacity: .8;
-        background-color: #141c14;
+        opacity: .7;
     }
     30% {
         opacity: 1;
-        background-color: #151e15;
     }
 }
 
 @keyframes brightness {
     from {
         opacity: 1;
-        background-color: #151e15;
     }
     1% {
         opacity: .5;
-        background-color: #101910;
+    }
+    1.5% {
+        opacity: .9;
     }
     2% {
-        opacity: .9;
-        background-color: #131d13;
-    }
-    3% {
         opacity: .1;
-        background-color: #0a150a;
     }
-    4% {
-        opacity: .7;
-        background-color: #141c14;
+    2.5% {
+        opacity: .6;
     }
-    30% {
+    10% {
+        opacity: .8;
+    }
+    20% {
         opacity: 1;
-        background-color: #151e15;
     }
 }

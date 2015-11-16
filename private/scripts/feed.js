@@ -3840,7 +3840,7 @@ function printStartMsg() {
 function downgrade() {
   if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid || /Vita/.test(navigator.userAgent)) {
     document.getElementById('overlay').className = '';
-    document.getElementById('html').className = '';
+    document.getElementById('background').className = '';
   }
 }
 

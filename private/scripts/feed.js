@@ -3332,32 +3332,7 @@ function beautifyNumb(number) {
   return 9 < number ? number : '0' + number;
 }
 
-function onMessage(msg) {
-  if (msg.roomName && 0 <= msg.roomName.indexOf('-whisper')) {
-    msg.roomName = 'WHISPER';
-  }
-
-  queueMsg(msg);
-}
-
-function onBroadcastMsg(msg) {
-  msg.extraClass = 'bold';
-
-  queueMsg(msg);
-}
-
-function onImportantMsg(msg) {
-  msg.extraClass = 'importantMsg';
-  msg.skipTime = true;
-
-  queueMsg(msg);
-
-  if (msg.morse) {
-    validCmds.morse.func(msg.text.slice(0, 1), msg.morse.local);
-  }
-}
-
-function onMultiMsg(msgs) {
+function onMessages(msgs) {
   var msg;
   var i;
 
@@ -3377,6 +3352,23 @@ function onMultiMsg(msgs) {
     }
 
     queueMsg(msg);
+  }
+}
+
+function onBroadcastMsg(msg) {
+  msg.extraClass = 'bold';
+
+  queueMsg(msg);
+}
+
+function onImportantMsg(msg) {
+  msg.extraClass = 'importantMsg';
+  msg.skipTime = true;
+
+  queueMsg(msg);
+
+  if (msg.morse) {
+    validCmds.morse.func(msg.text.slice(0, 1), msg.morse.local);
   }
 }
 
@@ -3734,10 +3726,9 @@ function onWhoami(data) {
 
 function startSocket() {
   if (socket) {
-    socket.on('message', onMessage);
+    socket.on('messages', onMessages);
     socket.on('broadcastMsg', onBroadcastMsg);
     socket.on('importantMsg', onImportantMsg);
-    socket.on('multiMsg', onMultiMsg);
     socket.on('reconnect', onReconnect);
     socket.on('disconnect', onDisconnect);
     socket.on('follow', onFollow);

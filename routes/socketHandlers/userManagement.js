@@ -24,11 +24,11 @@ function handle(socket, io) {
 
           return;
         } else if (null !== foundUser) {
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               'User with that name already exists'
             ]
-          });
+          }]);
           socket.emit('commandFail');
 
           return;
@@ -68,11 +68,11 @@ function handle(socket, io) {
 
           return;
         } else if (null === user) {
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               userName + ' already exists'
             ]
-          });
+          }]);
 
           return;
         }
@@ -88,18 +88,18 @@ function handle(socket, io) {
         newRoom.accessLevel = 12;
 
         if (appConfig.userVerify) {
-          socket.broadcast.to(message.roomName).emit('message', {
+          socket.broadcast.to(message.roomName).emit('messages', [{
             text : [
               'User ' + user.userName + ' needs to be verified'
             ]
-          });
+          }]);
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : [
             user.userName + ' has been registered!'
           ]
-        });
+        }]);
 
         manager.createRoom(newRoom, user, function(createErr, roomName) {
           if (createErr) {
@@ -218,12 +218,12 @@ function handle(socket, io) {
             }
 
             oldSocket.emit('logout');
-            oldSocket.emit('message', {
+            oldSocket.emit('messages', [{
               text : [
                 'Your user has been logged in on another device',
                 'You have been logged out'
               ]
-            });
+            }]);
           }
 
           manager.joinRooms(rooms, socket);
@@ -252,11 +252,11 @@ function handle(socket, io) {
               return;
             }
 
-            socket.emit('message', {
+            socket.emit('messages', [{
               text : [
                 'Password has been successfully changed!'
               ]
-            });
+            }]);
           });
         });
       }
@@ -292,9 +292,9 @@ function handle(socket, io) {
           }
 
           socket.emit('logout');
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : ['You have been logged out']
-          });
+          }]);
         });
       });
     });
@@ -315,11 +315,9 @@ function handle(socket, io) {
             return;
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : ['User ' + user.userName + ' has been verified']
-          });
-
-          //TODO Send message to verified user
+          }]);
         });
       }
     });
@@ -343,9 +341,9 @@ function handle(socket, io) {
             return;
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : ['Users have been verified']
-          });
+          }]);
           //TODO Send message to verified user
         });
       });
@@ -374,7 +372,7 @@ function handle(socket, io) {
           }
         }
 
-        socket.emit('message', { text : [usersString] });
+        socket.emit('messages', [{ text : [usersString] }]);
       });
     });
   });
@@ -395,9 +393,9 @@ function handle(socket, io) {
 
         const bannedSocketId = user.socketId;
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['User ' + userNameLower + ' has been banned']
-        });
+        }]);
 
         dbConnector.updateUserSocketId(userNameLower, '', function(userErr, updatedUser) {
           if (userErr || null == updatedUser) {
@@ -414,11 +412,11 @@ function handle(socket, io) {
             socket.leave(rooms[i]);
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               'User ' + userNameLower + ' has been disconnected'
             ]
-          });
+          }]);
         });
       });
     });
@@ -438,9 +436,9 @@ function handle(socket, io) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Ban on user ' + userNameLower + ' has been removed']
-        });
+        }]);
       });
     });
   });
@@ -467,7 +465,7 @@ function handle(socket, io) {
           }
         }
 
-        socket.emit('message', { text : [usersString] });
+        socket.emit('messages', [{ text : [usersString] }]);
       });
     });
   });
@@ -491,9 +489,9 @@ function handle(socket, io) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['User has been updated']
-        });
+        }]);
       };
 
       switch (field) {
@@ -517,9 +515,9 @@ function handle(socket, io) {
           break;
         default:
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Invalid field. User doesn\'t have ' + field);
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : ['Invalid field. User doesn\'t have ' + field]
-          });
+          }]);
 
           break;
       }

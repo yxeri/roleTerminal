@@ -26,7 +26,7 @@ function handle(socket) {
           entityArray.push(entities[i].entityName + ' [' + keyAmount + ' unlocked]');
         }
 
-        socket.emit('message', { text : entityArray });
+        socket.emit('messages', [{ text : entityArray }]);
 
       });
     });
@@ -105,9 +105,9 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Key has been uploaded to the database']
-        });
+        }]);
       });
     });
   });
@@ -128,9 +128,9 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Entity has been uploaded to the database']
-        });
+        }]);
       });
     });
   });

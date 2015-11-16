@@ -25,10 +25,10 @@ function sendChatMsg(socket, message, skipSelfMsg) {
   const roomName = message.roomName;
 
   addMsgToHistory(roomName, message, function() {
-    socket.broadcast.to(roomName).emit('message', message);
+    socket.broadcast.to(roomName).emit('messages', [message]);
 
     if (!skipSelfMsg) {
-      socket.emit('message', message);
+      socket.emit('messages', [message]);
     }
   });
 }
@@ -38,13 +38,13 @@ function sendWhisperMsg(socket, message) {
   const senderRoomName = message.user + dbDefaults.whisper;
 
   addMsgToHistory(roomName, message, function() {
-    socket.broadcast.to(roomName).emit('message', message);
+    socket.broadcast.to(roomName).emit('messages', [message]);
 
     /*
      * Save the sent message in the sender's room history too, if it is a whisper
      */
     addMsgToHistory(senderRoomName, message, function() {
-      socket.emit('message', message);
+      socket.emit('messages', [message]);
     });
   });
 }

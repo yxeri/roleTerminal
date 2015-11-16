@@ -42,7 +42,7 @@ function sendErrorMsg(code, text, err) {
  * @returns {undefined} Returns undefined
  */
 function sendSocketErrorMsg(socket, code, text, err) {
-  socket.emit('message', { text : ['[' + code.num + '] ' + text] });
+  socket.emit('messages', [{ text : ['[' + code.num + '] ' + text] }]);
   sendErrorMsg(code, text, err);
 }
 

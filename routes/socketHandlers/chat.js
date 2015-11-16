@@ -11,10 +11,10 @@ function followRoom(socket, userName, newRoom) {
   const newRoomName = newRoom.roomName;
 
   if (0 > socket.rooms.indexOf(newRoomName)) {
-    socket.broadcast.to(newRoomName).emit('message', {
+    socket.broadcast.to(newRoomName).emit('messages', [{
       text : [userName + ' is following ' + newRoomName],
       roomName : newRoomName
-    });
+    }]);
   }
 
   socket.join(newRoomName);
@@ -56,7 +56,7 @@ function handle(socket) {
         data.roomName = 'ALL';
 
         socket.broadcast.emit('broadcastMsg', data);
-        socket.emit('message', data);
+        socket.emit('messages', [data]);
       });
     });
   });
@@ -77,9 +77,9 @@ function handle(socket) {
 
         room.roomName = roomName;
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Room has been created']
-        });
+        }]);
         followRoom(socket, user.userName, room);
       });
     });
@@ -132,9 +132,9 @@ function handle(socket) {
       if (0 < socket.rooms.indexOf(room.roomName)) {
         socket.emit('follow', room);
       } else {
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['You are not following room ' + room.roomName]
-        });
+        }]);
       }
     });
   });
@@ -161,17 +161,16 @@ function handle(socket) {
               return;
             }
 
-            socket.broadcast.to(roomName).emit('message', {
+            socket.broadcast.to(roomName).emit('messages', [{
               text : [userName + ' left ' + roomName],
               room : roomName
-            });
+            }]);
             socket.leave(roomName);
             socket.emit('unfollow', room);
           });
         }
       } else {
-        socket.emit('message',
-          { text : ['You are not following ' + roomName] });
+        socket.emit('messages', [{ text : ['You are not following ' + roomName] }]);
       }
     });
   });
@@ -196,14 +195,14 @@ function handle(socket) {
             roomsString += rooms[i].roomName + '\t';
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               '--------------',
               '  List rooms',
               '--------------',
               roomsString
             ]
-          });
+          }]);
         }
       });
     });
@@ -239,7 +238,7 @@ function handle(socket) {
             }
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               '--------------',
               '  List users',
@@ -252,7 +251,7 @@ function handle(socket) {
               '-----------------',
               usersString
             ]
-          });
+          }]);
         }
       });
     });
@@ -286,7 +285,7 @@ function handle(socket) {
         }
       }
 
-      socket.emit('message', {
+      socket.emit('messages', [{
         text : [
           '------------',
           '  My rooms',
@@ -294,7 +293,7 @@ function handle(socket) {
           'You are following rooms:',
           rooms.join('\t')
         ]
-      });
+      }]);
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
         if (err || null === ownedRooms) {
@@ -309,12 +308,12 @@ function handle(socket) {
         }
 
         if (0 < ownedRoomsString.length) {
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               'You are owner of the rooms:',
               ownedRoomsString
             ]
-          });
+          }]);
         }
       });
     });
@@ -336,7 +335,7 @@ function handle(socket) {
         }
 
         while (0 < historyMessages.length) {
-          socket.emit('multiMsg', historyMessages.splice(0, appConfig.chunkLength));
+          socket.emit('messages', historyMessages.splice(0, appConfig.chunkLength));
         }
       });
     });
@@ -371,9 +370,9 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Removed the room']
-        });
+        }]);
       });
     });
   });
@@ -445,9 +444,9 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['User has been updated']
-        });
+        }]);
       };
 
       switch (field) {

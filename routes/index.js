@@ -223,9 +223,9 @@ function handle(io) {
 
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : ['Device has been updated']
-        });
+        }]);
       });
     });
 
@@ -247,16 +247,16 @@ function handle(io) {
               errMsg += '. Alias already exists';
             }
 
-            socket.emit('message', {
+            socket.emit('messages', [{
               text : [errMsg]
-            });
+            }]);
             console.log(errMsg, err);
             return;
           }
 
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : ['Device has been updated']
-          });
+          }]);
         };
 
         switch (field) {
@@ -265,9 +265,9 @@ function handle(io) {
 
             break;
           default:
-            socket.emit('message', {
+            socket.emit('messages', [{
               text : ['Invalid field. Device doesn\'t have ' + field]
-            });
+            }]);
 
             break;
         }
@@ -277,20 +277,20 @@ function handle(io) {
     socket.on('verifyDevice', function(data) {
       dbConnector.getDevice(data.device, function(err, device) {
         if (err || null === device) {
-          socket.emit('message', {
+          socket.emit('messages', [{
             text : [
               'Device is not in the database'
             ]
-          });
+          }]);
           socket.emit('commandFail');
           return;
         }
 
-        socket.emit('message', {
+        socket.emit('messages', [{
           text : [
             'Device found in the database'
           ]
-        });
+        }]);
         socket.emit('commandSuccess', data);
       });
     });
@@ -328,9 +328,9 @@ function handle(io) {
               allDevices.push(deviceString);
             }
 
-            socket.emit('message', {
+            socket.emit('messages', [{
               text : allDevices
-            });
+            }]);
           }
         });
       });

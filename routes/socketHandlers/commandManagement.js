@@ -33,10 +33,10 @@ function handle(socket) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, command) {
-        if (err || command === null) {
+        if (err || null === command) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
         } else {
-          socket.emit('message', { text : ['Command has been updated'] });
+          socket.emit('messages', [{ text : ['Command has been updated'] }]);
           socket.emit('updateCommands', [command]);
           socket.broadcast.emit('updateCommands', [command]);
         }

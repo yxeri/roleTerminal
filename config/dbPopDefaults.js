@@ -7,7 +7,7 @@ const generatePass = function() {
   const randomLength = randomString.length;
   let code = '';
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; 10 > i; i++) {
     const randomVal = Math.random() * (randomLength - 1);
 
     code += randomString[Math.round(randomVal)];

@@ -31,7 +31,7 @@ config.dbHost = process.env.DBHOST || 'localhost';
 config.dbPort = process.env.DBPORT || 27017;
 
 // Database database name
-config.dbName = process.env.DBNAME;
+config.dbName = process.env.DBNAME || 'roleHaven';
 
 // Node server port number
 config.port = process.env.PORT || 8888;

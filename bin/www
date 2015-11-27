@@ -8,37 +8,34 @@ const logger = require('../logger');
 const minifier = require('../minifier');
 const config = require('../config/serverConfig');
 
+function resolvePath(dir, secondDir) {
+  const privatePath = path.resolve(path.join(config.privateBase, dir));
+  const publicPath = path.resolve(path.join(config.publicBase, secondDir || dir));
+
+  return { publicPath: publicPath, privatePath: privatePath };
+}
+
 /**
  * Minifies all files in the directories with a specific extension
  *
  * @returns {undefined} Returns undefined
  */
 function minifyDirs() {
-  minifier.minifyDir(
-    path.resolve(path.join(config.privateBase, config.paths.views)), path.resolve(path.join(config.publicBase, config.paths.views)),
-    'html'
-  );
-  minifier.minifyDir(
-    path.resolve(path.join(config.privateBase, config.paths.styles)), path.resolve(path.join(config.publicBase, config.paths.styles)),
-    'css'
-  );
-  minifier.minifyDir(
-    path.resolve(path.join(config.privateBase, config.paths.scripts)), path.resolve(path.join(config.publicBase, config.paths.scripts)),
-    'js'
-  );
+  minifier.minifyDir(resolvePath(config.paths.views), 'html');
+  minifier.minifyDir(resolvePath(config.paths.styles), 'css');
+  minifier.minifyDir(resolvePath(config.paths.scripts), 'js');
 }
 
 function moveRequired() {
-  const privatePath = path.resolve(path.join(config.privateBase, config.paths.required));
-  const publicPath = path.resolve(path.join(config.publicBase, config.paths.scripts));
+  const pathObj = resolvePath(config.paths.required, config.paths.scripts);
 
-  fs.readdir(privatePath, function(readErr, files) {
+  fs.readdir(pathObj.privatePath, function(readErr, files) {
     if (readErr) {
       console.log(readErr);
     } else {
       files.forEach(function(file) {
-        const fullPrivatePath = path.join(privatePath, file);
-        const fullPublicPath = path.join(publicPath, file);
+        const fullPrivatePath = path.join(pathObj.privatePath, file);
+        const fullPublicPath = path.join(pathObj.publicPath, file);
 
         fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
       });

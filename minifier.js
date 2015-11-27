@@ -46,7 +46,7 @@ function htmlMinify(inPath, outPath) {
  * @returns {undefined} Returns undefined
  */
 function nodeMinify(inPath, outPath, minifierType, extension) {
-  function removeTemp(filePath) {
+  function removeTransTemp(filePath) {
     fs.unlink(filePath, function(err) {
       if (err) {
         console.log('Failed to remove temp file');
@@ -86,7 +86,7 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
 
     file.on('finish', function() {
       console.log('Transpiled ', transpilePath);
-      minify(transpilePath, removeTemp);
+      minify(transpilePath, removeTransTemp);
     });
   } else {
     minify(inPath);
@@ -118,49 +118,6 @@ function checkDir(dirPath, callback) {
 }
 
 /**
- * Goes through a directory and minifies all files with a specific extension
- * @param {string} inPath Private directory path for the file
- * @param {string} outPath Public directory path for the file
- * @param {string} extension Extension of the file
- * @returns {undefined} Returns undefined
- */
-function minifyDir(inPath, outPath, extension) {
-  checkDir(outPath, function(err) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-
-    fs.readdir(inPath, function(readErr, files) {
-      if (readErr) {
-        console.log(readErr);
-      } else {
-        files.forEach(function(file) {
-          const fullInPath = path.join(inPath, file);
-          const fullOutPath = path.join(outPath, file);
-
-          if (path.extname(file).substr(1) === extension) {
-            let type = '';
-
-            if (extension === 'html') {
-              htmlMinify(fullInPath, fullOutPath);
-            } else if (extension === 'js') {
-              type = config.mode === 'dev' ? 'no-compress' : 'uglifyjs';
-
-              nodeMinify(fullInPath, fullOutPath, type, extension);
-            } else if (extension === 'css') {
-              type = config.mode === 'dev' ? 'no-compress' : 'sqwish';
-
-              nodeMinify(fullInPath, fullOutPath, type);
-            }
-          }
-        });
-      }
-    });
-  });
-}
-
-/**
  * Minifies a file by calling the correct funtion based on its extension
  * @param {string} filePath File path
  * @param {string} outPath Directory path where the minified file will be moved to
@@ -181,6 +138,37 @@ function minifyFile(filePath, outPath) {
 
     nodeMinify(filePath, outPath, type);
   }
+}
+
+/**
+ * Goes through a directory and minifies all files with a specific extension
+ * @param {string} pathObj Contaisn public (.publicPath) and private (.privatePath) directory path for the file
+ * @param {string} extension Extension of the file
+ * @returns {undefined} Returns undefined
+ */
+function minifyDir(pathObj, extension) {
+  checkDir(pathObj.publicPath, function(err) {
+    if (err) {
+      console.log(err);
+
+      return;
+    }
+
+    fs.readdir(pathObj.privatePath, function(readErr, files) {
+      if (readErr) {
+        console.log(readErr);
+      } else {
+        files.forEach(function(file) {
+          const fullInPath = path.join(pathObj.privatePath, file);
+          const fullOutPath = path.join(pathObj.publicPath, file);
+
+          if (path.extname(file).substr(1) === extension) {
+            minifyFile(fullInPath, fullOutPath);
+          }
+        });
+      }
+    });
+  });
 }
 
 exports.minifyDir = minifyDir;

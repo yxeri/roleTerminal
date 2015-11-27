@@ -23,11 +23,11 @@ function handle(socket, io) {
           socket.emit('commandFail');
 
           return;
-        } else if (null !== foundUser) {
+        } else if (foundUser !== null) {
           socket.emit('messages', [{
-            text : [
-              'User with that name already exists'
-            ]
+            text: [
+              'User with that name already exists',
+            ],
           }]);
           socket.emit('commandFail');
 
@@ -50,28 +50,28 @@ function handle(socket, io) {
 
       const userName = sentUser.userName.toLowerCase();
       const userObj = {
-        userName : userName,
-        socketId : '',
-        password : sentUser.password,
-        registerDevice : sentUser.registerDevice,
-        mode : dbDefaults.modes.command
+        userName: userName,
+        socketId: '',
+        password: sentUser.password,
+        registerDevice: sentUser.registerDevice,
+        mode: dbDefaults.modes.command,
       };
 
       if (!appConfig.userVerify) {
         userObj.verified = true;
       }
 
-      //TODO Refactor the inner code
+      // TODO Refactor the inner code
       dbConnector.addUser(userObj, function(err, user) {
         if (err) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to register user', err);
 
           return;
-        } else if (null === user) {
+        } else if (user === null) {
           socket.emit('messages', [{
-            text : [
-              userName + ' already exists'
-            ]
+            text: [
+              userName + ' already exists',
+            ],
           }]);
 
           return;
@@ -89,16 +89,16 @@ function handle(socket, io) {
 
         if (appConfig.userVerify) {
           socket.broadcast.to(message.roomName).emit('messages', [{
-            text : [
-              'User ' + user.userName + ' needs to be verified'
-            ]
+            text: [
+              'User ' + user.userName + ' needs to be verified',
+            ],
           }]);
         }
 
         socket.emit('messages', [{
-          text : [
-            user.userName + ' has been registered!'
-          ]
+          text: [
+            user.userName + ' has been registered!',
+          ],
         }]);
 
         manager.createRoom(newRoom, user, function(createErr, roomName) {
@@ -112,9 +112,9 @@ function handle(socket, io) {
     });
   });
 
-  //TODO Rename to reflect the function
+  // TODO Rename to reflect the function
   socket.on('updateId', function(sentObject) {
-    if (null === sentObject.userName) {
+    if (sentObject.userName === null) {
       const publicRoom = dbDefaults.rooms.public.roomName;
       const data = {};
 
@@ -127,7 +127,7 @@ function handle(socket, io) {
       manager.updateUserSocketId(socket.id, sentObject.userName, function(idErr, user) {
         if (idErr) {
           return;
-        } else if (null === user) {
+        } else if (user === null) {
           socket.emit('disconnectUser');
           socket.join(dbDefaults.rooms.public.roomName);
           return;
@@ -151,7 +151,6 @@ function handle(socket, io) {
           while (missedMessages.length) {
             socket.emit('multiMsg', missedMessages.splice(0, appConfig.chunkLength));
           }
-
         });
       });
     }
@@ -159,7 +158,7 @@ function handle(socket, io) {
 
   socket.on('updateLocation', function(position) {
     dbConnector.getUserById(socket.id, function(err, user) {
-      if (err || null === user) {
+      if (err || user === null) {
         logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update location', err);
         return;
       }
@@ -181,7 +180,7 @@ function handle(socket, io) {
       const userName = sentUser.userName.toLowerCase();
 
       dbConnector.authUser(userName, sentUser.password, function(err, user) {
-        if (err || null === user) {
+        if (err || user === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to login', err);
           return;
         } else if (!user.verified || user.banned) {
@@ -212,17 +211,17 @@ function handle(socket, io) {
             const oldRooms = oldSocket.rooms;
 
             for (let i = 1; i < oldRooms.length; i++) {
-              if (0 > oldRooms[i].indexOf(dbDefaults.device)) {
+              if (oldRooms[i].indexOf(dbDefaults.device) < 0) {
                 oldSocket.leave(oldRooms[i]);
               }
             }
 
             oldSocket.emit('logout');
             oldSocket.emit('messages', [{
-              text : [
+              text: [
                 'Your user has been logged in on another device',
-                'You have been logged out'
-              ]
+                'You have been logged out',
+              ],
             }]);
           }
 
@@ -241,21 +240,21 @@ function handle(socket, io) {
 
       if (data.oldPassword && data.newPassword && data.userName) {
         dbConnector.authUser(data.userName, data.oldPassword, function(err, user) {
-          if (err || null === user) {
+          if (err || user === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', err);
             return;
           }
 
           dbConnector.updateUserPassword(user.userName, data.newPassword, function(userErr, updatedUser) {
-            if (userErr || null === updatedUser) {
+            if (userErr || updatedUser === null) {
               logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', userErr);
               return;
             }
 
             socket.emit('messages', [{
-              text : [
-                'Password has been successfully changed!'
-              ]
+              text: [
+                'Password has been successfully changed!',
+              ],
             }]);
           });
         });
@@ -272,13 +271,13 @@ function handle(socket, io) {
       const userName = user.userName;
 
       dbConnector.updateUserSocketId(userName, '', function(err, socketUser) {
-        if (err || null === socketUser) {
+        if (err || socketUser === null) {
           logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to reset user socket ID', err);
           return;
         }
 
         dbConnector.updateUserOnline(userName, false, function(userErr, updatedUser) {
-          if (userErr || null === updatedUser) {
+          if (userErr || updatedUser === null) {
             logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to reset socket id', userErr);
             return;
           }
@@ -286,14 +285,14 @@ function handle(socket, io) {
           const rooms = socket.rooms;
 
           for (let i = 1; i < rooms.length; i++) {
-            if (0 > rooms[i].indexOf(dbDefaults.device)) {
+            if (rooms[i].indexOf(dbDefaults.device) < 0) {
               socket.leave(rooms[i]);
             }
           }
 
           socket.emit('logout');
           socket.emit('messages', [{
-            text : ['You have been logged out']
+            text: ['You have been logged out'],
           }]);
         });
       });
@@ -310,13 +309,13 @@ function handle(socket, io) {
 
       if (userNameLower !== undefined) {
         dbConnector.verifyUser(userNameLower, function(err, user) {
-          if (err || null === user) {
+          if (err || user === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to verify user', err);
             return;
           }
 
           socket.emit('messages', [{
-            text : ['User ' + user.userName + ' has been verified']
+            text: ['User ' + user.userName + ' has been verified'],
           }]);
         });
       }
@@ -330,7 +329,7 @@ function handle(socket, io) {
       }
 
       dbConnector.getUnverifiedUsers(function(err, users) {
-        if (err || null === users) {
+        if (err || users === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to verify all user', err);
           return;
         }
@@ -342,9 +341,9 @@ function handle(socket, io) {
           }
 
           socket.emit('messages', [{
-            text : ['Users have been verified']
+            text: ['Users have been verified'],
           }]);
-          //TODO Send message to verified user
+          // TODO Send message to verified user
         });
       });
     });
@@ -357,7 +356,7 @@ function handle(socket, io) {
       }
 
       dbConnector.getUnverifiedUsers(function(err, users) {
-        if (err || null === users) {
+        if (err || users === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to unverified users', err);
           return;
         }
@@ -372,7 +371,7 @@ function handle(socket, io) {
           }
         }
 
-        socket.emit('messages', [{ text : [usersString] }]);
+        socket.emit('messages', [{ text: [usersString] }]);
       });
     });
   });
@@ -386,7 +385,7 @@ function handle(socket, io) {
       const userNameLower = sentUserName.toLowerCase();
 
       dbConnector.banUser(userNameLower, function(err, user) {
-        if (err || null === user) {
+        if (err || user === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to ban user');
           return;
         }
@@ -394,11 +393,11 @@ function handle(socket, io) {
         const bannedSocketId = user.socketId;
 
         socket.emit('messages', [{
-          text : ['User ' + userNameLower + ' has been banned']
+          text: ['User ' + userNameLower + ' has been banned'],
         }]);
 
         dbConnector.updateUserSocketId(userNameLower, '', function(userErr, updatedUser) {
-          if (userErr || null == updatedUser) {
+          if (userErr || updatedUser === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to disconnect user ' + userNameLower,
               userErr);
             return;
@@ -413,9 +412,9 @@ function handle(socket, io) {
           }
 
           socket.emit('messages', [{
-            text : [
-              'User ' + userNameLower + ' has been disconnected'
-            ]
+            text: [
+              'User ' + userNameLower + ' has been disconnected',
+            ],
           }]);
         });
       });
@@ -431,13 +430,13 @@ function handle(socket, io) {
       const userNameLower = sentUserName.toLowerCase();
 
       dbConnector.unbanUser(userNameLower, function(err, user) {
-        if (err || null === user) {
+        if (err || user === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to unban user', err);
           return;
         }
 
         socket.emit('messages', [{
-          text : ['Ban on user ' + userNameLower + ' has been removed']
+          text: ['Ban on user ' + userNameLower + ' has been removed'],
         }]);
       });
     });
@@ -450,7 +449,7 @@ function handle(socket, io) {
       }
 
       dbConnector.getBannedUsers(function(err, users) {
-        if (err || null === users) {
+        if (err || users === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to get all banned users', err);
           return;
         }
@@ -465,12 +464,12 @@ function handle(socket, io) {
           }
         }
 
-        socket.emit('messages', [{ text : [usersString] }]);
+        socket.emit('messages', [{ text: [usersString] }]);
       });
     });
   });
 
-  socket.on('updateUserTeam', function(data) {
+  socket.on('updateUserTeam', function() {
 
   });
 
@@ -484,42 +483,42 @@ function handle(socket, io) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, user) {
-        if (err || null === user) {
+        if (err || user === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update user', err);
           return;
         }
 
         socket.emit('messages', [{
-          text : ['User has been updated']
+          text: ['User has been updated'],
         }]);
       };
 
       switch (field) {
-        case 'visibility':
-          dbConnector.updateUserVisibility(userName, value, callback);
+      case 'visibility':
+        dbConnector.updateUserVisibility(userName, value, callback);
 
-          break;
-        case 'accesslevel':
-          dbConnector.updateUserAccessLevel(userName, value, callback);
+        break;
+      case 'accesslevel':
+        dbConnector.updateUserAccessLevel(userName, value, callback);
 
-          break;
-        case 'addgroup':
+        break;
+      case 'addgroup':
 
-          break;
-        case 'removegroup':
+        break;
+      case 'removegroup':
 
-          break;
-        case 'password':
-          dbConnector.updateUserPassword(userName, value, callback);
+        break;
+      case 'password':
+        dbConnector.updateUserPassword(userName, value, callback);
 
-          break;
-        default:
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Invalid field. User doesn\'t have ' + field);
-          socket.emit('messages', [{
-            text : ['Invalid field. User doesn\'t have ' + field]
-          }]);
+        break;
+      default:
+        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Invalid field. User doesn\'t have ' + field);
+        socket.emit('messages', [{
+          text: ['Invalid field. User doesn\'t have ' + field],
+        }]);
 
-          break;
+        break;
       }
     });
   });

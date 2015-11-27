@@ -23,7 +23,6 @@ function handle(socket) {
         }
 
         socket.emit('commandSuccess');
-
       });
     });
   });

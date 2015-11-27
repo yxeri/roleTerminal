@@ -5,7 +5,8 @@ const path = require('path');
 const htmlMinifier = require('html-minifier');
 const minifier = require('node-minify');
 const logger = require('./logger');
-const serverConfig = require('./config/serverConfig');
+const config = require('./config/serverConfig');
+const browserify = require('browserify');
 
 /**
  * Minifies a HTML file
@@ -19,12 +20,12 @@ function htmlMinify(inPath, outPath) {
       logger.sendErrorMsg(logger.ErrorCodes.general, 'ReadError', readError);
     } else {
       const minifyConfig = {
-        removeComments : true,
-        removeCommentsFromCDATA : true,
-        removeCDATASectionsFromCDATA : true,
-        collapseWhitespace : true,
-        minifyJS : true,
-        minifyCSS : true
+        removeComments: true,
+        removeCommentsFromCDATA: true,
+        removeCDATASectionsFromCDATA: true,
+        collapseWhitespace: true,
+        minifyJS: true,
+        minifyCSS: true,
       };
 
       fs.writeFile(outPath, htmlMinifier.minify(readFile, minifyConfig),
@@ -44,20 +45,52 @@ function htmlMinify(inPath, outPath) {
  * @param {string} minifierType Type of the file, either js or css
  * @returns {undefined} Returns undefined
  */
-function nodeMinify(inPath, outPath, minifierType) {
-  new minifier.minify({ // eslint-disable-line
-    type : minifierType,
-    fileIn : inPath,
-    fileOut : outPath,
-    options : ['--mangle', '--compress unsafe=true'],
-    callback : function(err) {
+function nodeMinify(inPath, outPath, minifierType, extension) {
+  function removeTemp(filePath) {
+    fs.unlink(filePath, function(err) {
       if (err) {
-        logger.sendErrorMsg(logger.ErrorCodes.general, 'Minify error', err);
+        console.log('Failed to remove temp file');
+      } else {
+        console.log('Successfully removed', filePath);
       }
+    });
+  }
 
-      logger.sendInfoMsg('Minified ' + inPath);
-    }
-  });
+  function minify(sourcePath, callback) {
+    new minifier.minify({ // eslint-disable-line
+      type: minifierType,
+      fileIn: sourcePath,
+      fileOut: outPath,
+      options: ['--mangle', '--compress unsafe=true'],
+      callback: function(err) {
+        if (err) {
+          logger.sendErrorMsg(logger.ErrorCodes.general, 'Minify error', err);
+        } else {
+          logger.sendInfoMsg('Minified ' + inPath);
+        }
+
+        if (callback) {
+          callback(sourcePath);
+        }
+      },
+    });
+  }
+
+  if (extension === 'js' && config.transpileEs6) {
+    const transpilePath = inPath + '-transpile';
+    let file;
+
+    browserify(inPath, {debug: true}).transform('babelify', {presets: ['es2015'], compact: false}).bundle().pipe(
+      file = fs.createWriteStream(transpilePath)
+    );
+
+    file.on('finish', function() {
+      console.log('Transpiled ', transpilePath);
+      minify(transpilePath, removeTemp);
+    });
+  } else {
+    minify(inPath);
+  }
 }
 
 /**
@@ -109,14 +142,14 @@ function minifyDir(inPath, outPath, extension) {
           if (path.extname(file).substr(1) === extension) {
             let type = '';
 
-            if ('html' === extension) {
+            if (extension === 'html') {
               htmlMinify(fullInPath, fullOutPath);
-            } else if ('js' === extension) {
-              type = 'dev' === serverConfig.mode ? 'no-compress' : 'uglifyjs';
+            } else if (extension === 'js') {
+              type = config.mode === 'dev' ? 'no-compress' : 'uglifyjs';
 
-              nodeMinify(fullInPath, fullOutPath, type);
-            } else if ('css' === extension) {
-              type = 'dev' === serverConfig.mode ? 'no-compress' : 'sqwish';
+              nodeMinify(fullInPath, fullOutPath, type, extension);
+            } else if (extension === 'css') {
+              type = config.mode === 'dev' ? 'no-compress' : 'sqwish';
 
               nodeMinify(fullInPath, fullOutPath, type);
             }
@@ -137,14 +170,14 @@ function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
   let type = '';
 
-  if ('html' === extension) {
+  if (extension === 'html') {
     htmlMinify(filePath, outPath);
-  } else if ('js' === extension) {
-    type = 'dev' === serverConfig.mode ? 'no-compress' : 'uglifyjs';
+  } else if (extension === 'js') {
+    type = config.mode === 'dev' ? 'no-compress' : 'uglifyjs';
 
-    nodeMinify(filePath, outPath, type);
-  } else if ('css' === extension) {
-    type = 'dev' === serverConfig.mode ? 'no-compress' : 'sqwish';
+    nodeMinify(filePath, outPath, type, extension);
+  } else if (extension === 'css') {
+    type = config.mode === 'dev' ? 'no-compress' : 'sqwish';
 
     nodeMinify(filePath, outPath, type);
   }

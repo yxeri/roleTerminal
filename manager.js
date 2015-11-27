@@ -66,10 +66,10 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
   dbConnector.getHistoryFromRooms(rooms, function(err, history) {
     let historyMessages = [];
 
-    if (err || null === history) {
+    if (err || history === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history', err);
     } else {
-      const maxLines = null === lines || isNaN(lines) ? appConfig.historyLines : lines;
+      const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
       for (let i = 0; i < history.length; i++) {
         historyMessages = historyMessages.concat(history[i].messages);
@@ -79,7 +79,7 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
       historyMessages = historyMessages.slice(-maxLines);
 
       if (missedMsgs) {
-        for (let i = historyMessages.length - 1; 0 < i; i--) {
+        for (let i = historyMessages.length - 1; i > 0; i--) {
           const message = historyMessages[i];
 
           if (lastOnline > message.time) {
@@ -106,7 +106,7 @@ function createRoom(newRoom, user, callback) {
   newRoom.roomName = newRoom.roomName.toLowerCase();
 
   dbConnector.createRoom(newRoom, null, function(err, room) {
-    if (err || null === room) {
+    if (err || room === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to create room for user ' + user.userName, err);
       callback(err);
     } else {

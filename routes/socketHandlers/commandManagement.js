@@ -9,12 +9,12 @@ function handle(socket) {
   socket.on('getCommands', function() {
     dbConnector.getAllCommands(function(err, commands) {
       if (err || commands === null || commands.length === 0) {
-        //TODO Important msg through logger?
+        // TODO Important msg through logger?
         socket.emit('importantMsg', {
-          text : [
+          text: [
             'Failure to retrieve commands',
-            'Please try rebooting with "-reboot"'
-          ]
+            'Please try rebooting with "-reboot"',
+          ],
         });
         return;
       }
@@ -33,28 +33,28 @@ function handle(socket) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, command) {
-        if (err || null === command) {
+        if (err || command === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
         } else {
-          socket.emit('messages', [{ text : ['Command has been updated'] }]);
+          socket.emit('messages', [{ text: ['Command has been updated'] }]);
           socket.emit('updateCommands', [command]);
           socket.broadcast.emit('updateCommands', [command]);
         }
       };
       switch (field) {
-        case 'visibility':
-          dbConnector.updateCommandVisibility(cmdName, value, callback);
+      case 'visibility':
+        dbConnector.updateCommandVisibility(cmdName, value, callback);
 
-          break;
-        case 'accesslevel':
-          dbConnector.updateCommandAccessLevel(cmdName, value, callback);
+        break;
+      case 'accesslevel':
+        dbConnector.updateCommandAccessLevel(cmdName, value, callback);
 
-          break;
-        default:
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' +
-                                                                        field);
+        break;
+      default:
+        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' +
+                                                                      field);
 
-          break;
+        break;
       }
     });
   });

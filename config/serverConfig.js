@@ -13,13 +13,12 @@ config.privateBase = 'private';
  * Will be appended to the base directories
  */
 config.paths = {
-  views : 'views',
-  styles : 'styles',
-  scripts : 'scripts',
-  favicon : 'images/favicon.ico'
+  views: 'views',
+  styles: 'styles',
+  scripts: 'scripts',
+  required: 'required',
+  favicon: 'images/favicon.ico',
 };
-
-/* eslint-disable */
 
 // Morgan log level
 config.logLevel = process.env.LOGLEVEL || 'tiny';
@@ -48,7 +47,7 @@ config.watchDir = process.env.WATCHDIR || false;
  * Retrieve socket.io from local server or cdn
  * Note! Android 2.2 fails when using cdn
  */
-config.socketPath = 'cdn' === process.env.SOCKETPATH
+config.socketPath = process.env.SOCKETPATH === 'cdn'
   ? 'https://cdn.socket.io/socket.io-1.3.5.js' : '/scripts/socket.io-1.3.5.js';
 
 /*
@@ -57,6 +56,6 @@ config.socketPath = 'cdn' === process.env.SOCKETPATH
  */
 config.mode = process.env.MODE || 'prod';
 
-/* eslint-enable */
+config.transpileEs6 = process.env.TRANSPILE || true;
 
 module.exports = config;

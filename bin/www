@@ -15,21 +15,35 @@ const config = require('../config/serverConfig');
  */
 function minifyDirs() {
   minifier.minifyDir(
-      path.resolve(path.join(config.privateBase, config.paths.views)),
-      path.resolve(path.join(config.publicBase, config.paths.views)),
-      'html'
+    path.resolve(path.join(config.privateBase, config.paths.views)), path.resolve(path.join(config.publicBase, config.paths.views)),
+    'html'
   );
   minifier.minifyDir(
-      path.resolve(path.join(config.privateBase, config.paths.styles)),
-      path.resolve(path.join(config.publicBase, config.paths.styles)),
-      'css'
+    path.resolve(path.join(config.privateBase, config.paths.styles)), path.resolve(path.join(config.publicBase, config.paths.styles)),
+    'css'
   );
   minifier.minifyDir(
-    path.resolve(
-      path.join(config.privateBase, config.paths.scripts)),
-      path.resolve(path.join(config.publicBase, config.paths.scripts)),
-      'js'
+    path.resolve(path.join(config.privateBase, config.paths.scripts)), path.resolve(path.join(config.publicBase, config.paths.scripts)),
+    'js'
   );
+}
+
+function moveRequired() {
+  const privatePath = path.resolve(path.join(config.privateBase, config.paths.required));
+  const publicPath = path.resolve(path.join(config.publicBase, config.paths.scripts));
+
+  fs.readdir(privatePath, function(readErr, files) {
+    if (readErr) {
+      console.log(readErr);
+    } else {
+      files.forEach(function(file) {
+        const fullPrivatePath = path.join(privatePath, file);
+        const fullPublicPath = path.join(publicPath, file);
+
+        fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
+      });
+    }
+  });
 }
 
 /*
@@ -44,6 +58,7 @@ fs.stat(path.resolve(config.publicBase), function(err) {
   }
 
   minifyDirs();
+  moveRequired();
 });
 
 // Sets server port

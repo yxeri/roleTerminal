@@ -10,10 +10,10 @@ const messenger = require('../../messenger');
 function followRoom(socket, userName, newRoom) {
   const newRoomName = newRoom.roomName;
 
-  if (0 > socket.rooms.indexOf(newRoomName)) {
+  if (socket.rooms.indexOf(newRoomName) < 0) {
     socket.broadcast.to(newRoomName).emit('messages', [{
-      text : [userName + ' is following ' + newRoomName],
-      roomName : newRoomName
+      text: [userName + ' is following ' + newRoomName],
+      roomName: newRoomName,
     }]);
   }
 
@@ -32,6 +32,7 @@ function handle(socket) {
 
       if (data.message.whisper) {
         data.message.roomName += dbDefaults.whisper;
+
         messenger.sendWhisperMsg(socket, data.message);
       } else {
         messenger.sendChatMsg(socket, data.message, data.skipSelfMsg);
@@ -48,8 +49,9 @@ function handle(socket) {
       data.time = new Date();
 
       dbConnector.addMsgToHistory('broadcast', data, function(err, history) {
-        if (err || null === history) {
+        if (err || history === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
+
           return;
         }
 
@@ -64,25 +66,24 @@ function handle(socket) {
   socket.on('createRoom', function(sentRoom) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName,
       function(allowErr, allowed, user) {
-      if (allowErr || !allowed || !user) {
-        return;
-      }
-
-      manager.createRoom(sentRoom, user, function(createErr, roomName) {
-        if (createErr) {
+        if (allowErr || !allowed || !user) {
           return;
         }
 
-        const room = {};
+        manager.createRoom(sentRoom, user, function(createErr, roomName) {
+          if (createErr) {
+            return;
+          }
 
-        room.roomName = roomName;
+          const room = {};
+          room.roomName = roomName;
 
-        socket.emit('messages', [{
-          text : ['Room has been created']
-        }]);
-        followRoom(socket, user.userName, room);
+          socket.emit('messages', [{
+            text: ['Room has been created'],
+          }]);
+          followRoom(socket, user.userName, room);
+        });
       });
-    });
   });
 
   socket.on('follow', function(data) {
@@ -96,10 +97,12 @@ function handle(socket) {
       if (data.password === undefined) {
         data.password = '';
       }
+
       dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
-        if (err || null === room) {
+        if (err || room === null) {
           logger.sendSocketErrorMsg(
             socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
+
           return;
         }
 
@@ -108,6 +111,7 @@ function handle(socket) {
         dbConnector.addRoomToUser(user.userName, roomName, function(roomErr) {
           if (roomErr) {
             logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + data.roomName, roomErr);
+
             return;
           }
 
@@ -129,11 +133,11 @@ function handle(socket) {
 
       room.roomName = room.roomName.toLowerCase();
 
-      if (0 < socket.rooms.indexOf(room.roomName)) {
+      if (socket.rooms.indexOf(room.roomName) > 0) {
         socket.emit('follow', room);
       } else {
         socket.emit('messages', [{
-          text : ['You are not following room ' + room.roomName]
+          text: ['You are not following room ' + room.roomName],
         }]);
       }
     });
@@ -147,7 +151,7 @@ function handle(socket) {
 
       const roomName = room.roomName.toLowerCase();
 
-      if (-1 < socket.rooms.indexOf(roomName)) {
+      if (socket.rooms.indexOf(roomName) > -1) {
         const userName = user.userName;
 
         /*
@@ -156,21 +160,22 @@ function handle(socket) {
          */
         if (roomName !== userName) {
           dbConnector.removeRoomFromUser(userName, roomName, function(err, removedUser) {
-            if (err || null === removedUser) {
+            if (err || removedUser === null) {
               logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to unfollow room', err);
+
               return;
             }
 
             socket.broadcast.to(roomName).emit('messages', [{
-              text : [userName + ' left ' + roomName],
-              room : roomName
+              text: [userName + ' left ' + roomName],
+              room: roomName,
             }]);
             socket.leave(roomName);
             socket.emit('unfollow', room);
           });
         }
       } else {
-        socket.emit('messages', [{ text : ['You are not following ' + roomName] }]);
+        socket.emit('messages', [{ text: ['You are not following ' + roomName] }]);
       }
     });
   });
@@ -185,10 +190,11 @@ function handle(socket) {
       dbConnector.getAllRooms(user, function(roomErr, rooms) {
         if (roomErr) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all room names', roomErr);
+
           return;
         }
 
-        if (0 < rooms.length) {
+        if (rooms.length > 0) {
           let roomsString = '';
 
           for (let i = 0; i < rooms.length; i++) {
@@ -196,12 +202,12 @@ function handle(socket) {
           }
 
           socket.emit('messages', [{
-            text : [
+            text: [
               '--------------',
               '  List rooms',
               '--------------',
-              roomsString
-            ]
+              roomsString,
+            ],
           }]);
         }
       });
@@ -215,12 +221,13 @@ function handle(socket) {
       }
 
       dbConnector.getAllUsers(user, function(userErr, users) {
-        if (userErr || null === users) {
+        if (userErr || users === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all users', userErr);
+
           return;
         }
 
-        if (0 < users.length) {
+        if (users.length > 0) {
           let usersString = '';
           let onlineString = '';
 
@@ -239,7 +246,7 @@ function handle(socket) {
           }
 
           socket.emit('messages', [{
-            text : [
+            text: [
               '--------------',
               '  List users',
               '--------------------',
@@ -249,8 +256,8 @@ function handle(socket) {
               '-----------------',
               '  Other users',
               '-----------------',
-              usersString
-            ]
+              usersString,
+            ],
           }]);
         }
       });
@@ -264,10 +271,10 @@ function handle(socket) {
         data.userName + dbDefaults.whisper,
         data.device + dbDefaults.device,
         dbDefaults.rooms.important.roomName,
-        dbDefaults.rooms.broadcast.roomName
+        dbDefaults.rooms.broadcast.roomName,
       ];
 
-      return 0 <= hiddenRooms.indexOf(room);
+      return hiddenRooms.indexOf(room) >= 0;
     }
 
     manager.userAllowedCommand(socket.id, dbDefaults.commands.myrooms.commandName, function(allowErr, allowed, user) {
@@ -286,18 +293,19 @@ function handle(socket) {
       }
 
       socket.emit('messages', [{
-        text : [
+        text: [
           '------------',
           '  My rooms',
           '------------',
           'You are following rooms:',
-          rooms.join('\t')
-        ]
+          rooms.join('\t'),
+        ],
       }]);
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
-        if (err || null === ownedRooms) {
+        if (err || ownedRooms === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get owned rooms', err);
+
           return;
         }
 
@@ -307,12 +315,12 @@ function handle(socket) {
           ownedRoomsString += ownedRooms[i].roomName + '\t';
         }
 
-        if (0 < ownedRoomsString.length) {
+        if (ownedRoomsString.length > 0) {
           socket.emit('messages', [{
-            text : [
+            text: [
               'You are owner of the rooms:',
-              ownedRoomsString
-            ]
+              ownedRoomsString,
+            ],
           }]);
         }
       });
@@ -334,7 +342,7 @@ function handle(socket) {
           return;
         }
 
-        while (0 < historyMessages.length) {
+        while (historyMessages.length > 0) {
           socket.emit('messages', historyMessages.splice(0, appConfig.chunkLength));
         }
       });
@@ -358,23 +366,24 @@ function handle(socket) {
   socket.on('removeRoom', function(roomName) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName,
       function(allowErr, allowed, user) {
-      if (allowErr || !allowed || !user) {
-        return;
-      }
-
-      const roomNameLower = roomName.toLowerCase();
-
-      dbConnector.removeRoom(roomNameLower, user, function(err, room) {
-        if (err || null === room) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
+        if (allowErr || !allowed || !user) {
           return;
         }
 
-        socket.emit('messages', [{
-          text : ['Removed the room']
-        }]);
+        const roomNameLower = roomName.toLowerCase();
+
+        dbConnector.removeRoom(roomNameLower, user, function(err, room) {
+          if (err || room === null) {
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
+
+            return;
+          }
+
+          socket.emit('messages', [{
+            text: ['Removed the room'],
+          }]);
+        });
       });
-    });
   });
 
   socket.on('importantMsg', function(data) {
@@ -387,8 +396,9 @@ function handle(socket) {
     };
     const historyFunc = function(roomName, sendFunc) {
       dbConnector.addMsgToHistory(roomName, data, function(err, history) {
-        if (err || null === history) {
+        if (err || history === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
+
           return;
         }
 
@@ -405,8 +415,9 @@ function handle(socket) {
 
       if (data.device) {
         dbConnector.getDevice(data.device, function(err, device) {
-          if (err || null === device) {
+          if (err || device === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message to the device', err);
+
             return;
           }
 
@@ -414,7 +425,6 @@ function handle(socket) {
           const roomName = deviceId + dbDefaults.device;
 
           historyFunc(roomName, deviceFunc);
-
         });
       } else {
         const roomName = dbDefaults.rooms.important.roomName;
@@ -424,7 +434,7 @@ function handle(socket) {
     });
   });
 
-  //TODO Change this, quick fix implementation
+  // TODO Change this, quick fix implementation
   socket.on('followPublic', function() {
     socket.join(dbDefaults.rooms.public.roomName);
   });
@@ -439,29 +449,30 @@ function handle(socket) {
       const field = data.field;
       const value = data.value;
       const callback = function(err, room) {
-        if (err || null === room) {
+        if (err || room === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update room', err);
+
           return;
         }
 
         socket.emit('messages', [{
-          text : ['User has been updated']
+          text: ['User has been updated'],
         }]);
       };
 
       switch (field) {
-        case 'visibility':
-          dbConnector.updateRoomVisibility(roomName, value, callback);
+      case 'visibility':
+        dbConnector.updateRoomVisibility(roomName, value, callback);
 
-          break;
-        case 'accesslevel':
-          dbConnector.updateRoomAccessLevel(roomName, value, callback);
+        break;
+      case 'accesslevel':
+        dbConnector.updateRoomAccessLevel(roomName, value, callback);
 
-          break;
-        default:
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Invalid field. Room doesn\'t have ' + field);
+        break;
+      default:
+        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Invalid field. Room doesn\'t have ' + field);
 
-          break;
+        break;
       }
     });
   });

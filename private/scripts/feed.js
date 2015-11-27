@@ -1,12 +1,7 @@
 'use strict';
 
-/**
- * const and let support is still kind of shaky on client side, thus the
- * usage of var
- */
-
-var razLogo = {
-  text : [
+const razLogo = {
+  text: [
     '   ####',
     '###############',
     ' #####  #########                                           ####',
@@ -20,12 +15,12 @@ var razLogo = {
     '########     ########        ####                        ######      #####   ##',
     '               ###########        ##                                    ###### ',
     '                    ###############',
-    '                  Razor  #####  Demos - Warez - Honey'
+    '                  Razor  #####  Demos - Warez - Honey',
   ],
-    extraClass : 'logo'
+  extraClass: 'logo',
 };
-var logo = {
-  text : [
+const logo = {
+  text: [
     '                          ####',
     '                ####    #########    ####',
     '               ###########################',
@@ -54,131 +49,99 @@ var logo = {
     '              ############################',
     '              #######  ##########  #######',
     '                ###      ######      ###',
-    '                          ####'
+    '                          ####',
   ],
-    extraClass : 'logo'
+  extraClass: 'logo',
 };
 // Timeout between print of rows (milliseconds)
-var rowTimeout = 60;
+const rowTimeout = 60;
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMsgQueue
  */
-var msgsPerQueue = 3;
+const msgsPerQueue = 3;
 /**
  * Queue of all the message objects that will be handled and printed
  */
-var msgQueue = [];
-/**
- * Shorter queue of messages that will be processed this loop. Length is
- * based on msgsPerQueue variable
- */
-var shortMsgQueue = [];
-var cmdQueue = [];
-// True if messages are being processed and printed right now
-var printing = false;
-/**
- * Used to block repeat of some key presses
- */
-var keyPressed = false;
-/**
- * Used for Android full screen to change CSS layout
- */
-var clicked = false;
+const msgQueue = [];
+const cmdQueue = [];
 /**
  * Char that is prepended on commands in chat mode
  */
-var cmdChars = ['-', '/'];
-var cmdMode = 'cmd';
-var chatMode = 'chat';
-var randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
-var randBinary = '01';
-var hideRooms = [
+const cmdChars = ['-', '/'];
+const cmdMode = 'cmd';
+const chatMode = 'chat';
+const randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+const randBinary = '01';
+const hideRooms = [
   'broadcast',
   'important',
-  'whisper'
+  'whisper',
 ];
-/**
- * Focus can sometimes trigger twice, which is used to check if a reconnection
- * is needed. This flag will be set to true while it is reconnecting to
- * block the second attempt
- */
-var reconnecting = false;
 // Interval/timeout times in milliseconds
-var printIntervalTime = 200;
-var screenOffIntervalTime = 1000;
-var watchPositionTime = 15000;
-var pausePositionTime = 40000;
+const printIntervalTime = 200;
+const screenOffIntervalTime = 1000;
+const watchPositionTime = 15000;
+const pausePositionTime = 40000;
 /**
  * DOM element init
  * Initiation of DOM elements has to be done here.
  * Android 4.1.* would otherwise give JS errors
  */
-var mainFeed = document.getElementById('mainFeed');
-var cmdInput = document.getElementById('cmdInput');
-var inputStart = document.getElementById('inputStart');
-var modeField = document.getElementById('mode');
-var spacer = document.getElementById('spacer');
-var background = document.getElementById('background');
+const mainFeed = document.getElementById('mainFeed');
+const cmdInput = document.getElementById('cmdInput');
+const inputStart = document.getElementById('inputStart');
+const modeField = document.getElementById('mode');
+const spacer = document.getElementById('spacer');
+const background = document.getElementById('background');
 // Socket.io
-var socket = io(); // eslint-disable-line
-// Is geolocation tracking on?
-var isTracking = true;
-var positions = [];
-var watchId = null;
+const socket = io(); // eslint-disable-line
 // Queue of all the sounds that will be handled and played
-var soundQueue = [];
-var audioCtx;
-var oscillator;
-var gainNode;
-var soundTimeout = 0;
-var prevCmdPointer;
-var cmdTime = 1000;
-var cmdUsed = false;
-var oldAndroid = isOldAndroid();
-var dot = '.';
-var dash = '-';
-var morseSeparator = '#';
-//TODO Convert to arrays with amounts pointing to either - or .
-var morseCodes = {
-  'a' : '.-',
-  'b' : '-...',
-  'c' : '-.-.',
-  'd' : '-..',
-  'e' : '.',
-  'f' : '..-.',
-  'g' : '--.',
-  'h' : '....',
-  'i' : '..',
-  'j' : '.---',
-  'k' : '-.-',
-  'l' : '.-..',
-  'm' : '--',
-  'n' : '-.',
-  'o' : '---',
-  'p' : '.--.',
-  'q' : '--.-',
-  'r' : '.-.',
-  's' : '...',
-  't' : '-',
-  'u' : '..-',
-  'v' : '...-',
-  'w' : '.--',
-  'x' : '-..-',
-  'y' : '-.--',
-  'z' : '--..',
-  '1' : '.----',
-  '2' : '..---',
-  '3' : '...--',
-  '4' : '....-',
-  '5' : '.....',
-  '6' : '-....',
-  '7' : '--...',
-  '8' : '---..',
-  '9' : '----.',
-  '0' : '-----',
+const soundQueue = [];
+const cmdTime = 1000;
+const dot = '.';
+const dash = '-';
+const morseSeparator = '#';
+// TODO Convert to arrays with amounts pointing to either - or .
+const morseCodes = {
+  'a': '.-',
+  'b': '-...',
+  'c': '-.-.',
+  'd': '-..',
+  'e': '.',
+  'f': '..-.',
+  'g': '--.',
+  'h': '....',
+  'i': '..',
+  'j': '.---',
+  'k': '-.-',
+  'l': '.-..',
+  'm': '--',
+  'n': '-.',
+  'o': '---',
+  'p': '.--.',
+  'q': '--.-',
+  'r': '.-.',
+  's': '...',
+  't': '-',
+  'u': '..-',
+  'v': '...-',
+  'w': '.--',
+  'x': '-..-',
+  'y': '-.--',
+  'z': '--..',
+  '1': '.----',
+  '2': '..---',
+  '3': '...--',
+  '4': '....-',
+  '5': '.....',
+  '6': '-....',
+  '7': '--...',
+  '8': '---..',
+  '9': '----.',
+  '0': '-----',
   // Symbolizes space betwen words
-  '#' : morseSeparator
+  '#': morseSeparator,
 };
 /**
  * Stores everything related to the map area
@@ -186,1973 +149,239 @@ var morseCodes = {
  * The size of each grid is dependent of the map size
  * (which is set with coordinates) and max amount of X and Y grids
  */
-var mapHelper = {
-  leftLong : 15.1857261,
-  rightLong : 15.2045467,
-  topLat : 59.7609695,
-  bottomLat : 59.7465301,
-  xGridsMax : 24,
-  yGridsMax : 36,
-  xSize : 0,
-  ySize : 0,
-  xGrids : {},
-  yGrids : {}
+const mapHelper = {
+  leftLong: 15.1857261,
+  rightLong: 15.2045467,
+  topLat: 59.7609695,
+  bottomLat: 59.7465301,
+  xGridsMax: 24,
+  yGridsMax: 36,
+  xSize: 0,
+  ySize: 0,
+  xGrids: {},
+  yGrids: {},
 };
-var cmdFailText = { text : ['command not found'] };
-var abortInfo = { text : ['You can cancel out of the command by typing "exit" or "abort"'] };
-var defaultInputStart = 'RAZCMD';
-var cmdHelper = {
-  maxSteps : 0,
-  onStep : 0,
-  command : null,
-  keysBlocked : false,
-  data : null,
-  hideInput : false
+const cmdFailText = { text: ['command not found'] };
+const abortInfo = { text: ['You can cancel out of the command by typing "exit" or "abort"'] };
+const defaultInputStart = 'RAZCMD';
+const cmdHelper = {
+  maxSteps: 0,
+  onStep: 0,
+  command: null,
+  keysBlocked: false,
+  data: null,
+  hideInput: false,
 };
+// Object containing all running intervals
+const intervals = {
+  tracking: null,
+  printText: null,
+  isScreenOff: null,
+};
+const validCmds = {};
+let audioCtx;
+let oscillator;
+let gainNode;
+let soundTimeout = 0;
+let prevCmdPointer;
+let watchId = null;
+// Is geolocation tracking on?
+let isTracking = true;
+let positions = [];
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
  * for a longer period of time
  */
-var lastScreenOff = (new Date()).getTime();
-// Object containing all running intervals
-var intervals = {
-  tracking : null,
-  printText : null,
-  isScreenOff : null
-};
-var validCmds = {
-  help : {
-    func : function(phrases) {
-      function getCmds() {
-        var cmds = [];
-        //TODO Change from Object.keys for compatibility with older Android
-        var keys = Object.keys(validCmds);
-        var i;
-        var cmd;
-        var cmdAccessLvl;
-
-        for (i = 0; i < keys.length; i++) {
-          cmd = validCmds[keys[i]];
-          cmdAccessLvl = cmd.accessLevel;
-
-          if (isNaN(cmdAccessLvl) || getAccessLvl() >= cmdAccessLvl) {
-            cmds.push(keys[i]);
-          }
-        }
-
-        return cmds.concat(Object.keys(getAliases())).sort();
-      }
-
-      function getAll() {
-        var allCmds = getCmds();
-
-        if (null === getUser()) {
-          queueMsg({
-            text : [
-              createLine(49),
-              ' Use register to register a new user',
-              ' Use login to log in to an existing user',
-              ' You have to log in to access most of the system',
-              createLine(49)
-            ]
-          });
-        }
-
-        queueMsg({
-          text : allCmds
-        });
-      }
-
-      if (undefined === phrases || 0 === phrases.length) {
-        queueMsg({
-          text : createCmdStart('help').concat([
-            'Instructions',
-            '  Add -help after a command to get instructions on how to use it. Example: ' + cmdChars[0] +
-            'uploadkey -help',
-            'Shortcuts',
-            '  Use page up/down to scroll the view',
-            '  Press arrow up/down to go through your previous used commands',
-            '  Pressing tab or space twice will auto-complete any command you have begun writing.',
-            '  Example: "he" and a tab / double space will automatically turn into "help"'
-          ])
-        });
-      }
-
-      getAll();
-    },
-    help : [
-      'Shows a list of available commands',
-      'The set of commands shown is the basic set',
-      'Add "all" to show all commands available to you. Example: ' +
-      'help all'
-    ],
-    instructions : [
-      ' Usage:',
-      '  help *optional all*',
-      ' Example:',
-      '  help',
-      '  help all'
-    ],
-    accessLevel : 1,
-    category : 'basic'
-  },
-  clear : {
-    func : function() {
-      while (1 < mainFeed.childNodes.length) {
-        mainFeed.removeChild(mainFeed.lastChild);
-      }
-    },
-    help : ['Clears the terminal view'],
-    clearAfterUse : true,
-    accessLevel : 13,
-    category : 'basic'
-  },
-  whoami : {
-    func : function() {
-      var data = {};
-      data.device = {};
-      data.device.deviceId = getDeviceId();
-
-      socket.emit('whoAmI', data);
-    },
-    help : ['Shows the current user'],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  msg : {
-    func : function(phrases) {
-      var writtenMsg;
-
-      if (phrases && 0 < phrases.length) {
-        writtenMsg = phrases.join(' ');
-
-        socket.emit('chatMsg', {
-          message : {
-            text : [writtenMsg],
-            userName : getUser(),
-            roomName : getRoom()
-          }
-        });
-      } else {
-        queueMsg({
-          text : ['You forgot to write the message!']
-        });
-      }
-    },
-    help : [
-      'Sends a message to your current room',
-      'The room you are in is written out to the left of the marker'
-    ],
-    instructions : [
-      ' Usage:',
-      '  msg *message*',
-      ' Example:',
-      '  msg Hello!'
-    ],
-    clearAfterUse : true,
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  broadcast : {
-    func : function() {
-      var data = {};
-
-      data.text = [];
-      cmdHelper.data = data;
-
-      queueMsg({
-        text : [
-          'Who is the broadcast from?',
-          'You can also leave it empty and just press enter'
-        ]
-      });
-      queueMsg(copyMsg(abortInfo));
-      setInputStart('broadcast');
-    },
-    steps : [
-      function(phrases) {
-        var phrase;
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          phrase = phrases.join(' ');
-
-          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast from: ' + phrase));
-        } else {
-          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast'));
-        }
-
-        queueMsg({
-          text : [
-            'Write a line and press enter',
-            'Press enter without any input when you are done ' +
-            'with the message'
-          ]
-        });
-        cmdHelper.onStep++;
-      },
-      function(phrases) {
-        var phrase;
-        var dataText;
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          phrase = phrases.join(' ');
-
-          cmdHelper.data.text.push(phrase);
-        } else {
-          cmdHelper.data.text.push(createLine(10));
-          dataText = copyString(cmdHelper.data.text);
-
-          cmdHelper.onStep++;
-
-          queueMsg({
-            text : ['Preview of the message:']
-          });
-          queueMsg({
-            text : dataText
-          });
-          queueMsg({
-            text : ['Is this OK? "yes" to accept the message']
-          });
-        }
-      },
-      function(phrases) {
-        if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
-          socket.emit('broadcastMsg', cmdHelper.data);
-          resetCmd();
-        } else {
-          resetCmd(true);
-        }
-      }
-    ],
-    help : [
-      'Sends a message to all users in all rooms',
-      'It will prepend the message with "[ALL]"'
-    ],
-    instructions : [
-      'Follow the on-screen instructions'
-    ],
-    accessLevel : 13,
-    clearAfterUse : true,
-    category : 'admin'
-  },
-  follow : {
-    func : function(phrases) {
-      var room = {};
-
-      if (0 < phrases.length) {
-        room.roomName = phrases[0].toLowerCase();
-        room.password = phrases[1];
-
-        socket.emit('follow', room);
-      } else {
-        queueMsg({
-          text : [
-            'You have to specify which room to follow and a' +
-            'password (if it is protected)'
-          ]
-        });
-      }
-    },
-    help : [
-      'Follows a room and shows you all messages posted in it.',
-      'You will get the messages from this room even if it isn\'t' +
-      'your currently selected one'
-    ],
-    instructions : [
-      ' Usage:',
-      '  follow *room name* *optional password*',
-      ' Example:',
-      '  follow room1 banana'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  unfollow : {
-    func : function(phrases) {
-      var room = {};
-      var roomName;
-
-      if (0 < phrases.length) {
-        roomName = phrases[0].toLowerCase();
-
-        if (roomName === getRoom()) {
-          room.exited = true;
-        }
-
-        room.roomName = roomName;
-
-        socket.emit('unfollow', room);
-      } else {
-        queueMsg({
-          text : ['You have to specify which room to unfollow']
-        });
-      }
-    },
-    help : ['Stops following a room.'],
-    instructions : [
-      ' Usage:',
-      '  unfollow *room name*',
-      ' Example:',
-      '  unfollow roomname'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  list : {
-    func : function(phrases) {
-      var listOption;
-
-      if (0 < phrases.length) {
-        listOption = phrases[0].toLowerCase();
-
-        if ('rooms' === listOption) {
-          socket.emit('listRooms');
-        } else if ('users' === listOption) {
-          socket.emit('listUsers');
-        } else if ('devices' === listOption) {
-          socket.emit('listDevices');
-        } else {
-          queueMsg({
-            text : [listOption + 'is not a valid option']
-          });
-        }
-      } else {
-        queueMsg({
-          text : [
-            'You have to input which option you want to list',
-            'Available options: users, rooms, devices',
-            'Example: list rooms'
-          ]
-        });
-      }
-    },
-    help : [
-      'Shows a list of users, rooms or devices which you are allowed to see',
-      'You have to input which option you want to list'
-    ],
-    instructions : [
-      ' Usage:',
-      '  list *option*',
-      ' Example',
-      '  list rooms',
-      '  list users',
-      '  list devices'
-    ],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  mode : {
-    func : function(phrases, verbose) {
-      var newMode;
-      var cmdString;
-
-      if (0 < phrases.length) {
-        newMode = phrases[0].toLowerCase();
-
-        //TODO Refactoring. Lots of duplicate code
-        if (chatMode === newMode) {
-          setMode(newMode);
-
-          if (verbose === undefined || verbose) {
-            cmdString = 'Chat mode activated';
-            queueMsg({
-              text : createCmdStart(cmdString).concat([
-                'Prepend commands with "' + cmdChars.join('" or "') + '", e.g. ' + '"' + cmdChars[0] + 'uploadkey"',
-                'Everything else written and sent will be intepreted as a chat message',
-                createCmdEnd(cmdString.length)
-              ])
-            });
-          }
-
-          socket.emit('updateMode', newMode);
-        } else if (cmdMode === newMode) {
-          setMode(newMode);
-
-          if (verbose === undefined || verbose) {
-            cmdString = 'Command mode activated';
-            queueMsg({
-              text : createCmdStart(cmdString).concat([
-                'Commands can be used without "' + cmdChars[0] + '"',
-                'You have to use command "msg" to send messages',
-                createCmdEnd(cmdString.length)
-              ])
-            });
-          }
-
-          socket.emit('updateMode', newMode);
-        } else {
-          queueMsg({
-            text : [newMode + 'is not a valid mode']
-          });
-        }
-      } else {
-        queueMsg({
-          text : ['Current mode: ' + getMode()]
-        });
-      }
-    },
-    help : [
-      'Change the input mode. The options are chat or cmd',
-      '--Chat mode--',
-      'Everything written will be interpreted as chat messages',
-      'All commands have to be prepended with "' +
-      cmdChars.join('" or "') + '" ' +
-      'Example: ' + cmdChars[0] + 'uploadkey',
-      '--Cmd mode--',
-      'Chat mode is the default mode',
-      'Text written will not be automatically be intepreted as ' +
-      'chat messages',
-      'You have to use "msg" command to write messages ' +
-      'Example: msg hello',
-      'Commands do not have to be prepended with anything. ' +
-      'Example: uploadkey'
-    ],
-    instructions : [
-      ' Usage:',
-      '  mode *mode*',
-      ' Example:',
-      '  mode chat',
-      '  mode cmd'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  register : {
-    func : function(phrases) {
-      var data = {};
-      var userName;
-
-      if (null === getUser()) {
-        userName = phrases ? phrases[0] : undefined;
-
-        if (userName && 3 <= userName.length && 6 >= userName.length && isTextAllowed(userName)) {
-          data.userName = userName;
-          data.registerDevice = getDeviceId();
-          cmdHelper.data = data;
-          cmdHelper.hideInput = true;
-          hideInput(true);
-          socket.emit('userExists', cmdHelper.data);
-        } else {
-          resetCmd(true);
-          queueMsg({
-            text : [
-              'Name has to be 3 to 6 characters long',
-              'The name can only contain letters and numbers (a-z, 0-9)',
-              'Don\'t use whitespace in your name!',
-              'e.g. register myname'
-            ]
-          });
-        }
-      } else {
-        resetCmd(true);
-        queueMsg({
-          text : [
-            'You have already registered a user',
-            getUser() + ' is registered to this device'
-          ]
-        });
-      }
-    },
-    steps : [
-      function() {
-        queueMsg({
-          text : [
-            'Input a password and press enter',
-            'Your password won\'t appear on the screen as you type it',
-            'Don\'t use whitespaces in your password!'
-          ]
-        });
-        queueMsg(copyMsg(abortInfo));
-        setInputStart('password');
-        cmdHelper.onStep++;
-      },
-      function(phrases) {
-        var password = phrases ? phrases[0] : undefined;
-
-        if (phrases && 3 <= password.length && isTextAllowed(password)) {
-          cmdHelper.data.password = password;
-          queueMsg({
-            text : [
-              'Repeat your password one more time'
-            ]
-          });
-          cmdHelper.onStep++;
-        } else {
-          queueMsg({
-            text : [
-              'Password is too short!',
-              'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
-              'Please, input a password and press enter'
-            ]
-          });
-        }
-      },
-      function(phrases) {
-        var password = phrases ? phrases[0] : undefined;
-
-        if (password === cmdHelper.data.password) {
-          queueMsg({
-            text : [
-              'Congratulations, employee #' + Math.floor(Math.random() * 120503),
-              'Welcome to the Organica Oracle department',
-              'You may now login to the system',
-              'Have a productive day!'
-            ]
-          });
-          socket.emit('register', cmdHelper.data);
-          validCmds[cmdHelper.command].abortFunc();
-          resetCmd(false);
-        } else {
-          queueMsg({
-            text : [
-              'Passwords don\'t match. Please try again',
-              'Input a password and press enter'
-            ]
-          });
-          cmdHelper.onStep--;
-        }
-      }
-    ],
-    abortFunc : function() {
-      hideInput(false);
-    },
-    help : [
-      'Registers your user name on the server and connects it ' +
-      'to your device',
-      'This user name will be your identity in the system',
-      'The name can only contain letters and numbers (a-z, 0-9)',
-      'Don\'t use whitespaces in your name or password!'
-    ],
-    instructions : [
-      ' Usage:',
-      '  register *user name*',
-      ' Example:',
-      '  register myname'
-    ],
-    accessLevel : 0,
-    category : 'login'
-  },
-  createroom : {
-    func : function(phrases) {
-      var roomName;
-      var password;
-      var room = {};
-      var errorMsg = {
-        text : [
-          'Failed to create room.',
-          'Room name has to be 1 to 6 characters long',
-          'The room name and password can only contain letters and numbers ' +
-          '(a-z, 0-9. Password can mix upper and lowercase)',
-          'e.g. createroom myroom'
-        ]
-      };
-
-      if (0 < phrases.length) {
-        roomName = phrases[0].toLowerCase();
-        password = phrases[1];
-
-        if (0 < roomName.length && 6 >= roomName.length && isTextAllowed(roomName) && isTextAllowed(password)) {
-          room.roomName = roomName;
-          room.password = password;
-          room.owner = getUser();
-
-          socket.emit('createRoom', room);
-        } else {
-          queueMsg(errorMsg);
-        }
-      } else {
-        queueMsg(errorMsg);
-      }
-    },
-    help : [
-      'Creates a chat room',
-      'The rooms name has to be 1 to 6 characters long',
-      'The password is optional, but if set it has to be 4 to 10 ' +
-      'characters',
-      'The name can only contain letters and numbers (a-z, 0-9)'
-    ],
-    instructions : [
-      ' Usage:',
-      '  createroom *room name* *optional password*',
-      ' Example:',
-      '  createroom myroom banana'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  myrooms : {
-    func : function() {
-      var data = {};
-
-      data.userName = getUser();
-      data.device = getDeviceId();
-
-      socket.emit('myRooms', data);
-    },
-    help : ['Shows a list of all rooms you are following'],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  login : {
-    func : function(phrases) {
-      var data = {};
-
-      if (null !== getUser()) {
-        queueMsg({
-          text : [
-            'You are already logged in',
-            'You have to be logged out to log in'
-          ]
-        });
-      } else if (0 < phrases.length) {
-        data.userName = phrases[0].toLowerCase();
-        cmdHelper.data = data;
-        cmdHelper.hideInput = true;
-        queueMsg({
-          text : [
-            'Input your password'
-          ]
-        });
-        setInputStart('password');
-        hideInput(true);
-      } else {
-        queueMsg({
-          text : [
-            'You need to input a user name',
-            'Example: login bestname '
-          ]
-        });
-      }
-    },
-    steps : [
-      function(phrases) {
-        cmdHelper.data.password = phrases[0].toLowerCase();
-        socket.emit('login', cmdHelper.data);
-        validCmds[cmdHelper.command].abortFunc();
-        validCmds.clear.func();
-        resetCmd();
-      }
-    ],
-    abortFunc : function() {
-      hideInput(false);
-    },
-    help : [
-      'Logs in as a user on this device',
-      'You have to be logged out to login as another user'
-    ],
-    instructions : [
-      ' Usage:',
-      '  login *user name*',
-      ' Example:',
-      '  login user11'
-    ],
-    clearAfterUse : true,
-    accessLevel : 0,
-    category : 'login'
-  },
-  time : {
-    func : function() {
-      socket.emit('time');
-    },
-    help : ['Shows the current time'],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  locate : {
-    func : function(phrases) {
-      var userName;
-
-      if (!isTracking) {
-        queueMsg({
-          text : [
-            'Tracking not available',
-            'You are not connected to the satellites'
-          ]
-        });
-      } else if (0 < phrases.length) {
-        userName = phrases[0].toLowerCase();
-
-        socket.emit('locate', userName);
-      } else {
-        socket.emit('locate', getUser());
-      }
-    },
-    help : [
-      'Shows the last known location of the user',
-      '* is a shortcut for all users. Example: locate *',
-      'Just writing the command without a user name will show your ' +
-      'current location. Example: locate',
-      'You need to be connected to the satellites to access this command'
-    ],
-    instructions : [
-      ' Usage:',
-      '  locate *optional user name OR "*"*',
-      ' Example:',
-      '  locate user1',
-      '  locate *',
-      '  locate'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  uploadkey : {
-    func : function() {
-      var razLogoCopy = copyMsg(razLogo);
-
-      // TODO: razLogo should be move to DB or other place
-      queueMsg(razLogoCopy);
-      queueMsg({
-        text : [
-          'Razor proudly presents:',
-          'Entity Hacking Access! (EHA)',
-          'AAAB3NzaC1yc2EAAAADAQABAAABAQDHS//2a/B',
-          'D6Rsc8OO/6wFUVDdpdAItvSCLCrc/dcJE/ybEV',
-          'w3OtlVFnfNkOVAvhObuWO/6wFUVDdkr2YTaDEt',
-          'i5mxEFD1zslvhObuWr6QKLvfZVczAxPFKLvfZV',
-          'dK2zXrxGOmOFllxiCbpGOmOFlcJyiCbp0mA4ca',
-          'MFvEEiKXrxGlxiCbp0miONA3EscgY/yujOMJHa',
-          'Q1uy6yEZOmOFl/yujOMJHa881DVwWl6lsjHvSi',
-          'wDDVwWl6el88/x1j5C+k/atg1lcvcz7Tdtve4q',
-          'VTVz0HIhxv595Xqw2qrv6GrdX/FrhObuWr6QKL',
-          ' ',
-          'Please wait.......',
-          'Command interception.........ACTIVATED',
-          'Oracle defense systems........DISABLED',
-          'Overriding locks..................DONE',
-          'Connecting to entity database.....DONE',
-          ' '
-        ]
-      });
-      queueMsg(copyMsg(abortInfo));
-      setInputStart('Enter encryption key');
-      socket.emit('entities');
-    },
-    steps : [
-      function(phrases) {
-        var cmdObj = cmdHelper;
-        var phrase = phrases.join(' ');
-
-        socket.emit('verifyKey', phrase.toLowerCase());
-        queueMsg({
-          text : [
-            'Verifying key. Please wait...'
-          ]
-        });
-        cmdObj.keysBlocked = true;
-        setInputStart('Verifying...');
-      },
-      function(data) {
-        var cmdObj = cmdHelper;
-
-        if (null !== data.keyData) {
-          if (data.keyData.reusable || !data.keyData.used) {
-            queueMsg({
-              text : ['Key has been verified. Proceeding']
-            });
-            cmdObj.onStep++;
-            cmdObj.data = data;
-            validCmds[cmdObj.command].steps[cmdObj.onStep](socket);
-          } else {
-            queueMsg({
-              text : ['Key has already been used. Aborting']
-            });
-            resetCmd(true);
-          }
-        } else {
-          queueMsg({
-            text : ['The key is invalid. Aborting']
-          });
-          resetCmd(true);
-        }
-      },
-      function() {
-        var cmdObj = cmdHelper;
-
-        setInputStart('Enter entity name');
-        cmdObj.keysBlocked = false;
-        cmdObj.onStep++;
-      },
-      function(phrases) {
-        var cmdObj = cmdHelper;
-        var data = cmdObj.data;
-        var phrase = phrases.join(' ');
-
-        data.entityName = phrase.toLowerCase();
-        data.userName = getUser();
-        socket.emit('unlockEntity', data);
-        queueMsg({
-          text : [
-            'Unlocking entity. Please wait...'
-          ]
-        });
-        cmdObj.keysBlocked = true;
-      },
-      function(entity) {
-        if (null !== entity) {
-          queueMsg({
-            text : [
-              'Confirmed. Encryption key has been used on the entity',
-              entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
-              'Thank you for using EHA'
-            ]
-          });
-        } else {
-          queueMsg({
-            text : [
-              'Failed',
-              'Encryption key could not be used on entity.',
-              'Aborting'
-            ]
-          });
-        }
-
-        resetCmd(true);
-      }
-    ],
-    help : [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
-      'Allows you to input an encryption key and use it to unlock an entity'
-    ],
-    instructions : [
-      'Follow the on-screen instructions'
-    ],
-    clearBeforeUse : true,
-    accessLevel : 13,
-    category : 'basic'
-  },
-  history : {
-    func : function(phrases) {
-      var data = {};
-
-      data.lines = phrases[0];
-      data.device = getDeviceId();
-
-      socket.emit('history', data);
-    },
-    help : [
-      'Clears the screen and retrieves chat messages from server',
-      'The amount you send with the command is the amount of messages that will be returned from each room you follow'
-    ],
-    instructions : [
-      ' Usage:',
-      '  history *optional number*',
-      ' Example:',
-      '  history',
-      '  history 25'
-    ],
-    clearAfterUse : true,
-    clearBeforeUse : true,
-    accessLevel : 1,
-    category : 'advanced'
-  },
-  morse : {
-    func : function(phrases, local) {
-      var filteredText;
-      var morseCodeText = '';
-      var i;
-      var j;
-      var morseCode;
-
-      if (phrases && 0 < phrases.length) {
-        filteredText = phrases.join(' ').toLowerCase();
-
-        filteredText = filteredText.replace(/[åä]/g, 'a');
-        filteredText = filteredText.replace(/[ö]/g, 'o');
-        filteredText = filteredText.replace(/\s/g, '#');
-        filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
-
-        for (i = 0; i < filteredText.length; i++) {
-          morseCode = morseCodes[filteredText.charAt(i)];
-
-          for (j = 0; j < morseCode.length; j++) {
-            morseCodeText += morseCode[j] + ' ';
-          }
-
-          morseCodeText += '   ';
-        }
-
-        if (0 < morseCodeText.length) {
-          socket.emit('morse', {
-            morseCode : morseCodeText,
-            local : local
-          });
-        }
-      }
-    },
-    help : [
-      'Sends a morse encoded message (sound) to everyone in the room'
-    ],
-    instructions : [
-      ' Usage:',
-      '  morse *message*',
-      ' Example:',
-      '  morse sos'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  password : {
-    func : function(phrases) {
-      var data = {};
-
-      if (phrases && 1 < phrases.length) {
-        data.oldPassword = phrases[0];
-        data.newPassword = phrases[1];
-        data.userName = getUser();
-
-        if (4 <= data.newPassword.length) {
-          socket.emit('changePassword', data);
-        } else {
-          queueMsg({
-            text : [
-              'You have to input the old and new password of ' +
-              'the user',
-              'Example: password old1 new1'
-            ]
-          });
-        }
-      } else {
-        queueMsg({
-          text : [
-            'You have to input the old and new password of the ' +
-            'user',
-            'Example: password old1 new1'
-          ]
-        });
-      }
-    },
-    help : [
-      'Allows you to change the user password',
-      'Password has to be 4 to 10 characters',
-      'Don\'t use whitespace in your name or password!'
-    ],
-    instructions : [
-      ' Usage:',
-      '  password *oldpassword* *newpassword*',
-      ' Example:',
-      '  password old1 new1'
-    ],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  logout : {
-    func : function() {
-      socket.emit('logout');
-    },
-    help : ['Logs out from the current user'],
-    accessLevel : 13,
-    category : 'basic',
-    clearAfterUse : true
-  },
-  reboot : {
-    func : function() {
-      refreshApp();
-    },
-    help : ['Reboots terminal'],
-    accessLevel : 1,
-    category : 'basic'
-  },
-  verifyuser : {
-    func : function(phrases) {
-      var userName;
-
-      if (0 < phrases.length) {
-        userName = phrases[0].toLowerCase();
-
-        if ('*' === userName) {
-          socket.emit('verifyAllUsers');
-        } else {
-          socket.emit('verifyUser', userName);
-        }
-      } else {
-        socket.emit('unverifiedUsers');
-      }
-    },
-    help : [
-      'Verifies a user and allows it to connect to the system',
-      'verifyuser without any additional input will show a list of ' +
-      'all unverified users',
-      'Use "*" to verify everyone in the list'
-    ],
-    instructions : [
-      ' Usage:',
-      '  verifyuser',
-      '  verifyuser *username*',
-      '  verifyuser *',
-      ' Example:',
-      '  verifyuser',
-      '  verifyuser appl1',
-      '  verifyuser *'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  banuser : {
-    func : function(phrases) {
-      var userName;
-
-      if (0 < phrases.length) {
-        userName = phrases[0].toLowerCase();
-
-        socket.emit('ban', userName);
-      } else {
-        socket.emit('bannedUsers');
-      }
-    },
-    help : [
-      'Bans a user and disconnects it from the system',
-      'The user will not be able to log on again'
-    ],
-    instructions : [
-      ' Usage:',
-      '  banuser *username*',
-      ' Example:',
-      '  banuser evil1'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  unbanuser : {
-    func : function(phrases) {
-      var userName;
-
-      if (0 < phrases.length) {
-        userName = phrases[0].toLowerCase();
-
-        socket.emit('unban', userName);
-      } else {
-        socket.emit('bannedUsers');
-      }
-    },
-    help : [
-      'Removes ban on user',
-      'The user will be able to log on again',
-      'ubanuser without any additional input will show a list of all ' +
-      'banned users'
-    ],
-    instructions : [
-      ' Usage:',
-      '  unbanuser',
-      '  unbanuser *username*',
-      ' Example:',
-      '  unbanuser',
-      '  unbanuser evil1'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  whisper : {
-    func : function(phrases) {
-      var data = {};
-
-      if (1 < phrases.length) {
-        data.message = {};
-        data.message.roomName = phrases[0].toLowerCase();
-        data.message.text = [phrases.slice(1).join(' ')];
-        data.message.userName = getUser();
-        data.message.whisper = true;
-
-        socket.emit('chatMsg', data);
-      } else {
-        queueMsg({
-          text : ['You forgot to write the message!']
-        });
-      }
-    },
-    help : [
-      'Send a private message to a specific user',
-      'The first word that you write will be interpreted as a user name',
-      'The rest of the input will be sent to only that user'
-    ],
-    instructions : [
-      ' Usage:',
-      '  whisper *user name* *message*',
-      ' Example:',
-      '  whisper adam hello, adam!',
-      '  whisper user1 sounds good!'
-    ],
-    clearAfterUse : true,
-    accessLevel : 13,
-    category : 'basic'
-  },
-  hackroom : {
-    func : function(phrases) {
-      var data = {};
-      var razLogoCopy = copyMsg(razLogo);
-
-      if (0 < phrases.length) {
-        data.roomName = phrases[0].toLowerCase();
-        data.timesCracked = 0;
-        data.timesRequired = 3;
-        cmdHelper.data = data;
-
-        // TODO: razLogo should be moved to DB or other place
-        queueMsg(razLogoCopy);
-        // TODO: Message about abort should be sent from a common
-        // function for all commands
-        queueMsg({
-          text : [
-            'Razor proudly presents:',
-            'Room Access Hacking! (RAH)',
-            '/8iybEVaC1yc2EAAAADAQABAAABAQDS//2ag4/',
-            'D6Rsc8OO/6wFUVDdpdAItvSCLCrc/dcE/8iybE',
-            'w3OtlVFnfNkOVAvhObuWO/6wFUVDdkr2yYTaDE',
-            'i5mB3Nz1aC1yc2buWr6QKLvfZVczAxAHPKLvfZ',
-            'dK2zXrxGOmOFllxiCbpGOmOFlcJy1/iCbpmA4c',
-            'MFvEEiKXrxGlxiCbp0miONAAvhObuWO/6ujMJH',
-            'JHa88/x1DVOFl/yujOMJHa88/x1DVwWl6lsjvS',
-            'wDDVwWl6el88/x1j5C+k/aadtg1lcvcz7Tdtve',
-            'k/aadtghxv595Xqw2qrvyp6GrdX/FrhObuWr6Q',
-            ' ',
-            'Please wait.......',
-            'Command interception.........ACTIVATED',
-            'Oracle defense systems.......DISABLED',
-            'Overriding locks.............DONE',
-            'Connecting to database ......DONE',
-            ' '
-          ]
-        });
-        queueMsg(copyMsg(abortInfo));
-        queueMsg({
-          text : ['Press enter to continue']
-        });
-
-        setInputStart('Start');
-      } else {
-        queueMsg({
-          text : ['You forgot to input the room name!']
-        });
-        resetCmd(true);
-      }
-    },
-    steps : [
-      function() {
-        queueMsg({
-          text : ['Checking room access...']
-        });
-        socket.emit('roomHackable', cmdHelper.data.roomName);
-      },
-      function() {
-        var cmdObj = cmdHelper;
-        var timeout = 18000;
-        var timerEnded = function() {
-          queueMsg({
-            text : [
-              'Your hacking attempt has been detected',
-              'Users of the room have been notified of your intrusion'
-            ]
-          });
-          socket.emit('chatMsg', {
-            message : {
-              text : [
-                'WARNING! Intrustion attempt detected!',
-                'User ' + getUser() + ' tried breaking in'
-              ],
-              user : 'SYSTEM'
-            },
-            roomName : cmdObj.data.roomName,
-            skipSelfMsg : true
-          });
-          resetCmd(true);
-        };
-
-        queueMsg({
-          text : [
-            'Activating cracking bot....',
-            'Warning. Intrusion defense system activated',
-            'Time until detection: ' + (timeout / 1000) + ' seconds',
-            'You will need 3 successful sequences to succeed'
-          ]
-        });
-        setInputStart('Verify seq');
-        cmdObj.data.code = createRandString(randString, 10, true);
-        cmdObj.data.timer = setTimeout(timerEnded, timeout);
-        cmdObj.onStep++;
-        queueMsg({
-          text : ['Sequence: ' + cmdObj.data.code]
-        });
-      },
-      function(phrases) {
-        var cmdObj = cmdHelper;
-        var phrase = phrases.join(' ').trim();
-        var data;
-
-        if (phrase.toUpperCase() === cmdObj.data.code) {
-          queueMsg({ text : ['Sequence accepted'] });
-          cmdObj.data.timesCracked++;
-        } else {
-          queueMsg({
-            text : [
-              'Incorrect sequence. Counter measures have been ' +
-              'released'
-            ]
-          });
-        }
-
-        if (cmdObj.data.timesCracked < cmdObj.data.timesRequired) {
-          cmdObj.data.code = createRandString(randString, 10, true);
-          queueMsg({
-            text : ['Sequence: ' + cmdObj.data.code]
-          });
-        } else {
-          data = {
-            userName : getUser(),
-            roomName : cmdObj.data.roomName
-          };
-
-          clearTimeout(cmdObj.data.timer);
-          socket.emit('hackRoom', data);
-          queueMsg(({
-            text : [
-              'Cracking complete',
-              'Intrusion defense system disabled',
-              'Suppressing notification and following room',
-              'Thank you for using RAH'
-            ]
-          }));
-          resetCmd();
-        }
-      }
-    ],
-    abortFunc : function() {
-      clearTimeout(cmdHelper.data.timer);
-    },
-    help : [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
-      'PRINTING INSTRUCTIONS',
-      'This command lets you follow a room without knowing the password',
-      'It will also supress the following notification',
-      'Failing the hack will warn everyone in the room'
-    ],
-    instructions : [
-      ' Usage:',
-      '  hackroom *room name*',
-      ' Example:',
-      '  hackroom secret'
-    ],
-    clearBeforeUse : true,
-    accessLevel : 13,
-    category : 'hacking'
-  },
-  importantmsg : {
-    func : function() {
-      var data = {};
-
-      data.text = [];
-      cmdHelper.data = data;
-
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
-        text : [
-          'Do you want to send it to a specific device?',
-          'Enter the device ID or alias to send it to a specific device',
-          'Leave it empty and press enter if you want to send it to ' +
-          'all users'
-        ]
-      });
-      setInputStart('imprtntMsg');
-    },
-    steps : [
-      function(phrases) {
-        var device;
-
-        if (0 < phrases.length) {
-          device = phrases[0];
-
-          if (0 < device.length) {
-            cmdHelper.data.device = device;
-            queueMsg({
-              text : ['Searching for device...']
-            });
-            socket.emit('verifyDevice', cmdHelper.data);
-          } else {
-            cmdHelper.onStep++;
-            validCmds[cmdHelper.command].steps[cmdHelper.onStep]();
-          }
-        }
-      },
-      function() {
-        cmdHelper.onStep++;
-        queueMsg({
-          text : [
-            'Write a line and press enter',
-            'Press enter without any input when you are done ' +
-            'with the message',
-            'Try to keep the first line short if you want to send it as morse'
-          ]
-        });
-      },
-      function(phrases) {
-        var phrase;
-        var dataText;
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          phrase = phrases.join(' ');
-
-          cmdHelper.data.text.push(phrase);
-        } else {
-          dataText = copyString(cmdHelper.data.text);
-
-          cmdHelper.onStep++;
-
-          queueMsg({
-            text : ['Preview of the message:']
-          });
-          queueMsg({
-            text : dataText,
-            extraClass : 'importantMsg'
-          });
-          queueMsg({
-            text : ['Is this OK? "yes" to accept the message']
-          });
-        }
-      },
-      function(phrases) {
-        if (0 < phrases.length) {
-          if ('yes' === phrases[0].toLowerCase()) {
-            cmdHelper.onStep++;
-
-            queueMsg({
-              text : [
-                'Do you want to send it as morse code too? ' +
-                '"yes" to send it as morse too',
-                'Note! Only the first line will be sent as morse'
-              ]
-            });
-          } else {
-            resetCmd(true);
-          }
-        }
-      },
-      function(phrases) {
-        if (0 < phrases.length) {
-          if ('yes' === phrases[0].toLowerCase()) {
-            cmdHelper.data.morse = { local : true };
-          }
-
-          socket.emit('importantMsg', cmdHelper.data);
-          resetCmd();
-        }
-      }
-    ],
-    help : [
-      'Send an important message to a single device or all users'
-    ],
-    instructions : [
-      'Follow the on-screen instructions',
-      'Note! Only the first line can be sent as morse code (optional)'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  chipper : {
-    func : function() {
-      queueMsg({
-        text : [
-          createLine(14),
-          '- DEACTIVATE -',
-          createLine(14)
-        ],
-        extraClass : 'importantMsg large'
-      });
-      queueMsg({
-        text : [
-          'CONTROL WORD SENT',
-          'AWAITING CONFIRMATION'
-        ],
-        extraClass : 'importantMsg'
-      });
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
-        text : ['Press Enter to continue']
-      });
-      setInputStart('Chipper');
-    },
-    steps : [
-      function() {
-        var cmdObj = cmdHelper;
-
-        cmdObj.onStep++;
-        queueMsg({
-          text : [
-            'Chipper has been activated',
-            'Connecting to ECU.........'
-          ]
-        });
-        setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 2000);
-      },
-      function() {
-        var cmdObj = cmdHelper;
-        var stopFunc = function() {
-          queueMsg({
-            text : [
-              'WARNING',
-              'CONTROL IS BEING RELEASED',
-              'CHIPPER POWERING DOWN'
-            ],
-            extraClass : 'importantMsg'
-          });
-
-          validCmds[cmdObj.command].abortFunc();
-        };
-
-        if (cmdObj.data.timer === undefined) {
-          cmdObj.data.timer = setTimeout(stopFunc, 300000, false);
-        }
-
-        queueMsg({
-          text : [createRandString(randBinary, 36)]
-        });
-
-        cmdObj.data.printTimer = setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 250);
-      }
-    ],
-    abortFunc : function() {
-      var cmdObj = cmdHelper;
-
-      clearTimeout(cmdObj.data.printTimer);
-      clearTimeout(cmdObj.data.timer);
-      validCmds.clear.func();
-      queueMsg({
-        text : [
-          'Chipper has powered down',
-          'Control has been released'
-        ]
-      });
-      resetCmd();
-    },
-    help : [
-      'Activate chipper function',
-      'Press enter when you have retrieved confirmation from the ECU'
-    ],
-    instructions : [
-      'Follow the instructions on the screen',
-      'The chipper will shutdown and release control after 5 minutes'
-    ],
-    accessLevel : 13,
-    category : 'hacking',
-    clearBeforeUse : true
-  },
-  room : {
-    func : function(phrases) {
-      var room = {};
-      var roomName;
-
-      if (0 < phrases.length) {
-        roomName = phrases[0].toLowerCase();
-
-        if (roomName) {
-          room.roomName = roomName;
-
-          /**
-           * Flag that will be used in .on function locally to
-           * show user they have entered
-           */
-          room.entered = true;
-
-          socket.emit('switchRoom', room);
-        }
-      } else {
-        queueMsg({
-          text : ['You have to specify which room to switch to']
-        });
-      }
-    },
-    help : [
-      'Switches your current room to another',
-      'You have to already be following the room to switch to it'
-    ],
-    instructions : [
-      ' Usage:',
-      '  room *room you are following*',
-      ' Example:',
-      '  room room1'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  removeroom : {
-    func : function(phrases) {
-      var data = {};
-
-      if (0 < phrases.length) {
-        data.roomName = phrases[0].toLowerCase();
-        cmdHelper.data = data;
-
-        queueMsg({
-          text : [
-            'Do you really want to remove the room?',
-            'Confirm by writing "yes"'
-          ]
-        });
-
-        setInputStart('removeroom');
-      } else {
-        resetCmd(true);
-
-        queueMsg({
-          text : ['You forgot to input the room name']
-        });
-      }
-    },
-    steps : [
-      function(phrases) {
-        if ('yes' === phrases[0].toLowerCase()) {
-          socket.emit('removeRoom', cmdHelper.data.roomName);
-        }
-
-        resetCmd();
-      }
-    ],
-    help : [
-      'Removes a room',
-      'You have to be either the owner or an admin of the room to remove it'
-    ],
-    instructions : [
-      ' Usage:',
-      '  removeroom *room name*',
-      '  *Follow the instructions*',
-      ' Example:',
-      '  removeroom room1',
-      '  *Follow the instructions*'
-    ],
-    accessLevel : 13,
-    category : 'advanced'
-  },
-  updateuser : {
-    func : function(phrases) {
-      var data = {};
-
-      if (2 < phrases.length) {
-        data.user = phrases[0];
-        data.field = phrases[1];
-        data.value = phrases[2];
-
-        socket.emit('updateUser', data);
-      } else {
-        queueMsg({
-          text : [
-            'You need to write a user name, field name and value',
-            'Example: updateuser user1 accesslevel 3'
-          ]
-        });
-      }
-    },
-    help : [
-      'Change fields on a user',
-      'You can change visibility, accesslevel, password or add/remove a group',
-      'Valid fields: visibility, accesslevel, addgroup, removegroup, password'
-    ],
-    instructions : [
-      ' Usage:',
-      '  updateuser *user name* *field name* *value*',
-      ' Example:',
-      '  updateuser user1 accesslevel 3',
-      '  updateuser user1 group hackers'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  updatecommand : {
-    func : function(phrases) {
-      var data = {};
-
-      if (2 < phrases.length) {
-        data.cmdName = phrases[0];
-        data.field = phrases[1];
-        data.value = phrases[2];
-
-        socket.emit('updateCommand', data);
-      } else {
-        queueMsg({
-          text : [
-            'You need to write a command name, field name and value',
-            'Example: updatecommand help accesslevel 3'
-          ]
-        });
-      }
-    },
-    help : [
-      'Change fields on a command',
-      'You can currently change visibility or accesslevel'
-    ],
-    instructions : [
-      ' Usage:',
-      '  updatecommand *command name* *field name* *value*',
-      ' Example:',
-      '  updatecommand help accesslevel 3',
-      '  updatecommand help visibility 6'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  updateroom : {
-    func : function(phrases) {
-      var data = {};
-
-      if (2 < phrases.length) {
-        data.room = phrases[0];
-        data.field = phrases[1];
-        data.value = phrases[2];
-
-        socket.emit('updateRoom', data);
-      } else {
-        queueMsg({
-          text : [
-            'You need to write a room name, field name and value',
-            'Example: updateroom room1 accesslevel 3'
-          ]
-        });
-      }
-    },
-    help : [
-      'Change fields on a room',
-      'You can change visibility, accesslevel',
-      'Valid fields: visibility, accesslevel'
-    ],
-    instructions : [
-      ' Usage:',
-      '  updateroom *room name* *field name* *value*',
-      ' Example:',
-      '  updateroom user1 accesslevel 3'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  addencryptionkeys : {
-    func : function() {
-      var data = {};
-
-      data.keys = [];
-      cmdHelper.data = data;
-
-      queueMsg({
-        text : createCmdStart('Add encryption keys').concat([
-          'You can add more than one key',
-          'Press enter without any input when you are done'
-        ])
-      });
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
-        text : ['Input an encryption key:']
-      });
-      setInputStart('Input key');
-    },
-    steps : [
-      function(phrases) {
-        var keyObj = {};
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          keyObj.key = phrases[0];
-
-          //TODO Remove hard coded reusable
-          if (phrases[1] && 'reusable' === phrases[1].toLowerCase()) {
-            keyObj.reusable = true;
-          }
-
-          cmdHelper.data.keys.push(keyObj);
-        } else {
-          queueMsg({
-            text : [
-              'Are you sure you want to add the keys?',
-              'Write "yes" to accept'
-            ]
-          });
-          cmdHelper.onStep++;
-        }
-      },
-      function(phrases) {
-        if ('yes' === phrases[0].toLowerCase()) {
-          queueMsg({
-            text : ['Uploading new keys...']
-          });
-          socket.emit('addKeys', cmdHelper.data.keys);
-          resetCmd();
-        } else {
-          queueMsg({
-            text : ['The keys will not be uploaded']
-          });
-          resetCmd(true);
-        }
-      }
-    ],
-    help : [
-      'Add one or more encryption keys to the database'
-    ],
-    instructions : [
-      ' Usage:',
-      '  Follow the instructions'
-    ],
-    accessLevel : 13,
-    category : 'admin',
-    clearBeforeUse : true
-  },
-  addentities : {
-    func : function() {
-      var data = {};
-
-      data.entities = [];
-      cmdHelper.data = data;
-
-      queueMsg({
-        text : createCmdStart('Add entities').concat([
-          'You can add more than one entity',
-          'Press enter without any input when you are done'
-        ])
-      });
-      queueMsg(copyMsg(abortInfo));
-      setInputStart('Input entity');
-    },
-    steps : [
-      function(phrases) {
-        var entityObj = {};
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          entityObj.entityName = phrases[0];
-
-          cmdHelper.data.entities.push(entityObj);
-        } else {
-          queueMsg({
-            text : [
-              'Are you sure you want to add the entities?',
-              'Write "yes" to accept'
-            ]
-          });
-          cmdHelper.onStep++;
-        }
-      },
-      function(phrases) {
-        if ('yes' === phrases[0].toLowerCase()) {
-          queueMsg({
-            text : ['Uploading new entities...']
-          });
-          socket.emit('addEntities', cmdHelper.data.entities);
-          resetCmd();
-        } else {
-          queueMsg({
-            text : ['The entities will not be uploaded']
-          });
-          resetCmd(true);
-        }
-      }
-    ],
-    help : [
-      'Add one or more entities to the database'
-    ],
-    instructions : [
-      ' Usage:',
-      '  Follow the instructions'
-    ],
-    accessLevel : 13,
-    category : 'admin',
-    clearBeforeUse : true
-  },
-  weather : {
-    func : function() {
-      socket.emit('weather');
-    },
-    accessLevel : 1,
-    category : 'basic'
-  },
-  updatedevice : {
-    func : function(phrases) {
-      var data = {};
-
-      if (2 < phrases.length) {
-        data.deviceId = phrases[0];
-        data.field = phrases[1];
-        data.value = phrases[2];
-
-        socket.emit('updateDevice', data);
-      } else {
-        queueMsg({
-          text : [
-            'You need to write a device Id, field name and value',
-            'Example: updatedevice 11jfej433 id betteralias'
-          ]
-        });
-      }
-    },
-    help : [
-      'Change fields on a device',
-      'You can currently change the alias',
-      'Valid fields: alias'
-    ],
-    instructions : [
-      ' Usage:',
-      '  updatedevice *device ID* *field name* *value*',
-      ' Example:',
-      '  updatedevice 32r23rj alias betteralias'
-    ],
-    accessLevel : 13,
-    category : 'admin'
-  },
-  moduleraid : {
-    func : function() {
-      var data = {};
-
-      data.text = [];
-      cmdHelper.data = data;
-
-      queueMsg({
-        text : [
-          'Write a coordinate and press enter',
-          'Press enter without any input when you are done ' +
-          'with the message'
-        ]
-      });
-      queueMsg(copyMsg(abortInfo));
-      setInputStart('moduleraid');
-    },
-    steps : [
-      function(phrases) {
-        var startText = [
-          'Celestial activity detected!',
-          'Satellite have visual confirmation of active modules',
-          'Sending Organica retrieval squads to the following coordinates:'
-        ];
-        var phrase;
-        var text = [];
-
-        if (0 < phrases.length && '' !== phrases[0]) {
-          phrase = phrases.join(' ');
-
-          cmdHelper.data.text.push(phrase);
-        } else {
-          cmdHelper.data.text = text.concat(startText, cmdHelper.data.text);
-          text = null !== cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : [];
-
-          cmdHelper.onStep++;
-
-          queueMsg({
-            text : ['Preview of the message:']
-          });
-          queueMsg({
-            text : text,
-            extraClass : 'importantMsg'
-          });
-          queueMsg({
-            text : ['Is this OK? "yes" to accept the message']
-          });
-        }
-      },
-      function(phrases) {
-        if (0 < phrases.length && 'yes' === phrases[0].toLowerCase()) {
-          cmdHelper.data.morse = { local : true };
-          socket.emit('importantMsg', cmdHelper.data);
-          resetCmd();
-        } else {
-          resetCmd(true);
-        }
-      }
-    ],
-    help : [
-      'Send a module raid message to all users',
-      'It will look like an important message'
-    ],
-    instructions : [
-      'Follow the on-screen instructions'
-    ],
-    accessLevel : 13,
-    clearAfterUse : true,
-    category : 'admin'
-  },
-  createteam : {
-    func : function(phrases) {
-      var teamName = phrases[0];
-      var data = {};
-      var team = {};
-
-      if (teamName) {
-        team.teamName = teamName;
-        team.owner = getUser();
-        data.team = team;
-
-        socket.emit('createTeam', data);
-      } else {
-        queueMsg({
-          text : ['You have to enter a name']
-        });
-      }
-    },
-    help : [
-      'Create a new team',
-      'You will be able to invite new members to the team'
-    ],
-    instructions : [
-      ' Usage:',
-      '  createteam *name*',
-      ' Example:',
-      '  createteam team1'
-    ],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  inviteteam : {
-    func : function(phrases) {
-      var data = {};
-      var userName = phrases[0];
-
-      if (userName) {
-        data.userName = userName;
-        socket.emit('inviteToTeam', data);
-      } else {
-        queueMsg({
-          text : ['You are not allowed to invite members to the team or you are not in a team']
-        });
-      }
-    },
-    help : [
-      'Invites another user to your team',
-      'You have to be the team leader or an team administrator to invite new members'
-    ],
-    instructions : [
-      ' Usage:',
-      '  inviteteam *user name*',
-      ' Example:',
-      '  inviteteam barry'
-    ],
-    accessLevel : 13,
-    category : 'basic'
-  },
-  alias : {
-    func : function(phrases) {
-      var aliasName = phrases.shift();
-      var sequence = phrases;
-      var aliases = getAliases();
-      var cmdKeys = Object.keys(validCmds);
-
-      if (aliasName && sequence && -1 === cmdKeys.indexOf(aliasName)) {
-        aliases[aliasName] = sequence;
-        setAliases(aliases);
-      } else if (-1 < cmdKeys.indexOf(aliasName)) {
-        queueMsg({
-          text : [aliasName + ' is a built-in command. You may not override built-in commands']
-        });
-      } else {
-        queueMsg({
-          text : [
-            'You have to input a name and sequence',
-            'E.g. alias goodalias msg hello'
-          ]
-        });
-      }
-    },
-    help : [
-      'Create a new shortcut for a command and sequence',
-      'The shortcut will appear among other commands when you auto-complete',
-      'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"'
-    ],
-    instructions : [
-      ' Usage:',
-      '  alias *alias name* *command name* *sequence*',
-      ' Example:',
-      '  alias hello msg Greetings to all!'
-    ],
-    accessLevel : 13,
-    category : 'basic'
+let lastScreenOff = (new Date()).getTime();
+let cmdUsed = false;
+/**
+ * Used to block repeat of some key presses
+ */
+let keyPressed = false;
+/**
+ * Used for Android full screen to change CSS layout
+ */
+let clicked = false;
+// True if messages are being processed and printed right now
+let printing = false;
+/**
+ * Shorter queue of messages that will be processed this loop. Length is
+ * based on msgsPerQueue constiable
+ */
+let shortMsgQueue = [];
+/**
+ * Focus can sometimes trigger twice, which is used to check if a reconnection
+ * is needed. This flag will be set to true while it is reconnecting to
+ * block the second attempt
+ */
+let reconnecting = false;
+let oldAndroid;
+
+function getInputText() {
+  return cmdInput.value;
+}
+
+function setCmdInput(text) {
+  cmdInput.value = text;
+}
+
+function getInputStart() {
+  return inputStart.textContent;
+}
+
+function clearInput() {
+  setCmdInput('');
+}
+
+function beautifyNumb(number) {
+  return number > 9 ? number : '0' + number;
+}
+
+function createLine(length) {
+  let line = '';
+
+  for (let i = 0; i < length; i++) {
+    line += '-';
   }
-};
+
+  return line;
+}
+
+function generateSpan(text, className) {
+  const spanObj = document.createElement('span');
+
+  spanObj.appendChild(document.createTextNode(text));
+
+  if (className) {
+    spanObj.className = className;
+  }
+
+  return spanObj;
+}
+
+function generateLink(text, className, func) {
+  const spanObj = generateSpan(text, className);
+
+  spanObj.className += ' link';
+  spanObj.addEventListener('click', function(event) {
+    func(this);
+    cmdInput.focus();
+    clicked = true;
+    event.stopPropagation();
+  });
+
+  return spanObj;
+}
+
+// Takes date and returns shorter readable time
+function generateTimeStamp(date, full) {
+  let newDate = new Date(date);
+  let timeStamp;
+
+  // Splitting of date is a fix for NaN on Android 2.*
+  if (isNaN(newDate.getMinutes)) {
+    const splitDate = date.split(/[-T:\.]+/);
+    newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
+  }
+
+  const mins = beautifyNumb(newDate.getMinutes());
+  const hours = beautifyNumb(newDate.getHours());
+  timeStamp = hours + ':' + mins;
+
+  if (full) {
+    const month = beautifyNumb(newDate.getMonth());
+    const day = beautifyNumb(newDate.getDate());
+    timeStamp = ' ' + day + '/' + month + ' ' + timeStamp;
+  }
+
+  return timeStamp;
+}
+
+function linkUser(elem) {
+  setCmdInput('whisper ' + elem.textContent + ' ');
+}
+
+function linkRoom(elem) {
+  validCmds.room.func([elem.textContent]);
+}
+
+function scrollView() {
+  if (!oldAndroid) {
+    spacer.scrollIntoView(false);
+  } else {
+    // Compatibility fix for old Android
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+}
+
+// Adds time stamp and room name to a string from a message if they are set
+function generateFullRow(sentText, message) {
+  const rowObj = document.createElement('li');
+  const roomName = message.roomName;
+  let roomElem;
+
+  if (message.time && !message.skipTime) {
+    rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
+  }
+
+  if (roomName) {
+    // If room is one of the system ones, not meant for direct messaging
+    if (hideRooms.indexOf(roomName.toLowerCase()) > -1) {
+      roomElem = generateSpan(roomName);
+    } else {
+      roomElem = generateLink(roomName, 'room', linkRoom);
+    }
+
+    rowObj.appendChild(roomElem);
+  }
+
+  if (message.userName) {
+    rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
+  }
+
+  rowObj.appendChild(generateSpan(sentText));
+
+  return rowObj;
+}
+
+function printRow(msg) {
+  if (msg.text && msg.text.length > 0) {
+    const text = msg.text.shift();
+    const row = generateFullRow(text, msg);
+
+    if (msg.extraClass) {
+      // classList doesn't work on older devices, thus the usage of className
+      row.className += ' ' + msg.extraClass;
+    }
+
+    mainFeed.appendChild(row);
+
+    scrollView();
+
+    setTimeout(printRow, rowTimeout, msg);
+  } else {
+    consumeMsgShortQueue();
+  }
+}
+
+function consumeMsgShortQueue() {
+  if (shortMsgQueue.length > 0) {
+    const msg = shortMsgQueue.shift();
+
+    printRow(msg);
+  } else {
+    printing = false;
+  }
+}
+
+// Prints messages from the queue
+function consumeMsgQueue() {
+  if (!printing && msgQueue.length > 0) {
+    shortMsgQueue = msgQueue.splice(0, msgsPerQueue);
+    printing = true;
+    consumeMsgShortQueue();
+  }
+}
 
 function findOneReplace(text, find, replaceWith) {
   return text.replace(new RegExp(find), replaceWith);
@@ -2186,31 +415,20 @@ function queueMsg(message) {
   msgQueue.push(message);
 }
 
-function resetAllLocalVals() {
-  removeCmdHistory();
-  removeRoom();
-  removeUser();
-  setAccessLvl(0);
-
-  prevCmdPointer = 0;
-  setInputStart(defaultInputStart);
-}
-
 function copyString(text) {
-  return null !== text ? JSON.parse(JSON.stringify(text)) : '';
+  return text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
 function copyMsg(textObj) {
-  return null !== textObj ? JSON.parse(JSON.stringify(textObj)) : { text : [''] };
+  return textObj !== null ? JSON.parse(JSON.stringify(textObj)) : { text: [''] };
 }
 
 function createRandString(selection, length, upperCase) {
-  var randLength = selection.length;
-  var result = '';
-  var randVal;
-  var i;
+  const randLength = selection.length;
+  let result = '';
+  let randVal;
 
-  for (i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     randVal = Math.random() * (randLength - 1);
 
     result += selection[Math.round(randVal)];
@@ -2224,9 +442,9 @@ function createRandString(selection, length, upperCase) {
 }
 
 function getAliases() {
-  var aliases = getLocalVal('aliases');
+  const aliases = getLocalVal('aliases');
 
-  return null !== aliases ? JSON.parse(aliases) : {};
+  return aliases !== null ? JSON.parse(aliases) : {};
 }
 
 function setAliases(aliases) {
@@ -2254,7 +472,7 @@ function removeRoom() {
 }
 
 function getAccessLvl() {
-  return parseInt(getLocalVal('accessLevel'));
+  return parseInt(getLocalVal('accessLevel'), 10);
 }
 
 function setAccessLvl(accessLevel) {
@@ -2274,9 +492,9 @@ function removeUser() {
 }
 
 function getCmdHistory() {
-  var cmdHistory = getLocalVal('cmdHistory');
+  const cmdHistory = getLocalVal('cmdHistory');
 
-  return null !== cmdHistory ? JSON.parse(cmdHistory) : [];
+  return cmdHistory !== null ? JSON.parse(cmdHistory) : [];
 }
 
 function setCmdHistory(cmdHistory) {
@@ -2312,11 +530,11 @@ function setInputStart(text) {
 }
 
 function resetCmd(aborted) {
-  var room = getRoom() ? getRoom() : defaultInputStart;
+  const room = getRoom() ? getRoom() : defaultInputStart;
 
   if (aborted) {
     queueMsg({
-      text : ['Aborting command']
+      text: ['Aborting command'],
     });
   }
 
@@ -2335,14 +553,45 @@ function refreshApp() {
 
 function queueCmd(cmd, data, cmdMsg) {
   cmdQueue.push({
-    command : cmd,
-    data : data,
-    cmdMsg : cmdMsg
+    command: cmd,
+    data: data,
+    cmdMsg: cmdMsg,
   });
 }
 
+function reconnect() {
+  const user = getUser();
+
+  if (!reconnecting) {
+    reconnecting = true;
+
+    socket.disconnect();
+    socket.connect({ forceNew: true });
+    socket.emit('updateId', { userName: user });
+  }
+}
+
+// Needed for Android 2.1. trim() is not supported
+function trimSpace(sentText) {
+  return findOneReplace(sentText, /^\s+|\s+$/, '');
+}
+
+function changeModeText() {
+  const inputText = getInputText();
+  const mode = getMode();
+
+  if (getUser() && !cmdHelper.command) {
+    // TODO msg command text in comparison should not be hard coded
+    if ((chatMode === mode && cmdChars.indexOf(inputText.charAt(0)) > -1) || (cmdMode === mode && trimSpace(inputText).split(' ')[0] !== 'msg')) {
+      setModeText(cmdMode.toUpperCase());
+    } else {
+      setModeText(chatMode.toUpperCase());
+    }
+  }
+}
+
 function pushCmdHistory(cmd) {
-  var cmdHistory = getCmdHistory();
+  const cmdHistory = getCmdHistory();
 
   cmdHistory.push(cmd);
 
@@ -2352,18 +601,13 @@ function pushCmdHistory(cmd) {
 function enterRoom(roomName) {
   setRoom(roomName);
   setInputStart(roomName);
-  queueMsg({ text : ['Entered ' + roomName] });
+  queueMsg({ text: ['Entered ' + roomName] });
 }
 
 function resetPrevCmdPointer() {
-  var cmdHistory = getCmdHistory();
+  const cmdHistory = getCmdHistory();
 
   prevCmdPointer = cmdHistory ? cmdHistory.length : 0;
-}
-
-// Needed for Android 2.1. trim() is not supported
-function trimSpace(sentText) {
-  return findOneReplace(sentText, /^\s+|\s+$/, '');
 }
 
 function setGain(value) {
@@ -2371,24 +615,23 @@ function setGain(value) {
 }
 
 function playMorse(morseCode) {
-  var i;
-  var duration;
-  var shouldPlay;
+  let duration;
+  let shouldPlay;
 
   function finishSoundQueue(timeouts) {
-    var cleanMorse = morseCode.replace(/#/g, '');
+    const cleanMorse = morseCode.replace(/#/g, '');
 
     soundQueue.splice(0, timeouts);
     queueMsg({
-      text : ['Morse code message received:  ' + cleanMorse]
+      text: ['Morse code message received:  ' + cleanMorse],
     });
   }
 
-  if (0 === soundQueue.length) {
+  if (soundQueue.length === 0) {
     soundTimeout = 0;
   }
 
-  for (i = 0; i < morseCode.length; i++) {
+  for (let i = 0; i < morseCode.length; i++) {
     shouldPlay = false;
     duration = 0;
 
@@ -2426,55 +669,45 @@ function playMorse(morseCode) {
  * @param {number} lon2 - Longitude for second coordinate
  * @returns {number} Returns distances in meters between the coordinates
  */
-//function measureDistance(lat1, lon1, lat2, lon2) {
+// function measureDistance(lat1, lon1, lat2, lon2) {
 //
 //  // Radius of earth in KM
-//  var R = 6378.137;
-//  var dLat = (lat2 - lat1) * Math.PI / 180;
-//  var dLon = (lon2 - lon1) * Math.PI / 180;
-//  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//  const R = 6378.137;
+//  const dLat = (lat2 - lat1) * Math.PI / 180;
+//  const dLon = (lon2 - lon1) * Math.PI / 180;
+//  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 //          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
 //          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//  var d = R * c;
+//  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//  const d = R * c;
 //  return d * 1000; // meters
-//}
+// }
 
 function generateMap() {
-  var startLetter = 'A';
-  var xGrid;
-  var yGrid;
-  var currentChar;
-
+  const startLetter = 'A';
   mapHelper.xSize = (mapHelper.rightLong - mapHelper.leftLong) / parseFloat(mapHelper.xGridsMax);
   mapHelper.ySize = (mapHelper.topLat - mapHelper.bottomLat) / parseFloat(mapHelper.yGridsMax);
 
-  for (xGrid = 0; xGrid < mapHelper.xGridsMax; xGrid++) {
-    currentChar = String.fromCharCode(startLetter.charCodeAt(0) + xGrid);
+  for (let xGrid = 0; xGrid < mapHelper.xGridsMax; xGrid++) {
+    const currentChar = String.fromCharCode(startLetter.charCodeAt(0) + xGrid);
     mapHelper.xGrids[currentChar] = mapHelper.leftLong + parseFloat(mapHelper.xSize * xGrid);
   }
 
-  for (yGrid = 0; yGrid < mapHelper.yGridsMax; yGrid++) {
+  for (let yGrid = 0; yGrid < mapHelper.yGridsMax; yGrid++) {
     mapHelper.yGrids[yGrid] = mapHelper.topLat - parseFloat(mapHelper.ySize * yGrid);
   }
 }
 
 function locateOnMap(latitude, longitude) {
-  //TODO Change from Object.keys for compatibility with older Android
-  var xKeys = Object.keys(mapHelper.xGrids);
-  var yKeys = Object.keys(mapHelper.yGrids);
-  var x;
-  var y;
-  var xGrid;
-  var nextXGrid;
-  var yGrid;
-  var nextYGrid;
+  // TODO Change from Object.keys for compatibility with older Android
+  const xKeys = Object.keys(mapHelper.xGrids);
+  const yKeys = Object.keys(mapHelper.yGrids);
+  let x;
+  let y;
 
-  if (longitude >= mapHelper.leftLong && longitude <= mapHelper.rightLong
-      && latitude <= mapHelper.topLat && latitude >= mapHelper.bottomLat) {
-
-    for (xGrid = 0; xGrid < xKeys.length; xGrid++) {
-      nextXGrid = mapHelper.xGrids[xKeys[xGrid + 1]];
+  if (longitude >= mapHelper.leftLong && longitude <= mapHelper.rightLong && latitude <= mapHelper.topLat && latitude >= mapHelper.bottomLat) {
+    for (let xGrid = 0; xGrid < xKeys.length; xGrid++) {
+      const nextXGrid = mapHelper.xGrids[xKeys[xGrid + 1]];
 
       if (longitude < nextXGrid) {
         x = xKeys[xGrid];
@@ -2485,8 +718,8 @@ function locateOnMap(latitude, longitude) {
       }
     }
 
-    for (yGrid = 0; yGrid < yKeys.length; yGrid++) {
-      nextYGrid = mapHelper.yGrids[yKeys[yGrid + 1]];
+    for (let yGrid = 0; yGrid < yKeys.length; yGrid++) {
+      const nextYGrid = mapHelper.yGrids[yKeys[yGrid + 1]];
 
       if (latitude > nextYGrid) {
         y = yKeys[yGrid];
@@ -2512,7 +745,7 @@ function locateOnMap(latitude, longitude) {
  * @returns {object} Returns position
  */
 function preparePosition(position) {
-  var preparedPosition = {};
+  const preparedPosition = {};
 
   preparedPosition.latitude = position.coords.latitude;
   preparedPosition.longitude = position.coords.longitude;
@@ -2525,48 +758,46 @@ function preparePosition(position) {
 }
 
 function sendLocation() {
-  var mostAccuratePos;
-  var i;
-  var position;
-  var accuracy;
+  let mostAccuratePos;
 
   function retrievePosition() {
-    var clearingWatch = function() {
+    const clearingWatch = function() {
       navigator.geolocation.clearWatch(watchId);
       watchId = null;
       intervals.tracking = setTimeout(sendLocation, pausePositionTime);
     };
 
     watchId = navigator.geolocation.watchPosition(function() {
-      if (position !== undefined) {
-        positions.push(position);
-      }
+      // FIXME This is broken and doesn't do anything
+      // if (position !== undefined) {
+      //  positions.push(position);
+      // }
     }, function(err) {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
         clearTimeout(intervals.tracking);
         queueMsg({
-          text : [
+          text: [
             'Unable to connect to the tracking satellites',
             'Turning off tracking is a major offense',
             'Organica Re-Education Squads have been ' +
-            'sent to scour the area'
-          ], extraClass : 'importantMsg'
+            'sent to scour the area',
+          ], extraClass: 'importantMsg',
         });
       }
-    }, { enableHighAccuracy : true });
+    }, { enableHighAccuracy: true });
 
     if (isTracking) {
       intervals.tracking = setTimeout(clearingWatch, watchPositionTime);
     }
   }
 
-  if (null !== getUser() && 0 < positions.length) {
+  if (getUser() !== null && positions.length > 0) {
     mostAccuratePos = positions[positions.length - 1];
 
-    for (i = positions.length - 2; 0 <= i; i--) {
-      position = positions[i];
-      accuracy = positions[i].coords.accuracy;
+    for (let i = positions.length - 2; i >= 0; i--) {
+      const position = positions[i];
+      const accuracy = positions[i].coords.accuracy;
 
       if (mostAccuratePos.coords.accuracy > accuracy) {
         mostAccuratePos = position;
@@ -2589,16 +820,16 @@ function sendLocation() {
  * @returns {undefined} Returns nothing
  */
 function isScreenOff() {
-  var now = (new Date()).getTime();
-  var diff = now - lastScreenOff;
-  //TODO Hard coded
-  var offBy = diff - 1000;
+  const now = (new Date()).getTime();
+  const diff = now - lastScreenOff;
+  // FIXME Hard coded
+  const offBy = diff - 1000;
 
   lastScreenOff = now;
 
-  //TODO Hard coded
-  if (10000 < offBy) {
-    onReconnect();
+  // FIXME Hard coded
+  if (offBy > 10000) {
+    reconnect();
   }
 }
 
@@ -2608,15 +839,15 @@ function isScreenOff() {
  * @returns {undefined} Returns nothing
  */
 function setIntervals() {
-  if (null !== intervals.printText) {
+  if (intervals.printText !== null) {
     clearInterval(intervals.printText);
   }
 
-  if (null !== intervals.tracking) {
+  if (intervals.tracking !== null) {
     clearTimeout(intervals.tracking);
   }
 
-  if (null !== watchId) {
+  if (watchId !== null) {
     navigator.geolocation.clearWatch(watchId);
   }
 
@@ -2629,8 +860,7 @@ function setIntervals() {
   }
 
   // Should not be recreated on focus
-  if (null === intervals.isScreenOff) {
-
+  if (intervals.isScreenOff === null) {
     /**
      * Checks time between when JS stopped and started working again
      * This will be most frequently triggered when a user turns off the
@@ -2646,7 +876,7 @@ function startAudio() {
     if (window.AudioContext) {
       audioCtx = new window.AudioContext();
     } else if (window.webkitAudioContext) {
-      audioCtx = new window.webkitAudioContext();
+      audioCtx = new window.webkitAudioContext(); // eslint-disable-line
     }
 
     oscillator = audioCtx.createOscillator();
@@ -2665,24 +895,8 @@ function startAudio() {
   }
 }
 
-function getInputText() {
-  return cmdInput.value;
-}
-
-function setCmdInput(text) {
-  cmdInput.value = text;
-}
-
-function getInputStart() {
-  return inputStart.textContent;
-}
-
-function clearInput() {
-  setCmdInput('');
-}
-
 function triggerAutoComplete(text, textChar) {
-  if (' ' === text.charAt(text.length - 1) && ' ' === textChar) {
+  if (text.charAt(text.length - 1) === ' ' && textChar === ' ') {
     setCmdInput(trimSpace(text));
 
     return true;
@@ -2696,16 +910,12 @@ function setCmdUsed(used) {
 }
 
 function consumeCmdQueue() {
-  var storedCmd;
-  var cmd;
-  var cmdMsg;
+  if (cmdQueue.length > 0) {
+    const storedCmd = cmdQueue.shift();
+    const cmd = storedCmd.command;
+    const cmdMsg = storedCmd.cmdMsg;
 
-  if (0 < cmdQueue.length) {
-    storedCmd = cmdQueue.shift();
-    cmd = storedCmd.command;
-    cmdMsg = storedCmd.cmdMsg;
-
-    if (cmdMsg !== undefined) {
+    if (cmdMsg) {
       queueMsg(cmdMsg);
     }
 
@@ -2728,8 +938,8 @@ function getCmdAccessLevel(cmdName) {
 }
 
 function getCmd(cmdName) {
-  var aliases = getAliases();
-  var cmd;
+  const aliases = getAliases();
+  let cmd;
 
   if (validCmds[cmdName]) {
     cmd = validCmds[cmdName];
@@ -2741,23 +951,20 @@ function getCmd(cmdName) {
 }
 
 function combineSequences(cmdName, phrases) {
-  var aliases = getAliases();
+  const aliases = getAliases();
 
   return aliases[cmdName] ? aliases[cmdName].concat(phrases.slice(1)) : phrases.slice(1);
 }
 
 function expandPartialMatch(cmds, partialMatch, sign) {
-  var i;
-  var j;
-  var cmdChar;
-  var firstCmd = cmds[0];
-  var expanded = '';
-  var matched = true;
+  const firstCmd = cmds[0];
+  let expanded = '';
+  let matched = true;
 
-  for (i = partialMatch.length; i < firstCmd.length; i++) {
-    cmdChar = firstCmd.charAt(i);
+  for (let i = partialMatch.length; i < firstCmd.length; i++) {
+    const cmdChar = firstCmd.charAt(i);
 
-    for (j = 0; j < cmds.length; j++) {
+    for (let j = 0; j < cmds.length; j++) {
       if (cmds[j].charAt(i) !== cmdChar) {
         matched = false;
 
@@ -2768,42 +975,37 @@ function expandPartialMatch(cmds, partialMatch, sign) {
     if (matched) {
       expanded += cmdChar;
     } else {
-      return 0 <= cmdChars.indexOf(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
+      return cmdChars.indexOf(sign) >= 0 ? sign + partialMatch + expanded : partialMatch + expanded;
     }
   }
 }
 
 function autoComplete() {
-  var phrases = trimSpace(getInputText().toLowerCase()).split(' ');
-  var partialCmd = phrases[0];
-  //TODO Change from Object.keys for compatibility with older Android
-  var cmds = Object.keys(validCmds).concat(Object.keys(getAliases()));
-  var matched = [];
-  var sign = partialCmd.charAt(0);
-  var i;
-  var j;
-  var matches;
-  var cmdAccesssLvl;
-  var newText = '';
-  var cmdIndex;
+  const phrases = trimSpace(getInputText().toLowerCase()).split(' ');
+  // TODO Change from Object.keys for compatibility with older Android
+  const cmds = Object.keys(validCmds).concat(Object.keys(getAliases()));
+  const matched = [];
+  const sign = phrases[0].charAt(0);
+  let newText = '';
+  let matches;
+  let partialCmd = phrases[0];
 
   /**
    * Auto-complete should only trigger when one phrase is in the input
    * It will not auto-complete flags
    * If chat mode and the command is prepended or normal mode
    */
-  if (1 === phrases.length && 0 < partialCmd.length
-      && (0 <= cmdChars.indexOf(sign) || (cmdMode === getMode()) || null === getUser())) {
+  if (phrases.length === 1 && partialCmd.length > 0 && (cmdChars.indexOf(sign) >= 0 || (cmdMode === getMode()) || getUser() === null)) {
     // Removes prepend sign
-    if (0 <= cmdChars.indexOf(sign)) {
+    if (cmdChars.indexOf(sign) >= 0) {
       partialCmd = partialCmd.slice(1);
     }
 
-    for (i = 0; i < cmds.length; i++) {
+    for (let i = 0; i < cmds.length; i++) {
       matches = false;
 
-      for (j = 0; j < partialCmd.length; j++) {
-        cmdAccesssLvl = getCmdAccessLevel(cmds[i]);
+      for (let j = 0; j < partialCmd.length; j++) {
+        const cmdAccesssLvl = getCmdAccessLevel(cmds[i]);
 
         if ((isNaN(cmdAccesssLvl) || getAccessLvl() >= cmdAccesssLvl) && partialCmd.charAt(j) === cmds[i].charAt(j)) {
           matches = true;
@@ -2819,10 +1021,10 @@ function autoComplete() {
       }
     }
 
-    if (1 === matched.length) {
-      cmdIndex = cmdChars.indexOf(sign);
+    if (matched.length === 1) {
+      const cmdIndex = cmdChars.indexOf(sign);
 
-      if (0 <= cmdIndex) {
+      if (cmdIndex >= 0) {
         newText += cmdChars[cmdIndex];
       }
 
@@ -2830,19 +1032,19 @@ function autoComplete() {
 
       clearInput();
       setCmdInput(newText);
-    } else if (0 < matched.length) {
+    } else if (matched.length > 0) {
       setCmdInput(expandPartialMatch(matched, partialCmd, sign));
-      queueMsg({ text : [matched.join('\t')] });
+      queueMsg({ text: [matched.join('\t')] });
     }
 
     // No input? Show all available commands
-  } else if (0 === partialCmd.length) {
+  } else if (partialCmd.length === 0) {
     validCmds.help.func();
   }
 }
 
 function printHelpMsg(command) {
-  var helpMsg = { text : [] };
+  const helpMsg = { text: [] };
 
   if (command.help) {
     helpMsg.text = helpMsg.text.concat(command.help);
@@ -2852,244 +1054,233 @@ function printHelpMsg(command) {
     helpMsg.text = helpMsg.text.concat(command.instructions);
   }
 
-  if (0 < helpMsg.text.length) {
+  if (helpMsg.text.length > 0) {
     queueMsg(helpMsg);
   }
 }
 
 function printUsedCmd(clearAfterUse, inputText) {
-  var cmdUsedMsg;
+  if (clearAfterUse) {
+    return null;
+  }
 
   /**
    * Print input if the command shouldn't clear
    * after use
    */
-  if (!clearAfterUse) {
-    cmdUsedMsg = {
-      text : [getInputStart() + getModeText() + '$ ' + inputText]
-    };
-  }
-
-  return cmdUsedMsg;
+  return {
+    text: [getInputStart() + getModeText() + '$ ' + inputText],
+  };
 }
 
 function specialKeyPress(event) {
-  var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
-  var cmdHistory;
-  var cmdObj = cmdHelper;
-  var cmds = validCmds;
-  var inputText;
-  var phrases;
-  var cmd = null;
-  var cmdName;
-  var user = getUser();
-  var sign;
+  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+  const user = getUser();
+  const cmdHistory = getCmdHistory();
 
   if (!keyPressed) {
     switch (keyCode) {
-      // Backspace
-      case 8:
-        if (1 >= getInputText().length) {
-          clearModeText();
-        } else {
-          changeModeText();
-        }
-
-        break;
-
-      // Tab
-      case 9:
-        keyPressed = true;
-
-        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
-          autoComplete();
-        }
-
+    // Backspace
+    case 8:
+      if (getInputText().length <= 1) {
+        clearModeText();
+      } else {
         changeModeText();
+      }
 
-        event.preventDefault();
+      break;
 
-        break;
-      // Enter
-      case 13:
-        keyPressed = true;
+    // Tab
+    case 9:
+      keyPressed = true;
 
-        if (!cmdObj.keysBlocked) {
-          if (null !== cmdObj.command) {
-            inputText = getInputText();
-            phrases = trimSpace(inputText).split(' ');
+      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
+        autoComplete();
+      }
 
-            //TODO Hard coded
-            if ('exit' === phrases[0] || 'abort' === phrases[0]) {
-              if (cmds[cmdObj.command].abortFunc) {
-                cmds[cmdObj.command].abortFunc();
-              }
+      changeModeText();
+      event.preventDefault();
 
-              resetCmd(true);
-            } else {
-              if (!cmdHelper.hideInput) {
-                queueMsg({
-                  text : [inputText]
-                });
-              }
+      break;
+    // Enter
+    case 13:
+      const cmdObj = cmdHelper;
+      const cmds = validCmds;
+      let inputText;
+      let phrases;
+      let cmdName;
+      keyPressed = true;
 
-              cmds[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
+      if (!cmdObj.keysBlocked) {
+        if (cmdObj.command !== null) {
+          inputText = getInputText();
+          phrases = trimSpace(inputText).split(' ');
+
+          // TODO Hard coded
+          if (phrases[0] === 'exit' || phrases[0] === 'abort') {
+            if (cmds[cmdObj.command].abortFunc) {
+              cmds[cmdObj.command].abortFunc();
             }
+
+            resetCmd(true);
           } else {
-            inputText = getInputText();
-            phrases = trimSpace(inputText).split(' ');
+            if (!cmdHelper.hideInput) {
+              queueMsg({
+                text: [inputText],
+              });
+            }
 
-            if (0 < phrases[0].length) {
-              sign = phrases[0].charAt(0);
+            cmds[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
+          }
+        } else {
+          inputText = getInputText();
+          phrases = trimSpace(inputText).split(' ');
 
-              if (0 <= cmdChars.indexOf(sign)) {
-                cmdName = phrases[0].slice(1).toLowerCase();
-              } else if (cmdMode === getMode() || null === user) {
-                cmdName = phrases[0].toLowerCase();
-              }
+          if (phrases[0].length > 0) {
+            const sign = phrases[0].charAt(0);
 
-              cmd = getCmd(cmdName);
+            if (cmdChars.indexOf(sign) >= 0) {
+              cmdName = phrases[0].slice(1).toLowerCase();
+            } else if (cmdMode === getMode() || user === null) {
+              cmdName = phrases[0].toLowerCase();
+            }
 
-              if (cmd && (isNaN(cmd.accessLevel) || getAccessLvl() >= cmd.accessLevel)) {
-                // Store the command for usage with up/down arrows
-                pushCmdHistory(phrases.join(' '));
+            const cmd = getCmd(cmdName);
 
-                /**
-                 * Print the help and instruction parts of the command
-                 */
-                if ('-help' === phrases[1]) {
-                  printHelpMsg(cmd);
-                } else {
-                  if (cmd.steps) {
-                    cmdObj.command = cmdName;
-                    cmdObj.maxSteps = cmd.steps.length;
-                  }
+            if (cmd && (isNaN(cmd.accessLevel) || getAccessLvl() >= cmd.accessLevel)) {
+              // Store the command for usage with up/down arrows
+              pushCmdHistory(phrases.join(' '));
 
-                  if (cmd.clearBeforeUse) {
-                    validCmds.clear.func();
-                  }
-
-                  queueCmd(cmd.func, combineSequences(cmdName, phrases),
-                    printUsedCmd(cmd.clearAfterUse, inputText)
-                  );
-                  startCmdQueue();
+              /**
+               * Print the help and instruction parts of the command
+               */
+              if (phrases[1] === '-help') {
+                printHelpMsg(cmd);
+              } else {
+                if (cmd.steps) {
+                  cmdObj.command = cmdName;
+                  cmdObj.maxSteps = cmd.steps.length;
                 }
+
+                if (cmd.clearBeforeUse) {
+                  validCmds.clear.func();
+                }
+
+                queueCmd(cmd.func, combineSequences(cmdName, phrases), printUsedCmd(cmd.clearAfterUse, inputText));
+                startCmdQueue();
+              }
               /**
                * User is logged in and in chat mode
                */
-              } else if (null !== user && chatMode === getMode() && 0 < phrases[0].length) {
-                if (0 > cmdChars.indexOf(phrases[0].charAt(0))) {
-                  queueCmd(cmds.msg.func, phrases);
-                  startCmdQueue();
+            } else if (user !== null && chatMode === getMode() && phrases[0].length > 0) {
+              if (cmdChars.indexOf(phrases[0].charAt(0)) < 0) {
+                queueCmd(cmds.msg.func, phrases);
+                startCmdQueue();
 
                 /**
                  * User input commandChar but didn't write
                  * a proper command
                  */
-                } else {
-                  queueMsg({
-                    text : [phrases[0] + ': ' + cmdFailText.text]
-                  });
-                }
-              } else if (null === user) {
-                queueMsg({ text : [phrases.toString()] });
+              } else {
                 queueMsg({
-                  text : [
-                    'You must register a new user or login with an existing user to gain access to more commands',
-                    'Use command register or login',
-                    'e.g. register myname 1135',
-                    'or login myname 1135'
-                  ]
-                });
-
-                /**
-                 * Sent command was not found.
-                 * Print the failed input
-                 */
-              } else if (0 < cmdName.length) {
-                queueMsg({
-                  text : ['- ' + phrases[0] + ': ' + cmdFailText.text]
+                  text: [phrases[0] + ': ' + cmdFailText.text],
                 });
               }
-            } else {
-              queueMsg(printUsedCmd(false, ' '));
+            } else if (user === null) {
+              queueMsg({ text: [phrases.toString()] });
+              queueMsg({
+                text: [
+                  'You must register a new user or login with an existing user to gain access to more commands',
+                  'Use command register or login',
+                  'e.g. register myname 1135',
+                  'or login myname 1135',
+                ],
+              });
+
+              /**
+               * Sent command was not found.
+               * Print the failed input
+               */
+            } else if (cmdName.length > 0) {
+              queueMsg({
+                text: ['- ' + phrases[0] + ': ' + cmdFailText.text],
+              });
             }
-          }
-        }
-
-        resetPrevCmdPointer();
-        clearInput();
-        clearModeText();
-
-        event.preventDefault();
-
-        break;
-      // Delete
-      case 46:
-        if (0 === getInputText().length) {
-          clearModeText();
-        } else {
-          changeModeText();
-        }
-
-        event.preventDefault();
-
-        break;
-      // Page up
-      case 33:
-        window.scrollBy(0, -window.innerHeight);
-
-        event.preventDefault();
-
-        break;
-      //Page down
-      case 34:
-        window.scrollBy(0, window.innerHeight);
-
-        event.preventDefault();
-
-        break;
-      // Up arrow
-      case 38:
-        cmdHistory = getCmdHistory();
-
-        keyPressed = true;
-
-        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
-          if (0 < prevCmdPointer) {
-            clearInput();
-            prevCmdPointer--;
-            setCmdInput(cmdHistory[prevCmdPointer]);
-          }
-        }
-
-        event.preventDefault();
-
-        break;
-      // Down arrow
-      case 40:
-        cmdHistory = getCmdHistory();
-
-        keyPressed = true;
-
-        if (!cmdHelper.keysBlocked && null === cmdHelper.command) {
-          if (prevCmdPointer < cmdHistory.length - 1) {
-            clearInput();
-            prevCmdPointer++;
-            setCmdInput(cmdHistory[prevCmdPointer]);
-          } else if (prevCmdPointer === cmdHistory.length - 1) {
-            clearInput();
-            prevCmdPointer++;
           } else {
-            clearInput();
+            queueMsg(printUsedCmd(false, ' '));
           }
         }
+      }
 
-        event.preventDefault();
+      resetPrevCmdPointer();
+      clearInput();
+      clearModeText();
 
-        break;
-      default:
-        break;
+      event.preventDefault();
+
+      break;
+    // Delete
+    case 46:
+      if (getInputText().length === 0) {
+        clearModeText();
+      } else {
+        changeModeText();
+      }
+
+      event.preventDefault();
+
+      break;
+    // Page up
+    case 33:
+      window.scrollBy(0, -window.innerHeight);
+
+      event.preventDefault();
+
+      break;
+    // Page down
+    case 34:
+      window.scrollBy(0, window.innerHeight);
+
+      event.preventDefault();
+
+      break;
+    // Up arrow
+    case 38:
+      keyPressed = true;
+
+      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
+        if (prevCmdPointer > 0) {
+          clearInput();
+          prevCmdPointer--;
+          setCmdInput(cmdHistory[prevCmdPointer]);
+        }
+      }
+
+      event.preventDefault();
+
+      break;
+    // Down arrow
+    case 40:
+      keyPressed = true;
+
+      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
+        if (prevCmdPointer < cmdHistory.length - 1) {
+          clearInput();
+          prevCmdPointer++;
+          setCmdInput(cmdHistory[prevCmdPointer]);
+        } else if (prevCmdPointer === cmdHistory.length - 1) {
+          clearInput();
+          prevCmdPointer++;
+        } else {
+          clearInput();
+        }
+      }
+
+      event.preventDefault();
+
+      break;
+    default:
+      break;
     }
   } else {
     event.preventDefault();
@@ -3097,209 +1288,34 @@ function specialKeyPress(event) {
 }
 
 function keyPress(event) {
-  var keyCode = 'number' === typeof event.which ? event.which : event.keyCode;
-  var textChar = String.fromCharCode(keyCode);
+  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+  const textChar = String.fromCharCode(keyCode);
 
   if (!keyPressed) {
     switch (keyCode) {
-      default:
-        if (textChar) {
-          changeModeText();
-        }
-
-        if (triggerAutoComplete(getInputText(), textChar) && null === cmdHelper.command) {
-          autoComplete();
-          // Prevent new whitespace to be printed
-          event.preventDefault();
-        }
-
-        break;
-    }
-  }
-}
-
-function changeModeText() {
-  var inputText = getInputText();
-  var mode = getMode();
-
-  if (getUser() && !cmdHelper.command) {
-      //TODO msg command text in comparison should not be hard coded
-      if ((chatMode === mode && -1 < cmdChars.indexOf(inputText.charAt(0)))
-          || (cmdMode === mode && 'msg' !== trimSpace(inputText).split(' ')[0])) {
-        setModeText(cmdMode.toUpperCase());
-      } else {
-        setModeText(chatMode.toUpperCase());
+    default:
+      if (textChar) {
+        changeModeText();
       }
-  }
-}
 
-function scrollView() {
-  if (!oldAndroid) {
-    spacer.scrollIntoView(false);
-  } else {
-    // Compatibility fix for old Android
-    window.scrollTo(0, document.body.scrollHeight);
-  }
-}
+      if (triggerAutoComplete(getInputText(), textChar) && cmdHelper.command === null) {
+        autoComplete();
+        // Prevent new whitespace to be printed
+        event.preventDefault();
+      }
 
-// Takes date and returns shorter readable time
-function generateTimeStamp(date, full) {
-  var newDate = new Date(date);
-  var splitDate;
-  var mins;
-  var hours;
-  var month;
-  var day;
-  var timeStamp;
-
-  // Splitting of date is a fix for NaN on Android 2.*
-  if (isNaN(newDate.getMinutes)) {
-    splitDate = date.split(/[-T:\.]+/);
-    newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
-  }
-
-  mins = beautifyNumb(newDate.getMinutes());
-  hours = beautifyNumb(newDate.getHours());
-  timeStamp = hours + ':' + mins;
-
-  if (full) {
-    month = beautifyNumb(newDate.getMonth());
-    day = beautifyNumb(newDate.getDate());
-
-    timeStamp = ' ' + day + '/' + month + ' ' + timeStamp;
-  }
-
-  return timeStamp;
-}
-
-function linkUser(elem) {
-  setCmdInput('whisper ' + elem.textContent + ' ');
-}
-
-function linkRoom(elem) {
-  validCmds.room.func([elem.textContent]);
-}
-
-function generateSpan(text, className) {
-  var spanObj = document.createElement('span');
-
-  spanObj.appendChild(document.createTextNode(text));
-
-  if (className) {
-    spanObj.className = className;
-  }
-
-  return spanObj;
-}
-
-function generateLink(text, className, func) {
-  var spanObj = generateSpan(text, className);
-
-  spanObj.className += ' link';
-  spanObj.addEventListener('click', function(event) {
-    func(this);
-    cmdInput.focus();
-    clicked = true;
-    event.stopPropagation();
-  });
-
-  return spanObj;
-}
-
-// Adds time stamp and room name to a string from a message if they are set
-function generateFullRow(sentText, message) {
-  var rowObj = document.createElement('li');
-  var roomName = message.roomName;
-  var roomElem;
-
-  if (message.time && !message.skipTime) {
-    rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
-  }
-
-  if (roomName) {
-    // If room is one of the system ones, not meant for direct messaging
-    if (-1 < hideRooms.indexOf(roomName.toLowerCase())) {
-      roomElem = generateSpan(roomName);
-    } else {
-      roomElem = generateLink(roomName, 'room', linkRoom);
+      break;
     }
-
-    rowObj.appendChild(roomElem);
   }
-
-  if (message.userName) {
-    rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
-  }
-
-  rowObj.appendChild(generateSpan(sentText));
-
-  return rowObj;
-}
-
-function consumeMsgShortQueue() {
-  var msg;
-
-  if (0 < shortMsgQueue.length) {
-    msg = shortMsgQueue.shift();
-
-    printRow(msg);
-  } else {
-    printing = false;
-  }
-}
-
-// Prints messages from the queue
-function consumeMsgQueue() {
-  if (!printing && 0 < msgQueue.length) {
-    shortMsgQueue = msgQueue.splice(0, msgsPerQueue);
-    printing = true;
-    consumeMsgShortQueue();
-  }
-}
-
-function printRow(msg) {
-  var text;
-  var row;
-
-  if (0 < msg.text.length) {
-    text = msg.text.shift();
-    row = generateFullRow(text, msg);
-
-    if (msg.extraClass) {
-      /*
-       * classList doesn't work on older devices, thus the usage of className
-       */
-      row.className += ' ' + msg.extraClass;
-    }
-
-    mainFeed.appendChild(row);
-
-    scrollView();
-
-    setTimeout(printRow, rowTimeout, msg);
-  } else {
-    consumeMsgShortQueue();
-  }
-}
-
-function createLine(length) {
-  var line = '';
-  var i;
-
-  for (i = 0; i < length; i++) {
-    line += '-';
-  }
-
-  return line;
 }
 
 function createCmdStart(cmdName) {
-  var length = cmdName.length + 2;
+  const length = cmdName.length + 2;
 
   return [
     createLine(length),
     ' ' + cmdName.toUpperCase(),
-    createLine(length)
+    createLine(length),
   ];
 }
 
@@ -3308,45 +1324,73 @@ function createCmdEnd(length) {
 }
 
 function printWelcomeMsg() {
-  var logoCopy = copyMsg(logo);
-  var razLogoCopy = copyMsg(razLogo);
+  const logoCopy = copyMsg(logo);
+  const razLogoCopy = copyMsg(razLogo);
 
   queueMsg(logoCopy);
   queueMsg({
-    text : [
+    text: [
       'Welcome, employee ' + getUser(),
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
       'Learn this valuable skill to increase your productivity!',
-      'May you have a productive day'
-    ]
+      'May you have a productive day',
+    ],
   });
   queueMsg({
-    text : [
-      '## This terminal has been cracked by your friendly Razor team. Enjoy! ##'
-    ]
+    text: [
+      '## This terminal has been cracked by your friendly Razor team. Enjoy! ##',
+    ],
   });
   queueMsg(razLogoCopy);
 }
 
-function beautifyNumb(number) {
-  return 9 < number ? number : '0' + number;
+function printStartMsg() {
+  const logoToPrint = copyMsg(logo);
+  const randRelay = createRandString(randString, 4, true);
+
+  queueMsg(logoToPrint);
+  queueMsg({
+    text: [
+      createLine(50),
+      'Connecting... Could not establish connection to HQ',
+      'Rerouting... Secondary relay ' + randRelay + ' found',
+      'Connecting to relay ' + randRelay + '... Connection established',
+      createLine(50),
+    ],
+    extraClass: 'upperCase',
+  });
+  queueMsg({
+    text: [
+      'Welcome to the Oracle of Organica',
+      'Please login to start your productive day!',
+      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
+      'You can also use it to show all available commands!',
+      'Learn this valuable skill to increase your productivity!',
+    ],
+  });
+}
+
+function resetAllLocalVals() {
+  removeCmdHistory();
+  removeRoom();
+  removeUser();
+  setAccessLvl(0);
+  setInputStart(defaultInputStart);
+  prevCmdPointer = 0;
 }
 
 function onMessages(msgs) {
-  var msg;
-  var i;
-
-  for (i = 0; i < msgs.length; i++) {
-    msg = msgs[i];
+  for (let i = 0; i < msgs.length; i++) {
+    const msg = msgs[i];
 
     if (msg.roomName) {
-      if (0 <= msg.roomName.indexOf('-whisper')) {
+      if (msg.roomName.indexOf('-whisper') >= 0) {
         msg.roomName = 'WHISPER';
-      } else if (0 <= msg.roomName.indexOf('-device')) {
+      } else if (msg.roomName.indexOf('-device') >= 0) {
         msg.roomName = 'DEVICE';
-      } else if ('important' === msg.roomName) {
+      } else if (msg.roomName === 'important') {
         msg.roomName = 'IMPORTNT';
-      } else if ('broadcast' === msg.roomName) {
+      } else if (msg.roomName === 'broadcast') {
         msg.roomName = 'BROADCST';
       }
     }
@@ -3376,22 +1420,13 @@ function onImportantMsg(msg) {
  * Triggers when the connection is lost and then re-established
  */
 function onReconnect() {
-  var user = getUser();
-
-  if (!reconnecting) {
-    reconnecting = true;
-
-    socket.disconnect();
-    socket.connect({ forceNew : true });
-
-    socket.emit('updateId', { userName : user });
-  }
+  reconnect();
 }
 
 function onDisconnect() {
   queueMsg({
-    text : ['Lost connection'],
-    extraClass : 'importantMsg'
+    text: ['Lost connection'],
+    extraClass: 'importantMsg',
   });
 }
 
@@ -3400,40 +1435,40 @@ function onFollow(room) {
     enterRoom(room.roomName);
   } else {
     queueMsg({
-      text : ['Following ' + room.roomName]
+      text: ['Following ' + room.roomName],
     });
   }
 }
 
 function onUnfollow(room) {
   queueMsg({
-    text : ['Stopped following ' + room.roomName]
+    text: ['Stopped following ' + room.roomName],
   });
 
   if (room.exited) {
-    socket.emit('follow', { roomName : 'public', entered : true });
+    socket.emit('follow', { roomName: 'public', entered: true });
   }
 }
 
 function onLogin(user) {
-  var mode = user.mode ? user.mode : cmdMode;
+  const mode = user.mode ? user.mode : cmdMode;
 
   validCmds.clear.func();
   setUser(user.userName);
   setAccessLvl(user.accessLevel);
   queueMsg({
-    text : ['Successfully logged in as ' + user.userName]
+    text: ['Successfully logged in as ' + user.userName],
   });
   printWelcomeMsg();
   validCmds.mode.func([mode]);
 
   socket.emit('updateDeviceSocketId', {
-    deviceId : getDeviceId(),
-    socketId : socket.id,
-    userName : getUser()
+    deviceId: getDeviceId(),
+    socketId: socket.id,
+    userName: getUser(),
   });
 
-  socket.emit('follow', { roomName : 'public', entered : true });
+  socket.emit('follow', { roomName: 'public', entered: true });
 }
 
 function onCommandSuccess(data) {
@@ -3450,26 +1485,23 @@ function onCommandFail() {
 }
 
 function onReconnectSuccess(data) {
-  var mode;
-  var room;
-
   if (!data.anonUser) {
-    mode = data.user.mode ? data.user.mode : cmdMode;
-    room = getRoom();
+    const mode = data.user.mode ? data.user.mode : cmdMode;
+    const room = getRoom();
 
     validCmds.mode.func([mode], false);
     setAccessLvl(data.user.accessLevel);
 
     socket.emit('updateDeviceSocketId', {
-      deviceId : getDeviceId(),
-      socketId : socket.id,
-      user : getUser()
+      deviceId: getDeviceId(),
+      socketId: socket.id,
+      user: getUser(),
     });
 
     if (!data.firstConnection) {
       queueMsg({
-        text : ['Re-established connection'],
-        extraClass : 'importantMsg'
+        text: ['Re-established connection'],
+        extraClass: 'importantMsg',
       });
     } else {
       printWelcomeMsg();
@@ -3480,13 +1512,13 @@ function onReconnectSuccess(data) {
     }
 
     queueMsg({
-      text : ['Retrieving missed messages (if any)']
+      text: ['Retrieving missed messages (if any)'],
     });
   } else {
     if (!data.firstConnection) {
       queueMsg({
-        text : ['Re-established connection'],
-        extraClass : 'importantMsg'
+        text: ['Re-established connection'],
+        extraClass: 'importantMsg',
       });
     }
   }
@@ -3495,15 +1527,15 @@ function onReconnectSuccess(data) {
 }
 
 function onDisconnectUser() {
-  var currentUser = getUser();
+  const currentUser = getUser();
 
   // There is no saved local user. We don't need to print this
-  if (null !== currentUser) {
+  if (currentUser !== null) {
     queueMsg({
-      text : [
+      text: [
         'Didn\'t find user ' + getUser() + ' in database',
-        'Resetting local configuration'
-      ]
+        'Resetting local configuration',
+      ],
     });
   }
 
@@ -3516,63 +1548,54 @@ function onMorse(morseCode) {
 
 function onTime(time) {
   queueMsg({
-    text : ['Time: ' + generateTimeStamp(time, true)]
+    text: ['Time: ' + generateTimeStamp(time, true)],
   });
 }
 
 function onLocationMsg(locationData) {
-  //TODO Change from Object.keys for compatibility with older Android
-  var locationKeys = Object.keys(locationData);
-  var i;
-  var user;
-  var userLoc;
-  var latitude;
-  var longitude;
-  var heading;
-  var accuracy;
-  var text;
-  var mapLoc;
+  // TODO Change from Object.keys for compatibility with older Android
+  const locationKeys = Object.keys(locationData);
 
-  for (i = 0; i < locationKeys.length; i++) {
-    text = '';
-    user = locationKeys[i];
+  for (let i = 0; i < locationKeys.length; i++) {
+    let text = '';
+    const user = locationKeys[i];
 
     if (locationData[user].coords) {
-      userLoc = locationData[user];
-      latitude = userLoc.coords.latitude.toFixed(6);
-      longitude = userLoc.coords.longitude.toFixed(6);
-      heading = null !== userLoc.coords.heading ? Math.round(userLoc.coords.heading) : null;
-      accuracy = 1000 > userLoc.accuracy ? Math.ceil(userLoc.accuracy) : 'BAD';
-      mapLoc = locateOnMap(latitude, longitude);
+      const userLoc = locationData[user];
+      const latitude = userLoc.coords.latitude.toFixed(6);
+      const longitude = userLoc.coords.longitude.toFixed(6);
+      const heading = userLoc.coords.heading !== null ? Math.round(userLoc.coords.heading) : null;
+      const accuracy = userLoc.accuracy < 1000 ? Math.ceil(userLoc.accuracy) : 'BAD';
+      const mapLoc = locateOnMap(latitude, longitude);
 
       text += 'User: ' + user + '\t';
       text += 'Time: ' + generateTimeStamp(userLoc.locTime, true) + '\t';
       text += 'Location: ' + mapLoc + '\t';
 
-      if ('---' !== mapLoc) {
+      if (mapLoc !== '---') {
         text += 'Accuracy: ' + accuracy + ' meters\t';
         text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
 
-        if (null !== heading) {
+        if (heading !== null) {
           text += 'Heading: ' + heading + ' deg.';
         }
       }
 
-      queueMsg({ text : [text] });
+      queueMsg({ text: [text] });
     }
   }
 }
 
 function onBan() {
   queueMsg({
-    text : [
+    text: [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support ' +
       'Center for re-education',
       '## or your nearest friendly Razor member. ' +
-      'Bring a huge bribe ##'
+      'Bring a huge bribe ##',
     ],
-    extraClass : 'importantMsg'
+    extraClass: 'importantMsg',
   });
   resetAllLocalVals();
 }
@@ -3585,14 +1608,10 @@ function onLogout() {
 }
 
 function onUpdateCommands(commands) {
-  var i;
-  var newCommand;
-  var oldCommand;
-
   if (commands) {
-    for (i = 0; i < commands.length; i++) {
-      newCommand = commands[i];
-      oldCommand = validCmds[newCommand.commandName];
+    for (let i = 0; i < commands.length; i++) {
+      const newCommand = commands[i];
+      const oldCommand = validCmds[newCommand.commandName];
 
       if (oldCommand) {
         oldCommand.accessLevel = newCommand.accessLevel;
@@ -3605,85 +1624,76 @@ function onUpdateCommands(commands) {
 }
 
 function onWeather(report) {
-  var weather = [];
-  var weatherInst;
-  var weatherString = '';
-  var time;
-  var hours;
-  var day;
-  var month;
-  var precipType;
-  var temperature;
-  var windSpeed;
-  var precip;
-  var coverage;
-  var i;
+  const weather = [];
+  let weatherString = '';
 
-  for (i = 0; i < report.length; i++) {
-    weatherInst = report[i];
+  for (let i = 0; i < report.length; i++) {
+    const weatherInst = report[i];
+    const time = new Date(weatherInst.time);
+    const hours = beautifyNumb(time.getHours());
+    const day = beautifyNumb(time.getDate());
+    const month = beautifyNumb(time.getMonth());
+    const temperature = Math.round(weatherInst.temperature);
+    const windSpeed = Math.round(weatherInst.gust);
+    const precip = weatherInst.precipitation === 0 ? 'Light ' : weatherInst.precipitation + 'mm ';
+    let coverage;
+    let precipType;
     weatherString = '';
-    time = new Date(weatherInst.time);
-    hours = beautifyNumb(time.getHours());
-    day = beautifyNumb(time.getDate());
-    month = beautifyNumb(time.getMonth());
-    temperature = Math.round(weatherInst.temperature);
-    windSpeed = Math.round(weatherInst.gust);
-    precip = 0 === weatherInst.precipitation ? 'Light ' : weatherInst.precipitation + 'mm ';
 
     switch (weatherInst.precipType) {
-      // No
-      case 0:
-        break;
-      // Snow
-      case 1:
-        precipType = 'snow';
-        break;
-      // Snow + rain
-      case 2:
-        precipType = 'snow and rain';
-        break;
-      // Rain
-      case 3:
-        precipType = 'acid rain';
-        break;
-      // Drizzle
-      case 4:
-        precipType = 'drizzle';
-        break;
-      // Freezing rain
-      case 5:
-        precipType = 'freezing rain';
-        break;
-      // Freezing drizzle
-      case 6:
-        precipType = 'freezing drizzle';
-        break;
-      default:
-        break;
+    // None
+    case 0:
+      break;
+    // Snow
+    case 1:
+      precipType = 'snow';
+      break;
+    // Snow + rain
+    case 2:
+      precipType = 'snow and rain';
+      break;
+    // Rain
+    case 3:
+      precipType = 'acid rain';
+      break;
+    // Drizzle
+    case 4:
+      precipType = 'drizzle';
+      break;
+    // Freezing rain
+    case 5:
+      precipType = 'freezing rain';
+      break;
+    // Freezing drizzle
+    case 6:
+      precipType = 'freezing drizzle';
+      break;
+    default:
+      break;
     }
 
     switch (weatherInst.cloud) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-        coverage = 'Light';
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      coverage = 'Light';
 
-        break;
-      case 4:
-      case 5:
-      case 6:
-        coverage = 'Moderate';
+      break;
+    case 4:
+    case 5:
+    case 6:
+      coverage = 'Moderate';
 
-        break;
-      case 7:
-      case 8:
-      case 9:
-        coverage = 'High';
+      break;
+    case 7:
+    case 8:
+    case 9:
+      coverage = 'High';
 
-        break;
-      default:
-        break;
+      break;
+    default:
+      break;
     }
 
     weatherString += day + '/' + month + ' ' + hours + ':00' + '\t';
@@ -3702,7 +1712,7 @@ function onWeather(report) {
     weather.push(weatherString);
   }
 
-  queueMsg({ text : weather });
+  queueMsg({ text: weather });
 }
 
 function onUpdateDeviceId(newId) {
@@ -3710,18 +1720,16 @@ function onUpdateDeviceId(newId) {
 }
 
 function onWhoami(data) {
-  var team = data.user.team ? data.user.team : '';
-  var text = createCmdStart('whoami');
-
-  text = text.concat([
+  const team = data.user.team || '';
+  const text = createCmdStart('whoami').concat([
     'User: ' + data.user.userName,
     'Access level: ' + data.user.accessLevel,
     'Team: ' + team,
     'Device ID: ' + data.device.deviceId,
-    createCmdEnd(text[0].length)
+    createCmdEnd(text[0].length),
   ]);
 
-  queueMsg({ text : text });
+  queueMsg({ text: text });
 }
 
 function startSocket() {
@@ -3795,43 +1803,15 @@ function fullscreenResize(keyboardShown) {
 }
 
 function generateDeviceId() {
-  var randomLength = randString.length;
-  var deviceId = '';
-  var i;
-  var randomVal;
+  const randomLength = randString.length;
+  let deviceId = '';
 
-  for (i = 0; 15 > i; i++) {
-    randomVal = Math.random() * (randomLength - 1);
+  for (let i = 0; i < 15; i++) {
+    const randomVal = Math.random() * (randomLength - 1);
     deviceId += randString[Math.round(randomVal)];
   }
 
   return deviceId;
-}
-
-function printStartMsg() {
-  var logoToPrint = copyMsg(logo);
-  var randRelay = createRandString(randString, 4, true);
-
-  queueMsg(logoToPrint);
-  queueMsg({
-    text : [
-      createLine(50),
-      'Connecting... Could not establish connection to HQ',
-      'Rerouting... Secondary relay ' + randRelay + ' found',
-      'Connecting to relay ' + randRelay + '... Connection established',
-      createLine(50)
-    ],
-    extraClass : 'upperCase'
-  });
-  queueMsg({
-    text : [
-      'Welcome to the Oracle of Organica',
-      'Please login to start your productive day!',
-      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
-      'You can also use it to show all available commands!',
-      'Learn this valuable skill to increase your productivity!'
-    ]
-  });
 }
 
 /*
@@ -3848,9 +1828,1916 @@ function isOldAndroid() {
   return /Android\s[0-3]/.test(navigator.userAgent);
 }
 
+function attachCommands() {
+  validCmds.help = {
+    func: function(phrases) {
+      function getCmds() {
+        const cmds = [];
+        // TODO Change from Object.keys for compatibility with older Android
+        const keys = Object.keys(validCmds);
+        let cmd;
+        let cmdAccessLvl;
+
+        for (let i = 0; i < keys.length; i++) {
+          cmd = validCmds[keys[i]];
+          cmdAccessLvl = cmd.accessLevel;
+
+          if (isNaN(cmdAccessLvl) || cmdAccessLvl <= getAccessLvl()) {
+            cmds.push(keys[i]);
+          }
+        }
+
+        return cmds.concat(Object.keys(getAliases())).sort();
+      }
+
+      function getAll() {
+        const allCmds = getCmds();
+
+        if (getUser() === null) {
+          queueMsg({
+            text: [
+              createLine(49),
+              ' Use register to register a new user',
+              ' Use login to log in to an existing user',
+              ' You have to log in to access most of the system',
+              createLine(49),
+            ],
+          });
+        }
+
+        queueMsg({
+          text: allCmds,
+        });
+      }
+
+      if (undefined === phrases || phrases.length === 0) {
+        queueMsg({
+          text: createCmdStart('help').concat([
+            'Instructions',
+            '  Add -help after a command to get instructions on how to use it. Example: ' + cmdChars[0] +
+            'uploadkey -help',
+            'Shortcuts',
+            '  Use page up/down to scroll the view',
+            '  Press arrow up/down to go through your previous used commands',
+            '  Pressing tab or space twice will auto-complete any command you have begun writing.',
+            '  Example: "he" and a tab / double space will automatically turn into "help"',
+          ]),
+        });
+      }
+
+      getAll();
+    },
+    help: [
+      'Shows a list of available commands',
+      'The set of commands shown is the basic set',
+      'Add "all" to show all commands available to you. Example: ' +
+      'help all',
+    ],
+    instructions: [
+      ' Usage:',
+      '  help *optional all*',
+      ' Example:',
+      '  help',
+      '  help all',
+    ],
+    accessLevel: 1,
+    category: 'basic',
+  };
+  validCmds.clear = {
+    func: function() {
+      while (mainFeed.childNodes.length > 1) {
+        mainFeed.removeChild(mainFeed.lastChild);
+      }
+    },
+    help: ['Clears the terminal view'],
+    clearAfterUse: true,
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.whoami = {
+    func: function() {
+      const data = {};
+      data.device = {};
+      data.device.deviceId = getDeviceId();
+
+      socket.emit('whoAmI', data);
+    },
+    help: ['Shows the current user'],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.msg = {
+    func: function(phrases) {
+      let writtenMsg;
+
+      if (phrases && phrases.length > 0) {
+        writtenMsg = phrases.join(' ');
+
+        socket.emit('chatMsg', {
+          message: {
+            text: [writtenMsg],
+            userName: getUser(),
+            roomName: getRoom(),
+          },
+        });
+      } else {
+        queueMsg({
+          text: ['You forgot to write the message!'],
+        });
+      }
+    },
+    help: [
+      'Sends a message to your current room',
+      'The room you are in is written out to the left of the marker',
+    ],
+    instructions: [
+      ' Usage:',
+      '  msg *message*',
+      ' Example:',
+      '  msg Hello!',
+    ],
+    clearAfterUse: true,
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.broadcast = {
+    func: function() {
+      const data = {};
+
+      data.text = [];
+      cmdHelper.data = data;
+
+      queueMsg({
+        text: [
+          'Who is the broadcast from?',
+          'You can also leave it empty and just press enter',
+        ],
+      });
+      queueMsg(copyMsg(abortInfo));
+      setInputStart('broadcast');
+    },
+    steps: [
+      function(phrases) {
+        let phrase;
+
+        if (phrases.length > 0 && phrases[0] !== '') {
+          phrase = phrases.join(' ');
+
+          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast from: ' + phrase));
+        } else {
+          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast'));
+        }
+
+        queueMsg({
+          text: [
+            'Write a line and press enter',
+            'Press enter without any input when you are done ' +
+            'with the message',
+          ],
+        });
+        cmdHelper.onStep++;
+      },
+      function(phrases) {
+        let dataText;
+
+        if (phrases.length > 0 && phrases[0] !== '') {
+          const phrase = phrases.join(' ');
+
+          cmdHelper.data.text.push(phrase);
+        } else {
+          cmdHelper.data.text.push(createLine(10));
+          dataText = copyString(cmdHelper.data.text);
+
+          cmdHelper.onStep++;
+
+          queueMsg({
+            text: ['Preview of the message:'],
+          });
+          queueMsg({
+            text: dataText,
+          });
+          queueMsg({
+            text: ['Is this OK? "yes" to accept the message'],
+          });
+        }
+      },
+      function(phrases) {
+        if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
+          socket.emit('broadcastMsg', cmdHelper.data);
+          resetCmd();
+        } else {
+          resetCmd(true);
+        }
+      },
+    ],
+    help: [
+      'Sends a message to all users in all rooms',
+      'It will prepend the message with "[ALL]"',
+    ],
+    instructions: [
+      'Follow the on-screen instructions',
+    ],
+    accessLevel: 13,
+    clearAfterUse: true,
+    category: 'admin',
+  };
+  validCmds.follow = {
+    func: function(phrases) {
+      const room = {};
+
+      if (phrases.length > 0) {
+        room.roomName = phrases[0].toLowerCase();
+        room.password = phrases[1];
+
+        socket.emit('follow', room);
+      } else {
+        queueMsg({
+          text: [
+            'You have to specify which room to follow and a' +
+            'password (if it is protected)',
+          ],
+        });
+      }
+    },
+    help: [
+      'Follows a room and shows you all messages posted in it.',
+      'You will get the messages from this room even if it isn\'t' +
+      'your currently selected one',
+    ],
+    instructions: [
+      ' Usage:',
+      '  follow *room name* *optional password*',
+      ' Example:',
+      '  follow room1 banana',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.unfollow = {
+    func: function(phrases) {
+      const room = {};
+
+      if (phrases.length > 0) {
+        const roomName = phrases[0].toLowerCase();
+
+        if (roomName === getRoom()) {
+          room.exited = true;
+        }
+
+        room.roomName = roomName;
+
+        socket.emit('unfollow', room);
+      } else {
+        queueMsg({
+          text: ['You have to specify which room to unfollow'],
+        });
+      }
+    },
+    help: ['Stops following a room.'],
+    instructions: [
+      ' Usage:',
+      '  unfollow *room name*',
+      ' Example:',
+      '  unfollow roomname',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.list = {
+    func: function(phrases) {
+      if (phrases.length > 0) {
+        const listOption = phrases[0].toLowerCase();
+
+        if (listOption === 'rooms') {
+          socket.emit('listRooms');
+        } else if (listOption === 'users') {
+          socket.emit('listUsers');
+        } else if (listOption === 'devices') {
+          socket.emit('listDevices');
+        } else {
+          queueMsg({
+            text: [listOption + 'is not a valid option'],
+          });
+        }
+      } else {
+        queueMsg({
+          text: [
+            'You have to input which option you want to list',
+            'Available options: users, rooms, devices',
+            'Example: list rooms',
+          ],
+        });
+      }
+    },
+    help: [
+      'Shows a list of users, rooms or devices which you are allowed to see',
+      'You have to input which option you want to list',
+    ],
+    instructions: [
+      ' Usage:',
+      '  list *option*',
+      ' Example',
+      '  list rooms',
+      '  list users',
+      '  list devices',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.mode = {
+    func: function(phrases, verbose) {
+      let cmdString;
+
+      if (phrases.length > 0) {
+        const newMode = phrases[0].toLowerCase();
+
+        // TODO Refactoring. Lots of duplicate code
+        if (chatMode === newMode) {
+          setMode(newMode);
+
+          if (verbose === undefined || verbose) {
+            cmdString = 'Chat mode activated';
+
+            queueMsg({
+              text: createCmdStart(cmdString).concat([
+                'Prepend commands with "' + cmdChars.join('" or "') + '", e.g. ' + '"' + cmdChars[0] + 'uploadkey"',
+                'Everything else written and sent will be intepreted as a chat message',
+                createCmdEnd(cmdString.length),
+              ]),
+            });
+          }
+
+          socket.emit('updateMode', newMode);
+        } else if (cmdMode === newMode) {
+          setMode(newMode);
+
+          if (verbose === undefined || verbose) {
+            cmdString = 'Command mode activated';
+
+            queueMsg({
+              text: createCmdStart(cmdString).concat([
+                'Commands can be used without "' + cmdChars[0] + '"',
+                'You have to use command "msg" to send messages',
+                createCmdEnd(cmdString.length),
+              ]),
+            });
+          }
+
+          socket.emit('updateMode', newMode);
+        } else {
+          queueMsg({
+            text: [newMode + 'is not a valid mode'],
+          });
+        }
+      } else {
+        queueMsg({
+          text: ['Current mode: ' + getMode()],
+        });
+      }
+    },
+    help: [
+      'Change the input mode. The options are chat or cmd',
+      '--Chat mode--',
+      'Everything written will be interpreted as chat messages',
+      'All commands have to be prepended with "' +
+      cmdChars.join('" or "') + '" ' +
+      'Example: ' + cmdChars[0] + 'uploadkey',
+      '--Cmd mode--',
+      'Chat mode is the default mode',
+      'Text written will not be automatically be intepreted as ' +
+      'chat messages',
+      'You have to use "msg" command to write messages ' +
+      'Example: msg hello',
+      'Commands do not have to be prepended with anything. ' +
+      'Example: uploadkey',
+    ],
+    instructions: [
+      ' Usage:',
+      '  mode *mode*',
+      ' Example:',
+      '  mode chat',
+      '  mode cmd',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.register = {
+    func: function(phrases) {
+      const data = {};
+
+      if (getUser() === null) {
+        const userName = phrases ? phrases[0] : undefined;
+
+        if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
+          data.userName = userName;
+          data.registerDevice = getDeviceId();
+          cmdHelper.data = data;
+          cmdHelper.hideInput = true;
+          hideInput(true);
+          socket.emit('userExists', cmdHelper.data);
+        } else {
+          resetCmd(true);
+          queueMsg({
+            text: [
+              'Name has to be 3 to 6 characters long',
+              'The name can only contain letters and numbers (a-z, 0-9)',
+              'Don\'t use whitespace in your name!',
+              'e.g. register myname',
+            ],
+          });
+        }
+      } else {
+        resetCmd(true);
+        queueMsg({
+          text: [
+            'You have already registered a user',
+            getUser() + ' is registered to this device',
+          ],
+        });
+      }
+    },
+    steps: [
+      function() {
+        queueMsg({
+          text: [
+            'Input a password and press enter',
+            'Your password won\'t appear on the screen as you type it',
+            'Don\'t use whitespaces in your password!',
+          ],
+        });
+        queueMsg(copyMsg(abortInfo));
+        setInputStart('password');
+        cmdHelper.onStep++;
+      },
+      function(phrases) {
+        const password = phrases ? phrases[0] : undefined;
+
+        if (phrases && password.length >= 3 && isTextAllowed(password)) {
+          cmdHelper.data.password = password;
+          queueMsg({
+            text: [
+              'Repeat your password one more time',
+            ],
+          });
+          cmdHelper.onStep++;
+        } else {
+          queueMsg({
+            text: [
+              'Password is too short!',
+              'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
+              'Please, input a password and press enter',
+            ],
+          });
+        }
+      },
+      function(phrases) {
+        const password = phrases ? phrases[0] : undefined;
+
+        if (password === cmdHelper.data.password) {
+          queueMsg({
+            text: [
+              'Congratulations, employee #' + Math.floor(Math.random() * 120503),
+              'Welcome to the Organica Oracle department',
+              'You may now login to the system',
+              'Have a productive day!',
+            ],
+          });
+          socket.emit('register', cmdHelper.data);
+          validCmds[cmdHelper.command].abortFunc();
+          resetCmd(false);
+        } else {
+          queueMsg({
+            text: [
+              'Passwords don\'t match. Please try again',
+              'Input a password and press enter',
+            ],
+          });
+          cmdHelper.onStep--;
+        }
+      },
+    ],
+    abortFunc: function() {
+      hideInput(false);
+    },
+    help: [
+      'Registers your user name on the server and connects it ' +
+      'to your device',
+      'This user name will be your identity in the system',
+      'The name can only contain letters and numbers (a-z, 0-9)',
+      'Don\'t use whitespaces in your name or password!',
+    ],
+    instructions: [
+      ' Usage:',
+      '  register *user name*',
+      ' Example:',
+      '  register myname',
+    ],
+    accessLevel: 0,
+    category: 'login',
+  };
+  validCmds.createroom = {
+    func: function(phrases) {
+      const room = {};
+      const errorMsg = {
+        text: [
+          'Failed to create room.',
+          'Room name has to be 1 to 6 characters long',
+          'The room name and password can only contain letters and numbers ' +
+          '(a-z, 0-9. Password can mix upper and lowercase)',
+          'e.g. createroom myroom',
+        ],
+      };
+
+      if (phrases.length > 0) {
+        const roomName = phrases[0].toLowerCase();
+        const password = phrases[1];
+
+        if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName) && isTextAllowed(password)) {
+          room.roomName = roomName;
+          room.password = password;
+          room.owner = getUser();
+
+          socket.emit('createRoom', room);
+        } else {
+          queueMsg(errorMsg);
+        }
+      } else {
+        queueMsg(errorMsg);
+      }
+    },
+    help: [
+      'Creates a chat room',
+      'The rooms name has to be 1 to 6 characters long',
+      'The password is optional, but if set it has to be 4 to 10 ' +
+      'characters',
+      'The name can only contain letters and numbers (a-z, 0-9)',
+    ],
+    instructions: [
+      ' Usage:',
+      '  createroom *room name* *optional password*',
+      ' Example:',
+      '  createroom myroom banana',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.myrooms = {
+    func: function() {
+      const data = {};
+
+      data.userName = getUser();
+      data.device = getDeviceId();
+
+      socket.emit('myRooms', data);
+    },
+    help: ['Shows a list of all rooms you are following'],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.login = {
+    func: function(phrases) {
+      const data = {};
+
+      if (getUser() !== null) {
+        queueMsg({
+          text: [
+            'You are already logged in',
+            'You have to be logged out to log in',
+          ],
+        });
+      } else if (phrases.length > 0) {
+        data.userName = phrases[0].toLowerCase();
+        cmdHelper.data = data;
+        cmdHelper.hideInput = true;
+        queueMsg({
+          text: [
+            'Input your password',
+          ],
+        });
+        setInputStart('password');
+        hideInput(true);
+      } else {
+        queueMsg({
+          text: [
+            'You need to input a user name',
+            'Example: login bestname ',
+          ],
+        });
+      }
+    },
+    steps: [
+      function(phrases) {
+        cmdHelper.data.password = phrases[0].toLowerCase();
+        socket.emit('login', cmdHelper.data);
+        validCmds[cmdHelper.command].abortFunc();
+        validCmds.clear.func();
+        resetCmd();
+      },
+    ],
+    abortFunc: function() {
+      hideInput(false);
+    },
+    help: [
+      'Logs in as a user on this device',
+      'You have to be logged out to login as another user',
+    ],
+    instructions: [
+      ' Usage:',
+      '  login *user name*',
+      ' Example:',
+      '  login user11',
+    ],
+    clearAfterUse: true,
+    accessLevel: 0,
+    category: 'login',
+  };
+  validCmds.time = {
+    func: function() {
+      socket.emit('time');
+    },
+    help: ['Shows the current time'],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.locate = {
+    func: function(phrases) {
+      if (!isTracking) {
+        queueMsg({
+          text: [
+            'Tracking not available',
+            'You are not connected to the satellites',
+          ],
+        });
+      } else if (phrases.length > 0) {
+        const userName = phrases[0].toLowerCase();
+
+        socket.emit('locate', userName);
+      } else {
+        socket.emit('locate', getUser());
+      }
+    },
+    help: [
+      'Shows the last known location of the user',
+      '* is a shortcut for all users. Example: locate *',
+      'Just writing the command without a user name will show your ' +
+      'current location. Example: locate',
+      'You need to be connected to the satellites to access this command',
+    ],
+    instructions: [
+      ' Usage:',
+      '  locate *optional user name OR "*"*',
+      ' Example:',
+      '  locate user1',
+      '  locate *',
+      '  locate',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.uploadkey = {
+    func: function() {
+      const razLogoCopy = copyMsg(razLogo);
+
+      // TODO: razLogo should be move to DB or other place
+      queueMsg(razLogoCopy);
+      queueMsg({
+        text: [
+          'Razor proudly presents:',
+          'Entity Hacking Access! (EHA)',
+          'AAAB3NzaC1yc2EAAAADAQABAAABAQDHS//2a/B',
+          'D6Rsc8OO/6wFUVDdpdAItvSCLCrc/dcJE/ybEV',
+          'w3OtlVFnfNkOVAvhObuWO/6wFUVDdkr2YTaDEt',
+          'i5mxEFD1zslvhObuWr6QKLvfZVczAxPFKLvfZV',
+          'dK2zXrxGOmOFllxiCbpGOmOFlcJyiCbp0mA4ca',
+          'MFvEEiKXrxGlxiCbp0miONA3EscgY/yujOMJHa',
+          'Q1uy6yEZOmOFl/yujOMJHa881DVwWl6lsjHvSi',
+          'wDDVwWl6el88/x1j5C+k/atg1lcvcz7Tdtve4q',
+          'VTVz0HIhxv595Xqw2qrv6GrdX/FrhObuWr6QKL',
+          ' ',
+          'Please wait.......',
+          'Command interception.........ACTIVATED',
+          'Oracle defense systems........DISABLED',
+          'Overriding locks..................DONE',
+          'Connecting to entity database.....DONE',
+          ' ',
+        ],
+      });
+      queueMsg(copyMsg(abortInfo));
+      setInputStart('Enter encryption key');
+      socket.emit('entities');
+    },
+    steps: [
+      function(phrases) {
+        const cmdObj = cmdHelper;
+        const phrase = phrases.join(' ');
+
+        socket.emit('verifyKey', phrase.toLowerCase());
+        queueMsg({
+          text: [
+            'Verifying key. Please wait...',
+          ],
+        });
+        cmdObj.keysBlocked = true;
+        setInputStart('Verifying...');
+      },
+      function(data) {
+        const cmdObj = cmdHelper;
+
+        if (data.keyData !== null) {
+          if (data.keyData.reusable || !data.keyData.used) {
+            queueMsg({
+              text: ['Key has been verified. Proceeding'],
+            });
+            cmdObj.onStep++;
+            cmdObj.data = data;
+            validCmds[cmdObj.command].steps[cmdObj.onStep](socket);
+          } else {
+            queueMsg({
+              text: ['Key has already been used. Aborting'],
+            });
+            resetCmd(true);
+          }
+        } else {
+          queueMsg({
+            text: ['The key is invalid. Aborting'],
+          });
+          resetCmd(true);
+        }
+      },
+      function() {
+        const cmdObj = cmdHelper;
+
+        setInputStart('Enter entity name');
+        cmdObj.keysBlocked = false;
+        cmdObj.onStep++;
+      },
+      function(phrases) {
+        const cmdObj = cmdHelper;
+        const data = cmdObj.data;
+        const phrase = phrases.join(' ');
+
+        data.entityName = phrase.toLowerCase();
+        data.userName = getUser();
+        socket.emit('unlockEntity', data);
+        queueMsg({
+          text: [
+            'Unlocking entity. Please wait...',
+          ],
+        });
+        cmdObj.keysBlocked = true;
+      },
+      function(entity) {
+        if (entity !== null) {
+          queueMsg({
+            text: [
+              'Confirmed. Encryption key has been used on the entity',
+              entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
+              'Thank you for using EHA',
+            ],
+          });
+        } else {
+          queueMsg({
+            text: [
+              'Failed',
+              'Encryption key could not be used on entity.',
+              'Aborting',
+            ],
+          });
+        }
+
+        resetCmd(true);
+      },
+    ],
+    help: [
+      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
+      'Allows you to input an encryption key and use it to unlock an entity',
+    ],
+    instructions: [
+      'Follow the on-screen instructions',
+    ],
+    clearBeforeUse: true,
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.history = {
+    func: function(phrases) {
+      const data = {};
+
+      data.lines = phrases[0];
+      data.device = getDeviceId();
+
+      socket.emit('history', data);
+    },
+    help: [
+      'Clears the screen and retrieves chat messages from server',
+      'The amount you send with the command is the amount of messages that will be returned from each room you follow',
+    ],
+    instructions: [
+      ' Usage:',
+      '  history *optional number*',
+      ' Example:',
+      '  history',
+      '  history 25',
+    ],
+    clearAfterUse: true,
+    clearBeforeUse: true,
+    accessLevel: 1,
+    category: 'advanced',
+  };
+  validCmds.morse = {
+    func: function(phrases, local) {
+      let morseCodeText = '';
+      let morseCode;
+
+      if (phrases && phrases.length > 0) {
+        let filteredText = phrases.join(' ').toLowerCase();
+
+        filteredText = filteredText.replace(/[åä]/g, 'a');
+        filteredText = filteredText.replace(/[ö]/g, 'o');
+        filteredText = filteredText.replace(/\s/g, '#');
+        filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
+
+        for (let i = 0; i < filteredText.length; i++) {
+          morseCode = morseCodes[filteredText.charAt(i)];
+
+          for (let j = 0; j < morseCode.length; j++) {
+            morseCodeText += morseCode[j] + ' ';
+          }
+
+          morseCodeText += '   ';
+        }
+
+        if (morseCodeText.length > 0) {
+          socket.emit('morse', {
+            morseCode: morseCodeText,
+            local: local,
+          });
+        }
+      }
+    },
+    help: [
+      'Sends a morse encoded message (sound) to everyone in the room',
+    ],
+    instructions: [
+      ' Usage:',
+      '  morse *message*',
+      ' Example:',
+      '  morse sos',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.password = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases && phrases.length > 1) {
+        data.oldPassword = phrases[0];
+        data.newPassword = phrases[1];
+        data.userName = getUser();
+
+        if (data.newPassword.length >= 4) {
+          socket.emit('changePassword', data);
+        } else {
+          queueMsg({
+            text: [
+              'You have to input the old and new password of ' +
+              'the user',
+              'Example: password old1 new1',
+            ],
+          });
+        }
+      } else {
+        queueMsg({
+          text: [
+            'You have to input the old and new password of the ' +
+            'user',
+            'Example: password old1 new1',
+          ],
+        });
+      }
+    },
+    help: [
+      'Allows you to change the user password',
+      'Password has to be 4 to 10 characters',
+      'Don\'t use whitespace in your name or password!',
+    ],
+    instructions: [
+      ' Usage:',
+      '  password *oldpassword* *newpassword*',
+      ' Example:',
+      '  password old1 new1',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.logout = {
+    func: function() {
+      socket.emit('logout');
+    },
+    help: ['Logs out from the current user'],
+    accessLevel: 13,
+    category: 'basic',
+    clearAfterUse: true,
+  };
+  validCmds.reboot = {
+    func: function() {
+      refreshApp();
+    },
+    help: ['Reboots terminal'],
+    accessLevel: 1,
+    category: 'basic',
+  };
+  validCmds.verifyuser = {
+    func: function(phrases) {
+      if (phrases.length > 0) {
+        const userName = phrases[0].toLowerCase();
+
+        if (userName === '*') {
+          socket.emit('verifyAllUsers');
+        } else {
+          socket.emit('verifyUser', userName);
+        }
+      } else {
+        socket.emit('unverifiedUsers');
+      }
+    },
+    help: [
+      'Verifies a user and allows it to connect to the system',
+      'verifyuser without any additional input will show a list of ' +
+      'all unverified users',
+      'Use "*" to verify everyone in the list',
+    ],
+    instructions: [
+      ' Usage:',
+      '  verifyuser',
+      '  verifyuser *username*',
+      '  verifyuser *',
+      ' Example:',
+      '  verifyuser',
+      '  verifyuser appl1',
+      '  verifyuser *',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.banuser = {
+    func: function(phrases) {
+      if (phrases.length > 0) {
+        const userName = phrases[0].toLowerCase();
+
+        socket.emit('ban', userName);
+      } else {
+        socket.emit('bannedUsers');
+      }
+    },
+    help: [
+      'Bans a user and disconnects it from the system',
+      'The user will not be able to log on again',
+    ],
+    instructions: [
+      ' Usage:',
+      '  banuser *username*',
+      ' Example:',
+      '  banuser evil1',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.unbanuser = {
+    func: function(phrases) {
+      if (phrases.length > 0) {
+        const userName = phrases[0].toLowerCase();
+
+        socket.emit('unban', userName);
+      } else {
+        socket.emit('bannedUsers');
+      }
+    },
+    help: [
+      'Removes ban on user',
+      'The user will be able to log on again',
+      'ubanuser without any additional input will show a list of all ' +
+      'banned users',
+    ],
+    instructions: [
+      ' Usage:',
+      '  unbanuser',
+      '  unbanuser *username*',
+      ' Example:',
+      '  unbanuser',
+      '  unbanuser evil1',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.whisper = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 1) {
+        data.message = {};
+        data.message.roomName = phrases[0].toLowerCase();
+        data.message.text = [phrases.slice(1).join(' ')];
+        data.message.userName = getUser();
+        data.message.whisper = true;
+
+        socket.emit('chatMsg', data);
+      } else {
+        queueMsg({
+          text: ['You forgot to write the message!'],
+        });
+      }
+    },
+    help: [
+      'Send a private message to a specific user',
+      'The first word that you write will be interpreted as a user name',
+      'The rest of the input will be sent to only that user',
+    ],
+    instructions: [
+      ' Usage:',
+      '  whisper *user name* *message*',
+      ' Example:',
+      '  whisper adam hello, adam!',
+      '  whisper user1 sounds good!',
+    ],
+    clearAfterUse: true,
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.hackroom = {
+    func: function(phrases) {
+      const data = {};
+      const razLogoCopy = copyMsg(razLogo);
+
+      if (phrases.length > 0) {
+        data.roomName = phrases[0].toLowerCase();
+        data.timesCracked = 0;
+        data.timesRequired = 3;
+        cmdHelper.data = data;
+
+        // TODO: razLogo should be moved to DB or other place
+        queueMsg(razLogoCopy);
+        // TODO: Message about abort should be sent from a common function for all commands
+        queueMsg({
+          text: [
+            'Razor proudly presents:',
+            'Room Access Hacking! (RAH)',
+            '/8iybEVaC1yc2EAAAADAQABAAABAQDS//2ag4/',
+            'D6Rsc8OO/6wFUVDdpdAItvSCLCrc/dcE/8iybE',
+            'w3OtlVFnfNkOVAvhObuWO/6wFUVDdkr2yYTaDE',
+            'i5mB3Nz1aC1yc2buWr6QKLvfZVczAxAHPKLvfZ',
+            'dK2zXrxGOmOFllxiCbpGOmOFlcJy1/iCbpmA4c',
+            'MFvEEiKXrxGlxiCbp0miONAAvhObuWO/6ujMJH',
+            'JHa88/x1DVOFl/yujOMJHa88/x1DVwWl6lsjvS',
+            'wDDVwWl6el88/x1j5C+k/aadtg1lcvcz7Tdtve',
+            'k/aadtghxv595Xqw2qrvyp6GrdX/FrhObuWr6Q',
+            ' ',
+            'Please wait.......',
+            'Command interception.........ACTIVATED',
+            'Oracle defense systems.......DISABLED',
+            'Overriding locks.............DONE',
+            'Connecting to database ......DONE',
+            ' ',
+          ],
+        });
+        queueMsg(copyMsg(abortInfo));
+        queueMsg({
+          text: ['Press enter to continue'],
+        });
+
+        setInputStart('Start');
+      } else {
+        queueMsg({
+          text: ['You forgot to input the room name!'],
+        });
+        resetCmd(true);
+      }
+    },
+    steps: [
+      function() {
+        queueMsg({
+          text: ['Checking room access...'],
+        });
+        socket.emit('roomHackable', cmdHelper.data.roomName);
+      },
+      function() {
+        const cmdObj = cmdHelper;
+        const timeout = 18000;
+        const timerEnded = function() {
+          queueMsg({
+            text: [
+              'Your hacking attempt has been detected',
+              'Users of the room have been notified of your intrusion',
+            ],
+          });
+          socket.emit('chatMsg', {
+            message: {
+              text: [
+                'WARNING! Intrustion attempt detected!',
+                'User ' + getUser() + ' tried breaking in',
+              ],
+              user: 'SYSTEM',
+            },
+            roomName: cmdObj.data.roomName,
+            skipSelfMsg: true,
+          });
+          resetCmd(true);
+        };
+
+        queueMsg({
+          text: [
+            'Activating cracking bot....',
+            'Warning. Intrusion defense system activated',
+            'Time until detection: ' + (timeout / 1000) + ' seconds',
+            'You will need 3 successful sequences to succeed',
+          ],
+        });
+        setInputStart('Verify seq');
+        cmdObj.data.code = createRandString(randString, 10, true);
+        cmdObj.data.timer = setTimeout(timerEnded, timeout);
+        cmdObj.onStep++;
+        queueMsg({
+          text: ['Sequence: ' + cmdObj.data.code],
+        });
+      },
+      function(phrases) {
+        const cmdObj = cmdHelper;
+        const phrase = phrases.join(' ').trim();
+
+        if (phrase.toUpperCase() === cmdObj.data.code) {
+          queueMsg({ text: ['Sequence accepted'] });
+          cmdObj.data.timesCracked++;
+        } else {
+          queueMsg({
+            text: [
+              'Incorrect sequence. Counter measures have been ' +
+              'released',
+            ],
+          });
+        }
+
+        if (cmdObj.data.timesCracked < cmdObj.data.timesRequired) {
+          cmdObj.data.code = createRandString(randString, 10, true);
+          queueMsg({
+            text: ['Sequence: ' + cmdObj.data.code],
+          });
+        } else {
+          const data = {
+            userName: getUser(),
+            roomName: cmdObj.data.roomName,
+          };
+
+          clearTimeout(cmdObj.data.timer);
+          socket.emit('hackRoom', data);
+          queueMsg(({
+            text: [
+              'Cracking complete',
+              'Intrusion defense system disabled',
+              'Suppressing notification and following room',
+              'Thank you for using RAH',
+            ],
+          }));
+          resetCmd();
+        }
+      },
+    ],
+    abortFunc: function() {
+      clearTimeout(cmdHelper.data.timer);
+    },
+    help: [
+      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
+      'PRINTING INSTRUCTIONS',
+      'This command lets you follow a room without knowing the password',
+      'It will also supress the following notification',
+      'Failing the hack will warn everyone in the room',
+    ],
+    instructions: [
+      ' Usage:',
+      '  hackroom *room name*',
+      ' Example:',
+      '  hackroom secret',
+    ],
+    clearBeforeUse: true,
+    accessLevel: 13,
+    category: 'hacking',
+  };
+  validCmds.importantmsg = {
+    func: function() {
+      const data = {};
+
+      data.text = [];
+      cmdHelper.data = data;
+
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
+        text: [
+          'Do you want to send it to a specific device?',
+          'Enter the device ID or alias to send it to a specific device',
+          'Leave it empty and press enter if you want to send it to ' +
+          'all users',
+        ],
+      });
+      setInputStart('imprtntMsg');
+    },
+    steps: [
+      function(phrases) {
+        if (phrases.length > 0) {
+          const device = phrases[0];
+
+          if (device.length > 0) {
+            cmdHelper.data.device = device;
+            queueMsg({
+              text: ['Searching for device...'],
+            });
+            socket.emit('verifyDevice', cmdHelper.data);
+          } else {
+            cmdHelper.onStep++;
+            validCmds[cmdHelper.command].steps[cmdHelper.onStep]();
+          }
+        }
+      },
+      function() {
+        cmdHelper.onStep++;
+        queueMsg({
+          text: [
+            'Write a line and press enter',
+            'Press enter without any input when you are done ' +
+            'with the message',
+            'Try to keep the first line short if you want to send it as morse',
+          ],
+        });
+      },
+      function(phrases) {
+        if (phrases.length > 0 && phrases[0] !== '') {
+          const phrase = phrases.join(' ');
+
+          cmdHelper.data.text.push(phrase);
+        } else {
+          const dataText = copyString(cmdHelper.data.text);
+          cmdHelper.onStep++;
+
+          queueMsg({
+            text: ['Preview of the message:'],
+          });
+          queueMsg({
+            text: dataText,
+            extraClass: 'importantMsg',
+          });
+          queueMsg({
+            text: ['Is this OK? "yes" to accept the message'],
+          });
+        }
+      },
+      function(phrases) {
+        if (phrases.length > 0) {
+          if (phrases[0].toLowerCase() === 'yes') {
+            cmdHelper.onStep++;
+
+            queueMsg({
+              text: [
+                'Do you want to send it as morse code too? ' +
+                '"yes" to send it as morse too',
+                'Note! Only the first line will be sent as morse',
+              ],
+            });
+          } else {
+            resetCmd(true);
+          }
+        }
+      },
+      function(phrases) {
+        if (phrases.length > 0) {
+          if (phrases[0].toLowerCase() === 'yes') {
+            cmdHelper.data.morse = { local: true };
+          }
+
+          socket.emit('importantMsg', cmdHelper.data);
+          resetCmd();
+        }
+      },
+    ],
+    help: [
+      'Send an important message to a single device or all users',
+    ],
+    instructions: [
+      'Follow the on-screen instructions',
+      'Note! Only the first line can be sent as morse code (optional)',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.chipper = {
+    func: function() {
+      queueMsg({
+        text: [
+          createLine(14),
+          '- DEACTIVATE -',
+          createLine(14),
+        ],
+        extraClass: 'importantMsg large',
+      });
+      queueMsg({
+        text: [
+          'CONTROL WORD SENT',
+          'AWAITING CONFIRMATION',
+        ],
+        extraClass: 'importantMsg',
+      });
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
+        text: ['Press Enter to continue'],
+      });
+      setInputStart('Chipper');
+    },
+    steps: [
+      function() {
+        const cmdObj = cmdHelper;
+
+        cmdObj.onStep++;
+        queueMsg({
+          text: [
+            'Chipper has been activated',
+            'Connecting to ECU.........',
+          ],
+        });
+        setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 2000);
+      },
+      function() {
+        const cmdObj = cmdHelper;
+        const stopFunc = function() {
+          queueMsg({
+            text: [
+              'WARNING',
+              'CONTROL IS BEING RELEASED',
+              'CHIPPER POWERING DOWN',
+            ],
+            extraClass: 'importantMsg',
+          });
+
+          validCmds[cmdObj.command].abortFunc();
+        };
+
+        if (cmdObj.data.timer === undefined) {
+          cmdObj.data.timer = setTimeout(stopFunc, 300000, false);
+        }
+
+        queueMsg({
+          text: [createRandString(randBinary, 36)],
+        });
+
+        cmdObj.data.printTimer = setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 250);
+      },
+    ],
+    abortFunc: function() {
+      const cmdObj = cmdHelper;
+
+      clearTimeout(cmdObj.data.printTimer);
+      clearTimeout(cmdObj.data.timer);
+      validCmds.clear.func();
+      queueMsg({
+        text: [
+          'Chipper has powered down',
+          'Control has been released',
+        ],
+      });
+      resetCmd();
+    },
+    help: [
+      'Activate chipper function',
+      'Press enter when you have retrieved confirmation from the ECU',
+    ],
+    instructions: [
+      'Follow the instructions on the screen',
+      'The chipper will shutdown and release control after 5 minutes',
+    ],
+    accessLevel: 13,
+    category: 'hacking',
+    clearBeforeUse: true,
+  };
+  validCmds.room = {
+    func: function(phrases) {
+      const room = {};
+
+      if (phrases.length > 0) {
+        const roomName = phrases[0].toLowerCase();
+
+        if (roomName) {
+          room.roomName = roomName;
+
+          /**
+           * Flag that will be used in .on function locally to
+           * show user they have entered
+           */
+          room.entered = true;
+
+          socket.emit('switchRoom', room);
+        }
+      } else {
+        queueMsg({
+          text: ['You have to specify which room to switch to'],
+        });
+      }
+    },
+    help: [
+      'Switches your current room to another',
+      'You have to already be following the room to switch to it',
+    ],
+    instructions: [
+      ' Usage:',
+      '  room *room you are following*',
+      ' Example:',
+      '  room room1',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.removeroom = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 0) {
+        data.roomName = phrases[0].toLowerCase();
+        cmdHelper.data = data;
+
+        queueMsg({
+          text: [
+            'Do you really want to remove the room?',
+            'Confirm by writing "yes"',
+          ],
+        });
+
+        setInputStart('removeroom');
+      } else {
+        resetCmd(true);
+
+        queueMsg({
+          text: ['You forgot to input the room name'],
+        });
+      }
+    },
+    steps: [
+      function(phrases) {
+        if (phrases[0].toLowerCase() === 'yes') {
+          socket.emit('removeRoom', cmdHelper.data.roomName);
+        }
+
+        resetCmd();
+      },
+    ],
+    help: [
+      'Removes a room',
+      'You have to be either the owner or an admin of the room to remove it',
+    ],
+    instructions: [
+      ' Usage:',
+      '  removeroom *room name*',
+      '  *Follow the instructions*',
+      ' Example:',
+      '  removeroom room1',
+      '  *Follow the instructions*',
+    ],
+    accessLevel: 13,
+    category: 'advanced',
+  };
+  validCmds.updateuser = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 2) {
+        data.user = phrases[0];
+        data.field = phrases[1];
+        data.value = phrases[2];
+
+        socket.emit('updateUser', data);
+      } else {
+        queueMsg({
+          text: [
+            'You need to write a user name, field name and value',
+            'Example: updateuser user1 accesslevel 3',
+          ],
+        });
+      }
+    },
+    help: [
+      'Change fields on a user',
+      'You can change visibility, accesslevel, password or add/remove a group',
+      'Valid fields: visibility, accesslevel, addgroup, removegroup, password',
+    ],
+    instructions: [
+      ' Usage:',
+      '  updateuser *user name* *field name* *value*',
+      ' Example:',
+      '  updateuser user1 accesslevel 3',
+      '  updateuser user1 group hackers',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.updatecommand = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 2) {
+        data.cmdName = phrases[0];
+        data.field = phrases[1];
+        data.value = phrases[2];
+
+        socket.emit('updateCommand', data);
+      } else {
+        queueMsg({
+          text: [
+            'You need to write a command name, field name and value',
+            'Example: updatecommand help accesslevel 3',
+          ],
+        });
+      }
+    },
+    help: [
+      'Change fields on a command',
+      'You can currently change visibility or accesslevel',
+    ],
+    instructions: [
+      ' Usage:',
+      '  updatecommand *command name* *field name* *value*',
+      ' Example:',
+      '  updatecommand help accesslevel 3',
+      '  updatecommand help visibility 6',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.updateroom = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 2) {
+        data.room = phrases[0];
+        data.field = phrases[1];
+        data.value = phrases[2];
+
+        socket.emit('updateRoom', data);
+      } else {
+        queueMsg({
+          text: [
+            'You need to write a room name, field name and value',
+            'Example: updateroom room1 accesslevel 3',
+          ],
+        });
+      }
+    },
+    help: [
+      'Change fields on a room',
+      'You can change visibility, accesslevel',
+      'Valid fields: visibility, accesslevel',
+    ],
+    instructions: [
+      ' Usage:',
+      '  updateroom *room name* *field name* *value*',
+      ' Example:',
+      '  updateroom user1 accesslevel 3',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.addencryptionkeys = {
+    func: function() {
+      const data = {};
+
+      data.keys = [];
+      cmdHelper.data = data;
+
+      queueMsg({
+        text: createCmdStart('Add encryption keys').concat([
+          'You can add more than one key',
+          'Press enter without any input when you are done',
+        ]),
+      });
+      queueMsg(copyMsg(abortInfo));
+      queueMsg({
+        text: ['Input an encryption key:'],
+      });
+      setInputStart('Input key');
+    },
+    steps: [
+      function(phrases) {
+        const keyObj = {};
+
+        if (phrases.length > 0 && phrases[0] !== '') {
+          keyObj.key = phrases[0];
+
+          // TODO Remove hard coded reusable
+          if (phrases[1] && phrases[1].toLowerCase() === 'reusable') {
+            keyObj.reusable = true;
+          }
+
+          cmdHelper.data.keys.push(keyObj);
+        } else {
+          queueMsg({
+            text: [
+              'Are you sure you want to add the keys?',
+              'Write "yes" to accept',
+            ],
+          });
+          cmdHelper.onStep++;
+        }
+      },
+      function(phrases) {
+        if (phrases[0].toLowerCase() === 'yes') {
+          queueMsg({
+            text: ['Uploading new keys...'],
+          });
+          socket.emit('addKeys', cmdHelper.data.keys);
+          resetCmd();
+        } else {
+          queueMsg({
+            text: ['The keys will not be uploaded'],
+          });
+          resetCmd(true);
+        }
+      },
+    ],
+    help: [
+      'Add one or more encryption keys to the database',
+    ],
+    instructions: [
+      ' Usage:',
+      '  Follow the instructions',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+    clearBeforeUse: true,
+  };
+  validCmds.addentities = {
+    func: function() {
+      const data = {};
+
+      data.entities = [];
+      cmdHelper.data = data;
+
+      queueMsg({
+        text: createCmdStart('Add entities').concat([
+          'You can add more than one entity',
+          'Press enter without any input when you are done',
+        ]),
+      });
+      queueMsg(copyMsg(abortInfo));
+      setInputStart('Input entity');
+    },
+    steps: [
+      function(phrases) {
+        const entityObj = {};
+
+        if (phrases.length > 0 && phrases[0] !== '') {
+          entityObj.entityName = phrases[0];
+
+          cmdHelper.data.entities.push(entityObj);
+        } else {
+          queueMsg({
+            text: [
+              'Are you sure you want to add the entities?',
+              'Write "yes" to accept',
+            ],
+          });
+          cmdHelper.onStep++;
+        }
+      },
+      function(phrases) {
+        if (phrases[0].toLowerCase() === 'yes') {
+          queueMsg({
+            text: ['Uploading new entities...'],
+          });
+          socket.emit('addEntities', cmdHelper.data.entities);
+          resetCmd();
+        } else {
+          queueMsg({
+            text: ['The entities will not be uploaded'],
+          });
+          resetCmd(true);
+        }
+      },
+    ],
+    help: [
+      'Add one or more entities to the database',
+    ],
+    instructions: [
+      ' Usage:',
+      '  Follow the instructions',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+    clearBeforeUse: true,
+  };
+  validCmds.weather = {
+    func: function() {
+      socket.emit('weather');
+    },
+    accessLevel: 1,
+    category: 'basic',
+  };
+  validCmds.updatedevice = {
+    func: function(phrases) {
+      const data = {};
+
+      if (phrases.length > 2) {
+        data.deviceId = phrases[0];
+        data.field = phrases[1];
+        data.value = phrases[2];
+
+        socket.emit('updateDevice', data);
+      } else {
+        queueMsg({
+          text: [
+            'You need to write a device Id, field name and value',
+            'Example: updatedevice 11jfej433 id betteralias',
+          ],
+        });
+      }
+    },
+    help: [
+      'Change fields on a device',
+      'You can currently change the alias',
+      'Valid fields: alias',
+    ],
+    instructions: [
+      ' Usage:',
+      '  updatedevice *device ID* *field name* *value*',
+      ' Example:',
+      '  updatedevice 32r23rj alias betteralias',
+    ],
+    accessLevel: 13,
+    category: 'admin',
+  };
+  validCmds.moduleraid = {
+    func: function() {
+      const data = {};
+
+      data.text = [];
+      cmdHelper.data = data;
+
+      queueMsg({
+        text: [
+          'Write a coordinate and press enter',
+          'Press enter without any input when you are done ' +
+          'with the message',
+        ],
+      });
+      queueMsg(copyMsg(abortInfo));
+      setInputStart('moduleraid');
+    },
+    steps: [
+      function(phrases) {
+        const startText = [
+          'Celestial activity detected!',
+          'Satellite have visual confirmation of active modules',
+          'Sending Organica retrieval squads to the following coordinates:',
+        ];
+
+        if (phrases.length > 0 && phrases[0] !== '') {
+          const phrase = phrases.join(' ');
+
+          cmdHelper.data.text.push(phrase);
+        } else {
+          const text = cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : [];
+          cmdHelper.data.text = text.concat(startText, cmdHelper.data.text);
+          cmdHelper.onStep++;
+
+          queueMsg({
+            text: ['Preview of the message:'],
+          });
+          queueMsg({
+            text: text,
+            extraClass: 'importantMsg',
+          });
+          queueMsg({
+            text: ['Is this OK? "yes" to accept the message'],
+          });
+        }
+      },
+      function(phrases) {
+        if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
+          cmdHelper.data.morse = { local: true };
+          socket.emit('importantMsg', cmdHelper.data);
+          resetCmd();
+        } else {
+          resetCmd(true);
+        }
+      },
+    ],
+    help: [
+      'Send a module raid message to all users',
+      'It will look like an important message',
+    ],
+    instructions: [
+      'Follow the on-screen instructions',
+    ],
+    accessLevel: 13,
+    clearAfterUse: true,
+    category: 'admin',
+  };
+  validCmds.createteam = {
+    func: function(phrases) {
+      const teamName = phrases[0];
+      const data = {};
+      const team = {};
+
+      if (teamName) {
+        team.teamName = teamName;
+        team.owner = getUser();
+        data.team = team;
+
+        socket.emit('createTeam', data);
+      } else {
+        queueMsg({
+          text: ['You have to enter a name'],
+        });
+      }
+    },
+    help: [
+      'Create a new team',
+      'You will be able to invite new members to the team',
+    ],
+    instructions: [
+      ' Usage:',
+      '  createteam *name*',
+      ' Example:',
+      '  createteam team1',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.inviteteam = {
+    func: function(phrases) {
+      const data = {};
+      const userName = phrases[0];
+
+      if (userName) {
+        data.userName = userName;
+        socket.emit('inviteToTeam', data);
+      } else {
+        queueMsg({
+          text: ['You are not allowed to invite members to the team or you are not in a team'],
+        });
+      }
+    },
+    help: [
+      'Invites another user to your team',
+      'You have to be the team leader or an team administrator to invite new members',
+    ],
+    instructions: [
+      ' Usage:',
+      '  inviteteam *user name*',
+      ' Example:',
+      '  inviteteam barry',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCmds.alias = {
+    func: function(phrases) {
+      const aliasName = phrases.shift();
+      const sequence = phrases;
+      const aliases = getAliases();
+      const cmdKeys = Object.keys(validCmds);
+
+      if (aliasName && sequence && cmdKeys.indexOf(aliasName) === -1) {
+        aliases[aliasName] = sequence;
+        setAliases(aliases);
+      } else if (cmdKeys.indexOf(aliasName) > -1) {
+        queueMsg({
+          text: [aliasName + ' is a built-in command. You may not override built-in commands'],
+        });
+      } else {
+        queueMsg({
+          text: [
+            'You have to input a name and sequence',
+            'E.g. alias goodalias msg hello',
+          ],
+        });
+      }
+    },
+    help: [
+      'Create a new shortcut for a command and sequence',
+      'The shortcut will appear among other commands when you auto-complete',
+      'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"',
+    ],
+    instructions: [
+      ' Usage:',
+      '  alias *alias name* *command name* *sequence*',
+      ' Example:',
+      '  alias hello msg Greetings to all!',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+}
+
 // Sets everything relevant when a user enters the site
 function startBoot() {
+  oldAndroid = isOldAndroid();
+
   downgrade();
+  attachCommands();
   socket.emit('getCommands');
 
   // TODO: Move this
@@ -3895,16 +3782,16 @@ function startBoot() {
     printStartMsg();
     setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
-      deviceId : getDeviceId(),
-      socketId : socket.id,
-      user : 'NO_USER_LOGGED_IN'
+      deviceId: getDeviceId(),
+      socketId: socket.id,
+      user: 'NO_USER_LOGGED_IN',
     });
   }
 
   socket.emit('updateId', {
-    userName : getUser(),
-    firstConnection : true,
-    device : getDeviceId()
+    userName: getUser(),
+    firstConnection: true,
+    device: getDeviceId(),
   });
 }
 

@@ -21,19 +21,18 @@ let appSpecific;
  */
 function watchPrivate() {
   // fs.watch is unstable. Recursive only works in OS X.
-  fs.watch(serverConfig.privateBase, { persistant : true, recursive : true }, function(triggeredEvent, filePath) {
+  fs.watch(serverConfig.privateBase, { persistant: true, recursive: true }, function(triggeredEvent, filePath) {
     const fullPath = path.join(serverConfig.privateBase, filePath);
 
-    if (('rename' === triggeredEvent || 'change' === triggeredEvent)
-        && '.tmp' !== path.extname(fullPath) && 0 > fullPath.indexOf('___')) {
+    if ((triggeredEvent === 'rename' || triggeredEvent === 'change') && path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0 && fullPath.indexOf('-transpile') < 0) {
       fs.readFile(fullPath, function(err) {
         if (err) {
           logger.sendErrorMsg(logger.ErrorCodes.general, 'fs.watch error. Automatic update of changed files disabled');
+
           return;
         }
 
-        minifier.minifyFile(
-          fullPath, path.join(serverConfig.publicBase, filePath));
+        minifier.minifyFile(fullPath, path.join(serverConfig.publicBase, filePath));
         logger.sendInfoMsg('Event: ' + triggeredEvent + '. File: ' + fullPath);
       });
     }
@@ -47,8 +46,7 @@ try {
    */
   appSpecific = require('./appSpecific');
 } catch (e) {
-  logger.sendErrorMsg(logger.ErrorCodes.general,
-    'appSpecific.js is missing. Check the documentation (code or standalone) for more information');
+  logger.sendErrorMsg(logger.ErrorCodes.general, 'appSpecific.js is missing. Check the documentation (code or standalone) for more information');
   throw e;
 }
 
@@ -57,8 +55,7 @@ app.io = socketIo();
 // view engine setup
 app.set('views', path.join(__dirname, serverConfig.publicBase, serverConfig.paths.views));
 app.set('view engine', 'html');
-app.engine('html', require('hbs').__express); //eslint-disable-line no-underscore-dangle
-
+app.engine('html', require('hbs').__express);
 app.use(compression());
 
 // Logging

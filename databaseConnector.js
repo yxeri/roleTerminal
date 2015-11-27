@@ -19,83 +19,83 @@ mongoose.connect(dbPath, function(err) {
 // 1 / 3 / 5 / 7 / 9 / 11
 
 const userSchema = new mongoose.Schema({
-  userName : { type : String, unique : true },
-  password : String,
-  socketId : String,
-  accessLevel : { type : Number, default : 1 },
-  visibility : { type : Number, default : 1 },
-  rooms : [{ type : String, unique : true }],
-  position : {},
-  lastOnline : Date,
-  verified : { type : Boolean, default : false },
-  banned : { type : Boolean, default : false },
-  online : { type : Boolean, default : false },
-  registerDevice : String,
-  team : String,
-  authGroups : [{ type : String, unique : true }],
-  mode : String
-}, { collection : 'users' });
+  userName: { type: String, unique: true },
+  password: String,
+  socketId: String,
+  accessLevel: { type: Number, default: 1 },
+  visibility: { type: Number, default: 1 },
+  rooms: [{ type: String, unique: true }],
+  position: {},
+  lastOnline: Date,
+  verified: { type: Boolean, default: false },
+  banned: { type: Boolean, default: false },
+  online: { type: Boolean, default: false },
+  registerDevice: String,
+  team: String,
+  authGroups: [{ type: String, unique: true }],
+  mode: String,
+}, { collection: 'users' });
 const roomSchema = new mongoose.Schema({
-  roomName : { type : String, unique : true },
-  password : { type : String, default : '' },
-  accessLevel : { type : Number, default : 1 },
-  visibility : { type : Number, default : 1 },
-  commands : [{
-    commandName : String,
-    accessLevel : Number,
-    requireAdmin : Boolean
+  roomName: { type: String, unique: true },
+  password: { type: String, default: '' },
+  accessLevel: { type: Number, default: 1 },
+  visibility: { type: Number, default: 1 },
+  commands: [{
+    commandName: String,
+    accessLevel: Number,
+    requireAdmin: Boolean,
   }],
-  admins : [{ type : String, unique : true }],
-  bannedUsers : [{ type : String, unique : true }],
-  owner : String,
-  team : String
-}, { collection : 'rooms' });
+  admins: [{ type: String, unique: true }],
+  bannedUsers: [{ type: String, unique: true }],
+  owner: String,
+  team: String,
+}, { collection: 'rooms' });
 const historySchema = new mongoose.Schema({
-  roomName : { type : String, unique : true },
-  messages : [{
-    text : [String],
-    time : Date,
-    userName : String,
-    roomName : String
-  }]
-}, { collection : 'histories' });
+  roomName: { type: String, unique: true },
+  messages: [{
+    text: [String],
+    time: Date,
+    userName: String,
+    roomName: String,
+  }],
+}, { collection: 'histories' });
 const commandSchema = new mongoose.Schema({
-  commandName : String,
-  accessLevel : Number,
-  visibility : Number,
-  authGroup : String,
-  category : String
-}, { collection : 'commands' });
+  commandName: String,
+  accessLevel: Number,
+  visibility: Number,
+  authGroup: String,
+  category: String,
+}, { collection: 'commands' });
 const schedEventSchema = new mongoose.Schema({
-  receiverName : String,
-  func : {},
-  createdAt : Date,
-  endAt : Date
-}, { collection : 'events' });
+  receiverName: String,
+  func: {},
+  createdAt: Date,
+  endAt: Date,
+}, { collection: 'events' });
 const deviceSchema = new mongoose.Schema({
-  deviceId : { type : String, unique : true },
-  socketId : String,
-  alias : { type : String, unique : true },
-  lastUser : String
-}, { collection : 'devices' });
+  deviceId: { type: String, unique: true },
+  socketId: String,
+  alias: { type: String, unique: true },
+  lastUser: String,
+}, { collection: 'devices' });
 const teamSchema = new mongoose.Schema({
-  teamName : String,
-  owner : String,
-  admins : [{type : String, unique : true}]
-}, { collection : 'teams' });
+  teamName: String,
+  owner: String,
+  admins: [{ type: String, unique: true }],
+}, { collection: 'teams' });
 
 // Blodsband specific schemas
 const entitySchema = new mongoose.Schema({
-  entityName : { type : String, unique : true },
-  keys : [String],
-  verified : [Boolean]
-}, { collection : 'entities' });
+  entityName: { type: String, unique: true },
+  keys: [String],
+  verified: [Boolean],
+}, { collection: 'entities' });
 const encryptionKeySchema = new mongoose.Schema({
-  key : { type : String, unique : true },
-  used : Boolean,
-  usedBy : String,
-  reusable : Boolean
-}, { collection : 'encryptionKeys' });
+  key: { type: String, unique: true },
+  used: Boolean,
+  usedBy: String,
+  reusable: Boolean,
+}, { collection: 'encryptionKeys' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -110,7 +110,7 @@ const Entity = mongoose.model('Entity', entitySchema);
 const EncryptionKey = mongoose.model('EncryptionKey', encryptionKeySchema);
 
 function updateUserValue(userName, update, callback) {
-  const query = { userName : userName };
+  const query = { userName: userName };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -132,19 +132,19 @@ function saveObject(object, objectName, callback) {
 }
 
 function updateUserTeam(userName, value, callback) {
-  const update = { team : value };
+  const update = { team: value };
 
   updateUserValue(userName, update, callback);
 }
 
 function addTeam(team, callback) {
   const newTeam = new Team(team);
-  const query = { teamName : team.teamName };
+  const query = { teamName: team.teamName };
 
   Team.findOne(query).lean().exec(function(err, foundTeam) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find a team', err);
-    } else if (null === foundTeam) {
+    } else if (foundTeam === null) {
       saveObject(newTeam, 'team', callback);
     } else {
       callback(err, null);
@@ -158,7 +158,7 @@ function addEncryptionKeys(keys, callback) {
   const findCallback = function(err, foundKey) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find an encryption key', err);
-    } else if (null === foundKey) {
+    } else if (foundKey === null) {
       saveObject(newKey, 'encryption key', callback);
     } else {
       callback(err, null);
@@ -168,19 +168,19 @@ function addEncryptionKeys(keys, callback) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     newKey = new EncryptionKey(key);
-    const query = { key : key.key };
+    const query = { key: key.key };
 
     EncryptionKey.findOne(query).lean().exec(findCallback);
   }
 }
 
 function updateDeviceAlias(deviceId, value, callback) {
-  const query = { deviceId : deviceId };
-  const update = { $set : { alias : value } };
-  const options = { new : true };
+  const query = { deviceId: deviceId };
+  const update = { $set: { alias: value } };
+  const options = { new: true };
 
   Device.findOneAndUpdate(query, update, options).lean().exec(
-    function (err, device) {
+    function(err, device) {
       if (err) {
         logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update device Id', err);
       }
@@ -191,24 +191,26 @@ function updateDeviceAlias(deviceId, value, callback) {
 }
 
 function updateDeviceSocketId(deviceId, socketId, user, callback) {
-  const query = { deviceId : deviceId };
-  const update = { $set : {
-    socketId : socketId,
-    lastUser : user
-  } };
-  const options = { new : true };
+  const query = { deviceId: deviceId };
+  const update = {
+    $set: {
+      socketId: socketId,
+      lastUser: user,
+    },
+  };
+  const options = { new: true };
 
   Device.findOneAndUpdate(query, update, options).lean().exec(
-    function (err, device) {
+    function(err, device) {
       if (err) {
         logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update device socket Id', err);
         callback(err, null);
-      } else if (null === device) {
+      } else if (device === null) {
         const newDevice = new Device({
-          deviceId : deviceId,
-          socketId : socketId,
-          lastUser : user,
-          alias : deviceId
+          deviceId: deviceId,
+          socketId: socketId,
+          lastUser: user,
+          alias: deviceId,
         });
 
         saveObject(newDevice, 'device', callback);
@@ -220,9 +222,9 @@ function updateDeviceSocketId(deviceId, socketId, user, callback) {
 }
 
 function updateCommandVisibility(cmdName, value, callback) {
-  const query = { commandName : cmdName };
-  const update = { $set : { visibility : value } };
-  const options = { new : true };
+  const query = { commandName: cmdName };
+  const update = { $set: { visibility: value } };
+  const options = { new: true };
 
   Command.findOneAndUpdate(query, update, options).lean().exec(
     function(err, cmd) {
@@ -236,9 +238,9 @@ function updateCommandVisibility(cmdName, value, callback) {
 }
 
 function updateCommandAccessLevel(cmdName, value, callback) {
-  const query = { commandName : cmdName };
-  const update = { $set : { accessLevel : value } };
-  const options = { new : true };
+  const query = { commandName: cmdName };
+  const update = { $set: { accessLevel: value } };
+  const options = { new: true };
 
   Command.findOneAndUpdate(query, update, options).lean().exec(
     function(err, cmd) {
@@ -252,8 +254,8 @@ function updateCommandAccessLevel(cmdName, value, callback) {
 }
 
 function addGroupToUser(userName, group, callback) {
-  const query = { userName : userName };
-  const update = { $push : { group : group } };
+  const query = { userName: userName };
+  const update = { $push: { group: group } };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -274,7 +276,7 @@ function addEntities(entities, callback) {
   const findCallback = function(err, foundEntity, newEntity) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find an entity', err);
-    } else if (null === foundEntity) {
+    } else if (foundEntity === null) {
       saveObject(newEntity, 'entity', callback);
     } else {
       callback(err, null);
@@ -283,7 +285,7 @@ function addEntities(entities, callback) {
 
   for (let i = 0; i < entities.length; i++) {
     const entity = entities[i];
-    const query = { entityName : entity.entityName };
+    const query = { entityName: entity.entityName };
     const newEntity = new Entity(entity);
 
     addEntity(query, newEntity, findCallback);
@@ -291,21 +293,21 @@ function addEntities(entities, callback) {
 }
 
 function unlockEntity(sentKey, sentEntityName, sentUserName, callback) {
-  const keyQuery = { key : sentKey};
-  const keyUpdate = { used : true, usedBy : sentUserName };
+  const keyQuery = { key: sentKey };
+  const keyUpdate = { used: true, usedBy: sentUserName };
 
   EncryptionKey.findOneAndUpdate(keyQuery, keyUpdate).lean().exec(function(err, key) {
-    if (err || null === key) {
+    if (err || key === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update key ' + sentKey, err);
       callback(err, null);
     } else if (key.reusable || !key.used) {
-      const entityQuery = { entityName : sentEntityName };
-      const entityUpdate = { $push : { keys : key.key } };
+      const entityQuery = { entityName: sentEntityName };
+      const entityUpdate = { $push: { keys: key.key } };
 
       Entity.findOneAndUpdate(entityQuery, entityUpdate).lean().exec(function(entityErr, entity) {
-        if (entityErr || null === entity) {
-          const rollbackQuery = { key : sentKey };
-          const rollbackUpdate = { used : false, usedBy : '' };
+        if (entityErr || entity === null) {
+          const rollbackQuery = { key: sentKey };
+          const rollbackUpdate = { used: false, usedBy: '' };
 
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find and update entity', entityErr);
 
@@ -329,11 +331,11 @@ function unlockEntity(sentKey, sentEntityName, sentUserName, callback) {
 }
 
 function getAllEntities(callback) {
-  const sort = { entityName : 1 };
-  const filter = { _id : 0 };
+  const sort = { entityName: 1 };
+  const filter = { _id: 0 };
 
   Entity.find({}, filter).sort(sort).lean().exec(function(err, entities) {
-    if (err || null === entities) {
+    if (err || entities === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all entities', err);
     }
 
@@ -342,10 +344,10 @@ function getAllEntities(callback) {
 }
 
 function getAllCommands(callback) {
-  const filter = { _id : 0 };
+  const filter = { _id: 0 };
 
   Command.find({}, filter).lean().exec(function(err, commands) {
-    if (err || null === commands) {
+    if (err || commands === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all command', err);
     }
 
@@ -354,8 +356,8 @@ function getAllCommands(callback) {
 }
 
 function getEncryptionKey(sentKey, callback) {
-  const query = { key : sentKey };
-  const filter = { _id : 0 };
+  const query = { key: sentKey };
+  const filter = { _id: 0 };
 
   EncryptionKey.findOne(query, filter).lean().exec(function(err, key) {
     if (err) {
@@ -367,17 +369,17 @@ function getEncryptionKey(sentKey, callback) {
 }
 
 function getUserByDevice(deviceCode, callback) {
-  const query = { $or : [{ deviceId : deviceCode }, { alias : deviceCode }] };
+  const query = { $or: [{ deviceId: deviceCode }, { alias: deviceCode }] };
 
   Device.findOne(query).lean().exec(function(err, device) {
-    if (err || null === device) {
+    if (err || device === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get device', err);
       callback(err, null);
     } else {
-      const userQuery = { socketId : device.socketId };
+      const userQuery = { socketId: device.socketId };
 
       User.findOne(userQuery).lean().exec(function(userErr, user) {
-        if (userErr || null === user) {
+        if (userErr || user === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get user by device', userErr);
         }
 
@@ -388,10 +390,10 @@ function getUserByDevice(deviceCode, callback) {
 }
 
 function getDevice(deviceCode, callback) {
-  const query = { $or : [{ deviceId : deviceCode }, { alias : deviceCode }] };
+  const query = { $or: [{ deviceId: deviceCode }, { alias: deviceCode }] };
 
   Device.findOne(query).lean().exec(function(err, device) {
-    if (err || null === device) {
+    if (err || device === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get device', err);
     }
 
@@ -400,8 +402,8 @@ function getDevice(deviceCode, callback) {
 }
 
 function getUserById(sentSocketId, callback) {
-  const query = { socketId : sentSocketId };
-  const filter = { _id : 0 };
+  const query = { socketId: sentSocketId };
+  const filter = { _id: 0 };
 
   User.findOne(query, filter).lean().exec(function(err, user) {
     if (err) {
@@ -414,7 +416,7 @@ function getUserById(sentSocketId, callback) {
 
 function authUser(sentUserName, sentPassword, callback) {
   const query = {
-    $and : [{ userName : sentUserName }, { password : sentPassword }]
+    $and: [{ userName: sentUserName }, { password: sentPassword }],
   };
 
   User.findOne(query).lean().exec(function(err, user) {
@@ -427,8 +429,8 @@ function authUser(sentUserName, sentPassword, callback) {
 }
 
 function getUser(userName, callback) {
-  const query = { userName : userName };
-  const filter = { userName : 1 };
+  const query = { userName: userName };
+  const filter = { userName: 1 };
 
   User.findOne(query, filter).lean().exec(function(err, foundUser) {
     if (err) {
@@ -445,7 +447,7 @@ function addUser(user, callback) {
   getUser(user.userName, function(err, foundUser) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to check if user exists', err);
-    } else if (null === foundUser) {
+    } else if (foundUser === null) {
       saveObject(newUser, 'user', callback);
     } else {
       callback(err, null);
@@ -454,9 +456,9 @@ function addUser(user, callback) {
 }
 
 function addMsgToHistory(sentRoomName, sentMessage, callback) {
-  const query = { roomName : sentRoomName };
-  const update = { $push : { messages : sentMessage } };
-  const options = { upsert : true, new : true };
+  const query = { roomName: sentRoomName };
+  const update = { $push: { messages: sentMessage } };
+  const options = { upsert: true, new: true };
 
   History.findOneAndUpdate(query, update, options).lean().exec(function(err, history) {
     if (err) {
@@ -468,8 +470,8 @@ function addMsgToHistory(sentRoomName, sentMessage, callback) {
 }
 
 function getHistoryFromRoom(roomName, callback) {
-  const query = { roomName : roomName };
-  const filter = { 'messages._id' : 0, _id : 0 };
+  const query = { roomName: roomName };
+  const filter = { 'messages._id': 0, _id: 0 };
 
   History.find(query, filter).lean().exec(function(err, history) {
     if (err) {
@@ -481,8 +483,8 @@ function getHistoryFromRoom(roomName, callback) {
 }
 
 function getHistoryFromRooms(rooms, callback) {
-  const query = { roomName : { $in : rooms } };
-  const filter = { 'messages._id' : 0, _id : 0 };
+  const query = { roomName: { $in: rooms } };
+  const filter = { 'messages._id': 0, _id: 0 };
 
   History.find(query, filter).lean().exec(function(err, history) {
     if (err) {
@@ -494,32 +496,32 @@ function getHistoryFromRooms(rooms, callback) {
 }
 
 function updateUserSocketId(userName, value, callback) {
-  const update = { socketId : value, online : true };
+  const update = { socketId: value, online: true };
 
   updateUserValue(userName, update, callback);
 }
 
 function updateUserOnline(userName, value, callback) {
-  const update = { online : value };
+  const update = { online: value };
 
   updateUserValue(userName, update, callback);
 }
 
 function updateUserLocation(userName, sentPosition, callback) {
-  const update = { position : sentPosition };
+  const update = { position: sentPosition };
 
   updateUserValue(userName, update, callback);
 }
 
 function updateUserMode(userName, mode, callback) {
-  const update = { mode : mode };
+  const update = { mode: mode };
 
   updateUserValue(userName, update, callback);
 }
 
 function verifyUser(sentUserName, callback) {
-  const query = { userName : sentUserName };
-  const newVarupdate = { verified : true };
+  const query = { userName: sentUserName };
+  const newVarupdate = { verified: true };
 
   User.findOneAndUpdate(query, newVarupdate).lean().exec(function(err, user) {
     if (err) {
@@ -531,9 +533,9 @@ function verifyUser(sentUserName, callback) {
 }
 
 function verifyAllUsers(callback) {
-  const query = { verified : false };
-  const update = { $set : { verified : true } };
-  const options = { multi : true };
+  const query = { verified: false };
+  const update = { $set: { verified: true } };
+  const options = { multi: true };
 
   User.update(query, update, options).lean().exec(function(err) {
     if (err) {
@@ -546,7 +548,7 @@ function verifyAllUsers(callback) {
 
 function getAllDevices(callback) {
   const query = {};
-  const filter = { _id : 0 };
+  const filter = { _id: 0 };
 
   Device.find(query, filter).lean().exec(function(err, devices) {
     if (err) {
@@ -558,8 +560,8 @@ function getAllDevices(callback) {
 }
 
 function getTeam(teamName, callback) {
-  const query = { teamName : teamName };
-  const filter = { _id : 0 };
+  const query = { teamName: teamName };
+  const filter = { _id: 0 };
 
   Team.findOne(query, filter).lean().exec(function(err, team) {
     if (err) {
@@ -572,11 +574,11 @@ function getTeam(teamName, callback) {
 
 function authUserToRoom(sentUser, sentRoomName, sentPassword, callback) {
   const query = {
-    $and : [
-      { accessLevel : { $lte : sentUser.accessLevel } },
-      { roomName : sentRoomName },
-      { password : sentPassword }
-    ]
+    $and: [
+      { accessLevel: { $lte: sentUser.accessLevel } },
+      { roomName: sentRoomName },
+      { password: sentPassword },
+    ],
   };
 
   Room.findOne(query).lean().exec(function(err, room) {
@@ -591,18 +593,18 @@ function authUserToRoom(sentUser, sentRoomName, sentPassword, callback) {
 // TODO Move findOne for user to outside of the database function
 function createRoom(sentRoom, sentUser, callback) {
   const newRoom = new Room(sentRoom);
-  const newHistory = new History({ roomName : sentRoom.roomName });
+  const newHistory = new History({ roomName: sentRoom.roomName });
   let query;
 
-  if (sentUser && 11 > sentUser.accessLevel) {
+  if (sentUser && sentUser.accessLevel < 11) {
     query = {
-      $or : [
-        { roomName : sentRoom.roomName },
-        { owner : sentRoom.owner }
-      ]
+      $or: [
+        { roomName: sentRoom.roomName },
+        { owner: sentRoom.owner },
+      ],
     };
   } else {
-    query = { roomName : sentRoom.roomName };
+    query = { roomName: sentRoom.roomName };
   }
 
   // Checks if room already exists
@@ -610,7 +612,7 @@ function createRoom(sentRoom, sentUser, callback) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find if room already exists', err);
       // Room doesn't exist in the collection, so let's add it!
-    } else if (null === room) {
+    } else if (room === null) {
       // Checks if history for room already exists
       History.findOne(query).lean().exec(function(histErr, history) {
         if (histErr) {
@@ -618,9 +620,9 @@ function createRoom(sentRoom, sentUser, callback) {
             'Failed to find if history already exists', histErr
           );
           // History doesn't exist in the collection, so let's add it and the room!
-        } else if (null === history) {
+        } else if (history === null) {
           newHistory.save(function(saveErr, saveHistory) {
-            if (saveErr || null === saveHistory) {
+            if (saveErr || saveHistory === null) {
               logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to save history', saveErr);
             } else {
               newRoom.save(function(roomSaveErr, saveRoom) {
@@ -641,9 +643,9 @@ function createRoom(sentRoom, sentUser, callback) {
 }
 
 function getAllUsers(sentUser, callback) {
-  const query = { visibility : { $lte : sentUser.accessLevel } };
-  const sort = { userName : 1 };
-  const filter = { _id : 0 };
+  const query = { visibility: { $lte: sentUser.accessLevel } };
+  const sort = { userName: 1 };
+  const filter = { _id: 0 };
 
   User.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
@@ -655,8 +657,8 @@ function getAllUsers(sentUser, callback) {
 }
 
 function getRoom(sentRoomName, callback) {
-  const query = { roomName : sentRoomName };
-  const filter = { _id : 0 };
+  const query = { roomName: sentRoomName };
+  const filter = { _id: 0 };
 
   Room.findOne(query, filter).lean().exec(function(err, room) {
     if (err) {
@@ -668,9 +670,9 @@ function getRoom(sentRoomName, callback) {
 }
 
 function getOwnedRooms(sentUser, callback) {
-  const query = { owner : sentUser.userName };
-  const sort = { roomName : 1 };
-  const filter = { _id : 0 };
+  const query = { owner: sentUser.userName };
+  const sort = { roomName: 1 };
+  const filter = { _id: 0 };
 
   Room.find(query, filter).sort(sort).lean().exec(function(err, rooms) {
     if (err) {
@@ -682,9 +684,9 @@ function getOwnedRooms(sentUser, callback) {
 }
 
 function getAllRooms(sentUser, callback) {
-  const query = { visibility : { $lte : sentUser.accessLevel } };
-  const sort = { roomName : 1 };
-  const filter = { _id : 0 };
+  const query = { visibility: { $lte: sentUser.accessLevel } };
+  const sort = { roomName: 1 };
+  const filter = { _id: 0 };
 
   Room.find(query, filter).sort(sort).lean().exec(function(err, rooms) {
     if (err) {
@@ -696,9 +698,9 @@ function getAllRooms(sentUser, callback) {
 }
 
 function getAllUserLocations(sentUser, callback) {
-  const query = { visibility : { $lte : sentUser.accessLevel } };
-  const sort = { userName : 1 };
-  const filter = { _id : 0 };
+  const query = { visibility: { $lte: sentUser.accessLevel } };
+  const sort = { userName: 1 };
+  const filter = { _id: 0 };
 
   User.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
@@ -711,12 +713,12 @@ function getAllUserLocations(sentUser, callback) {
 
 function getUserLocation(sentUser, sentUserName, callback) {
   const query = {
-    $and : [
-      { visibility : { $lte : sentUser.accessLevel } },
-      { userName : sentUserName }
-    ]
+    $and: [
+      { visibility: { $lte: sentUser.accessLevel } },
+      { userName: sentUserName },
+    ],
   };
-  const filter = { _id : 0 };
+  const filter = { _id: 0 };
 
   User.findOne(query, filter).lean().exec(function(err, user) {
     if (err) {
@@ -728,8 +730,8 @@ function getUserLocation(sentUser, sentUserName, callback) {
 }
 
 function addRoomToUser(sentUserName, sentRoomName, callback) {
-  const query = { userName : sentUserName };
-  const update = { $addToSet : { rooms : sentRoomName } };
+  const query = { userName: sentUserName };
+  const update = { $addToSet: { rooms: sentRoomName } };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err) {
     if (err) {
@@ -741,8 +743,8 @@ function addRoomToUser(sentUserName, sentRoomName, callback) {
 }
 
 function removeRoomFromUser(sentUserName, sentRoomName, callback) {
-  const query = { userName : sentUserName };
-  const update = { $pull : { rooms : sentRoomName } };
+  const query = { userName: sentUserName };
+  const update = { $pull: { rooms: sentRoomName } };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -754,8 +756,8 @@ function removeRoomFromUser(sentUserName, sentRoomName, callback) {
 }
 
 function setUserLastOnline(sentUserName, sentDate, callback) {
-  const query = { userName : sentUserName };
-  const update = { lastOnline : sentDate };
+  const query = { userName: sentUserName };
+  const update = { lastOnline: sentDate };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -769,9 +771,9 @@ function setUserLastOnline(sentUserName, sentDate, callback) {
 }
 
 function getUnverifiedUsers(callback) {
-  const query = { verified : false };
-  const filter = { _id : 0 };
-  const sort = { userName : 1 };
+  const query = { verified: false };
+  const filter = { _id: 0 };
+  const sort = { userName: 1 };
 
   User.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
@@ -783,8 +785,8 @@ function getUnverifiedUsers(callback) {
 }
 
 function banUser(sentUserName, callback) {
-  const query = { userName : sentUserName };
-  const update = { banned : true, socketId : '' };
+  const query = { userName: sentUserName };
+  const update = { banned: true, socketId: '' };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -796,8 +798,8 @@ function banUser(sentUserName, callback) {
 }
 
 function banUserFromRoom(sentUserName, sentRoomName, callback) {
-  const query = { roomName : sentRoomName };
-  const update = { $addToSet : { bannedUsers : sentUserName } };
+  const query = { roomName: sentRoomName };
+  const update = { $addToSet: { bannedUsers: sentUserName } };
 
   Room.findOneAndUpdate(query, update).lean().exec(function(err, room) {
     if (err) {
@@ -812,8 +814,8 @@ function banUserFromRoom(sentUserName, sentRoomName, callback) {
 }
 
 function unbanUserFromRoom(sentUserName, sentRoomName, callback) {
-  const query = { roomName : sentRoomName };
-  const update = { $pull : { bannedUsers : sentUserName } };
+  const query = { roomName: sentRoomName };
+  const update = { $pull: { bannedUsers: sentUserName } };
 
   Room.findOneAndUpdate(query, update).lean().exec(function(err, room) {
     if (err) {
@@ -828,8 +830,8 @@ function unbanUserFromRoom(sentUserName, sentRoomName, callback) {
 }
 
 function unbanUser(sentUserName, callback) {
-  const query = { userName : sentUserName };
-  const update = { banned : false };
+  const query = { userName: sentUserName };
+  const update = { banned: false };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -841,9 +843,9 @@ function unbanUser(sentUserName, callback) {
 }
 
 function getBannedUsers(callback) {
-  const query = { banned : true };
-  const filter = { userName : 1, _id : 0 };
-  const sort = { userName : 1 };
+  const query = { banned: true };
+  const filter = { userName: 1, _id: 0 };
+  const sort = { userName: 1 };
 
   User.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
@@ -857,9 +859,9 @@ function getBannedUsers(callback) {
 function addEvent(sentReceiverName, sentEndAt, callback) {
   const now = new Date();
   const query = {
-    receiverName : sentReceiverName,
-    createdAt : now,
-    endAt : sentEndAt
+    receiverName: sentReceiverName,
+    createdAt: now,
+    endAt: sentEndAt,
   };
   const newEvent = new SchedEvent(query);
 
@@ -868,8 +870,8 @@ function addEvent(sentReceiverName, sentEndAt, callback) {
 
 function getPassedEvents(callback) {
   const now = new Date();
-  const query = { endAt : { $lte : now } };
-  const filter = { _id : 0 };
+  const query = { endAt: { $lte: now } };
+  const filter = { _id: 0 };
 
   SchedEvent.find(query, filter).lean().exec(function(err, events) {
     if (err) {
@@ -883,25 +885,25 @@ function getPassedEvents(callback) {
 function removeRoom(sentRoomName, sentUser, callback) {
   let query;
 
-  if (11 <= sentUser.accessLevel) {
-    query = { roomName : sentRoomName };
+  if (sentUser.accessLevel >= 11) {
+    query = { roomName: sentRoomName };
   } else {
     query = {
-      $and : [
-        { owner : sentUser.userName },
-        { roomName : sentRoomName }
-      ]
+      $and: [
+        { owner: sentUser.userName },
+        { roomName: sentRoomName },
+      ],
     };
   }
 
   Room.findOneAndRemove(query).lean().exec(function(err, room) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to remove room', err);
-    } else if (null !== room) {
-      History.findOneAndRemove({ roomName : sentRoomName }).lean().exec(function(histErr, history) {
+    } else if (room !== null) {
+      History.findOneAndRemove({ roomName: sentRoomName }).lean().exec(function(histErr, history) {
         if (histErr) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to remove history', histErr);
-        } else if (null !== history) {
+        } else if (history !== null) {
           callback(histErr, history);
         } else {
           callback(histErr, null);
@@ -915,7 +917,7 @@ function removeRoom(sentRoomName, sentUser, callback) {
 
 function populateDbRooms(sentRooms, user) {
   const roomCallback = function(err, room) {
-    if (err || null === room) {
+    if (err || room === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db,
         'PopulateDb: [failure] Failed to create room', err);
     } else {
@@ -926,7 +928,7 @@ function populateDbRooms(sentRooms, user) {
   Room.find().lean().exec(function(err, rooms) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'PopulateDb: [failure] Failed to find rooms', err);
-    } else if (null === rooms || 3 > rooms.length) {
+    } else if (rooms === null || rooms.length < 3) {
       const roomKeys = Object.keys(sentRooms);
 
       logger.sendErrorMsg(logger.ErrorCodes.db, 'PopulateDb: [failure] One of the main rooms are missing');
@@ -947,10 +949,10 @@ function populateDbUsers(sentUsers) {
   User.count({}).exec(function(err, userCount) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'PopulateDb: [failure] Failed to count users', err);
-    } else if (1 > userCount) {
+    } else if (userCount < 1) {
       const userKeys = Object.keys(sentUsers);
       const callback = function(userErr, user) {
-        if (userErr || null === user) {
+        if (userErr || user === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db,
             'PopulateDb: [failure] Failed to create user', userErr);
         } else {
@@ -985,22 +987,22 @@ function populateDbCommands(sentCommands) {
 
   for (let i = 0; i < cmdKeys.length; i++) {
     const command = sentCommands[cmdKeys[i]];
-    const query = { commandName : command.commandName };
-    const options = { upsert : true };
+    const query = { commandName: command.commandName };
+    const options = { upsert: true };
 
     Command.findOneAndUpdate(query, command, options).lean().exec(callback);
   }
 }
 
 function updateUserVisibility(userName, value, callback) {
-  const update = { visibility : value };
+  const update = { visibility: value };
 
   updateUserValue(userName, update, callback);
 }
 
 function updateUserAccessLevel(userName, value, callback) {
-  const query = { userName : userName };
-  const update = { accessLevel : value };
+  const query = { userName: userName };
+  const update = { accessLevel: value };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -1012,8 +1014,8 @@ function updateUserAccessLevel(userName, value, callback) {
 }
 
 function updateRoomVisibility(roomName, value, callback) {
-  const query = { roomName : roomName };
-  const update = { visibility : value };
+  const query = { roomName: roomName };
+  const update = { visibility: value };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -1025,8 +1027,8 @@ function updateRoomVisibility(roomName, value, callback) {
 }
 
 function updateRoomAccessLevel(roomName, value, callback) {
-  const query = { roomName : roomName };
-  const update = { accessLevel : value };
+  const query = { roomName: roomName };
+  const update = { accessLevel: value };
 
   User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
     if (err) {
@@ -1038,13 +1040,13 @@ function updateRoomAccessLevel(roomName, value, callback) {
 }
 
 function updateUserPassword(userName, value, callback) {
-  const update = { password : value };
+  const update = { password: value };
 
   updateUserValue(userName, update, callback);
 }
 
 function getCommand(commandName, callback) {
-  const query = { commandName : commandName };
+  const query = { commandName: commandName };
 
   Command.findOne(query).lean().exec(function(err, command) {
     if (err) {
@@ -1110,7 +1112,7 @@ exports.updateUserTeam = updateUserTeam;
 exports.addTeam = addTeam;
 exports.getTeam = getTeam;
 
-//Blodsband specific
+// Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;
 exports.addEntities = addEntities;
 exports.unlockEntity = unlockEntity;

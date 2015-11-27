@@ -6,9 +6,9 @@ const logger = require('./logger.js');
 
 function addMsgToHistory(roomName, message, callback) {
   dbConnector.addMsgToHistory(roomName, message, function(err, history) {
-    if (err || null === history) {
+    if (err || history === null) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
-      //logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
+      // logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
 
       return;
     }

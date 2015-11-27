@@ -3,23 +3,23 @@
 /*
  * Possible error codes with number and text representation, for usage towards users or internal
  */
-var ErrorCodes = {
-  db : {
-    text : 'Database',
-    num : 1
+const ErrorCodes = {
+  db: {
+    text: 'Database',
+    num: 1,
   },
-  unauth : {
-    text : 'Unauthorized',
-    num : 2
+  unauth: {
+    text: 'Unauthorized',
+    num: 2,
   },
-  notFound : {
-    text : 'Not found',
-    num : 3
+  notFound: {
+    text: 'Not found',
+    num: 3,
   },
-  general : {
-    text : 'General',
-    num : 4
-  }
+  general: {
+    text: 'General',
+    num: 4,
+  },
 };
 
 /**
@@ -42,7 +42,7 @@ function sendErrorMsg(code, text, err) {
  * @returns {undefined} Returns undefined
  */
 function sendSocketErrorMsg(socket, code, text, err) {
-  socket.emit('messages', [{ text : ['[' + code.num + '] ' + text] }]);
+  socket.emit('messages', [{ text: ['[' + code.num + '] ' + text] }]);
   sendErrorMsg(code, text, err);
 }
 

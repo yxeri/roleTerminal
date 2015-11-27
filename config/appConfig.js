@@ -7,9 +7,9 @@
 const config = {};
 
 config.gameLocation = {
-  country : 'Sweden',
-  lat : '59.751429',
-  lon : '15.198645'
+  country: 'Sweden',
+  lat: '59.751429',
+  lon: '15.198645',
 };
 
 config.historyLines = 80;

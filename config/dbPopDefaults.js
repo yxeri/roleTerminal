@@ -2,7 +2,7 @@
 
 const config = {};
 
-const generatePass = function() {
+const generatePass = function generatePass() {
   const randomString = '023456789abcdefghijkmnopqrstuvwxyz';
   const randomLength = randomString.length;
   let code = '';

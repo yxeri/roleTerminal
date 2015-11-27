@@ -263,7 +263,7 @@ function generateLink(text, className, func) {
   const spanObj = generateSpan(text, className);
 
   spanObj.className += ' link';
-  spanObj.addEventListener('click', function(event) {
+  spanObj.addEventListener('click', function linkClickHandler(event) {
     func(this);
     commandInput.focus();
     clicked = true;
@@ -344,31 +344,31 @@ function generateFullRow(sentText, message) {
   return rowObj;
 }
 
-function printRow(message) {
-  if (message.text && message.text.length > 0) {
-    const text = message.text.shift();
-    const row = generateFullRow(text, message);
-
-    if (message.extraClass) {
-      // classList doesn't work on older devices, thus the usage of className
-      row.className += ' ' + message.extraClass;
-    }
-
-    mainFeed.appendChild(row);
-
-    scrollView();
-
-    setTimeout(printRow, rowTimeout, message);
-  } else {
-    consumeMessageShortQueue();
-  }
-}
-
 function consumeMessageShortQueue() {
+  function printRow(message) {
+    if (message.text && message.text.length > 0) {
+      const text = message.text.shift();
+      const row = generateFullRow(text, message);
+
+      if (message.extraClass) {
+        // classList doesn't work on older devices, thus the usage of className
+        row.className += ' ' + message.extraClass;
+      }
+
+      mainFeed.appendChild(row);
+
+      scrollView();
+
+      setTimeout(printRow, rowTimeout, message);
+    } else {
+      consumeMessageShortQueue();
+    }
+  }
+
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
 
-    printRow(message);
+    printRow(message, consumeMessageShortQueue);
   } else {
     printing = false;
   }
@@ -765,18 +765,18 @@ function sendLocation() {
   let mostAccuratePos;
 
   function retrievePosition() {
-    const clearingWatch = function() {
+    const clearingWatch = function clearingWatch() {
       navigator.geolocation.clearWatch(watchId);
       watchId = null;
       intervals.tracking = setTimeout(sendLocation, pausePositionTime);
     };
 
-    watchId = navigator.geolocation.watchPosition(function() {
+    watchId = navigator.geolocation.watchPosition(function watchPosition() {
       // FIXME This is broken and doesn't do anything
       // if (position !== undefined) {
       //  positions.push(position);
       // }
-    }, function(err) {
+    }, function watchPositionCallback(err) {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
         clearTimeout(intervals.tracking);
@@ -1833,7 +1833,7 @@ function isOldAndroid() {
 
 function attachCommands() {
   validCommands.help = {
-    func: function(phrases) {
+    func: function helpCommand(phrases) {
       function getCommands() {
         const commands = [];
         // TODO Change from Object.keys for compatibility with older Android
@@ -1907,7 +1907,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.clear = {
-    func: function() {
+    func: function clearCommand() {
       while (mainFeed.childNodes.length > 1) {
         mainFeed.removeChild(mainFeed.lastChild);
       }
@@ -1918,7 +1918,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.whoami = {
-    func: function() {
+    func: function whoamiCommand() {
       const data = {};
       data.device = {};
       data.device.deviceId = getDeviceId();
@@ -1930,7 +1930,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.msg = {
-    func: function(phrases) {
+    func: function msgCommand(phrases) {
       let writtenMsg;
 
       if (phrases && phrases.length > 0) {
@@ -1964,7 +1964,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.broadcast = {
-    func: function() {
+    func: function broadcastCommand() {
       const data = {};
 
       data.text = [];
@@ -1980,7 +1980,7 @@ function attachCommands() {
       setInputStart('broadcast');
     },
     steps: [
-      function(phrases) {
+      function broadcastStepOne(phrases) {
         let phrase;
 
         if (phrases.length > 0 && phrases[0] !== '') {
@@ -2000,7 +2000,7 @@ function attachCommands() {
         });
         commmandHelper.onStep++;
       },
-      function(phrases) {
+      function broadcastStepTwo(phrases) {
         let dataText;
 
         if (phrases.length > 0 && phrases[0] !== '') {
@@ -2024,7 +2024,7 @@ function attachCommands() {
           });
         }
       },
-      function(phrases) {
+      function broadcastStepThree(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
           socket.emit('broadcastMsg', commmandHelper.data);
           resetCommand();
@@ -2045,7 +2045,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.follow = {
-    func: function(phrases) {
+    func: function followCommand(phrases) {
       const room = {};
 
       if (phrases.length > 0) {
@@ -2077,7 +2077,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.unfollow = {
-    func: function(phrases) {
+    func: function unfollowCommand(phrases) {
       const room = {};
 
       if (phrases.length > 0) {
@@ -2107,7 +2107,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.list = {
-    func: function(phrases) {
+    func: function listCommand(phrases) {
       if (phrases.length > 0) {
         const listOption = phrases[0].toLowerCase();
 
@@ -2148,7 +2148,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.mode = {
-    func: function(phrases, verbose) {
+    func: function modeCommand(phrases, verbose) {
       let commandString;
 
       if (phrases.length > 0) {
@@ -2225,7 +2225,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.register = {
-    func: function(phrases) {
+    func: function registerCommand(phrases) {
       const data = {};
 
       if (getUser() === null) {
@@ -2260,7 +2260,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function() {
+      function registerStepOne() {
         queueMessage({
           text: [
             'Input a password and press enter',
@@ -2272,7 +2272,7 @@ function attachCommands() {
         setInputStart('password');
         commmandHelper.onStep++;
       },
-      function(phrases) {
+      function registerStepTwo(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
@@ -2293,7 +2293,7 @@ function attachCommands() {
           });
         }
       },
-      function(phrases) {
+      function registerStepThree(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
         if (password === commmandHelper.data.password) {
@@ -2319,7 +2319,7 @@ function attachCommands() {
         }
       },
     ],
-    abortFunc: function() {
+    abortFunc: function registerAbort() {
       hideInput(false);
     },
     help: [
@@ -2339,7 +2339,7 @@ function attachCommands() {
     category: 'login',
   };
   validCommands.createroom = {
-    func: function(phrases) {
+    func: function createroomCommand(phrases) {
       const room = {};
       const errorMsg = {
         text: [
@@ -2385,7 +2385,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.myrooms = {
-    func: function() {
+    func: function myroomsCommand() {
       const data = {};
 
       data.userName = getUser();
@@ -2398,7 +2398,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.login = {
-    func: function(phrases) {
+    func: function loginCommand(phrases) {
       const data = {};
 
       if (getUser() !== null) {
@@ -2429,7 +2429,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function(phrases) {
+      function loginStepOne(phrases) {
         commmandHelper.data.password = phrases[0].toLowerCase();
         socket.emit('login', commmandHelper.data);
         validCommands[commmandHelper.command].abortFunc();
@@ -2437,7 +2437,7 @@ function attachCommands() {
         resetCommand();
       },
     ],
-    abortFunc: function() {
+    abortFunc: function loginAbort() {
       hideInput(false);
     },
     help: [
@@ -2455,7 +2455,7 @@ function attachCommands() {
     category: 'login',
   };
   validCommands.time = {
-    func: function() {
+    func: function timeCommand() {
       socket.emit('time');
     },
     help: ['Shows the current time'],
@@ -2463,7 +2463,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.locate = {
-    func: function(phrases) {
+    func: function locateCommand(phrases) {
       if (!isTracking) {
         queueMessage({
           text: [
@@ -2498,7 +2498,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.uploadkey = {
-    func: function() {
+    func: function uploadkeyCommand() {
       const razLogoCopy = copyMessage(razorLogo);
 
       // TODO: razorLogo should be move to DB or other place
@@ -2530,7 +2530,7 @@ function attachCommands() {
       socket.emit('entities');
     },
     steps: [
-      function(phrases) {
+      function uploadkeyStepOne(phrases) {
         const commandObj = commmandHelper;
         const phrase = phrases.join(' ');
 
@@ -2543,7 +2543,7 @@ function attachCommands() {
         commandObj.keysBlocked = true;
         setInputStart('Verifying...');
       },
-      function(data) {
+      function uploadkeyStepTwo(data) {
         const commandObj = commmandHelper;
 
         if (data.keyData !== null) {
@@ -2567,14 +2567,14 @@ function attachCommands() {
           resetCommand(true);
         }
       },
-      function() {
+      function uploadkeyStepThree() {
         const commandObj = commmandHelper;
 
         setInputStart('Enter entity name');
         commandObj.keysBlocked = false;
         commandObj.onStep++;
       },
-      function(phrases) {
+      function uploadkeyStepFour(phrases) {
         const commandObj = commmandHelper;
         const data = commandObj.data;
         const phrase = phrases.join(' ');
@@ -2589,7 +2589,7 @@ function attachCommands() {
         });
         commandObj.keysBlocked = true;
       },
-      function(entity) {
+      function uploadkeyStepFive(entity) {
         if (entity !== null) {
           queueMessage({
             text: [
@@ -2623,7 +2623,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.history = {
-    func: function(phrases) {
+    func: function historyCommand(phrases) {
       const data = {};
 
       data.lines = phrases[0];
@@ -2648,7 +2648,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.morse = {
-    func: function(phrases, local) {
+    func: function morseCommand(phrases, local) {
       let morseCodeText = '';
       let morseCode;
 
@@ -2691,7 +2691,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.password = {
-    func: function(phrases) {
+    func: function passwordCommand(phrases) {
       const data = {};
 
       if (phrases && phrases.length > 1) {
@@ -2735,7 +2735,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.logout = {
-    func: function() {
+    func: function logoutCommand() {
       socket.emit('logout');
     },
     help: ['Logs out from the current user'],
@@ -2744,7 +2744,7 @@ function attachCommands() {
     clearAfterUse: true,
   };
   validCommands.reboot = {
-    func: function() {
+    func: function rebootCommand() {
       refreshApp();
     },
     help: ['Reboots terminal'],
@@ -2752,7 +2752,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.verifyuser = {
-    func: function(phrases) {
+    func: function verifyuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
@@ -2785,7 +2785,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.banuser = {
-    func: function(phrases) {
+    func: function banuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
@@ -2808,7 +2808,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.unbanuser = {
-    func: function(phrases) {
+    func: function unbanuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
@@ -2835,7 +2835,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.whisper = {
-    func: function(phrases) {
+    func: function whisperCommand(phrases) {
       const data = {};
 
       if (phrases.length > 1) {
@@ -2869,7 +2869,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.hackroom = {
-    func: function(phrases) {
+    func: function hackroomCommand(phrases) {
       const data = {};
       const razLogoCopy = copyMessage(razorLogo);
 
@@ -2918,16 +2918,16 @@ function attachCommands() {
       }
     },
     steps: [
-      function() {
+      function hackroomStepOne() {
         queueMessage({
           text: ['Checking room access...'],
         });
         socket.emit('roomHackable', commmandHelper.data.roomName);
       },
-      function() {
+      function hackroomStepTwo() {
         const commandObj = commmandHelper;
         const timeout = 18000;
-        const timerEnded = function() {
+        const timerEnded = function timerEnded() {
           queueMessage({
             text: [
               'Your hacking attempt has been detected',
@@ -2964,7 +2964,7 @@ function attachCommands() {
           text: ['Sequence: ' + commandObj.data.code],
         });
       },
-      function(phrases) {
+      function hackroomStepThree(phrases) {
         const commandObj = commmandHelper;
         const phrase = phrases.join(' ').trim();
 
@@ -3005,7 +3005,7 @@ function attachCommands() {
         }
       },
     ],
-    abortFunc: function() {
+    abortFunc: function hackroomAbort() {
       clearTimeout(commmandHelper.data.timer);
     },
     help: [
@@ -3026,7 +3026,7 @@ function attachCommands() {
     category: 'hacking',
   };
   validCommands.importantmsg = {
-    func: function() {
+    func: function importantmsgCommand() {
       const data = {};
 
       data.text = [];
@@ -3044,7 +3044,7 @@ function attachCommands() {
       setInputStart('imprtntMsg');
     },
     steps: [
-      function(phrases) {
+      function importantmsgStepOne(phrases) {
         if (phrases.length > 0) {
           const device = phrases[0];
 
@@ -3060,7 +3060,7 @@ function attachCommands() {
           }
         }
       },
-      function() {
+      function importantmsgStepTwo() {
         commmandHelper.onStep++;
         queueMessage({
           text: [
@@ -3071,7 +3071,7 @@ function attachCommands() {
           ],
         });
       },
-      function(phrases) {
+      function importantmsgStepThree(phrases) {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
@@ -3092,7 +3092,7 @@ function attachCommands() {
           });
         }
       },
-      function(phrases) {
+      function importantmsgStepFour(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
             commmandHelper.onStep++;
@@ -3109,7 +3109,7 @@ function attachCommands() {
           }
         }
       },
-      function(phrases) {
+      function importantmsgStepFive(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
             commmandHelper.data.morse = { local: true };
@@ -3131,7 +3131,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.chipper = {
-    func: function() {
+    func: function chipperCommand() {
       queueMessage({
         text: [
           createLine(14),
@@ -3154,7 +3154,7 @@ function attachCommands() {
       setInputStart('Chipper');
     },
     steps: [
-      function() {
+      function chipperStepOne() {
         const commandObj = commmandHelper;
 
         commandObj.onStep++;
@@ -3166,9 +3166,9 @@ function attachCommands() {
         });
         setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
       },
-      function() {
+      function chipperStepTwo() {
         const commandObj = commmandHelper;
-        const stopFunc = function() {
+        const stopFunc = function stopFunc() {
           queueMessage({
             text: [
               'WARNING',
@@ -3192,7 +3192,7 @@ function attachCommands() {
         commandObj.data.printTimer = setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 250);
       },
     ],
-    abortFunc: function() {
+    abortFunc: function chipperAbort() {
       const commandObj = commmandHelper;
 
       clearTimeout(commandObj.data.printTimer);
@@ -3219,7 +3219,7 @@ function attachCommands() {
     clearBeforeUse: true,
   };
   validCommands.room = {
-    func: function(phrases) {
+    func: function roomCommand(phrases) {
       const room = {};
 
       if (phrases.length > 0) {
@@ -3256,7 +3256,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.removeroom = {
-    func: function(phrases) {
+    func: function removeroomCommand(phrases) {
       const data = {};
 
       if (phrases.length > 0) {
@@ -3280,7 +3280,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function(phrases) {
+      function removeroomStepOne(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
           socket.emit('removeRoom', commmandHelper.data.roomName);
         }
@@ -3304,7 +3304,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.updateuser = {
-    func: function(phrases) {
+    func: function updateuserCommand(phrases) {
       const data = {};
 
       if (phrases.length > 2) {
@@ -3338,7 +3338,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.updatecommand = {
-    func: function(phrases) {
+    func: function updatecommandCommand(phrases) {
       const data = {};
 
       if (phrases.length > 2) {
@@ -3371,7 +3371,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.updateroom = {
-    func: function(phrases) {
+    func: function updateroomCommand(phrases) {
       const data = {};
 
       if (phrases.length > 2) {
@@ -3404,7 +3404,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.addencryptionkeys = {
-    func: function() {
+    func: function addencryptionkeysCommand() {
       const data = {};
 
       data.keys = [];
@@ -3423,7 +3423,7 @@ function attachCommands() {
       setInputStart('Input key');
     },
     steps: [
-      function(phrases) {
+      function addencryptionkeysStepOne(phrases) {
         const keyObj = {};
 
         if (phrases.length > 0 && phrases[0] !== '') {
@@ -3445,7 +3445,7 @@ function attachCommands() {
           commmandHelper.onStep++;
         }
       },
-      function(phrases) {
+      function addencryptionkeysStepTwo(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
           queueMessage({
             text: ['Uploading new keys...'],
@@ -3472,7 +3472,7 @@ function attachCommands() {
     clearBeforeUse: true,
   };
   validCommands.addentities = {
-    func: function() {
+    func: function addentitiesCommand() {
       const data = {};
 
       data.entities = [];
@@ -3488,7 +3488,7 @@ function attachCommands() {
       setInputStart('Input entity');
     },
     steps: [
-      function(phrases) {
+      function addentitiesStepOne(phrases) {
         const entityObj = {};
 
         if (phrases.length > 0 && phrases[0] !== '') {
@@ -3505,7 +3505,7 @@ function attachCommands() {
           commmandHelper.onStep++;
         }
       },
-      function(phrases) {
+      function addentitiesStepTwo(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
           queueMessage({
             text: ['Uploading new entities...'],
@@ -3532,14 +3532,14 @@ function attachCommands() {
     clearBeforeUse: true,
   };
   validCommands.weather = {
-    func: function() {
+    func: function weatherCommand() {
       socket.emit('weather');
     },
     accessLevel: 1,
     category: 'basic',
   };
   validCommands.updatedevice = {
-    func: function(phrases) {
+    func: function updatedeviceCommand(phrases) {
       const data = {};
 
       if (phrases.length > 2) {
@@ -3572,7 +3572,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.moduleraid = {
-    func: function() {
+    func: function moduleraidCommand() {
       const data = {};
 
       data.text = [];
@@ -3589,7 +3589,7 @@ function attachCommands() {
       setInputStart('moduleraid');
     },
     steps: [
-      function(phrases) {
+      function moduleraidStepOne(phrases) {
         const startText = [
           'Celestial activity detected!',
           'Satellite have visual confirmation of active modules',
@@ -3617,7 +3617,7 @@ function attachCommands() {
           });
         }
       },
-      function(phrases) {
+      function moduleraidStepTwo(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
           commmandHelper.data.morse = { local: true };
           socket.emit('importantMsg', commmandHelper.data);
@@ -3639,7 +3639,7 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.createteam = {
-    func: function(phrases) {
+    func: function createteamCommand(phrases) {
       const teamName = phrases[0];
       const data = {};
       const team = {};
@@ -3670,7 +3670,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.inviteteam = {
-    func: function(phrases) {
+    func: function inviteteamCommand(phrases) {
       const data = {};
       const userName = phrases[0];
 
@@ -3697,7 +3697,7 @@ function attachCommands() {
     category: 'basic',
   };
   validCommands.alias = {
-    func: function(phrases) {
+    func: function aliasCommand(phrases) {
       const aliasName = phrases.shift();
       const sequence = phrases;
       const aliases = getAliases();
@@ -3748,7 +3748,7 @@ function startBoot() {
     setDeviceId(generateDeviceId());
   }
 
-  document.getElementById('background').addEventListener('click', function(event) {
+  document.getElementById('background').addEventListener('click', function clickHandler(event) {
     clicked = !clicked;
 
     if (clicked) {

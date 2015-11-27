@@ -46,7 +46,7 @@ function htmlMinify(inPath, outPath) {
  * @returns {undefined} Returns undefined
  */
 function nodeMinify(inPath, outPath, minifierType, extension) {
-  function removeTransTemp(filePath) {
+  function removeTranspiledTemp(filePath) {
     fs.unlink(filePath, function(err) {
       if (err) {
         console.log('Failed to remove temp file');
@@ -86,7 +86,7 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
 
     file.on('finish', function() {
       console.log('Transpiled ', transpilePath);
-      minify(transpilePath, removeTransTemp);
+      minify(transpilePath, removeTranspiledTemp);
     });
   } else {
     minify(inPath);

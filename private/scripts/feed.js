@@ -1,6 +1,6 @@
 'use strict';
 
-const razLogo = {
+const razorLogo = {
   text: [
     '   ####',
     '###############',
@@ -57,22 +57,22 @@ const logo = {
 const rowTimeout = 60;
 /**
  * Number of messages that will be processed and printed
- * per loop in consumeMsgQueue
+ * per loop in consumeMessageQueue
  */
-const msgsPerQueue = 3;
+const messagesPerQueue = 3;
 /**
  * Queue of all the message objects that will be handled and printed
  */
-const msgQueue = [];
-const cmdQueue = [];
+const messageQueue = [];
+const commandQueue = [];
 /**
  * Char that is prepended on commands in chat mode
  */
-const cmdChars = ['-', '/'];
+const commandChars = ['-', '/'];
 const cmdMode = 'cmd';
 const chatMode = 'chat';
-const randString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
-const randBinary = '01';
+const randomString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+const randomBinary = '01';
 const hideRooms = [
   'broadcast',
   'important',
@@ -89,7 +89,7 @@ const pausePositionTime = 40000;
  * Android 4.1.* would otherwise give JS errors
  */
 const mainFeed = document.getElementById('mainFeed');
-const cmdInput = document.getElementById('cmdInput');
+const commandInput = document.getElementById('cmdInput');
 const inputStart = document.getElementById('inputStart');
 const modeField = document.getElementById('mode');
 const spacer = document.getElementById('spacer');
@@ -98,7 +98,7 @@ const background = document.getElementById('background');
 const socket = io(); // eslint-disable-line
 // Queue of all the sounds that will be handled and played
 const soundQueue = [];
-const cmdTime = 1000;
+const commandTime = 1000;
 const dot = '.';
 const dash = '-';
 const morseSeparator = '#';
@@ -161,10 +161,10 @@ const mapHelper = {
   xGrids: {},
   yGrids: {},
 };
-const cmdFailText = { text: ['command not found'] };
+const commmandFailText = { text: ['command not found'] };
 const abortInfo = { text: ['You can cancel out of the command by typing "exit" or "abort"'] };
 const defaultInputStart = 'RAZCMD';
-const cmdHelper = {
+const commmandHelper = {
   maxSteps: 0,
   onStep: 0,
   command: null,
@@ -178,12 +178,12 @@ const intervals = {
   printText: null,
   isScreenOff: null,
 };
-const validCmds = {};
+const validCommands = {};
 let audioCtx;
 let oscillator;
 let gainNode;
 let soundTimeout = 0;
-let prevCmdPointer;
+let previousCommandPointer;
 let watchId = null;
 // Is geolocation tracking on?
 let isTracking = true;
@@ -193,7 +193,7 @@ let positions = [];
  * for a longer period of time
  */
 let lastScreenOff = (new Date()).getTime();
-let cmdUsed = false;
+let commmandUsed = false;
 /**
  * Used to block repeat of some key presses
  */
@@ -206,9 +206,9 @@ let clicked = false;
 let printing = false;
 /**
  * Shorter queue of messages that will be processed this loop. Length is
- * based on msgsPerQueue constiable
+ * based on messagesPerQueue constiable
  */
-let shortMsgQueue = [];
+let shortMessageQueue = [];
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
@@ -218,11 +218,11 @@ let reconnecting = false;
 let oldAndroid;
 
 function getInputText() {
-  return cmdInput.value;
+  return commandInput.value;
 }
 
-function setCmdInput(text) {
-  cmdInput.value = text;
+function setCommandInput(text) {
+  commandInput.value = text;
 }
 
 function getInputStart() {
@@ -230,7 +230,7 @@ function getInputStart() {
 }
 
 function clearInput() {
-  setCmdInput('');
+  setCommandInput('');
 }
 
 function beautifyNumb(number) {
@@ -265,7 +265,7 @@ function generateLink(text, className, func) {
   spanObj.className += ' link';
   spanObj.addEventListener('click', function(event) {
     func(this);
-    cmdInput.focus();
+    commandInput.focus();
     clicked = true;
     event.stopPropagation();
   });
@@ -298,11 +298,11 @@ function generateTimeStamp(date, full) {
 }
 
 function linkUser(elem) {
-  setCmdInput('whisper ' + elem.textContent + ' ');
+  setCommandInput('whisper ' + elem.textContent + ' ');
 }
 
 function linkRoom(elem) {
-  validCmds.room.func([elem.textContent]);
+  validCommands.room.func([elem.textContent]);
 }
 
 function scrollView() {
@@ -344,42 +344,42 @@ function generateFullRow(sentText, message) {
   return rowObj;
 }
 
-function printRow(msg) {
-  if (msg.text && msg.text.length > 0) {
-    const text = msg.text.shift();
-    const row = generateFullRow(text, msg);
+function printRow(message) {
+  if (message.text && message.text.length > 0) {
+    const text = message.text.shift();
+    const row = generateFullRow(text, message);
 
-    if (msg.extraClass) {
+    if (message.extraClass) {
       // classList doesn't work on older devices, thus the usage of className
-      row.className += ' ' + msg.extraClass;
+      row.className += ' ' + message.extraClass;
     }
 
     mainFeed.appendChild(row);
 
     scrollView();
 
-    setTimeout(printRow, rowTimeout, msg);
+    setTimeout(printRow, rowTimeout, message);
   } else {
-    consumeMsgShortQueue();
+    consumeMessageShortQueue();
   }
 }
 
-function consumeMsgShortQueue() {
-  if (shortMsgQueue.length > 0) {
-    const msg = shortMsgQueue.shift();
+function consumeMessageShortQueue() {
+  if (shortMessageQueue.length > 0) {
+    const message = shortMessageQueue.shift();
 
-    printRow(msg);
+    printRow(message);
   } else {
     printing = false;
   }
 }
 
 // Prints messages from the queue
-function consumeMsgQueue() {
-  if (!printing && msgQueue.length > 0) {
-    shortMsgQueue = msgQueue.splice(0, msgsPerQueue);
+function consumeMessageQueue() {
+  if (!printing && messageQueue.length > 0) {
+    shortMessageQueue = messageQueue.splice(0, messagesPerQueue);
     printing = true;
-    consumeMsgShortQueue();
+    consumeMessageShortQueue();
   }
 }
 
@@ -389,9 +389,9 @@ function findOneReplace(text, find, replaceWith) {
 
 function hideInput(hide) {
   if (hide) {
-    cmdInput.setAttribute('type', 'password');
+    commandInput.setAttribute('type', 'password');
   } else {
-    cmdInput.setAttribute('type', 'text');
+    commandInput.setAttribute('type', 'text');
   }
 }
 
@@ -411,27 +411,27 @@ function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
 }
 
-function queueMsg(message) {
-  msgQueue.push(message);
+function queueMessage(message) {
+  messageQueue.push(message);
 }
 
 function copyString(text) {
   return text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
-function copyMsg(textObj) {
+function copyMessage(textObj) {
   return textObj !== null ? JSON.parse(JSON.stringify(textObj)) : { text: [''] };
 }
 
 function createRandString(selection, length, upperCase) {
-  const randLength = selection.length;
+  const randomLength = selection.length;
   let result = '';
-  let randVal;
+  let randomVal;
 
   for (let i = 0; i < length; i++) {
-    randVal = Math.random() * (randLength - 1);
+    randomVal = Math.random() * (randomLength - 1);
 
-    result += selection[Math.round(randVal)];
+    result += selection[Math.round(randomVal)];
   }
 
   if (upperCase) {
@@ -471,11 +471,11 @@ function removeRoom() {
   removeLocalVal('room');
 }
 
-function getAccessLvl() {
+function getAccessLevel() {
   return parseInt(getLocalVal('accessLevel'), 10);
 }
 
-function setAccessLvl(accessLevel) {
+function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
 }
 
@@ -491,17 +491,17 @@ function removeUser() {
   removeLocalVal('user');
 }
 
-function getCmdHistory() {
-  const cmdHistory = getLocalVal('cmdHistory');
+function getCommandHistory() {
+  const commandHistory = getLocalVal('cmdHistory');
 
-  return cmdHistory !== null ? JSON.parse(cmdHistory) : [];
+  return commandHistory !== null ? JSON.parse(commandHistory) : [];
 }
 
-function setCmdHistory(cmdHistory) {
-  setLocalVal('cmdHistory', JSON.stringify(cmdHistory));
+function setCommandHistory(commandHistory) {
+  setLocalVal('cmdHistory', JSON.stringify(commandHistory));
 }
 
-function removeCmdHistory() {
+function removeCommandHistory() {
   removeLocalVal('cmdHistory');
 }
 
@@ -529,21 +529,21 @@ function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
-function resetCmd(aborted) {
+function resetCommand(aborted) {
   const room = getRoom() ? getRoom() : defaultInputStart;
 
   if (aborted) {
-    queueMsg({
+    queueMessage({
       text: ['Aborting command'],
     });
   }
 
-  cmdHelper.command = null;
-  cmdHelper.onStep = 0;
-  cmdHelper.maxSteps = 0;
-  cmdHelper.keysBlocked = false;
-  cmdHelper.data = null;
-  cmdHelper.hideInput = false;
+  commmandHelper.command = null;
+  commmandHelper.onStep = 0;
+  commmandHelper.maxSteps = 0;
+  commmandHelper.keysBlocked = false;
+  commmandHelper.data = null;
+  commmandHelper.hideInput = false;
   setInputStart(room);
 }
 
@@ -551,11 +551,11 @@ function refreshApp() {
   window.location.reload();
 }
 
-function queueCmd(cmd, data, cmdMsg) {
-  cmdQueue.push({
-    command: cmd,
+function queueCommand(command, data, commandMsg) {
+  commandQueue.push({
+    command: command,
     data: data,
-    cmdMsg: cmdMsg,
+    commandMsg: commandMsg,
   });
 }
 
@@ -580,9 +580,9 @@ function changeModeText() {
   const inputText = getInputText();
   const mode = getMode();
 
-  if (getUser() && !cmdHelper.command) {
+  if (getUser() && !commmandHelper.command) {
     // TODO msg command text in comparison should not be hard coded
-    if ((chatMode === mode && cmdChars.indexOf(inputText.charAt(0)) > -1) || (cmdMode === mode && trimSpace(inputText).split(' ')[0] !== 'msg')) {
+    if ((chatMode === mode && commandChars.indexOf(inputText.charAt(0)) > -1) || (cmdMode === mode && trimSpace(inputText).split(' ')[0] !== 'msg')) {
       setModeText(cmdMode.toUpperCase());
     } else {
       setModeText(chatMode.toUpperCase());
@@ -590,24 +590,24 @@ function changeModeText() {
   }
 }
 
-function pushCmdHistory(cmd) {
-  const cmdHistory = getCmdHistory();
+function pushCommandHistory(command) {
+  const commandHistory = getCommandHistory();
 
-  cmdHistory.push(cmd);
+  commandHistory.push(command);
 
-  setCmdHistory(cmdHistory);
+  setCommandHistory(commandHistory);
 }
 
 function enterRoom(roomName) {
   setRoom(roomName);
   setInputStart(roomName);
-  queueMsg({ text: ['Entered ' + roomName] });
+  queueMessage({ text: ['Entered ' + roomName] });
 }
 
-function resetPrevCmdPointer() {
-  const cmdHistory = getCmdHistory();
+function resetPreviousCommandPointer() {
+  const commandHistory = getCommandHistory();
 
-  prevCmdPointer = cmdHistory ? cmdHistory.length : 0;
+  previousCommandPointer = commandHistory ? commandHistory.length : 0;
 }
 
 function setGain(value) {
@@ -622,7 +622,7 @@ function playMorse(morseCode) {
     const cleanMorse = morseCode.replace(/#/g, '');
 
     soundQueue.splice(0, timeouts);
-    queueMsg({
+    queueMessage({
       text: ['Morse code message received:  ' + cleanMorse],
     });
   }
@@ -711,9 +711,11 @@ function locateOnMap(latitude, longitude) {
 
       if (longitude < nextXGrid) {
         x = xKeys[xGrid];
+
         break;
       } else if (longitude === (nextXGrid + parseFloat(mapHelper.xSize))) {
         x = xKeys[xGrid + 1];
+
         break;
       }
     }
@@ -723,9 +725,11 @@ function locateOnMap(latitude, longitude) {
 
       if (latitude > nextYGrid) {
         y = yKeys[yGrid];
+
         break;
       } else if (latitude === (nextYGrid - parseFloat(mapHelper.ySize))) {
         y = yKeys[yGrid + 1];
+
         break;
       }
     }
@@ -776,7 +780,7 @@ function sendLocation() {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
         clearTimeout(intervals.tracking);
-        queueMsg({
+        queueMessage({
           text: [
             'Unable to connect to the tracking satellites',
             'Turning off tracking is a major offense',
@@ -824,7 +828,6 @@ function isScreenOff() {
   const diff = now - lastScreenOff;
   // FIXME Hard coded
   const offBy = diff - 1000;
-
   lastScreenOff = now;
 
   // FIXME Hard coded
@@ -852,7 +855,7 @@ function setIntervals() {
   }
 
   // Prints messages from the queue
-  intervals.printText = setInterval(consumeMsgQueue, printIntervalTime);
+  intervals.printText = setInterval(consumeMessageQueue, printIntervalTime);
 
   if (isTracking && navigator.geolocation) {
     // Gets new geolocation data
@@ -897,7 +900,7 @@ function startAudio() {
 
 function triggerAutoComplete(text, textChar) {
   if (text.charAt(text.length - 1) === ' ' && textChar === ' ') {
-    setCmdInput(trimSpace(text));
+    setCommandInput(trimSpace(text));
 
     return true;
   }
@@ -905,67 +908,67 @@ function triggerAutoComplete(text, textChar) {
   return false;
 }
 
-function setCmdUsed(used) {
-  cmdUsed = used;
+function setCommandUsed(used) {
+  commmandUsed = used;
 }
 
-function consumeCmdQueue() {
-  if (cmdQueue.length > 0) {
-    const storedCmd = cmdQueue.shift();
-    const cmd = storedCmd.command;
-    const cmdMsg = storedCmd.cmdMsg;
+function consumeCommandQueue() {
+  if (commandQueue.length > 0) {
+    const storedCommand = commandQueue.shift();
+    const commmand = storedCommand.command;
+    const commandMessage = storedCommand.commandMsg;
 
-    if (cmdMsg) {
-      queueMsg(cmdMsg);
+    if (commandMessage) {
+      queueMessage(commandMessage);
     }
 
-    setCmdUsed(true);
-    cmd(storedCmd.data);
-    setTimeout(consumeCmdQueue, cmdTime);
+    setCommandUsed(true);
+    commmand(storedCommand.data);
+    setTimeout(consumeCommandQueue, commandTime);
   } else {
-    setCmdUsed(false);
+    setCommandUsed(false);
   }
 }
 
-function startCmdQueue() {
-  if (!cmdUsed) {
-    consumeCmdQueue();
+function startCommandQueue() {
+  if (!commmandUsed) {
+    consumeCommandQueue();
   }
 }
 
-function getCmdAccessLevel(cmdName) {
-  return validCmds[cmdName] ? validCmds[cmdName].accessLevel : 1;
+function getCommandAccessLevel(commandName) {
+  return validCommands[commandName] ? validCommands[commandName].accessLevel : 1;
 }
 
-function getCmd(cmdName) {
+function getCommand(commandName) {
   const aliases = getAliases();
-  let cmd;
+  let command;
 
-  if (validCmds[cmdName]) {
-    cmd = validCmds[cmdName];
-  } else if (aliases[cmdName]) {
-    cmd = validCmds[aliases[cmdName][0]];
+  if (validCommands[commandName]) {
+    command = validCommands[commandName];
+  } else if (aliases[commandName]) {
+    command = validCommands[aliases[commandName][0]];
   }
 
-  return cmd;
+  return command;
 }
 
-function combineSequences(cmdName, phrases) {
+function combineSequences(commandName, phrases) {
   const aliases = getAliases();
 
-  return aliases[cmdName] ? aliases[cmdName].concat(phrases.slice(1)) : phrases.slice(1);
+  return aliases[commandName] ? aliases[commandName].concat(phrases.slice(1)) : phrases.slice(1);
 }
 
-function expandPartialMatch(cmds, partialMatch, sign) {
-  const firstCmd = cmds[0];
+function expandPartialMatch(commands, partialMatch, sign) {
+  const firstCommand = commands[0];
   let expanded = '';
   let matched = true;
 
-  for (let i = partialMatch.length; i < firstCmd.length; i++) {
-    const cmdChar = firstCmd.charAt(i);
+  for (let i = partialMatch.length; i < firstCommand.length; i++) {
+    const commandChar = firstCommand.charAt(i);
 
-    for (let j = 0; j < cmds.length; j++) {
-      if (cmds[j].charAt(i) !== cmdChar) {
+    for (let j = 0; j < commands.length; j++) {
+      if (commands[j].charAt(i) !== commandChar) {
         matched = false;
 
         break;
@@ -973,9 +976,9 @@ function expandPartialMatch(cmds, partialMatch, sign) {
     }
 
     if (matched) {
-      expanded += cmdChar;
+      expanded += commandChar;
     } else {
-      return cmdChars.indexOf(sign) >= 0 ? sign + partialMatch + expanded : partialMatch + expanded;
+      return commandChars.indexOf(sign) >= 0 ? sign + partialMatch + expanded : partialMatch + expanded;
     }
   }
 }
@@ -983,31 +986,31 @@ function expandPartialMatch(cmds, partialMatch, sign) {
 function autoComplete() {
   const phrases = trimSpace(getInputText().toLowerCase()).split(' ');
   // TODO Change from Object.keys for compatibility with older Android
-  const cmds = Object.keys(validCmds).concat(Object.keys(getAliases()));
+  const commands = Object.keys(validCommands).concat(Object.keys(getAliases()));
   const matched = [];
   const sign = phrases[0].charAt(0);
   let newText = '';
   let matches;
-  let partialCmd = phrases[0];
+  let partialCommand = phrases[0];
 
   /**
    * Auto-complete should only trigger when one phrase is in the input
    * It will not auto-complete flags
    * If chat mode and the command is prepended or normal mode
    */
-  if (phrases.length === 1 && partialCmd.length > 0 && (cmdChars.indexOf(sign) >= 0 || (cmdMode === getMode()) || getUser() === null)) {
+  if (phrases.length === 1 && partialCommand.length > 0 && (commandChars.indexOf(sign) >= 0 || (cmdMode === getMode()) || getUser() === null)) {
     // Removes prepend sign
-    if (cmdChars.indexOf(sign) >= 0) {
-      partialCmd = partialCmd.slice(1);
+    if (commandChars.indexOf(sign) >= 0) {
+      partialCommand = partialCommand.slice(1);
     }
 
-    for (let i = 0; i < cmds.length; i++) {
+    for (let i = 0; i < commands.length; i++) {
       matches = false;
 
-      for (let j = 0; j < partialCmd.length; j++) {
-        const cmdAccesssLvl = getCmdAccessLevel(cmds[i]);
+      for (let j = 0; j < partialCommand.length; j++) {
+        const commandAccesssLevel = getCommandAccessLevel(commands[i]);
 
-        if ((isNaN(cmdAccesssLvl) || getAccessLvl() >= cmdAccesssLvl) && partialCmd.charAt(j) === cmds[i].charAt(j)) {
+        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && partialCommand.charAt(j) === commands[i].charAt(j)) {
           matches = true;
         } else {
           matches = false;
@@ -1017,33 +1020,33 @@ function autoComplete() {
       }
 
       if (matches) {
-        matched.push(cmds[i]);
+        matched.push(commands[i]);
       }
     }
 
     if (matched.length === 1) {
-      const cmdIndex = cmdChars.indexOf(sign);
+      const commandIndex = commandChars.indexOf(sign);
 
-      if (cmdIndex >= 0) {
-        newText += cmdChars[cmdIndex];
+      if (commandIndex >= 0) {
+        newText += commandChars[commandIndex];
       }
 
       newText += matched[0] + ' ';
 
       clearInput();
-      setCmdInput(newText);
+      setCommandInput(newText);
     } else if (matched.length > 0) {
-      setCmdInput(expandPartialMatch(matched, partialCmd, sign));
-      queueMsg({ text: [matched.join('\t')] });
+      setCommandInput(expandPartialMatch(matched, partialCommand, sign));
+      queueMessage({ text: [matched.join('\t')] });
     }
 
     // No input? Show all available commands
-  } else if (partialCmd.length === 0) {
-    validCmds.help.func();
+  } else if (partialCommand.length === 0) {
+    validCommands.help.func();
   }
 }
 
-function printHelpMsg(command) {
+function printHelpMessage(command) {
   const helpMsg = { text: [] };
 
   if (command.help) {
@@ -1055,11 +1058,11 @@ function printHelpMsg(command) {
   }
 
   if (helpMsg.text.length > 0) {
-    queueMsg(helpMsg);
+    queueMessage(helpMsg);
   }
 }
 
-function printUsedCmd(clearAfterUse, inputText) {
+function printUsedCommand(clearAfterUse, inputText) {
   if (clearAfterUse) {
     return null;
   }
@@ -1076,7 +1079,7 @@ function printUsedCmd(clearAfterUse, inputText) {
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const user = getUser();
-  const cmdHistory = getCmdHistory();
+  const commandHistory = getCommandHistory();
 
   if (!keyPressed) {
     switch (keyCode) {
@@ -1094,7 +1097,7 @@ function specialKeyPress(event) {
     case 9:
       keyPressed = true;
 
-      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
+      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
         autoComplete();
       }
 
@@ -1104,33 +1107,33 @@ function specialKeyPress(event) {
       break;
     // Enter
     case 13:
-      const cmdObj = cmdHelper;
-      const cmds = validCmds;
+      const commandObj = commmandHelper;
+      const commands = validCommands;
       let inputText;
       let phrases;
-      let cmdName;
+      let commandName;
       keyPressed = true;
 
-      if (!cmdObj.keysBlocked) {
-        if (cmdObj.command !== null) {
+      if (!commandObj.keysBlocked) {
+        if (commandObj.command !== null) {
           inputText = getInputText();
           phrases = trimSpace(inputText).split(' ');
 
           // TODO Hard coded
           if (phrases[0] === 'exit' || phrases[0] === 'abort') {
-            if (cmds[cmdObj.command].abortFunc) {
-              cmds[cmdObj.command].abortFunc();
+            if (commands[commandObj.command].abortFunc) {
+              commands[commandObj.command].abortFunc();
             }
 
-            resetCmd(true);
+            resetCommand(true);
           } else {
-            if (!cmdHelper.hideInput) {
-              queueMsg({
+            if (!commmandHelper.hideInput) {
+              queueMessage({
                 text: [inputText],
               });
             }
 
-            cmds[cmdObj.command].steps[cmdObj.onStep](phrases, socket);
+            commands[commandObj.command].steps[commandObj.onStep](phrases, socket);
           }
         } else {
           inputText = getInputText();
@@ -1139,56 +1142,56 @@ function specialKeyPress(event) {
           if (phrases[0].length > 0) {
             const sign = phrases[0].charAt(0);
 
-            if (cmdChars.indexOf(sign) >= 0) {
-              cmdName = phrases[0].slice(1).toLowerCase();
+            if (commandChars.indexOf(sign) >= 0) {
+              commandName = phrases[0].slice(1).toLowerCase();
             } else if (cmdMode === getMode() || user === null) {
-              cmdName = phrases[0].toLowerCase();
+              commandName = phrases[0].toLowerCase();
             }
 
-            const cmd = getCmd(cmdName);
+            const command = getCommand(commandName);
 
-            if (cmd && (isNaN(cmd.accessLevel) || getAccessLvl() >= cmd.accessLevel)) {
+            if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
               // Store the command for usage with up/down arrows
-              pushCmdHistory(phrases.join(' '));
+              pushCommandHistory(phrases.join(' '));
 
               /**
                * Print the help and instruction parts of the command
                */
               if (phrases[1] === '-help') {
-                printHelpMsg(cmd);
+                printHelpMessage(command);
               } else {
-                if (cmd.steps) {
-                  cmdObj.command = cmdName;
-                  cmdObj.maxSteps = cmd.steps.length;
+                if (command.steps) {
+                  commandObj.command = commandName;
+                  commandObj.maxSteps = command.steps.length;
                 }
 
-                if (cmd.clearBeforeUse) {
-                  validCmds.clear.func();
+                if (command.clearBeforeUse) {
+                  validCommands.clear.func();
                 }
 
-                queueCmd(cmd.func, combineSequences(cmdName, phrases), printUsedCmd(cmd.clearAfterUse, inputText));
-                startCmdQueue();
+                queueCommand(command.func, combineSequences(commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
+                startCommandQueue();
               }
               /**
                * User is logged in and in chat mode
                */
             } else if (user !== null && chatMode === getMode() && phrases[0].length > 0) {
-              if (cmdChars.indexOf(phrases[0].charAt(0)) < 0) {
-                queueCmd(cmds.msg.func, phrases);
-                startCmdQueue();
+              if (commandChars.indexOf(phrases[0].charAt(0)) < 0) {
+                queueCommand(commands.msg.func, phrases);
+                startCommandQueue();
 
                 /**
                  * User input commandChar but didn't write
                  * a proper command
                  */
               } else {
-                queueMsg({
-                  text: [phrases[0] + ': ' + cmdFailText.text],
+                queueMessage({
+                  text: [phrases[0] + ': ' + commmandFailText.text],
                 });
               }
             } else if (user === null) {
-              queueMsg({ text: [phrases.toString()] });
-              queueMsg({
+              queueMessage({ text: [phrases.toString()] });
+              queueMessage({
                 text: [
                   'You must register a new user or login with an existing user to gain access to more commands',
                   'Use command register or login',
@@ -1201,18 +1204,18 @@ function specialKeyPress(event) {
                * Sent command was not found.
                * Print the failed input
                */
-            } else if (cmdName.length > 0) {
-              queueMsg({
-                text: ['- ' + phrases[0] + ': ' + cmdFailText.text],
+            } else if (commandName.length > 0) {
+              queueMessage({
+                text: ['- ' + phrases[0] + ': ' + commmandFailText.text],
               });
             }
           } else {
-            queueMsg(printUsedCmd(false, ' '));
+            queueMessage(printUsedCommand(false, ' '));
           }
         }
       }
 
-      resetPrevCmdPointer();
+      resetPreviousCommandPointer();
       clearInput();
       clearModeText();
 
@@ -1248,11 +1251,11 @@ function specialKeyPress(event) {
     case 38:
       keyPressed = true;
 
-      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
-        if (prevCmdPointer > 0) {
+      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
+        if (previousCommandPointer > 0) {
           clearInput();
-          prevCmdPointer--;
-          setCmdInput(cmdHistory[prevCmdPointer]);
+          previousCommandPointer--;
+          setCommandInput(commandHistory[previousCommandPointer]);
         }
       }
 
@@ -1263,14 +1266,14 @@ function specialKeyPress(event) {
     case 40:
       keyPressed = true;
 
-      if (!cmdHelper.keysBlocked && cmdHelper.command === null) {
-        if (prevCmdPointer < cmdHistory.length - 1) {
+      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
+        if (previousCommandPointer < commandHistory.length - 1) {
           clearInput();
-          prevCmdPointer++;
-          setCmdInput(cmdHistory[prevCmdPointer]);
-        } else if (prevCmdPointer === cmdHistory.length - 1) {
+          previousCommandPointer++;
+          setCommandInput(commandHistory[previousCommandPointer]);
+        } else if (previousCommandPointer === commandHistory.length - 1) {
           clearInput();
-          prevCmdPointer++;
+          previousCommandPointer++;
         } else {
           clearInput();
         }
@@ -1298,7 +1301,7 @@ function keyPress(event) {
         changeModeText();
       }
 
-      if (triggerAutoComplete(getInputText(), textChar) && cmdHelper.command === null) {
+      if (triggerAutoComplete(getInputText(), textChar) && commmandHelper.command === null) {
         autoComplete();
         // Prevent new whitespace to be printed
         event.preventDefault();
@@ -1309,26 +1312,26 @@ function keyPress(event) {
   }
 }
 
-function createCmdStart(cmdName) {
-  const length = cmdName.length + 2;
+function createCommandStart(commandName) {
+  const length = commandName.length + 2;
 
   return [
     createLine(length),
-    ' ' + cmdName.toUpperCase(),
+    ' ' + commandName.toUpperCase(),
     createLine(length),
   ];
 }
 
-function createCmdEnd(length) {
+function createCommandEnd(length) {
   return createLine(length + 2);
 }
 
-function printWelcomeMsg() {
-  const logoCopy = copyMsg(logo);
-  const razLogoCopy = copyMsg(razLogo);
+function printWelcomeMessage() {
+  const logoCopy = copyMessage(logo);
+  const razLogoCopy = copyMessage(razorLogo);
 
-  queueMsg(logoCopy);
-  queueMsg({
+  queueMessage(logoCopy);
+  queueMessage({
     text: [
       'Welcome, employee ' + getUser(),
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
@@ -1336,30 +1339,30 @@ function printWelcomeMsg() {
       'May you have a productive day',
     ],
   });
-  queueMsg({
+  queueMessage({
     text: [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##',
     ],
   });
-  queueMsg(razLogoCopy);
+  queueMessage(razLogoCopy);
 }
 
-function printStartMsg() {
-  const logoToPrint = copyMsg(logo);
-  const randRelay = createRandString(randString, 4, true);
+function printStartMessage() {
+  const logoToPrint = copyMessage(logo);
+  const randomRelay = createRandString(randomString, 4, true);
 
-  queueMsg(logoToPrint);
-  queueMsg({
+  queueMessage(logoToPrint);
+  queueMessage({
     text: [
       createLine(50),
       'Connecting... Could not establish connection to HQ',
-      'Rerouting... Secondary relay ' + randRelay + ' found',
-      'Connecting to relay ' + randRelay + '... Connection established',
+      'Rerouting... Secondary relay ' + randomRelay + ' found',
+      'Connecting to relay ' + randomRelay + '... Connection established',
       createLine(50),
     ],
     extraClass: 'upperCase',
   });
-  queueMsg({
+  queueMessage({
     text: [
       'Welcome to the Oracle of Organica',
       'Please login to start your productive day!',
@@ -1371,48 +1374,48 @@ function printStartMsg() {
 }
 
 function resetAllLocalVals() {
-  removeCmdHistory();
+  removeCommandHistory();
   removeRoom();
   removeUser();
-  setAccessLvl(0);
+  setAccessLevel(0);
   setInputStart(defaultInputStart);
-  prevCmdPointer = 0;
+  previousCommandPointer = 0;
 }
 
-function onMessages(msgs) {
-  for (let i = 0; i < msgs.length; i++) {
-    const msg = msgs[i];
+function onMessages(messages) {
+  for (let i = 0; i < messages.length; i++) {
+    const message = messages[i];
 
-    if (msg.roomName) {
-      if (msg.roomName.indexOf('-whisper') >= 0) {
-        msg.roomName = 'WHISPER';
-      } else if (msg.roomName.indexOf('-device') >= 0) {
-        msg.roomName = 'DEVICE';
-      } else if (msg.roomName === 'important') {
-        msg.roomName = 'IMPORTNT';
-      } else if (msg.roomName === 'broadcast') {
-        msg.roomName = 'BROADCST';
+    if (message.roomName) {
+      if (message.roomName.indexOf('-whisper') >= 0) {
+        message.roomName = 'WHISPER';
+      } else if (message.roomName.indexOf('-device') >= 0) {
+        message.roomName = 'DEVICE';
+      } else if (message.roomName === 'important') {
+        message.roomName = 'IMPORTNT';
+      } else if (message.roomName === 'broadcast') {
+        message.roomName = 'BROADCST';
       }
     }
 
-    queueMsg(msg);
+    queueMessage(message);
   }
 }
 
-function onBroadcastMsg(msg) {
-  msg.extraClass = 'bold';
+function onBroadcastMsg(message) {
+  message.extraClass = 'bold';
 
-  queueMsg(msg);
+  queueMessage(message);
 }
 
-function onImportantMsg(msg) {
-  msg.extraClass = 'importantMsg';
-  msg.skipTime = true;
+function onImportantMsg(message) {
+  message.extraClass = 'importantMsg';
+  message.skipTime = true;
 
-  queueMsg(msg);
+  queueMessage(message);
 
-  if (msg.morse) {
-    validCmds.morse.func(msg.text.slice(0, 1), msg.morse.local);
+  if (message.morse) {
+    validCommands.morse.func(message.text.slice(0, 1), message.morse.local);
   }
 }
 
@@ -1424,7 +1427,7 @@ function onReconnect() {
 }
 
 function onDisconnect() {
-  queueMsg({
+  queueMessage({
     text: ['Lost connection'],
     extraClass: 'importantMsg',
   });
@@ -1434,14 +1437,14 @@ function onFollow(room) {
   if (room.entered) {
     enterRoom(room.roomName);
   } else {
-    queueMsg({
+    queueMessage({
       text: ['Following ' + room.roomName],
     });
   }
 }
 
 function onUnfollow(room) {
-  queueMsg({
+  queueMessage({
     text: ['Stopped following ' + room.roomName],
   });
 
@@ -1453,14 +1456,14 @@ function onUnfollow(room) {
 function onLogin(user) {
   const mode = user.mode ? user.mode : cmdMode;
 
-  validCmds.clear.func();
+  validCommands.clear.func();
   setUser(user.userName);
-  setAccessLvl(user.accessLevel);
-  queueMsg({
+  setAccessLevel(user.accessLevel);
+  queueMessage({
     text: ['Successfully logged in as ' + user.userName],
   });
-  printWelcomeMsg();
-  validCmds.mode.func([mode]);
+  printWelcomeMessage();
+  validCommands.mode.func([mode]);
 
   socket.emit('updateDeviceSocketId', {
     deviceId: getDeviceId(),
@@ -1473,15 +1476,15 @@ function onLogin(user) {
 
 function onCommandSuccess(data) {
   if (!data.freezeStep) {
-    cmdHelper.onStep++;
+    commmandHelper.onStep++;
   }
 
-  validCmds[cmdHelper.command].steps[cmdHelper.onStep](data, socket);
+  validCommands[commmandHelper.command].steps[commmandHelper.onStep](data, socket);
 }
 
 function onCommandFail() {
-  validCmds[cmdHelper.command].abortFunc();
-  resetCmd(true);
+  validCommands[commmandHelper.command].abortFunc();
+  resetCommand(true);
 }
 
 function onReconnectSuccess(data) {
@@ -1489,8 +1492,8 @@ function onReconnectSuccess(data) {
     const mode = data.user.mode ? data.user.mode : cmdMode;
     const room = getRoom();
 
-    validCmds.mode.func([mode], false);
-    setAccessLvl(data.user.accessLevel);
+    validCommands.mode.func([mode], false);
+    setAccessLevel(data.user.accessLevel);
 
     socket.emit('updateDeviceSocketId', {
       deviceId: getDeviceId(),
@@ -1499,24 +1502,24 @@ function onReconnectSuccess(data) {
     });
 
     if (!data.firstConnection) {
-      queueMsg({
+      queueMessage({
         text: ['Re-established connection'],
         extraClass: 'importantMsg',
       });
     } else {
-      printWelcomeMsg();
+      printWelcomeMessage();
 
       if (room) {
-        validCmds.room.func([room]);
+        validCommands.room.func([room]);
       }
     }
 
-    queueMsg({
+    queueMessage({
       text: ['Retrieving missed messages (if any)'],
     });
   } else {
     if (!data.firstConnection) {
-      queueMsg({
+      queueMessage({
         text: ['Re-established connection'],
         extraClass: 'importantMsg',
       });
@@ -1531,7 +1534,7 @@ function onDisconnectUser() {
 
   // There is no saved local user. We don't need to print this
   if (currentUser !== null) {
-    queueMsg({
+    queueMessage({
       text: [
         'Didn\'t find user ' + getUser() + ' in database',
         'Resetting local configuration',
@@ -1547,7 +1550,7 @@ function onMorse(morseCode) {
 }
 
 function onTime(time) {
-  queueMsg({
+  queueMessage({
     text: ['Time: ' + generateTimeStamp(time, true)],
   });
 }
@@ -1561,18 +1564,18 @@ function onLocationMsg(locationData) {
     const user = locationKeys[i];
 
     if (locationData[user].coords) {
-      const userLoc = locationData[user];
-      const latitude = userLoc.coords.latitude.toFixed(6);
-      const longitude = userLoc.coords.longitude.toFixed(6);
-      const heading = userLoc.coords.heading !== null ? Math.round(userLoc.coords.heading) : null;
-      const accuracy = userLoc.accuracy < 1000 ? Math.ceil(userLoc.accuracy) : 'BAD';
-      const mapLoc = locateOnMap(latitude, longitude);
+      const userLocation = locationData[user];
+      const latitude = userLocation.coords.latitude.toFixed(6);
+      const longitude = userLocation.coords.longitude.toFixed(6);
+      const heading = userLocation.coords.heading !== null ? Math.round(userLocation.coords.heading) : null;
+      const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
+      const mapLocation = locateOnMap(latitude, longitude);
 
       text += 'User: ' + user + '\t';
-      text += 'Time: ' + generateTimeStamp(userLoc.locTime, true) + '\t';
-      text += 'Location: ' + mapLoc + '\t';
+      text += 'Time: ' + generateTimeStamp(userLocation.locTime, true) + '\t';
+      text += 'Location: ' + mapLocation + '\t';
 
-      if (mapLoc !== '---') {
+      if (mapLocation !== '---') {
         text += 'Accuracy: ' + accuracy + ' meters\t';
         text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
 
@@ -1581,13 +1584,13 @@ function onLocationMsg(locationData) {
         }
       }
 
-      queueMsg({ text: [text] });
+      queueMessage({ text: [text] });
     }
   }
 }
 
 function onBan() {
-  queueMsg({
+  queueMessage({
     text: [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support ' +
@@ -1601,17 +1604,17 @@ function onBan() {
 }
 
 function onLogout() {
-  validCmds.clear.func();
+  validCommands.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
-  printStartMsg();
+  printStartMessage();
 }
 
 function onUpdateCommands(commands) {
   if (commands) {
     for (let i = 0; i < commands.length; i++) {
       const newCommand = commands[i];
-      const oldCommand = validCmds[newCommand.commandName];
+      const oldCommand = validCommands[newCommand.commandName];
 
       if (oldCommand) {
         oldCommand.accessLevel = newCommand.accessLevel;
@@ -1628,19 +1631,19 @@ function onWeather(report) {
   let weatherString = '';
 
   for (let i = 0; i < report.length; i++) {
-    const weatherInst = report[i];
-    const time = new Date(weatherInst.time);
+    const weatherInstance = report[i];
+    const time = new Date(weatherInstance.time);
     const hours = beautifyNumb(time.getHours());
     const day = beautifyNumb(time.getDate());
     const month = beautifyNumb(time.getMonth());
-    const temperature = Math.round(weatherInst.temperature);
-    const windSpeed = Math.round(weatherInst.gust);
-    const precip = weatherInst.precipitation === 0 ? 'Light ' : weatherInst.precipitation + 'mm ';
+    const temperature = Math.round(weatherInstance.temperature);
+    const windSpeed = Math.round(weatherInstance.gust);
+    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : weatherInstance.precipitation + 'mm ';
     let coverage;
     let precipType;
     weatherString = '';
 
-    switch (weatherInst.precipType) {
+    switch (weatherInstance.precipType) {
     // None
     case 0:
       break;
@@ -1672,7 +1675,7 @@ function onWeather(report) {
       break;
     }
 
-    switch (weatherInst.cloud) {
+    switch (weatherInstance.cloud) {
     case 0:
     case 1:
     case 2:
@@ -1698,21 +1701,21 @@ function onWeather(report) {
 
     weatherString += day + '/' + month + ' ' + hours + ':00' + '\t';
     weatherString += 'Temperature: ' + temperature + '\xB0C\t';
-    weatherString += 'Visibility: ' + weatherInst.visibility + 'km \t';
-    weatherString += 'Wind direction: ' + weatherInst.windDirection + '\xB0\t';
+    weatherString += 'Visibility: ' + weatherInstance.visibility + 'km \t';
+    weatherString += 'Wind direction: ' + weatherInstance.windDirection + '\xB0\t';
     weatherString += 'Wind speed: ' + windSpeed + 'm/s\t';
-    weatherString += 'Blowout risk: ' + weatherInst.thunder + '%\t';
+    weatherString += 'Blowout risk: ' + weatherInstance.thunder + '%\t';
     weatherString += 'Pollution coverage: ' + coverage + '\t';
 
     if (precipType) {
-      weatherString += precip;
+      weatherString += precipitation;
       weatherString += precipType;
     }
 
     weather.push(weatherString);
   }
 
-  queueMsg({ text: weather });
+  queueMessage({ text: weather });
 }
 
 function onUpdateDeviceId(newId) {
@@ -1721,15 +1724,15 @@ function onUpdateDeviceId(newId) {
 
 function onWhoami(data) {
   const team = data.user.team || '';
-  const text = createCmdStart('whoami').concat([
+  const text = createCommandStart('whoami').concat([
     'User: ' + data.user.userName,
     'Access level: ' + data.user.accessLevel,
     'Team: ' + team,
     'Device ID: ' + data.device.deviceId,
-    createCmdEnd(text[0].length),
+    createCommandEnd(text[0].length),
   ]);
 
-  queueMsg({ text: text });
+  queueMessage({ text: text });
 }
 
 function startSocket() {
@@ -1803,12 +1806,12 @@ function fullscreenResize(keyboardShown) {
 }
 
 function generateDeviceId() {
-  const randomLength = randString.length;
+  const randomLength = randomString.length;
   let deviceId = '';
 
   for (let i = 0; i < 15; i++) {
     const randomVal = Math.random() * (randomLength - 1);
-    deviceId += randString[Math.round(randomVal)];
+    deviceId += randomString[Math.round(randomVal)];
   }
 
   return deviceId;
@@ -1829,32 +1832,32 @@ function isOldAndroid() {
 }
 
 function attachCommands() {
-  validCmds.help = {
+  validCommands.help = {
     func: function(phrases) {
-      function getCmds() {
-        const cmds = [];
+      function getCommands() {
+        const commands = [];
         // TODO Change from Object.keys for compatibility with older Android
-        const keys = Object.keys(validCmds);
-        let cmd;
-        let cmdAccessLvl;
+        const keys = Object.keys(validCommands);
+        let command;
+        let commandAccessLevel;
 
         for (let i = 0; i < keys.length; i++) {
-          cmd = validCmds[keys[i]];
-          cmdAccessLvl = cmd.accessLevel;
+          command = validCommands[keys[i]];
+          commandAccessLevel = command.accessLevel;
 
-          if (isNaN(cmdAccessLvl) || cmdAccessLvl <= getAccessLvl()) {
-            cmds.push(keys[i]);
+          if (isNaN(commandAccessLevel) || commandAccessLevel <= getAccessLevel()) {
+            commands.push(keys[i]);
           }
         }
 
-        return cmds.concat(Object.keys(getAliases())).sort();
+        return commands.concat(Object.keys(getAliases())).sort();
       }
 
       function getAll() {
-        const allCmds = getCmds();
+        const allCommands = getCommands();
 
         if (getUser() === null) {
-          queueMsg({
+          queueMessage({
             text: [
               createLine(49),
               ' Use register to register a new user',
@@ -1865,16 +1868,16 @@ function attachCommands() {
           });
         }
 
-        queueMsg({
-          text: allCmds,
+        queueMessage({
+          text: allCommands,
         });
       }
 
       if (undefined === phrases || phrases.length === 0) {
-        queueMsg({
-          text: createCmdStart('help').concat([
+        queueMessage({
+          text: createCommandStart('help').concat([
             'Instructions',
-            '  Add -help after a command to get instructions on how to use it. Example: ' + cmdChars[0] +
+            '  Add -help after a command to get instructions on how to use it. Example: ' + commandChars[0] +
             'uploadkey -help',
             'Shortcuts',
             '  Use page up/down to scroll the view',
@@ -1903,7 +1906,7 @@ function attachCommands() {
     accessLevel: 1,
     category: 'basic',
   };
-  validCmds.clear = {
+  validCommands.clear = {
     func: function() {
       while (mainFeed.childNodes.length > 1) {
         mainFeed.removeChild(mainFeed.lastChild);
@@ -1914,7 +1917,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.whoami = {
+  validCommands.whoami = {
     func: function() {
       const data = {};
       data.device = {};
@@ -1926,7 +1929,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.msg = {
+  validCommands.msg = {
     func: function(phrases) {
       let writtenMsg;
 
@@ -1941,7 +1944,7 @@ function attachCommands() {
           },
         });
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You forgot to write the message!'],
         });
       }
@@ -1960,20 +1963,20 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.broadcast = {
+  validCommands.broadcast = {
     func: function() {
       const data = {};
 
       data.text = [];
-      cmdHelper.data = data;
+      commmandHelper.data = data;
 
-      queueMsg({
+      queueMessage({
         text: [
           'Who is the broadcast from?',
           'You can also leave it empty and just press enter',
         ],
       });
-      queueMsg(copyMsg(abortInfo));
+      queueMessage(copyMessage(abortInfo));
       setInputStart('broadcast');
     },
     steps: [
@@ -1983,19 +1986,19 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           phrase = phrases.join(' ');
 
-          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast from: ' + phrase));
+          commmandHelper.data.text = commmandHelper.data.text.concat(createCommandStart('broadcast from: ' + phrase));
         } else {
-          cmdHelper.data.text = cmdHelper.data.text.concat(createCmdStart('broadcast'));
+          commmandHelper.data.text = commmandHelper.data.text.concat(createCommandStart('broadcast'));
         }
 
-        queueMsg({
+        queueMessage({
           text: [
             'Write a line and press enter',
             'Press enter without any input when you are done ' +
             'with the message',
           ],
         });
-        cmdHelper.onStep++;
+        commmandHelper.onStep++;
       },
       function(phrases) {
         let dataText;
@@ -2003,30 +2006,30 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          cmdHelper.data.text.push(phrase);
+          commmandHelper.data.text.push(phrase);
         } else {
-          cmdHelper.data.text.push(createLine(10));
-          dataText = copyString(cmdHelper.data.text);
+          commmandHelper.data.text.push(createLine(10));
+          dataText = copyString(commmandHelper.data.text);
 
-          cmdHelper.onStep++;
+          commmandHelper.onStep++;
 
-          queueMsg({
+          queueMessage({
             text: ['Preview of the message:'],
           });
-          queueMsg({
+          queueMessage({
             text: dataText,
           });
-          queueMsg({
+          queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
           });
         }
       },
       function(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-          socket.emit('broadcastMsg', cmdHelper.data);
-          resetCmd();
+          socket.emit('broadcastMsg', commmandHelper.data);
+          resetCommand();
         } else {
-          resetCmd(true);
+          resetCommand(true);
         }
       },
     ],
@@ -2041,7 +2044,7 @@ function attachCommands() {
     clearAfterUse: true,
     category: 'admin',
   };
-  validCmds.follow = {
+  validCommands.follow = {
     func: function(phrases) {
       const room = {};
 
@@ -2051,7 +2054,7 @@ function attachCommands() {
 
         socket.emit('follow', room);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You have to specify which room to follow and a' +
             'password (if it is protected)',
@@ -2073,7 +2076,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.unfollow = {
+  validCommands.unfollow = {
     func: function(phrases) {
       const room = {};
 
@@ -2088,7 +2091,7 @@ function attachCommands() {
 
         socket.emit('unfollow', room);
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You have to specify which room to unfollow'],
         });
       }
@@ -2103,7 +2106,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.list = {
+  validCommands.list = {
     func: function(phrases) {
       if (phrases.length > 0) {
         const listOption = phrases[0].toLowerCase();
@@ -2115,12 +2118,12 @@ function attachCommands() {
         } else if (listOption === 'devices') {
           socket.emit('listDevices');
         } else {
-          queueMsg({
+          queueMessage({
             text: [listOption + 'is not a valid option'],
           });
         }
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You have to input which option you want to list',
             'Available options: users, rooms, devices',
@@ -2144,9 +2147,9 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.mode = {
+  validCommands.mode = {
     func: function(phrases, verbose) {
-      let cmdString;
+      let commandString;
 
       if (phrases.length > 0) {
         const newMode = phrases[0].toLowerCase();
@@ -2156,13 +2159,13 @@ function attachCommands() {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
-            cmdString = 'Chat mode activated';
+            commandString = 'Chat mode activated';
 
-            queueMsg({
-              text: createCmdStart(cmdString).concat([
-                'Prepend commands with "' + cmdChars.join('" or "') + '", e.g. ' + '"' + cmdChars[0] + 'uploadkey"',
+            queueMessage({
+              text: createCommandStart(commandString).concat([
+                'Prepend commands with "' + commandChars.join('" or "') + '", e.g. ' + '"' + commandChars[0] + 'uploadkey"',
                 'Everything else written and sent will be intepreted as a chat message',
-                createCmdEnd(cmdString.length),
+                createCommandEnd(commandString.length),
               ]),
             });
           }
@@ -2172,25 +2175,25 @@ function attachCommands() {
           setMode(newMode);
 
           if (verbose === undefined || verbose) {
-            cmdString = 'Command mode activated';
+            commandString = 'Command mode activated';
 
-            queueMsg({
-              text: createCmdStart(cmdString).concat([
-                'Commands can be used without "' + cmdChars[0] + '"',
+            queueMessage({
+              text: createCommandStart(commandString).concat([
+                'Commands can be used without "' + commandChars[0] + '"',
                 'You have to use command "msg" to send messages',
-                createCmdEnd(cmdString.length),
+                createCommandEnd(commandString.length),
               ]),
             });
           }
 
           socket.emit('updateMode', newMode);
         } else {
-          queueMsg({
+          queueMessage({
             text: [newMode + 'is not a valid mode'],
           });
         }
       } else {
-        queueMsg({
+        queueMessage({
           text: ['Current mode: ' + getMode()],
         });
       }
@@ -2200,8 +2203,8 @@ function attachCommands() {
       '--Chat mode--',
       'Everything written will be interpreted as chat messages',
       'All commands have to be prepended with "' +
-      cmdChars.join('" or "') + '" ' +
-      'Example: ' + cmdChars[0] + 'uploadkey',
+      commandChars.join('" or "') + '" ' +
+      'Example: ' + commandChars[0] + 'uploadkey',
       '--Cmd mode--',
       'Chat mode is the default mode',
       'Text written will not be automatically be intepreted as ' +
@@ -2221,7 +2224,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.register = {
+  validCommands.register = {
     func: function(phrases) {
       const data = {};
 
@@ -2231,13 +2234,13 @@ function attachCommands() {
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
           data.userName = userName;
           data.registerDevice = getDeviceId();
-          cmdHelper.data = data;
-          cmdHelper.hideInput = true;
+          commmandHelper.data = data;
+          commmandHelper.hideInput = true;
           hideInput(true);
-          socket.emit('userExists', cmdHelper.data);
+          socket.emit('userExists', commmandHelper.data);
         } else {
-          resetCmd(true);
-          queueMsg({
+          resetCommand(true);
+          queueMessage({
             text: [
               'Name has to be 3 to 6 characters long',
               'The name can only contain letters and numbers (a-z, 0-9)',
@@ -2247,8 +2250,8 @@ function attachCommands() {
           });
         }
       } else {
-        resetCmd(true);
-        queueMsg({
+        resetCommand(true);
+        queueMessage({
           text: [
             'You have already registered a user',
             getUser() + ' is registered to this device',
@@ -2258,30 +2261,30 @@ function attachCommands() {
     },
     steps: [
       function() {
-        queueMsg({
+        queueMessage({
           text: [
             'Input a password and press enter',
             'Your password won\'t appear on the screen as you type it',
             'Don\'t use whitespaces in your password!',
           ],
         });
-        queueMsg(copyMsg(abortInfo));
+        queueMessage(copyMessage(abortInfo));
         setInputStart('password');
-        cmdHelper.onStep++;
+        commmandHelper.onStep++;
       },
       function(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
-          cmdHelper.data.password = password;
-          queueMsg({
+          commmandHelper.data.password = password;
+          queueMessage({
             text: [
               'Repeat your password one more time',
             ],
           });
-          cmdHelper.onStep++;
+          commmandHelper.onStep++;
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Password is too short!',
               'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
@@ -2293,8 +2296,8 @@ function attachCommands() {
       function(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
-        if (password === cmdHelper.data.password) {
-          queueMsg({
+        if (password === commmandHelper.data.password) {
+          queueMessage({
             text: [
               'Congratulations, employee #' + Math.floor(Math.random() * 120503),
               'Welcome to the Organica Oracle department',
@@ -2302,17 +2305,17 @@ function attachCommands() {
               'Have a productive day!',
             ],
           });
-          socket.emit('register', cmdHelper.data);
-          validCmds[cmdHelper.command].abortFunc();
-          resetCmd(false);
+          socket.emit('register', commmandHelper.data);
+          validCommands[commmandHelper.command].abortFunc();
+          resetCommand(false);
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Passwords don\'t match. Please try again',
               'Input a password and press enter',
             ],
           });
-          cmdHelper.onStep--;
+          commmandHelper.onStep--;
         }
       },
     ],
@@ -2335,7 +2338,7 @@ function attachCommands() {
     accessLevel: 0,
     category: 'login',
   };
-  validCmds.createroom = {
+  validCommands.createroom = {
     func: function(phrases) {
       const room = {};
       const errorMsg = {
@@ -2359,10 +2362,10 @@ function attachCommands() {
 
           socket.emit('createRoom', room);
         } else {
-          queueMsg(errorMsg);
+          queueMessage(errorMsg);
         }
       } else {
-        queueMsg(errorMsg);
+        queueMessage(errorMsg);
       }
     },
     help: [
@@ -2381,7 +2384,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.myrooms = {
+  validCommands.myrooms = {
     func: function() {
       const data = {};
 
@@ -2394,12 +2397,12 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.login = {
+  validCommands.login = {
     func: function(phrases) {
       const data = {};
 
       if (getUser() !== null) {
-        queueMsg({
+        queueMessage({
           text: [
             'You are already logged in',
             'You have to be logged out to log in',
@@ -2407,9 +2410,9 @@ function attachCommands() {
         });
       } else if (phrases.length > 0) {
         data.userName = phrases[0].toLowerCase();
-        cmdHelper.data = data;
-        cmdHelper.hideInput = true;
-        queueMsg({
+        commmandHelper.data = data;
+        commmandHelper.hideInput = true;
+        queueMessage({
           text: [
             'Input your password',
           ],
@@ -2417,7 +2420,7 @@ function attachCommands() {
         setInputStart('password');
         hideInput(true);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You need to input a user name',
             'Example: login bestname ',
@@ -2427,11 +2430,11 @@ function attachCommands() {
     },
     steps: [
       function(phrases) {
-        cmdHelper.data.password = phrases[0].toLowerCase();
-        socket.emit('login', cmdHelper.data);
-        validCmds[cmdHelper.command].abortFunc();
-        validCmds.clear.func();
-        resetCmd();
+        commmandHelper.data.password = phrases[0].toLowerCase();
+        socket.emit('login', commmandHelper.data);
+        validCommands[commmandHelper.command].abortFunc();
+        validCommands.clear.func();
+        resetCommand();
       },
     ],
     abortFunc: function() {
@@ -2451,7 +2454,7 @@ function attachCommands() {
     accessLevel: 0,
     category: 'login',
   };
-  validCmds.time = {
+  validCommands.time = {
     func: function() {
       socket.emit('time');
     },
@@ -2459,10 +2462,10 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.locate = {
+  validCommands.locate = {
     func: function(phrases) {
       if (!isTracking) {
-        queueMsg({
+        queueMessage({
           text: [
             'Tracking not available',
             'You are not connected to the satellites',
@@ -2494,13 +2497,13 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.uploadkey = {
+  validCommands.uploadkey = {
     func: function() {
-      const razLogoCopy = copyMsg(razLogo);
+      const razLogoCopy = copyMessage(razorLogo);
 
-      // TODO: razLogo should be move to DB or other place
-      queueMsg(razLogoCopy);
-      queueMsg({
+      // TODO: razorLogo should be move to DB or other place
+      queueMessage(razLogoCopy);
+      queueMessage({
         text: [
           'Razor proudly presents:',
           'Entity Hacking Access! (EHA)',
@@ -2522,73 +2525,73 @@ function attachCommands() {
           ' ',
         ],
       });
-      queueMsg(copyMsg(abortInfo));
+      queueMessage(copyMessage(abortInfo));
       setInputStart('Enter encryption key');
       socket.emit('entities');
     },
     steps: [
       function(phrases) {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
         const phrase = phrases.join(' ');
 
         socket.emit('verifyKey', phrase.toLowerCase());
-        queueMsg({
+        queueMessage({
           text: [
             'Verifying key. Please wait...',
           ],
         });
-        cmdObj.keysBlocked = true;
+        commandObj.keysBlocked = true;
         setInputStart('Verifying...');
       },
       function(data) {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
 
         if (data.keyData !== null) {
           if (data.keyData.reusable || !data.keyData.used) {
-            queueMsg({
+            queueMessage({
               text: ['Key has been verified. Proceeding'],
             });
-            cmdObj.onStep++;
-            cmdObj.data = data;
-            validCmds[cmdObj.command].steps[cmdObj.onStep](socket);
+            commandObj.onStep++;
+            commandObj.data = data;
+            validCommands[commandObj.command].steps[commandObj.onStep](socket);
           } else {
-            queueMsg({
+            queueMessage({
               text: ['Key has already been used. Aborting'],
             });
-            resetCmd(true);
+            resetCommand(true);
           }
         } else {
-          queueMsg({
+          queueMessage({
             text: ['The key is invalid. Aborting'],
           });
-          resetCmd(true);
+          resetCommand(true);
         }
       },
       function() {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
 
         setInputStart('Enter entity name');
-        cmdObj.keysBlocked = false;
-        cmdObj.onStep++;
+        commandObj.keysBlocked = false;
+        commandObj.onStep++;
       },
       function(phrases) {
-        const cmdObj = cmdHelper;
-        const data = cmdObj.data;
+        const commandObj = commmandHelper;
+        const data = commandObj.data;
         const phrase = phrases.join(' ');
 
         data.entityName = phrase.toLowerCase();
         data.userName = getUser();
         socket.emit('unlockEntity', data);
-        queueMsg({
+        queueMessage({
           text: [
             'Unlocking entity. Please wait...',
           ],
         });
-        cmdObj.keysBlocked = true;
+        commandObj.keysBlocked = true;
       },
       function(entity) {
         if (entity !== null) {
-          queueMsg({
+          queueMessage({
             text: [
               'Confirmed. Encryption key has been used on the entity',
               entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
@@ -2596,7 +2599,7 @@ function attachCommands() {
             ],
           });
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Failed',
               'Encryption key could not be used on entity.',
@@ -2605,7 +2608,7 @@ function attachCommands() {
           });
         }
 
-        resetCmd(true);
+        resetCommand(true);
       },
     ],
     help: [
@@ -2619,7 +2622,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.history = {
+  validCommands.history = {
     func: function(phrases) {
       const data = {};
 
@@ -2644,7 +2647,7 @@ function attachCommands() {
     accessLevel: 1,
     category: 'advanced',
   };
-  validCmds.morse = {
+  validCommands.morse = {
     func: function(phrases, local) {
       let morseCodeText = '';
       let morseCode;
@@ -2687,7 +2690,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.password = {
+  validCommands.password = {
     func: function(phrases) {
       const data = {};
 
@@ -2699,7 +2702,7 @@ function attachCommands() {
         if (data.newPassword.length >= 4) {
           socket.emit('changePassword', data);
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'You have to input the old and new password of ' +
               'the user',
@@ -2708,7 +2711,7 @@ function attachCommands() {
           });
         }
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You have to input the old and new password of the ' +
             'user',
@@ -2731,7 +2734,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.logout = {
+  validCommands.logout = {
     func: function() {
       socket.emit('logout');
     },
@@ -2740,7 +2743,7 @@ function attachCommands() {
     category: 'basic',
     clearAfterUse: true,
   };
-  validCmds.reboot = {
+  validCommands.reboot = {
     func: function() {
       refreshApp();
     },
@@ -2748,7 +2751,7 @@ function attachCommands() {
     accessLevel: 1,
     category: 'basic',
   };
-  validCmds.verifyuser = {
+  validCommands.verifyuser = {
     func: function(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2781,7 +2784,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.banuser = {
+  validCommands.banuser = {
     func: function(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2804,7 +2807,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.unbanuser = {
+  validCommands.unbanuser = {
     func: function(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2831,7 +2834,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.whisper = {
+  validCommands.whisper = {
     func: function(phrases) {
       const data = {};
 
@@ -2844,7 +2847,7 @@ function attachCommands() {
 
         socket.emit('chatMsg', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You forgot to write the message!'],
         });
       }
@@ -2865,21 +2868,21 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.hackroom = {
+  validCommands.hackroom = {
     func: function(phrases) {
       const data = {};
-      const razLogoCopy = copyMsg(razLogo);
+      const razLogoCopy = copyMessage(razorLogo);
 
       if (phrases.length > 0) {
         data.roomName = phrases[0].toLowerCase();
         data.timesCracked = 0;
         data.timesRequired = 3;
-        cmdHelper.data = data;
+        commmandHelper.data = data;
 
-        // TODO: razLogo should be moved to DB or other place
-        queueMsg(razLogoCopy);
+        // TODO: razorLogo should be moved to DB or other place
+        queueMessage(razLogoCopy);
         // TODO: Message about abort should be sent from a common function for all commands
-        queueMsg({
+        queueMessage({
           text: [
             'Razor proudly presents:',
             'Room Access Hacking! (RAH)',
@@ -2901,31 +2904,31 @@ function attachCommands() {
             ' ',
           ],
         });
-        queueMsg(copyMsg(abortInfo));
-        queueMsg({
+        queueMessage(copyMessage(abortInfo));
+        queueMessage({
           text: ['Press enter to continue'],
         });
 
         setInputStart('Start');
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You forgot to input the room name!'],
         });
-        resetCmd(true);
+        resetCommand(true);
       }
     },
     steps: [
       function() {
-        queueMsg({
+        queueMessage({
           text: ['Checking room access...'],
         });
-        socket.emit('roomHackable', cmdHelper.data.roomName);
+        socket.emit('roomHackable', commmandHelper.data.roomName);
       },
       function() {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
         const timeout = 18000;
         const timerEnded = function() {
-          queueMsg({
+          queueMessage({
             text: [
               'Your hacking attempt has been detected',
               'Users of the room have been notified of your intrusion',
@@ -2939,13 +2942,13 @@ function attachCommands() {
               ],
               user: 'SYSTEM',
             },
-            roomName: cmdObj.data.roomName,
+            roomName: commandObj.data.roomName,
             skipSelfMsg: true,
           });
-          resetCmd(true);
+          resetCommand(true);
         };
 
-        queueMsg({
+        queueMessage({
           text: [
             'Activating cracking bot....',
             'Warning. Intrusion defense system activated',
@@ -2954,22 +2957,22 @@ function attachCommands() {
           ],
         });
         setInputStart('Verify seq');
-        cmdObj.data.code = createRandString(randString, 10, true);
-        cmdObj.data.timer = setTimeout(timerEnded, timeout);
-        cmdObj.onStep++;
-        queueMsg({
-          text: ['Sequence: ' + cmdObj.data.code],
+        commandObj.data.code = createRandString(randomString, 10, true);
+        commandObj.data.timer = setTimeout(timerEnded, timeout);
+        commandObj.onStep++;
+        queueMessage({
+          text: ['Sequence: ' + commandObj.data.code],
         });
       },
       function(phrases) {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
         const phrase = phrases.join(' ').trim();
 
-        if (phrase.toUpperCase() === cmdObj.data.code) {
-          queueMsg({ text: ['Sequence accepted'] });
-          cmdObj.data.timesCracked++;
+        if (phrase.toUpperCase() === commandObj.data.code) {
+          queueMessage({ text: ['Sequence accepted'] });
+          commandObj.data.timesCracked++;
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Incorrect sequence. Counter measures have been ' +
               'released',
@@ -2977,20 +2980,20 @@ function attachCommands() {
           });
         }
 
-        if (cmdObj.data.timesCracked < cmdObj.data.timesRequired) {
-          cmdObj.data.code = createRandString(randString, 10, true);
-          queueMsg({
-            text: ['Sequence: ' + cmdObj.data.code],
+        if (commandObj.data.timesCracked < commandObj.data.timesRequired) {
+          commandObj.data.code = createRandString(randomString, 10, true);
+          queueMessage({
+            text: ['Sequence: ' + commandObj.data.code],
           });
         } else {
           const data = {
             userName: getUser(),
-            roomName: cmdObj.data.roomName,
+            roomName: commandObj.data.roomName,
           };
 
-          clearTimeout(cmdObj.data.timer);
+          clearTimeout(commandObj.data.timer);
           socket.emit('hackRoom', data);
-          queueMsg(({
+          queueMessage(({
             text: [
               'Cracking complete',
               'Intrusion defense system disabled',
@@ -2998,12 +3001,12 @@ function attachCommands() {
               'Thank you for using RAH',
             ],
           }));
-          resetCmd();
+          resetCommand();
         }
       },
     ],
     abortFunc: function() {
-      clearTimeout(cmdHelper.data.timer);
+      clearTimeout(commmandHelper.data.timer);
     },
     help: [
       'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
@@ -3022,15 +3025,15 @@ function attachCommands() {
     accessLevel: 13,
     category: 'hacking',
   };
-  validCmds.importantmsg = {
+  validCommands.importantmsg = {
     func: function() {
       const data = {};
 
       data.text = [];
-      cmdHelper.data = data;
+      commmandHelper.data = data;
 
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
+      queueMessage(copyMessage(abortInfo));
+      queueMessage({
         text: [
           'Do you want to send it to a specific device?',
           'Enter the device ID or alias to send it to a specific device',
@@ -3046,20 +3049,20 @@ function attachCommands() {
           const device = phrases[0];
 
           if (device.length > 0) {
-            cmdHelper.data.device = device;
-            queueMsg({
+            commmandHelper.data.device = device;
+            queueMessage({
               text: ['Searching for device...'],
             });
-            socket.emit('verifyDevice', cmdHelper.data);
+            socket.emit('verifyDevice', commmandHelper.data);
           } else {
-            cmdHelper.onStep++;
-            validCmds[cmdHelper.command].steps[cmdHelper.onStep]();
+            commmandHelper.onStep++;
+            validCommands[commmandHelper.command].steps[commmandHelper.onStep]();
           }
         }
       },
       function() {
-        cmdHelper.onStep++;
-        queueMsg({
+        commmandHelper.onStep++;
+        queueMessage({
           text: [
             'Write a line and press enter',
             'Press enter without any input when you are done ' +
@@ -3072,19 +3075,19 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          cmdHelper.data.text.push(phrase);
+          commmandHelper.data.text.push(phrase);
         } else {
-          const dataText = copyString(cmdHelper.data.text);
-          cmdHelper.onStep++;
+          const dataText = copyString(commmandHelper.data.text);
+          commmandHelper.onStep++;
 
-          queueMsg({
+          queueMessage({
             text: ['Preview of the message:'],
           });
-          queueMsg({
+          queueMessage({
             text: dataText,
             extraClass: 'importantMsg',
           });
-          queueMsg({
+          queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
           });
         }
@@ -3092,9 +3095,9 @@ function attachCommands() {
       function(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
-            cmdHelper.onStep++;
+            commmandHelper.onStep++;
 
-            queueMsg({
+            queueMessage({
               text: [
                 'Do you want to send it as morse code too? ' +
                 '"yes" to send it as morse too',
@@ -3102,18 +3105,18 @@ function attachCommands() {
               ],
             });
           } else {
-            resetCmd(true);
+            resetCommand(true);
           }
         }
       },
       function(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
-            cmdHelper.data.morse = { local: true };
+            commmandHelper.data.morse = { local: true };
           }
 
-          socket.emit('importantMsg', cmdHelper.data);
-          resetCmd();
+          socket.emit('importantMsg', commmandHelper.data);
+          resetCommand();
         }
       },
     ],
@@ -3127,9 +3130,9 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.chipper = {
+  validCommands.chipper = {
     func: function() {
-      queueMsg({
+      queueMessage({
         text: [
           createLine(14),
           '- DEACTIVATE -',
@@ -3137,36 +3140,36 @@ function attachCommands() {
         ],
         extraClass: 'importantMsg large',
       });
-      queueMsg({
+      queueMessage({
         text: [
           'CONTROL WORD SENT',
           'AWAITING CONFIRMATION',
         ],
         extraClass: 'importantMsg',
       });
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
+      queueMessage(copyMessage(abortInfo));
+      queueMessage({
         text: ['Press Enter to continue'],
       });
       setInputStart('Chipper');
     },
     steps: [
       function() {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
 
-        cmdObj.onStep++;
-        queueMsg({
+        commandObj.onStep++;
+        queueMessage({
           text: [
             'Chipper has been activated',
             'Connecting to ECU.........',
           ],
         });
-        setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 2000);
+        setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
       },
       function() {
-        const cmdObj = cmdHelper;
+        const commandObj = commmandHelper;
         const stopFunc = function() {
-          queueMsg({
+          queueMessage({
             text: [
               'WARNING',
               'CONTROL IS BEING RELEASED',
@@ -3175,33 +3178,33 @@ function attachCommands() {
             extraClass: 'importantMsg',
           });
 
-          validCmds[cmdObj.command].abortFunc();
+          validCommands[commandObj.command].abortFunc();
         };
 
-        if (cmdObj.data.timer === undefined) {
-          cmdObj.data.timer = setTimeout(stopFunc, 300000, false);
+        if (commandObj.data.timer === undefined) {
+          commandObj.data.timer = setTimeout(stopFunc, 300000, false);
         }
 
-        queueMsg({
-          text: [createRandString(randBinary, 36)],
+        queueMessage({
+          text: [createRandString(randomBinary, 36)],
         });
 
-        cmdObj.data.printTimer = setTimeout(validCmds[cmdObj.command].steps[cmdObj.onStep], 250);
+        commandObj.data.printTimer = setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 250);
       },
     ],
     abortFunc: function() {
-      const cmdObj = cmdHelper;
+      const commandObj = commmandHelper;
 
-      clearTimeout(cmdObj.data.printTimer);
-      clearTimeout(cmdObj.data.timer);
-      validCmds.clear.func();
-      queueMsg({
+      clearTimeout(commandObj.data.printTimer);
+      clearTimeout(commandObj.data.timer);
+      validCommands.clear.func();
+      queueMessage({
         text: [
           'Chipper has powered down',
           'Control has been released',
         ],
       });
-      resetCmd();
+      resetCommand();
     },
     help: [
       'Activate chipper function',
@@ -3215,7 +3218,7 @@ function attachCommands() {
     category: 'hacking',
     clearBeforeUse: true,
   };
-  validCmds.room = {
+  validCommands.room = {
     func: function(phrases) {
       const room = {};
 
@@ -3234,7 +3237,7 @@ function attachCommands() {
           socket.emit('switchRoom', room);
         }
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You have to specify which room to switch to'],
         });
       }
@@ -3252,15 +3255,15 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.removeroom = {
+  validCommands.removeroom = {
     func: function(phrases) {
       const data = {};
 
       if (phrases.length > 0) {
         data.roomName = phrases[0].toLowerCase();
-        cmdHelper.data = data;
+        commmandHelper.data = data;
 
-        queueMsg({
+        queueMessage({
           text: [
             'Do you really want to remove the room?',
             'Confirm by writing "yes"',
@@ -3269,9 +3272,9 @@ function attachCommands() {
 
         setInputStart('removeroom');
       } else {
-        resetCmd(true);
+        resetCommand(true);
 
-        queueMsg({
+        queueMessage({
           text: ['You forgot to input the room name'],
         });
       }
@@ -3279,10 +3282,10 @@ function attachCommands() {
     steps: [
       function(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
-          socket.emit('removeRoom', cmdHelper.data.roomName);
+          socket.emit('removeRoom', commmandHelper.data.roomName);
         }
 
-        resetCmd();
+        resetCommand();
       },
     ],
     help: [
@@ -3300,7 +3303,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCmds.updateuser = {
+  validCommands.updateuser = {
     func: function(phrases) {
       const data = {};
 
@@ -3311,7 +3314,7 @@ function attachCommands() {
 
         socket.emit('updateUser', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You need to write a user name, field name and value',
             'Example: updateuser user1 accesslevel 3',
@@ -3334,7 +3337,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.updatecommand = {
+  validCommands.updatecommand = {
     func: function(phrases) {
       const data = {};
 
@@ -3345,7 +3348,7 @@ function attachCommands() {
 
         socket.emit('updateCommand', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You need to write a command name, field name and value',
             'Example: updatecommand help accesslevel 3',
@@ -3367,7 +3370,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.updateroom = {
+  validCommands.updateroom = {
     func: function(phrases) {
       const data = {};
 
@@ -3378,7 +3381,7 @@ function attachCommands() {
 
         socket.emit('updateRoom', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You need to write a room name, field name and value',
             'Example: updateroom room1 accesslevel 3',
@@ -3400,21 +3403,21 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.addencryptionkeys = {
+  validCommands.addencryptionkeys = {
     func: function() {
       const data = {};
 
       data.keys = [];
-      cmdHelper.data = data;
+      commmandHelper.data = data;
 
-      queueMsg({
-        text: createCmdStart('Add encryption keys').concat([
+      queueMessage({
+        text: createCommandStart('Add encryption keys').concat([
           'You can add more than one key',
           'Press enter without any input when you are done',
         ]),
       });
-      queueMsg(copyMsg(abortInfo));
-      queueMsg({
+      queueMessage(copyMessage(abortInfo));
+      queueMessage({
         text: ['Input an encryption key:'],
       });
       setInputStart('Input key');
@@ -3431,29 +3434,29 @@ function attachCommands() {
             keyObj.reusable = true;
           }
 
-          cmdHelper.data.keys.push(keyObj);
+          commmandHelper.data.keys.push(keyObj);
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Are you sure you want to add the keys?',
               'Write "yes" to accept',
             ],
           });
-          cmdHelper.onStep++;
+          commmandHelper.onStep++;
         }
       },
       function(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
-          queueMsg({
+          queueMessage({
             text: ['Uploading new keys...'],
           });
-          socket.emit('addKeys', cmdHelper.data.keys);
-          resetCmd();
+          socket.emit('addKeys', commmandHelper.data.keys);
+          resetCommand();
         } else {
-          queueMsg({
+          queueMessage({
             text: ['The keys will not be uploaded'],
           });
-          resetCmd(true);
+          resetCommand(true);
         }
       },
     ],
@@ -3468,20 +3471,20 @@ function attachCommands() {
     category: 'admin',
     clearBeforeUse: true,
   };
-  validCmds.addentities = {
+  validCommands.addentities = {
     func: function() {
       const data = {};
 
       data.entities = [];
-      cmdHelper.data = data;
+      commmandHelper.data = data;
 
-      queueMsg({
-        text: createCmdStart('Add entities').concat([
+      queueMessage({
+        text: createCommandStart('Add entities').concat([
           'You can add more than one entity',
           'Press enter without any input when you are done',
         ]),
       });
-      queueMsg(copyMsg(abortInfo));
+      queueMessage(copyMessage(abortInfo));
       setInputStart('Input entity');
     },
     steps: [
@@ -3491,29 +3494,29 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           entityObj.entityName = phrases[0];
 
-          cmdHelper.data.entities.push(entityObj);
+          commmandHelper.data.entities.push(entityObj);
         } else {
-          queueMsg({
+          queueMessage({
             text: [
               'Are you sure you want to add the entities?',
               'Write "yes" to accept',
             ],
           });
-          cmdHelper.onStep++;
+          commmandHelper.onStep++;
         }
       },
       function(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
-          queueMsg({
+          queueMessage({
             text: ['Uploading new entities...'],
           });
-          socket.emit('addEntities', cmdHelper.data.entities);
-          resetCmd();
+          socket.emit('addEntities', commmandHelper.data.entities);
+          resetCommand();
         } else {
-          queueMsg({
+          queueMessage({
             text: ['The entities will not be uploaded'],
           });
-          resetCmd(true);
+          resetCommand(true);
         }
       },
     ],
@@ -3528,14 +3531,14 @@ function attachCommands() {
     category: 'admin',
     clearBeforeUse: true,
   };
-  validCmds.weather = {
+  validCommands.weather = {
     func: function() {
       socket.emit('weather');
     },
     accessLevel: 1,
     category: 'basic',
   };
-  validCmds.updatedevice = {
+  validCommands.updatedevice = {
     func: function(phrases) {
       const data = {};
 
@@ -3546,7 +3549,7 @@ function attachCommands() {
 
         socket.emit('updateDevice', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You need to write a device Id, field name and value',
             'Example: updatedevice 11jfej433 id betteralias',
@@ -3568,21 +3571,21 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCmds.moduleraid = {
+  validCommands.moduleraid = {
     func: function() {
       const data = {};
 
       data.text = [];
-      cmdHelper.data = data;
+      commmandHelper.data = data;
 
-      queueMsg({
+      queueMessage({
         text: [
           'Write a coordinate and press enter',
           'Press enter without any input when you are done ' +
           'with the message',
         ],
       });
-      queueMsg(copyMsg(abortInfo));
+      queueMessage(copyMessage(abortInfo));
       setInputStart('moduleraid');
     },
     steps: [
@@ -3596,31 +3599,31 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          cmdHelper.data.text.push(phrase);
+          commmandHelper.data.text.push(phrase);
         } else {
-          const text = cmdHelper.data.text ? JSON.parse(JSON.stringify(cmdHelper.data.text)) : [];
-          cmdHelper.data.text = text.concat(startText, cmdHelper.data.text);
-          cmdHelper.onStep++;
+          const text = commmandHelper.data.text ? JSON.parse(JSON.stringify(commmandHelper.data.text)) : [];
+          commmandHelper.data.text = text.concat(startText, commmandHelper.data.text);
+          commmandHelper.onStep++;
 
-          queueMsg({
+          queueMessage({
             text: ['Preview of the message:'],
           });
-          queueMsg({
+          queueMessage({
             text: text,
             extraClass: 'importantMsg',
           });
-          queueMsg({
+          queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
           });
         }
       },
       function(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-          cmdHelper.data.morse = { local: true };
-          socket.emit('importantMsg', cmdHelper.data);
-          resetCmd();
+          commmandHelper.data.morse = { local: true };
+          socket.emit('importantMsg', commmandHelper.data);
+          resetCommand();
         } else {
-          resetCmd(true);
+          resetCommand(true);
         }
       },
     ],
@@ -3635,7 +3638,7 @@ function attachCommands() {
     clearAfterUse: true,
     category: 'admin',
   };
-  validCmds.createteam = {
+  validCommands.createteam = {
     func: function(phrases) {
       const teamName = phrases[0];
       const data = {};
@@ -3648,7 +3651,7 @@ function attachCommands() {
 
         socket.emit('createTeam', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You have to enter a name'],
         });
       }
@@ -3666,7 +3669,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.inviteteam = {
+  validCommands.inviteteam = {
     func: function(phrases) {
       const data = {};
       const userName = phrases[0];
@@ -3675,7 +3678,7 @@ function attachCommands() {
         data.userName = userName;
         socket.emit('inviteToTeam', data);
       } else {
-        queueMsg({
+        queueMessage({
           text: ['You are not allowed to invite members to the team or you are not in a team'],
         });
       }
@@ -3693,22 +3696,22 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCmds.alias = {
+  validCommands.alias = {
     func: function(phrases) {
       const aliasName = phrases.shift();
       const sequence = phrases;
       const aliases = getAliases();
-      const cmdKeys = Object.keys(validCmds);
+      const commandKeys = Object.keys(validCommands);
 
-      if (aliasName && sequence && cmdKeys.indexOf(aliasName) === -1) {
+      if (aliasName && sequence && commandKeys.indexOf(aliasName) === -1) {
         aliases[aliasName] = sequence;
         setAliases(aliases);
-      } else if (cmdKeys.indexOf(aliasName) > -1) {
-        queueMsg({
+      } else if (commandKeys.indexOf(aliasName) > -1) {
+        queueMessage({
           text: [aliasName + ' is a built-in command. You may not override built-in commands'],
         });
       } else {
-        queueMsg({
+        queueMessage({
           text: [
             'You have to input a name and sequence',
             'E.g. alias goodalias msg hello',
@@ -3749,9 +3752,9 @@ function startBoot() {
     clicked = !clicked;
 
     if (clicked) {
-      cmdInput.focus();
+      commandInput.focus();
     } else {
-      cmdInput.blur();
+      commandInput.blur();
     }
 
     // Set whole document to full screen
@@ -3768,18 +3771,18 @@ function startBoot() {
   addEventListener('keyup', keyReleased);
   window.addEventListener('focus', setIntervals);
 
-  resetPrevCmdPointer();
+  resetPreviousCommandPointer();
   generateMap();
   setIntervals();
   startAudio();
 
   // TODO: Move this
-  if (!getAccessLvl()) {
-    setAccessLvl(0);
+  if (!getAccessLevel()) {
+    setAccessLevel(0);
   }
 
   if (!getUser()) {
-    printStartMsg();
+    printStartMessage();
     setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
       deviceId: getDeviceId(),

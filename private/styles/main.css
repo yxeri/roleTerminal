@@ -10,6 +10,7 @@ html {
 
 body {
     margin: 0;
+    background-color: #151e15;
     color: #00FF00;
     text-shadow: 1px 1px 4px #008700;
     font-family: monospace;

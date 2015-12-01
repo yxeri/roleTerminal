@@ -164,7 +164,7 @@ const mapHelper = {
 const commmandFailText = { text: ['command not found'] };
 const abortInfo = { text: ['You can cancel out of the command by typing "exit" or "abort"'] };
 const defaultInputStart = 'RAZCMD';
-const commmandHelper = {
+const commandHelper = {
   maxSteps: 0,
   onStep: 0,
   command: null,
@@ -538,12 +538,12 @@ function resetCommand(aborted) {
     });
   }
 
-  commmandHelper.command = null;
-  commmandHelper.onStep = 0;
-  commmandHelper.maxSteps = 0;
-  commmandHelper.keysBlocked = false;
-  commmandHelper.data = null;
-  commmandHelper.hideInput = false;
+  commandHelper.command = null;
+  commandHelper.onStep = 0;
+  commandHelper.maxSteps = 0;
+  commandHelper.keysBlocked = false;
+  commandHelper.data = null;
+  commandHelper.hideInput = false;
   setInputStart(room);
 }
 
@@ -580,7 +580,7 @@ function changeModeText() {
   const inputText = getInputText();
   const mode = getMode();
 
-  if (getUser() && !commmandHelper.command) {
+  if (getUser() && !commandHelper.command) {
     // TODO msg command text in comparison should not be hard coded
     if ((chatMode === mode && commandChars.indexOf(inputText.charAt(0)) > -1) || (cmdMode === mode && trimSpace(inputText).split(' ')[0] !== 'msg')) {
       setModeText(cmdMode.toUpperCase());
@@ -1097,7 +1097,7 @@ function specialKeyPress(event) {
     case 9:
       keyPressed = true;
 
-      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
+      if (!commandHelper.keysBlocked && commandHelper.command === null) {
         autoComplete();
       }
 
@@ -1107,7 +1107,7 @@ function specialKeyPress(event) {
       break;
     // Enter
     case 13:
-      const commandObj = commmandHelper;
+      const commandObj = commandHelper;
       const commands = validCommands;
       let inputText;
       let phrases;
@@ -1127,7 +1127,7 @@ function specialKeyPress(event) {
 
             resetCommand(true);
           } else {
-            if (!commmandHelper.hideInput) {
+            if (!commandHelper.hideInput) {
               queueMessage({
                 text: [inputText],
               });
@@ -1251,7 +1251,7 @@ function specialKeyPress(event) {
     case 38:
       keyPressed = true;
 
-      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
+      if (!commandHelper.keysBlocked && commandHelper.command === null) {
         if (previousCommandPointer > 0) {
           clearInput();
           previousCommandPointer--;
@@ -1266,7 +1266,7 @@ function specialKeyPress(event) {
     case 40:
       keyPressed = true;
 
-      if (!commmandHelper.keysBlocked && commmandHelper.command === null) {
+      if (!commandHelper.keysBlocked && commandHelper.command === null) {
         if (previousCommandPointer < commandHistory.length - 1) {
           clearInput();
           previousCommandPointer++;
@@ -1301,7 +1301,7 @@ function keyPress(event) {
         changeModeText();
       }
 
-      if (triggerAutoComplete(getInputText(), textChar) && commmandHelper.command === null) {
+      if (triggerAutoComplete(getInputText(), textChar) && commandHelper.command === null) {
         autoComplete();
         // Prevent new whitespace to be printed
         event.preventDefault();
@@ -1474,16 +1474,21 @@ function onLogin(user) {
   socket.emit('follow', { roomName: 'public', entered: true });
 }
 
-function onCommandSuccess(data) {
+function onCommandSuccess(data = {}) {
   if (!data.freezeStep) {
-    commmandHelper.onStep++;
+    commandHelper.onStep++;
   }
 
-  validCommands[commmandHelper.command].steps[commmandHelper.onStep](data, socket);
+  validCommands[commandHelper.command].steps[commandHelper.onStep](data, socket);
 }
 
 function onCommandFail() {
-  validCommands[commmandHelper.command].abortFunc();
+  const abortFunc = validCommands[commandHelper.command].abortFunc;
+
+  if (abortFunc) {
+    abortFunc();
+  }
+
   resetCommand(true);
 }
 
@@ -1968,7 +1973,7 @@ function attachCommands() {
       const data = {};
 
       data.text = [];
-      commmandHelper.data = data;
+      commandHelper.data = data;
 
       queueMessage({
         text: [
@@ -1986,9 +1991,9 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           phrase = phrases.join(' ');
 
-          commmandHelper.data.text = commmandHelper.data.text.concat(createCommandStart('broadcast from: ' + phrase));
+          commandHelper.data.text = commandHelper.data.text.concat(createCommandStart('broadcast from: ' + phrase));
         } else {
-          commmandHelper.data.text = commmandHelper.data.text.concat(createCommandStart('broadcast'));
+          commandHelper.data.text = commandHelper.data.text.concat(createCommandStart('broadcast'));
         }
 
         queueMessage({
@@ -1998,7 +2003,7 @@ function attachCommands() {
             'with the message',
           ],
         });
-        commmandHelper.onStep++;
+        commandHelper.onStep++;
       },
       function broadcastStepTwo(phrases) {
         let dataText;
@@ -2006,12 +2011,12 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          commmandHelper.data.text.push(phrase);
+          commandHelper.data.text.push(phrase);
         } else {
-          commmandHelper.data.text.push(createLine(10));
-          dataText = copyString(commmandHelper.data.text);
+          commandHelper.data.text.push(createLine(10));
+          dataText = copyString(commandHelper.data.text);
 
-          commmandHelper.onStep++;
+          commandHelper.onStep++;
 
           queueMessage({
             text: ['Preview of the message:'],
@@ -2026,7 +2031,7 @@ function attachCommands() {
       },
       function broadcastStepThree(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-          socket.emit('broadcastMsg', commmandHelper.data);
+          socket.emit('broadcastMsg', commandHelper.data);
           resetCommand();
         } else {
           resetCommand(true);
@@ -2234,10 +2239,10 @@ function attachCommands() {
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
           data.userName = userName;
           data.registerDevice = getDeviceId();
-          commmandHelper.data = data;
-          commmandHelper.hideInput = true;
+          commandHelper.data = data;
+          commandHelper.hideInput = true;
           hideInput(true);
-          socket.emit('userExists', commmandHelper.data);
+          socket.emit('userExists', commandHelper.data);
         } else {
           resetCommand(true);
           queueMessage({
@@ -2270,19 +2275,19 @@ function attachCommands() {
         });
         queueMessage(copyMessage(abortInfo));
         setInputStart('password');
-        commmandHelper.onStep++;
+        commandHelper.onStep++;
       },
       function registerStepTwo(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
-          commmandHelper.data.password = password;
+          commandHelper.data.password = password;
           queueMessage({
             text: [
               'Repeat your password one more time',
             ],
           });
-          commmandHelper.onStep++;
+          commandHelper.onStep++;
         } else {
           queueMessage({
             text: [
@@ -2296,7 +2301,7 @@ function attachCommands() {
       function registerStepThree(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
-        if (password === commmandHelper.data.password) {
+        if (password === commandHelper.data.password) {
           queueMessage({
             text: [
               'Congratulations, employee #' + Math.floor(Math.random() * 120503),
@@ -2305,8 +2310,8 @@ function attachCommands() {
               'Have a productive day!',
             ],
           });
-          socket.emit('register', commmandHelper.data);
-          validCommands[commmandHelper.command].abortFunc();
+          socket.emit('register', commandHelper.data);
+          validCommands[commandHelper.command].abortFunc();
           resetCommand(false);
         } else {
           queueMessage({
@@ -2315,7 +2320,7 @@ function attachCommands() {
               'Input a password and press enter',
             ],
           });
-          commmandHelper.onStep--;
+          commandHelper.onStep--;
         }
       },
     ],
@@ -2410,8 +2415,8 @@ function attachCommands() {
         });
       } else if (phrases.length > 0) {
         data.userName = phrases[0].toLowerCase();
-        commmandHelper.data = data;
-        commmandHelper.hideInput = true;
+        commandHelper.data = data;
+        commandHelper.hideInput = true;
         queueMessage({
           text: [
             'Input your password',
@@ -2430,9 +2435,9 @@ function attachCommands() {
     },
     steps: [
       function loginStepOne(phrases) {
-        commmandHelper.data.password = phrases[0].toLowerCase();
-        socket.emit('login', commmandHelper.data);
-        validCommands[commmandHelper.command].abortFunc();
+        commandHelper.data.password = phrases[0].toLowerCase();
+        socket.emit('login', commandHelper.data);
+        validCommands[commandHelper.command].abortFunc();
         validCommands.clear.func();
         resetCommand();
       },
@@ -2531,7 +2536,7 @@ function attachCommands() {
     },
     steps: [
       function uploadkeyStepOne(phrases) {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
         const phrase = phrases.join(' ');
 
         socket.emit('verifyKey', phrase.toLowerCase());
@@ -2544,7 +2549,7 @@ function attachCommands() {
         setInputStart('Verifying...');
       },
       function uploadkeyStepTwo(data) {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
 
         if (data.keyData !== null) {
           if (data.keyData.reusable || !data.keyData.used) {
@@ -2568,14 +2573,14 @@ function attachCommands() {
         }
       },
       function uploadkeyStepThree() {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
 
         setInputStart('Enter entity name');
         commandObj.keysBlocked = false;
         commandObj.onStep++;
       },
       function uploadkeyStepFour(phrases) {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
         const data = commandObj.data;
         const phrase = phrases.join(' ');
 
@@ -2691,45 +2696,63 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.password = {
-    func: function passwordCommand(phrases) {
-      const data = {};
+    func: function passwordCommand() {
+      commandHelper.hideInput = true;
 
-      if (phrases && phrases.length > 1) {
-        data.oldPassword = phrases[0];
-        data.newPassword = phrases[1];
-        data.userName = getUser();
+      hideInput(true);
+      setInputStart('Old passwd');
+      queueMessage(copyMessage(abortInfo));
+      queueMessage({
+        text: ['Enter your current password'],
+      });
+    },
+    steps: [
+      function passwordStepOne(phrases = ['']) {
+        const data = {};
+        const oldPassword = phrases[0];
+        data.oldPassword = oldPassword;
+        commandHelper.data = data;
+        commandHelper.onStep++;
 
-        if (data.newPassword.length >= 4) {
-          socket.emit('changePassword', data);
+        setInputStart('New pass');
+        socket.emit('checkPassword', data);
+      },
+      function passwordStepTwo(phrases = []) {
+        commandHelper.data.newPassword = phrases[0];
+        commandHelper.onStep++;
+
+        setInputStart('Repeat passwd');
+        queueMessage({
+          text: ['Repeat your new password'],
+        });
+      },
+      function passwordStepThree(phrases = []) {
+        const repeatedPassword = phrases[0];
+
+        if (repeatedPassword === commandHelper.data.newPassword) {
+          socket.emit('changePassword', commandHelper.data);
         } else {
+          commandHelper.onStep--;
+
+          setInputStart('New pass');
           queueMessage({
             text: [
-              'You have to input the old and new password of ' +
-              'the user',
-              'Example: password old1 new1',
+              'Password doesn\'t match. Please try again',
+              'Enter your new password',
             ],
           });
         }
-      } else {
-        queueMessage({
-          text: [
-            'You have to input the old and new password of the ' +
-            'user',
-            'Example: password old1 new1',
-          ],
-        });
-      }
+      },
+    ],
+    abortFunc: function passwordAbort() {
+      hideInput(false);
     },
     help: [
       'Allows you to change the user password',
-      'Password has to be 4 to 10 characters',
-      'Don\'t use whitespace in your name or password!',
+      'Don\'t use whitespace in your password!',
     ],
     instructions: [
-      ' Usage:',
-      '  password *oldpassword* *newpassword*',
-      ' Example:',
-      '  password old1 new1',
+      'Follow the instructions',
     ],
     accessLevel: 13,
     category: 'basic',
@@ -2877,7 +2900,7 @@ function attachCommands() {
         data.roomName = phrases[0].toLowerCase();
         data.timesCracked = 0;
         data.timesRequired = 3;
-        commmandHelper.data = data;
+        commandHelper.data = data;
 
         // TODO: razorLogo should be moved to DB or other place
         queueMessage(razLogoCopy);
@@ -2922,10 +2945,10 @@ function attachCommands() {
         queueMessage({
           text: ['Checking room access...'],
         });
-        socket.emit('roomHackable', commmandHelper.data.roomName);
+        socket.emit('roomHackable', commandHelper.data.roomName);
       },
       function hackroomStepTwo() {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
         const timeout = 18000;
         const timerEnded = function timerEnded() {
           queueMessage({
@@ -2965,7 +2988,7 @@ function attachCommands() {
         });
       },
       function hackroomStepThree(phrases) {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
         const phrase = phrases.join(' ').trim();
 
         if (phrase.toUpperCase() === commandObj.data.code) {
@@ -3006,7 +3029,7 @@ function attachCommands() {
       },
     ],
     abortFunc: function hackroomAbort() {
-      clearTimeout(commmandHelper.data.timer);
+      clearTimeout(commandHelper.data.timer);
     },
     help: [
       'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
@@ -3030,7 +3053,7 @@ function attachCommands() {
       const data = {};
 
       data.text = [];
-      commmandHelper.data = data;
+      commandHelper.data = data;
 
       queueMessage(copyMessage(abortInfo));
       queueMessage({
@@ -3049,19 +3072,19 @@ function attachCommands() {
           const device = phrases[0];
 
           if (device.length > 0) {
-            commmandHelper.data.device = device;
+            commandHelper.data.device = device;
             queueMessage({
               text: ['Searching for device...'],
             });
-            socket.emit('verifyDevice', commmandHelper.data);
+            socket.emit('verifyDevice', commandHelper.data);
           } else {
-            commmandHelper.onStep++;
-            validCommands[commmandHelper.command].steps[commmandHelper.onStep]();
+            commandHelper.onStep++;
+            validCommands[commandHelper.command].steps[commandHelper.onStep]();
           }
         }
       },
       function importantmsgStepTwo() {
-        commmandHelper.onStep++;
+        commandHelper.onStep++;
         queueMessage({
           text: [
             'Write a line and press enter',
@@ -3075,10 +3098,10 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          commmandHelper.data.text.push(phrase);
+          commandHelper.data.text.push(phrase);
         } else {
-          const dataText = copyString(commmandHelper.data.text);
-          commmandHelper.onStep++;
+          const dataText = copyString(commandHelper.data.text);
+          commandHelper.onStep++;
 
           queueMessage({
             text: ['Preview of the message:'],
@@ -3095,7 +3118,7 @@ function attachCommands() {
       function importantmsgStepFour(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
-            commmandHelper.onStep++;
+            commandHelper.onStep++;
 
             queueMessage({
               text: [
@@ -3112,10 +3135,10 @@ function attachCommands() {
       function importantmsgStepFive(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
-            commmandHelper.data.morse = { local: true };
+            commandHelper.data.morse = { local: true };
           }
 
-          socket.emit('importantMsg', commmandHelper.data);
+          socket.emit('importantMsg', commandHelper.data);
           resetCommand();
         }
       },
@@ -3155,7 +3178,7 @@ function attachCommands() {
     },
     steps: [
       function chipperStepOne() {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
 
         commandObj.onStep++;
         queueMessage({
@@ -3167,7 +3190,7 @@ function attachCommands() {
         setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
       },
       function chipperStepTwo() {
-        const commandObj = commmandHelper;
+        const commandObj = commandHelper;
         const stopFunc = function stopFunc() {
           queueMessage({
             text: [
@@ -3193,7 +3216,7 @@ function attachCommands() {
       },
     ],
     abortFunc: function chipperAbort() {
-      const commandObj = commmandHelper;
+      const commandObj = commandHelper;
 
       clearTimeout(commandObj.data.printTimer);
       clearTimeout(commandObj.data.timer);
@@ -3261,7 +3284,7 @@ function attachCommands() {
 
       if (phrases.length > 0) {
         data.roomName = phrases[0].toLowerCase();
-        commmandHelper.data = data;
+        commandHelper.data = data;
 
         queueMessage({
           text: [
@@ -3282,7 +3305,7 @@ function attachCommands() {
     steps: [
       function removeroomStepOne(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
-          socket.emit('removeRoom', commmandHelper.data.roomName);
+          socket.emit('removeRoom', commandHelper.data.roomName);
         }
 
         resetCommand();
@@ -3408,7 +3431,7 @@ function attachCommands() {
       const data = {};
 
       data.keys = [];
-      commmandHelper.data = data;
+      commandHelper.data = data;
 
       queueMessage({
         text: createCommandStart('Add encryption keys').concat([
@@ -3434,7 +3457,7 @@ function attachCommands() {
             keyObj.reusable = true;
           }
 
-          commmandHelper.data.keys.push(keyObj);
+          commandHelper.data.keys.push(keyObj);
         } else {
           queueMessage({
             text: [
@@ -3442,7 +3465,7 @@ function attachCommands() {
               'Write "yes" to accept',
             ],
           });
-          commmandHelper.onStep++;
+          commandHelper.onStep++;
         }
       },
       function addencryptionkeysStepTwo(phrases) {
@@ -3450,7 +3473,7 @@ function attachCommands() {
           queueMessage({
             text: ['Uploading new keys...'],
           });
-          socket.emit('addKeys', commmandHelper.data.keys);
+          socket.emit('addKeys', commandHelper.data.keys);
           resetCommand();
         } else {
           queueMessage({
@@ -3476,7 +3499,7 @@ function attachCommands() {
       const data = {};
 
       data.entities = [];
-      commmandHelper.data = data;
+      commandHelper.data = data;
 
       queueMessage({
         text: createCommandStart('Add entities').concat([
@@ -3494,7 +3517,7 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           entityObj.entityName = phrases[0];
 
-          commmandHelper.data.entities.push(entityObj);
+          commandHelper.data.entities.push(entityObj);
         } else {
           queueMessage({
             text: [
@@ -3502,7 +3525,7 @@ function attachCommands() {
               'Write "yes" to accept',
             ],
           });
-          commmandHelper.onStep++;
+          commandHelper.onStep++;
         }
       },
       function addentitiesStepTwo(phrases) {
@@ -3510,7 +3533,7 @@ function attachCommands() {
           queueMessage({
             text: ['Uploading new entities...'],
           });
-          socket.emit('addEntities', commmandHelper.data.entities);
+          socket.emit('addEntities', commandHelper.data.entities);
           resetCommand();
         } else {
           queueMessage({
@@ -3576,7 +3599,7 @@ function attachCommands() {
       const data = {};
 
       data.text = [];
-      commmandHelper.data = data;
+      commandHelper.data = data;
 
       queueMessage({
         text: [
@@ -3599,11 +3622,11 @@ function attachCommands() {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          commmandHelper.data.text.push(phrase);
+          commandHelper.data.text.push(phrase);
         } else {
-          const text = commmandHelper.data.text ? JSON.parse(JSON.stringify(commmandHelper.data.text)) : [];
-          commmandHelper.data.text = text.concat(startText, commmandHelper.data.text);
-          commmandHelper.onStep++;
+          const text = commandHelper.data.text ? JSON.parse(JSON.stringify(commandHelper.data.text)) : [];
+          commandHelper.data.text = text.concat(startText, commandHelper.data.text);
+          commandHelper.onStep++;
 
           queueMessage({
             text: ['Preview of the message:'],
@@ -3619,8 +3642,8 @@ function attachCommands() {
       },
       function moduleraidStepTwo(phrases) {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-          commmandHelper.data.morse = { local: true };
-          socket.emit('importantMsg', commmandHelper.data);
+          commandHelper.data.morse = { local: true };
+          socket.emit('importantMsg', commandHelper.data);
           resetCommand();
         } else {
           resetCommand(true);

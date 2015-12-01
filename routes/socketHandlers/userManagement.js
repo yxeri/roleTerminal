@@ -232,38 +232,63 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('changePassword', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.login.commandName, function(allowErr, allowed) {
+  socket.on('checkPassword', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.password.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
 
-      if (data.oldPassword && data.newPassword && data.userName) {
-        dbConnector.authUser(data.userName, data.oldPassword, function(err, user) {
-          if (err || user === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', err);
+      dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
+        if (err || authUser === null) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Incorrect password', err);
+          socket.emit('commandFail');
+
+          return;
+        }
+
+        socket.emit('messages', [{
+          text: ['Enter your new password'],
+        }]);
+      });
+    });
+  });
+
+  socket.on('changePassword', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.password.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed) {
+        return;
+      } else if (!data.newPassword) {
+        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password. No new password sent');
+
+        return;
+      }
+
+      dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
+        if (err || authUser === null) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', err);
+
+          return;
+        }
+
+        dbConnector.updateUserPassword(authUser.userName, data.newPassword, function(userErr, updatedUser) {
+          if (userErr || updatedUser === null) {
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', userErr);
+
             return;
           }
 
-          dbConnector.updateUserPassword(user.userName, data.newPassword, function(userErr, updatedUser) {
-            if (userErr || updatedUser === null) {
-              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', userErr);
-              return;
-            }
-
-            socket.emit('messages', [{
-              text: [
-                'Password has been successfully changed!',
-              ],
-            }]);
-          });
+          socket.emit('messages', [{
+            text: [
+              'Password has been successfully changed!',
+            ],
+          }]);
         });
-      }
+      });
     });
   });
 
   socket.on('logout', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.login.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.logout.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }

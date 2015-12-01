@@ -47,12 +47,18 @@ function htmlMinify(inPath, outPath) {
  */
 function nodeMinify(inPath, outPath, minifierType, extension) {
   function removeTranspiledTemp(filePath) {
-    fs.unlink(filePath, function(err) {
+    fs.stat(filePath, function(err) {
       if (err) {
-        console.log('Failed to remove temp file');
-      } else {
-        console.log('Successfully removed', filePath);
+        return;
       }
+
+      fs.unlink(filePath, function(unlinkErr) {
+        if (unlinkErr) {
+          console.log('Failed to remove temp file');
+        } else {
+          console.log('Successfully removed', filePath);
+        }
+      });
     });
   }
 
@@ -80,7 +86,7 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
     const transpilePath = inPath + '-transpile';
     let file;
 
-    browserify(inPath, {debug: true}).transform('babelify', {presets: ['es2015'], compact: false}).bundle().pipe(
+    browserify(inPath, { debug: true }).transform('babelify', { presets: ['es2015'], compact: false }).bundle().pipe(
       file = fs.createWriteStream(transpilePath)
     );
 

@@ -32,7 +32,7 @@ function handle(socket) {
 
       if (data.message.whisper) {
         data.message.roomName += dbDefaults.whisper;
-        data.extraClass = 'whisperMsg';
+        data.message.extraClass = 'whisperMsg';
 
         messenger.sendWhisperMsg(socket, data.message);
       } else {

@@ -2008,7 +2008,7 @@ function attachCommands() {
 
           commandHelper.data.text.push(phrase);
         } else {
-          commandHelper.data.text.push(createLine(10));
+          commandHelper.data.text.push(createLine(commandHelper.data.text[0].length));
           dataText = copyString(commandHelper.data.text);
 
           commandHelper.onStep++;

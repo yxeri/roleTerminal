@@ -76,6 +76,8 @@ const randomBinary = '01';
 const hideRooms = [
   'broadcast',
   'important',
+];
+const noLinkRooms = [
   'whisper',
 ];
 // Interval/timeout times in milliseconds
@@ -318,21 +320,17 @@ function scrollView() {
 function generateFullRow(sentText, message) {
   const rowObj = document.createElement('li');
   const roomName = message.roomName;
-  let roomElem;
 
   if (message.time && !message.skipTime) {
     rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
   }
 
-  if (roomName) {
-    // If room is one of the system ones, not meant for direct messaging
-    if (hideRooms.indexOf(roomName.toLowerCase()) > -1) {
-      roomElem = generateSpan(roomName);
+  if (roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
+    if (noLinkRooms.indexOf(roomName.toLowerCase()) > -1) {
+      rowObj.appendChild(generateSpan(roomName, 'room'));
     } else {
-      roomElem = generateLink(roomName, 'room', linkRoom);
+      rowObj.appendChild(generateLink(roomName, 'room', linkRoom));
     }
-
-    rowObj.appendChild(roomElem);
   }
 
   if (message.userName) {
@@ -349,10 +347,11 @@ function consumeMessageShortQueue() {
     if (message.text && message.text.length > 0) {
       const text = message.text.shift();
       const row = generateFullRow(text, message);
+      const extraClass = message.extraClass;
 
-      if (message.extraClass) {
+      if (extraClass) {
         // classList doesn't work on older devices, thus the usage of className
-        row.className += ' ' + message.extraClass;
+        row.className += ' ' + extraClass;
       }
 
       mainFeed.appendChild(row);
@@ -1388,13 +1387,9 @@ function onMessages(messages) {
 
     if (message.roomName) {
       if (message.roomName.indexOf('-whisper') >= 0) {
-        message.roomName = 'WHISPER';
+        message.roomName = 'whisper';
       } else if (message.roomName.indexOf('-device') >= 0) {
-        message.roomName = 'DEVICE';
-      } else if (message.roomName === 'important') {
-        message.roomName = 'IMPORTNT';
-      } else if (message.roomName === 'broadcast') {
-        message.roomName = 'BROADCST';
+        message.roomName = 'device';
       }
     }
 
@@ -1403,7 +1398,7 @@ function onMessages(messages) {
 }
 
 function onBroadcastMsg(message) {
-  message.extraClass = 'bold';
+  message.extraClass = 'broadcastMsg';
 
   queueMessage(message);
 }

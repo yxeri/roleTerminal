@@ -32,6 +32,7 @@ function handle(socket) {
 
       if (data.message.whisper) {
         data.message.roomName += dbDefaults.whisper;
+        data.extraClass = 'whisperMsg';
 
         messenger.sendWhisperMsg(socket, data.message);
       } else {
@@ -46,16 +47,17 @@ function handle(socket) {
         return;
       }
 
+      const roomName = dbDefaults.rooms.broadcast.roomName;
       data.time = new Date();
+      data.extraClass = 'broadcastMsg';
+      data.roomName = roomName;
 
-      dbConnector.addMsgToHistory('broadcast', data, function(err, history) {
+      dbConnector.addMsgToHistory(roomName, data, function(err, history) {
         if (err || history === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
 
           return;
         }
-
-        data.roomName = 'ALL';
 
         socket.broadcast.emit('broadcastMsg', data);
         socket.emit('messages', [data]);
@@ -72,7 +74,7 @@ function handle(socket) {
 
         manager.createRoom(sentRoom, user, function(createErr, roomName) {
           if (createErr) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', err);
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', createErr);
 
             return;
           } else if (!roomName) {
@@ -419,6 +421,7 @@ function handle(socket) {
       }
 
       data.time = new Date();
+      data.extraClass = 'importantMsg';
 
       if (data.device) {
         dbConnector.getDevice(data.device, function(err, device) {
@@ -430,11 +433,13 @@ function handle(socket) {
 
           const deviceId = device.deviceId;
           const roomName = deviceId + dbDefaults.device;
+          data.roomName = roomName;
 
           historyFunc(roomName, deviceFunc);
         });
       } else {
         const roomName = dbDefaults.rooms.important.roomName;
+        data.roomName = roomName;
 
         historyFunc(roomName, messageFunc);
       }

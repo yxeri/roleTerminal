@@ -57,6 +57,7 @@ const historySchema = new mongoose.Schema({
     time: Date,
     userName: String,
     roomName: String,
+    extraClass: String,
   }],
 }, { collection: 'histories' });
 const commandSchema = new mongoose.Schema({

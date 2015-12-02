@@ -356,9 +356,7 @@ function consumeMessageShortQueue() {
       }
 
       mainFeed.appendChild(row);
-
       scrollView();
-
       setTimeout(printRow, rowTimeout, message);
     } else {
       consumeMessageShortQueue();
@@ -544,7 +542,9 @@ function resetCommand(aborted) {
   commandHelper.keysBlocked = false;
   commandHelper.data = null;
   commandHelper.hideInput = false;
+
   setInputStart(room);
+  hideInput(false);
 }
 
 function refreshApp() {
@@ -2344,45 +2344,82 @@ function attachCommands() {
     category: 'login',
   };
   validCommands.createroom = {
-    func: function createroomCommand(phrases) {
-      const room = {};
-      const errorMsg = {
-        text: [
-          'Failed to create room.',
-          'Room name has to be 1 to 6 characters long',
-          'The room name and password can only contain letters and numbers ' +
-          '(a-z, 0-9. Password can mix upper and lowercase)',
-          'e.g. createroom myroom',
-        ],
-      };
+    func: function createroomCommand(phrases = ['']) {
+      const roomName = phrases[0].toLowerCase();
 
-      if (phrases.length > 0) {
-        const roomName = phrases[0].toLowerCase();
-        const password = phrases[1];
+      if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName)) {
+        const data = {};
+        data.roomName = roomName;
+        data.owner = getUser();
+        commandHelper.data = data;
+        commandHelper.hideInput = true;
 
-        if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName) && isTextAllowed(password)) {
-          room.roomName = roomName;
-          room.password = password;
-          room.owner = getUser();
-
-          socket.emit('createRoom', room);
-        } else {
-          queueMessage(errorMsg);
-        }
+        queueMessage({
+          text: [
+            'Enter a password for the room',
+            'Leave it empty if you don\'t want to password protect the room',
+          ],
+        });
+        setInputStart('Set passwd');
+        hideInput(true);
       } else {
-        queueMessage(errorMsg);
+        queueMessage({
+          text: [
+            'Failed to create room',
+            'Room name has to be 1 to 6 characters long',
+            'The room name can only contain letters and numbers',
+            'e.g. createroom myroom',
+          ],
+        });
       }
     },
+    steps: [
+      function createroomStepOne(phrases = ['']) {
+        const password = phrases[0];
+        commandHelper.onStep++;
+
+        if (password.length > 0) {
+          commandHelper.data.password = password;
+
+          setInputStart('Repeat passwd');
+          queueMessage({
+            text: ['Repeat the password'],
+          });
+        } else {
+          commandHelper.onStep++;
+          socket.emit('createRoom', commandHelper.data);
+          resetCommand(false);
+        }
+      },
+      function createroomStepTwo(phrases = ['']) {
+        const password = phrases[0];
+
+        if (password === commandHelper.data.password) {
+          socket.emit('createRoom', commandHelper.data);
+          resetCommand(false);
+        } else {
+          commandHelper.onStep--;
+
+          queueMessage({
+            text: [
+              'Passwords don\'t match. Try again',
+              'Enter a password for the room',
+              'Leave it empty if you don\'t want password-protect the room',
+            ],
+          });
+          setInputStart('Set passwd');
+        }
+      },
+    ],
     help: [
       'Creates a chat room',
       'The rooms name has to be 1 to 6 characters long',
-      'The password is optional, but if set it has to be 4 to 10 ' +
-      'characters',
+      'The password is optional',
       'The name can only contain letters and numbers (a-z, 0-9)',
     ],
     instructions: [
       ' Usage:',
-      '  createroom *room name* *optional password*',
+      '  createroom *room name*',
       ' Example:',
       '  createroom myroom banana',
     ],
@@ -2731,6 +2768,7 @@ function attachCommands() {
 
         if (repeatedPassword === commandHelper.data.newPassword) {
           socket.emit('changePassword', commandHelper.data);
+          resetCommand(false);
         } else {
           commandHelper.onStep--;
 

@@ -72,6 +72,14 @@ function handle(socket) {
 
         manager.createRoom(sentRoom, user, function(createErr, roomName) {
           if (createErr) {
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', err);
+
+            return;
+          } else if (!roomName) {
+            socket.emit('messages', [{
+              text: ['Failed to create room. A room with that name already exists'],
+            }]);
+
             return;
           }
 
@@ -100,8 +108,7 @@ function handle(socket) {
 
       dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
         if (err || room === null) {
-          logger.sendSocketErrorMsg(
-            socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
 
           return;
         }

@@ -1,159 +1,159 @@
 html {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: #151e15;
-    -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #151e15;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-    margin: 0;
-    background-color: #151e15;
-    color: #00FF00;
-    text-shadow: 1px 1px 4px #008700;
-    font-family: monospace;
-    font-size: 1.2em;
-    letter-spacing: .05em;
-    white-space: pre-wrap;
-    overflow: hidden;
-    -webkit-text-size-adjust: 100%;
+  margin: 0;
+  background-color: #151e15;
+  color: #00ff00;
+  text-shadow: 1px 1px 4px #008700;
+  font-family: monospace;
+  font-size: 1.2em;
+  letter-spacing: .05em;
+  white-space: pre-wrap;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    line-height: 1.4em;
-    overflow-x: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.4em;
+  overflow-x: hidden;
 }
 
 li {
-    word-wrap: break-word;
-    padding: 0 .6em 0 .6em;
+  word-wrap: break-word;
+  padding: 0 .6em 0 .6em;
 }
 
 pre {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
 #inputContainer {
-    display: table;
-    width: 99%;
+  display: table;
+  width: 99%;
 }
 
 #inputContainer span {
-    display: table-cell;
+  display: table-cell;
 }
 
 #inputStart {
-    padding-left: .5em;
-    width: 1px;
-    white-space: pre;
+  padding-left: .5em;
+  width: 1px;
+  white-space: pre;
 }
 
 #cmdInput {
-    border: 0;
-    font-size: inherit;
-    font-family: inherit;
-    vertical-align: baseline;
-    color: inherit;
-    background-color: transparent;
-    width: 100%;
-    display: table-cell;
-    padding-left: .3em;
+  border: 0;
+  font-size: inherit;
+  font-family: inherit;
+  vertical-align: baseline;
+  color: inherit;
+  background-color: transparent;
+  width: 100%;
+  display: table-cell;
+  padding-left: .3em;
 }
 
 #cmdInput:focus {
-    outline: 0;
+  outline: 0;
 }
 
 #overlay {
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 
 #mode {
-    width: 1px;
+  width: 1px;
 }
 
 #mode:after {
-    content: '$';
+  content: '$';
 }
 
 #mainFeed li span {
-    margin-right: .5em;
+  margin-right: .5em;
 }
 
 #mainFeed li span:last-child {
-    margin: 0;
+  margin: 0;
 }
 
 #hiddenInput {
-    visibility: hidden;
-    border: 0;
+  visibility: hidden;
+  border: 0;
 }
 
 .importantMsg {
-    color: #151e15;
-    text-shadow: none;
-    background-color: #00FF00;
-    font-size: 1.2em;
-    text-transform: uppercase;
-    font-weight: bold;
-    text-align: center;
+  color: #151e15;
+  text-shadow: none;
+  background-color: #00ff00;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
 }
 
 .broadcastMsg {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .whisperMsg {
 }
 
 .boxShadow {
-    z-index: 1;
-    -webkit-box-shadow: inset 0 0 25px 1px #000000;
-    box-shadow: inset 0 0 25px 1px #000000;
+  z-index: 1;
+  -webkit-box-shadow: inset 0 0 25px 1px #000000;
+  box-shadow: inset 0 0 25px 1px #000000;
 }
 
 .link {
-    font-weight: bold;
-    cursor: pointer;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .logo {
-    white-space: pre;
-    line-height: 1.2;
-    letter-spacing: 0;
-    text-transform: uppercase;
-    word-wrap: normal;
+  white-space: pre;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  word-wrap: normal;
 }
 
 .large {
-    font-size: 2em;
+  font-size: 2em;
 }
 
 .anon {
-    font-size: 0.2em;
+  font-size: 0.2em;
 }
 
 .room:after {
-    content: '>';
+  content: '>';
 }
 
 .user {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .user:after {
-    content: ':';
+  content: ':';
 }
 
 /*
@@ -161,7 +161,7 @@ pre {
  * Virtual keyboard blocks part of the view
  */
 .keyboardFix {
-    height: 50vh;
+  height: 50vh;
 }
 
 /*
@@ -169,89 +169,89 @@ pre {
  * Virtual buttons blocks the input field
  */
 .fullFix {
-    height: 7vh;
+  height: 7vh;
 }
 
 .fullscreen {
-    overflow: scroll;
+  overflow: scroll;
 }
 
 .upperCase {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .brightnessAnim {
-    opacity: 1;
-    -webkit-animation: brightness 20s linear infinite 10s;
-    animation: brightness 20s linear infinite 10s;
+  opacity: 1;
+  -webkit-animation: brightness 20s linear infinite 10s;
+  animation: brightness 20s linear infinite 10s;
 }
 
 @media (max-height: 768px) and (max-width: 1024px) {
-    body {
-        overflow: scroll;
-    }
+  body {
+    overflow: scroll;
+  }
 }
 
 @media (max-width: 736px) {
-    .logo {
-        font-size: .8em;
-    }
+  .logo {
+    font-size: .8em;
+  }
 }
 
 @media (max-width: 414px) {
-    .logo {
-        font-size: .6em;
-    }
+  .logo {
+    font-size: .6em;
+  }
 }
 
 @media (max-height: 414px) and (max-width: 736px) , (max-height: 736px) and (max-width: 414px) {
-    .feed {
-        padding-left: .1em;
-        padding-right: .1em;
-    }
+  .feed {
+    padding-left: .1em;
+    padding-right: .1em;
+  }
 }
 
 @-webkit-keyframes brightness {
-    from {
-        opacity: 1;
-    }
-    1% {
-        opacity: .5;
-    }
-    2% {
-        opacity: .9;
-    }
-    3% {
-        opacity: .1;
-    }
-    4% {
-        opacity: .7;
-    }
-    30% {
-        opacity: 1;
-    }
+  from {
+    opacity: 1;
+  }
+  1% {
+    opacity: .5;
+  }
+  2% {
+    opacity: .9;
+  }
+  3% {
+    opacity: .1;
+  }
+  4% {
+    opacity: .7;
+  }
+  30% {
+    opacity: 1;
+  }
 }
 
 @keyframes brightness {
-    from {
-        opacity: 1;
-    }
-    1% {
-        opacity: .5;
-    }
-    1.5% {
-        opacity: .9;
-    }
-    2% {
-        opacity: .1;
-    }
-    2.5% {
-        opacity: .6;
-    }
-    10% {
-        opacity: .8;
-    }
-    20% {
-        opacity: 1;
-    }
+  from {
+    opacity: 1;
+  }
+  1% {
+    opacity: .5;
+  }
+  1.5% {
+    opacity: .9;
+  }
+  2% {
+    opacity: .1;
+  }
+  2.5% {
+    opacity: .6;
+  }
+  10% {
+    opacity: .8;
+  }
+  20% {
+    opacity: 1;
+  }
 }

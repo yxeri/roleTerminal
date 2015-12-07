@@ -1,31 +1,31 @@
 <!doctype html>
 <html lang="en" id="html">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-		<link rel="stylesheet" type="text/css" href="styles/main.css"/>
-		<title>{{title}}</title>
-	</head>
-	<body>
-		<!-- Required for Android 2.2. Browser will crash if there is only one input field -->
-		<input disabled="true" id="hiddenInput" />
-		<div id="overlay" class="boxShadow"></div>
-		<div id="background" class="brightnessAnim">
-			<ul class="feed" id="mainFeed">
-				<!-- Required for Safari to render text -->
-				<li>
-					<pre>&nbsp;</pre>
-				</li>
-			</ul>
-			<div id="inputContainer" class="feed">
-				<span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
-			</div>
-			<div id="spacer"><span>&nbsp;</span></div>
-		</div>
-		<script src={{socketPath}}></script>
-		<script src="scripts/feed.js" charset="utf-8"></script>
-	</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" type="text/css" href="styles/main.css"/>
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <!-- Required for Android 2.2. Browser will crash if there is only one input field -->
+    <input disabled="true" id="hiddenInput" />
+    <div id="overlay" class="boxShadow"></div>
+      <div id="background" class="brightnessAnim">
+      <ul class="feed" id="mainFeed">
+        <!-- Required for Safari to render text -->
+        <li>
+          <pre>&nbsp;</pre>
+        </li>
+      </ul>
+      <div id="inputContainer" class="feed">
+        <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
+      </div>
+      <div id="spacer"><span>&nbsp;</span></div>
+    </div>
+    <script src={{socketPath}}></script>
+    <script src="scripts/feed.js" charset="utf-8"></script>
+</body>
 </html>

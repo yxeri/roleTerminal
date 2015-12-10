@@ -2,6 +2,7 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
+const messenger = require('../../messenger');
 const dbDefaults = require('../../config/dbPopDefaults');
 const logger = require('../../logger');
 
@@ -9,13 +10,16 @@ function handle(socket) {
   socket.on('getCommands', function() {
     dbConnector.getAllCommands(function(err, commands) {
       if (err || commands === null || commands.length === 0) {
-        // TODO Important msg through logger?
-        socket.emit('importantMsg', {
-          text: [
-            'Failure to retrieve commands',
-            'Please try rebooting with "-reboot"',
-          ],
+        messenger.sendImportantMsg({
+          message: {
+            text: [
+              'Failure to retrieve commands',
+              'Please try rebooting with "reboot"',
+            ],
+          },
+          socket: socket,
         });
+
         return;
       }
 
@@ -29,30 +33,34 @@ function handle(socket) {
         return;
       }
 
-      const cmdName = data.cmdName;
+      const commandName = data.command.commandName;
       const field = data.field;
       const value = data.value;
       const callback = function(err, command) {
         if (err || command === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
         } else {
-          socket.emit('messages', [{ text: ['Command has been updated'] }]);
+          messenger.sendSelfMsg({
+            message: {
+              text: ['Command has been updated'],
+            },
+            socket: socket,
+          });
           socket.emit('updateCommands', [command]);
           socket.broadcast.emit('updateCommands', [command]);
         }
       };
       switch (field) {
       case 'visibility':
-        dbConnector.updateCommandVisibility(cmdName, value, callback);
+        dbConnector.updateCommandVisibility(commandName, value, callback);
 
         break;
       case 'accesslevel':
-        dbConnector.updateCommandAccessLevel(cmdName, value, callback);
+        dbConnector.updateCommandAccessLevel(commandName, value, callback);
 
         break;
       default:
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' +
-                                                                      field);
+        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' + field);
 
         break;
       }

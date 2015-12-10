@@ -3381,7 +3381,7 @@ function attachCommands() {
       const data = {};
 
       if (phrases.length > 2) {
-        data.cmdName = phrases[0];
+        data.command = { commandName: phrases[0] };
         data.field = phrases[1];
         data.value = phrases[2];
 

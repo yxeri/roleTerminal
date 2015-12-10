@@ -1397,12 +1397,6 @@ function onMessages(messages) {
   }
 }
 
-function onBroadcastMsg(message) {
-  message.extraClass = 'broadcastMsg';
-
-  queueMessage(message);
-}
-
 function onImportantMsg(message) {
   message.extraClass = 'importantMsg';
   message.skipTime = true;
@@ -1729,7 +1723,7 @@ function onWhoami(data) {
     'Access level: ' + data.user.accessLevel,
     'Team: ' + team,
     'Device ID: ' + data.device.deviceId,
-    createCommandEnd(text[0].length),
+    createCommandEnd('whoami'),
   ]);
 
   queueMessage({ text: text });
@@ -1738,7 +1732,6 @@ function onWhoami(data) {
 function startSocket() {
   if (socket) {
     socket.on('messages', onMessages);
-    socket.on('broadcastMsg', onBroadcastMsg);
     socket.on('importantMsg', onImportantMsg);
     socket.on('reconnect', onReconnect);
     socket.on('disconnect', onDisconnect);
@@ -1965,10 +1958,7 @@ function attachCommands() {
   };
   validCommands.broadcast = {
     func: function broadcastCommand() {
-      const data = {};
-
-      data.text = [];
-      commandHelper.data = data;
+      commandHelper.data = { message: { text: [] } };
 
       queueMessage({
         text: [
@@ -1982,13 +1972,14 @@ function attachCommands() {
     steps: [
       function broadcastStepOne(phrases) {
         let phrase;
+        const message = commandHelper.data.message;
 
         if (phrases.length > 0 && phrases[0] !== '') {
           phrase = phrases.join(' ');
 
-          commandHelper.data.text = commandHelper.data.text.concat(createCommandStart('broadcast from: ' + phrase));
+          message.text = message.text.concat(createCommandStart('broadcast from: ' + phrase));
         } else {
-          commandHelper.data.text = commandHelper.data.text.concat(createCommandStart('broadcast'));
+          message.text = message.text.concat(createCommandStart('broadcast'));
         }
 
         queueMessage({
@@ -2002,25 +1993,26 @@ function attachCommands() {
       },
       function broadcastStepTwo(phrases) {
         let dataText;
+        const message = commandHelper.data.message;
 
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
-
-          commandHelper.data.text.push(phrase);
+          message.text.push(phrase);
         } else {
-          commandHelper.data.text.push(createLine(commandHelper.data.text[0].length));
-          dataText = copyString(commandHelper.data.text);
-
+          message.text.push(createLine(message.text[0].length));
+          dataText = copyString(message.text);
           commandHelper.onStep++;
 
           queueMessage({
-            text: ['Preview of the message:'],
+            text: [
+              'Preview of the message:',
+            ],
           });
+          queueMessage({ text: dataText });
           queueMessage({
-            text: dataText,
-          });
-          queueMessage({
-            text: ['Is this OK? "yes" to accept the message'],
+            text: [
+              'Is this OK? "yes" to accept the message',
+            ],
           });
         }
       },
@@ -2046,26 +2038,24 @@ function attachCommands() {
   };
   validCommands.follow = {
     func: function followCommand(phrases) {
-      const room = {};
-
       if (phrases.length > 0) {
-        room.roomName = phrases[0].toLowerCase();
-        room.password = phrases[1];
+        const room = {
+          roomName: phrases[0].toLowerCase(),
+          password: phrases[1],
+        };
 
-        socket.emit('follow', room);
+        socket.emit('follow', { room: room });
       } else {
         queueMessage({
           text: [
-            'You have to specify which room to follow and a' +
-            'password (if it is protected)',
+            'You have to specify which room to follow and a password (if it is protected)',
           ],
         });
       }
     },
     help: [
       'Follows a room and shows you all messages posted in it.',
-      'You will get the messages from this room even if it isn\'t' +
-      'your currently selected one',
+      'You will get the messages from this room even if it isn\'t your currently selected one',
     ],
     instructions: [
       ' Usage:',
@@ -2078,18 +2068,16 @@ function attachCommands() {
   };
   validCommands.unfollow = {
     func: function unfollowCommand(phrases) {
-      const room = {};
-
       if (phrases.length > 0) {
-        const roomName = phrases[0].toLowerCase();
+        const room = {
+          roomName: phrases[0].toLowerCase(),
+        };
 
-        if (roomName === getRoom()) {
+        if (room.roomName === getRoom()) {
           room.exited = true;
         }
 
-        room.roomName = roomName;
-
-        socket.emit('unfollow', room);
+        socket.emit('unfollow', { room: room });
       } else {
         queueMessage({
           text: ['You have to specify which room to unfollow'],
@@ -2343,9 +2331,9 @@ function attachCommands() {
       const roomName = phrases[0].toLowerCase();
 
       if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName)) {
-        const data = {};
-        data.roomName = roomName;
-        data.owner = getUser();
+        const data = { room: {} };
+        data.room.roomName = roomName;
+        data.room.owner = getUser();
         commandHelper.data = data;
         commandHelper.hideInput = true;
 
@@ -2374,7 +2362,7 @@ function attachCommands() {
         commandHelper.onStep++;
 
         if (password.length > 0) {
-          commandHelper.data.password = password;
+          commandHelper.data.room.password = password;
 
           setInputStart('Repeat passwd');
           queueMessage({
@@ -2389,7 +2377,7 @@ function attachCommands() {
       function createroomStepTwo(phrases = ['']) {
         const password = phrases[0];
 
-        if (password === commandHelper.data.password) {
+        if (password === commandHelper.data.room.password) {
           socket.emit('createRoom', commandHelper.data);
           resetCommand(false);
         } else {
@@ -2423,10 +2411,10 @@ function attachCommands() {
   };
   validCommands.myrooms = {
     func: function myroomsCommand() {
-      const data = {};
+      const data = { user: {}, device: {} };
 
-      data.userName = getUser();
-      data.device = getDeviceId();
+      data.user.userName = getUser();
+      data.device.deviceId = getDeviceId();
 
       socket.emit('myRooms', data);
     },
@@ -2661,12 +2649,9 @@ function attachCommands() {
   };
   validCommands.history = {
     func: function historyCommand(phrases) {
-      const data = {};
+      const lines = phrases[0];
 
-      data.lines = phrases[0];
-      data.device = getDeviceId();
-
-      socket.emit('history', data);
+      socket.emit('history', { lines: lines });
     },
     help: [
       'Clears the screen and retrieves chat messages from server',
@@ -2999,7 +2984,6 @@ function attachCommands() {
               user: 'SYSTEM',
             },
             roomName: commandObj.data.roomName,
-            skipSelfMsg: true,
           });
           resetCommand(true);
         };
@@ -3083,9 +3067,7 @@ function attachCommands() {
   };
   validCommands.importantmsg = {
     func: function importantmsgCommand() {
-      const data = {};
-
-      data.text = [];
+      const data = { message: { text: [] } };
       commandHelper.data = data;
 
       queueMessage(copyMessage(abortInfo));
@@ -3102,10 +3084,10 @@ function attachCommands() {
     steps: [
       function importantmsgStepOne(phrases) {
         if (phrases.length > 0) {
-          const device = phrases[0];
+          const deviceId = phrases[0];
 
-          if (device.length > 0) {
-            commandHelper.data.device = device;
+          if (deviceId.length > 0) {
+            commandHelper.data.device = { deviceId: deviceId };
             queueMessage({
               text: ['Searching for device...'],
             });
@@ -3128,12 +3110,14 @@ function attachCommands() {
         });
       },
       function importantmsgStepThree(phrases) {
+        const message = commandHelper.data.message;
+
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
 
-          commandHelper.data.text.push(phrase);
+          message.text.push(phrase);
         } else {
-          const dataText = copyString(commandHelper.data.text);
+          const dataText = copyString(message.text);
           commandHelper.onStep++;
 
           queueMessage({
@@ -3276,21 +3260,20 @@ function attachCommands() {
   };
   validCommands.room = {
     func: function roomCommand(phrases) {
-      const room = {};
+      const data = { room: {} };
 
       if (phrases.length > 0) {
         const roomName = phrases[0].toLowerCase();
 
         if (roomName) {
-          room.roomName = roomName;
-
+          data.room.roomName = roomName;
           /**
            * Flag that will be used in .on function locally to
            * show user they have entered
            */
-          room.entered = true;
+          data.room.entered = true;
 
-          socket.emit('switchRoom', room);
+          socket.emit('switchRoom', data);
         }
       } else {
         queueMessage({
@@ -3313,10 +3296,10 @@ function attachCommands() {
   };
   validCommands.removeroom = {
     func: function removeroomCommand(phrases) {
-      const data = {};
+      const data = { room: {} };
 
       if (phrases.length > 0) {
-        data.roomName = phrases[0].toLowerCase();
+        data.room.roomName = phrases[0].toLowerCase();
         commandHelper.data = data;
 
         queueMessage({
@@ -3338,7 +3321,7 @@ function attachCommands() {
     steps: [
       function removeroomStepOne(phrases) {
         if (phrases[0].toLowerCase() === 'yes') {
-          socket.emit('removeRoom', commandHelper.data.roomName);
+          socket.emit('removeRoom', commandHelper.data);
         }
 
         resetCommand();
@@ -3428,10 +3411,10 @@ function attachCommands() {
   };
   validCommands.updateroom = {
     func: function updateroomCommand(phrases) {
-      const data = {};
+      const data = { room: {} };
 
       if (phrases.length > 2) {
-        data.room = phrases[0];
+        data.room.roomName = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
 

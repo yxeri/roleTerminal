@@ -7,14 +7,19 @@ const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
 const messenger = require('../../messenger');
 
-function followRoom(socket, userName, newRoom) {
+function followRoom(params) {
+  const socket = params.socket;
+  const newRoom = params.newRoom;
   const newRoomName = newRoom.roomName;
 
-  if (socket.rooms.indexOf(newRoomName) < 0) {
-    socket.broadcast.to(newRoomName).emit('messages', [{
-      text: [userName + ' is following ' + newRoomName],
-      roomName: newRoomName,
-    }]);
+  if (socket.rooms.indexOf(newRoom) < 0) {
+    messenger.sendMsg({
+      socket: socket,
+      message: {
+        text: [params.userName + ' is following ' + newRoomName],
+        roomName: newRoomName,
+      },
+    });
   }
 
   socket.join(newRoomName);
@@ -28,15 +33,10 @@ function handle(socket) {
         return;
       }
 
-      data.message.time = new Date();
-
       if (data.message.whisper) {
-        data.message.roomName += dbDefaults.whisper;
-        data.message.extraClass = 'whisperMsg';
-
-        messenger.sendWhisperMsg(socket, data.message);
+        messenger.sendWhisperMsg({ socket: socket, message: data.message });
       } else {
-        messenger.sendChatMsg(socket, data.message, data.skipSelfMsg);
+        messenger.sendChatMsg({ socket: socket, message: data.message });
       }
     });
   });
@@ -47,53 +47,40 @@ function handle(socket) {
         return;
       }
 
-      const roomName = dbDefaults.rooms.broadcast.roomName;
-      data.time = new Date();
-      data.extraClass = 'broadcastMsg';
-      data.roomName = roomName;
-
-      dbConnector.addMsgToHistory(roomName, data, function(err, history) {
-        if (err || history === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
-
-          return;
-        }
-
-        socket.broadcast.emit('broadcastMsg', data);
-        socket.emit('messages', [data]);
-      });
+      messenger.sendBroadcastMsg({ socket: socket, message: data.message });
     });
   });
 
-  socket.on('createRoom', function(sentRoom) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName,
-      function(allowErr, allowed, user) {
-        if (allowErr || !allowed || !user) {
+  socket.on('createRoom', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed || !user) {
+        return;
+      }
+
+      manager.createRoom(data.room, user, function(createErr, roomName) {
+        if (createErr) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', createErr);
+
+          return;
+        } else if (!roomName) {
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: { text: ['Failed to create room. A room with that name already exists'] },
+          });
+
           return;
         }
 
-        manager.createRoom(sentRoom, user, function(createErr, roomName) {
-          if (createErr) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', createErr);
+        const room = {};
+        room.roomName = roomName;
 
-            return;
-          } else if (!roomName) {
-            socket.emit('messages', [{
-              text: ['Failed to create room. A room with that name already exists'],
-            }]);
-
-            return;
-          }
-
-          const room = {};
-          room.roomName = roomName;
-
-          socket.emit('messages', [{
-            text: ['Room has been created'],
-          }]);
-          followRoom(socket, user.userName, room);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: { text: ['Room has been created'] },
         });
+        followRoom({ socket: socket, userName: user.userName, newRoom: room });
       });
+    });
   });
 
   socket.on('follow', function(data) {
@@ -102,24 +89,24 @@ function handle(socket) {
         return;
       }
 
-      data.roomName = data.roomName.toLowerCase();
+      const roomName = data.room.roomName.toLowerCase();
+      // TODO Move toLowerCase to class
+      data.room.roomName = roomName;
 
-      if (data.password === undefined) {
-        data.password = '';
+      if (data.room.password === undefined) {
+        data.room.password = '';
       }
 
-      dbConnector.authUserToRoom(user, data.roomName, data.password, function(err, room) {
+      dbConnector.authUserToRoom(user, roomName, data.room.password, function(err, room) {
         if (err || room === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'You are not authorized to join ' + data.roomName, err);
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'You are not authorized to join ' + roomName, err);
 
           return;
         }
 
-        const roomName = room.roomName;
-
-        dbConnector.addRoomToUser(user.userName, roomName, function(roomErr) {
+        dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
           if (roomErr) {
-            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + data.roomName, roomErr);
+            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + roomName, roomErr);
 
             return;
           }
@@ -128,37 +115,40 @@ function handle(socket) {
             room.entered = true;
           }
 
-          followRoom(socket, user.userName, room);
+          followRoom({ socket: socket, userName: user.userName, newRoom: room });
         });
       });
     });
   });
 
-  socket.on('switchRoom', function(room) {
+  socket.on('switchRoom', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.switchroom.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
 
-      room.roomName = room.roomName.toLowerCase();
+      // TODO Move toLowerCase to class
+      data.room.roomName = data.room.roomName.toLowerCase();
 
-      if (socket.rooms.indexOf(room.roomName) > 0) {
-        socket.emit('follow', room);
+      if (socket.rooms.indexOf(data.room.roomName) > 0) {
+        socket.emit('follow', data.room);
       } else {
-        socket.emit('messages', [{
-          text: ['You are not following room ' + room.roomName],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: { text: ['You are not following room ' + data.room.roomName] },
+        });
       }
     });
   });
 
-  socket.on('unfollow', function(room) {
+  socket.on('unfollow', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.unfollow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
 
-      const roomName = room.roomName.toLowerCase();
+      // TODO Move toLowerCase to class
+      const roomName = data.room.roomName.toLowerCase();
 
       if (socket.rooms.indexOf(roomName) > -1) {
         const userName = user.userName;
@@ -175,16 +165,19 @@ function handle(socket) {
               return;
             }
 
-            socket.broadcast.to(roomName).emit('messages', [{
-              text: [userName + ' left ' + roomName],
-              room: roomName,
-            }]);
+            messenger.sendMsg({
+              socket: socket,
+              message: { text: [userName + ' left ' + roomName], roomName: roomName },
+            });
             socket.leave(roomName);
-            socket.emit('unfollow', room);
+            socket.emit('unfollow', data.room);
           });
         }
       } else {
-        socket.emit('messages', [{ text: ['You are not following ' + roomName] }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: { text: ['You are not following ' + roomName] },
+        });
       }
     });
   });
@@ -210,14 +203,17 @@ function handle(socket) {
             roomsString += rooms[i].roomName + '\t';
           }
 
-          socket.emit('messages', [{
-            text: [
-              '--------------',
-              '  List rooms',
-              '--------------',
-              roomsString,
-            ],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: [
+                '--------------',
+                '  List rooms',
+                '--------------',
+                roomsString,
+              ],
+            },
+          });
         }
       });
     });
@@ -254,31 +250,35 @@ function handle(socket) {
             }
           }
 
-          socket.emit('messages', [{
-            text: [
-              '--------------',
-              '  List users',
-              '--------------------',
-              '  Currently online',
-              '--------------------',
-              onlineString,
-              '-----------------',
-              '  Other users',
-              '-----------------',
-              usersString,
-            ],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: [
+                '--------------',
+                '  List users',
+                '--------------------',
+                '  Currently online',
+                '--------------------',
+                onlineString,
+                '-----------------',
+                '  Other users',
+                '-----------------',
+                usersString,
+              ],
+            },
+          });
         }
       });
     });
   });
 
+  // TODO Data structure. data.user.userName?
   socket.on('myRooms', function(data) {
     function shouldBeHidden(room) {
       const hiddenRooms = [
         socket.id,
-        data.userName + dbDefaults.whisper,
-        data.device + dbDefaults.device,
+        data.user.userName + dbDefaults.whisper,
+        data.device.deviceId + dbDefaults.device,
         dbDefaults.rooms.important.roomName,
         dbDefaults.rooms.broadcast.roomName,
       ];
@@ -301,15 +301,18 @@ function handle(socket) {
         }
       }
 
-      socket.emit('messages', [{
-        text: [
-          '------------',
-          '  My rooms',
-          '------------',
-          'You are following rooms:',
-          rooms.join('\t'),
-        ],
-      }]);
+      messenger.sendSelfMsg({
+        socket: socket,
+        message: {
+          text: [
+            '------------',
+            '  My rooms',
+            '------------',
+            'You are following rooms:',
+            rooms.join('\t'),
+          ],
+        },
+      });
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
         if (err || ownedRooms === null) {
@@ -325,12 +328,15 @@ function handle(socket) {
         }
 
         if (ownedRoomsString.length > 0) {
-          socket.emit('messages', [{
-            text: [
-              'You are owner of the rooms:',
-              ownedRoomsString,
-            ],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: [
+                'You are owner of the rooms:',
+                ownedRoomsString,
+              ],
+            },
+          });
         }
       });
     });
@@ -343,8 +349,9 @@ function handle(socket) {
       }
 
       const allRooms = socket.rooms;
+      const startDate = data.startDate || new Date();
 
-      manager.getHistory(allRooms, data.lines, false, new Date(), function(histErr, historyMessages) {
+      manager.getHistory(allRooms, data.lines, false, startDate, function(histErr, historyMessages) {
         if (histErr) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to retrieve history', histErr);
 
@@ -352,12 +359,13 @@ function handle(socket) {
         }
 
         while (historyMessages.length > 0) {
-          socket.emit('messages', historyMessages.splice(0, appConfig.chunkLength));
+          messenger.sendSelfMsgs({ socket: socket, messages: historyMessages.splice(0, appConfig.chunkLength) });
         }
       });
     });
   });
 
+  // TODO morse class?
   socket.on('morse', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.morse.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
@@ -372,56 +380,31 @@ function handle(socket) {
     });
   });
 
-  socket.on('removeRoom', function(roomName) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName,
-      function(allowErr, allowed, user) {
-        if (allowErr || !allowed || !user) {
+  socket.on('removeRoom', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed || !user) {
+        return;
+      }
+
+      const roomNameLower = data.room.roomName.toLowerCase();
+
+      dbConnector.removeRoom(roomNameLower, user, function(err, room) {
+        if (err || room === null) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
+
           return;
         }
 
-        const roomNameLower = roomName.toLowerCase();
-
-        dbConnector.removeRoom(roomNameLower, user, function(err, room) {
-          if (err || room === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
-
-            return;
-          }
-
-          socket.emit('messages', [{
-            text: ['Removed the room'],
-          }]);
-        });
+        messenger.sendSelfMsg({ socket: socket, message: { text: ['Removed the room'] } });
       });
+    });
   });
 
   socket.on('importantMsg', function(data) {
-    const deviceFunc = function(roomName) {
-      socket.to(roomName).emit('importantMsg', data);
-    };
-    const messageFunc = function() {
-      socket.broadcast.emit('importantMsg', data);
-      socket.emit('importantMsg', data);
-    };
-    const historyFunc = function(roomName, sendFunc) {
-      dbConnector.addMsgToHistory(roomName, data, function(err, history) {
-        if (err || history === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
-
-          return;
-        }
-
-        sendFunc(roomName);
-      });
-    };
-
     manager.userAllowedCommand(socket.id, dbDefaults.commands.importantmsg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
-
-      data.time = new Date();
-      data.extraClass = 'importantMsg';
 
       if (data.device) {
         dbConnector.getDevice(data.device, function(err, device) {
@@ -431,17 +414,12 @@ function handle(socket) {
             return;
           }
 
-          const deviceId = device.deviceId;
-          const roomName = deviceId + dbDefaults.device;
-          data.roomName = roomName;
+          data.roomName = device.deviceId + dbDefaults.device;
 
-          historyFunc(roomName, deviceFunc);
+          messenger.sendImportantMsg({ socket: socket, message: data.message, toOneDevice: true });
         });
       } else {
-        const roomName = dbDefaults.rooms.important.roomName;
-        data.roomName = roomName;
-
-        historyFunc(roomName, messageFunc);
+        messenger.sendImportantMsg({ socket: socket, message: data.message });
       }
     });
   });
@@ -457,7 +435,7 @@ function handle(socket) {
         return;
       }
 
-      const roomName = data.room;
+      const roomName = data.room.roomName;
       const field = data.field;
       const value = data.value;
       const callback = function(err, room) {
@@ -467,9 +445,10 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('messages', [{
-          text: ['User has been updated'],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: { text: ['Room has been updated'] },
+        });
       };
 
       switch (field) {

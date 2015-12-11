@@ -23,7 +23,7 @@ function handle(socket) {
         return;
       }
 
-      socket.emit('updateCommands', commands);
+      socket.emit('updateCommands', { commands: commands });
     });
   });
 
@@ -46,8 +46,8 @@ function handle(socket) {
             },
             socket: socket,
           });
-          socket.emit('updateCommands', [command]);
-          socket.broadcast.emit('updateCommands', [command]);
+          socket.emit('updateCommands', { commands: [command] });
+          socket.broadcast.emit('updateCommands', { commands: [command] });
         }
       };
       switch (field) {

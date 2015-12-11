@@ -1604,7 +1604,9 @@ function onLogout() {
   printStartMessage();
 }
 
-function onUpdateCommands(commands) {
+function onUpdateCommands(data) {
+  const commands = data.commands;
+
   if (commands) {
     for (let i = 0; i < commands.length; i++) {
       const newCommand = commands[i];

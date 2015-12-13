@@ -19,11 +19,12 @@ function followRoom(params) {
         text: [params.userName + ' is following ' + newRoomName],
         roomName: newRoomName,
       },
+      sendTo: newRoomName,
     });
   }
 
   socket.join(newRoomName);
-  socket.emit('follow', newRoom);
+  socket.emit('follow', { room: newRoom });
 }
 
 function handle(socket) {
@@ -131,7 +132,7 @@ function handle(socket) {
       data.room.roomName = data.room.roomName.toLowerCase();
 
       if (socket.rooms.indexOf(data.room.roomName) > 0) {
-        socket.emit('follow', data.room);
+        socket.emit('follow', { room: data.room });
       } else {
         messenger.sendSelfMsg({
           socket: socket,
@@ -168,9 +169,10 @@ function handle(socket) {
             messenger.sendMsg({
               socket: socket,
               message: { text: [userName + ' left ' + roomName], roomName: roomName },
+              sendTo: roomName,
             });
             socket.leave(roomName);
-            socket.emit('unfollow', data.room);
+            socket.emit('unfollow', { room: data.room });
           });
         }
       } else {

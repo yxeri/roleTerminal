@@ -566,7 +566,10 @@ function reconnect() {
 
     socket.disconnect();
     socket.connect({ forceNew: true });
-    socket.emit('updateId', { userName: user });
+    socket.emit('updateId', {
+      user: { userName: user },
+      device: { deviceId: getDeviceId },
+    });
   }
 }
 
@@ -808,7 +811,7 @@ function sendLocation() {
     }
 
     positions = [];
-    socket.emit('updateLocation', preparePosition(mostAccuratePos));
+    socket.emit('updateLocation', { position: preparePosition(mostAccuratePos) });
   }
 
   retrievePosition();
@@ -1422,7 +1425,9 @@ function onDisconnect() {
   });
 }
 
-function onFollow(room) {
+function onFollow(data = { room: {} }) {
+  const room = data.room;
+
   if (room.entered) {
     enterRoom(room.roomName);
   } else {
@@ -1432,7 +1437,9 @@ function onFollow(room) {
   }
 }
 
-function onUnfollow(room) {
+function onUnfollow(data = { room: { roomName: '' } }) {
+  const room = data.room;
+
   queueMessage({
     text: ['Stopped following ' + room.roomName],
   });
@@ -1604,20 +1611,18 @@ function onLogout() {
   printStartMessage();
 }
 
-function onUpdateCommands(data) {
+function onUpdateCommands(data = { commands: [] }) {
   const commands = data.commands;
 
-  if (commands) {
-    for (let i = 0; i < commands.length; i++) {
-      const newCommand = commands[i];
-      const oldCommand = validCommands[newCommand.commandName];
+  for (let i = 0; i < commands.length; i++) {
+    const newCommand = commands[i];
+    const oldCommand = validCommands[newCommand.commandName];
 
-      if (oldCommand) {
-        oldCommand.accessLevel = newCommand.accessLevel;
-        oldCommand.category = newCommand.category;
-        oldCommand.visibility = newCommand.visibility;
-        oldCommand.authGroup = newCommand.authGroup;
-      }
+    if (oldCommand) {
+      oldCommand.accessLevel = newCommand.accessLevel;
+      oldCommand.category = newCommand.category;
+      oldCommand.visibility = newCommand.visibility;
+      oldCommand.authGroup = newCommand.authGroup;
     }
   }
 }
@@ -1724,7 +1729,7 @@ function onWhoami(data) {
     'User: ' + data.user.userName,
     'Access level: ' + data.user.accessLevel,
     'Team: ' + team,
-    'Device ID: ' + data.device.deviceId,
+    'Device ID: ' + getDeviceId(),
     createCommandEnd('whoami'),
   ]);
 
@@ -1914,11 +1919,7 @@ function attachCommands() {
   };
   validCommands.whoami = {
     func: function whoamiCommand() {
-      const data = {};
-      data.device = {};
-      data.device.deviceId = getDeviceId();
-
-      socket.emit('whoAmI', data);
+      socket.emit('whoAmI');
     },
     help: ['Shows the current user'],
     accessLevel: 13,
@@ -2160,7 +2161,7 @@ function attachCommands() {
             });
           }
 
-          socket.emit('updateMode', newMode);
+          socket.emit('updateMode', { mode: newMode });
         } else if (cmdMode === newMode) {
           setMode(newMode);
 
@@ -2176,7 +2177,7 @@ function attachCommands() {
             });
           }
 
-          socket.emit('updateMode', newMode);
+          socket.emit('updateMode', { mode: newMode });
         } else {
           queueMessage({
             text: [newMode + 'is not a valid mode'],
@@ -2426,7 +2427,7 @@ function attachCommands() {
   };
   validCommands.login = {
     func: function loginCommand(phrases) {
-      const data = {};
+      const data = { user: {} };
 
       if (getUser() !== null) {
         queueMessage({
@@ -2436,7 +2437,7 @@ function attachCommands() {
           ],
         });
       } else if (phrases.length > 0) {
-        data.userName = phrases[0].toLowerCase();
+        data.user.userName = phrases[0].toLowerCase();
         commandHelper.data = data;
         commandHelper.hideInput = true;
         queueMessage({
@@ -2457,7 +2458,7 @@ function attachCommands() {
     },
     steps: [
       function loginStepOne(phrases) {
-        commandHelper.data.password = phrases[0].toLowerCase();
+        commandHelper.data.user.password = phrases[0].toLowerCase();
         socket.emit('login', commandHelper.data);
         validCommands[commandHelper.command].abortFunc();
         validCommands.clear.func();
@@ -2561,7 +2562,7 @@ function attachCommands() {
         const commandObj = commandHelper;
         const phrase = phrases.join(' ');
 
-        socket.emit('verifyKey', phrase.toLowerCase());
+        socket.emit('verifyKey', { encryptionKey: phrase.toLowerCase() });
         queueMessage({
           text: [
             'Verifying key. Please wait...',
@@ -2574,7 +2575,7 @@ function attachCommands() {
         const commandObj = commandHelper;
 
         if (data.keyData !== null) {
-          if (data.keyData.reusable || !data.keyData.used) {
+          if (data.key.reusable || !data.keyData.used) {
             queueMessage({
               text: ['Key has been verified. Proceeding'],
             });
@@ -2606,8 +2607,8 @@ function attachCommands() {
         const data = commandObj.data;
         const phrase = phrases.join(' ');
 
-        data.entityName = phrase.toLowerCase();
-        data.userName = getUser();
+        data.entity = { entityName: phrase.toLowerCase() };
+        data.user = { userName: getUser() };
         socket.emit('unlockEntity', data);
         queueMessage({
           text: [
@@ -2616,12 +2617,12 @@ function attachCommands() {
         });
         commandObj.keysBlocked = true;
       },
-      function uploadkeyStepFive(entity) {
-        if (entity !== null) {
+      function uploadkeyStepFive(data = {}) {
+        if (data.entity !== null) {
           queueMessage({
             text: [
               'Confirmed. Encryption key has been used on the entity',
-              entity.entityName + ' now has ' + (entity.keys.length + 1) + ' unlocks',
+              data.entity.entityName + ' now has ' + (data.keys.length + 1) + ' unlocks',
               'Thank you for using EHA',
             ],
           });
@@ -2798,11 +2799,12 @@ function attachCommands() {
     func: function verifyuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
+        const data = { user: { userName: userName } };
 
         if (userName === '*') {
           socket.emit('verifyAllUsers');
         } else {
-          socket.emit('verifyUser', userName);
+          socket.emit('verifyUser', data);
         }
       } else {
         socket.emit('unverifiedUsers');
@@ -2831,8 +2833,9 @@ function attachCommands() {
     func: function banuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
+        const data = { user: { userName: userName } };
 
-        socket.emit('ban', userName);
+        socket.emit('ban', data);
       } else {
         socket.emit('bannedUsers');
       }
@@ -2854,8 +2857,9 @@ function attachCommands() {
     func: function unbanuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
+        const data = { user: { userName: userName } };
 
-        socket.emit('unban', userName);
+        socket.emit('unban', data);
       } else {
         socket.emit('bannedUsers');
       }
@@ -3346,10 +3350,10 @@ function attachCommands() {
   };
   validCommands.updateuser = {
     func: function updateuserCommand(phrases) {
-      const data = {};
+      const data = { user: {} };
 
       if (phrases.length > 2) {
-        data.user = phrases[0];
+        data.user.userName = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
 
@@ -3491,7 +3495,7 @@ function attachCommands() {
           queueMessage({
             text: ['Uploading new keys...'],
           });
-          socket.emit('addKeys', commandHelper.data.keys);
+          socket.emit('addKeys', { keys: commandHelper.data.keys });
           resetCommand();
         } else {
           queueMessage({
@@ -3514,9 +3518,7 @@ function attachCommands() {
   };
   validCommands.addentities = {
     func: function addentitiesCommand() {
-      const data = {};
-
-      data.entities = [];
+      const data = { entities: [] };
       commandHelper.data = data;
 
       queueMessage({
@@ -3551,7 +3553,7 @@ function attachCommands() {
           queueMessage({
             text: ['Uploading new entities...'],
           });
-          socket.emit('addEntities', commandHelper.data.entities);
+          socket.emit('addEntities', { entities: commandHelper.data.entities });
           resetCommand();
         } else {
           queueMessage({
@@ -3681,14 +3683,10 @@ function attachCommands() {
   };
   validCommands.createteam = {
     func: function createteamCommand(phrases) {
-      const teamName = phrases[0];
-      const data = {};
-      const team = {};
+      const data = { team: { teamName: teamName } };
 
-      if (teamName) {
-        team.teamName = teamName;
-        team.owner = getUser();
-        data.team = team;
+      if (data.team.teamName) {
+        data.team.owner = getUser();
 
         socket.emit('createTeam', data);
       } else {
@@ -3712,11 +3710,9 @@ function attachCommands() {
   };
   validCommands.inviteteam = {
     func: function inviteteamCommand(phrases) {
-      const data = {};
-      const userName = phrases[0];
+      const data = { user: { userName: phrases[0] } };
 
-      if (userName) {
-        data.userName = userName;
+      if (data.user.userName) {
         socket.emit('inviteToTeam', data);
       } else {
         queueMessage({
@@ -3833,9 +3829,9 @@ function startBoot() {
   }
 
   socket.emit('updateId', {
-    userName: getUser(),
+    user: { userName: getUser() },
     firstConnection: true,
-    device: getDeviceId(),
+    device: { deviceId: getDeviceId() },
   });
 }
 

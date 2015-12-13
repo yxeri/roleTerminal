@@ -1,5 +1,7 @@
 'use strict';
 
+const messenger = require('./messenger');
+
 /*
  * Possible error codes with number and text representation, for usage towards users or internal
  */
@@ -42,7 +44,12 @@ function sendErrorMsg(code, text, err) {
  * @returns {undefined} Returns undefined
  */
 function sendSocketErrorMsg(socket, code, text, err) {
-  socket.emit('messages', [{ text: ['[' + code.num + '] ' + text] }]);
+  messenger.sendSelfMsg({
+    socket: socket,
+    message: {
+      text: ['[' + code.num + '] ' + text],
+    },
+  });
   sendErrorMsg(code, text, err);
 }
 

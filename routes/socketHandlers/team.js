@@ -47,7 +47,7 @@ function handle(socket) {
     const cmdName = dbDefaults.commands.inviteteam.commandName;
 
     manager.userAllowedCommand(socket.id, cmdName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed || !data.userName) {
+      if (allowErr || !allowed || !data.user || !data.user.userName) {
         return;
       }
 
@@ -71,7 +71,7 @@ function handle(socket) {
     const cmdName = dbDefaults.commands.createteam.commandName;
 
     manager.userAllowedCommand(socket.id, cmdName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed || !data.team) {
+      if (allowErr || !allowed || !data.team || !data.team.teamName) {
         return;
       }
 

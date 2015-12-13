@@ -4,6 +4,7 @@ const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const dbDefaults = require('../../config/dbPopDefaults');
 const logger = require('../../logger');
+const messenger = require('../../messenger');
 
 function handle(socket) {
   socket.on('entities', function() {
@@ -27,18 +28,23 @@ function handle(socket) {
           entityArray.push(entities[i].entityName + ' [' + keyAmount + ' unlocked]');
         }
 
-        socket.emit('messages', [{ text: entityArray }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: [entityArray],
+          },
+        });
       });
     });
   });
 
-  socket.on('verifyKey', function(sentKey) {
+  socket.on('verifyKey', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.uploadkey.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
 
-      const keyLower = sentKey.toLowerCase();
+      const keyLower = data.encryptionKey.toLowerCase();
 
       dbConnector.getEncryptionKey(keyLower, function(err, key) {
         if (err || key === null) {
@@ -48,10 +54,11 @@ function handle(socket) {
           return;
         }
 
-        const data = {};
-        data.keyData = key;
-
-        socket.emit('commandSuccess', data);
+        socket.emit('commandSuccess', {
+          keyData: {
+            encryptionKey: key,
+          },
+        });
       });
     });
   });
@@ -62,10 +69,11 @@ function handle(socket) {
         return;
       }
 
-      data.entityName = data.entityName.toLowerCase();
-      data.keyData.key = data.keyData.key.toLowerCase();
+      const encryptionKey = data.keyData.encryptionKey.toLowerCase();
+      const entityName = data.entity.entityName.toLowerCase();
+      const userName = data.user.userName;
 
-      dbConnector.unlockEntity(data.keyData.key, data.entityName, data.userName, function(err, entity) {
+      dbConnector.unlockEntity(encryptionKey, entityName, userName, function(err, entity) {
         if (err || entity === null) {
           logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to unlock entity. Aborting', err);
           socket.emit('commandFail');
@@ -76,24 +84,29 @@ function handle(socket) {
         const message = {
           text: [
             'Entity event',
-            'User ' + data.userName + ' has used a key on entity ' + data.entityName,
+            'User ' + userName + ' has used a key on entity ' + entityName,
             'Organica Re-Education Squads have been deployed',
-          ], morse: { local: true },
+            // TODO Send morse emit instead of object in message
+          ], /*  morse: { local: true }, */
         };
 
-        socket.emit('commandSuccess', entity);
-        socket.broadcast.emit('importantMsg', message);
-        socket.emit('importantMsg', message);
+        socket.emit('commandSuccess', { entity: entity });
+        messenger.sendImportantMsg({
+          socket: socket,
+          message: message,
+        });
       });
     });
   });
 
-  socket.on('addKeys', function(keys) {
+  socket.on('addKeys', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.addencryptionkeys.commandName,
       function(allowErr, allowed) {
         if (allowErr || !allowed) {
           return;
         }
+
+        const keys = data.keys;
 
         for (let i = 0; i < keys.length; i++) {
           keys[i].key = keys[i].key.toLowerCase();
@@ -106,18 +119,23 @@ function handle(socket) {
             return;
           }
 
-          socket.emit('messages', [{
-            text: ['Key has been uploaded to the database'],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Key has been uploaded to the database'],
+            },
+          });
         });
       });
   });
 
-  socket.on('addEntities', function(entities) {
+  socket.on('addEntities', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.addentities.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
+
+      const entities = data.entities;
 
       for (let i = 0; i < entities.length; i++) {
         entities[i].entityName = entities[i].entityName.toLowerCase();
@@ -130,9 +148,12 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('messages', [{
-          text: ['Entity has been uploaded to the database'],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['Entity has been uploaded to the database'],
+          },
+        });
       });
     });
   });

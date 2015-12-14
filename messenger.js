@@ -19,19 +19,19 @@ function addMsgToHistory(roomName, message, socket, callback) {
 function sendSelfMsg(params) {
   const message = params.message;
 
-  params.socket.emit('messages', [message]);
+  params.socket.emit('message', { message: message });
 }
 
 function sendSelfMsgs(params) {
   const messages = params.messages;
 
-  params.socket.emit('messages', messages);
+  params.socket.emit('messages', { messages: messages });
 }
 
 function sendMsg(params) {
   const message = params.message;
 
-  params.socket.broadcast.to(params.sendTo).emit('messages', [message]);
+  params.socket.broadcast.to(params.sendTo).emit('message', { message: message });
 }
 
 function sendImportantMsg(params) {
@@ -52,8 +52,8 @@ function sendImportantMsg(params) {
         message: { text: ['Sent important message to device', message] },
       });
     } else {
-      socket.broadcast.emit('importantMsg', message);
-      socket.emit('importantMsg', message);
+      socket.broadcast.emit('importantMsg', { message: message });
+      socket.emit('importantMsg', { message: message });
     }
   });
 }
@@ -68,8 +68,8 @@ function sendChatMsg(params) {
       return;
     }
 
-    socket.broadcast.to(message.roomName).emit('messages', [message]);
-    socket.emit('messages', [message]);
+    socket.broadcast.to(message.roomName).emit('message', { message: message });
+    socket.emit('message', { message: message });
   });
 }
 
@@ -92,8 +92,8 @@ function sendWhisperMsg(params) {
         return;
       }
 
-      socket.broadcast.to(message.roomName).emit('messages', [message]);
-      socket.emit('messages', [message]);
+      socket.broadcast.to(message.roomName).emit('message', { message: message });
+      socket.emit('message', { message: message });
     });
   });
 }
@@ -110,8 +110,8 @@ function sendBroadcastMsg(params) {
       return;
     }
 
-    socket.broadcast.emit('messages', [message]);
-    socket.emit('messages', [message]);
+    socket.broadcast.emit('message', { message: message });
+    socket.emit('message', { message: message });
   });
 }
 

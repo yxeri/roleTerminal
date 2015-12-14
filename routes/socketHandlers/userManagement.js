@@ -143,7 +143,7 @@ function handle(socket, io) {
         manager.joinRooms(allRooms, socket, data.device.deviceId);
         socket.emit('reconnectSuccess', {
           firstConnection: data.firstConnection,
-          user: data.user,
+          user: user,
         });
         manager.getHistory(allRooms, Infinity, true, user.lastOnline, function(histErr, missedMessages) {
           if (histErr) {
@@ -151,7 +151,10 @@ function handle(socket, io) {
           }
 
           while (missedMessages.length) {
-            messenger.sendSelfMsgs({ messages: missedMessages.splice(0, appConfig.chunkLength) });
+            messenger.sendSelfMsgs({
+              socket: socket,
+              messages: missedMessages.splice(0, appConfig.chunkLength),
+            });
           }
         });
       });
@@ -560,9 +563,12 @@ function handle(socket, io) {
           return;
         }
 
-        socket.emit('messages', [{
-          text: ['User has been updated'],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['User has been updated'],
+          },
+        });
       };
 
       switch (field) {

@@ -181,6 +181,7 @@ const intervals = {
   isScreenOff: null,
 };
 const validCommands = {};
+const commandLineLength = 6;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1315,17 +1316,15 @@ function keyPress(event) {
 }
 
 function createCommandStart(commandName) {
-  const length = commandName.length + 2;
-
   return [
-    createLine(length),
+    createLine(commandLineLength),
     ' ' + commandName.toUpperCase(),
-    createLine(length),
+    createLine(commandLineLength),
   ];
 }
 
-function createCommandEnd(length) {
-  return createLine(length + 2);
+function createCommandEnd() {
+  return createLine(commandLineLength);
 }
 
 function printWelcomeMessage() {
@@ -1384,30 +1383,50 @@ function resetAllLocalVals() {
   previousCommandPointer = 0;
 }
 
-function onMessages(messages) {
-  for (let i = 0; i < messages.length; i++) {
-    const message = messages[i];
-
-    if (message.roomName) {
-      if (message.roomName.indexOf('-whisper') >= 0) {
-        message.roomName = 'whisper';
-      } else if (message.roomName.indexOf('-device') >= 0) {
-        message.roomName = 'device';
-      }
+function createRedableRoomName(roomName) {
+  if (roomName) {
+    if (roomName.indexOf('-whisper') >= 0) {
+      return 'whisper';
+    } else if (roomName.indexOf('-device') >= 0) {
+      return 'device';
     }
+  }
 
+  return roomName;
+}
+
+function onMessage(data = {}) {
+  const message = data.message;
+
+  if (message) {
+    message.roomName = createRedableRoomName(message.roomName);
     queueMessage(message);
   }
 }
 
-function onImportantMsg(message) {
-  message.extraClass = 'importantMsg';
-  message.skipTime = true;
+function onMessages(data = { messages: [] }) {
+  const messages = data.messages;
 
-  queueMessage(message);
+  for (let i = 0; i < messages.length; i++) {
+    const message = messages[i];
 
-  if (message.morse) {
-    validCommands.morse.func(message.text.slice(0, 1), message.morse.local);
+    message.roomName = createRedableRoomName(message.roomName);
+    queueMessage(message);
+  }
+}
+
+function onImportantMsg(data = {}) {
+  const message = data.message;
+
+  if (message) {
+    message.extraClass = 'importantMsg';
+    message.skipTime = true;
+
+    queueMessage(message);
+
+    if (message.morse) {
+      validCommands.morse.func(message.text.slice(0, 1), message.morse.local);
+    }
   }
 }
 
@@ -1738,6 +1757,7 @@ function onWhoami(data) {
 
 function startSocket() {
   if (socket) {
+    socket.on('message', onMessage);
     socket.on('messages', onMessages);
     socket.on('importantMsg', onImportantMsg);
     socket.on('reconnect', onReconnect);
@@ -3682,8 +3702,8 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.createteam = {
-    func: function createteamCommand(phrases) {
-      const data = { team: { teamName: teamName } };
+    func: function createteamCommand() {
+      const data = { team: { teamName: '' } };
 
       if (data.team.teamName) {
         data.team.owner = getUser();

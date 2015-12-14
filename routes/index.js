@@ -14,6 +14,7 @@ const serverConfig = require('../config/serverConfig');
 const http = require('http');
 const dbDefaults = require('../config/dbPopDefaults');
 const logger = require('../logger');
+const messenger = require('../messenger');
 
 // Blodsband specific
 const blodsband = require('./socketHandlers/blodsband');
@@ -70,19 +71,19 @@ function handle(io) {
     socket.on('disconnect', function() {
       dbConnector.getUserById(socket.id, function(err, user) {
         if (err || user === null) {
-          console.log(
-            'User has disconnected. Couldn\'t retrieve user name'
-          );
+          console.log('User has disconnected. Couldn\'t retrieve user name');
         } else {
           dbConnector.updateUserSocketId(user.userName, '', function(userErr, socketUser) {
             if (userErr || socketUser === null) {
               console.log('Failed to reset user socket ID', userErr);
+
               return;
             }
 
             dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
               if (userOnlineErr || settedUser === null) {
                 console.log('Failed to set last online');
+
                 return;
               }
 
@@ -170,8 +171,7 @@ function handle(io) {
         let url = '';
 
         if (appConfig.gameLocation.country.toLowerCase() === 'sweden') {
-          url = 'http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/' +
-                'version/1/geopoint/lat/' + lat + '/lon/' + lon + '/data.json';
+          url = 'http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/version/1/geopoint/lat/' + lat + '/lon/' + lon + '/data.json';
         }
 
         http.get(url, function(resp) {
@@ -228,9 +228,12 @@ function handle(io) {
           return;
         }
 
-        socket.emit('messages', [{
-          text: ['Device has been updated'],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['Device has been updated'],
+          },
+        });
       });
     });
 
@@ -252,17 +255,23 @@ function handle(io) {
               errMsg += '. Alias already exists';
             }
 
-            socket.emit('messages', [{
-              text: [errMsg],
-            }]);
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: [errMsg],
+              },
+            });
             console.log(errMsg, err);
 
             return;
           }
 
-          socket.emit('messages', [{
-            text: ['Device has been updated'],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Device has been updated'],
+            },
+          });
         };
 
         switch (field) {
@@ -271,9 +280,12 @@ function handle(io) {
 
           break;
         default:
-          socket.emit('messages', [{
-            text: ['Invalid field. Device doesn\'t have ' + field],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Invalid field. Device doesn\'t have ' + field],
+            },
+          });
 
           break;
         }
@@ -283,21 +295,23 @@ function handle(io) {
     socket.on('verifyDevice', function(data) {
       dbConnector.getDevice(data.device, function(err, device) {
         if (err || device === null) {
-          socket.emit('messages', [{
-            text: [
-              'Device is not in the database',
-            ],
-          }]);
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Device is not in the database'],
+            },
+          });
           socket.emit('commandFail');
 
           return;
         }
 
-        socket.emit('messages', [{
-          text: [
-            'Device found in the database',
-          ],
-        }]);
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['Device found in the database'],
+          },
+        });
         socket.emit('commandSuccess', data);
       });
     });
@@ -337,9 +351,12 @@ function handle(io) {
               allDevices.push(deviceString);
             }
 
-            socket.emit('messages', [{
-              text: allDevices,
-            }]);
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: [allDevices],
+              },
+            });
           }
         });
       });

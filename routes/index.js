@@ -37,7 +37,7 @@ function generateWeatherReport(jsonObj) {
 
 function createUserPosition(user) {
   const position = user.position;
-  const locTime = new Date(position.timestamp);
+  const timestamp = new Date(position.timestamp);
   const locObj = {};
   const coords = {};
 
@@ -45,8 +45,7 @@ function createUserPosition(user) {
   coords.longitude = position.longitude;
   coords.heading = position.heading;
   locObj.coords = coords;
-
-  locObj.locTime = locTime;
+  locObj.timestamp = timestamp;
   locObj.accuracy = position.accuracy;
 
   return locObj;
@@ -155,7 +154,7 @@ function handle(io) {
           return;
         }
 
-        socket.emit('time', new Date());
+        socket.emit('time', { time: new Date() });
       });
     });
 
@@ -215,9 +214,9 @@ function handle(io) {
      * to the device room
      */
     socket.on('updateDeviceSocketId', function(data) {
-      const deviceId = data.deviceId;
-      const socketId = data.socketId;
-      const userName = data.userName;
+      const deviceId = data.device.deviceId;
+      const socketId = data.user.socketId;
+      const userName = data.user.userName;
 
       socket.join(deviceId + dbDefaults.device);
 
@@ -244,7 +243,7 @@ function handle(io) {
           return;
         }
 
-        const deviceId = data.deviceId;
+        const deviceId = data.device.deviceId;
         const field = data.field;
         const value = data.value;
         const callback = function(err, device) {

@@ -6,6 +6,7 @@ const dbDefaults = require('../../config/dbPopDefaults');
 const appConfig = require('../../config/appConfig');
 const logger = require('../../logger');
 const messenger = require('../../messenger');
+const objectValidator = require('../../objectValidator');
 
 function followRoom(params) {
   const socket = params.socket;
@@ -29,6 +30,10 @@ function followRoom(params) {
 
 function handle(socket) {
   socket.on('chatMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.msg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -43,6 +48,10 @@ function handle(socket) {
   });
 
   socket.on('broadcastMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.broadcast.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -53,6 +62,10 @@ function handle(socket) {
   });
 
   socket.on('createRoom', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true, owner: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
@@ -378,7 +391,7 @@ function handle(socket) {
         socket.broadcast.emit('morse', data.morseCode);
       }
 
-      socket.emit('morse', data.morseCode);
+      socket.emit('morse', { morseCode: data.morseCode });
     });
   });
 

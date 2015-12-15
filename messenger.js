@@ -28,6 +28,20 @@ function sendSelfMsgs(params) {
   params.socket.emit('messages', { messages: messages });
 }
 
+function isSocketFollowingRoom(socket, roomName) {
+  if (socket.rooms.indexOf(roomName) === -1) {
+    sendSelfMsg({
+      message: {
+        text: ['You are not following room ' + roomName],
+      },
+    });
+
+    return false;
+  }
+
+  return true;
+}
+
 function sendMsg(params) {
   const message = params.message;
 
@@ -62,6 +76,10 @@ function sendChatMsg(params) {
   const message = params.message;
   const socket = params.socket;
   message.time = new Date();
+
+  if (!isSocketFollowingRoom(socket, message.roomName)) {
+    return;
+  }
 
   addMsgToHistory(message.roomName, message, socket, function(err) {
     if (err) {

@@ -181,7 +181,7 @@ const intervals = {
   isScreenOff: null,
 };
 const validCommands = {};
-const commandLineLength = 6;
+const commandLineLength = 10;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1355,11 +1355,11 @@ function printStartMessage() {
   queueMessage(logoToPrint);
   queueMessage({
     text: [
-      createLine(50),
+      createLine(10),
       'Connecting... Could not establish connection to HQ',
       'Rerouting... Secondary relay ' + randomRelay + ' found',
       'Connecting to relay ' + randomRelay + '... Connection established',
-      createLine(50),
+      createLine(10),
     ],
     extraClass: 'upperCase',
   });
@@ -1464,11 +1464,17 @@ function onUnfollow(data = { room: { roomName: '' } }) {
   });
 
   if (room.exited) {
-    socket.emit('follow', { roomName: 'public', entered: true });
+    socket.emit('follow', {
+      room: {
+        roomName: 'public',
+        entered: true,
+      },
+    });
   }
 }
 
-function onLogin(user) {
+function onLogin(data = {}) {
+  const user = data.user;
   const mode = user.mode ? user.mode : cmdMode;
 
   validCommands.clear.func();
@@ -1481,12 +1487,21 @@ function onLogin(user) {
   validCommands.mode.func([mode]);
 
   socket.emit('updateDeviceSocketId', {
-    deviceId: getDeviceId(),
-    socketId: socket.id,
-    userName: getUser(),
+    device: {
+      deviceId: getDeviceId(),
+    },
+    user: {
+      socketId: socket.id,
+      userName: getUser(),
+    },
   });
 
-  socket.emit('follow', { roomName: 'public', entered: true });
+  socket.emit('follow', {
+    room: {
+      roomName: 'public',
+      entered: true,
+    },
+  });
 }
 
 function onCommandSuccess(data = {}) {
@@ -1516,9 +1531,13 @@ function onReconnectSuccess(data) {
     setAccessLevel(data.user.accessLevel);
 
     socket.emit('updateDeviceSocketId', {
-      deviceId: getDeviceId(),
-      socketId: socket.id,
-      user: getUser(),
+      device: {
+        deviceId: getDeviceId(),
+      },
+      user: {
+        socketId: socket.id,
+        userName: getUser(),
+      },
     });
 
     if (!data.firstConnection) {
@@ -1565,13 +1584,13 @@ function onDisconnectUser() {
   resetAllLocalVals();
 }
 
-function onMorse(morseCode) {
-  playMorse(morseCode);
+function onMorse(data = {}) {
+  playMorse(data.morseCode);
 }
 
-function onTime(time) {
+function onTime(data = {}) {
   queueMessage({
-    text: ['Time: ' + generateTimeStamp(time, true)],
+    text: ['Time: ' + generateTimeStamp(data.time, true)],
   });
 }
 
@@ -1582,30 +1601,27 @@ function onLocationMsg(locationData) {
   for (let i = 0; i < locationKeys.length; i++) {
     let text = '';
     const user = locationKeys[i];
+    const userLocation = locationData[user];
+    const latitude = userLocation.latitude.toFixed(6);
+    const longitude = userLocation.longitude.toFixed(6);
+    const heading = userLocation.heading !== null ? Math.round(userLocation.heading) : null;
+    const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
+    const mapLocation = locateOnMap(latitude, longitude);
 
-    if (locationData[user].coords) {
-      const userLocation = locationData[user];
-      const latitude = userLocation.coords.latitude.toFixed(6);
-      const longitude = userLocation.coords.longitude.toFixed(6);
-      const heading = userLocation.coords.heading !== null ? Math.round(userLocation.coords.heading) : null;
-      const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
-      const mapLocation = locateOnMap(latitude, longitude);
+    text += 'User: ' + user + '\t';
+    text += 'Time: ' + generateTimeStamp(userLocation.timestamp, true) + '\t';
+    text += 'Location: ' + mapLocation + '\t';
 
-      text += 'User: ' + user + '\t';
-      text += 'Time: ' + generateTimeStamp(userLocation.locTime, true) + '\t';
-      text += 'Location: ' + mapLocation + '\t';
+    if (mapLocation !== '---') {
+      text += 'Accuracy: ' + accuracy + ' meters\t';
+      text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
 
-      if (mapLocation !== '---') {
-        text += 'Accuracy: ' + accuracy + ' meters\t';
-        text += 'Coordinates: ' + latitude + ', ' + longitude + '\t';
-
-        if (heading !== null) {
-          text += 'Heading: ' + heading + ' deg.';
-        }
+      if (heading !== null) {
+        text += 'Heading: ' + heading + ' deg.';
       }
-
-      queueMessage({ text: [text] });
     }
+
+    queueMessage({ text: [text] });
   }
 }
 
@@ -1879,11 +1895,11 @@ function attachCommands() {
         if (getUser() === null) {
           queueMessage({
             text: [
-              createLine(49),
+              createLine(10),
               ' Use register to register a new user',
               ' Use login to log in to an existing user',
               ' You have to log in to access most of the system',
-              createLine(49),
+              createLine(10),
             ],
           });
         }
@@ -2022,7 +2038,7 @@ function attachCommands() {
           const phrase = phrases.join(' ');
           message.text.push(phrase);
         } else {
-          message.text.push(createLine(message.text[0].length));
+          message.text.push(createLine(10));
           dataText = copyString(message.text);
           commandHelper.onStep++;
 
@@ -2522,9 +2538,9 @@ function attachCommands() {
       } else if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
-        socket.emit('locate', userName);
+        socket.emit('locate', { user: { userName: userName } });
       } else {
-        socket.emit('locate', getUser());
+        socket.emit('locate', { user: { userName: getUser() } });
       }
     },
     help: [
@@ -2819,11 +2835,12 @@ function attachCommands() {
     func: function verifyuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
-        const data = { user: { userName: userName } };
 
         if (userName === '*') {
           socket.emit('verifyAllUsers');
         } else {
+          const data = { user: { userName: userName } };
+
           socket.emit('verifyUser', data);
         }
       } else {
@@ -3053,8 +3070,12 @@ function attachCommands() {
           });
         } else {
           const data = {
-            userName: getUser(),
-            roomName: commandObj.data.roomName,
+            user: {
+              userName: getUser(),
+            },
+            room: {
+              roomName: commandObj.data.roomName,
+            },
           };
 
           clearTimeout(commandObj.data.timer);
@@ -3200,9 +3221,9 @@ function attachCommands() {
     func: function chipperCommand() {
       queueMessage({
         text: [
-          createLine(14),
+          createLine(10),
           '- DEACTIVATE -',
-          createLine(14),
+          createLine(10),
         ],
         extraClass: 'importantMsg large',
       });
@@ -3603,10 +3624,10 @@ function attachCommands() {
   };
   validCommands.updatedevice = {
     func: function updatedeviceCommand(phrases) {
-      const data = {};
+      const data = { device: {} };
 
       if (phrases.length > 2) {
-        data.deviceId = phrases[0];
+        data.device.deviceId = phrases[0];
         data.field = phrases[1];
         data.value = phrases[2];
 
@@ -3842,9 +3863,11 @@ function startBoot() {
     printStartMessage();
     setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
-      deviceId: getDeviceId(),
-      socketId: socket.id,
-      user: 'NO_USER_LOGGED_IN',
+      device: { deviceId: getDeviceId() },
+      user: {
+        socketId: socket.id,
+        userName: 'NO_USER_LOGGED_IN',
+      },
     });
   }
 

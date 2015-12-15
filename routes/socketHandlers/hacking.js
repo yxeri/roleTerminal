@@ -32,8 +32,8 @@ function handle(socket) {
   socket.on('hackRoom', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowed) {
       if (allowed) {
-        const roomName = data.roomName.toLowerCase();
-        const userName = data.userName.toLowerCase();
+        const roomName = data.room.roomName.toLowerCase();
+        const userName = data.user.userName.toLowerCase();
 
         dbConnector.addRoomToUser(userName, roomName, function(err) {
           if (err) {

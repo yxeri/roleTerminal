@@ -98,6 +98,10 @@ function handle(socket) {
   });
 
   socket.on('follow', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.follow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
@@ -136,6 +140,10 @@ function handle(socket) {
   });
 
   socket.on('switchRoom', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.switchroom.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -156,6 +164,10 @@ function handle(socket) {
   });
 
   socket.on('unfollow', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.unfollow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
@@ -289,6 +301,10 @@ function handle(socket) {
 
   // TODO Data structure. data.user.userName?
   socket.on('myRooms', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true }, device: { deviceId: true } })) {
+      return;
+    }
+
     function shouldBeHidden(room) {
       const hiddenRooms = [
         socket.id,
@@ -358,6 +374,10 @@ function handle(socket) {
   });
 
   socket.on('history', function(data) {
+    if (!objectValidator.isValidData(data, {})) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.history.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -382,6 +402,10 @@ function handle(socket) {
 
   // TODO morse class?
   socket.on('morse', function(data) {
+    if (!objectValidator.isValidData(data, { morseCode: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.morse.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -396,6 +420,10 @@ function handle(socket) {
   });
 
   socket.on('removeRoom', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
@@ -416,6 +444,10 @@ function handle(socket) {
   });
 
   socket.on('importantMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.importantmsg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -445,6 +477,10 @@ function handle(socket) {
   });
 
   socket.on('updateRoom', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true }, field: true, value: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, dbDefaults.commands.updateroom.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;

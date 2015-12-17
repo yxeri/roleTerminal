@@ -81,7 +81,6 @@ const noLinkRooms = [
   'whisper',
 ];
 // Interval/timeout times in milliseconds
-const printIntervalTime = 200;
 const screenOffIntervalTime = 1000;
 const watchPositionTime = 15000;
 const pausePositionTime = 40000;
@@ -174,12 +173,6 @@ const commandHelper = {
   data: null,
   hideInput: false,
 };
-// Object containing all running intervals
-const intervals = {
-  tracking: null,
-  printText: null,
-  isScreenOff: null,
-};
 const validCommands = {};
 const lineLength = 29;
 let audioCtx;
@@ -219,6 +212,8 @@ let shortMessageQueue = [];
  */
 let reconnecting = false;
 let oldAndroid;
+let trackingInterval = null;
+let isScreenOffInterval = null;
 
 function getInputText() {
   return commandInput.value;
@@ -343,32 +338,33 @@ function generateFullRow(sentText, message) {
   return rowObj;
 }
 
-function consumeMessageShortQueue() {
-  function printRow(message) {
-    if (message.text && message.text.length > 0) {
-      const text = message.text.shift();
-      const row = generateFullRow(text, message);
-      const extraClass = message.extraClass;
+function printRow(message) {
+  if (message.text && message.text.length > 0) {
+    const text = message.text.shift();
+    const row = generateFullRow(text, message);
+    const extraClass = message.extraClass;
 
-      if (extraClass) {
-        // classList doesn't work on older devices, thus the usage of className
-        row.className += ' ' + extraClass;
-      }
-
-      mainFeed.appendChild(row);
-      scrollView();
-      setTimeout(printRow, rowTimeout, message);
-    } else {
-      consumeMessageShortQueue();
+    if (extraClass) {
+      // classList doesn't work on older devices, thus the usage of className
+      row.className += ' ' + extraClass;
     }
-  }
 
+    mainFeed.appendChild(row);
+    scrollView();
+    setTimeout(printRow, rowTimeout, message);
+  } else {
+    consumeMessageShortQueue(); // eslint-disable-line no-use-before-define
+  }
+}
+
+function consumeMessageShortQueue() {
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
 
     printRow(message, consumeMessageShortQueue);
   } else {
     printing = false;
+    consumeMessageQueue(); // eslint-disable-line no-use-before-define
   }
 }
 
@@ -411,6 +407,7 @@ function isTextAllowed(text) {
 
 function queueMessage(message) {
   messageQueue.push(message);
+  consumeMessageQueue();
 }
 
 function copyString(text) {
@@ -771,7 +768,7 @@ function sendLocation() {
     const clearingWatch = function clearingWatch() {
       navigator.geolocation.clearWatch(watchId);
       watchId = null;
-      intervals.tracking = setTimeout(sendLocation, pausePositionTime);
+      trackingInterval = setTimeout(sendLocation, pausePositionTime);
     };
 
     watchId = navigator.geolocation.watchPosition(function watchPosition() {
@@ -782,7 +779,7 @@ function sendLocation() {
     }, function watchPositionCallback(err) {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
-        clearTimeout(intervals.tracking);
+        clearTimeout(trackingInterval);
         queueMessage({
           text: [
             'Unable to connect to the tracking satellites',
@@ -795,7 +792,7 @@ function sendLocation() {
     }, { enableHighAccuracy: true });
 
     if (isTracking) {
-      intervals.tracking = setTimeout(clearingWatch, watchPositionTime);
+      trackingInterval = setTimeout(clearingWatch, watchPositionTime);
     }
   }
 
@@ -845,20 +842,13 @@ function isScreenOff() {
  * @returns {undefined} Returns nothing
  */
 function setIntervals() {
-  if (intervals.printText !== null) {
-    clearInterval(intervals.printText);
-  }
-
-  if (intervals.tracking !== null) {
-    clearTimeout(intervals.tracking);
+  if (trackingInterval !== null) {
+    clearTimeout(trackingInterval);
   }
 
   if (watchId !== null) {
     navigator.geolocation.clearWatch(watchId);
   }
-
-  // Prints messages from the queue
-  intervals.printText = setInterval(consumeMessageQueue, printIntervalTime);
 
   if (isTracking && navigator.geolocation) {
     // Gets new geolocation data
@@ -866,13 +856,13 @@ function setIntervals() {
   }
 
   // Should not be recreated on focus
-  if (intervals.isScreenOff === null) {
+  if (isScreenOffInterval === null) {
     /**
      * Checks time between when JS stopped and started working again
      * This will be most frequently triggered when a user turns off the
      * screen on their phone and turns it back on
      */
-    intervals.isScreenOff = setInterval(isScreenOff, screenOffIntervalTime);
+    isScreenOffInterval = setInterval(isScreenOff, screenOffIntervalTime);
   }
 }
 
@@ -1346,6 +1336,7 @@ function printWelcomeMessage() {
     ],
   });
   queueMessage(razLogoCopy);
+  consumeMessageQueue();
 }
 
 function printStartMessage() {

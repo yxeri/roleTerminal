@@ -30,10 +30,6 @@ function followRoom(params) {
 
 function handle(socket) {
   socket.on('chatMsg', function(data) {
-    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true } })) {
-      return;
-    }
-
     manager.userAllowedCommand(socket.id, dbDefaults.commands.msg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -48,10 +44,6 @@ function handle(socket) {
   });
 
   socket.on('broadcastMsg', function(data) {
-    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true } })) {
-      return;
-    }
-
     manager.userAllowedCommand(socket.id, dbDefaults.commands.broadcast.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -224,21 +216,17 @@ function handle(socket) {
         }
 
         if (rooms.length > 0) {
-          let roomsString = '';
+          const roomNames = [];
 
           for (let i = 0; i < rooms.length; i++) {
-            roomsString += rooms[i].roomName + '\t';
+            roomNames.push(rooms[i].roomName);
           }
 
-          messenger.sendSelfMsg({
+          messenger.sendList({
             socket: socket,
-            message: {
-              text: [
-                '--------------',
-                '  List rooms',
-                '--------------',
-                roomsString,
-              ],
+            itemList: {
+              listTitle: 'List rooms',
+              itemList: roomNames,
             },
           });
         }
@@ -260,38 +248,33 @@ function handle(socket) {
         }
 
         if (users.length > 0) {
-          let usersString = '';
-          let onlineString = '';
+          const offlineUsers = [];
+          const onlineUsers = [];
 
           for (let i = 0; i < users.length; i++) {
             const currentUser = users[i];
 
             if (currentUser.verified && !currentUser.banned) {
               if (currentUser.online) {
-                onlineString += currentUser.userName;
-                onlineString += '\t';
+                onlineUsers.push(currentUser.userName);
               } else {
-                usersString += currentUser.userName;
-                usersString += '\t';
+                offlineUsers.push(currentUser.userName);
               }
             }
           }
 
-          messenger.sendSelfMsg({
+          messenger.sendList({
             socket: socket,
-            message: {
-              text: [
-                '--------------',
-                '  List users',
-                '--------------------',
-                '  Currently online',
-                '--------------------',
-                onlineString,
-                '-----------------',
-                '  Other users',
-                '-----------------',
-                usersString,
-              ],
+            itemList: {
+              listTitle: 'Online users',
+              itemList: onlineUsers,
+            },
+          });
+          messenger.sendList({
+            socket: socket,
+            itemList: {
+              listTitle: 'Other users',
+              itemList: offlineUsers,
             },
           });
         }
@@ -332,40 +315,27 @@ function handle(socket) {
         }
       }
 
-      messenger.sendSelfMsg({
+      messenger.sendList({
         socket: socket,
-        message: {
-          text: [
-            '------------',
-            '  My rooms',
-            '------------',
-            'You are following rooms:',
-            rooms.join('\t'),
-          ],
+        itemList: {
+          listTitle: 'My rooms',
+          itemList: rooms,
         },
       });
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
-        if (err || ownedRooms === null) {
+        if (err || !ownedRooms || ownedRooms === null) {
           logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get owned rooms', err);
 
           return;
         }
 
-        let ownedRoomsString = '';
-
-        for (let i = 0; i < ownedRooms.length; i++) {
-          ownedRoomsString += ownedRooms[i].roomName + '\t';
-        }
-
-        if (ownedRoomsString.length > 0) {
-          messenger.sendSelfMsg({
+        if (ownedRooms.length > 0) {
+          messenger.sendList({
             socket: socket,
-            message: {
-              text: [
-                'You are owner of the rooms:',
-                ownedRoomsString,
-              ],
+            itemList: {
+              listTitle: 'You are owner of the rooms:',
+              itemList: ownedRooms,
             },
           });
         }
@@ -444,10 +414,6 @@ function handle(socket) {
   });
 
   socket.on('importantMsg', function(data) {
-    if (!objectValidator.isValidData(data, { message: { text: true, userName: true } })) {
-      return;
-    }
-
     manager.userAllowedCommand(socket.id, dbDefaults.commands.importantmsg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;

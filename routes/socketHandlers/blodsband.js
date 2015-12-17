@@ -20,7 +20,7 @@ function handle(socket) {
           return;
         }
 
-        const entityArray = ['Available entities:'];
+        const entityArray = [];
 
         for (let i = 0; i < entities.length; i++) {
           const keyAmount = entities[i].keys.length;
@@ -28,11 +28,10 @@ function handle(socket) {
           entityArray.push(entities[i].entityName + ' [' + keyAmount + ' unlocked]');
         }
 
-        messenger.sendSelfMsg({
+        messenger.sendList({
           socket: socket,
-          message: {
-            text: [entityArray],
-          },
+          listTitle: 'Available entities',
+          itemList: entityArray,
         });
       });
     });

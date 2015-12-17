@@ -9,14 +9,15 @@ function checkKeys(data, expected) {
     const expectedKey = expectedKeys[i];
 
     if (!data[expectedKey] || data[expectedKey] === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.general, ['Key missing:', expectedKey]);
+      logger.sendErrorMsg(logger.ErrorCodes.general, 'Key missing: ' + expectedKey);
 
       return false;
     }
 
     const dataObj = data[expectedKey];
+    const expectedDataObj = expected[expectedKey];
 
-    if (dataObj !== null && !(dataObj instanceof Array) && typeof dataObj === 'object') {
+    if (!(expectedDataObj instanceof Array) && typeof expectedDataObj === 'object') {
       return checkKeys(dataObj, expected[expectedKey]);
     }
   }
@@ -34,12 +35,7 @@ function isValidData(data, expected) {
   const isValid = checkKeys(data, expected);
 
   if (!isValid) {
-    logger.sendErrorMsg(logger.ErrorCodes.general, [
-      'Expected:',
-      expected,
-      'Received:',
-      data,
-    ]);
+    logger.sendErrorMsg(logger.ErrorCodes.general, 'Expected: ' + JSON.stringify(expected));
   }
 
   return isValid;

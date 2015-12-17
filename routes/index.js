@@ -100,7 +100,7 @@ function handle(io) {
     });
 
     // TODO This should be moved
-    socket.on('locate', function(sentUserName) {
+    socket.on('locate', function(data) {
       manager.userAllowedCommand(socket.id, dbDefaults.commands.locate.commandName, function(allowErr, allowed, user) {
         if (allowErr || !allowed) {
           return;
@@ -109,8 +109,8 @@ function handle(io) {
         const locationData = {};
 
         // Return all user locations
-        if (sentUserName === '*') {
-          dbConnector.getAllUserLocations(user, function(err, users) {
+        if (data.user.userName === '*') {
+          dbConnector.getAllUserLocations(data.user, function(err, users) {
             if (err || users === null) {
               logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
 
@@ -129,18 +129,16 @@ function handle(io) {
             socket.emit('locationMsg', locationData);
           });
         } else {
-          // TODO Refactor this
-          dbConnector.getUserLocation(user, sentUserName, function(err, foundUser) {
+          dbConnector.getUserLocation(user, data.user.userName, function(err, foundUser) {
             if (err || foundUser === null) {
               logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
             } else if (foundUser.position !== undefined) {
               const userName = foundUser.userName;
-
               locationData[userName] = createUserPosition(foundUser);
 
               socket.emit('locationMsg', locationData);
             } else {
-              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Unable to locate ' + sentUserName);
+              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Unable to locate ' + data.user.userName);
             }
           });
         }
@@ -333,6 +331,8 @@ function handle(io) {
             return;
           }
 
+          // TODO Send objects through list?
+
           const allDevices = [];
 
           if (devices.length > 0) {
@@ -342,19 +342,19 @@ function handle(io) {
 
               deviceString += 'DeviceID: ' + device.deviceId + '\t';
 
-              if (device.alias !== device.deviceId) {
-                deviceString += 'Alias: ' + device.alias + '\t';
+              if (device.deviceAlias !== device.deviceId) {
+                deviceString += 'Alias: ' + device.deviceAlias + '\t';
               }
 
               deviceString += 'Last user: ' + device.lastUser;
               allDevices.push(deviceString);
             }
 
-            messenger.sendSelfMsg({
+            messenger.sendList({
               socket: socket,
-              message: {
-                text: [allDevices],
-              },
+
+                listTitle: 'Devices',
+                itemList: allDevices,
             });
           }
         });

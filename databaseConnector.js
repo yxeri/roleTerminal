@@ -76,7 +76,7 @@ const schedEventSchema = new mongoose.Schema({
 const deviceSchema = new mongoose.Schema({
   deviceId: { type: String, unique: true },
   socketId: String,
-  alias: { type: String, unique: true },
+  deviceAlias: { type: String, unique: true },
   lastUser: String,
 }, { collection: 'devices' });
 const teamSchema = new mongoose.Schema({
@@ -177,7 +177,7 @@ function addEncryptionKeys(keys, callback) {
 
 function updateDeviceAlias(deviceId, value, callback) {
   const query = { deviceId: deviceId };
-  const update = { $set: { alias: value } };
+  const update = { $set: { deviceAlias: value } };
   const options = { new: true };
 
   Device.findOneAndUpdate(query, update, options).lean().exec(
@@ -211,7 +211,7 @@ function updateDeviceSocketId(deviceId, socketId, user, callback) {
           deviceId: deviceId,
           socketId: socketId,
           lastUser: user,
-          alias: deviceId,
+          deviceAlias: deviceId,
         });
 
         saveObject(newDevice, 'device', callback);
@@ -370,7 +370,7 @@ function getEncryptionKey(sentKey, callback) {
 }
 
 function getUserByDevice(deviceCode, callback) {
-  const query = { $or: [{ deviceId: deviceCode }, { alias: deviceCode }] };
+  const query = { $or: [{ deviceId: deviceCode }, { deviceAlias: deviceCode }] };
 
   Device.findOne(query).lean().exec(function(err, device) {
     if (err || device === null) {
@@ -391,7 +391,7 @@ function getUserByDevice(deviceCode, callback) {
 }
 
 function getDevice(deviceCode, callback) {
-  const query = { $or: [{ deviceId: deviceCode }, { alias: deviceCode }] };
+  const query = { $or: [{ deviceId: deviceCode }, { deviceAlias: deviceCode }] };
 
   Device.findOne(query).lean().exec(function(err, device) {
     if (err || device === null) {
@@ -701,7 +701,7 @@ function getAllRooms(sentUser, callback) {
 function getAllUserLocations(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
   const sort = { userName: 1 };
-  const filter = { _id: 0 };
+  const filter = { _id: 0, userName: 1, position: 1 };
 
   User.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
@@ -719,7 +719,7 @@ function getUserLocation(sentUser, sentUserName, callback) {
       { userName: sentUserName },
     ],
   };
-  const filter = { _id: 0 };
+  const filter = { _id: 0, userName: 1, position: 1 };
 
   User.findOne(query, filter).lean().exec(function(err, user) {
     if (err) {

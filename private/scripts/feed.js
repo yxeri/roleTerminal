@@ -181,7 +181,7 @@ const intervals = {
   isScreenOff: null,
 };
 const validCommands = {};
-const commandLineLength = 10;
+const lineLength = 29;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1317,14 +1317,14 @@ function keyPress(event) {
 
 function createCommandStart(commandName) {
   return [
-    createLine(commandLineLength),
+    createLine(lineLength),
     ' ' + commandName.toUpperCase(),
-    createLine(commandLineLength),
+    createLine(lineLength),
   ];
 }
 
 function createCommandEnd() {
-  return createLine(commandLineLength);
+  return createLine(lineLength);
 }
 
 function printWelcomeMessage() {
@@ -1355,11 +1355,11 @@ function printStartMessage() {
   queueMessage(logoToPrint);
   queueMessage({
     text: [
-      createLine(10),
+      createLine(lineLength),
       'Connecting... Could not establish connection to HQ',
       'Rerouting... Secondary relay ' + randomRelay + ' found',
       'Connecting to relay ' + randomRelay + '... Connection established',
-      createLine(10),
+      createLine(lineLength),
     ],
     extraClass: 'upperCase',
   });
@@ -1771,6 +1771,15 @@ function onWhoami(data) {
   queueMessage({ text: text });
 }
 
+function onList(data = {}) {
+  const itemList = data.itemList.itemList;
+  const title = data.itemList.listTitle;
+  const text = createCommandStart(title);
+  text.push(itemList.join('\t'));
+
+  onMessage({ message: { text: text } });
+}
+
 function startSocket() {
   if (socket) {
     socket.on('message', onMessage);
@@ -1794,6 +1803,7 @@ function startSocket() {
     socket.on('weather', onWeather);
     socket.on('updateDeviceId', onUpdateDeviceId);
     socket.on('whoAmI', onWhoami);
+    socket.on('list', onList);
   }
 }
 
@@ -1895,11 +1905,11 @@ function attachCommands() {
         if (getUser() === null) {
           queueMessage({
             text: [
-              createLine(10),
+              createLine(lineLength),
               ' Use register to register a new user',
               ' Use login to log in to an existing user',
               ' You have to log in to access most of the system',
-              createLine(10),
+              createLine(lineLength),
             ],
           });
         }
@@ -2038,7 +2048,7 @@ function attachCommands() {
           const phrase = phrases.join(' ');
           message.text.push(phrase);
         } else {
-          message.text.push(createLine(10));
+          message.text.push(createLine(lineLength));
           dataText = copyString(message.text);
           commandHelper.onStep++;
 
@@ -3114,7 +3124,12 @@ function attachCommands() {
   };
   validCommands.importantmsg = {
     func: function importantmsgCommand() {
-      const data = { message: { text: [] } };
+      const data = {
+        message: {
+          text: [],
+          userName: getUser(),
+        },
+      };
       commandHelper.data = data;
 
       queueMessage(copyMessage(abortInfo));
@@ -3221,9 +3236,9 @@ function attachCommands() {
     func: function chipperCommand() {
       queueMessage({
         text: [
-          createLine(10),
+          createLine(lineLength),
           '- DEACTIVATE -',
-          createLine(10),
+          createLine(lineLength),
         ],
         extraClass: 'importantMsg large',
       });

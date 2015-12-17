@@ -32,7 +32,7 @@ const ErrorCodes = {
  * @returns {undefined} Returns undefined
  */
 function sendErrorMsg(code, text, err) {
-  console.log('[ERROR]', code.text, text, '- Error:', err);
+  console.log('[ERROR]', code.text, text, '- Error:', err || '');
 }
 
 /**

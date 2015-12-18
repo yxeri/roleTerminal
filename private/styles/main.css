@@ -31,7 +31,7 @@ ul {
 
 li {
   word-wrap: break-word;
-  padding: 0 .6em 0 .6em;
+  padding: 0 .8em 0 .8em;
 }
 
 pre {
@@ -40,6 +40,7 @@ pre {
 }
 
 #inputContainer {
+  padding: 0 .8em 0 .8em;
   display: table;
   width: 99%;
 }
@@ -49,7 +50,6 @@ pre {
 }
 
 #inputStart {
-  padding-left: .5em;
   width: 1px;
   white-space: pre;
 }
@@ -197,22 +197,34 @@ pre {
 }
 
 @media (max-width: 736px) {
+  li {
+    padding: 0 .4em 0 .4em;
+  }
+
+  #inputContainer {
+    padding: 0 .4em 0 .4em;
+  }
+
   .logo {
     font-size: .8em;
   }
 }
 
 @media (max-width: 414px) {
+  li {
+    padding: 0 .2em 0 .2em;
+  }
+
+  #inputContainer {
+    padding: 0 .2em 0 .2em;
+  }
+
   .logo {
     font-size: .6em;
   }
 }
 
 @media (max-height: 414px) and (max-width: 736px) , (max-height: 736px) and (max-width: 414px) {
-  .feed {
-    padding-left: .1em;
-    padding-right: .1em;
-  }
 }
 
 @-webkit-keyframes brightness {

@@ -1331,34 +1331,38 @@ function resetAllLocalVals() {
   previousCommandPointer = 0;
 }
 
-function createRedableRoomName(roomName) {
+function hideMessageProperties(message = { }) {
+  const roomName = message.roomName;
+
+  if (message.extraClass === 'importantMsg') {
+    message.roomName = '';
+    message.userName = '';
+    message.skipTime = true;
+  }
+
   if (roomName && roomName !== null) {
     if (roomName.indexOf('-whisper') >= 0) {
-      return 'whisper';
+      message.roomName = 'whisper';
     } else if (roomName.indexOf('-device') >= 0) {
-      return 'device';
+      message.roomName = 'device';
     }
   }
 
-  return roomName;
+  return message;
 }
 
-function onMessage(data = {}) {
-  const message = data.message;
+function onMessage(data = { message: {} }) {
+  const message = hideMessageProperties(data.message);
 
-  if (message) {
-    message.roomName = createRedableRoomName(message.roomName);
-    queueMessage(message);
-  }
+  queueMessage(message);
 }
 
 function onMessages(data = { messages: [] }) {
   const messages = data.messages;
 
   for (let i = 0; i < messages.length; i++) {
-    const message = messages[i];
+    const message = hideMessageProperties(messages[i]);
 
-    message.roomName = createRedableRoomName(message.roomName);
     queueMessage(message);
   }
 }

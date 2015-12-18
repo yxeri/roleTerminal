@@ -1,58 +1,6 @@
 'use strict';
 
-const razorLogo = {
-  text: [
-    '   ####',
-    '###############',
-    ' #####  #########                                           ####',
-    '  ####     #######  ########     ###########    ####     ###########',
-    '  ####    ######      #######   ####   #####  ########    ####   #####',
-    '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
-    '  #########        ####    ####     ####   #####     ##############',
-    '  #### ######     ####     #####  ####     #######   ###  ########',
-    '  ####   ######  ##### #### #### ############  #######    ####   ###',
-    ' ######    #############    ################     ###      ####    #####',
-    '########     ########        ####                        ######      #####   ##',
-    '               ###########        ##                                    ###### ',
-    '                    ###############',
-    '                  Razor  #####  Demos - Warez - Honey',
-  ],
-  extraClass: 'logo',
-};
-const logo = {
-  text: [
-    '                          ####',
-    '                ####    #########    ####',
-    '               ###########################',
-    '              #############################',
-    '            #######        ##   #  ##########',
-    '      ##########           ##    #  ###  ##########',
-    '     #########             #########   #   #########',
-    '       #####               ##     ########   #####',
-    '     #####                 ##     ##     ##########',
-    '     ####                  ##      ##     #   ######',
-    ' #######                   ##########     ##    ########',
-    '########                   ##       ########     ########',
-    ' ######      Organica      ##       #      #############',
-    '   ####     Oracle         ##       #      ##     ####',
-    '   ####     Operations     ##       #      ##    #####',
-    '   ####      Center        ##       #      ###########',
-    '########                   ##       #########    ########',
-    '########                   ##########      #    #########',
-    ' ########                  ##      ##     ## ###########',
-    '     #####                 ##      ##     ### #####',
-    '       #####               ##     ########   #####',
-    '      #######              ##########   #  ########',
-    '     ###########           ##    ##    # ###########',
-    '      #############        ##    #   #############',
-    '            ################################',
-    '              ############################',
-    '              #######  ##########  #######',
-    '                ###      ######      ###',
-    '                          ####',
-  ],
-  extraClass: 'logo',
-};
+const storedMessages = {};
 // Timeout between print of rows (milliseconds)
 const rowTimeout = 60;
 /**
@@ -71,7 +19,7 @@ const commandQueue = [];
 const commandChars = ['-', '/'];
 const cmdMode = 'cmd';
 const chatMode = 'chat';
-const randomString = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+const randomString = '023456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
 const randomBinary = '01';
 const hideRooms = [
   'broadcast',
@@ -411,11 +359,19 @@ function queueMessage(message) {
 }
 
 function copyString(text) {
-  return text !== null ? JSON.parse(JSON.stringify(text)) : '';
+  if (text && text !== null) {
+    return JSON.parse(JSON.stringify(text));
+  }
+
+  return '';
 }
 
 function copyMessage(textObj) {
-  return textObj !== null ? JSON.parse(JSON.stringify(textObj)) : { text: [''] };
+  if (textObj && textObj !== null) {
+    return JSON.parse(JSON.stringify(textObj));
+  }
+
+  return { text: [''] };
 }
 
 function createRandString(selection, length, upperCase) {
@@ -425,7 +381,6 @@ function createRandString(selection, length, upperCase) {
 
   for (let i = 0; i < length; i++) {
     randomVal = Math.random() * (randomLength - 1);
-
     result += selection[Math.round(randomVal)];
   }
 
@@ -489,7 +444,11 @@ function removeUser() {
 function getCommandHistory() {
   const commandHistory = getLocalVal('cmdHistory');
 
-  return commandHistory !== null ? JSON.parse(commandHistory) : [];
+  if (commandHistory && commandHistory !== null) {
+    return JSON.parse(commandHistory);
+  }
+
+  return [];
 }
 
 function setCommandHistory(commandHistory) {
@@ -526,19 +485,18 @@ function setInputStart(text) {
 
 function resetCommand(aborted) {
   const room = getRoom() ? getRoom() : defaultInputStart;
-
-  if (aborted) {
-    queueMessage({
-      text: ['Aborting command'],
-    });
-  }
-
   commandHelper.command = null;
   commandHelper.onStep = 0;
   commandHelper.maxSteps = 0;
   commandHelper.keysBlocked = false;
   commandHelper.data = null;
   commandHelper.hideInput = false;
+
+  if (aborted) {
+    queueMessage({
+      text: ['Aborting command'],
+    });
+  }
 
   setInputStart(room);
   hideInput(false);
@@ -594,7 +552,6 @@ function pushCommandHistory(command) {
   const commandHistory = getCommandHistory();
 
   commandHistory.push(command);
-
   setCommandHistory(commandHistory);
 }
 
@@ -655,8 +612,7 @@ function playMorse(morseCode) {
     soundTimeout += duration;
   }
 
-  setTimeout(finishSoundQueue, soundTimeout, (2 * morseCode.length),
-    morseCode);
+  setTimeout(finishSoundQueue, soundTimeout, (2 * morseCode.length), morseCode);
 }
 
 /*
@@ -750,7 +706,6 @@ function locateOnMap(latitude, longitude) {
  */
 function preparePosition(position) {
   const preparedPosition = {};
-
   preparedPosition.latitude = position.coords.latitude;
   preparedPosition.longitude = position.coords.longitude;
   preparedPosition.speed = position.coords.speed;
@@ -809,6 +764,7 @@ function sendLocation() {
     }
 
     positions = [];
+
     socket.emit('updateLocation', { position: preparePosition(mostAccuratePos) });
   }
 
@@ -1318,10 +1274,11 @@ function createCommandEnd() {
 }
 
 function printWelcomeMessage() {
-  const logoCopy = copyMessage(logo);
-  const razLogoCopy = copyMessage(razorLogo);
+  const organicaLogo = copyMessage(storedMessages.organica);
+  const razorLogo = copyMessage(storedMessages.razor);
+  const seasonToPrint = copyMessage(storedMessages.christmas);
 
-  queueMessage(logoCopy);
+  queueMessage(organicaLogo);
   queueMessage({
     text: [
       'Welcome, employee ' + getUser(),
@@ -1335,15 +1292,15 @@ function printWelcomeMessage() {
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##',
     ],
   });
-  queueMessage(razLogoCopy);
-  consumeMessageQueue();
+  queueMessage(razorLogo);
+  queueMessage(seasonToPrint);
 }
 
 function printStartMessage() {
-  const logoToPrint = copyMessage(logo);
+  const organicaLogo = copyMessage(storedMessages.organica);
   const randomRelay = createRandString(randomString, 4, true);
 
-  queueMessage(logoToPrint);
+  queueMessage(organicaLogo);
   queueMessage({
     text: [
       createLine(lineLength),
@@ -1375,7 +1332,7 @@ function resetAllLocalVals() {
 }
 
 function createRedableRoomName(roomName) {
-  if (roomName) {
+  if (roomName && roomName !== null) {
     if (roomName.indexOf('-whisper') >= 0) {
       return 'whisper';
     } else if (roomName.indexOf('-device') >= 0) {
@@ -1486,7 +1443,6 @@ function onLogin(data = {}) {
       userName: getUser(),
     },
   });
-
   socket.emit('follow', {
     room: {
       roomName: 'public',
@@ -1521,16 +1477,6 @@ function onReconnectSuccess(data) {
     validCommands.mode.func([mode], false);
     setAccessLevel(data.user.accessLevel);
 
-    socket.emit('updateDeviceSocketId', {
-      device: {
-        deviceId: getDeviceId(),
-      },
-      user: {
-        socketId: socket.id,
-        userName: getUser(),
-      },
-    });
-
     if (!data.firstConnection) {
       queueMessage({
         text: ['Re-established connection'],
@@ -1546,6 +1492,16 @@ function onReconnectSuccess(data) {
 
     queueMessage({
       text: ['Retrieving missed messages (if any)'],
+    });
+
+    socket.emit('updateDeviceSocketId', {
+      device: {
+        deviceId: getDeviceId(),
+      },
+      user: {
+        socketId: socket.id,
+        userName: getUser(),
+      },
     });
   } else {
     if (!data.firstConnection) {
@@ -1563,10 +1519,10 @@ function onDisconnectUser() {
   const currentUser = getUser();
 
   // There is no saved local user. We don't need to print this
-  if (currentUser !== null) {
+  if (currentUser && currentUser !== null) {
     queueMessage({
       text: [
-        'Didn\'t find user ' + getUser() + ' in database',
+        'Didn\'t find user ' + currentUser + ' in database',
         'Resetting local configuration',
       ],
     });
@@ -1766,9 +1722,18 @@ function onList(data = {}) {
   const itemList = data.itemList.itemList;
   const title = data.itemList.listTitle;
   const text = createCommandStart(title);
-  text.push(itemList.join('\t'));
 
+  text.push(itemList.join('\t'));
   onMessage({ message: { text: text } });
+}
+
+function onStoredMessages(data = { storedMessages: {} }) {
+  const keys = Object.keys(data.storedMessages);
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    storedMessages[key] = data.storedMessages[key];
+  }
 }
 
 function startSocket() {
@@ -1795,6 +1760,7 @@ function startSocket() {
     socket.on('updateDeviceId', onUpdateDeviceId);
     socket.on('whoAmI', onWhoami);
     socket.on('list', onList);
+    socket.on('storedMessages', onStoredMessages);
   }
 }
 
@@ -1914,8 +1880,7 @@ function attachCommands() {
         queueMessage({
           text: createCommandStart('help').concat([
             'Instructions',
-            '  Add -help after a command to get instructions on how to use it. Example: ' + commandChars[0] +
-            'uploadkey -help',
+            '  Add -help after a command to get instructions on how to use it. Example: ' + commandChars[0] + 'uploadkey -help',
             'Shortcuts',
             '  Use page up/down to scroll the view',
             '  Press arrow up/down to go through your previous used commands',
@@ -1930,8 +1895,7 @@ function attachCommands() {
     help: [
       'Shows a list of available commands',
       'The set of commands shown is the basic set',
-      'Add "all" to show all commands available to you. Example: ' +
-      'help all',
+      'Add "all" to show all commands available to you. Example: help all',
     ],
     instructions: [
       ' Usage:',
@@ -2011,12 +1975,11 @@ function attachCommands() {
     },
     steps: [
       function broadcastStepOne(phrases) {
-        let phrase;
         const message = commandHelper.data.message;
+        let phrase;
 
         if (phrases.length > 0 && phrases[0] !== '') {
           phrase = phrases.join(' ');
-
           message.text = message.text.concat(createCommandStart('broadcast from: ' + phrase));
         } else {
           message.text = message.text.concat(createCommandStart('broadcast'));
@@ -2032,8 +1995,8 @@ function attachCommands() {
         commandHelper.onStep++;
       },
       function broadcastStepTwo(phrases) {
-        let dataText;
         const message = commandHelper.data.message;
+        let dataText;
 
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
@@ -2044,15 +2007,11 @@ function attachCommands() {
           commandHelper.onStep++;
 
           queueMessage({
-            text: [
-              'Preview of the message:',
-            ],
+            text: ['Preview of the message:'],
           });
           queueMessage({ text: dataText });
           queueMessage({
-            text: [
-              'Is this OK? "yes" to accept the message',
-            ],
+            text: ['Is this OK? "yes" to accept the message'],
           });
         }
       },
@@ -2087,9 +2046,7 @@ function attachCommands() {
         socket.emit('follow', { room: room });
       } else {
         queueMessage({
-          text: [
-            'You have to specify which room to follow and a password (if it is protected)',
-          ],
+          text: ['You have to specify which room to follow and a password (if it is protected)'],
         });
       }
     },
@@ -2230,17 +2187,12 @@ function attachCommands() {
       'Change the input mode. The options are chat or cmd',
       '--Chat mode--',
       'Everything written will be interpreted as chat messages',
-      'All commands have to be prepended with "' +
-      commandChars.join('" or "') + '" ' +
-      'Example: ' + commandChars[0] + 'uploadkey',
+      'All commands have to be prepended with "' + commandChars.join('" or "') + '" Example: ' + commandChars[0] + 'uploadkey',
       '--Cmd mode--',
       'Chat mode is the default mode',
-      'Text written will not be automatically be intepreted as ' +
-      'chat messages',
-      'You have to use "msg" command to write messages ' +
-      'Example: msg hello',
-      'Commands do not have to be prepended with anything. ' +
-      'Example: uploadkey',
+      'Text written will not be automatically be intepreted as chat messages',
+      'You have to use "msg" command to write messages Example: msg hello',
+      'Commands do not have to be prepended with anything. Example: uploadkey',
     ],
     instructions: [
       ' Usage:',
@@ -2306,9 +2258,7 @@ function attachCommands() {
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
           commandHelper.data.password = password;
           queueMessage({
-            text: [
-              'Repeat your password one more time',
-            ],
+            text: ['Repeat your password one more time'],
           });
           commandHelper.onStep++;
         } else {
@@ -2478,9 +2428,7 @@ function attachCommands() {
         commandHelper.data = data;
         commandHelper.hideInput = true;
         queueMessage({
-          text: [
-            'Input your password',
-          ],
+          text: ['Input your password'],
         });
         setInputStart('password');
         hideInput(true);
@@ -2564,7 +2512,7 @@ function attachCommands() {
   };
   validCommands.uploadkey = {
     func: function uploadkeyCommand() {
-      const razLogoCopy = copyMessage(razorLogo);
+      const razLogoCopy = copyMessage(storedMessages.razor);
 
       // TODO: razorLogo should be move to DB or other place
       queueMessage(razLogoCopy);
@@ -2956,7 +2904,7 @@ function attachCommands() {
   validCommands.hackroom = {
     func: function hackroomCommand(phrases) {
       const data = {};
-      const razLogoCopy = copyMessage(razorLogo);
+      const razLogoCopy = copyMessage(storedMessages.razor);
 
       if (phrases.length > 0) {
         data.roomName = phrases[0].toLowerCase();
@@ -3825,6 +3773,7 @@ function startBoot() {
 
   downgrade();
   attachCommands();
+  socket.emit('getStoredMessages');
   socket.emit('getCommands');
 
   // TODO: Move this

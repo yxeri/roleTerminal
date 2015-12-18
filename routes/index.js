@@ -15,6 +15,7 @@ const http = require('http');
 const dbDefaults = require('../config/dbPopDefaults');
 const logger = require('../logger');
 const messenger = require('../messenger');
+const storedMessages = require('../config/messages');
 
 // Blodsband specific
 const blodsband = require('./socketHandlers/blodsband');
@@ -352,13 +353,18 @@ function handle(io) {
 
             messenger.sendList({
               socket: socket,
-
+              itemList: {
                 listTitle: 'Devices',
                 itemList: allDevices,
+              },
             });
           }
         });
       });
+    });
+
+    socket.on('getStoredMessages', function() {
+      socket.emit('storedMessages', { storedMessages: storedMessages });
     });
   });
 

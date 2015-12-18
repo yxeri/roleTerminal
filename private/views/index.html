@@ -14,16 +14,17 @@
     <input disabled="true" id="hiddenInput" />
     <div id="overlay" class="boxShadow"></div>
       <div id="background" class="brightnessAnim">
-      <ul class="feed" id="mainFeed">
-        <!-- Required for Safari to render text -->
-        <li>
-          <pre>&nbsp;</pre>
-        </li>
-      </ul>
-      <div id="inputContainer" class="feed">
-        <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
+        <ul class="feed" id="mainFeed">
+          <!-- Required for Safari to render text -->
+          <li>
+            <pre>&nbsp;</pre>
+          </li>
+        </ul>
+        <div id="inputContainer" class="feed">
+          <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
+        </div>
+        <div id="spacer"></div>
       </div>
-      <div id="spacer"><span>&nbsp;</span></div>
     </div>
     <script src={{socketPath}}></script>
     <script src="scripts/feed.js" charset="utf-8"></script>

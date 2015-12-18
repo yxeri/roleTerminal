@@ -36,11 +36,14 @@ function handle(socket) {
 
             deviceString += 'DeviceID: ' + device.deviceId + '\t';
 
-            if (device.deviceAlias && device.deviceAlias !== device.deviceId) {
+            if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
               deviceString += 'Alias: ' + device.deviceAlias + '\t';
             }
 
-            deviceString += 'Last user: ' + device.lastUser + '\n';
+            if (device.lastUser && device.lastUser !== null) {
+              deviceString += 'Last user: ' + device.lastUser;
+            }
+
             allDevices.push(deviceString);
           }
 

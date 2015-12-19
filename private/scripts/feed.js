@@ -1725,7 +1725,13 @@ function onWhoami(data) {
 function onList(data = {}) {
   const itemList = data.itemList.itemList;
   const title = data.itemList.listTitle;
-  const text = createCommandStart(title).concat(itemList);
+  let text = createCommandStart(title);
+
+  if (itemList[0].length < 20) {
+    text.push(itemList.join('\t\t'));
+  } else {
+    text = text.concat(itemList);
+  }
 
   onMessage({ message: { text: text } });
 }

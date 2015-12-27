@@ -5,19 +5,19 @@ const config = {};
 /*
  * Base directory for public and private files
  */
-config.publicBase = 'public';
-config.privateBase = 'private';
+config.publicBase = process.env.PUBLICBASE || 'public';
+config.privateBase = process.env.PRIVATEBASE || 'private';
 
 /*
  * Sub directories for public and private files
  * Will be appended to the base directories
  */
 config.paths = {
-  views: 'views',
-  styles: 'styles',
-  scripts: 'scripts',
-  required: 'required',
-  favicon: 'images/favicon.ico',
+  views: process.env.VIEWSPATH || 'views',
+  styles: process.env.STYLESPATH || 'styles',
+  scripts: process.env.SCRIPTSPATH || 'scripts',
+  required: process.env.REQUIREDPATH || 'required',
+  favicon: process.env.FAVICONPATH || 'images/favicon.ico',
 };
 
 // Morgan log level
@@ -43,12 +43,13 @@ config.port = process.env.PORT || 8888;
  */
 config.watchDir = process.env.WATCHDIR || false;
 
+// TODO Move to paths
 /*
  * Retrieve socket.io from local server or cdn
  * Note! Android 2.2 fails when using cdn
  */
-config.socketPath = process.env.SOCKETPATH === 'cdn'
-  ? 'https://cdn.socket.io/socket.io-1.3.5.js' : '/scripts/socket.io-1.3.5.js';
+config.socketPath = process.env.SOCKETPATH === 'cdn' ?
+                    'https://cdn.socket.io/socket.io-1.3.5.js' : (process.env.SOCKETPATH || '/scripts/socket.io-1.3.5.js');
 
 /*
  * Server mode. Options:

@@ -9,14 +9,14 @@ const dbDefaults = require('./dbPopDefaults');
 const config = {};
 
 config.gameLocation = {
-  country: 'Sweden',
-  lat: '59.751429',
-  lon: '15.198645',
+  country: process.env.COUNTRY || 'Sweden',
+  lat: process.env.LATITUDE || '59.751429',
+  lon: process.env.LONGITUDE || '15.198645',
 };
-config.historyLines = 80;
-config.chunkLength = 10;
-config.userVerify = false;
-config.title = 'Organica Oracle v4.0';
-config.defaultMode = dbDefaults.modes.command;
+config.historyLines = process.env.MAXHISTORY || 80;
+config.chunkLength = process.env.MAXCHUNK || 10;
+config.userVerify = process.env.REQUIREVERIFY || false;
+config.title = process.env.TITLE || 'Organica Oracle v4.0';
+config.defaultMode = process.env.DEFAULTMODE || dbDefaults.modes.command;
 
 module.exports = config;

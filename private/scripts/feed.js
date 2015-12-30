@@ -1832,7 +1832,7 @@ function generateDeviceId() {
 /*
  * Removes some visual effects for better performance on older devices
  */
-function downgrade() {
+function downgradeOlderDevices() {
   if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid || /Vita/.test(navigator.userAgent)) {
     document.getElementById('overlay').className = '';
     document.getElementById('background').className = '';
@@ -1841,6 +1841,10 @@ function downgrade() {
 
 function isOldAndroid() {
   return /Android\s[0-3]/.test(navigator.userAgent);
+}
+
+function isTouchDevice() {
+  return ((/iP(hone|ad|od)/.test(navigator.userAgent) || /Android/.test(navigator.userAgent)));
 }
 
 function attachCommands() {
@@ -3780,10 +3784,14 @@ function attachCommands() {
 function startBoot() {
   oldAndroid = isOldAndroid();
 
-  downgrade();
+  downgradeOlderDevices();
   attachCommands();
   socket.emit('getStoredMessages');
   socket.emit('getCommands');
+
+  if (!isTouchDevice()) {
+    commandInput.focus();
+  }
 
   // TODO: Move this
   if (!getDeviceId()) {

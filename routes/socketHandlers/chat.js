@@ -35,11 +35,17 @@ function handle(socket) {
         return;
       }
 
-      if (data.message.whisper) {
-        messenger.sendWhisperMsg({ socket: socket, message: data.message });
-      } else {
-        messenger.sendChatMsg({ socket: socket, message: data.message });
+      messenger.sendChatMsg({ socket: socket, message: data.message });
+    });
+  });
+
+  socket.on('whisperMsg', function(data) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.whisper.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
       }
+
+      messenger.sendWhisperMsg({ socket: socket, message: data.message });
     });
   });
 
@@ -409,6 +415,13 @@ function handle(socket) {
         }
 
         messenger.sendSelfMsg({ socket: socket, message: { text: ['Removed the room'] } });
+        messenger.sendMsg({
+          socket: socket,
+          message: {
+            text: ['Room ' + roomNameLower + ' has been removed by the room administrator'],
+          },
+          sendTo: roomNameLower,
+        });
       });
     });
   });

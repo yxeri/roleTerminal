@@ -2887,7 +2887,7 @@ function attachCommands() {
         data.message.userName = getUser();
         data.message.whisper = true;
 
-        socket.emit('chatMsg', data);
+        socket.emit('whisperMsg', data);
       } else {
         queueMessage({
           text: ['You forgot to write the message!'],

@@ -146,21 +146,12 @@ function saveObject(object, objectName, callback) {
 
 function addWeather(sentWeather, callback) {
   const newWeather = new Weather(sentWeather);
-  const query = { time: sentWeather.time };
 
-  Weather.findOne(query).lean().exec(function(err, foundWeather) {
-    if (err) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find weather report', err);
-    } else if (foundWeather === null) {
-      saveObject(newWeather, 'weather', callback);
-    } else {
-      callback(err, null);
-    }
-  });
+  saveObject(newWeather, 'weather', callback);
 }
 
 function getWeather(sentTime, callback) {
-  const query = { time: sentTime };
+  const query = { time: { $lte: sentTime } };
   const filter = { _id: 0 };
 
   Weather.findOne(query, filter).lean().exec(function(err, foundWeather) {

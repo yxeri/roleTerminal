@@ -151,7 +151,7 @@ function addWeather(sentWeather, callback) {
 }
 
 function getWeather(sentTime, callback) {
-  const query = { time: { $lte: sentTime } };
+  const query = { time: { $gte: sentTime } };
   const filter = { _id: 0 };
 
   Weather.findOne(query, filter).lean().exec(function(err, foundWeather) {

@@ -67,7 +67,7 @@ const commandSchema = new mongoose.Schema({
   authGroup: String,
   category: String,
 }, { collection: 'commands' });
-const schedEventSchema = new mongoose.Schema({
+const scheduledEventSchema = new mongoose.Schema({
   receiverName: String,
   func: {},
   createdAt: Date,
@@ -84,6 +84,17 @@ const teamSchema = new mongoose.Schema({
   owner: String,
   admins: [{ type: String, unique: true }],
 }, { collection: 'teams' });
+const weatherSchema = new mongoose.Schema({
+  time: { type: Date, unique: true },
+  temperature: Number,
+  windSpeed: Number,
+  precipitation: Number,
+  precipType: Number,
+  coverage: Number,
+  viewDistance: Number,
+  windDirection: Number,
+  thunderRisk: Number,
+}, { collection: 'weather' });
 
 // Blodsband specific schemas
 const entitySchema = new mongoose.Schema({
@@ -102,9 +113,10 @@ const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
 const History = mongoose.model('History', historySchema);
 const Command = mongoose.model('Command', commandSchema);
-const SchedEvent = mongoose.model('SchedEvent', schedEventSchema);
+const ScheduledEvent = mongoose.model('ScheduledEvent', scheduledEventSchema);
 const Device = mongoose.model('Device', deviceSchema);
 const Team = mongoose.model('Team', teamSchema);
+const Weather = mongoose.model('Weather', weatherSchema);
 
 // Blodsband specific
 const Entity = mongoose.model('Entity', entitySchema);
@@ -129,6 +141,34 @@ function saveObject(object, objectName, callback) {
     }
 
     callback(saveErr, savedObj);
+  });
+}
+
+function addWeather(sentWeather, callback) {
+  const newWeather = new Weather(sentWeather);
+  const query = { time: sentWeather.time };
+
+  Weather.findOne(query).lean().exec(function(err, foundWeather) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find weather report', err);
+    } else if (foundWeather === null) {
+      saveObject(newWeather, 'weather', callback);
+    } else {
+      callback(err, null);
+    }
+  });
+}
+
+function getWeather(sentTime, callback) {
+  const query = { time: sentTime };
+  const filter = { _id: 0 };
+
+  Weather.findOne(query, filter).lean().exec(function(err, foundWeather) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get weather', err);
+    }
+
+    callback(err, foundWeather);
   });
 }
 
@@ -864,7 +904,7 @@ function addEvent(sentReceiverName, sentEndAt, callback) {
     createdAt: now,
     endAt: sentEndAt,
   };
-  const newEvent = new SchedEvent(query);
+  const newEvent = new ScheduledEvent(query);
 
   saveObject(newEvent, 'event', callback);
 }
@@ -874,7 +914,7 @@ function getPassedEvents(callback) {
   const query = { endAt: { $lte: now } };
   const filter = { _id: 0 };
 
-  SchedEvent.find(query, filter).lean().exec(function(err, events) {
+  ScheduledEvent.find(query, filter).lean().exec(function(err, events) {
     if (err) {
       logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to trigger events', err);
     }
@@ -1112,6 +1152,8 @@ exports.getUser = getUser;
 exports.updateUserTeam = updateUserTeam;
 exports.addTeam = addTeam;
 exports.getTeam = getTeam;
+exports.addWeather = addWeather;
+exports.getWeather = getWeather;
 
 // Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

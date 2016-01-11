@@ -7,6 +7,7 @@ const dbPath = 'mongodb://' +
                serverConfig.dbHost + ':' +
                serverConfig.dbPort + '/' +
                serverConfig.dbName;
+
 mongoose.connect(dbPath, function(err) {
   if (err) {
     logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to connect to database', err);
@@ -95,6 +96,18 @@ const weatherSchema = new mongoose.Schema({
   windDirection: Number,
   thunderRisk: Number,
 }, { collection: 'weather' });
+const missionSchema = new mongoose.Schema({
+  timeCreated: Date,
+  timeFinished: Date,
+  reward: String,
+  rewardHistory: [String],
+  title: String,
+  description: String,
+  requirement: String,
+  creator: String,
+  agent: String,
+  missionType: String,
+}, { collection: 'missions' });
 
 // Blodsband specific schemas
 const entitySchema = new mongoose.Schema({
@@ -117,6 +130,7 @@ const ScheduledEvent = mongoose.model('ScheduledEvent', scheduledEventSchema);
 const Device = mongoose.model('Device', deviceSchema);
 const Team = mongoose.model('Team', teamSchema);
 const Weather = mongoose.model('Weather', weatherSchema);
+const Mission = mongoose.model('Mission', missionSchema);
 
 // Blodsband specific
 const Entity = mongoose.model('Entity', entitySchema);
@@ -144,6 +158,11 @@ function saveObject(object, objectName, callback) {
   });
 }
 
+function addMission(sentMission, callback) {
+  const newMission = new Mission(sentMission);
+
+  saveObject(newMission, 'mission', callback);
+}
 function addWeather(sentWeather, callback) {
   const newWeather = new Weather(sentWeather);
 
@@ -1145,6 +1164,7 @@ exports.addTeam = addTeam;
 exports.getTeam = getTeam;
 exports.addWeather = addWeather;
 exports.getWeather = getWeather;
+exports.addMission = addMission;
 
 // Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

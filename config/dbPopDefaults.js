@@ -347,6 +347,12 @@ config.commands = {
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
+  jobs: {
+    commandName: 'jobs',
+    accessLevel: config.accessLevels.anonymous,
+    visibility: config.accessLevels.anonymous,
+    category: 'basic',
+  },
 };
 
 config.modes = {

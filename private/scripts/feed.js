@@ -1745,6 +1745,12 @@ function onStoredMessages(data = { storedMessages: {} }) {
   }
 }
 
+function onMissions(data = []) {
+  for (let i = 0; i < data.length; i++) {
+
+  }
+}
+
 function startSocket() {
   if (socket) {
     socket.on('message', onMessage);
@@ -1770,6 +1776,7 @@ function startSocket() {
     socket.on('whoAmI', onWhoami);
     socket.on('list', onList);
     socket.on('storedMessages', onStoredMessages);
+    socket.on('missions', onMissions);
   }
 }
 

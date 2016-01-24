@@ -123,6 +123,7 @@ const commandHelper = {
 };
 const validCommands = {};
 const lineLength = 29;
+const triggerKeysPressed = [];
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1171,6 +1172,16 @@ function specialKeyPress(event) {
       event.preventDefault();
 
       break;
+    // Ctrl
+    case 17:
+      triggerKeysPressed.ctrl = true;
+
+      break;
+    // Alt
+    case 18:
+      triggerKeysPressed.alt = true;
+
+      break;
     // Delete
     case 46:
       if (getInputText().length === 0) {
@@ -1200,11 +1211,15 @@ function specialKeyPress(event) {
     case 38:
       keyPressed = true;
 
-      if (!commandHelper.keysBlocked && commandHelper.command === null) {
-        if (previousCommandPointer > 0) {
-          clearInput();
-          previousCommandPointer--;
-          setCommandInput(commandHistory[previousCommandPointer]);
+      if (triggerKeysPressed.ctrl) {
+        window.scrollBy(0, -window.innerHeight);
+      } else {
+        if (!commandHelper.keysBlocked && commandHelper.command === null) {
+          if (previousCommandPointer > 0) {
+            clearInput();
+            previousCommandPointer--;
+            setCommandInput(commandHistory[previousCommandPointer]);
+          }
         }
       }
 
@@ -1215,16 +1230,20 @@ function specialKeyPress(event) {
     case 40:
       keyPressed = true;
 
-      if (!commandHelper.keysBlocked && commandHelper.command === null) {
-        if (previousCommandPointer < commandHistory.length - 1) {
-          clearInput();
-          previousCommandPointer++;
-          setCommandInput(commandHistory[previousCommandPointer]);
-        } else if (previousCommandPointer === commandHistory.length - 1) {
-          clearInput();
-          previousCommandPointer++;
-        } else {
-          clearInput();
+      if (triggerKeysPressed.ctrl) {
+        window.scrollBy(0, window.innerHeight);
+      } else {
+        if (!commandHelper.keysBlocked && commandHelper.command === null) {
+          if (previousCommandPointer < commandHistory.length - 1) {
+            clearInput();
+            previousCommandPointer++;
+            setCommandInput(commandHistory[previousCommandPointer]);
+          } else if (previousCommandPointer === commandHistory.length - 1) {
+            clearInput();
+            previousCommandPointer++;
+          } else {
+            clearInput();
+          }
         }
       }
 
@@ -1780,8 +1799,25 @@ function startSocket() {
   }
 }
 
-function keyReleased() {
-  keyPressed = false;
+function keyReleased(event) {
+  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+  switch (keyCode) {
+  // Ctrl
+  case 17:
+    triggerKeysPressed.ctrl = false;
+
+    break;
+  // Alt
+  case 18:
+    triggerKeysPressed.alt = false;
+
+    break;
+  default:
+    keyPressed = false;
+
+    break;
+  }
 }
 
 function isFullscreen() {

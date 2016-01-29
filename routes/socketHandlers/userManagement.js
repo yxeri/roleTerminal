@@ -15,6 +15,8 @@ function handle(socket, io) {
   socket.on('userExists', function(data) {
     manager.userAllowedCommand(socket.id, dbDefaults.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
+        socket.emit('commandFail');
+
         return;
       }
 

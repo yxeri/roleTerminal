@@ -2366,7 +2366,7 @@ function attachCommands() {
         const userName = phrases ? phrases[0] : undefined;
 
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
-          data.userName = userName;
+          data.user = { userName: userName };
           data.registerDevice = getDeviceId();
           commandHelper.data = data;
           commandHelper.hideInput = true;

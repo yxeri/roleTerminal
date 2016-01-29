@@ -31,12 +31,32 @@ ul {
 
 li {
   word-wrap: break-word;
-  padding: 0 .8em 0 .8em;
 }
 
 pre {
   padding: 0;
   margin: 0;
+}
+
+#menu {
+  width: 100%;
+  padding: 0 .2em 0 .8em;
+  position: fixed;
+  bottom: 0;
+  background-color: #001e15;
+  border-top: 2px solid;
+  overflow: hidden;
+}
+
+#menu li {
+  padding: .4em 0 .4em 0;
+  margin-left: 1em;
+  display: block;
+  float: left;
+}
+
+#menu li:first-child {
+  margin-left: 0;
 }
 
 #inputContainer {
@@ -64,6 +84,7 @@ pre {
   width: 100%;
   display: table-cell;
   padding-left: .3em;
+  padding-bottom: 1.7em;
 }
 
 #cmdInput:focus {
@@ -85,6 +106,14 @@ pre {
 
 #mode:after {
   content: '$';
+}
+
+#background {
+  overflow-x: hidden;
+}
+
+#mainFeed li {
+  padding: 0 .8em 0 .8em;
 }
 
 #mainFeed li span {
@@ -186,6 +215,12 @@ pre {
   animation: brightness 20s linear infinite 10s;
 }
 
+.menuButton {
+  padding: 0 .2em 0 .2em;
+  border-left: 2px solid;
+  border-right: 2px solid;
+}
+
 @media (max-height: 768px) and (max-width: 1024px) {
   body {
     overflow: scroll;
@@ -193,12 +228,16 @@ pre {
 }
 
 @media (max-width: 736px) {
-  li {
+  #mainFeed li {
     padding: 0 .4em 0 .4em;
   }
 
   #inputContainer {
     padding: 0 .4em 0 .4em;
+  }
+
+  #menu {
+    padding-left: .2em;
   }
 
   .logo {
@@ -207,8 +246,12 @@ pre {
 }
 
 @media (max-width: 414px) {
-  li {
+  #mainFeed li {
     padding: 0 .2em 0 .2em;
+  }
+
+  #menu {
+    padding-left: .2em;
   }
 
   #inputContainer {

@@ -2,12 +2,12 @@
 
 const storedMessages = {};
 // Timeout between print of rows (milliseconds)
-const rowTimeout = 60;
+const rowTimeout = 40;
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMessageQueue
  */
-const messagesPerQueue = 3;
+const messagesPerQueue = 5;
 /**
  * Queue of all the message objects that will be handled and printed
  */
@@ -194,8 +194,24 @@ function createLine(length) {
   return line;
 }
 
-function generateSpan(text, className) {
+function generateSpan(params = { text: '' }) {
+  const text = params.text;
+  const linkable = params.linkable;
+  const className = params.className;
   const spanObj = document.createElement('span');
+
+  // TODO Refactor this and generateLink()
+  if (linkable) {
+    spanObj.classList.add('link');
+
+    spanObj.addEventListener('click', function spanClick(event) {
+      clicked = true;
+
+      setCommandInput(text + ' ');
+      commandInput.focus();
+      event.stopPropagation();
+    });
+  }
 
   spanObj.appendChild(document.createTextNode(text));
 
@@ -206,14 +222,19 @@ function generateSpan(text, className) {
   return spanObj;
 }
 
+// TODO Refactor this and if case for linkable in generateSpan()
 function generateLink(text, className, func) {
-  const spanObj = generateSpan(text, className);
+  const spanObj = generateSpan({
+    text: text,
+    className: className,
+  });
+  spanObj.classList.add('link');
 
-  spanObj.className += ' link';
   spanObj.addEventListener('click', function linkClickHandler(event) {
+    clicked = true;
+
     func(this);
     commandInput.focus();
-    clicked = true;
     event.stopPropagation();
   });
 
@@ -267,12 +288,18 @@ function generateFullRow(sentText, message) {
   const roomName = message.roomName;
 
   if (message.time && !message.skipTime) {
-    rowObj.appendChild(generateSpan(generateTimeStamp(message.time), 'timestamp'));
+    rowObj.appendChild(generateSpan({
+      text: generateTimeStamp(message.time),
+      extraClass: 'timestamp',
+    }));
   }
 
   if (roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
     if (noLinkRooms.indexOf(roomName.toLowerCase()) > -1) {
-      rowObj.appendChild(generateSpan(roomName, 'room'));
+      rowObj.appendChild(generateSpan({
+        text: roomName,
+        className: 'room',
+      }));
     } else {
       rowObj.appendChild(generateLink(roomName, 'room', linkRoom));
     }
@@ -282,7 +309,10 @@ function generateFullRow(sentText, message) {
     rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
   }
 
-  rowObj.appendChild(generateSpan(sentText));
+  rowObj.appendChild(generateSpan({
+    text: sentText,
+    linkable: message.linkable,
+  }));
 
   return rowObj;
 }
@@ -1026,9 +1056,123 @@ function printUsedCommand(clearAfterUse, inputText) {
   };
 }
 
+function enterKeyHandler() {
+  const commandObj = commandHelper;
+  const commands = validCommands;
+  const user = getUser();
+  let inputText;
+  let phrases;
+  let commandName;
+  keyPressed = true;
+
+  if (!commandObj.keysBlocked) {
+    if (commandObj.command !== null) {
+      inputText = getInputText();
+      phrases = trimSpace(inputText).split(' ');
+
+      // TODO Hard coded
+      if (phrases[0] === 'exit' || phrases[0] === 'abort') {
+        if (commands[commandObj.command].abortFunc) {
+          commands[commandObj.command].abortFunc();
+        }
+
+        resetCommand(true);
+      } else {
+        if (!commandHelper.hideInput) {
+          queueMessage({
+            text: [inputText],
+          });
+        }
+
+        commands[commandObj.command].steps[commandObj.onStep](phrases, socket);
+      }
+    } else {
+      inputText = getInputText();
+      phrases = trimSpace(inputText).split(' ');
+
+      if (phrases[0].length > 0) {
+        const sign = phrases[0].charAt(0);
+
+        if (commandChars.indexOf(sign) >= 0) {
+          commandName = phrases[0].slice(1).toLowerCase();
+        } else if (cmdMode === getMode() || user === null) {
+          commandName = phrases[0].toLowerCase();
+        }
+
+        const command = getCommand(commandName);
+
+        if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
+          // Store the command for usage with up/down arrows
+          pushCommandHistory(phrases.join(' '));
+
+          /**
+           * Print the help and instruction parts of the command
+           */
+          if (phrases[1] === '-help') {
+            printHelpMessage(command);
+          } else {
+            if (command.steps) {
+              commandObj.command = commandName;
+              commandObj.maxSteps = command.steps.length;
+            }
+
+            if (command.clearBeforeUse) {
+              validCommands.clear.func();
+            }
+
+            queueCommand(command.func, combineSequences(commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
+            startCommandQueue();
+          }
+          /**
+           * User is logged in and in chat mode
+           */
+        } else if (user !== null && chatMode === getMode() && phrases[0].length > 0) {
+          if (commandChars.indexOf(phrases[0].charAt(0)) < 0) {
+            queueCommand(commands.msg.func, phrases);
+            startCommandQueue();
+
+            /**
+             * User input commandChar but didn't write
+             * a proper command
+             */
+          } else {
+            queueMessage({
+              text: [phrases[0] + ': ' + commmandFailText.text],
+            });
+          }
+        } else if (user === null) {
+          queueMessage({ text: [phrases.toString()] });
+          queueMessage({
+            text: [
+              'You must register a new user or login with an existing user to gain access to more commands',
+              'Use command register or login',
+              'e.g. register myname 1135',
+              'or login myname 1135',
+            ],
+          });
+
+          /**
+           * Sent command was not found.
+           * Print the failed input
+           */
+        } else if (commandName.length > 0) {
+          queueMessage({
+            text: ['- ' + phrases[0] + ': ' + commmandFailText.text],
+          });
+        }
+      } else {
+        queueMessage(printUsedCommand(false, ' '));
+      }
+    }
+  }
+
+  resetPreviousCommandPointer();
+  clearInput();
+  clearModeText();
+}
+
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
-  const user = getUser();
   const commandHistory = getCommandHistory();
 
   if (!keyPressed) {
@@ -1057,117 +1201,7 @@ function specialKeyPress(event) {
       break;
     // Enter
     case 13:
-      const commandObj = commandHelper;
-      const commands = validCommands;
-      let inputText;
-      let phrases;
-      let commandName;
-      keyPressed = true;
-
-      if (!commandObj.keysBlocked) {
-        if (commandObj.command !== null) {
-          inputText = getInputText();
-          phrases = trimSpace(inputText).split(' ');
-
-          // TODO Hard coded
-          if (phrases[0] === 'exit' || phrases[0] === 'abort') {
-            if (commands[commandObj.command].abortFunc) {
-              commands[commandObj.command].abortFunc();
-            }
-
-            resetCommand(true);
-          } else {
-            if (!commandHelper.hideInput) {
-              queueMessage({
-                text: [inputText],
-              });
-            }
-
-            commands[commandObj.command].steps[commandObj.onStep](phrases, socket);
-          }
-        } else {
-          inputText = getInputText();
-          phrases = trimSpace(inputText).split(' ');
-
-          if (phrases[0].length > 0) {
-            const sign = phrases[0].charAt(0);
-
-            if (commandChars.indexOf(sign) >= 0) {
-              commandName = phrases[0].slice(1).toLowerCase();
-            } else if (cmdMode === getMode() || user === null) {
-              commandName = phrases[0].toLowerCase();
-            }
-
-            const command = getCommand(commandName);
-
-            if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
-              // Store the command for usage with up/down arrows
-              pushCommandHistory(phrases.join(' '));
-
-              /**
-               * Print the help and instruction parts of the command
-               */
-              if (phrases[1] === '-help') {
-                printHelpMessage(command);
-              } else {
-                if (command.steps) {
-                  commandObj.command = commandName;
-                  commandObj.maxSteps = command.steps.length;
-                }
-
-                if (command.clearBeforeUse) {
-                  validCommands.clear.func();
-                }
-
-                queueCommand(command.func, combineSequences(commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
-                startCommandQueue();
-              }
-              /**
-               * User is logged in and in chat mode
-               */
-            } else if (user !== null && chatMode === getMode() && phrases[0].length > 0) {
-              if (commandChars.indexOf(phrases[0].charAt(0)) < 0) {
-                queueCommand(commands.msg.func, phrases);
-                startCommandQueue();
-
-                /**
-                 * User input commandChar but didn't write
-                 * a proper command
-                 */
-              } else {
-                queueMessage({
-                  text: [phrases[0] + ': ' + commmandFailText.text],
-                });
-              }
-            } else if (user === null) {
-              queueMessage({ text: [phrases.toString()] });
-              queueMessage({
-                text: [
-                  'You must register a new user or login with an existing user to gain access to more commands',
-                  'Use command register or login',
-                  'e.g. register myname 1135',
-                  'or login myname 1135',
-                ],
-              });
-
-              /**
-               * Sent command was not found.
-               * Print the failed input
-               */
-            } else if (commandName.length > 0) {
-              queueMessage({
-                text: ['- ' + phrases[0] + ': ' + commmandFailText.text],
-              });
-            }
-          } else {
-            queueMessage(printUsedCommand(false, ' '));
-          }
-        }
-      }
-
-      resetPreviousCommandPointer();
-      clearInput();
-      clearModeText();
+      enterKeyHandler();
 
       event.preventDefault();
 
@@ -1277,6 +1311,69 @@ function keyPress(event) {
 
       break;
     }
+  }
+}
+
+function attachMenuListener(menuItem, func, funcParam) {
+  if (func) {
+    menuItem.addEventListener('click', function menuListener(event) {
+      func([funcParam]);
+      clicked = true;
+      event.stopPropagation();
+    });
+  }
+}
+
+function createMenuItem(menuItem) {
+  const listItem = document.createElement('li');
+  const span = document.createElement('span');
+
+  if (menuItem.extraClass) {
+    span.classList.add(menuItem.extraClass);
+  }
+
+  listItem.classList.add('link');
+  span.appendChild(document.createTextNode(menuItem.itemName));
+  listItem.appendChild(span);
+
+  return listItem;
+}
+
+function populateMenu() {
+  const menuItems = {
+    runCommand: {
+      itemName: 'EXEC',
+      extraClass: 'menuButton',
+    },
+    commands: {
+      itemName: 'CMDS',
+      func: validCommands.help.func,
+    },
+    users: {
+      itemName: 'USERS',
+      func: validCommands.list.func,
+      funcParam: 'users',
+    },
+    rooms: {
+      itemName: 'ROOMS',
+      func: validCommands.list.func,
+      funcParam: 'rooms',
+    },
+    jobs: {
+      itemName: 'JOBS',
+    },
+  };
+
+  const menuList = document.getElementById('menuList');
+  const menuItemsKeys = Object.keys(menuItems);
+
+  for (let i = 0; i < menuItemsKeys.length; i++) {
+    const key = menuItemsKeys[i];
+    const menuItem = menuItems[key];
+    const listItem = createMenuItem(menuItem);
+
+    attachMenuListener(listItem, menuItem.func, menuItem.funcParam);
+    menuList.appendChild(listItem);
   }
 }
 
@@ -1764,11 +1861,11 @@ function onStoredMessages(data = { storedMessages: {} }) {
   }
 }
 
-function onMissions(data = []) {
-  for (let i = 0; i < data.length; i++) {
-
-  }
-}
+// function onMissions(data = []) {
+  // for (let i = 0; i < data.length; i++) {
+  //
+  // }
+// }
 
 function startSocket() {
   if (socket) {
@@ -1795,7 +1892,7 @@ function startSocket() {
     socket.on('whoAmI', onWhoami);
     socket.on('list', onList);
     socket.on('storedMessages', onStoredMessages);
-    socket.on('missions', onMissions);
+    // socket.on('missions', onMissions);
   }
 }
 
@@ -1929,6 +2026,7 @@ function attachCommands() {
 
         queueMessage({
           text: allCommands,
+          linkable: true,
         });
       }
 
@@ -2148,7 +2246,7 @@ function attachCommands() {
     category: 'advanced',
   };
   validCommands.list = {
-    func: function listCommand(phrases) {
+    func: function listCommand(phrases = []) {
       if (phrases.length > 0) {
         const listOption = phrases[0].toLowerCase();
 
@@ -3292,8 +3390,11 @@ function attachCommands() {
     abortFunc: function chipperAbort() {
       const commandObj = commandHelper;
 
-      clearTimeout(commandObj.data.printTimer);
-      clearTimeout(commandObj.data.timer);
+      if (commandObj.data) {
+        clearTimeout(commandObj.data.printTimer);
+        clearTimeout(commandObj.data.timer);
+      }
+
       validCommands.clear.func();
       queueMessage({
         text: [
@@ -3829,6 +3930,7 @@ function startBoot() {
 
   downgradeOlderDevices();
   attachCommands();
+  populateMenu();
   socket.emit('getStoredMessages');
   socket.emit('getCommands');
 

@@ -13,7 +13,9 @@ function followRoom(params) {
   const newRoom = params.newRoom;
   const newRoomName = newRoom.roomName;
 
-  if (socket.rooms.indexOf(newRoom) < 0) {
+  console.log(params);
+
+  if (socket.rooms && socket.rooms.indexOf(newRoom) < 0) {
     messenger.sendMsg({
       socket: socket,
       message: {

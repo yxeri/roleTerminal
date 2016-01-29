@@ -2366,8 +2366,10 @@ function attachCommands() {
         const userName = phrases ? phrases[0] : undefined;
 
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
-          data.user = { userName: userName };
-          data.registerDevice = getDeviceId();
+          data.user = {
+            userName: userName,
+            registerDevice: getDeviceId(),
+          };
           commandHelper.data = data;
           commandHelper.hideInput = true;
           hideInput(true);
@@ -2410,7 +2412,7 @@ function attachCommands() {
         const password = phrases ? phrases[0] : undefined;
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
-          commandHelper.data.password = password;
+          commandHelper.data.user.password = password;
           queueMessage({
             text: ['Repeat your password one more time'],
           });
@@ -2428,7 +2430,7 @@ function attachCommands() {
       function registerStepThree(phrases) {
         const password = phrases ? phrases[0] : undefined;
 
-        if (password === commandHelper.data.password) {
+        if (password === commandHelper.data.user.password) {
           queueMessage({
             text: [
               'Congratulations, employee #' + Math.floor(Math.random() * 120503),

@@ -49,7 +49,7 @@ config.watchDir = process.env.WATCHDIR || false;
  * Note! Android 2.2 fails when using cdn
  */
 config.socketPath = process.env.SOCKETPATH === 'cdn' ?
-                    'https://cdn.socket.io/socket.io-1.3.5.js' : (process.env.SOCKETPATH || '/scripts/socket.io-1.3.5.js');
+                    'https://cdn.socket.io/socket.io-1.4.5.js' : (process.env.SOCKETPATH || '/scripts/socket.io-1.4.5.js');
 
 /*
  * Server mode. Options:

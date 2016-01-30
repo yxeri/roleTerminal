@@ -219,7 +219,7 @@ function handle(socket, io) {
           const rooms = authUser.rooms;
 
           if (oldSocket) {
-            const oldRooms = oldSocket.rooms;
+            const oldRooms = Object.keys(oldSocket.rooms);
 
             for (let i = 1; i < oldRooms.length; i++) {
               if (oldRooms[i].indexOf(dbDefaults.device) < 0) {
@@ -327,7 +327,7 @@ function handle(socket, io) {
             return;
           }
 
-          const rooms = socket.rooms;
+          const rooms = Object.keys(socket.rooms);
 
           for (let i = 1; i < rooms.length; i++) {
             if (rooms[i].indexOf(dbDefaults.device) < 0) {
@@ -469,7 +469,7 @@ function handle(socket, io) {
             return;
           }
 
-          const rooms = socket.rooms;
+          const rooms = Object.keys(socket.rooms);
 
           socket.to(bannedSocketId).emit('ban');
 

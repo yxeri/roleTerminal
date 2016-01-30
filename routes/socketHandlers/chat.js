@@ -13,16 +13,16 @@ function followRoom(params) {
   const newRoom = params.newRoom;
   const newRoomName = newRoom.roomName;
 
-  // if (socket.rooms.indexOf(newRoomName) < 0) {
-  //  messenger.sendMsg({
-  //    socket: socket,
-  //    message: {
-  //      text: [params.userName + ' is following ' + newRoomName],
-  //      roomName: newRoomName,
-  //    },
-  //    sendTo: newRoomName,
-  //  });
-  // }
+  if (Object.keys(socket.rooms).indexOf(newRoomName) < 0) {
+    messenger.sendMsg({
+      socket: socket,
+      message: {
+        text: [params.userName + ' is following ' + newRoomName],
+        roomName: newRoomName,
+      },
+      sendTo: newRoomName,
+    });
+  }
 
   socket.join(newRoomName);
   socket.emit('follow', { room: newRoom });
@@ -148,7 +148,7 @@ function handle(socket) {
       // TODO Move toLowerCase to class
       data.room.roomName = data.room.roomName.toLowerCase();
 
-      if (socket.rooms.indexOf(data.room.roomName) > 0) {
+      if (Object.keys(socket.rooms).indexOf(data.room.roomName) > 0) {
         socket.emit('follow', { room: data.room });
       } else {
         messenger.sendSelfMsg({
@@ -172,7 +172,7 @@ function handle(socket) {
       // TODO Move toLowerCase to class
       const roomName = data.room.roomName.toLowerCase();
 
-      if (socket.rooms.indexOf(roomName) > -1) {
+      if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
         const userName = user.userName;
 
         /*
@@ -310,9 +310,10 @@ function handle(socket) {
       }
 
       const rooms = [];
+      const socketRooms = Object.keys(socket.rooms);
 
-      for (let i = 0; i < socket.rooms.length; i++) {
-        const room = socket.rooms[i];
+      for (let i = 0; i < socketRooms.length; i++) {
+        const room = socketRooms[i];
 
         if (!shouldBeHidden(room)) {
           rooms.push(room);
@@ -357,7 +358,7 @@ function handle(socket) {
         return;
       }
 
-      const allRooms = socket.rooms;
+      const allRooms = Object.keys(socket.rooms);
       const startDate = data.startDate || new Date();
 
       manager.getHistory(allRooms, data.lines, false, startDate, function(histErr, historyMessages) {

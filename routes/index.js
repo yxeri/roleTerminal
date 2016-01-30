@@ -223,8 +223,6 @@ function handle(io) {
 
       dbConnector.updateDeviceSocketId(deviceId, socketId, userName, function(err, device) {
         if (err || device === null) {
-          console.log('Failed to update device', err);
-
           return;
         }
 

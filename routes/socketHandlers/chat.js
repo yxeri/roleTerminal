@@ -13,16 +13,16 @@ function followRoom(params) {
   const newRoom = params.newRoom;
   const newRoomName = newRoom.roomName;
 
-  if (socket.rooms.indexOf(newRoomName) < 0) {
-    messenger.sendMsg({
-      socket: socket,
-      message: {
-        text: [params.userName + ' is following ' + newRoomName],
-        roomName: newRoomName,
-      },
-      sendTo: newRoomName,
-    });
-  }
+  // if (socket.rooms.indexOf(newRoomName) < 0) {
+  //  messenger.sendMsg({
+  //    socket: socket,
+  //    message: {
+  //      text: [params.userName + ' is following ' + newRoomName],
+  //      roomName: newRoomName,
+  //    },
+  //    sendTo: newRoomName,
+  //  });
+  // }
 
   socket.join(newRoomName);
   socket.emit('follow', { room: newRoom });

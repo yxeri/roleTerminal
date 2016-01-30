@@ -242,6 +242,14 @@ function handle(socket, io) {
           manager.joinRooms(rooms, socket);
           socket.emit('login', { user: authUser });
         });
+
+        dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
+          if (userOnlineErr || settedUser === null) {
+            console.log('Failed to set last online');
+
+            return;
+          }
+        });
       });
     });
   });

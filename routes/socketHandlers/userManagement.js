@@ -59,6 +59,7 @@ function handle(socket, io) {
         registerDevice: data.user.registerDevice,
         mode: dbDefaults.modes.command,
         verified: !appConfig.userVerify ? true : false,
+        rooms: [dbDefaults.rooms.public.roomName],
       };
 
       // TODO Refactor the inner code

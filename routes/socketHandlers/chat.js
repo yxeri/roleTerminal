@@ -13,9 +13,7 @@ function followRoom(params) {
   const newRoom = params.newRoom;
   const newRoomName = newRoom.roomName;
 
-  console.log(params);
-
-  if (socket.rooms && socket.rooms.indexOf(newRoom) < 0) {
+  if (socket.rooms.indexOf(newRoomName) < 0) {
     messenger.sendMsg({
       socket: socket,
       message: {
@@ -129,9 +127,7 @@ function handle(socket) {
             return;
           }
 
-          if (data.entered) {
-            room.entered = true;
-          }
+          room.entered = data.room.entered;
 
           followRoom({ socket: socket, userName: user.userName, newRoom: room });
         });

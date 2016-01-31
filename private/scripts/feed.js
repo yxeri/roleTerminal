@@ -180,6 +180,19 @@ function clearInput() {
   setCommandInput('');
 }
 
+function appendInputText(text) {
+  const currentInputText = getInputText();
+  let appendText = '';
+
+  if (currentInputText[currentInputText.length - 1] !== ' ') {
+    appendText = ' ';
+  }
+
+  appendText += text;
+
+  setCommandInput(currentInputText + appendText);
+}
+
 function beautifyNumb(number) {
   return number > 9 ? number : '0' + number;
 }
@@ -197,6 +210,7 @@ function createLine(length) {
 function generateSpan(params = { text: '' }) {
   const text = params.text;
   const linkable = params.linkable;
+  const keepInput = params.keepInput;
   const className = params.className;
   const spanObj = document.createElement('span');
 
@@ -207,7 +221,12 @@ function generateSpan(params = { text: '' }) {
     spanObj.addEventListener('click', function spanClick(event) {
       clicked = true;
 
-      setCommandInput(text + ' ');
+      if (keepInput) {
+        appendInputText(text + ' ');
+      } else {
+        setCommandInput(text + ' ');
+      }
+
       commandInput.focus();
       event.stopPropagation();
     });
@@ -312,6 +331,7 @@ function generateFullRow(sentText, message) {
   rowObj.appendChild(generateSpan({
     text: sentText,
     linkable: message.linkable,
+    keepInput: message.keepInput,
   }));
 
   return rowObj;
@@ -1319,6 +1339,7 @@ function attachMenuListener(menuItem, func, funcParam) {
     menuItem.addEventListener('click', function menuListener(event) {
       func([funcParam]);
       clicked = true;
+      commandInput.focus();
       event.stopPropagation();
     });
   }
@@ -1344,6 +1365,7 @@ function populateMenu() {
     runCommand: {
       itemName: 'EXEC',
       extraClass: 'menuButton',
+      func: enterKeyHandler,
     },
     commands: {
       itemName: 'CMDS',
@@ -1841,15 +1863,15 @@ function onWhoami(data) {
 function onList(data = {}) {
   const itemList = data.itemList.itemList;
   const title = data.itemList.listTitle;
-  let text = createCommandStart(title);
 
-  if (itemList[0].length < 20) {
-    text.push(itemList.join('\t\t'));
-  } else {
-    text = text.concat(itemList);
-  }
-
-  onMessage({ message: { text: text } });
+  onMessage({ message: { text: createCommandStart(title) } });
+  onMessage({
+    message: {
+      text: itemList,
+      linkable: true,
+      keepInput: true,
+    },
+  });
 }
 
 function onStoredMessages(data = { storedMessages: {} }) {

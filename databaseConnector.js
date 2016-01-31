@@ -1162,6 +1162,24 @@ function getCommand(commandName, callback) {
   });
 }
 
+function matchPartialUser(partialUserName, user, callback) {
+  const query = {
+    $and: [
+      { userName: { $regex: '^' + partialUserName + '.*' } },
+      { visibility: { $lte: user.accessLevel } },
+    ],
+  };
+  const filter = { _id: 0, userName: 1 };
+
+  User.find(query, filter).lean().exec(function(err, users) {
+    if (err) {
+      logger.sendErrorMsg(logger.ErrorCodes.db, 'matchPartialUser', err);
+    }
+
+    callback(err, users);
+  });
+}
+
 exports.getCommand = getCommand;
 exports.getUserById = getUserById;
 exports.authUser = authUser;
@@ -1221,8 +1239,9 @@ exports.getWeather = getWeather;
 exports.addMission = addMission;
 exports.getActiveMissions = getActiveMissions;
 exports.getAllMissions = getAllMissions;
-exports.updateMissionCompleted = updateMissionCompleted
+exports.updateMissionCompleted = updateMissionCompleted;
 exports.updateMissionReward = updateMissionReward;
+exports.matchPartialUser = matchPartialUser;
 
 // Blodsband specific
 exports.addEncryptionKeys = addEncryptionKeys;

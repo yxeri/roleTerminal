@@ -6,6 +6,7 @@ const manager = require('../../manager');
 const logger = require('../../logger');
 const appConfig = require('../../config/appConfig');
 const messenger = require('../../messenger');
+const objectValidator = require('../../objectValidator');
 
 function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
@@ -648,6 +649,39 @@ function handle(socket, io) {
       };
 
       socket.emit('whoAmI', data);
+    });
+  });
+
+  socket.on('matchPartialuser', function(data) {
+    if (!objectValidator.isValidData(data, { partialName: true })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+      dbConnector.matchPartialUser(data.partialName, user, function(err, users) {
+        if (err) {
+          return;
+        }
+
+        const itemList = [];
+        const userKeys = Object.keys(users);
+
+        for (let i = 0; i < userKeys.length; i++) {
+          itemList.push(users[userKeys[i]].userName);
+        }
+
+        if (itemList.length === 1) {
+          socket.emit('matchFound', { matchedName: itemList[0] });
+        } else {
+          socket.emit('list', {
+            itemList: {
+              itemList: itemList,
+              keepInput: false,
+              replacePhrase: true,
+            },
+          });
+        }
+      });
     });
   });
 }

@@ -193,6 +193,13 @@ function appendInputText(text) {
   setCommandInput(currentInputText + appendText);
 }
 
+function replaceLastInputPhrase(text) {
+  const phrases = getInputText().split(' ');
+  phrases[phrases.length - 1] = text;
+
+  setCommandInput(phrases.join(' '));
+}
+
 function beautifyNumb(number) {
   return number > 9 ? number : '0' + number;
 }
@@ -211,6 +218,7 @@ function generateSpan(params = { text: '' }) {
   const text = params.text;
   const linkable = params.linkable;
   const keepInput = params.keepInput;
+  const replacePhrase = params.replacePhrase;
   const className = params.className;
   const spanObj = document.createElement('span');
 
@@ -221,7 +229,10 @@ function generateSpan(params = { text: '' }) {
     spanObj.addEventListener('click', function spanClick(event) {
       clicked = true;
 
-      if (keepInput) {
+
+      if (replacePhrase) {
+        replaceLastInputPhrase(text + ' ');
+      } else if (keepInput) {
         appendInputText(text + ' ');
       } else {
         setCommandInput(text + ' ');
@@ -332,6 +343,7 @@ function generateFullRow(sentText, message) {
     text: sentText,
     linkable: message.linkable,
     keepInput: message.keepInput,
+    replacePhrase: message.replacePhrase,
   }));
 
   return rowObj;
@@ -983,7 +995,7 @@ function expandPartialMatch(commands, partialMatch, sign) {
   }
 }
 
-function autoComplete() {
+function autoCompleteCommand() {
   const phrases = trimSpace(getInputText().toLowerCase()).split(' ');
   // TODO Change from Object.keys for compatibility with older Android
   const commands = Object.keys(validCommands).concat(Object.keys(getAliases()));
@@ -1076,18 +1088,36 @@ function printUsedCommand(clearAfterUse, inputText) {
   };
 }
 
+/**
+ * Returns found command based on sent command string
+ * undefined means that no match was found
+ */
+function retrieveCommand(command) {
+  const sign = command.charAt(0);
+  let commandName;
+
+  if (commandChars.indexOf(sign) >= 0) {
+    commandName = command.slice(1).toLowerCase();
+  } else if (cmdMode === getMode() || getUser() === null) {
+    commandName = command.toLowerCase();
+  }
+
+  return {
+    command: getCommand(commandName),
+    commandName: commandName,
+  };
+}
+
 function enterKeyHandler() {
   const commandObj = commandHelper;
   const commands = validCommands;
   const user = getUser();
-  let inputText;
+  const inputText = getInputText();
   let phrases;
-  let commandName;
   keyPressed = true;
 
   if (!commandObj.keysBlocked) {
     if (commandObj.command !== null) {
-      inputText = getInputText();
       phrases = trimSpace(inputText).split(' ');
 
       // TODO Hard coded
@@ -1107,21 +1137,12 @@ function enterKeyHandler() {
         commands[commandObj.command].steps[commandObj.onStep](phrases, socket);
       }
     } else {
-      inputText = getInputText();
       phrases = trimSpace(inputText).split(' ');
 
       if (phrases[0].length > 0) {
-        const sign = phrases[0].charAt(0);
+        const command = retrieveCommand(phrases[0]);
 
-        if (commandChars.indexOf(sign) >= 0) {
-          commandName = phrases[0].slice(1).toLowerCase();
-        } else if (cmdMode === getMode() || user === null) {
-          commandName = phrases[0].toLowerCase();
-        }
-
-        const command = getCommand(commandName);
-
-        if (command && (isNaN(command.accessLevel) || getAccessLevel() >= command.accessLevel)) {
+        if (command.command && (isNaN(command.command.accessLevel) || getAccessLevel() >= command.command.accessLevel)) {
           // Store the command for usage with up/down arrows
           pushCommandHistory(phrases.join(' '));
 
@@ -1129,18 +1150,18 @@ function enterKeyHandler() {
            * Print the help and instruction parts of the command
            */
           if (phrases[1] === '-help') {
-            printHelpMessage(command);
+            printHelpMessage(command.command);
           } else {
-            if (command.steps) {
-              commandObj.command = commandName;
-              commandObj.maxSteps = command.steps.length;
+            if (command.command.steps) {
+              commandObj.command = command.commandName;
+              commandObj.maxSteps = command.command.steps.length;
             }
 
-            if (command.clearBeforeUse) {
+            if (command.command.clearBeforeUse) {
               validCommands.clear.func();
             }
 
-            queueCommand(command.func, combineSequences(commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
+            queueCommand(command.command.func, combineSequences(command.commandName, phrases), printUsedCommand(command.command.clearAfterUse, inputText));
             startCommandQueue();
           }
           /**
@@ -1175,7 +1196,7 @@ function enterKeyHandler() {
            * Sent command was not found.
            * Print the failed input
            */
-        } else if (commandName.length > 0) {
+        } else if (command.commandName.length > 0) {
           queueMessage({
             text: ['- ' + phrases[0] + ': ' + commmandFailText.text],
           });
@@ -1209,13 +1230,29 @@ function specialKeyPress(event) {
 
     // Tab
     case 9:
+      const phrases = getInputText().split(' ');
+
       keyPressed = true;
 
-      if (!commandHelper.keysBlocked && commandHelper.command === null) {
-        autoComplete();
+      if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
+        autoCompleteCommand();
+        changeModeText();
+      } else if (phrases.length === 2) {
+        const command = retrieveCommand(phrases[0]);
+
+        console.log(command);
+        if (command.command && command.command.autocomplete) {
+          switch (command.command.autocomplete.type) {
+          case 'users':
+            socket.emit('matchPartialuser', { partialName: phrases[1] });
+
+            break;
+          default:
+            break;
+          }
+        }
       }
 
-      changeModeText();
       event.preventDefault();
 
       break;
@@ -1324,7 +1361,7 @@ function keyPress(event) {
       }
 
       if (triggerAutoComplete(getInputText(), textChar) && commandHelper.command === null) {
-        autoComplete();
+        autoCompleteCommand();
         // Prevent new whitespace to be printed
         event.preventDefault();
       }
@@ -1860,16 +1897,20 @@ function onWhoami(data) {
   queueMessage({ text: text });
 }
 
-function onList(data = {}) {
+function onList(data = { itemList: [] }) {
   const itemList = data.itemList.itemList;
   const title = data.itemList.listTitle;
 
-  onMessage({ message: { text: createCommandStart(title) } });
+  if (title) {
+    onMessage({ message: { text: createCommandStart(title) } });
+  }
+
   onMessage({
     message: {
       text: itemList,
-      linkable: true,
-      keepInput: true,
+      linkable: data.itemList.linkable || true,
+      keepInput: data.itemList.keepInput || true,
+      replacePhrase: data.itemList.replacePhrase || false,
     },
   });
 }
@@ -1881,6 +1922,10 @@ function onStoredMessages(data = { storedMessages: {} }) {
     const key = keys[i];
     storedMessages[key] = data.storedMessages[key];
   }
+}
+
+function onMatchFound(data = { matchedName: '' }) {
+  replaceLastInputPhrase(data.matchedName + ' ');
 }
 
 // function onMissions(data = []) {
@@ -1914,6 +1959,7 @@ function startSocket() {
     socket.on('whoAmI', onWhoami);
     socket.on('list', onList);
     socket.on('storedMessages', onStoredMessages);
+    socket.on('matchFound', onMatchFound);
     // socket.on('missions', onMissions);
   }
 }
@@ -2236,6 +2282,7 @@ function attachCommands() {
       ' Example:',
       '  follow room1 banana',
     ],
+    autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2264,6 +2311,7 @@ function attachCommands() {
       ' Example:',
       '  unfollow roomname',
     ],
+    autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2305,6 +2353,7 @@ function attachCommands() {
       '  list users',
       '  list devices',
     ],
+    autocomplete: { type: 'lists' },
     accessLevel: 13,
     category: 'basic',
   };
@@ -2377,6 +2426,7 @@ function attachCommands() {
       '  mode chat',
       '  mode cmd',
     ],
+    autocomplete: { type: 'modes' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2685,6 +2735,7 @@ function attachCommands() {
       '  locate *',
       '  locate',
     ],
+    autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3076,6 +3127,7 @@ function attachCommands() {
       '  whisper user1 sounds good!',
     ],
     clearAfterUse: true,
+    autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'basic',
   };
@@ -3473,6 +3525,7 @@ function attachCommands() {
       ' Example:',
       '  room room1',
     ],
+    autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3555,6 +3608,7 @@ function attachCommands() {
       '  updateuser user1 accesslevel 3',
       '  updateuser user1 group hackers',
     ],
+    autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'admin',
   };
@@ -3621,6 +3675,7 @@ function attachCommands() {
       ' Example:',
       '  updateroom user1 accesslevel 3',
     ],
+    autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'admin',
   };
@@ -3787,6 +3842,7 @@ function attachCommands() {
       ' Example:',
       '  updatedevice 32r23rj alias betteralias',
     ],
+    autocomplete: { type: 'devices' },
     accessLevel: 13,
     category: 'admin',
   };

@@ -30,12 +30,11 @@ function handle(socket) {
   });
 
   socket.on('hackRoom', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowed) {
+    manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowErr, allowed, user) {
       if (allowed) {
         const roomName = data.room.roomName.toLowerCase();
-        const userName = data.user.userName.toLowerCase();
 
-        dbConnector.addRoomToUser(userName, roomName, function(err) {
+        dbConnector.addRoomToUser(user.userName, roomName, function(err) {
           if (err) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to follow the room', err);
             return;

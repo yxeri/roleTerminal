@@ -15,7 +15,6 @@ const http = require('http');
 const dbDefaults = require('../config/dbPopDefaults');
 const logger = require('../logger');
 const messenger = require('../messenger');
-const storedMessages = require('../config/messages');
 const deviceManagement = require('./socketHandlers/deviceManagement');
 
 // Blodsband specific
@@ -236,7 +235,7 @@ function handle(io) {
     });
 
     socket.on('getStoredMessages', function() {
-      socket.emit('storedMessages', { storedMessages: storedMessages });
+      socket.emit('storedMessages', { storedMessages: require('../config/messages') });
     });
   });
 

@@ -1,6 +1,5 @@
 'use strict';
 
-const storedMessages = {};
 // Timeout between print of rows (milliseconds)
 const rowTimeout = 40;
 /**
@@ -124,6 +123,7 @@ const commandHelper = {
 const validCommands = {};
 const lineLength = 29;
 const triggerKeysPressed = [];
+let storedMessages = {};
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1922,6 +1922,8 @@ function onStoredMessages(data = { storedMessages: {} }) {
     const key = keys[i];
     storedMessages[key] = data.storedMessages[key];
   }
+
+  setLocalVal('storedMessages', JSON.stringify(storedMessages));
 }
 
 function onMatchFound(data = { matchedName: '' }) {
@@ -3189,7 +3191,7 @@ function attachCommands() {
       },
       function hackroomStepTwo() {
         const commandObj = commandHelper;
-        const timeout = 18000;
+        const timeout = 25000;
         const timerEnded = function timerEnded() {
           queueMessage({
             text: [
@@ -3215,7 +3217,8 @@ function attachCommands() {
             'Activating cracking bot....',
             'Warning. Intrusion defense system activated',
             'Time until detection: ' + (timeout / 1000) + ' seconds',
-            'You will need 3 successful sequences to succeed',
+            'Level 3 security protection detected',
+            '3 sequences required',
           ],
         });
         setInputStart('Verify seq');
@@ -3236,8 +3239,7 @@ function attachCommands() {
         } else {
           queueMessage({
             text: [
-              'Incorrect sequence. Counter measures have been ' +
-              'released',
+              'Incorrect sequence. Counter measures have been released',
             ],
           });
         }
@@ -3249,9 +3251,6 @@ function attachCommands() {
           });
         } else {
           const data = {
-            user: {
-              userName: getUser(),
-            },
             room: {
               roomName: commandObj.data.roomName,
             },
@@ -4007,6 +4006,7 @@ function attachCommands() {
 // Sets everything relevant when a user enters the site
 function startBoot() {
   oldAndroid = isOldAndroid();
+  storedMessages = getLocalVal('storedMessages') !== null ? JSON.parse(getLocalVal('storedMessages')) : {};
 
   downgradeOlderDevices();
   attachCommands();

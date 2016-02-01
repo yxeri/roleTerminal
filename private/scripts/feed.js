@@ -3237,7 +3237,7 @@ function attachCommands() {
           ],
         });
         setInputStart('Verify seq');
-        commandObj.data.code = createRandString(randomString, 10, true);
+        commandObj.data.code = createRandString(randomString.slice(9), 10, true);
         commandObj.data.timer = setTimeout(timerEnded, timeout);
         commandObj.onStep++;
         queueMessage({
@@ -3260,7 +3260,7 @@ function attachCommands() {
         }
 
         if (commandObj.data.timesCracked < commandObj.data.timesRequired) {
-          commandObj.data.code = createRandString(randomString, 10, true);
+          commandObj.data.code = createRandString(randomString.slice(9), 10, true);
           queueMessage({
             text: ['Sequence: ' + commandObj.data.code],
           });

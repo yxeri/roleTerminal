@@ -1451,7 +1451,6 @@ function createCommandEnd() {
 function printWelcomeMessage() {
   const organicaLogo = copyMessage(storedMessages.organica);
   const razorLogo = copyMessage(storedMessages.razor);
-  const seasonToPrint = copyMessage(storedMessages.christmas);
 
   queueMessage(organicaLogo);
   queueMessage({
@@ -1468,7 +1467,6 @@ function printWelcomeMessage() {
     ],
   });
   queueMessage(razorLogo);
-  queueMessage(seasonToPrint);
 }
 
 function printStartMessage() {
@@ -3196,7 +3194,7 @@ function attachCommands() {
           queueMessage({
             text: [
               'Your hacking attempt has been detected',
-              'Users of the room have been notified of your intrusion',
+              'Users of the room have been notified of your intrusion attempt',
             ],
           });
           socket.emit('chatMsg', {

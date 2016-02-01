@@ -2866,20 +2866,37 @@ function attachCommands() {
   };
   validCommands.history = {
     func: function historyCommand(phrases) {
-      const lines = phrases[0];
+      const data = {};
 
-      socket.emit('history', { lines: lines });
+      if (phrases.length > 0) {
+        if (!isNaN(phrases[0])) {
+          data.lines = phrases[0];
+        } else {
+          data.room = { roomName: phrases[0] };
+
+          if (phrases.length > 1 && !isNaN(phrases[1])) {
+            data.lines = phrases[1];
+          }
+        }
+      }
+
+      socket.emit('history', data);
     },
     help: [
       'Clears the screen and retrieves chat messages from server',
       'The amount you send with the command is the amount of messages that will be returned from each room you follow',
+      'You can retrieve history from a specific room by adding the room name to the input',
     ],
     instructions: [
       ' Usage:',
       '  history *optional number*',
+      '  history *room name*',
+      '  history *room name* *optional number*',
       ' Example:',
       '  history',
       '  history 25',
+      '  history aroom 25',
+      '  history aroom',
     ],
     clearAfterUse: true,
     clearBeforeUse: true,
@@ -3272,8 +3289,7 @@ function attachCommands() {
       clearTimeout(commandHelper.data.timer);
     },
     help: [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. ' +
-      'PRINTING INSTRUCTIONS',
+      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
       'This command lets you follow a room without knowing the password',
       'It will also supress the following notification',
       'Failing the hack will warn everyone in the room',
@@ -3410,7 +3426,7 @@ function attachCommands() {
       });
       queueMessage({
         text: [
-          'CONTROL WORD SENT',
+          'CONTROL COMMAND SENT',
           'AWAITING CONFIRMATION',
         ],
         extraClass: 'importantMsg',
@@ -3424,12 +3440,12 @@ function attachCommands() {
     steps: [
       function chipperStepOne() {
         const commandObj = commandHelper;
-
+        commandObj.data = {};
         commandObj.onStep++;
         queueMessage({
           text: [
             'Chipper has been activated',
-            'Connecting to ECU.........',
+            'Connecting to external system .....',
           ],
         });
         setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
@@ -3450,7 +3466,7 @@ function attachCommands() {
         };
 
         if (commandObj.data.timer === undefined) {
-          commandObj.data.timer = setTimeout(stopFunc, 300000, false);
+          commandObj.data.timer = setTimeout(stopFunc, 20000, false);
         }
 
         queueMessage({
@@ -3471,19 +3487,18 @@ function attachCommands() {
       validCommands.clear.func();
       queueMessage({
         text: [
-          'Chipper has powered down',
           'Control has been released',
+          'Chipper has powered down',
         ],
       });
       resetCommand();
     },
     help: [
       'Activate chipper function',
-      'Press enter when you have retrieved confirmation from the ECU',
+      'Press enter when you have retrieved confirmation from the external system',
     ],
     instructions: [
       'Follow the instructions on the screen',
-      'The chipper will shutdown and release control after 5 minutes',
     ],
     accessLevel: 13,
     category: 'hacking',

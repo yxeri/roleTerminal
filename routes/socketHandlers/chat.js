@@ -358,7 +358,7 @@ function handle(socket) {
         return;
       }
 
-      const allRooms = Object.keys(socket.rooms);
+      const allRooms = data.room ? [data.room.roomName] : Object.keys(socket.rooms);
       const startDate = data.startDate || new Date();
 
       manager.getHistory(allRooms, data.lines, false, startDate, function(histErr, historyMessages) {

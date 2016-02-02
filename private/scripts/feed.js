@@ -3206,7 +3206,7 @@ function attachCommands() {
       },
       function hackroomStepTwo() {
         const commandObj = commandHelper;
-        const timeout = 25000;
+        const timeout = 28000;
         const timerEnded = function timerEnded() {
           queueMessage({
             text: [

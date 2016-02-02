@@ -2651,6 +2651,7 @@ function attachCommands() {
             'You have to be logged out to log in',
           ],
         });
+        resetCommand();
       } else if (phrases.length > 0) {
         data.user.userName = phrases[0].toLowerCase();
         commandHelper.data = data;
@@ -2667,6 +2668,7 @@ function attachCommands() {
             'Example: login bestname ',
           ],
         });
+        resetCommand();
       }
     },
     steps: [

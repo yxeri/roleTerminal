@@ -190,12 +190,6 @@ config.commands = {
     visibility: config.accessLevels.basic,
     category: 'advanced',
   },
-  uploadkey: {
-    commandName: 'uploadkey',
-    accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
-    category: 'basic',
-  },
   history: {
     commandName: 'history',
     accessLevel: config.accessLevels.basic,
@@ -293,18 +287,6 @@ config.commands = {
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  addentities: {
-    commandName: 'addentities',
-    accessLevel: config.accessLevels.admin,
-    visibility: config.accessLevels.admin,
-    category: 'admin',
-  },
-  addencryptionkeys: {
-    commandName: 'addencryptionkeys',
-    accessLevel: config.accessLevels.admin,
-    visibility: config.accessLevels.admin,
-    category: 'admin',
-  },
   weather: {
     commandName: 'weather',
     accessLevel: config.accessLevels.anonymous,
@@ -319,12 +301,6 @@ config.commands = {
   },
   updateroom: {
     commandName: 'updateroom',
-    accessLevel: config.accessLevels.admin,
-    visibility: config.accessLevels.admin,
-    category: 'admin',
-  },
-  moduleraid: {
-    commandName: 'moduleraid',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',

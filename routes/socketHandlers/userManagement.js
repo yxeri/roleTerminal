@@ -273,6 +273,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: ['Enter your new password'],
+            text_se: ['Skriv in ert nya lösenord'],
           },
         });
       });

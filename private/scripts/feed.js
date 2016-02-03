@@ -109,8 +109,14 @@ const mapHelper = {
   xGrids: {},
   yGrids: {},
 };
-const commmandFailText = { text: ['command not found'] };
-const abortInfo = { text: ['You can cancel out of the command by typing "exit" or "abort"'] };
+const commmandFailText = {
+  text: ['command not found'],
+  text_se: ['Kommandot kunde inte hittas'],
+};
+const abortInfo = {
+  text: ['You can cancel out of the command by typing "exit" or "abort"'],
+  text_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
+};
 const defaultInputStart = 'RAZCMD';
 const commandHelper = {
   maxSteps: 0,
@@ -558,6 +564,7 @@ function resetCommand(aborted) {
   if (aborted) {
     queueMessage({
       text: ['Aborting command'],
+      text_se: ['Avbryter kommandot'],
     });
   }
 
@@ -621,7 +628,10 @@ function pushCommandHistory(command) {
 function enterRoom(roomName) {
   setRoom(roomName);
   setInputStart(roomName);
-  queueMessage({ text: ['Entered ' + roomName] });
+  queueMessage({
+    text: ['Entered ' + roomName],
+    text_se: ['Gick in i ' + roomName],
+  });
 }
 
 function resetPreviousCommandPointer() {
@@ -644,6 +654,7 @@ function playMorse(morseCode) {
     soundQueue.splice(0, timeouts);
     queueMessage({
       text: ['Morse code message received:  ' + cleanMorse],
+      text_se: ['Morse mottaget:  ' + cleanMorse],
     });
   }
 
@@ -804,7 +815,8 @@ function sendLocation() {
             'Turning off tracking is a major offense',
             'Organica Re-Education Squads have been ' +
             'sent to scour the area',
-          ], extraClass: 'importantMsg',
+          ],
+          extraClass: 'importantMsg',
         });
       }
     }, { enableHighAccuracy: true });
@@ -1187,8 +1199,14 @@ function enterKeyHandler() {
             text: [
               'You must register a new user or login with an existing user to gain access to more commands',
               'Use command register or login',
-              'e.g. register myname 1135',
+              'example: register myname 1135',
               'or login myname 1135',
+            ],
+            text_se: [
+              'Ni måste registrera en ny användare eller logga in med en existerande användare för att få tillgång till fler kommandon',
+              'Använd kommando register eller login',
+              'Exempel: register myname 1135',
+              'eller login myname 1135',
             ],
           });
 
@@ -1460,10 +1478,19 @@ function printWelcomeMessage() {
       'Learn this valuable skill to increase your productivity!',
       'May you have a productive day',
     ],
+    text_se: [
+      'Välkommen, uppdragstagare ' + getUser(),
+      'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva min två mellanslag i rad?',
+      'Lär dig denna värdefulla teknik för att öka din produktivitet!',
+      'Ha en produktiv dag',
+    ],
   });
   queueMessage({
     text: [
       '## This terminal has been cracked by your friendly Razor team. Enjoy! ##',
+    ],
+    text_se: [
+      '## Denna terminal låstes upp av er vänliga Razor-grupp. Ha så kul! ##',
     ],
   });
   queueMessage(razorLogo);
@@ -1482,6 +1509,13 @@ function printStartMessage() {
       'Connecting to relay ' + randomRelay + '... Connection established',
       createLine(lineLength),
     ],
+    text_se: [
+      createLine(lineLength),
+      'Ansluter... Kunde inte etablera en anslutning mot HQ',
+      'Omdirigerar... Sekundär relä ' + randomRelay + ' funnen',
+      'Ansluter till relä ' + randomRelay + '... Anslutning etablerad',
+      createLine(lineLength),
+    ],
     extraClass: 'upperCase',
   });
   queueMessage({
@@ -1491,6 +1525,13 @@ function printStartMessage() {
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
       'You can also use it to show all available commands!',
       'Learn this valuable skill to increase your productivity!',
+    ],
+    text_se: [
+      'Välkommen till Oraklet av Organica',
+      'Var vänlig och logga in för att starta in produktiva dag!',
+      'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva in två mellanslag i rad?',
+      'Lär dig denna värdefulla teknik för att öka din produktivtet!',
+      'Ha en bra och produktiv dag',
     ],
   });
 }
@@ -1565,6 +1606,7 @@ function onReconnect() {
 function onDisconnect() {
   queueMessage({
     text: ['Lost connection'],
+    text_se: ['Förlorat anslutningen'],
     extraClass: 'importantMsg',
   });
 }
@@ -1577,6 +1619,7 @@ function onFollow(data = { room: {} }) {
   } else {
     queueMessage({
       text: ['Following ' + room.roomName],
+      text_se: ['Följer ' + room.roomName],
     });
   }
 }
@@ -1586,6 +1629,7 @@ function onUnfollow(data = { room: { roomName: '' } }) {
 
   queueMessage({
     text: ['Stopped following ' + room.roomName],
+    text_se: ['Slutade följa ' + room.roomName],
   });
 
   if (room.exited) {
@@ -1607,6 +1651,7 @@ function onLogin(data = {}) {
   setAccessLevel(user.accessLevel);
   queueMessage({
     text: ['Successfully logged in as ' + user.userName],
+    text_se: ['Lyckades logga in som ' + user.userName],
   });
   printWelcomeMessage();
   validCommands.mode.func([mode]);
@@ -1657,6 +1702,7 @@ function onReconnectSuccess(data) {
     if (!data.firstConnection) {
       queueMessage({
         text: ['Re-established connection'],
+        text_se: ['Lyckades återansluta'],
         extraClass: 'importantMsg',
       });
     } else {
@@ -1669,6 +1715,7 @@ function onReconnectSuccess(data) {
 
     queueMessage({
       text: ['Retrieving missed messages (if any)'],
+      text_se: ['Hämtar missade meddelanden (om det finns några'],
     });
 
     socket.emit('updateDeviceSocketId', {
@@ -1684,6 +1731,7 @@ function onReconnectSuccess(data) {
     if (!data.firstConnection) {
       queueMessage({
         text: ['Re-established connection'],
+        text_se: ['Lyckades återansluta'],
         extraClass: 'importantMsg',
       });
     }
@@ -1702,6 +1750,10 @@ function onDisconnectUser() {
         'Didn\'t find user ' + currentUser + ' in database',
         'Resetting local configuration',
       ],
+      text_se: [
+        'Kunde inte hitta användaren ' + currentUser + ' i databasen',
+        'Återställer lokala konfigurationen',
+      ],
     });
   }
 
@@ -1715,6 +1767,7 @@ function onMorse(data = {}) {
 function onTime(data = {}) {
   queueMessage({
     text: ['Time: ' + generateTimeStamp(data.time, true)],
+    text_en: ['Tid: ' + generateTimeStamp(data.time, true)],
   });
 }
 
@@ -1757,6 +1810,11 @@ function onBan() {
       'Center for re-education',
       '## or your nearest friendly Razor member. ' +
       'Bring a huge bribe ##',
+    ],
+    text_se: [
+      'Ni har blivit bannade från systemet',
+      'Kontakta ert närmaste Organica IT-supportcenter för omskolning',
+      '## eller er närmaste vänliga Razor-medlem. Ta med en stor mängd mutor ##',
     ],
     extraClass: 'importantMsg',
   });
@@ -2089,6 +2147,13 @@ function attachCommands() {
               ' You have to log in to access most of the system',
               createLine(lineLength),
             ],
+            text_se: [
+              createLine(lineLength),
+              ' Använd register för att registrera en ny användare',
+              ' Använd login för att logga in som en existerande användare',
+              ' Ni måste logga in för att få tillgång till majoriteten av systemet',
+              createLine(lineLength),
+            ],
           });
         }
 
@@ -2102,12 +2167,21 @@ function attachCommands() {
         queueMessage({
           text: createCommandStart('help').concat([
             'Instructions',
-            '  Add -help after a command to get instructions on how to use it. Example: ' + commandChars[0] + 'uploadkey -help',
+            '  Add -help after a command to get instructions on how to use it. Example: uploadkey -help',
             'Shortcuts',
             '  Use page up/down to scroll the view',
             '  Press arrow up/down to go through your previous used commands',
             '  Pressing tab or space twice will auto-complete any command you have begun writing.',
             '  Example: "he" and a tab / double space will automatically turn into "help"',
+          ]),
+          text_se: createCommandStart('help').concat([
+            'Instruktioner',
+            '  Lägg till -help efter ett kommando för att få instruktioner på hur det kan användas. Exempel: uploadkey -help',
+            'Genvägar',
+            '  Använd page up/down för att skrolla vyn',
+            '  Använd pil upp/ner för att gå igenom tidigare använda kommandon',
+            '  Tryck på tab-knappen eller två mellanslag i rad för att autoifylla kommandon som ni har börjat skriva',
+            '  Exempel: "he" och en tabbning / två mellanslag i rad kommer automatiskt ändra det till "help"',
           ]),
         });
       }
@@ -2116,15 +2190,21 @@ function attachCommands() {
     },
     help: [
       'Shows a list of available commands',
-      'The set of commands shown is the basic set',
-      'Add "all" to show all commands available to you. Example: help all',
+    ],
+    help_se: [
+      'Visa en lista av tillgängliga kommandon',
     ],
     instructions: [
       ' Usage:',
-      '  help *optional all*',
+      '  help',
       ' Example:',
       '  help',
-      '  help all',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  help',
+      ' Exempel:',
+      '  help',
     ],
     accessLevel: 1,
     category: 'basic',
@@ -2136,6 +2216,7 @@ function attachCommands() {
       }
     },
     help: ['Clears the terminal view'],
+    help_se: ['Rensar terminalvyn'],
     clearAfterUse: true,
     accessLevel: 13,
     category: 'basic',
@@ -2144,7 +2225,8 @@ function attachCommands() {
     func: function whoamiCommand() {
       socket.emit('whoAmI');
     },
-    help: ['Shows the current user'],
+    help: ['Shows information about the current user'],
+    help_se: ['Visar information om nuvarande användaren'],
     accessLevel: 13,
     category: 'basic',
   };
@@ -2165,6 +2247,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You forgot to write the message!'],
+          text_se: ['Ni glömde skriva in ett meddelande!'],
         });
       }
     },
@@ -2172,11 +2255,21 @@ function attachCommands() {
       'Sends a message to your current room',
       'The room you are in is written out to the left of the marker',
     ],
+    help_se: [
+      'Skickar ett meddelande till ert nuvarande rum',
+      'Rummet ni är inne i står skrivet längst ner till vänster om markören',
+    ],
     instructions: [
       ' Usage:',
-      '  msg *message*',
+      '  msg *message',
       ' Example:',
-      '  msg Hello!',
+      ' msg Hello!',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  msg *meddelande*',
+      ' Exempel:',
+      '  msg Hej!',
     ],
     clearAfterUse: true,
     accessLevel: 13,
@@ -2190,6 +2283,10 @@ function attachCommands() {
         text: [
           'Who is the broadcast from?',
           'You can also leave it empty and just press enter',
+        ],
+        text_se: [
+          'Vem är detta meddelande från?',
+          'Ni kan också lämna det tomt och trycka på enter-knappen',
         ],
       });
       queueMessage(copyMessage(abortInfo));
@@ -2210,8 +2307,11 @@ function attachCommands() {
         queueMessage({
           text: [
             'Write a line and press enter',
-            'Press enter without any input when you are done ' +
-            'with the message',
+            'Press enter without any input when you are completely done with the message',
+          ],
+          text_se: [
+            'Skriv en rad och tryck på enter-knappen',
+            'Tryck på enter-knappen utan något i inmatningsfältet när ni är helt klara med meddelandet',
           ],
         });
         commandHelper.onStep++;
@@ -2230,10 +2330,12 @@ function attachCommands() {
 
           queueMessage({
             text: ['Preview of the message:'],
+            text_se: ['Förhandsgranskning av meddelandet'],
           });
           queueMessage({ text: dataText });
           queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
+            text_se: ['Är detta meddelande OK? Skriv "yes" för att acceptera meddelandet'],
           });
         }
       },
@@ -2250,8 +2352,15 @@ function attachCommands() {
       'Sends a message to all users in all rooms',
       'It will prepend the message with "[ALL]"',
     ],
+    help_se: [
+      'Skicka ett meddelande till alla användare i alla rum',
+      '"[ALL"] kommer att läggas till i början av meddelandet',
+    ],
     instructions: [
       'Follow the on-screen instructions',
+    ],
+    instructions_se: [
+      'Följ instruktionerna som ges',
     ],
     accessLevel: 13,
     clearAfterUse: true,
@@ -2269,6 +2378,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You have to specify which room to follow and a password (if it is protected)'],
+          text_se: ['Ni måste specificera vilket rum ni vill följa och dess lösenord (om rummet är skyddat)'],
         });
       }
     },
@@ -2276,11 +2386,22 @@ function attachCommands() {
       'Follows a room and shows you all messages posted in it.',
       'You will get the messages from this room even if it isn\'t your currently selected one',
     ],
+    help_se: [
+      'Följer ett rum och visar alla meddelande som skrivs i det',
+      'Ni kommer att få alla meddelande som skickas i detta rum även om ni har ett annat valt som ert nuvarande rum',
+    ],
     instructions: [
       ' Usage:',
       '  follow *room name* *optional password*',
       ' Example:',
       '  follow room1 banana',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  follow *rumsnamn* *frivilligt lösenord*',
+      ' Exempel:',
+      '  follow rum1',
+      '  follow rum2 banan',
     ],
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
@@ -2301,15 +2422,23 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You have to specify which room to unfollow'],
+          text_se: ['Ni måste specificera vilket rum ni vill sluta följa'],
         });
       }
     },
     help: ['Stops following a room.'],
+    help_se: ['Slutar följa ett rum'],
     instructions: [
       ' Usage:',
       '  unfollow *room name*',
       ' Example:',
-      '  unfollow roomname',
+      '  unfollow room1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  unfollow *rumsnamn*',
+      ' Exempel:',
+      '  unfollow rum1',
     ],
     autocomplete: { type: 'myRooms' },
     accessLevel: 13,
@@ -2328,15 +2457,21 @@ function attachCommands() {
           socket.emit('listDevices');
         } else {
           queueMessage({
-            text: [listOption + 'is not a valid option'],
+            text: [listOption + ' is not a valid type'],
+            text_se: [listOption + ' är inte en giltig typ'],
           });
         }
       } else {
         queueMessage({
           text: [
-            'You have to input which option you want to list',
-            'Available options: users, rooms, devices',
+            'You have to input which type you want to list',
+            'Available types: users, rooms, devices',
             'Example: list rooms',
+          ],
+          text_se: [
+            'Ni måste skriva in vilken typ ni vill lista',
+            'Tillgängliga typer: users, rooms, devices',
+            'Exempel: list rooms',
           ],
         });
       }
@@ -2345,10 +2480,22 @@ function attachCommands() {
       'Shows a list of users, rooms or devices which you are allowed to see',
       'You have to input which option you want to list',
     ],
+    help_se: [
+      'Visar en list över användare, rum eller enheter som ni har tillåtelse att se',
+      'Ni måste skriva in vilken typ ni vill lista',
+    ],
     instructions: [
       ' Usage:',
-      '  list *option*',
+      '  list *type*',
       ' Example',
+      '  list rooms',
+      '  list users',
+      '  list devices',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  list *typ*',
+      ' Exempel',
       '  list rooms',
       '  list users',
       '  list devices',
@@ -2373,8 +2520,15 @@ function attachCommands() {
 
             queueMessage({
               text: createCommandStart(commandString).concat([
-                'Prepend commands with "' + commandChars.join('" or "') + '", e.g. ' + '"' + commandChars[0] + 'uploadkey"',
+                'Prepend commands with "' + commandChars.join('" or "') + '", example: ' + '"' + commandChars[0] + 'mode"',
                 'Everything else written and sent will be intepreted as a chat message',
+                'You will no longer need to use msg command to write chat messages',
+                createCommandEnd(commandString.length),
+              ]),
+              text_se: createCommandStart(commandString).concat([
+                'Lägg till ' + commandChars.join('" eller "') + ' i början av varje kommando, exempel: ' + '"' + commandChars[0] + 'mode"',
+                'Allt annat ni skriver kommer att tolkas som chatmeddelanden',
+                'Ni kommer inte längre behöva använda msg-kommandot för att skriva chatmeddelanden',
                 createCommandEnd(commandString.length),
               ]),
             });
@@ -2393,6 +2547,11 @@ function attachCommands() {
                 'You have to use command "msg" to send messages',
                 createCommandEnd(commandString.length),
               ]),
+              text_se: createCommandStart(commandString).concat([
+                'Kommandon kan användas utan "' + commandChars[0] + '"',
+                'Ni måste använda msg-kommandot för att skriva chatmeddelanden',
+                createCommandEnd(commandString.length),
+              ]),
             });
           }
 
@@ -2400,11 +2559,13 @@ function attachCommands() {
         } else {
           queueMessage({
             text: [newMode + 'is not a valid mode'],
+            text_se: [newMode + ' är inte ett giltigt alternativ'],
           });
         }
       } else {
         queueMessage({
           text: ['Current mode: ' + getMode()],
+          text_se: ['Nuvarande läge: ' + getMode()],
         });
       }
     },
@@ -2425,6 +2586,13 @@ function attachCommands() {
       ' Example:',
       '  mode chat',
       '  mode cmd',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  mode *läge*',
+      ' Exempel:',
+      '  mode chat',
+      '  -mode cmd',
     ],
     autocomplete: { type: 'modes' },
     accessLevel: 13,
@@ -2455,6 +2623,12 @@ function attachCommands() {
               'Don\'t use whitespace in your name!',
               'e.g. register myname',
             ],
+            text_se: [
+              'Namnet behöver vara 3 till 6 tecken långt',
+              'Namnet får endast innehålla bokstäver och nummer (a-z, 0-9)',
+              'Använd inte blanksteg i ert namn!',
+              'Exempel: register myname',
+            ],
           });
         }
       } else {
@@ -2462,7 +2636,11 @@ function attachCommands() {
         queueMessage({
           text: [
             'You have already registered a user',
-            getUser() + ' is registered to this device',
+            getUser() + ' is registered and logged in',
+          ],
+          text_se: [
+            'Ni har redan registrerat en användare',
+            getUser() + ' är registrerad och inloggad',
           ],
         });
       }
@@ -2474,6 +2652,11 @@ function attachCommands() {
             'Input a password and press enter',
             'Your password won\'t appear on the screen as you type it',
             'Don\'t use whitespaces in your password!',
+          ],
+          text_se: [
+            'Skriv in ert lösenord och tryck på enter-knappen',
+            'Ert lösenord kommer inte visas på skärmen',
+            'Använd inte blanksteg i ert lösenord!',
           ],
         });
         queueMessage(copyMessage(abortInfo));
@@ -2487,6 +2670,7 @@ function attachCommands() {
           commandHelper.data.user.password = password;
           queueMessage({
             text: ['Repeat your password one more time'],
+            text_se: ['Skriv in ert lösenord en gång till'],
           });
           commandHelper.onStep++;
         } else {
@@ -2495,6 +2679,11 @@ function attachCommands() {
               'Password is too short!',
               'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
               'Please, input a password and press enter',
+            ],
+            text_se: [
+              'Lösenordet är för kort!',
+              'Det måste vara minst 3 tecken långt (a-z, 0-9. Lösenordet kan ha en blandning av gemener och versaler)',
+              'Skriv in ert lösenord och tryck på enter-knappen',
             ],
           });
         }
@@ -2510,6 +2699,12 @@ function attachCommands() {
               'You may now login to the system',
               'Have a productive day!',
             ],
+            text_se: [
+              'Gratulerar, uppdragstagare #' + Math.floor(Math.random() * 120503),
+              'Välkommen till Organica Orakelavdelningen',
+              'Ni kan nu logga in i systemet',
+              'Ha en produktiv dag!',
+            ],
           });
           socket.emit('register', commandHelper.data);
           validCommands[commandHelper.command].abortFunc();
@@ -2520,6 +2715,10 @@ function attachCommands() {
               'Passwords don\'t match. Please try again',
               'Input a password and press enter',
             ],
+            text_se: [
+              'Lösenorden matchar inte. Försök igen',
+              'Skriv in ert lösenord och tryck på enter-knappen',
+            ],
           });
           commandHelper.onStep--;
         }
@@ -2529,16 +2728,27 @@ function attachCommands() {
       hideInput(false);
     },
     help: [
-      'Registers your user name on the server and connects it ' +
-      'to your device',
+      'Registers your user name on the server',
       'This user name will be your identity in the system',
       'The name can only contain letters and numbers (a-z, 0-9)',
       'Don\'t use whitespaces in your name or password!',
+    ],
+    help_se: [
+      'Registrerar ert användarnamn på servern',
+      'Detta användarnamn kommer vara er identitet i systemet',
+      'Namnet kan endast innehålla bokstäver och siffror (a-z, 0-9)',
+      'Använd inte blankstegi ert namn eller lösenord!',
     ],
     instructions: [
       ' Usage:',
       '  register *user name*',
       ' Example:',
+      '  register myname',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  register *användarnamn*',
+      ' Exempel:',
       '  register myname',
     ],
     accessLevel: 0,
@@ -2560,6 +2770,10 @@ function attachCommands() {
             'Enter a password for the room',
             'Leave it empty if you don\'t want to password protect the room',
           ],
+          text_se: [
+            'Skriv in ett lösenord för rummet',
+            'Ni kan lämna det tomt om ni inte vill skydda rummet med ett lösenord',
+          ],
         });
         setInputStart('Set passwd');
         hideInput(true);
@@ -2568,8 +2782,14 @@ function attachCommands() {
           text: [
             'Failed to create room',
             'Room name has to be 1 to 6 characters long',
-            'The room name can only contain letters and numbers',
-            'e.g. createroom myroom',
+            'The room name can only contain letters and numbers (a-z, 0-9)',
+            'Example: createroom myroom',
+          ],
+          text_se: [
+            'Misslyckades att skapa rummet',
+            'Rummets namn måste vara 1 till 6 tecken långt',
+            'Rummets namn kan endast innehålla bokstäver och siffror (a-z, 0-9)',
+            'Exempel: createroom myroom',
           ],
         });
       }
@@ -2585,6 +2805,7 @@ function attachCommands() {
           setInputStart('Repeat passwd');
           queueMessage({
             text: ['Repeat the password'],
+            text_se: ['Skriv in lösenordet igen'],
           });
         } else {
           commandHelper.onStep++;
@@ -2607,6 +2828,11 @@ function attachCommands() {
               'Enter a password for the room',
               'Leave it empty if you don\'t want password-protect the room',
             ],
+            text_se: [
+              'Lösenorden matchar inte. Försök igen',
+              'Skriv in lösenordet för rummet',
+              'Lämna det tomt om ni inte vill skydda rummet med ett lösenord',
+            ],
           });
           setInputStart('Set passwd');
         }
@@ -2618,11 +2844,22 @@ function attachCommands() {
       'The password is optional',
       'The name can only contain letters and numbers (a-z, 0-9)',
     ],
+    help_se: [
+      'Skapar ett chatrum',
+      'Rummets namn måste vara 1 till 6 tecken långt',
+      'Namnet får endast innehålla bokstäver och siffror (a-z, 0-9)',
+    ],
     instructions: [
       ' Usage:',
       '  createroom *room name*',
       ' Example:',
       '  createroom myroom banana',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  createroom *rumsnamn*',
+      ' Exempel:',
+      '  createroom myroom',
     ],
     accessLevel: 13,
     category: 'advanced',
@@ -2637,6 +2874,7 @@ function attachCommands() {
       socket.emit('myRooms', data);
     },
     help: ['Shows a list of all rooms you are following'],
+    help_se: ['Visar en lista över alla rum som ni följer'],
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2650,6 +2888,10 @@ function attachCommands() {
             'You are already logged in',
             'You have to be logged out to log in',
           ],
+          text_se: [
+            'Ni har redan loggat in',
+            'Ni måste vara utloggade för att kunna logga in',
+          ],
         });
         resetCommand();
       } else if (phrases.length > 0) {
@@ -2658,6 +2900,7 @@ function attachCommands() {
         commandHelper.hideInput = true;
         queueMessage({
           text: ['Input your password'],
+          text_se: ['Skriv in ert lösenord'],
         });
         setInputStart('password');
         hideInput(true);
@@ -2665,7 +2908,11 @@ function attachCommands() {
         queueMessage({
           text: [
             'You need to input a user name',
-            'Example: login bestname ',
+            'Example: login best',
+          ],
+          text_se: [
+            'Ni måste skriva in ert användarnamn',
+            'Exempel: login best',
           ],
         });
         resetCommand();
@@ -2687,10 +2934,20 @@ function attachCommands() {
       'Logs in as a user on this device',
       'You have to be logged out to login as another user',
     ],
+    help_se: [
+      'Loggar in som en användare på denna enhet',
+      'Ni måste vara utloggade för att kunna logga in som en annan användare',
+    ],
     instructions: [
       ' Usage:',
       '  login *user name*',
       ' Example:',
+      '  login user11',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  login *användarnamn*',
+      ' Exempel:',
       '  login user11',
     ],
     clearAfterUse: true,
@@ -2702,6 +2959,7 @@ function attachCommands() {
       socket.emit('time');
     },
     help: ['Shows the current time'],
+    help_se: ['Visar nuvarande tiden'],
     accessLevel: 13,
     category: 'basic',
   };
@@ -2712,6 +2970,10 @@ function attachCommands() {
           text: [
             'Tracking not available',
             'You are not connected to the satellites',
+          ],
+          text_se: [
+            'Spårning är inte tillgänglig',
+            'Ni är inte uppkopplade mot satelliterna',
           ],
         });
       } else if (phrases.length > 0) {
@@ -2725,9 +2987,14 @@ function attachCommands() {
     help: [
       'Shows the last known location of the user',
       '* is a shortcut for all users. Example: locate *',
-      'Just writing the command without a user name will show your ' +
-      'current location. Example: locate',
+      'Just writing the command without a user name will show your current location. Example: locate',
       'You need to be connected to the satellites to access this command',
+    ],
+    help_se: [
+      'Visar senaste identifierade position för användaren',
+      '* är en genväg för alla användare. Exempel: locate *',
+      'Om ni bara skriver kommandot utan ett användarnamn så kommer det visa er nuvarande position. Exempel: locate',
+      'Ni måste vara uppkopplade mot satelliterna för att ha tillgång till detta kommando',
     ],
     instructions: [
       ' Usage:',
@@ -2737,134 +3004,17 @@ function attachCommands() {
       '  locate *',
       '  locate',
     ],
+    instructions_se: [
+      ' Användning:',
+      '  locate *frivilligt användarnamn ELLER "*"*',
+      ' Exempel:',
+      '  locate user1',
+      '  locate *',
+      '  locate',
+    ],
     autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'advanced',
-  };
-  validCommands.uploadkey = {
-    func: function uploadkeyCommand() {
-      const razLogoCopy = copyMessage(storedMessages.razor);
-
-      // TODO: razorLogo should be move to DB or other place
-      queueMessage(razLogoCopy);
-      queueMessage({
-        text: [
-          'Razor proudly presents:',
-          'Entity Hacking Access! (EHA)',
-          'AAAB3NzaC1yc2EAAAADAQABAAABAQDHS//2a/B',
-          'D6Rsc8OO/6wFUVDdpdAItvSCLCrc/dcJE/ybEV',
-          'w3OtlVFnfNkOVAvhObuWO/6wFUVDdkr2YTaDEt',
-          'i5mxEFD1zslvhObuWr6QKLvfZVczAxPFKLvfZV',
-          'dK2zXrxGOmOFllxiCbpGOmOFlcJyiCbp0mA4ca',
-          'MFvEEiKXrxGlxiCbp0miONA3EscgY/yujOMJHa',
-          'Q1uy6yEZOmOFl/yujOMJHa881DVwWl6lsjHvSi',
-          'wDDVwWl6el88/x1j5C+k/atg1lcvcz7Tdtve4q',
-          'VTVz0HIhxv595Xqw2qrv6GrdX/FrhObuWr6QKL',
-          ' ',
-          'Please wait.......',
-          'Command interception.........ACTIVATED',
-          'Oracle defense systems........DISABLED',
-          'Overriding locks..................DONE',
-          'Connecting to entity database.....DONE',
-          ' ',
-        ],
-      });
-      queueMessage(copyMessage(abortInfo));
-      setInputStart('Enter encryption key');
-      socket.emit('entities');
-    },
-    steps: [
-      function uploadkeyStepOne(phrases) {
-        const commandObj = commandHelper;
-        const phrase = phrases.join(' ');
-
-        socket.emit('verifyKey', { encryptionKey: phrase.toLowerCase() });
-        queueMessage({
-          text: [
-            'Verifying key. Please wait...',
-          ],
-        });
-        commandObj.keysBlocked = true;
-        setInputStart('Verifying...');
-      },
-      function uploadkeyStepTwo(data) {
-        const commandObj = commandHelper;
-
-        if (data.keyData !== null) {
-          if (data.key.reusable || !data.keyData.used) {
-            queueMessage({
-              text: ['Key has been verified. Proceeding'],
-            });
-            commandObj.onStep++;
-            commandObj.data = data;
-            validCommands[commandObj.command].steps[commandObj.onStep](socket);
-          } else {
-            queueMessage({
-              text: ['Key has already been used. Aborting'],
-            });
-            resetCommand(true);
-          }
-        } else {
-          queueMessage({
-            text: ['The key is invalid. Aborting'],
-          });
-          resetCommand(true);
-        }
-      },
-      function uploadkeyStepThree() {
-        const commandObj = commandHelper;
-
-        setInputStart('Enter entity name');
-        commandObj.keysBlocked = false;
-        commandObj.onStep++;
-      },
-      function uploadkeyStepFour(phrases) {
-        const commandObj = commandHelper;
-        const data = commandObj.data;
-        const phrase = phrases.join(' ');
-
-        data.entity = { entityName: phrase.toLowerCase() };
-        data.user = { userName: getUser() };
-        socket.emit('unlockEntity', data);
-        queueMessage({
-          text: [
-            'Unlocking entity. Please wait...',
-          ],
-        });
-        commandObj.keysBlocked = true;
-      },
-      function uploadkeyStepFive(data = {}) {
-        if (data.entity !== null) {
-          queueMessage({
-            text: [
-              'Confirmed. Encryption key has been used on the entity',
-              data.entity.entityName + ' now has ' + (data.keys.length + 1) + ' unlocks',
-              'Thank you for using EHA',
-            ],
-          });
-        } else {
-          queueMessage({
-            text: [
-              'Failed',
-              'Encryption key could not be used on entity.',
-              'Aborting',
-            ],
-          });
-        }
-
-        resetCommand(true);
-      },
-    ],
-    help: [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
-      'Allows you to input an encryption key and use it to unlock an entity',
-    ],
-    instructions: [
-      'Follow the on-screen instructions',
-    ],
-    clearBeforeUse: true,
-    accessLevel: 13,
-    category: 'basic',
   };
   validCommands.history = {
     func: function historyCommand(phrases) {
@@ -2887,18 +3037,32 @@ function attachCommands() {
     help: [
       'Clears the screen and retrieves chat messages from server',
       'The amount you send with the command is the amount of messages that will be returned from each room you follow',
-      'You can retrieve history from a specific room by adding the room name to the input',
+      'You can retrieve history from a specific room by adding the room name to the input. Example: history room1',
+    ],
+    help_se: [
+      'Rensar skärmen och hämtar chatmeddelanden från servern',
+      'Om ni skriver med ett värde så kommer servern skicka tillbaka så många meddelanden från varje rum ni följer',
+      'Ni kan hämta meddelanden från ett specifikt rum om ni skriver med namnet. Exempel: history rum1',
     ],
     instructions: [
       ' Usage:',
       '  history *optional number*',
-      '  history *room name*',
-      '  history *room name* *optional number*',
+      '  history *optional room name* *optional number*',
       ' Example:',
       '  history',
       '  history 25',
       '  history aroom 25',
       '  history aroom',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  history *frivilligt nummer*',
+      '  history *frivilligt rumsnamn* *frivilligt nummer*',
+      ' Exempel:',
+      '  history',
+      '  history 25',
+      '  history aroom',
+      '  history aroom 25',
     ],
     clearAfterUse: true,
     clearBeforeUse: true,
@@ -2936,13 +3100,18 @@ function attachCommands() {
         }
       }
     },
-    help: [
-      'Sends a morse encoded message (sound) to everyone in the room',
-    ],
+    help: ['Sends a morse encoded message (sound) to all users'],
+    help_se: ['Skicka ett meddelande via morse (ljud) till alla användare'],
     instructions: [
       ' Usage:',
       '  morse *message*',
       ' Example:',
+      '  morse sos',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  morse *meddelande*',
+      ' Exempel:',
       '  morse sos',
     ],
     accessLevel: 13,
@@ -2957,6 +3126,7 @@ function attachCommands() {
       queueMessage(copyMessage(abortInfo));
       queueMessage({
         text: ['Enter your current password'],
+        text_se: ['Skriv in ert nuvarande lösenord'],
       });
     },
     steps: [
@@ -2977,6 +3147,7 @@ function attachCommands() {
         setInputStart('Repeat passwd');
         queueMessage({
           text: ['Repeat your new password'],
+          text_se: ['Skriv in ert nya lösenord igen'],
         });
       },
       function passwordStepThree(phrases = []) {
@@ -2994,6 +3165,10 @@ function attachCommands() {
               'Password doesn\'t match. Please try again',
               'Enter your new password',
             ],
+            text_se: [
+              'Lösenorden matchar inte. Försök igen',
+              'Skriv in ert nya lösenord',
+            ],
           });
         }
       },
@@ -3005,9 +3180,12 @@ function attachCommands() {
       'Allows you to change the user password',
       'Don\'t use whitespace in your password!',
     ],
-    instructions: [
-      'Follow the instructions',
+    help_se: [
+      'Tillåter er att ändra ert lösenord',
+      'Använd inte blanksteg i lösenordet!',
     ],
+    instructions: ['Follow the instructions on the screen'],
+    instructions_se: ['Följ instruktionerna på skärmen'],
     accessLevel: 13,
     category: 'basic',
   };
@@ -3015,7 +3193,8 @@ function attachCommands() {
     func: function logoutCommand() {
       socket.emit('logout');
     },
-    help: ['Logs out from the current user'],
+    help: ['Logs out from the current user on this device'],
+    help_se: ['Loggar ut din nuvarande användare från denna enhet'],
     accessLevel: 13,
     category: 'basic',
     clearAfterUse: true,
@@ -3025,6 +3204,7 @@ function attachCommands() {
       refreshApp();
     },
     help: ['Reboots terminal'],
+    help_se: ['Startar om terminalen'],
     accessLevel: 1,
     category: 'basic',
   };
@@ -3046,9 +3226,13 @@ function attachCommands() {
     },
     help: [
       'Verifies a user and allows it to connect to the system',
-      'verifyuser without any additional input will show a list of ' +
-      'all unverified users',
-      'Use "*" to verify everyone in the list',
+      'verifyuser without any additional input will show a list of all unverified users. Exempel: verifyuser',
+      'Use "*" to verify all users',
+    ],
+    help_se: [
+      'Verifiera en användare och tillåter denne att koppla upp sig mot systemet',
+      'verifyuser utan några andra tillägg visara en lista över alla icke-verifierade användare. Exempel: verifyuser',
+      'Använd "*" för att verifiera alla icke-verifierade användare',
     ],
     instructions: [
       ' Usage:',
@@ -3056,6 +3240,14 @@ function attachCommands() {
       '  verifyuser *username*',
       '  verifyuser *',
       ' Example:',
+      '  verifyuser',
+      '  verifyuser appl1',
+      '  verifyuser *',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  verifyuser *frivilligt användarnamn ELLER "*"*',
+      ' Exempel:',
       '  verifyuser',
       '  verifyuser appl1',
       '  verifyuser *',
@@ -3078,10 +3270,20 @@ function attachCommands() {
       'Bans a user and disconnects it from the system',
       'The user will not be able to log on again',
     ],
+    help_se: [
+      'Bannar användaren och kopplar från denne från systemet',
+      'Användaren kommer inte kunna logga in igen',
+    ],
     instructions: [
       ' Usage:',
       '  banuser *username*',
       ' Example:',
+      '  banuser evil1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  banuser *användarnamn*',
+      ' Exempel:',
       '  banuser evil1',
     ],
     accessLevel: 13,
@@ -3101,14 +3303,24 @@ function attachCommands() {
     help: [
       'Removes ban on user',
       'The user will be able to log on again',
-      'ubanuser without any additional input will show a list of all ' +
-      'banned users',
+      'unbanuser without any additional input will show a list of all banned users. Example: unbanuser',
+    ],
+    help_se: [
+      'Tar bort en banning från en användare',
+      'Användaren kommer kunna logga in igen',
+      'unbanuser utan tillägg visar en lista över alla bannade användare. Example: unbanuser',
     ],
     instructions: [
       ' Usage:',
-      '  unbanuser',
-      '  unbanuser *username*',
+      '  unbanuser *optional username*',
       ' Example:',
+      '  unbanuser',
+      '  unbanuser evil1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  unbanuser *frivilligt användarnamn*',
+      ' Exempel:',
       '  unbanuser',
       '  unbanuser evil1',
     ],
@@ -3130,12 +3342,18 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You forgot to write the message!'],
+          text_se: ['Ni glömde skriva in ett meddelande!'],
         });
       }
     },
     help: [
-      'Send a private message to a specific user',
+      'Send a private message to a user',
       'The first word that you write will be interpreted as a user name',
+      'The rest of the input will be sent to only that user',
+    ],
+    help_se: [
+      'Skicka ett privat meddelande till en användare',
+      'Det första ni skriver in kommer att tolkas som användarnamnet',
       'The rest of the input will be sent to only that user',
     ],
     instructions: [
@@ -3144,6 +3362,13 @@ function attachCommands() {
       ' Example:',
       '  whisper adam hello, adam!',
       '  whisper user1 sounds good!',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  whisper *användarnamn* *meddelande*',
+      ' Exempel:',
+      '  whisper ada Hej, Ada!',
+      '  whisper user1 Låter bra!',
     ],
     clearAfterUse: true,
     autocomplete: { type: 'users' },
@@ -3189,12 +3414,14 @@ function attachCommands() {
         queueMessage(copyMessage(abortInfo));
         queueMessage({
           text: ['Press enter to continue'],
+          text_se: ['Tryck på enter för att fortsätta'],
         });
 
         setInputStart('Start');
       } else {
         queueMessage({
           text: ['You forgot to input the room name!'],
+          text_se: ['Ni glömde att skriva in rumsnamnet!'],
         });
         resetCommand(true);
       }
@@ -3203,6 +3430,7 @@ function attachCommands() {
       function hackroomStepOne() {
         queueMessage({
           text: ['Checking room access...'],
+          text_se: ['Undersöker rummet...'],
         });
         socket.emit('roomHackable', commandHelper.data.roomName);
       },
@@ -3215,7 +3443,12 @@ function attachCommands() {
               'Your hacking attempt has been detected',
               'Users of the room have been notified of your intrusion attempt',
             ],
+            text_se: [
+              'Ditt hackningsförsök har upptäckts',
+              'Användarna i rummet har blivit notifierad om ditt försök att bryta dig in',
+            ],
           });
+          // TODO Move to server side
           socket.emit('chatMsg', {
             message: {
               text: [
@@ -3237,6 +3470,13 @@ function attachCommands() {
             'Level 3 security protection detected',
             '3 sequences required',
           ],
+          text_se: [
+            'Aktiverar botten....',
+            'Varning. Försvarssystem mot intrång har aktiverats',
+            'Antal sekunder innan intråget upptäcks: ' + (timeout / 1000) + ' sekunder',
+            'Level 3 försvarssystem upptäckt',
+            '3 sekvenser krävs',
+          ],
         });
         setInputStart('Verify seq');
         commandObj.data.code = createRandString(randomString.slice(9), 10, true);
@@ -3244,6 +3484,7 @@ function attachCommands() {
         commandObj.onStep++;
         queueMessage({
           text: ['Sequence: ' + commandObj.data.code],
+          text_en: ['Sekvens: ' + commandObj.data.code],
         });
       },
       function hackroomStepThree(phrases) {
@@ -3251,13 +3492,16 @@ function attachCommands() {
         const phrase = phrases.join(' ').trim();
 
         if (phrase.toUpperCase() === commandObj.data.code) {
-          queueMessage({ text: ['Sequence accepted'] });
+          queueMessage({
+            text: ['Sequence accepted'],
+            text_se: ['Sekvens accepterad'],
+          });
+
           commandObj.data.timesCracked++;
         } else {
           queueMessage({
-            text: [
-              'Incorrect sequence. Counter measures have been released',
-            ],
+            text: ['Incorrect sequence. Counter measures have been released'],
+            text_se: ['Felaktiv sekvens. Motåtgärder har blivit aktivetade'],
           });
         }
 
@@ -3265,6 +3509,7 @@ function attachCommands() {
           commandObj.data.code = createRandString(randomString.slice(9), 10, true);
           queueMessage({
             text: ['Sequence: ' + commandObj.data.code],
+            text_se: ['Sekvens: ' + commandObj.data.code],
           });
         } else {
           const data = {
@@ -3282,6 +3527,12 @@ function attachCommands() {
               'Suppressing notification and following room',
               'Thank you for using RAH',
             ],
+            text_se: [
+              'Crackningen har lyckats',
+              'Försvarsystemet har inaktiverats',
+              'Stävjar notifikationen och börjar följa rummet',
+              'Tack for att ni använde RAH',
+            ],
           }));
           resetCommand();
         }
@@ -3291,15 +3542,27 @@ function attachCommands() {
       clearTimeout(commandHelper.data.timer);
     },
     help: [
-      'ERROR. UNAUTHORIZED COMMAND...AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
+      'ERROR. UNAUTHORIZED COMMAND... AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
       'This command lets you follow a room without knowing the password',
       'It will also supress the following notification',
       'Failing the hack will warn everyone in the room',
+    ],
+    help_se: [
+      'FEL. EJ BEHÖRIGT KOMMANDO... KRINGÅR BEHÖRIGHET. SKRIVER UT INSTRUKTIONER',
+      'Detta kommando låter dig följa rum utan att veta dess lösenord',
+      'Det kommer att stoppa notifikationen som vanligtvis skickas till rum',
+      'Alla i rummet kommer bli notifierade om ni misslyckas med hackningen',
     ],
     instructions: [
       ' Usage:',
       '  hackroom *room name*',
       ' Example:',
+      '  hackroom secret',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  hackroom *rumsnamn*',
+      ' Exempel:',
       '  hackroom secret',
     ],
     clearBeforeUse: true,
@@ -3321,8 +3584,12 @@ function attachCommands() {
         text: [
           'Do you want to send it to a specific device?',
           'Enter the device ID or alias to send it to a specific device',
-          'Leave it empty and press enter if you want to send it to ' +
-          'all users',
+          'Leave it empty and press enter if you want to send it to all users',
+        ],
+        text_se: [
+          'Vill ni skicka meddelandet till en specifik enhet?',
+          'Skriv in ID eller alias till en enhet för att skicka meddelandet till endast den enheten',
+          'Lämna det tomt och tryck på enter-knappen om ni vill skicka det till alla användare',
         ],
       });
       setInputStart('imprtntMsg');
@@ -3336,6 +3603,7 @@ function attachCommands() {
             commandHelper.data.device = { deviceId: deviceId };
             queueMessage({
               text: ['Searching for device...'],
+              text_se: ['Letar efter enheten...'],
             });
             socket.emit('verifyDevice', commandHelper.data);
           } else {
@@ -3349,9 +3617,13 @@ function attachCommands() {
         queueMessage({
           text: [
             'Write a line and press enter',
-            'Press enter without any input when you are done ' +
-            'with the message',
+            'Press enter without any input when you are completely done with the message',
             'Try to keep the first line short if you want to send it as morse',
+          ],
+          text_se: [
+            'Skriv en rad och tryck på enter-knappen',
+            'Tryck på enter-knappen utan någon text när ni är helt klara med meddelandet',
+            'Försök att hålla första raden kort om ni vill skicka meddelandet som morse',
           ],
         });
       },
@@ -3368,6 +3640,7 @@ function attachCommands() {
 
           queueMessage({
             text: ['Preview of the message:'],
+            text_se: ['Förhandsvisning av meddelandet:'],
           });
           queueMessage({
             text: dataText,
@@ -3375,6 +3648,7 @@ function attachCommands() {
           });
           queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
+            text_se: ['Är detta OK? Skriv in "yes" för att acceptera meddelandet'],
           });
         }
       },
@@ -3385,9 +3659,12 @@ function attachCommands() {
 
             queueMessage({
               text: [
-                'Do you want to send it as morse code too? ' +
-                '"yes" to send it as morse too',
+                'Do you want to send it as morse code too? "yes" to send it as morse too',
                 'Note! Only the first line will be sent as morse',
+              ],
+              text_se: [
+                'Vill ni också skicka det som morse? Skriv "yes" för att skicka det som morse',
+                'Notera att endast första raden skickas som morse',
               ],
             });
           } else {
@@ -3406,12 +3683,15 @@ function attachCommands() {
         }
       },
     ],
-    help: [
-      'Send an important message to a single device or all users',
-    ],
+    help: ['Send an important message to a single device or all users'],
+    help_se: ['Skicka ett viktigt meddelande till en enheter eller alla användare'],
     instructions: [
       'Follow the on-screen instructions',
       'Note! Only the first line can be sent as morse code (optional)',
+    ],
+    instructions_se: [
+      'Följ instruktionerna på skärmen',
+      'Notera att endast första raden skickas som morse (frivilligt)',
     ],
     accessLevel: 13,
     category: 'admin',
@@ -3431,11 +3711,16 @@ function attachCommands() {
           'CONTROL COMMAND SENT',
           'AWAITING CONFIRMATION',
         ],
+        text_se: [
+          'KONTROLLKOMMANDOT HAR SKICKATS',
+          'VÄNTAR PÅ KONFIRMATION',
+        ],
         extraClass: 'importantMsg',
       });
       queueMessage(copyMessage(abortInfo));
       queueMessage({
         text: ['Press Enter to continue'],
+        text_se: ['Tryck på enter-knappen för att fortsätta'],
       });
       setInputStart('Chipper');
     },
@@ -3449,6 +3734,10 @@ function attachCommands() {
             'Chipper has been activated',
             'Connecting to external system .....',
           ],
+          text_se: [
+            'Chipper har blivit aktiverad',
+            'Ansluter till externt system .....',
+          ],
         });
         setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
       },
@@ -3460,6 +3749,11 @@ function attachCommands() {
               'WARNING',
               'CONTROL IS BEING RELEASED',
               'CHIPPER POWERING DOWN',
+            ],
+            text_se: [
+              'VARNING',
+              'ANSLUTNINGEN STÄNGD',
+              'CHIPPER AVSLUTAS',
             ],
             extraClass: 'importantMsg',
           });
@@ -3492,6 +3786,10 @@ function attachCommands() {
           'Control has been released',
           'Chipper has powered down',
         ],
+        text_se: [
+          'Anslutningen har stängts',
+          'Chipper har avslutas',
+        ],
       });
       resetCommand();
     },
@@ -3499,9 +3797,12 @@ function attachCommands() {
       'Activate chipper function',
       'Press enter when you have retrieved confirmation from the external system',
     ],
-    instructions: [
-      'Follow the instructions on the screen',
+    help_se: [
+      'Aktivera chipperfunktionen',
+      'Tryck på enter-knappen när ni har fått konfirmation från externa systemet',
     ],
+    instructions: ['Follow the instructions on the screen'],
+    instructions_se: ['Följ instruktionerna på skärmen'],
     accessLevel: 13,
     category: 'hacking',
     clearBeforeUse: true,
@@ -3526,6 +3827,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You have to specify which room to switch to'],
+          text_se: ['Ni måste specificera vilket ni vill byta till'],
         });
       }
     },
@@ -3533,10 +3835,20 @@ function attachCommands() {
       'Switches your current room to another',
       'You have to already be following the room to switch to it',
     ],
+    help_se: [
+      'Byter nuvrande rum till ett annat',
+      'Ni måste redan följa rummet för att kunna byta till det',
+    ],
     instructions: [
       ' Usage:',
       '  room *room you are following*',
       ' Example:',
+      '  room room1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  room *rumsnamn på ett rum ni följer',
+      ' Exempel:',
       '  room room1',
     ],
     autocomplete: { type: 'myRooms' },
@@ -3556,6 +3868,10 @@ function attachCommands() {
             'Do you really want to remove the room?',
             'Confirm by writing "yes"',
           ],
+          text_se: [
+            'Vill ni verkligen ta bort rummet?',
+            'Skriv "ja" om ni är säkra',
+          ],
         });
 
         setInputStart('removeroom');
@@ -3564,6 +3880,7 @@ function attachCommands() {
 
         queueMessage({
           text: ['You forgot to input the room name'],
+          text_se: ['Ni glömde bort att skriva in ett rumsnamn'],
         });
       }
     },
@@ -3580,13 +3897,21 @@ function attachCommands() {
       'Removes a room',
       'You have to be either the owner or an admin of the room to remove it',
     ],
+    help_se: [
+      'Tar bort ett rum',
+      'Ni måste vara antingen ägaren eller en administratör av rummet för att kunna ta bort det',
+    ],
     instructions: [
       ' Usage:',
       '  removeroom *room name*',
-      '  *Follow the instructions*',
       ' Example:',
       '  removeroom room1',
-      '  *Follow the instructions*',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  removeroom *rumsnamn*',
+      ' Exempel:',
+      '  removeroom room1',
     ],
     accessLevel: 13,
     category: 'advanced',
@@ -3607,6 +3932,10 @@ function attachCommands() {
             'You need to write a user name, field name and value',
             'Example: updateuser user1 accesslevel 3',
           ],
+          text_se: [
+            'Ni måste skriva in ett användarnamn, fältnamn och värde',
+            'Exempel: updateuser user1 accesslevel 3',
+          ],
         });
       }
     },
@@ -3615,12 +3944,24 @@ function attachCommands() {
       'You can change visibility, accesslevel, password or add/remove a group',
       'Valid fields: visibility, accesslevel, addgroup, removegroup, password',
     ],
+    help_se: [
+      'Ändra ett fält hos en användare',
+      'Ni kan ändra visibility, accesslevel, password eller lägga till/ta bort en grupp',
+      'Giltiga fält: visibility, accesslevel, addgroup, removegroup, password',
+    ],
     instructions: [
       ' Usage:',
       '  updateuser *user name* *field name* *value*',
       ' Example:',
       '  updateuser user1 accesslevel 3',
       '  updateuser user1 group hackers',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  updateuser *användarnamn* *fältnamn* *värde',
+      ' Exempel:',
+      '  updateuser user1 accesslevel 3',
+      '  update user1 group hackers',
     ],
     autocomplete: { type: 'users' },
     accessLevel: 13,
@@ -3642,17 +3983,34 @@ function attachCommands() {
             'You need to write a command name, field name and value',
             'Example: updatecommand help accesslevel 3',
           ],
+          text_se: [
+            'Ni måste skriva in ett kommandonamn, fältnamn och värde',
+            'Exempel: updatecommand help accesslevel 3',
+          ],
         });
       }
     },
     help: [
       'Change fields on a command',
       'You can currently change visibility or accesslevel',
+      'Valid fields: visibility, accesslevel',
+    ],
+    help_se: [
+      'Ändra ett fält i ett kommando',
+      'Ni kan ändra visibility eller accesslevel',
+      'Giltiga fält: visibility, accesslevel',
     ],
     instructions: [
       ' Usage:',
       '  updatecommand *command name* *field name* *value*',
       ' Example:',
+      '  updatecommand help accesslevel 3',
+      '  updatecommand help visibility 6',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  updatecommand *kommandonamn* *fältnamn* *värde*',
+      ' Exempel:',
       '  updatecommand help accesslevel 3',
       '  updatecommand help visibility 6',
     ],
@@ -3675,6 +4033,10 @@ function attachCommands() {
             'You need to write a room name, field name and value',
             'Example: updateroom room1 accesslevel 3',
           ],
+          text_se: [
+            'Ni måste skriva in ett rumsnamn, fältnamn och värde',
+            'Exempel: updateroom room1 accesslevel 3',
+          ],
         });
       }
     },
@@ -3683,141 +4045,26 @@ function attachCommands() {
       'You can change visibility, accesslevel',
       'Valid fields: visibility, accesslevel',
     ],
+    help_se: [
+      'Ändra ett fält på ett rum',
+      'Ni kan ändra visibility, accesslevel',
+      'Giltiga fält: visibility, accesslevel',
+    ],
     instructions: [
       ' Usage:',
       '  updateroom *room name* *field name* *value*',
       ' Example:',
       '  updateroom user1 accesslevel 3',
     ],
+    instructions_se: [
+      ' Användning:',
+      '  updateroom *rumsnamn* *fältnamn* *värde*',
+      ' Exempel:',
+      '  updateroom user1 accesslevel 3',
+    ],
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'admin',
-  };
-  validCommands.addencryptionkeys = {
-    func: function addencryptionkeysCommand() {
-      const data = {};
-
-      data.keys = [];
-      commandHelper.data = data;
-
-      queueMessage({
-        text: createCommandStart('Add encryption keys').concat([
-          'You can add more than one key',
-          'Press enter without any input when you are done',
-        ]),
-      });
-      queueMessage(copyMessage(abortInfo));
-      queueMessage({
-        text: ['Input an encryption key:'],
-      });
-      setInputStart('Input key');
-    },
-    steps: [
-      function addencryptionkeysStepOne(phrases) {
-        const keyObj = {};
-
-        if (phrases.length > 0 && phrases[0] !== '') {
-          keyObj.key = phrases[0];
-
-          // TODO Remove hard coded reusable
-          if (phrases[1] && phrases[1].toLowerCase() === 'reusable') {
-            keyObj.reusable = true;
-          }
-
-          commandHelper.data.keys.push(keyObj);
-        } else {
-          queueMessage({
-            text: [
-              'Are you sure you want to add the keys?',
-              'Write "yes" to accept',
-            ],
-          });
-          commandHelper.onStep++;
-        }
-      },
-      function addencryptionkeysStepTwo(phrases) {
-        if (phrases[0].toLowerCase() === 'yes') {
-          queueMessage({
-            text: ['Uploading new keys...'],
-          });
-          socket.emit('addKeys', { keys: commandHelper.data.keys });
-          resetCommand();
-        } else {
-          queueMessage({
-            text: ['The keys will not be uploaded'],
-          });
-          resetCommand(true);
-        }
-      },
-    ],
-    help: [
-      'Add one or more encryption keys to the database',
-    ],
-    instructions: [
-      ' Usage:',
-      '  Follow the instructions',
-    ],
-    accessLevel: 13,
-    category: 'admin',
-    clearBeforeUse: true,
-  };
-  validCommands.addentities = {
-    func: function addentitiesCommand() {
-      const data = { entities: [] };
-      commandHelper.data = data;
-
-      queueMessage({
-        text: createCommandStart('Add entities').concat([
-          'You can add more than one entity',
-          'Press enter without any input when you are done',
-        ]),
-      });
-      queueMessage(copyMessage(abortInfo));
-      setInputStart('Input entity');
-    },
-    steps: [
-      function addentitiesStepOne(phrases) {
-        const entityObj = {};
-
-        if (phrases.length > 0 && phrases[0] !== '') {
-          entityObj.entityName = phrases[0];
-
-          commandHelper.data.entities.push(entityObj);
-        } else {
-          queueMessage({
-            text: [
-              'Are you sure you want to add the entities?',
-              'Write "yes" to accept',
-            ],
-          });
-          commandHelper.onStep++;
-        }
-      },
-      function addentitiesStepTwo(phrases) {
-        if (phrases[0].toLowerCase() === 'yes') {
-          queueMessage({
-            text: ['Uploading new entities...'],
-          });
-          socket.emit('addEntities', { entities: commandHelper.data.entities });
-          resetCommand();
-        } else {
-          queueMessage({
-            text: ['The entities will not be uploaded'],
-          });
-          resetCommand(true);
-        }
-      },
-    ],
-    help: [
-      'Add one or more entities to the database',
-    ],
-    instructions: [
-      ' Usage:',
-      '  Follow the instructions',
-    ],
-    accessLevel: 13,
-    category: 'admin',
-    clearBeforeUse: true,
   };
   validCommands.weather = {
     func: function weatherCommand() {
@@ -3842,6 +4089,10 @@ function attachCommands() {
             'You need to write a device Id, field name and value',
             'Example: updatedevice 11jfej433 id betteralias',
           ],
+          text_se: [
+            'Ni måste skriva in ett enhets-ID, fältnamn och värde',
+            'Exempel: updatedevice 11jfej433 id betteralias',
+          ],
         });
       }
     },
@@ -3850,81 +4101,25 @@ function attachCommands() {
       'You can currently change the alias',
       'Valid fields: alias',
     ],
+    help_se: [
+      'Ändra fält på en enhet',
+      'Ni kan ändra alias',
+      'Giltiga fält: alias',
+    ],
     instructions: [
       ' Usage:',
       '  updatedevice *device ID* *field name* *value*',
       ' Example:',
       '  updatedevice 32r23rj alias betteralias',
     ],
+    instructions_se: [
+      ' Användning:',
+      '  updatedevice *enhets-ID* *fältnamn* *värde*',
+      ' Exempel:',
+      '  updatedevice 32r23rj alias betteralias',
+    ],
     autocomplete: { type: 'devices' },
     accessLevel: 13,
-    category: 'admin',
-  };
-  validCommands.moduleraid = {
-    func: function moduleraidCommand() {
-      const data = {};
-
-      data.text = [];
-      commandHelper.data = data;
-
-      queueMessage({
-        text: [
-          'Write a coordinate and press enter',
-          'Press enter without any input when you are done ' +
-          'with the message',
-        ],
-      });
-      queueMessage(copyMessage(abortInfo));
-      setInputStart('moduleraid');
-    },
-    steps: [
-      function moduleraidStepOne(phrases) {
-        const startText = [
-          'Celestial activity detected!',
-          'Satellite have visual confirmation of active modules',
-          'Sending Organica retrieval squads to the following coordinates:',
-        ];
-
-        if (phrases.length > 0 && phrases[0] !== '') {
-          const phrase = phrases.join(' ');
-
-          commandHelper.data.text.push(phrase);
-        } else {
-          const text = commandHelper.data.text ? JSON.parse(JSON.stringify(commandHelper.data.text)) : [];
-          commandHelper.data.text = text.concat(startText, commandHelper.data.text);
-          commandHelper.onStep++;
-
-          queueMessage({
-            text: ['Preview of the message:'],
-          });
-          queueMessage({
-            text: text,
-            extraClass: 'importantMsg',
-          });
-          queueMessage({
-            text: ['Is this OK? "yes" to accept the message'],
-          });
-        }
-      },
-      function moduleraidStepTwo(phrases) {
-        if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-          commandHelper.data.morse = { local: true };
-          socket.emit('importantMsg', commandHelper.data);
-          resetCommand();
-        } else {
-          resetCommand(true);
-        }
-      },
-    ],
-    help: [
-      'Send a module raid message to all users',
-      'It will look like an important message',
-    ],
-    instructions: [
-      'Follow the on-screen instructions',
-    ],
-    accessLevel: 13,
-    clearAfterUse: true,
     category: 'admin',
   };
   validCommands.createteam = {
@@ -3938,6 +4133,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You have to enter a name'],
+          text_se: ['Ni måste skriva in ett namn'],
         });
       }
     },
@@ -3945,10 +4141,20 @@ function attachCommands() {
       'Create a new team',
       'You will be able to invite new members to the team',
     ],
+    help_se: [
+      'Skapa ett nytt team',
+      'Ni kommer att kunna bjuda in nya medlemmar till teamet',
+    ],
     instructions: [
       ' Usage:',
       '  createteam *name*',
       ' Example:',
+      '  createteam team1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  createteam *namn*',
+      ' Exempel:',
       '  createteam team1',
     ],
     accessLevel: 13,
@@ -3963,6 +4169,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: ['You are not allowed to invite members to the team or you are not in a team'],
+          text_se: ['Ni har antingen inte tillåtelse att bjuda in medlemmar till teamet eller är inte med i ett team'],
         });
       }
     },
@@ -3970,11 +4177,21 @@ function attachCommands() {
       'Invites another user to your team',
       'You have to be the team leader or an team administrator to invite new members',
     ],
+    help_se: [
+      'Bjuder in andra användare till ditt team',
+      'Ni måste vara ledare för teamet eller en administratör för teamet för att kunna bjuda in nya medlemmar',
+    ],
     instructions: [
       ' Usage:',
       '  inviteteam *user name*',
       ' Example:',
-      '  inviteteam barry',
+      '  inviteteam user1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  inviteteam *användarnamn*',
+      ' Exempel:',
+      '  inviteteam user1',
     ],
     accessLevel: 13,
     category: 'basic',
@@ -3992,12 +4209,17 @@ function attachCommands() {
       } else if (commandKeys.indexOf(aliasName) > -1) {
         queueMessage({
           text: [aliasName + ' is a built-in command. You may not override built-in commands'],
+          text_se: [aliasName + ' är ett inbyggt kommando. Inbyggda kommandon kan inte ersättas'],
         });
       } else {
         queueMessage({
           text: [
             'You have to input a name and sequence',
-            'E.g. alias goodalias msg hello',
+            'Example: alias goodalias msg hello',
+          ],
+          text_se: [
+            'Ni måste skriva in ett namn och sekvens',
+            'Exempel: alias goodalias msg hello',
           ],
         });
       }
@@ -4007,11 +4229,22 @@ function attachCommands() {
       'The shortcut will appear among other commands when you auto-complete',
       'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"',
     ],
+    help_se: [
+      'Skapa en ny genväg för ett kommando och en sekvens',
+      'Genvägen kommer att synas tillsammans med andra kommandon när ni använder autoifyllning',
+      'Nedan kan ni se ett exempel som skickar ett meddelande (via kommandot "msg") när "hello" körs',
+    ],
     instructions: [
       ' Usage:',
       '  alias *alias name* *command name* *sequence*',
       ' Example:',
       '  alias hello msg Greetings to all!',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  alias *namn* *kommandonamn* *sekvens*',
+      ' Exempel:',
+      '  alias hello msg God dag, folket!',
     ],
     accessLevel: 13,
     category: 'basic',

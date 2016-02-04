@@ -17,9 +17,6 @@ const logger = require('../logger');
 const messenger = require('../messenger');
 const deviceManagement = require('./socketHandlers/deviceManagement');
 
-// Blodsband specific
-const blodsband = require('./socketHandlers/blodsband');
-
 function generateWeatherReport(jsonObj) {
   const weatherRep = {};
 
@@ -67,7 +64,6 @@ function handle(io) {
     deviceManagement.handle(socket, io);
     team.handle(socket, io);
     hacking.handle(socket, io);
-    blodsband.handle(socket, io);
 
     socket.on('disconnect', function() {
       dbConnector.getUserById(socket.id, function(err, user) {

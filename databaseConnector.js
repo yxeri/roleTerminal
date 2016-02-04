@@ -112,19 +112,6 @@ const missionSchema = new mongoose.Schema({
   accessLevel: Number,
 }, { collection: 'missions' });
 
-// Blodsband specific schemas
-const entitySchema = new mongoose.Schema({
-  entityName: { type: String, unique: true },
-  keys: [String],
-  verified: [Boolean],
-}, { collection: 'entities' });
-const encryptionKeySchema = new mongoose.Schema({
-  key: { type: String, unique: true },
-  used: Boolean,
-  usedBy: String,
-  reusable: Boolean,
-}, { collection: 'encryptionKeys' });
-
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
 const History = mongoose.model('History', historySchema);
@@ -134,10 +121,6 @@ const Device = mongoose.model('Device', deviceSchema);
 const Team = mongoose.model('Team', teamSchema);
 const Weather = mongoose.model('Weather', weatherSchema);
 const Mission = mongoose.model('Mission', missionSchema);
-
-// Blodsband specific
-const Entity = mongoose.model('Entity', entitySchema);
-const EncryptionKey = mongoose.model('EncryptionKey', encryptionKeySchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName: userName };
@@ -257,28 +240,6 @@ function addTeam(team, callback) {
   });
 }
 
-function addEncryptionKeys(keys, callback) {
-  let newKey;
-
-  const findCallback = function(err, foundKey) {
-    if (err) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find an encryption key', err);
-    } else if (foundKey === null) {
-      saveObject(newKey, 'encryption key', callback);
-    } else {
-      callback(err, null);
-    }
-  };
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    newKey = new EncryptionKey(key);
-    const query = { key: key.key };
-
-    EncryptionKey.findOne(query).lean().exec(findCallback);
-  }
-}
-
 function updateDeviceAlias(deviceId, value, callback) {
   const query = { deviceId: deviceId };
   const update = { $set: { deviceAlias: value } };
@@ -371,83 +332,6 @@ function addGroupToUser(userName, group, callback) {
   });
 }
 
-function addEntity(query, newEntity, callback) {
-  Entity.findOne(query).lean().exec(function(err, foundEntity) {
-    callback(err, foundEntity, newEntity);
-  });
-}
-
-function addEntities(entities, callback) {
-  const findCallback = function(err, foundEntity, newEntity) {
-    if (err) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find an entity', err);
-    } else if (foundEntity === null) {
-      saveObject(newEntity, 'entity', callback);
-    } else {
-      callback(err, null);
-    }
-  };
-
-  for (let i = 0; i < entities.length; i++) {
-    const entity = entities[i];
-    const query = { entityName: entity.entityName };
-    const newEntity = new Entity(entity);
-
-    addEntity(query, newEntity, findCallback);
-  }
-}
-
-function unlockEntity(sentKey, sentEntityName, sentUserName, callback) {
-  const keyQuery = { key: sentKey };
-  const keyUpdate = { used: true, usedBy: sentUserName };
-
-  EncryptionKey.findOneAndUpdate(keyQuery, keyUpdate).lean().exec(function(err, key) {
-    if (err || key === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update key ' + sentKey, err);
-      callback(err, null);
-    } else if (key.reusable || !key.used) {
-      const entityQuery = { entityName: sentEntityName };
-      const entityUpdate = { $push: { keys: key.key } };
-
-      Entity.findOneAndUpdate(entityQuery, entityUpdate).lean().exec(function(entityErr, entity) {
-        if (entityErr || entity === null) {
-          const rollbackQuery = { key: sentKey };
-          const rollbackUpdate = { used: false, usedBy: '' };
-
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to find and update entity', entityErr);
-
-          // Rollback
-          EncryptionKey.findOneAndUpdate(rollbackQuery, rollbackUpdate).lean().exec(function(keyErr) {
-            if (keyErr) {
-              logger.sendErrorMsg(logger.ErrorCodes.db,
-                'Failed to do a rollback on key',
-                sentKey
-              );
-            }
-          });
-        }
-
-        callback(entityErr, entity);
-      });
-    } else {
-      callback(err, null);
-    }
-  });
-}
-
-function getAllEntities(callback) {
-  const sort = { entityName: 1 };
-  const filter = { _id: 0 };
-
-  Entity.find({}, filter).sort(sort).lean().exec(function(err, entities) {
-    if (err || entities === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all entities', err);
-    }
-
-    callback(err, entities);
-  });
-}
-
 function getAllCommands(callback) {
   const filter = { _id: 0 };
 
@@ -457,19 +341,6 @@ function getAllCommands(callback) {
     }
 
     callback(err, commands);
-  });
-}
-
-function getEncryptionKey(sentKey, callback) {
-  const query = { key: sentKey };
-  const filter = { _id: 0 };
-
-  EncryptionKey.findOne(query, filter).lean().exec(function(err, key) {
-    if (err) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get encryption key', err);
-    }
-
-    callback(err, key);
   });
 }
 
@@ -1242,10 +1113,3 @@ exports.getAllMissions = getAllMissions;
 exports.updateMissionCompleted = updateMissionCompleted;
 exports.updateMissionReward = updateMissionReward;
 exports.matchPartialUser = matchPartialUser;
-
-// Blodsband specific
-exports.addEncryptionKeys = addEncryptionKeys;
-exports.addEntities = addEntities;
-exports.unlockEntity = unlockEntity;
-exports.getAllEntities = getAllEntities;
-exports.getEncryptionKey = getEncryptionKey;

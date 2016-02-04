@@ -341,7 +341,7 @@ function generateFullRow(sentText, message) {
     }
   }
 
-  if (message.userName) {
+  if (!message.hideName && message.userName) {
     rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
   }
 
@@ -3575,6 +3575,7 @@ function attachCommands() {
         message: {
           text: [],
           userName: getUser(),
+          hideName: true,
         },
       };
       commandHelper.data = data;

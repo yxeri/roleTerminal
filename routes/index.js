@@ -230,7 +230,7 @@ function handle(io) {
     });
 
     socket.on('getStoredMessages', function() {
-      socket.emit('storedMessages', { storedMessages: require('../node_modules/rolehaven-config/lib/messages') });
+      socket.emit('storedMessages', { storedMessages: require('rolehaven-config').messages });
     });
   });
 

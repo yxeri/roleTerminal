@@ -5,7 +5,7 @@ const path = require('path');
 const htmlMinifier = require('html-minifier');
 const minifier = require('node-minify');
 const logger = require('./logger');
-const config = require('./config/serverConfig');
+const appConfig = require('rolehaven-config').app;
 const browserify = require('browserify');
 
 /**
@@ -82,7 +82,7 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
     });
   }
 
-  if (extension === 'js' && config.transpileEs6) {
+  if (extension === 'js' && appConfig.transpileEs6) {
     const transpilePath = inPath + '-transpile';
     let file;
 
@@ -136,11 +136,11 @@ function minifyFile(filePath, outPath) {
   if (extension === 'html') {
     htmlMinify(filePath, outPath);
   } else if (extension === 'js') {
-    type = config.mode === 'dev' ? 'no-compress' : 'uglifyjs';
+    type = appConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
 
     nodeMinify(filePath, outPath, type, extension);
   } else if (extension === 'css') {
-    type = config.mode === 'dev' ? 'no-compress' : 'sqwish';
+    type = appConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
 
     nodeMinify(filePath, outPath, type);
   }

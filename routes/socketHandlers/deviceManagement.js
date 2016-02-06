@@ -3,13 +3,13 @@
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const messenger = require('../../messenger');
-const dbDefaults = require('../../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
 
 function handle(socket) {
   // TODO Sub-command?
   socket.on('listDevices', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       } else if (user.accessLevel < 11) {
@@ -60,7 +60,7 @@ function handle(socket) {
   });
 
   socket.on('updateDevice', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.updatedevice.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.updatedevice.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }

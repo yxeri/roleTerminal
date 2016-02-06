@@ -2,13 +2,12 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
-const messenger = require('../../messenger');
-const dbDefaults = require('../../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
 
 function handle(socket) {
   socket.on('getAllMissions', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.jobs.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.jobs.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -24,7 +23,7 @@ function handle(socket) {
   });
 
   socket.on('getActiveMissions', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.jobs.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.jobs.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }

@@ -6,11 +6,11 @@ const app = require('../app');
 const path = require('path');
 const logger = require('../logger');
 const minifier = require('../minifier');
-const config = require('../config/serverConfig');
+const appConfig = require('rolehaven-config').app;
 
 function resolvePath(dir, secondDir) {
-  const privatePath = path.resolve(path.join(config.privateBase, dir));
-  const publicPath = path.resolve(path.join(config.publicBase, secondDir || dir));
+  const privatePath = path.resolve(path.join(appConfig.privateBase, dir));
+  const publicPath = path.resolve(path.join(appConfig.publicBase, secondDir || dir));
 
   return { publicPath: publicPath, privatePath: privatePath };
 }
@@ -21,13 +21,13 @@ function resolvePath(dir, secondDir) {
  * @returns {undefined} Returns undefined
  */
 function minifyDirs() {
-  minifier.minifyDir(resolvePath(config.paths.views), 'html');
-  minifier.minifyDir(resolvePath(config.paths.styles), 'css');
-  minifier.minifyDir(resolvePath(config.paths.scripts), 'js');
+  minifier.minifyDir(resolvePath(appConfig.viewsPath), 'html');
+  minifier.minifyDir(resolvePath(appConfig.stylesPath), 'css');
+  minifier.minifyDir(resolvePath(appConfig.scriptsPath), 'js');
 }
 
 function moveRequired() {
-  const pathObj = resolvePath(config.paths.required, config.paths.scripts);
+  const pathObj = resolvePath(appConfig.requiredPath, appConfig.scriptsPath);
 
   fs.readdir(pathObj.privatePath, function(readErr, files) {
     if (readErr) {
@@ -47,9 +47,9 @@ function moveRequired() {
  * Checks if the public directory.
  * Creats it if it doesn't exist
  */
-fs.stat(path.resolve(config.publicBase), function(err) {
+fs.stat(path.resolve(appConfig.publicBase), function(err) {
   if (err) {
-    fs.mkdir(path.resolve(config.publicBase), function(dirErr) {
+    fs.mkdir(path.resolve(appConfig.publicBase), function(dirErr) {
       logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', dirErr);
     });
   }
@@ -59,7 +59,7 @@ fs.stat(path.resolve(config.publicBase), function(err) {
 });
 
 // Sets server port
-app.set('port', config.port);
+app.set('port', appConfig.port);
 
 /*
  * Starts Express server

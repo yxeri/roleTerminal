@@ -1,7 +1,7 @@
 'use strict';
 
 const dbConnector = require('./databaseConnector');
-const dbDefaults = require('./config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('./logger');
 const objectValidator = require('./objectValidator');
 
@@ -71,7 +71,7 @@ function sendImportantMsg(params) {
   const data = {
     message: params.message,
   };
-  data.message.roomName = data.message.roomName || dbDefaults.rooms.important.roomName;
+  data.message.roomName = data.message.roomName || databasePopulation.rooms.important.roomName;
   data.message.extraClass = 'importantMsg';
   data.message.time = new Date();
 
@@ -124,7 +124,7 @@ function sendWhisperMsg(params) {
   const data = {
     message: params.message,
   };
-  data.message.roomName += dbDefaults.whisper;
+  data.message.roomName += databasePopulation.whisper;
   data.message.extraClass = 'whisperMsg';
   data.message.time = new Date();
 
@@ -137,7 +137,7 @@ function sendWhisperMsg(params) {
       return;
     }
 
-    const senderRoomName = data.message.userName + dbDefaults.whisper;
+    const senderRoomName = data.message.userName + databasePopulation.whisper;
 
     addMsgToHistory(senderRoomName, data.message, socket, function(senderErr) {
       if (senderErr) {
@@ -156,7 +156,7 @@ function sendBroadcastMsg(params) {
     message: params.message,
   };
   data.message.extraClass = 'broadcastMsg';
-  data.message.roomName = dbDefaults.rooms.broadcast.roomName;
+  data.message.roomName = databasePopulation.rooms.broadcast.roomName;
   data.message.time = new Date();
 
   if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true, time: true, extraClass: true } })) {

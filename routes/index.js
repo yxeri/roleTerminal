@@ -9,10 +9,9 @@ const commandManagement = require('./socketHandlers/commandManagement');
 const team = require('./socketHandlers/team');
 const hacking = require('./socketHandlers/hacking');
 const manager = require('../manager');
-const appConfig = require('../config/appConfig');
-const serverConfig = require('../config/serverConfig');
+const appConfig = require('rolehaven-config').app;
 const http = require('http');
-const dbDefaults = require('../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../logger');
 const messenger = require('../messenger');
 const deviceManagement = require('./socketHandlers/deviceManagement');
@@ -53,7 +52,7 @@ function handle(io) {
   router.get('/', function(req, res) {
     res.render('index', {
       title: appConfig.title,
-      socketPath: serverConfig.socketPath,
+      socketPath: appConfig.socketPath,
     });
   });
 
@@ -99,7 +98,7 @@ function handle(io) {
 
     // TODO This should be moved
     socket.on('locate', function(data) {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.locate.commandName, function(allowErr, allowed, user) {
+      manager.userAllowedCommand(socket.id, databasePopulation.commands.locate.commandName, function(allowErr, allowed, user) {
         if (allowErr || !allowed) {
           return;
         }
@@ -145,7 +144,7 @@ function handle(io) {
 
     // TODO This should be moved
     socket.on('time', function() {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.time.commandName, function(allowErr, allowed) {
+      manager.userAllowedCommand(socket.id, databasePopulation.commands.time.commandName, function(allowErr, allowed) {
         if (allowErr || !allowed) {
           return;
         }
@@ -155,7 +154,7 @@ function handle(io) {
     });
 
     socket.on('weather', function() {
-      manager.userAllowedCommand(socket.id, dbDefaults.commands.weather.commandName, function(allowErr, allowed) {
+      manager.userAllowedCommand(socket.id, databasePopulation.commands.weather.commandName, function(allowErr, allowed) {
         if (allowErr || !allowed) {
           return;
         }
@@ -214,7 +213,7 @@ function handle(io) {
       const socketId = data.user.socketId;
       const userName = data.user.userName;
 
-      socket.join(deviceId + dbDefaults.device);
+      socket.join(deviceId + databasePopulation.device);
 
       dbConnector.updateDeviceSocketId(deviceId, socketId, userName, function(err, device) {
         if (err || device === null) {
@@ -231,7 +230,7 @@ function handle(io) {
     });
 
     socket.on('getStoredMessages', function() {
-      socket.emit('storedMessages', { storedMessages: require('../config/messages') });
+      socket.emit('storedMessages', { storedMessages: require('../node_modules/rolehaven-config/lib/messages') });
     });
   });
 

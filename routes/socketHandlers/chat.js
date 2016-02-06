@@ -2,8 +2,8 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
-const dbDefaults = require('../../config/dbPopDefaults');
-const appConfig = require('../../config/appConfig');
+const databasePopulation = require('rolehaven-config').databasePopulation;
+const appConfig = require('rolehaven-config').app;
 const logger = require('../../logger');
 const messenger = require('../../messenger');
 const objectValidator = require('../../objectValidator');
@@ -30,7 +30,7 @@ function followRoom(params) {
 
 function handle(socket) {
   socket.on('chatMsg', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.msg.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -40,7 +40,7 @@ function handle(socket) {
   });
 
   socket.on('whisperMsg', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.whisper.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.whisper.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -50,7 +50,7 @@ function handle(socket) {
   });
 
   socket.on('broadcastMsg', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.broadcast.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.broadcast.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -64,7 +64,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.createroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.createroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -100,7 +100,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.follow.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.follow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -140,7 +140,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.switchroom.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.switchroom.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -164,7 +164,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.unfollow.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.unfollow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -207,7 +207,7 @@ function handle(socket) {
 
   // Shows all available rooms
   socket.on('listRooms', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -239,7 +239,7 @@ function handle(socket) {
   });
 
   socket.on('listUsers', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -295,16 +295,16 @@ function handle(socket) {
     function shouldBeHidden(room) {
       const hiddenRooms = [
         socket.id,
-        data.user.userName + dbDefaults.whisper,
-        data.device.deviceId + dbDefaults.device,
-        dbDefaults.rooms.important.roomName,
-        dbDefaults.rooms.broadcast.roomName,
+        data.user.userName + databasePopulation.whisper,
+        data.device.deviceId + databasePopulation.device,
+        databasePopulation.rooms.important.roomName,
+        databasePopulation.rooms.broadcast.roomName,
       ];
 
       return hiddenRooms.indexOf(room) >= 0;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.myrooms.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.myrooms.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
@@ -353,7 +353,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.history.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -381,7 +381,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.morse.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.morse.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -399,7 +399,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.removeroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.removeroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -426,7 +426,7 @@ function handle(socket) {
   });
 
   socket.on('importantMsg', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.importantmsg.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.importantmsg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -439,7 +439,7 @@ function handle(socket) {
             return;
           }
 
-          data.roomName = device.deviceId + dbDefaults.device;
+          data.roomName = device.deviceId + databasePopulation.device;
 
           messenger.sendImportantMsg({ socket: socket, message: data.message, toOneDevice: true });
         });
@@ -451,7 +451,7 @@ function handle(socket) {
 
   // TODO Change this, quick fix implementation
   socket.on('followPublic', function() {
-    socket.join(dbDefaults.rooms.public.roomName);
+    socket.join(databasePopulation.rooms.public.roomName);
   });
 
   socket.on('updateRoom', function(data) {
@@ -459,7 +459,7 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.updateroom.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.updateroom.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }

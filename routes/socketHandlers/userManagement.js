@@ -1,10 +1,10 @@
 'use strict';
 
 const dbConnector = require('../../databaseConnector');
-const dbDefaults = require('../../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const manager = require('../../manager');
 const logger = require('../../logger');
-const appConfig = require('../../config/appConfig');
+const appConfig = require('rolehaven-config').app;
 const messenger = require('../../messenger');
 const objectValidator = require('../../objectValidator');
 
@@ -14,7 +14,7 @@ function isTextAllowed(text) {
 
 function handle(socket, io) {
   socket.on('userExists', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.register.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
         socket.emit('commandFail');
 
@@ -47,7 +47,7 @@ function handle(socket, io) {
   });
 
   socket.on('register', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.register.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
         return;
       }
@@ -58,9 +58,9 @@ function handle(socket, io) {
         socketId: '',
         password: data.user.password,
         registerDevice: data.user.registerDevice,
-        mode: dbDefaults.modes.command,
+        mode: databasePopulation.modes.command,
         verified: !appConfig.userVerify ? true : false,
-        rooms: [dbDefaults.rooms.public.roomName],
+        rooms: [databasePopulation.rooms.public.roomName],
       };
 
       // TODO Refactor the inner code
@@ -86,9 +86,9 @@ function handle(socket, io) {
         const newRoom = {};
 
         message.time = new Date();
-        message.roomName = dbDefaults.rooms.admin.roomName;
+        message.roomName = databasePopulation.rooms.admin.roomName;
 
-        newRoom.roomName = user.userName + dbDefaults.whisper;
+        newRoom.roomName = user.userName + databasePopulation.whisper;
         newRoom.visibility = 12;
         newRoom.accessLevel = 12;
 
@@ -127,7 +127,7 @@ function handle(socket, io) {
   // TODO Rename to reflect the function
   socket.on('updateId', function(data) {
     if (data.user.userName === null) {
-      const publicRoom = dbDefaults.rooms.public.roomName;
+      const publicRoom = databasePopulation.rooms.public.roomName;
 
       socket.join(publicRoom);
       socket.emit('reconnectSuccess', { anonUser: true, firstConnection: data.firstConnection });
@@ -137,7 +137,7 @@ function handle(socket, io) {
           return;
         } else if (user === null) {
           socket.emit('disconnectUser');
-          socket.join(dbDefaults.rooms.public.roomName);
+          socket.join(databasePopulation.rooms.public.roomName);
 
           return;
         }
@@ -184,7 +184,7 @@ function handle(socket, io) {
   socket.on('login', function(data) {
     const user = data.user;
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.login.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.login.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !user.userName || !user.password) {
         return;
       }
@@ -223,7 +223,7 @@ function handle(socket, io) {
             const oldRooms = Object.keys(oldSocket.rooms);
 
             for (let i = 1; i < oldRooms.length; i++) {
-              if (oldRooms[i].indexOf(dbDefaults.device) < 0) {
+              if (oldRooms[i].indexOf(databasePopulation.device) < 0) {
                 oldSocket.leave(oldRooms[i]);
               }
             }
@@ -256,7 +256,7 @@ function handle(socket, io) {
   });
 
   socket.on('checkPassword', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.password.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
@@ -281,7 +281,7 @@ function handle(socket, io) {
   });
 
   socket.on('changePassword', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.password.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       } else if (!data.newPassword) {
@@ -316,7 +316,7 @@ function handle(socket, io) {
   });
 
   socket.on('logout', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.logout.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.logout.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         return;
       }
@@ -340,7 +340,7 @@ function handle(socket, io) {
           const rooms = Object.keys(socket.rooms);
 
           for (let i = 1; i < rooms.length; i++) {
-            if (rooms[i].indexOf(dbDefaults.device) < 0) {
+            if (rooms[i].indexOf(databasePopulation.device) < 0) {
               socket.leave(rooms[i]);
             }
           }
@@ -358,7 +358,7 @@ function handle(socket, io) {
   });
 
   socket.on('verifyUser', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.verifyuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -384,7 +384,7 @@ function handle(socket, io) {
   });
 
   socket.on('verifyAllUsers', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.verifyuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -416,7 +416,7 @@ function handle(socket, io) {
   });
 
   socket.on('unverifiedUsers', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.verifyuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -449,7 +449,7 @@ function handle(socket, io) {
   });
 
   socket.on('ban', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.banuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.banuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -499,7 +499,7 @@ function handle(socket, io) {
   });
 
   socket.on('unban', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.unbanuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -524,7 +524,7 @@ function handle(socket, io) {
   });
 
   socket.on('bannedUsers', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.unbanuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -561,7 +561,7 @@ function handle(socket, io) {
   });
 
   socket.on('updateUser', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.updateuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.updateuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
       }
@@ -618,7 +618,7 @@ function handle(socket, io) {
   });
 
   socket.on('updateMode', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.mode.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.mode.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
@@ -636,7 +636,7 @@ function handle(socket, io) {
   });
 
   socket.on('whoAmI', function() {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.whoami.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
@@ -658,7 +658,7 @@ function handle(socket, io) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.list.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       dbConnector.matchPartialUser(data.partialName, user, function(err, users) {
         if (err) {
           return;

@@ -1,7 +1,7 @@
 'use strict';
 
 const dbConnector = require('../../databaseConnector');
-const dbDefaults = require('../../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const manager = require('../../manager');
 const logger = require('../../logger');
 
@@ -28,7 +28,7 @@ function getTeam(socket, user, callback) {
 
 function handle(socket) {
   socket.on('getTeam', function() {
-    const cmdName = dbDefaults.commands.inviteteam.commandName;
+    const cmdName = databasePopulation.commands.inviteteam.commandName;
 
     manager.userAllowedCommand(socket.id, cmdName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
@@ -44,7 +44,7 @@ function handle(socket) {
   });
 
   socket.on('inviteToTeam', function(data) {
-    const cmdName = dbDefaults.commands.inviteteam.commandName;
+    const cmdName = databasePopulation.commands.inviteteam.commandName;
 
     manager.userAllowedCommand(socket.id, cmdName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !data.user || !data.user.userName) {
@@ -68,7 +68,7 @@ function handle(socket) {
   });
 
   socket.on('createTeam', function(data) {
-    const cmdName = dbDefaults.commands.createteam.commandName;
+    const cmdName = databasePopulation.commands.createteam.commandName;
 
     manager.userAllowedCommand(socket.id, cmdName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !data.team || !data.team.teamName) {

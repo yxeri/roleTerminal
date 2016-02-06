@@ -1,9 +1,9 @@
 'use strict';
 
 const dbConnector = require('./databaseConnector');
-const dbDefaults = require('./config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('./logger.js');
-const appConfig = require('./config/appConfig');
+const appConfig = require('rolehaven-config').app;
 
 const messageSort = function(a, b) {
   if (a.time < b.time) {
@@ -134,11 +134,11 @@ function updateUserSocketId(socketId, userName, callback) {
 function joinRooms(rooms, socket, device) {
   const allRooms = rooms;
 
-  allRooms.push(dbDefaults.rooms.important.roomName);
-  allRooms.push(dbDefaults.rooms.broadcast.roomName);
+  allRooms.push(databasePopulation.rooms.important.roomName);
+  allRooms.push(databasePopulation.rooms.broadcast.roomName);
 
   if (device) {
-    allRooms.push(device + dbDefaults.device);
+    allRooms.push(device + databasePopulation.device);
   }
 
   for (let i = 0; i < allRooms.length; i++) {

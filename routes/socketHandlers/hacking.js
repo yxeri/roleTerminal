@@ -2,14 +2,14 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
-const dbDefaults = require('../../config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
 
 function handle(socket) {
   socket.on('roomHackable', function(roomName) {
     const roomNameLower = roomName.toLowerCase();
 
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.hackroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
         logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to hack the room. Something is broken');
 
@@ -30,7 +30,7 @@ function handle(socket) {
   });
 
   socket.on('hackRoom', function(data) {
-    manager.userAllowedCommand(socket.id, dbDefaults.commands.hackroom.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.hackroom.commandName, function(allowErr, allowed, user) {
       if (allowed) {
         const roomName = data.room.roomName.toLowerCase();
 

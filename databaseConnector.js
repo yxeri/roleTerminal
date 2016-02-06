@@ -2,12 +2,12 @@
 
 const ObjectId = require('mongodb').ObjectID;
 const mongoose = require('mongoose');
-const serverConfig = require('./config/serverConfig');
+const appConfig = require('rolehaven-config').app;
 const logger = require('./logger');
 const dbPath = 'mongodb://' +
-               serverConfig.dbHost + ':' +
-               serverConfig.dbPort + '/' +
-               serverConfig.dbName;
+               appConfig.dbHost + ':' +
+               appConfig.dbPort + '/' +
+               appConfig.dbName;
 
 mongoose.connect(dbPath, function(err) {
   if (err) {

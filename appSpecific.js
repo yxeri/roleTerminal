@@ -1,7 +1,7 @@
 'use strict';
 
 const dbConnector = require('./databaseConnector');
-const dbDefaults = require('./config/dbPopDefaults');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 
 /**
  * Gets called from app.js. Triggers the app specific code
@@ -9,9 +9,9 @@ const dbDefaults = require('./config/dbPopDefaults');
  * @returns {undefined} Returns undefined
  */
 function run() {
-  dbConnector.populateDbUsers(dbDefaults.users);
-  dbConnector.populateDbRooms(dbDefaults.rooms, dbDefaults.users.superuser);
-  dbConnector.populateDbCommands(dbDefaults.commands);
+  dbConnector.populateDbUsers(databasePopulation.users);
+  dbConnector.populateDbRooms(databasePopulation.rooms, databasePopulation.users.superuser);
+  dbConnector.populateDbCommands(databasePopulation.commands);
 }
 
 module.exports = run;

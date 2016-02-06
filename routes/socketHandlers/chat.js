@@ -18,6 +18,7 @@ function followRoom(params) {
       socket: socket,
       message: {
         text: [params.userName + ' is following ' + newRoomName],
+        text_se: [params.username + ' följer ' + newRoomName],
         roomName: newRoomName,
       },
       sendTo: newRoomName,
@@ -77,7 +78,10 @@ function handle(socket) {
         } else if (!roomName) {
           messenger.sendSelfMsg({
             socket: socket,
-            message: { text: ['Failed to create room. A room with that name already exists'] },
+            message: {
+              text: ['Failed to create room. A room with that name already exists'],
+              text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
+            },
           });
 
           return;
@@ -88,7 +92,10 @@ function handle(socket) {
 
         messenger.sendSelfMsg({
           socket: socket,
-          message: { text: ['Room has been created'] },
+          message: {
+            text: ['Room has been created'],
+            text_se: ['Rummet har skapats'],
+          },
         });
         followRoom({ socket: socket, userName: user.userName, newRoom: room });
       });
@@ -153,7 +160,10 @@ function handle(socket) {
       } else {
         messenger.sendSelfMsg({
           socket: socket,
-          message: { text: ['You are not following room ' + data.room.roomName] },
+          message: {
+            text: ['You are not following room ' + data.room.roomName],
+            text_se: ['Ni följer inte rummet' + data.room.roomName],
+          },
         });
       }
     });
@@ -189,7 +199,11 @@ function handle(socket) {
 
             messenger.sendMsg({
               socket: socket,
-              message: { text: [userName + ' left ' + roomName], roomName: roomName },
+              message: {
+                text: [userName + ' left ' + roomName],
+                text_se: [userName + ' lämnade' + roomName],
+                roomName: roomName,
+              },
               sendTo: roomName,
             });
             socket.leave(roomName);
@@ -199,7 +213,10 @@ function handle(socket) {
       } else {
         messenger.sendSelfMsg({
           socket: socket,
-          message: { text: ['You are not following ' + roomName] },
+          message: {
+            text: ['You are not following ' + roomName],
+            text_se: ['Ni följer inte ' + roomName],
+          },
         });
       }
     });
@@ -413,11 +430,18 @@ function handle(socket) {
           return;
         }
 
-        messenger.sendSelfMsg({ socket: socket, message: { text: ['Removed the room'] } });
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['Removed the room'],
+            text_se: ['Rummet borttaget'],
+          },
+        });
         messenger.sendMsg({
           socket: socket,
           message: {
             text: ['Room ' + roomNameLower + ' has been removed by the room administrator'],
+            text_se: ['Rummet ' + roomNameLower + ' har blivit borttaget av en administratör för rummet'],
           },
           sendTo: roomNameLower,
         });
@@ -476,7 +500,10 @@ function handle(socket) {
 
         messenger.sendSelfMsg({
           socket: socket,
-          message: { text: ['Room has been updated'] },
+          message: {
+            text: ['Room has been updated'],
+            text_se: ['Rummet har uppdaterats'],
+          },
         });
       };
 

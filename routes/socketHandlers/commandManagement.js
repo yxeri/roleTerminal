@@ -14,7 +14,11 @@ function handle(socket) {
           message: {
             text: [
               'Failure to retrieve commands',
-              'Please try rebooting with "reboot"',
+              'Please try rebooting with the command "reboot"',
+            ],
+            text_se: [
+              'Lyckades inte hämta kommandon',
+              'Försök att starta om med kommandot "reboot"',
             ],
           },
           socket: socket,
@@ -43,6 +47,7 @@ function handle(socket) {
           messenger.sendSelfMsg({
             message: {
               text: ['Command has been updated'],
+              text_se: ['Kommandot har uppdaterats'],
             },
             socket: socket,
           });

@@ -2,6 +2,7 @@
 
 const dbConnector = require('./databaseConnector');
 const databasePopulation = require('rolehaven-config').databasePopulation;
+const appConfig = require('rolehaven-config').app;
 const logger = require('./logger');
 const objectValidator = require('./objectValidator');
 
@@ -43,6 +44,7 @@ function isSocketFollowingRoom(socket, roomName) {
     sendSelfMsg({
       message: {
         text: ['You are not following room ' + roomName],
+        text_se: ['Ni följer inte rummet ' + roomName],
       },
     });
 
@@ -87,7 +89,10 @@ function sendImportantMsg(params) {
     if (params.toOneDevice) {
       socket.to(data.message.roomName).emit('importantMsg', data);
       sendSelfMsg({
-        message: { text: ['Sent important message to device'] },
+        message: {
+          text: ['Sent important message to device'],
+          text_se: ['Skickade viktigt meddelande till enheten'],
+        },
       });
     } else {
       socket.broadcast.emit('importantMsg', data);

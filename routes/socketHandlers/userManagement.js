@@ -31,9 +31,8 @@ function handle(socket, io) {
           messenger.sendSelfMsg({
             socket: socket,
             message: {
-              text: [
-                'User with that name already exists',
-              ],
+              text: ['User with that name already exists'],
+              text_se: ['En användare med det namnet existerar redan'],
             },
           });
           socket.emit('commandFail');
@@ -73,9 +72,8 @@ function handle(socket, io) {
           messenger.sendSelfMsg({
             socket: socket,
             message: {
-              text: [
-                userName + ' already exists',
-              ],
+              text: [userName + ' already exists'],
+              text_se: [userName + ' existerar redan'],
             },
           });
 
@@ -96,9 +94,8 @@ function handle(socket, io) {
           messenger.sendMsg({
             socket: socket,
             message: {
-              text: [
-                'User ' + user.userName + ' needs to be verified',
-              ],
+              text: ['User ' + user.userName + ' needs to be verified'],
+              text_se: ['Användaren ' + user.userName + ' måste bli verifierad'],
             },
             sendTo: message.roomName,
           });
@@ -107,9 +104,8 @@ function handle(socket, io) {
         messenger.sendSelfMsg({
           socket: socket,
           message: {
-            text: [
-              user.userName + ' has been registered!',
-            ],
+            text: [user.userName + ' has been registered!'],
+            text_se: [userUserName + ' har blivit registerad!'],
           },
         });
 
@@ -236,6 +232,10 @@ function handle(socket, io) {
                   'Your user has been logged in on another device',
                   'You have been logged out',
                 ],
+                text_se: [
+                  'Din användare har loggat in på en annan enhet',
+                  'Ni har blivit urloggade',
+                ],
               },
             });
           }
@@ -308,6 +308,7 @@ function handle(socket, io) {
             socket: socket,
             message: {
               text: ['Password has been successfully changed!'],
+              text_se: ['Lösenordet har ändrats!'],
             },
           });
         });
@@ -350,6 +351,7 @@ function handle(socket, io) {
             socket: socket,
             message: {
               text: ['You have been logged out'],
+              text_se: ['Ni har blivit urloggade'],
             },
           });
         });
@@ -376,6 +378,7 @@ function handle(socket, io) {
             socket: socket,
             message: {
               text: ['User ' + user.userName + ' has been verified'],
+              text_se: ['Användaren ' + user.userName + ' har blivit verifierad'],
             },
           });
         });
@@ -407,6 +410,7 @@ function handle(socket, io) {
             socket: socket,
             message: {
               text: ['Users have been verified'],
+              text_se: ['Användarna har blivit verifierade'],
             },
           });
           // TODO Send message to verified user
@@ -469,6 +473,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: ['User ' + userNameLower + ' has been banned'],
+            text_se: ['Användaren ' + userNameLower + ' har blivit bannad'],
           },
         });
 
@@ -491,6 +496,7 @@ function handle(socket, io) {
             socket: socket,
             message: {
               text: ['User ' + userNameLower + ' has been disconnected'],
+              text_se: ['Användaren ' + userNameLower + ' har blivit urloggad'],
             },
           });
         });
@@ -517,6 +523,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: ['Ban on user ' + userNameLower + ' has been removed'],
+            text_se: ['Ban på användaren ' + userNameLower + ' har blivit borttaget'],
           },
         });
       });
@@ -580,6 +587,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: ['User has been updated'],
+            text_se: ['Användaren har blivit uppdaterad'],
           },
         });
       };
@@ -609,6 +617,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: ['Invalid field. User doesn\'t have ' + field],
+            text_se: ['Inkorrekt fält. Användare har inte fältet ' + field],
           },
         });
 

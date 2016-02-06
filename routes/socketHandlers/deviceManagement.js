@@ -91,6 +91,7 @@ function handle(socket) {
           socket: socket,
           message: {
             text: ['Device has been updated'],
+            text_se: ['Enheten har uppdaterats'],
           },
         });
       };
@@ -105,6 +106,7 @@ function handle(socket) {
           socket: socket,
           message: {
             text: ['Invalid field. Device doesn\'t have ' + field],
+            text_se: ['Inkorrekt fält. Enheter har inte fältet ' + field],
           },
         });
 
@@ -120,6 +122,7 @@ function handle(socket) {
           socket: socket,
           message: {
             text: ['Device is not in the database'],
+            text_se: ['Enheten finns inte i databasen'],
           },
         });
         socket.emit('commandFail');
@@ -131,6 +134,7 @@ function handle(socket) {
         socket: socket,
         message: {
           text: ['Device found in the database'],
+          text_se: ['Enheten funnen i databasen'],
         },
       });
       socket.emit('commandSuccess', data);

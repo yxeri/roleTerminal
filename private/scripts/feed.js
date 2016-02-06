@@ -1971,7 +1971,11 @@ function onList(data = { itemList: [] }) {
   });
 }
 
-function onStoredMessages(data = { storedMessages: {} }) {
+function onMatchFound(data = { matchedName: '' }) {
+  replaceLastInputPhrase(data.matchedName + ' ');
+}
+
+function onStartup(data = { storedMessages: {} }) {
   const keys = Object.keys(data.storedMessages);
 
   for (let i = 0; i < keys.length; i++) {
@@ -1980,10 +1984,7 @@ function onStoredMessages(data = { storedMessages: {} }) {
   }
 
   setLocalVal('storedMessages', JSON.stringify(storedMessages));
-}
-
-function onMatchFound(data = { matchedName: '' }) {
-  replaceLastInputPhrase(data.matchedName + ' ');
+  printStartMessage();
 }
 
 // function onMissions(data = []) {
@@ -2016,8 +2017,8 @@ function startSocket() {
     socket.on('updateDeviceId', onUpdateDeviceId);
     socket.on('whoAmI', onWhoami);
     socket.on('list', onList);
-    socket.on('storedMessages', onStoredMessages);
     socket.on('matchFound', onMatchFound);
+    socket.on('startup', onStartup);
     // socket.on('missions', onMissions);
   }
 }
@@ -4256,7 +4257,6 @@ function startBoot() {
   downgradeOlderDevices();
   attachCommands();
   populateMenu();
-  socket.emit('getStoredMessages');
   socket.emit('getCommands');
 
   if (!isTouchDevice()) {
@@ -4302,7 +4302,6 @@ function startBoot() {
   }
 
   if (!getUser()) {
-    printStartMessage();
     setInputStart(defaultInputStart);
     socket.emit('updateDeviceSocketId', {
       device: { deviceId: getDeviceId() },

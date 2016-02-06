@@ -228,10 +228,6 @@ function handle(io) {
         });
       });
     });
-
-    socket.on('getStoredMessages', function() {
-      socket.emit('storedMessages', { storedMessages: require('rolehaven-config').messages });
-    });
   });
 
   return router;

@@ -133,6 +133,10 @@ function handle(socket, io) {
 
       socket.join(publicRoom);
       socket.emit('reconnectSuccess', { anonUser: true, firstConnection: data.firstConnection });
+
+      if (data.firstConnection) {
+        socket.emit('startup', { storedMessages: require('rolehaven-config').messages });
+      }
     } else {
       manager.updateUserSocketId(socket.id, data.user.userName, function(idErr, user) {
         if (idErr) {

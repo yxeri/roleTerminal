@@ -90,6 +90,20 @@ function handle(socket, io) {
         newRoom.visibility = 12;
         newRoom.accessLevel = 12;
 
+        manager.createRoom(newRoom, user, function(createErr, roomName) {
+          if (createErr) {
+            return;
+          }
+        });
+
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: [user.userName + ' has been registered'],
+            text_se: [user.UserName + ' har blivit registerad'],
+          },
+        });
+
         if (appConfig.userVerify) {
           messenger.sendMsg({
             socket: socket,
@@ -99,23 +113,15 @@ function handle(socket, io) {
             },
             sendTo: message.roomName,
           });
+
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['You will need to be verified before you can login'],
+              text_se: ['Ni måste bli verifierad innan ni kan logga in'],
+            },
+          });
         }
-
-        messenger.sendSelfMsg({
-          socket: socket,
-          message: {
-            text: [user.userName + ' has been registered!'],
-            text_se: [user.UserName + ' har blivit registerad!'],
-          },
-        });
-
-        manager.createRoom(newRoom, user, function(createErr, roomName) {
-          if (createErr) {
-            return;
-          }
-
-          socket.join(roomName);
-        });
       });
     });
   });

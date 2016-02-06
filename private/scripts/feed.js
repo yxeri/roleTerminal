@@ -2696,14 +2696,10 @@ function attachCommands() {
             text: [
               'Congratulations, employee #' + Math.floor(Math.random() * 120503),
               'Welcome to the Organica Oracle department',
-              'You may now login to the system',
-              'Have a productive day!',
             ],
             text_se: [
               'Gratulerar, uppdragstagare #' + Math.floor(Math.random() * 120503),
               'Välkommen till Organica Orakelavdelningen',
-              'Ni kan nu logga in i systemet',
-              'Ha en produktiv dag!',
             ],
           });
           socket.emit('register', commandHelper.data);

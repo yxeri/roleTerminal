@@ -135,7 +135,10 @@ function handle(socket, io) {
       socket.emit('reconnectSuccess', { anonUser: true, firstConnection: data.firstConnection });
 
       if (data.firstConnection) {
-        socket.emit('startup', { storedMessages: require('rolehaven-config').messages });
+        socket.emit('startup', {
+          storedMessages: require('rolehaven-config').messages,
+          defaultLanguage: appConfig.defaultLanguage,
+        });
       }
     } else {
       manager.updateUserSocketId(socket.id, data.user.userName, function(idErr, user) {

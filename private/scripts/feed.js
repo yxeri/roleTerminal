@@ -355,9 +355,26 @@ function generateFullRow(sentText, message) {
   return rowObj;
 }
 
+function getLocalVal(name) {
+  return localStorage.getItem(name);
+}
+
+function getDefaultLanguage() {
+  return getLocalVal('defaultLanguage');
+}
+
 function printRow(message) {
-  if (message.text && message.text.length > 0) {
-    const text = message.text.shift();
+  const defaultLanguage = getDefaultLanguage();
+  // Set text depending on default language set. Empty means English
+  let currentText = defaultLanguage === '' ? message.text : message['text_' + defaultLanguage];
+
+  // Fallback to English if there is no text in the default language
+  if (!currentText) {
+    currentText = message.text;
+  }
+
+  if (currentText && currentText.length > 0) {
+    const text = currentText.shift();
     const row = generateFullRow(text, message);
     const extraClass = message.extraClass;
 
@@ -408,10 +425,6 @@ function hideInput(hide) {
 
 function setLocalVal(name, item) {
   localStorage.setItem(name, item);
-}
-
-function getLocalVal(name) {
-  return localStorage.getItem(name);
 }
 
 function removeLocalVal(name) {
@@ -1971,7 +1984,7 @@ function onList(data = { itemList: [] }) {
   });
 }
 
-function onMatchFound(data = { matchedName: '' }) {
+function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
   replaceLastInputPhrase(data.matchedName + ' ');
 }
 
@@ -1984,6 +1997,7 @@ function onStartup(data = { storedMessages: {} }) {
   }
 
   setLocalVal('storedMessages', JSON.stringify(storedMessages));
+  setLocalVal('defaultLanguage', data.defaultLanguage);
   printStartMessage();
 }
 

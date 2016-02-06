@@ -124,7 +124,7 @@ function sendWhisperMsg(params) {
   const data = {
     message: params.message,
   };
-  data.message.roomName += databasePopulation.whisper;
+  data.message.roomName += appConfig.whisperAppend;
   data.message.extraClass = 'whisperMsg';
   data.message.time = new Date();
 
@@ -137,7 +137,7 @@ function sendWhisperMsg(params) {
       return;
     }
 
-    const senderRoomName = data.message.userName + databasePopulation.whisper;
+    const senderRoomName = data.message.userName + appConfig.whisperAppend;
 
     addMsgToHistory(senderRoomName, data.message, socket, function(senderErr) {
       if (senderErr) {

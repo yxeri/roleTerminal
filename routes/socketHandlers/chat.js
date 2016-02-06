@@ -295,8 +295,8 @@ function handle(socket) {
     function shouldBeHidden(room) {
       const hiddenRooms = [
         socket.id,
-        data.user.userName + databasePopulation.whisper,
-        data.device.deviceId + databasePopulation.device,
+        data.user.userName + appConfig.whisperAppend,
+        data.device.deviceId + appConfig.deviceAppend,
         databasePopulation.rooms.important.roomName,
         databasePopulation.rooms.broadcast.roomName,
       ];
@@ -439,7 +439,7 @@ function handle(socket) {
             return;
           }
 
-          data.roomName = device.deviceId + databasePopulation.device;
+          data.roomName = device.deviceId + appConfig.deviceAppend;
 
           messenger.sendImportantMsg({ socket: socket, message: data.message, toOneDevice: true });
         });

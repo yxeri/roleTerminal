@@ -213,7 +213,7 @@ function handle(io) {
       const socketId = data.user.socketId;
       const userName = data.user.userName;
 
-      socket.join(deviceId + databasePopulation.device);
+      socket.join(deviceId + appConfig.deviceAppend);
 
       dbConnector.updateDeviceSocketId(deviceId, socketId, userName, function(err, device) {
         if (err || device === null) {

@@ -138,7 +138,7 @@ function joinRooms(rooms, socket, device) {
   allRooms.push(databasePopulation.rooms.broadcast.roomName);
 
   if (device) {
-    allRooms.push(device + databasePopulation.device);
+    allRooms.push(device + appConfig.deviceAppend);
   }
 
   for (let i = 0; i < allRooms.length; i++) {

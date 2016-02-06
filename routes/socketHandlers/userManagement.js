@@ -88,7 +88,7 @@ function handle(socket, io) {
         message.time = new Date();
         message.roomName = databasePopulation.rooms.admin.roomName;
 
-        newRoom.roomName = user.userName + databasePopulation.whisper;
+        newRoom.roomName = user.userName + appConfig.whisperAppend;
         newRoom.visibility = 12;
         newRoom.accessLevel = 12;
 
@@ -223,7 +223,7 @@ function handle(socket, io) {
             const oldRooms = Object.keys(oldSocket.rooms);
 
             for (let i = 1; i < oldRooms.length; i++) {
-              if (oldRooms[i].indexOf(databasePopulation.device) < 0) {
+              if (oldRooms[i].indexOf(appConfig.deviceAppend) < 0) {
                 oldSocket.leave(oldRooms[i]);
               }
             }
@@ -340,7 +340,7 @@ function handle(socket, io) {
           const rooms = Object.keys(socket.rooms);
 
           for (let i = 1; i < rooms.length; i++) {
-            if (rooms[i].indexOf(databasePopulation.device) < 0) {
+            if (rooms[i].indexOf(appConfig.deviceAppend) < 0) {
               socket.leave(rooms[i]);
             }
           }

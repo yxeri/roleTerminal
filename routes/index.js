@@ -159,12 +159,12 @@ function handle(io) {
           return;
         }
 
-        const lat = appConfig.gameLocation.lat;
-        const lon = appConfig.gameLocation.lon;
+        const lat = appConfig.latitude;
+        const lon = appConfig.longitude;
         const hoursAllowed = [0, 4, 8, 12, 16, 20];
         let url = '';
 
-        if (appConfig.gameLocation.country.toLowerCase() === 'sweden') {
+        if (appConfig.country.toLowerCase() === 'sweden') {
           url = 'http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/version/1/geopoint/lat/' + lat + '/lon/' + lon + '/data.json';
         }
 

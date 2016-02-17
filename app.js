@@ -72,7 +72,7 @@ for (let i = 0; i < appConfig.routes.length; i++) {
   app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
 }
 
-if (appConfig.watchDir) {
+if (appConfig.watchDir === true) {
   watchPrivate();
 }
 

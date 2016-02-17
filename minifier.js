@@ -82,7 +82,7 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
     });
   }
 
-  if (extension === 'js' && appConfig.transpileEs6) {
+  if (extension === 'js' && appConfig.transpileEs6 === true) {
     const transpilePath = inPath + '-transpile';
     let file;
 

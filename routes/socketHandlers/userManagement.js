@@ -58,7 +58,7 @@ function handle(socket, io) {
         password: data.user.password,
         registerDevice: data.user.registerDevice,
         mode: appConfig.modes.command,
-        verified: !appConfig.userVerify ? true : false,
+        verified: appConfig.userVerify === false ? true : false,
         rooms: [databasePopulation.rooms.public.roomName],
       };
 
@@ -104,7 +104,7 @@ function handle(socket, io) {
           },
         });
 
-        if (appConfig.userVerify) {
+        if (appConfig.userVerify === true) {
           messenger.sendMsg({
             socket: socket,
             message: {

@@ -275,7 +275,7 @@ function handle(socket) {
           for (let i = 0; i < users.length; i++) {
             const currentUser = users[i];
 
-            if (currentUser.verified && !currentUser.banned) {
+            if ((appConfig.userVerify === false || currentUser.verified) && !currentUser.banned) {
               if (currentUser.online) {
                 onlineUsers.push(currentUser.userName);
               } else {

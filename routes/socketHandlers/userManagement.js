@@ -100,7 +100,7 @@ function handle(socket, io) {
           socket: socket,
           message: {
             text: [user.userName + ' has been registered'],
-            text_se: [user.UserName + ' har blivit registerad'],
+            text_se: [user.userName + ' har blivit registerad'],
           },
         });
 

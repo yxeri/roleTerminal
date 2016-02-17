@@ -58,7 +58,7 @@ function handle(socket, io) {
         password: data.user.password,
         registerDevice: data.user.registerDevice,
         mode: appConfig.modes.command,
-        verified: appConfig.userVerify === false ? true : false,
+        verified: false,
         rooms: [databasePopulation.rooms.public.roomName],
       };
 
@@ -90,7 +90,7 @@ function handle(socket, io) {
         newRoom.visibility = 12;
         newRoom.accessLevel = 12;
 
-        manager.createRoom(newRoom, user, function(createErr, roomName) {
+        manager.createRoom(newRoom, user, function(createErr) {
           if (createErr) {
             return;
           }
@@ -205,16 +205,12 @@ function handle(socket, io) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to login', err);
 
           return;
-        } else if (!authUser.verified || authUser.banned) {
-          let errMsg;
+        } else if (appConfig.userVerify === true && !authUser.verified) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'The user has not yet been verified. Failed to login');
 
-          if (!authUser.verified) {
-            errMsg = 'The user has not yet been verified. Failed to login';
-          } else {
-            errMsg = 'The user has been banned. Failed to login';
-          }
-
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, errMsg);
+          return;
+        } else if (authUser.banned) {
+          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'The user has been banned. Failed to login');
 
           return;
         }

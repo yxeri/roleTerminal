@@ -1602,6 +1602,7 @@ function prependBroadcastMessage(data = {}) {
 function addMessageSpecialProperties(message = {}) {
   if (message.extraClass === 'broadcastMsg') {
     message.text = prependBroadcastMessage({ sender: message.customSender }).concat(message.text);
+    message.text.push(createLine(lineLength));
   }
 
   return message;
@@ -2370,7 +2371,6 @@ function attachCommands() {
 
           message.text.push(phrase);
         } else {
-          message.text.push(createLine(lineLength));
           dataText = copyString(message.text);
           commandHelper.onStep++;
 
@@ -2378,8 +2378,7 @@ function attachCommands() {
             text: ['Preview of the message:'],
             text_se: ['Förhandsgranskning av meddelandet'],
           });
-          console.log(message);
-          queueMessage({ text: prependBroadcastMessage({ sender: message.customSender }).concat(dataText) });
+          queueMessage({ text: prependBroadcastMessage({ sender: message.customSender }).concat(dataText, createLine(lineLength)) });
           queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
             text_se: ['Är detta meddelande OK? Skriv "yes" för att acceptera meddelandet'],

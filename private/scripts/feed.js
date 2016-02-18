@@ -1581,8 +1581,34 @@ function hideMessageProperties(message = { }) {
   return message;
 }
 
+function appendLanguageString(varName) {
+  return getDefaultLanguage() ? varName + '_' + getDefaultLanguage() : varName;
+}
+
+function prependBroadcastMessage(data = {}) {
+  const title = {};
+
+  if (data.sender) {
+    title.text = 'broadcast from: ' + data.sender;
+    title.text_se = 'allmänt meddelande från: ' + data.sender;
+  } else {
+    title.text = 'broadcast';
+    title.text_se = 'allmänt meddelande';
+  }
+
+  return createCommandStart(title[appendLanguageString('text')]);
+}
+
+function addMessageSpecialProperties(message = {}) {
+  if (message.extraClass === 'broadcastMsg') {
+    message.text = prependBroadcastMessage({ sender: message.customSender }).concat(message.text);
+  }
+
+  return message;
+}
+
 function onMessage(data = { message: {} }) {
-  const message = hideMessageProperties(data.message);
+  const message = addMessageSpecialProperties(hideMessageProperties(data.message));
 
   queueMessage(message);
 }
@@ -1591,7 +1617,7 @@ function onMessages(data = { messages: [] }) {
   const messages = data.messages;
 
   for (let i = 0; i < messages.length; i++) {
-    const message = hideMessageProperties(messages[i]);
+    const message = addMessageSpecialProperties(hideMessageProperties(messages[i]));
 
     queueMessage(message);
   }
@@ -2298,6 +2324,7 @@ function attachCommands() {
       commandHelper.data = {
         message: {
           text: [],
+          title: [],
           hideName: true,
         },
       };
@@ -2317,14 +2344,9 @@ function attachCommands() {
     },
     steps: [
       function broadcastStepOne(phrases) {
-        const message = commandHelper.data.message;
-        let phrase;
-
         if (phrases.length > 0 && phrases[0] !== '') {
-          phrase = phrases.join(' ');
-          message.text = message.text.concat(createCommandStart('broadcast from: ' + phrase));
-        } else {
-          message.text = message.text.concat(createCommandStart('broadcast'));
+          const phrase = phrases.join(' ');
+          commandHelper.data.message.customSender = phrase;
         }
 
         queueMessage({
@@ -2345,6 +2367,7 @@ function attachCommands() {
 
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
+
           message.text.push(phrase);
         } else {
           message.text.push(createLine(lineLength));
@@ -2355,7 +2378,8 @@ function attachCommands() {
             text: ['Preview of the message:'],
             text_se: ['Förhandsgranskning av meddelandet'],
           });
-          queueMessage({ text: dataText });
+          console.log(message);
+          queueMessage({ text: prependBroadcastMessage({ sender: message.customSender }).concat(dataText) });
           queueMessage({
             text: ['Is this OK? "yes" to accept the message'],
             text_se: ['Är detta meddelande OK? Skriv "yes" för att acceptera meddelandet'],

@@ -60,6 +60,7 @@ const historySchema = new mongoose.Schema({
     userName: String,
     roomName: String,
     extraClass: String,
+    customSender: String,
   }],
 }, { collection: 'histories' });
 const commandSchema = new mongoose.Schema({

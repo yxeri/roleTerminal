@@ -31,30 +31,36 @@ function followRoom(params) {
 
 function handle(socket) {
   socket.on('chatMsg', function(data) {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
+
+      data.message.userName = user.userName;
 
       messenger.sendChatMsg({ socket: socket, message: data.message });
     });
   });
 
   socket.on('whisperMsg', function(data) {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.whisper.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.whisper.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
+
+      data.message.userName = user.userName;
 
       messenger.sendWhisperMsg({ socket: socket, message: data.message });
     });
   });
 
   socket.on('broadcastMsg', function(data) {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.broadcast.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.broadcast.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
+
+      data.message.userName = user.userName;
 
       messenger.sendBroadcastMsg({ socket: socket, message: data.message });
     });

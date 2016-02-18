@@ -1565,6 +1565,9 @@ function hideMessageProperties(message = { }) {
     message.roomName = '';
     message.userName = '';
     message.skipTime = true;
+  } else if (message.extraClass === 'broadcastMsg') {
+    message.roomName = '';
+    message.userName = '';
   }
 
   if (roomName && roomName !== null) {
@@ -2292,7 +2295,12 @@ function attachCommands() {
   };
   validCommands.broadcast = {
     func: function broadcastCommand() {
-      commandHelper.data = { message: { text: [] } };
+      commandHelper.data = {
+        message: {
+          text: [],
+          hideName: true,
+        },
+      };
 
       queueMessage({
         text: [

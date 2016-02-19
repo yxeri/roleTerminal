@@ -359,11 +359,17 @@ function handle(socket) {
         }
 
         if (ownedRooms.length > 0) {
+          const roomNames = [];
+
+          for (let i = 0; i < ownedRooms.length; i++) {
+            roomNames.push(ownedRooms[i].roomName);
+          }
+
           messenger.sendList({
             socket: socket,
             itemList: {
               listTitle: 'You are owner of the rooms:',
-              itemList: ownedRooms,
+              itemList: roomNames,
             },
           });
         }

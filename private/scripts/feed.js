@@ -1566,6 +1566,7 @@ function resetAllLocalVals() {
 function hideMessageProperties(message = { }) {
   const roomName = message.roomName;
 
+  // TODO Change blank user and room to booleans instead of string removal
   if (message.extraClass === 'importantMsg') {
     message.roomName = '';
     message.userName = '';
@@ -1576,8 +1577,14 @@ function hideMessageProperties(message = { }) {
   }
 
   if (roomName && roomName !== null) {
-    if (roomName.indexOf('-whisper') >= 0) {
-      message.roomName = 'whisper';
+    const whisperIndex = roomName.indexOf('-whisper');
+
+    if (whisperIndex >= 0) {
+      if (message.userName === getUser()) {
+        message.roomName = roomName.substring(0, whisperIndex);
+      } else {
+        message.roomName = 'whisper';
+      }
     } else if (roomName.indexOf('-device') >= 0) {
       message.roomName = 'device';
     }

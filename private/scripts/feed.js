@@ -1901,7 +1901,7 @@ function onWeather(report) {
     const time = new Date(weatherInstance.time);
     const hours = beautifyNumb(time.getHours());
     const day = beautifyNumb(time.getDate());
-    const month = beautifyNumb(time.getMonth());
+    const month = beautifyNumb(time.getMonth() + 1);
     const temperature = Math.round(weatherInstance.temperature);
     const windSpeed = Math.round(weatherInstance.gust);
     const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : weatherInstance.precipitation + 'mm ';

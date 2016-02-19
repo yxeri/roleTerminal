@@ -57,7 +57,7 @@ function handle(socket, io) {
         socketId: '',
         password: data.user.password,
         registerDevice: data.user.registerDevice,
-        mode: appConfig.modes.command,
+        mode: appConfig.defaultMode,
         verified: false,
         rooms: [databasePopulation.rooms.public.roomName],
       };

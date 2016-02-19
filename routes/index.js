@@ -149,7 +149,14 @@ function handle(io) {
           return;
         }
 
-        socket.emit('time', { time: new Date() });
+        const appDate = appConfig.gameDate;
+        const now = new Date();
+
+        if (appDate) {
+          now.setFullYear(appDate.getFullYear());
+        }
+
+        socket.emit('time', { time: now });
       });
     });
 

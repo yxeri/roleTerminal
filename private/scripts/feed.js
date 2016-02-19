@@ -278,7 +278,7 @@ function generateLink(text, className, func) {
 }
 
 // Takes date and returns shorter readable time
-function generateTimeStamp(date, full) {
+function generateTimeStamp(date, full, year) {
   let newDate = new Date(date);
   let timeStamp;
 
@@ -295,7 +295,12 @@ function generateTimeStamp(date, full) {
   if (full) {
     const month = beautifyNumb(newDate.getMonth());
     const day = beautifyNumb(newDate.getDate());
-    timeStamp = ' ' + day + '/' + month + ' ' + timeStamp;
+    timeStamp = day + '/' + month + ' ' + timeStamp;
+  }
+
+  if (year) {
+    const year = newDate.getFullYear();
+    timeStamp = year + ' ' + timeStamp;
   }
 
   return timeStamp;
@@ -1809,8 +1814,8 @@ function onMorse(data = {}) {
 
 function onTime(data = {}) {
   queueMessage({
-    text: ['Time: ' + generateTimeStamp(data.time, true)],
-    text_en: ['Tid: ' + generateTimeStamp(data.time, true)],
+    text: ['Time: ' + generateTimeStamp(data.time, true, true)],
+    text_en: ['Tid: ' + generateTimeStamp(data.time, true, true)],
   });
 }
 

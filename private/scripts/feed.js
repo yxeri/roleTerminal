@@ -299,8 +299,8 @@ function generateTimeStamp(date, full, year) {
   }
 
   if (year) {
-    const year = newDate.getFullYear();
-    timeStamp = year + ' ' + timeStamp;
+    const fullYear = newDate.getFullYear();
+    timeStamp = fullYear + ' ' + timeStamp;
   }
 
   return timeStamp;
@@ -2825,6 +2825,7 @@ function attachCommands() {
         setInputStart('Set passwd');
         hideInput(true);
       } else {
+        resetCommand(true);
         queueMessage({
           text: [
             'Failed to create room',

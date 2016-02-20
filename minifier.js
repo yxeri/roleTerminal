@@ -17,7 +17,11 @@ const browserify = require('browserify');
 function htmlMinify(inPath, outPath) {
   fs.readFile(inPath, 'utf8', function(readError, readFile) {
     if (readError) {
-      logger.sendErrorMsg(logger.ErrorCodes.general, 'ReadError', readError);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.general,
+        text: ['ReadError'],
+        err: readError,
+      });
     } else {
       const minifyConfig = {
         removeComments: true,
@@ -31,7 +35,11 @@ function htmlMinify(inPath, outPath) {
       fs.writeFile(outPath, htmlMinifier.minify(readFile, minifyConfig),
         function(writeError) {
           if (writeError) {
-            logger.sendErrorMsg(logger.ErrorCodes.general, 'WriteError', writeError);
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.general,
+              text: ['WriteError'],
+              err: writeError,
+            });
           }
         });
     }
@@ -70,7 +78,11 @@ function nodeMinify(inPath, outPath, minifierType, extension) {
       options: ['--mangle', '--compress unsafe=true'],
       callback: function(err) {
         if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Minify error', err);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['Minify error'],
+            err: err,
+          });
         } else {
           logger.sendInfoMsg('Minified ' + inPath);
         }
@@ -111,7 +123,12 @@ function checkDir(dirPath, callback) {
     if (err) {
       fs.mkdir(dirPath, function(dirErr) {
         if (dirErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', dirErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['Mkdir error'],
+            err: dirErr,
+          });
+
           return;
         }
 
@@ -146,6 +163,7 @@ function minifyFile(filePath, outPath) {
   }
 }
 
+// TODO Use logger instead of console.log
 /**
  * Goes through a directory and minifies all files with a specific extension
  * @param {string} pathObj Contaisn public (.publicPath) and private (.privatePath) directory path for the file

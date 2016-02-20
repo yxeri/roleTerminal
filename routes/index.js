@@ -227,6 +227,7 @@ function handle(io) {
           socket: socket,
           message: {
             text: ['Device has been updated'],
+            text_se: ['Enheten har uppdaterats'],
           },
         });
       });

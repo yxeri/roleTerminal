@@ -9,8 +9,18 @@ const objectValidator = require('./objectValidator');
 function addMsgToHistory(roomName, message, socket, callback) {
   dbConnector.addMsgToHistory(roomName, message, function(err, history) {
     if (err || history === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add message to history', err);
-      logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message', err);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to add message to history'],
+        err: err,
+      });
+      logger.sendSocketErrorMsg({
+        socket: socket,
+        code: logger.ErrorCodes.db,
+        text: ['Failed to send the message'],
+        text_se: ['Misslyckades med att skicka meddelandet'],
+        err: err,
+      });
       callback(err || {});
     } else {
       callback(err, message);

@@ -23,7 +23,13 @@ function handle(socket, io) {
 
       dbConnector.getUser(data.user.userName, function(err, foundUser) {
         if (err) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to check if user exists', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to check if user exists'],
+            text_se: ['Misslyckades med att försöka hitta användaren'],
+            err: err,
+          });
           socket.emit('commandFail');
 
           return;
@@ -65,7 +71,13 @@ function handle(socket, io) {
       // TODO Refactor the inner code
       dbConnector.addUser(userObj, function(err, user) {
         if (err) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to register user', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to register user'],
+            text_se: ['Misslyckades med att registrera användare'],
+            err: err,
+          });
 
           return;
         } else if (user === null) {
@@ -104,7 +116,7 @@ function handle(socket, io) {
           },
         });
 
-        if (appConfig.userVerify === true) {
+        if (appConfig.userVerify) {
           messenger.sendMsg({
             socket: socket,
             message: {
@@ -177,14 +189,22 @@ function handle(socket, io) {
   socket.on('updateLocation', function(data) {
     dbConnector.getUserById(socket.id, function(err, user) {
       if (err || user === null) {
-        logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update location', err);
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.db,
+          text: ['Failed to update location'],
+          err: err,
+        });
 
         return;
       }
 
       dbConnector.updateUserLocation(user.userName, data.position, function(userErr) {
         if (userErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update location', userErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to update location'],
+            err: userErr,
+          });
         }
       });
     });
@@ -202,15 +222,31 @@ function handle(socket, io) {
 
       dbConnector.authUser(userName, user.password, function(err, authUser) {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to login', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to login'],
+            text_se: ['Misslyckades med att logga in'],
+            err: err,
+          });
 
           return;
-        } else if (appConfig.userVerify === true && !authUser.verified) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'The user has not yet been verified. Failed to login');
+        } else if (appConfig.userVerify && !authUser.verified) {
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['The user has not yet been verified. Failed to login'],
+            text_se: ['Användaren har ännu inte blivit verifierad. Inloggningen misslyckades'],
+          });
 
           return;
         } else if (authUser.banned) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'The user has been banned. Failed to login');
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['The user has been banned. Failed to login'],
+            text_se: ['Användaren är bannad. Inloggningen misslyckades'],
+          });
 
           return;
         }
@@ -272,7 +308,13 @@ function handle(socket, io) {
 
       dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Incorrect password', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Incorrect password'],
+            text_se: ['Felaktigt lösenord'],
+            err: err,
+          });
           socket.emit('commandFail');
 
           return;
@@ -294,21 +336,38 @@ function handle(socket, io) {
       if (allowErr || !allowed) {
         return;
       } else if (!data.newPassword) {
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password. No new password sent');
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.general,
+          text: ['Failed to update password. No new password sent'],
+          text_se: ['Misslyckades med att uppdatera lösenordet. Inget nytt lösenord skickades'],
+        });
 
         return;
       }
 
       dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to update password'],
+            text_se: ['Misslyckades med att uppdatera lösenordet'],
+            err: err,
+          });
 
           return;
         }
 
         dbConnector.updateUserPassword(authUser.userName, data.newPassword, function(userErr, updatedUser) {
           if (userErr || updatedUser === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update password', userErr);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.general,
+              text: ['Failed to update password'],
+              text_se: ['Misslyckades med att uppdatera lösenordet'],
+              err: userErr,
+            });
 
             return;
           }
@@ -335,14 +394,22 @@ function handle(socket, io) {
 
       dbConnector.updateUserSocketId(userName, '', function(err, socketUser) {
         if (err || socketUser === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to reset user socket ID', err);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['Failed to reset user socket ID'],
+            err: err,
+          });
 
           return;
         }
 
         dbConnector.updateUserOnline(userName, false, function(userErr, updatedUser) {
           if (userErr || updatedUser === null) {
-            logger.sendErrorMsg(logger.ErrorCodes.general, 'Failed to reset socket id', userErr);
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.general,
+              text: ['Failed to reset socket id'],
+              err: userErr,
+            });
 
             return;
           }
@@ -379,7 +446,14 @@ function handle(socket, io) {
       if (userNameLower !== undefined) {
         dbConnector.verifyUser(userNameLower, function(err, user) {
           if (err || user === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to verify user', err);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.general,
+              text: ['Failed to verify user'],
+              text_se: ['Misslyckades med att verifiera användaren'],
+              err: err,
+            });
+
             return;
           }
 
@@ -403,14 +477,26 @@ function handle(socket, io) {
 
       dbConnector.getUnverifiedUsers(function(err, users) {
         if (err || users === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to verify all user', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to verify all user'],
+            text_se: ['Misslyckades med att verifiera alla användare'],
+            err: err,
+          });
 
           return;
         }
 
         dbConnector.verifyAllUsers(function(verifyErr) {
           if (verifyErr) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to verify all user', verifyErr);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.general,
+              text: ['Failed to verify all user'],
+              text_se: ['Misslyckades med att verifiera alla användare'],
+              err: verifyErr,
+            });
 
             return;
           }
@@ -436,7 +522,13 @@ function handle(socket, io) {
 
       dbConnector.getUnverifiedUsers(function(err, users) {
         if (err || users === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to unverified users', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get unverified users'],
+            text_se: ['Misslyckades med hämtningen av icke-verifierade användare'],
+            err: err,
+          });
 
           return;
         }
@@ -471,7 +563,12 @@ function handle(socket, io) {
 
       dbConnector.banUser(userNameLower, function(err, user) {
         if (err || user === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to ban user');
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to ban user'],
+            text_se: ['Misslyckades med att banna användaren'],
+          });
 
           return;
         }
@@ -488,7 +585,13 @@ function handle(socket, io) {
 
         dbConnector.updateUserSocketId(userNameLower, '', function(userErr, updatedUser) {
           if (userErr || updatedUser === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to disconnect user ' + userNameLower, userErr);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.general,
+              text: ['Failed to disconnect user ' + userNameLower],
+              text_se: ['Misslyckades med att koppla från användaren ' + userNameLower],
+              err: userErr,
+            });
 
             return;
           }
@@ -523,7 +626,13 @@ function handle(socket, io) {
 
       dbConnector.unbanUser(userNameLower, function(err, user) {
         if (err || user === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to unban user', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to unban user'],
+            text_se: ['Misslyckades med att unbanna användaren'],
+            err: err,
+          });
 
           return;
         }
@@ -547,7 +656,13 @@ function handle(socket, io) {
 
       dbConnector.getBannedUsers(function(err, users) {
         if (err || users === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to get all banned users', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get all banned users'],
+            text_se: ['Misslyckades med att hämta en lista över alla bannade användare'],
+            err: err,
+          });
 
           return;
         }
@@ -587,7 +702,13 @@ function handle(socket, io) {
       const value = data.value;
       const callback = function(err, user) {
         if (err || user === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to update user', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to update user'],
+            text_se: ['Misslyckades med att uppdatera användaren'],
+            err: err,
+          });
 
           return;
         }
@@ -621,7 +742,12 @@ function handle(socket, io) {
 
         break;
       default:
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Invalid field. User doesn\'t have ' + field);
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.general,
+          text: ['Invalid field. User doesn\'t have ' + field],
+          text_se: ['Inkorrekt fält. Användare har inte fältet ' + field],
+        });
         messenger.sendSelfMsg({
           socket: socket,
           message: {
@@ -646,7 +772,14 @@ function handle(socket, io) {
 
       dbConnector.updateUserMode(userName, value, function(err) {
         if (err) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to store new user mode', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to store new user mode'],
+            text_se: ['Misslyckades med att lagra nya användarläget'],
+            err: err,
+          });
+
           return;
         }
       });

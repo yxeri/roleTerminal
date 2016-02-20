@@ -11,14 +11,25 @@ function handle(socket) {
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.hackroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to hack the room. Something is broken');
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.general,
+          text: ['Unable to hack the room. Something is broken'],
+          text_se: ['Kunde inte hacka rummet. Något är trasigt'],
+        });
 
         return;
       }
 
       dbConnector.getRoom(roomNameLower, function(err, room) {
         if (err || room === null || user.accessLevel < room.visibility) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Room is not hackable by you or doesn\'t exist', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Room is not hackable by you or doesn\'t exist'],
+            text_se: ['Rummet kan inte hackas av dig eller existerar inte'],
+            err: err,
+          });
           socket.emit('commandFail');
 
           return;
@@ -36,7 +47,14 @@ function handle(socket) {
 
         dbConnector.addRoomToUser(user.userName, roomName, function(err) {
           if (err) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to follow the room', err);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to follow the room'],
+              text_se: ['Misslyckades med att följa rummet'],
+              err: err,
+            });
+
             return;
           }
 

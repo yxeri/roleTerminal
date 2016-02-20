@@ -13,14 +13,23 @@ function handle(socket) {
       if (allowErr || !allowed) {
         return;
       } else if (user.accessLevel < 11) {
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.unauth, 'You are not allowed to list devices');
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.unauth,
+          text: ['You are not allowed to list devices'],
+          text_se: ['Ni har inte tillåtelse att lista enheter'],
+        });
 
         return;
       }
 
       dbConnector.getAllDevices(function(devErr, devices) {
         if (devErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all devices', devErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get all devices'],
+            err: devErr,
+          });
 
           return;
         }

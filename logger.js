@@ -1,6 +1,8 @@
 'use strict';
 
 const messenger = require('./messenger');
+const languagePicker = require('./languagePicker');
+const objectValidator = require('./objectValidator');
 
 /*
  * Possible error codes with number and text representation, for usage towards users or internal
@@ -24,33 +26,45 @@ const ErrorCodes = {
   },
 };
 
-/**
- * Prints an error message to the log
- * @param {object} code Error code
- * @param {string} text Error message
- * @param {object} err Error object
- * @returns {undefined} Returns undefined
- */
-function sendErrorMsg(code, text, err) {
+function printErrorMsg(code, text, err) {
   console.log('[ERROR]', code.text, text, '- Error:', err || '');
 }
 
 /**
- * Sends an error message to the sent socket and prints it to the log
- * @param {object} socket SocketIO socket
- * @param {object} code Error code
- * @param {object} text Error message
- * @param {object} err Error object
- * @returns {undefined} Returns undefined
+ * Prints an error message to the log
  */
-function sendSocketErrorMsg(socket, code, text, err) {
+function sendErrorMsg(data) {
+  if (!objectValidator.isValidData(data, { code: true, text: true })) {
+    return;
+  }
+
+  const code = data.code;
+  const text = data[languagePicker.appendLanguageCode('text')];
+  const err = data.err;
+
+  printErrorMsg(code, text, err);
+}
+
+/**
+ * Sends an error message to the sent socket and prints it to the log
+ */
+function sendSocketErrorMsg(data) {
+  if (!objectValidator.isValidData(data, { socket: true, code: true, text: true })) {
+    return;
+  }
+
+  const socket = data.socket;
+  const code = data.code;
+  const text = data[languagePicker.appendLanguageCode('text')];
+  const err = data.err;
+
   messenger.sendSelfMsg({
     socket: socket,
     message: {
-      text: ['[' + code.num + '] ' + text],
+      text: ['[' + code.num + '] '].join(text),
     },
   });
-  sendErrorMsg(code, text, err);
+  printErrorMsg(code, text, err);
 }
 
 function sendInfoMsg(text) {

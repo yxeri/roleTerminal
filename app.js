@@ -26,7 +26,10 @@ function watchPrivate() {
     if ((triggeredEvent === 'rename' || triggeredEvent === 'change') && path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0 && fullPath.indexOf('-transpile') < 0) {
       fs.readFile(fullPath, function(err) {
         if (err) {
-          logger.sendErrorMsg(logger.ErrorCodes.general, 'fs.watch error. Automatic update of changed files disabled');
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['fs.watch error. Automatic update of changed files disabled'],
+          });
 
           return;
         }
@@ -45,8 +48,12 @@ try {
    */
   appSpecific = require('./appSpecific');
 } catch (e) {
-  logger.sendErrorMsg(logger.ErrorCodes.general, 'appSpecific.js is missing. Check the documentation (code or standalone) for more information');
-  throw e;
+  logger.sendErrorMsg({
+    code: logger.ErrorCodes.general,
+    text: ['appSpecific.js is missing. Check the documentation (code or standalone) for more information'],
+  });
+
+throw e;
 }
 
 app.io = socketIo();

@@ -14,7 +14,15 @@ function handle(socket) {
 
       dbConnector.getAllMissions(function(err, missions) {
         if (err || missions === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to get all missions', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get all missions'],
+            text_se: ['Misslyckades med att hämta alla uppdrag'],
+            err: err,
+          });
+
+          return;
         }
 
         socket.emit('missions', missions);
@@ -30,11 +38,19 @@ function handle(socket) {
 
       dbConnector.getActiveMissions(function(err, missions) {
         if (err || missions === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to get active missions', err);
-        }
-      });
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get active missions'],
+            text_se: ['Misslyckades med att hämta alla aktiva uppdrag'],
+            err: err,
+          });
 
-      socket.emit('missions', missions);
+          return;
+        }
+
+        socket.emit('missions', missions);
+      });
     });
   });
 }

@@ -50,7 +50,11 @@ function moveRequired() {
 fs.stat(path.resolve(appConfig.publicBase), function(err) {
   if (err) {
     fs.mkdir(path.resolve(appConfig.publicBase), function(dirErr) {
-      logger.sendErrorMsg(logger.ErrorCodes.general, 'Mkdir error', dirErr);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.general,
+        text: ['Mkdir error'],
+        err: dirErr,
+      });
     });
   }
 

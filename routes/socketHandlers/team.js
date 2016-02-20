@@ -8,7 +8,13 @@ const logger = require('../../logger');
 function updateUserTeam(socket, userName, teamName) {
   dbConnector.updateUserTeam(userName, teamName, function(err, user) {
     if (err || user === null) {
-      logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to add member to team', err);
+      logger.sendSocketErrorMsg({
+        socket: socket,
+        code: logger.ErrorCodes.general,
+        text: ['Failed to add member to team'],
+        text_se: ['Misslyckades med att lägga till medlem till teamet'],
+        err: err,
+      });
     }
   });
 }
@@ -18,7 +24,12 @@ function getTeam(socket, user, callback) {
     let newErr;
 
     if (err || team === null) {
-      logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed', err);
+      logger.sendSocketErrorMsg({
+        socket: socket,
+        code: logger.ErrorCodes.general,
+        text: ['Failed'],
+        err: err,
+      });
       newErr = {};
     }
 
@@ -57,7 +68,12 @@ function handle(socket) {
         } else if (team.owner !== user.userName && team.admins.indexOf(user.userName) === -1) {
           const errMsg = 'You are not an admin of the team. You are not allowed to add new team mebers';
 
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, errMsg, err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: [errMsg],
+            err: err,
+          });
 
           return;
         }
@@ -77,7 +93,12 @@ function handle(socket) {
 
       dbConnector.addTeam(data.team, function(err, team) {
         if (err || team === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Failed to create team', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to create team'],
+            err: err,
+          });
 
           return;
         }

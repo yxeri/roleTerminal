@@ -67,7 +67,11 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
     let historyMessages = [];
 
     if (err || history === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get history', err);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get history'],
+        err: err,
+      });
     } else {
       const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
@@ -107,12 +111,20 @@ function createRoom(newRoom, user, callback) {
 
   dbConnector.createRoom(newRoom, null, function(err, room) {
     if (err || room === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to create room for user ' + user.userName, err);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to create room for user ' + user.userName],
+        err: err,
+      });
       callback(err);
     } else {
       dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
         if (roomErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to add user ' + user.userName + ' to its room', roomErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to add user ' + user.userName + ' to its room'],
+            err: roomErr,
+          });
         }
 
         callback(roomErr, room.roomName);
@@ -124,7 +136,11 @@ function createRoom(newRoom, user, callback) {
 function updateUserSocketId(socketId, userName, callback) {
   dbConnector.updateUserSocketId(userName, socketId, function(err, user) {
     if (err) {
-      logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to update Id', err);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to update Id'],
+        err: err,
+      });
     }
 
     callback(err, user);

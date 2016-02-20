@@ -42,7 +42,12 @@ function handle(socket) {
       const value = data.value;
       const callback = function(err, command) {
         if (err || command === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update command');
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to update command'],
+            text_se: ['Misslyckades med att uppdatera kommandot'],
+          });
         } else {
           messenger.sendSelfMsg({
             message: {
@@ -65,7 +70,12 @@ function handle(socket) {
 
         break;
       default:
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Invalid field. Command doesn\'t have ' + field);
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.notFound,
+          text: ['Invalid field. Command doesn\'t have ' + field],
+          text_se: ['Ej giltigt fält. Kommandon har inte fältet ' + field],
+        });
 
         break;
       }

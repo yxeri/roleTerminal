@@ -2600,13 +2600,13 @@ function attachCommands() {
 
             queueMessage({
               text: createCommandStart(commandString).concat([
-                'Prepend commands with "' + commandChars.join('" or "') + '", example: ' + '"' + commandChars[0] + 'mode"',
+                'Prepend commands with ' + commandChars.join('" or "') + ', example: "' + commandChars[0] + 'mode"',
                 'Everything else written and sent will be intepreted as a chat message',
                 'You will no longer need to use msg command to write chat messages',
                 createCommandEnd(commandString.length),
               ]),
               text_se: createCommandStart(commandString).concat([
-                'Lägg till ' + commandChars.join('" eller "') + ' i början av varje kommando, exempel: ' + '"' + commandChars[0] + 'mode"',
+                'Lägg till ' + commandChars.join('" eller "') + ' i början av varje kommando, exempel: "' + commandChars[0] + 'mode"',
                 'Allt annat ni skriver kommer att tolkas som chatmeddelanden',
                 'Ni kommer inte längre behöva använda msg-kommandot för att skriva chatmeddelanden',
                 createCommandEnd(commandString.length),

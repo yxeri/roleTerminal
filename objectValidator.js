@@ -9,7 +9,10 @@ function checkKeys(data, expected) {
     const expectedKey = expectedKeys[i];
 
     if (!data[expectedKey] || data[expectedKey] === null) {
-      logger.sendErrorMsg(logger.ErrorCodes.general, 'Key missing: ' + expectedKey);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.general,
+        text: ['Key missing: ' + expectedKey],
+      });
 
       return false;
     }
@@ -27,7 +30,10 @@ function checkKeys(data, expected) {
 
 function isValidData(data, expected) {
   if ((!data || data === null) || (!expected || expected === null)) {
-    logger.sendErrorMsg(logger.ErrorCodes.general, 'Data and expected structure have to be set');
+    logger.sendErrorMsg({
+      code: logger.ErrorCodes.general,
+      text: ['Data and expected structure have to be set'],
+    });
 
     return false;
   }
@@ -35,7 +41,10 @@ function isValidData(data, expected) {
   const isValid = checkKeys(data, expected);
 
   if (!isValid) {
-    logger.sendErrorMsg(logger.ErrorCodes.general, 'Expected: ' + JSON.stringify(expected));
+    logger.sendErrorMsg({
+      code: logger.ErrorCodes.general,
+      text: ['Expected: ' + JSON.stringify(expected)],
+    });
   }
 
   return isValid;

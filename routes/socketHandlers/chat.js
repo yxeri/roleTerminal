@@ -79,7 +79,13 @@ function handle(socket) {
 
       manager.createRoom(data.room, user, function(createErr, roomName) {
         if (createErr) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to create room', createErr);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to create room'],
+            text_se: ['Lyckades inte skapa rummet'],
+            err: createErr,
+          });
 
           return;
         } else if (!roomName) {
@@ -133,7 +139,13 @@ function handle(socket) {
 
       dbConnector.authUserToRoom(user, roomName, data.room.password, function(err, room) {
         if (err || room === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'You are not authorized to join ' + roomName, err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['You are not authorized to join ' + roomName],
+            text_se: ['Ni har inte tillåtelse att gå in i rummet ' + roomName],
+            err: err,
+          });
           socket.emit('commandFail');
 
           return;
@@ -141,7 +153,11 @@ function handle(socket) {
 
         dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
           if (roomErr) {
-            logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + roomName, roomErr);
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.db,
+              text: ['Failed to follow ' + roomName],
+              err: roomErr,
+            });
             socket.emit('commandFail');
 
             return;
@@ -205,7 +221,13 @@ function handle(socket) {
         if (roomName !== userName) {
           dbConnector.removeRoomFromUser(userName, roomName, function(err, removedUser) {
             if (err || removedUser === null) {
-              logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to unfollow room', err);
+              logger.sendSocketErrorMsg({
+                socket: socket,
+                code: logger.ErrorCodes.db,
+                text: ['Failed to unfollow room'],
+                text_se: ['Misslyckades med att följa rummet'],
+                err: err,
+              });
 
               return;
             }
@@ -244,7 +266,11 @@ function handle(socket) {
 
       dbConnector.getAllRooms(user, function(roomErr, rooms) {
         if (roomErr) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all room names', roomErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get all room names'],
+            err: roomErr,
+          });
 
           return;
         }
@@ -276,7 +302,11 @@ function handle(socket) {
 
       dbConnector.getAllUsers(user, function(userErr, users) {
         if (userErr || users === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get all users', userErr);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get all users'],
+            err: userErr,
+          });
 
           return;
         }
@@ -288,7 +318,7 @@ function handle(socket) {
           for (let i = 0; i < users.length; i++) {
             const currentUser = users[i];
 
-            if ((appConfig.userVerify === false || currentUser.verified) && !currentUser.banned) {
+            if ((!appConfig.userVerify || currentUser.verified) && !currentUser.banned) {
               if (currentUser.online) {
                 onlineUsers.push(currentUser.userName);
               } else {
@@ -360,7 +390,11 @@ function handle(socket) {
 
       dbConnector.getOwnedRooms(user, function(err, ownedRooms) {
         if (err || !ownedRooms || ownedRooms === null) {
-          logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to get owned rooms', err);
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get owned rooms'],
+            err: err,
+          });
 
           return;
         }
@@ -399,7 +433,13 @@ function handle(socket) {
 
       manager.getHistory(allRooms, data.lines, false, startDate, function(histErr, historyMessages) {
         if (histErr) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.general, 'Unable to retrieve history', histErr);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Unable to retrieve history'],
+            text_se: ['Misslyckades med hämtningen av historik'],
+            err: histErr,
+          });
 
           return;
         }
@@ -444,7 +484,13 @@ function handle(socket) {
 
       dbConnector.removeRoom(roomNameLower, user, function(err, room) {
         if (err || room === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to remove the room', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to remove the room'],
+            text_se: ['Misslyckades med att ta bort rummet'],
+            err: err,
+          });
 
           return;
         }
@@ -477,7 +523,13 @@ function handle(socket) {
       if (data.device) {
         dbConnector.getDevice(data.device, function(err, device) {
           if (err || device === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to send the message to the device', err);
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to send the message to the device'],
+              text_se: ['Misslyckades med att skicka meddelande till enheten'],
+              err: err,
+            });
 
             return;
           }
@@ -512,7 +564,13 @@ function handle(socket) {
       const value = data.value;
       const callback = function(err, room) {
         if (err || room === null) {
-          logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to update room', err);
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to update room'],
+            text_se: ['Misslyckades med att uppdatera rummet'],
+            err: err,
+          });
 
           return;
         }
@@ -536,7 +594,12 @@ function handle(socket) {
 
         break;
       default:
-        logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Invalid field. Room doesn\'t have ' + field);
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.db,
+          text: ['Invalid field. Room doesn\'t have ' + field],
+          text_se: ['Felaktigt fält. Rum har inte fältet ' + field],
+        });
 
         break;
       }

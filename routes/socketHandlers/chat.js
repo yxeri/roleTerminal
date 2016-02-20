@@ -27,6 +27,7 @@ function followRoom(params) {
 
   socket.join(newRoomName);
   socket.emit('follow', { room: newRoom });
+  socket.emit('commandSuccess', { noStepCall: true });
 }
 
 function handle(socket) {
@@ -110,11 +111,15 @@ function handle(socket) {
 
   socket.on('follow', function(data) {
     if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      socket.emit('commandFail');
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.follow.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
+        socket.emit('commandFail');
+
         return;
       }
 
@@ -129,6 +134,7 @@ function handle(socket) {
       dbConnector.authUserToRoom(user, roomName, data.room.password, function(err, room) {
         if (err || room === null) {
           logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'You are not authorized to join ' + roomName, err);
+          socket.emit('commandFail');
 
           return;
         }
@@ -136,6 +142,7 @@ function handle(socket) {
         dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
           if (roomErr) {
             logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to follow ' + roomName, roomErr);
+            socket.emit('commandFail');
 
             return;
           }

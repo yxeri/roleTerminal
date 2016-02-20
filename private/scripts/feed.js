@@ -1729,21 +1729,27 @@ function onLogin(data = {}) {
 }
 
 function onCommandSuccess(data = {}) {
-  if (!data.freezeStep) {
-    commandHelper.onStep++;
-  }
+  if (!data.noStepCall) {
+    if (!data.freezeStep) {
+      commandHelper.onStep++;
+    }
 
-  validCommands[commandHelper.command].steps[commandHelper.onStep](data, socket);
+    validCommands[commandHelper.command].steps[commandHelper.onStep](data, socket);
+  } else {
+    resetCommand(false);
+  }
 }
 
 function onCommandFail() {
-  const abortFunc = validCommands[commandHelper.command].abortFunc;
+  if (commandHelper.command !== null) {
+    const abortFunc = validCommands[commandHelper.command].abortFunc;
 
-  if (abortFunc) {
-    abortFunc();
+    if (abortFunc) {
+      abortFunc();
+    }
+
+    resetCommand(true);
   }
-
-  resetCommand(true);
 }
 
 function onReconnectSuccess(data) {
@@ -2429,17 +2435,33 @@ function attachCommands() {
       if (phrases.length > 0) {
         const room = {
           roomName: phrases[0].toLowerCase(),
-          password: phrases[1],
         };
 
-        socket.emit('follow', { room: room });
+        commandHelper.data = { room: room };
+        commandHelper.hideInput = true;
+        hideInput(true);
+
+        queueMessage({
+          text: ['Enter the password for the room. Leave empty and press enter if the room is not protected'],
+          text_se: ['Skriv in rummets lösenord. Lämna det tomt och tryck på enter-knappen om rummet inte är skyddat'],
+        });
+        setInputStart('password');
       } else {
         queueMessage({
-          text: ['You have to specify which room to follow and a password (if it is protected)'],
-          text_se: ['Ni måste specificera vilket rum ni vill följa och dess lösenord (om rummet är skyddat)'],
+          text: ['You have to specify which room to follow'],
+          text_se: ['Ni måste specificera vilket rum ni vill följa'],
         });
       }
     },
+    steps: [
+      function followStepOne(phrases) {
+        if (phrases.length > 0) {
+          commandHelper.data.room.password = phrases[0];
+        }
+
+        socket.emit('follow', { room: commandHelper.data.room });
+      },
+    ],
     help: [
       'Follows a room and shows you all messages posted in it.',
       'You will get the messages from this room even if it isn\'t your currently selected one',
@@ -2450,16 +2472,16 @@ function attachCommands() {
     ],
     instructions: [
       ' Usage:',
-      '  follow *room name* *optional password*',
+      '  follow *room name*',
       ' Example:',
-      '  follow room1 banana',
+      '  follow room1',
     ],
     instructions_se: [
       ' Användning:',
-      '  follow *rumsnamn* *frivilligt lösenord*',
+      '  follow *rumsnamn*',
       ' Exempel:',
       '  follow rum1',
-      '  follow rum2 banan',
+      '  follow rum2',
     ],
     autocomplete: { type: 'rooms' },
     accessLevel: 13,

@@ -52,6 +52,7 @@ function sendSelfMsgs(params) {
 function isSocketFollowingRoom(socket, roomName) {
   if (Object.keys(socket.rooms).indexOf(roomName) === -1) {
     sendSelfMsg({
+      socket: socket,
       message: {
         text: ['You are not following room ' + roomName],
         text_se: ['Ni följer inte rummet ' + roomName],

@@ -85,4 +85,8 @@ if (appConfig.watchDir === true) {
 
 appSpecific();
 
+process.on('uncaughtException', function(err) {
+  console.log('Caught exception', err);
+});
+
 module.exports = app;

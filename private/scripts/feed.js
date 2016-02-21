@@ -1454,9 +1454,6 @@ function populateMenu() {
       func: validCommands.list.func,
       funcParam: 'rooms',
     },
-    jobs: {
-      itemName: 'JOBS',
-    },
   };
 
   const menuList = document.getElementById('menuList');

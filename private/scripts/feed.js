@@ -2448,6 +2448,7 @@ function attachCommands() {
           text: ['You have to specify which room to follow'],
           text_se: ['Ni måste specificera vilket rum ni vill följa'],
         });
+        resetCommand(false);
       }
     },
     steps: [

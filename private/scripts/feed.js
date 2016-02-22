@@ -868,7 +868,7 @@ function sendLocation() {
  * Some devices disable Javascript when screen is off (iOS)
  * They also fail to notice that they have been disconnected
  * We check the time between heartbeats and if the time i
- * over 10 seconds (e.g. when screen is turned off and then on)
+ * over 10 seconds (example: when screen is turned off and then on)
  * we force them to reconnect
  * @returns {undefined} Returns nothing
  */
@@ -1217,14 +1217,14 @@ function enterKeyHandler() {
             text: [
               'You must register a new user or login with an existing user to gain access to more commands',
               'Use command register or login',
-              'example: register myname 1135',
-              'or login myname 1135',
+              'example: register myname',
+              'or login myname',
             ],
             text_se: [
               'Ni måste registrera en ny användare eller logga in med en existerande användare för att få tillgång till fler kommandon',
               'Använd kommando register eller login',
-              'Exempel: register myname 1135',
-              'eller login myname 1135',
+              'Exempel: register myname',
+              'eller login myname',
             ],
           });
 
@@ -1773,7 +1773,7 @@ function onReconnectSuccess(data) {
 
     queueMessage({
       text: ['Retrieving missed messages (if any)'],
-      text_se: ['Hämtar missade meddelanden (om det finns några'],
+      text_se: ['Hämtar missade meddelanden (om det finns några)'],
     });
 
     socket.emit('updateDeviceSocketId', {

@@ -57,11 +57,12 @@ function sendSocketErrorMsg(data) {
   const code = data.code;
   const text = data[languagePicker.appendLanguageCode('text')];
   const err = data.err;
+  text[0] = '[' + code.num + '] ' + text[0];
 
   messenger.sendSelfMsg({
     socket: socket,
     message: {
-      text: ['[' + code.num + '] '].join(text),
+      text: text,
     },
   });
   printErrorMsg(code, text, err);

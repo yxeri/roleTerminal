@@ -462,11 +462,13 @@ function handle(socket) {
         return;
       }
 
-      if (!data.local) {
-        socket.broadcast.emit('morse', data.morseCode);
-      }
-
-      socket.emit('morse', { morseCode: data.morseCode });
+      messenger.sendMorse({
+        socket: socket,
+        local: data.local,
+        message: {
+          morseCode: data.morseCode,
+        },
+      });
     });
   });
 
@@ -536,10 +538,32 @@ function handle(socket) {
 
           data.roomName = device.deviceId + appConfig.deviceAppend;
 
-          messenger.sendImportantMsg({ socket: socket, message: data.message, toOneDevice: true });
+          messenger.sendImportantMsg({
+            socket: socket,
+            message: data.message,
+            toOneDevice: true,
+          });
+          messenger.sendMorse({
+            socket: socket,
+            local: data.morse.local,
+            message: {
+              roomName: data.roomName,
+              morseCode: data.morse.morseCode,
+            },
+          });
         });
       } else {
-        messenger.sendImportantMsg({ socket: socket, message: data.message });
+        messenger.sendImportantMsg({
+          socket: socket,
+          message: data.message,
+        });
+        messenger.sendMorse({
+          socket: socket,
+          local: data.morse.local,
+          message: {
+            morseCode: data.morse.morseCode,
+          },
+        });
       }
     });
   });
@@ -603,6 +627,36 @@ function handle(socket) {
 
         break;
       }
+    });
+  });
+
+  socket.on('matchPartialRoom', function(data) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
+      console.log(socket.id, user);
+      dbConnector.matchPartialRoom(data.partialName, user, function(err, rooms) {
+        if (err) {
+          return;
+        }
+
+        const itemList = [];
+        const roomKeys = Object.keys(rooms);
+
+        for (let i = 0; i < roomKeys.length; i++) {
+          itemList.push(rooms[roomKeys[i]].roomName);
+        }
+
+        if (itemList.length === 1) {
+          socket.emit('matchFound', { matchedName: itemList[0] });
+        } else {
+          socket.emit('list', {
+            itemList: {
+              itemList: itemList,
+              keepInput: false,
+              replacePhrase: true,
+            },
+          });
+        }
+      });
     });
   });
 }

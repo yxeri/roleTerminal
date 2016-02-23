@@ -92,12 +92,8 @@ function handle(socket, io) {
           return;
         }
 
-        const message = {};
+
         const newRoom = {};
-
-        message.time = new Date();
-        message.roomName = databasePopulation.rooms.admin.roomName;
-
         newRoom.roomName = user.userName + appConfig.whisperAppend;
         newRoom.visibility = 12;
         newRoom.accessLevel = 12;
@@ -117,9 +113,14 @@ function handle(socket, io) {
         });
 
         if (appConfig.userVerify) {
+          const message = {};
+          message.time = new Date();
+          message.roomName = databasePopulation.rooms.admin.roomName;
+
           messenger.sendMsg({
             socket: socket,
             message: {
+              userName: 'SYSTEM',
               text: ['User ' + user.userName + ' needs to be verified'],
               text_se: ['Användaren ' + user.userName + ' måste bli verifierad'],
             },
@@ -804,11 +805,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialuser', function(data) {
-    if (!objectValidator.isValidData(data, { partialName: true })) {
-      return;
-    }
-
+  socket.on('matchPartialUser', function(data) {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       dbConnector.matchPartialUser(data.partialName, user, function(err, users) {
         if (err) {

@@ -152,6 +152,7 @@ function joinRooms(rooms, socket, device) {
 
   allRooms.push(databasePopulation.rooms.important.roomName);
   allRooms.push(databasePopulation.rooms.broadcast.roomName);
+  allRooms.push(databasePopulation.rooms.morse.roomName);
 
   if (device) {
     allRooms.push(device + appConfig.deviceAppend);

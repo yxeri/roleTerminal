@@ -29,7 +29,7 @@ function addMsgToHistory(roomName, message, socket, callback) {
 }
 
 function sendSelfMsg(params) {
-  if (!objectValidator.isValidData(params, { message: { text: true } })) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true } })) {
     return;
   }
 
@@ -39,13 +39,14 @@ function sendSelfMsg(params) {
 }
 
 function sendSelfMsgs(params) {
+  if (!objectValidator.isValidData(params, { socket: true, messages: true })) {
+    return;
+  }
+
   const data = {
     messages: params.messages,
   };
 
-  if (!objectValidator.isValidData(data, { messages: true })) {
-    return;
-  }
   params.socket.emit('messages', data);
 }
 
@@ -66,20 +67,24 @@ function isSocketFollowingRoom(socket, roomName) {
 }
 
 function sendMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true }, sendTo: true })) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     message: params.message,
     sendTo: params.sendTo,
   };
 
-  if (!objectValidator.isValidData(data, { message: { text: true, userName: true }, sendTo: true })) {
-    return;
-  }
-
   socket.broadcast.to(data.sendTo).emit('message', data);
 }
 
 function sendImportantMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     message: params.message,
@@ -87,10 +92,6 @@ function sendImportantMsg(params) {
   data.message.roomName = data.message.roomName || databasePopulation.rooms.important.roomName;
   data.message.extraClass = 'importantMsg';
   data.message.time = new Date();
-
-  if (!objectValidator.isValidData(data, { message: { text: true, userName: true, roomName: true, time: true, extraClass: true } })) {
-    return;
-  }
 
   addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
     if (err) {
@@ -113,17 +114,17 @@ function sendImportantMsg(params) {
 }
 
 function sendChatMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+    return;
+  } else if (params.message && !isSocketFollowingRoom(params.socket, params.message.roomName)) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     message: params.message,
   };
   data.message.time = new Date();
-
-  if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true, time: true } })) {
-    return;
-  } else if (!isSocketFollowingRoom(socket, data.message.roomName)) {
-    return;
-  }
 
   addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
     if (err) {
@@ -136,6 +137,10 @@ function sendChatMsg(params) {
 }
 
 function sendWhisperMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     message: params.message,
@@ -143,10 +148,6 @@ function sendWhisperMsg(params) {
   data.message.roomName += appConfig.whisperAppend;
   data.message.extraClass = 'whisperMsg';
   data.message.time = new Date();
-
-  if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true, time: true, extraClass: true } })) {
-    return;
-  }
 
   addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
     if (err) {
@@ -167,6 +168,10 @@ function sendWhisperMsg(params) {
 }
 
 function sendBroadcastMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     message: params.message,
@@ -174,10 +179,6 @@ function sendBroadcastMsg(params) {
   data.message.extraClass = 'broadcastMsg';
   data.message.roomName = databasePopulation.rooms.broadcast.roomName;
   data.message.time = new Date();
-
-  if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, userName: true, time: true, extraClass: true } })) {
-    return;
-  }
 
   addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
     if (err) {
@@ -190,16 +191,43 @@ function sendBroadcastMsg(params) {
 }
 
 function sendList(params) {
+  if (!objectValidator.isValidData(params, { socket: true, itemList: { itemList: true, listTitle: true } })) {
+    return;
+  }
+
   const socket = params.socket;
   const data = {
     itemList: params.itemList,
   };
 
-  if (!objectValidator.isValidData(data, { itemList: { itemList: true, listTitle: true } })) {
+  socket.emit('list', data);
+}
+
+function sendMorse(params) {
+  if (!objectValidator.isValidData(params, { socket: true, message: { morseCode: true } })) {
     return;
   }
 
-  socket.emit('list', data);
+  const roomName = params.message.roomName || databasePopulation.rooms.morse.roomName;
+  const morseCode = params.message.morseCode;
+  const socket = params.socket;
+  const message = {
+    morseCode: morseCode,
+    time: new Date(),
+    roomName: roomName,
+  };
+
+  if (!params.local) {
+    socket.broadcast.emit('morse', { morseCode: morseCode });
+  }
+
+  socket.emit('morse', { morseCode: morseCode });
+
+  addMsgToHistory(roomName, message, socket, function(err) {
+    if (err) {
+      return;
+    }
+  });
 }
 
 exports.sendImportantMsg = sendImportantMsg;
@@ -210,3 +238,4 @@ exports.sendMsg = sendMsg;
 exports.sendSelfMsg = sendSelfMsg;
 exports.sendSelfMsgs = sendSelfMsgs;
 exports.sendList = sendList;
+exports.sendMorse = sendMorse;

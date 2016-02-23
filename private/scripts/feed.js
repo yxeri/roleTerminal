@@ -23,6 +23,7 @@ const randomBinary = '01';
 const hideRooms = [
   'broadcast',
   'important',
+  'morse',
 ];
 const noLinkRooms = [
   'whisper',
@@ -368,7 +369,20 @@ function getDefaultLanguage() {
   return getLocalVal('defaultLanguage');
 }
 
-function printRow(message) {
+function printRow(text, message) {
+  const row = generateFullRow(text, message);
+  const extraClass = message.extraClass;
+
+  if (extraClass) {
+    // classList doesn't work on older devices, thus the usage of className
+    row.className += ' ' + extraClass;
+  }
+
+  mainFeed.appendChild(row);
+  scrollView();
+}
+
+function createRow(message) {
   const defaultLanguage = getDefaultLanguage();
   // Set text depending on default language set. Empty means English
   let currentText = defaultLanguage === '' ? message.text : message['text_' + defaultLanguage];
@@ -380,18 +394,14 @@ function printRow(message) {
 
   if (currentText && currentText.length > 0) {
     const text = currentText.shift();
-    const row = generateFullRow(text, message);
-    const extraClass = message.extraClass;
 
-    if (extraClass) {
-      // classList doesn't work on older devices, thus the usage of className
-      row.className += ' ' + extraClass;
+    printRow(text, message);
+    setTimeout(createRow, rowTimeout, message);
+  } else {
+    if (message.morseCode) {
+      printRow(message.morseCode, { time: message.time });
     }
 
-    mainFeed.appendChild(row);
-    scrollView();
-    setTimeout(printRow, rowTimeout, message);
-  } else {
     consumeMessageShortQueue(); // eslint-disable-line no-use-before-define
   }
 }
@@ -400,7 +410,7 @@ function consumeMessageShortQueue() {
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
 
-    printRow(message, consumeMessageShortQueue);
+    createRow(message, consumeMessageShortQueue);
   } else {
     printing = false;
     consumeMessageQueue(); // eslint-disable-line no-use-before-define
@@ -578,6 +588,7 @@ function resetCommand(aborted) {
   commandHelper.keysBlocked = false;
   commandHelper.data = null;
   commandHelper.hideInput = false;
+  commandHelper.allowAutoComplete = false;
 
   if (aborted) {
     queueMessage({
@@ -730,6 +741,29 @@ function playMorse(morseCode) {
 //  const d = R * c;
 //  return d * 1000; // meters
 // }
+
+function parseMorse(text) {
+  let morseCode;
+  let morseCodeText = '';
+  let filteredText = text.toLowerCase();
+
+  filteredText = filteredText.replace(/[åä]/g, 'a');
+  filteredText = filteredText.replace(/[ö]/g, 'o');
+  filteredText = filteredText.replace(/\s/g, '#');
+  filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
+
+  for (let i = 0; i < filteredText.length; i++) {
+    morseCode = morseCodes[filteredText.charAt(i)];
+
+    for (let j = 0; j < morseCode.length; j++) {
+      morseCodeText += morseCode[j] + ' ';
+    }
+
+    morseCodeText += '   ';
+  }
+
+  return morseCodeText;
+}
 
 function generateMap() {
   const startLetter = 'A';
@@ -1273,14 +1307,18 @@ function specialKeyPress(event) {
       if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
         autoCompleteCommand();
         changeModeText();
-      } else if (phrases.length === 2) {
-        const command = retrieveCommand(phrases[0]);
+      } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
+        const command = validCommands[commandHelper.command] || retrieveCommand(phrases[0]).command;
+        const partial = commandHelper.command ? phrases[0] : phrases[1];
 
-        console.log(command);
-        if (command.command && command.command.autocomplete) {
-          switch (command.command.autocomplete.type) {
+        if (command && command.autocomplete) {
+          switch (command.autocomplete.type) {
           case 'users':
-            socket.emit('matchPartialuser', { partialName: phrases[1] });
+            socket.emit('matchPartialUser', { partialName: partial });
+
+            break;
+          case 'rooms':
+            socket.emit('matchPartialRoom', { partialName: partial });
 
             break;
           default:
@@ -2699,7 +2737,7 @@ function attachCommands() {
               'Name has to be 3 to 6 characters long',
               'The name can only contain letters and numbers (a-z, 0-9)',
               'Don\'t use whitespace in your name!',
-              'e.g. register myname',
+              'example: register myname',
             ],
             text_se: [
               'Namnet behöver vara 3 till 6 tecken långt',
@@ -3146,26 +3184,8 @@ function attachCommands() {
   };
   validCommands.morse = {
     func: function morseCommand(phrases, local) {
-      let morseCodeText = '';
-      let morseCode;
-
       if (phrases && phrases.length > 0) {
-        let filteredText = phrases.join(' ').toLowerCase();
-
-        filteredText = filteredText.replace(/[åä]/g, 'a');
-        filteredText = filteredText.replace(/[ö]/g, 'o');
-        filteredText = filteredText.replace(/\s/g, '#');
-        filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
-
-        for (let i = 0; i < filteredText.length; i++) {
-          morseCode = morseCodes[filteredText.charAt(i)];
-
-          for (let j = 0; j < morseCode.length; j++) {
-            morseCodeText += morseCode[j] + ' ';
-          }
-
-          morseCodeText += '   ';
-        }
+        const morseCodeText = parseMorse(phrases.join(' ').toLowerCase());
 
         if (morseCodeText.length > 0) {
           socket.emit('morse', {
@@ -3751,7 +3771,10 @@ function attachCommands() {
       function importantmsgStepFive(phrases) {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
-            commandHelper.data.morse = { local: true };
+            commandHelper.data.morse = {
+              morseCode: parseMorse(commandHelper.data.message.text[0]),
+              local: true,
+            };
           }
 
           socket.emit('importantMsg', commandHelper.data);
@@ -4199,20 +4222,52 @@ function attachCommands() {
     category: 'admin',
   };
   validCommands.createteam = {
-    func: function createteamCommand() {
+    func: function createteamCommand(phrases) {
       const data = { team: { teamName: '' } };
 
-      if (data.team.teamName) {
-        data.team.owner = getUser();
-
-        socket.emit('createTeam', data);
+      if (phrases.length > 0) {
+        data.team.teamName = phrases.join(' ');
+        commandHelper.data = data;
+        queueMessage(copyMessage(abortInfo));
+        setInputStart('owner');
+        socket.emit('teamExists', commandHelper.data);
       } else {
         queueMessage({
-          text: ['You have to enter a name'],
-          text_se: ['Ni måste skriva in ett namn'],
+          text: ['You have to enter a name. Example: createteam My Team Name'],
+          text_se: ['Ni måste skriva in ett namn. Exempel: createteam Mitt Team'],
         });
+        resetCommand(false);
       }
     },
+    steps: [
+      function creeateTeamStepOne() {
+        queueMessage({
+          text: [
+            'Are you the owner of the team? Leave it empty and press enter, if you are. Enter the name of the user that is the owner, if you are not',
+            'You can press tab or double space to see available users',
+          ],
+          text_se: [
+            'Är ni ägaren av teamet? Lämna fältet tomt och tryck på Enter-knappen om ni är det. Skriv annars in användarnamnet som är ägaren om inte ni är det',
+            'Ni kan trycka på tab-knappen eller skriva in dubbelblanksteg för att se tillgängliga användare',
+          ],
+        });
+        commandHelper.allowAutoComplete = true;
+        commandHelper.onStep++;
+      },
+      function createTeamStepTwo(phrases) {
+        if (phrases[0] !== '') {
+          const owner = phrases[0];
+
+          commandHelper.data.team.owner = owner;
+          commandHelper.data.team.admins = [getUser()];
+        } else {
+          commandHelper.data.team.owner = getUser();
+        }
+
+        socket.emit('createTeam', commandHelper.data);
+        resetCommand(false);
+      },
+    ],
     help: [
       'Create a new team',
       'You will be able to invite new members to the team',
@@ -4235,6 +4290,7 @@ function attachCommands() {
     ],
     accessLevel: 13,
     category: 'basic',
+    autocomplete: { type: 'users' },
   };
   validCommands.inviteteam = {
     func: function inviteteamCommand(phrases) {

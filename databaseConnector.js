@@ -61,6 +61,7 @@ const historySchema = new mongoose.Schema({
     roomName: String,
     extraClass: String,
     customSender: String,
+    morseCode: String,
   }],
 }, { collection: 'histories' });
 const commandSchema = new mongoose.Schema({
@@ -258,7 +259,7 @@ function addTeam(team, callback) {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to find a team'],
+        text: ['Failed to check if team already exists'],
         err: err,
       });
     } else if (foundTeam === null) {
@@ -474,6 +475,23 @@ function authUser(sentUserName, sentPassword, callback) {
     }
 
     callback(err, user);
+  });
+}
+
+function getTeam(teamName, callback) {
+  const query = { teamName: teamName };
+  const filter = { teamName: 1 };
+
+  Team.findOne(query, filter).lean().exec(function(err, foundTeam) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to find team'],
+        err: err,
+      });
+    }
+
+    callback(err, foundTeam);
   });
 }
 
@@ -1089,42 +1107,26 @@ function removeRoom(sentRoomName, sentUser, callback) {
 
 function populateDbRooms(sentRooms, user) {
   const roomCallback = function(err, room) {
-    if (err || room === null) {
+    if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['PopulateDb: [failure] Failed to create room'],
         err: err,
       });
-    } else {
-      logger.sendInfoMsg('PopulateDb: [success] Created room');
+    } else if (room !== null) {
+      logger.sendInfoMsg('PopulateDb: [success] Created room ' + room.roomName);
     }
   };
 
-  Room.find().lean().exec(function(err, rooms) {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['PopulateDb: [failure] Failed to find rooms'],
-        err: err,
-      });
-    } else if (rooms === null || rooms.length < 3) {
-      const roomKeys = Object.keys(sentRooms);
+  const roomKeys = Object.keys(sentRooms);
 
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['PopulateDb: [failure] One of the main rooms are missing'],
-      });
-      logger.sendInfoMsg('PopulateDb: Creating rooms from defaults');
+  logger.sendInfoMsg('PopulateDb: Creating rooms from defaults, if needed');
 
-      for (let i = 0; i < roomKeys.length; i++) {
-        const room = sentRooms[roomKeys[i]];
+  for (let i = 0; i < roomKeys.length; i++) {
+    const room = sentRooms[roomKeys[i]];
 
-        createRoom(room, user, roomCallback);
-      }
-    } else {
-      logger.sendInfoMsg('PopulateDb: [success] DB has all the main rooms');
-    }
-  });
+    createRoom(room, user, roomCallback);
+  }
 }
 
 function populateDbUsers(sentUsers) {
@@ -1266,26 +1268,45 @@ function getCommand(commandName, callback) {
   });
 }
 
-function matchPartialUser(partialUserName, user, callback) {
-  const query = {
-    $and: [
-      { userName: { $regex: '^' + partialUserName + '.*' } },
-      { visibility: { $lte: user.accessLevel } },
-    ],
-  };
-  const filter = { _id: 0, userName: 1 };
+function matchPartial(filter, sort, itemName, user, queryType, callback) {
+  let query;
 
-  User.find(query, filter).lean().exec(function(err, users) {
+  if (itemName) {
+    query = {
+      $and: [
+        { userName: { $regex: '^' + itemName + '.*' } },
+        { visibility: { $lte: user.accessLevel } },
+      ],
+    };
+  } else {
+    query = { visibility: { $lte: user.accessLevel } };
+  }
+
+  queryType.find(query, filter).sort(sort).lean().exec(function(err, users) {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['matchPartialUser'],
+        text: ['matchPartial'],
         err: err,
       });
     }
 
     callback(err, users);
   });
+}
+
+function matchPartialUser(partialUserName, user, callback) {
+  const filter = { _id: 0, userName: 1 };
+  const sort = { userName: 1 };
+
+  matchPartial(filter, sort, partialUserName, user, User, callback);
+}
+
+function matchPartialRoom(partialRoomName, user, callback) {
+  const filter = { _id: 0, roomName: 1 };
+  const sort = { roomName: 1 };
+
+  matchPartial(filter, sort, partialRoomName, user, Room, callback);
 }
 
 exports.getCommand = getCommand;
@@ -1350,3 +1371,5 @@ exports.getAllMissions = getAllMissions;
 exports.updateMissionCompleted = updateMissionCompleted;
 exports.updateMissionReward = updateMissionReward;
 exports.matchPartialUser = matchPartialUser;
+exports.matchPartialRoom = matchPartialRoom;
+exports.getTeam = getTeam;

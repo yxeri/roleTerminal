@@ -359,6 +359,7 @@ function handle(socket) {
         data.device.deviceId + appConfig.deviceAppend,
         databasePopulation.rooms.important.roomName,
         databasePopulation.rooms.broadcast.roomName,
+        databasePopulation.rooms.morse.roomName,
       ];
 
       return hiddenRooms.indexOf(room) >= 0;
@@ -543,27 +544,33 @@ function handle(socket) {
             message: data.message,
             toOneDevice: true,
           });
-          messenger.sendMorse({
-            socket: socket,
-            local: data.morse.local,
-            message: {
-              roomName: data.roomName,
-              morseCode: data.morse.morseCode,
-            },
-          });
+
+          if (data.morse) {
+            messenger.sendMorse({
+              socket: socket,
+              local: data.morse.local,
+              message: {
+                roomName: data.roomName,
+                morseCode: data.morse.morseCode,
+              },
+            });
+          }
         });
       } else {
         messenger.sendImportantMsg({
           socket: socket,
           message: data.message,
         });
-        messenger.sendMorse({
-          socket: socket,
-          local: data.morse.local,
-          message: {
-            morseCode: data.morse.morseCode,
-          },
-        });
+
+        if (data.morse) {
+          messenger.sendMorse({
+            socket: socket,
+            local: data.morse.local,
+            message: {
+              morseCode: data.morse.morseCode,
+            },
+          });
+        }
       }
     });
   });

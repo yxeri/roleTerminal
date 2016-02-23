@@ -141,8 +141,18 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.createteam.commandName, function(allowErr, allowed) {
-      if (allowErr || !allowed || !data.team || !data.team.teamName) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.createteam.commandName, function(allowErr, allowed, allowedUser) {
+      if (allowErr || !allowed) {
+        return;
+      } else if (allowedUser.team) {
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: ['You are already a member of a team. Failed to create team'],
+            text_se: ['Ni är redan medlem i ett team. Misslyckades med att skapa teamet'],
+          },
+        });
+
         return;
       }
 

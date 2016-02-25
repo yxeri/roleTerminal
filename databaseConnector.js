@@ -113,6 +113,15 @@ const missionSchema = new mongoose.Schema({
   visibility: Number,
   accessLevel: Number,
 }, { collection: 'missions' });
+const invitationListSchema = new mongoose.Schema({
+  userName: { type: String, unique: true, index: true },
+  invitations: [{
+    invitationType: String,
+    itemName: String,
+    sender: String,
+    time: Date,
+  }],
+}, { collection: 'invitationLists' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -123,6 +132,7 @@ const Device = mongoose.model('Device', deviceSchema);
 const Team = mongoose.model('Team', teamSchema);
 const Weather = mongoose.model('Weather', weatherSchema);
 const Mission = mongoose.model('Mission', missionSchema);
+const InvitationList = mongoose.model('InvitationList', invitationListSchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName: userName };
@@ -480,24 +490,24 @@ function authUser(sentUserName, sentPassword, callback) {
 
 function getTeam(teamName, callback) {
   const query = { teamName: teamName };
-  const filter = { teamName: 1 };
+  const filter = { _id: 0 };
 
-  Team.findOne(query, filter).lean().exec(function(err, foundTeam) {
+  Team.findOne(query, filter).lean().exec(function(err, team) {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to find team'],
+        text: ['Failed to get team'],
         err: err,
       });
     }
 
-    callback(err, foundTeam);
+    callback(err, team);
   });
 }
 
 function getUser(userName, callback) {
   const query = { userName: userName };
-  const filter = { userName: 1 };
+  const filter = { userName: 1, team: 1 };
 
   User.findOne(query, filter).lean().exec(function(err, foundUser) {
     if (err) {
@@ -655,23 +665,6 @@ function getAllDevices(callback) {
     }
 
     callback(err, devices);
-  });
-}
-
-function getTeam(teamName, callback) {
-  const query = { teamName: teamName };
-  const filter = { _id: 0 };
-
-  Team.findOne(query, filter).lean().exec(function(err, team) {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['Failed to get team'],
-        err: err,
-      });
-    }
-
-    callback(err, team);
   });
 }
 
@@ -908,6 +901,96 @@ function removeRoomFromUser(sentUserName, sentRoomName, callback) {
   });
 }
 
+function getInvitations(userName, callback) {
+  const query = { userName: userName};
+
+  InvitationList.findOne(query).lean().exec(function(err, list) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get invitations for ' + userName],
+        err: err,
+      });
+    }
+
+    callback(err, list);
+  });
+}
+
+function addInvitationToList(userName, invitation, callback) {
+  const query = {
+    $and: [
+      { userName: userName },
+      { 'invitations.itemName': invitation.itemName },
+      { 'invitations.invitationType': invitation.invitationType },
+    ],
+  };
+
+  InvitationList.findOne(query).lean().exec(function(invErr, invitationList) {
+    if (invErr || invitationList) {
+      if (invErr && (!invErr.code || invErr.code !== 11000)) {
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.db,
+          text: ['Failed to find invitation list to add invitation to user ' + userName],
+          err: invErr,
+        });
+      }
+
+      callback(invErr, invitationList);
+    } else {
+      const update = { $push: { invitations: invitation } };
+      const options = { new: true, upsert: true };
+
+      InvitationList.update({ userName: userName }, update, options).lean().exec(function(updErr) {
+        if (updErr) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to add invitation to user ' + userName + ' list'],
+            err: invErr,
+          });
+        }
+
+        callback(updErr, invitationList);
+      });
+    }
+  });
+}
+
+function removeInvitationFromList(userName, itemName, invitationType, callback) {
+  const query = { userName: userName };
+  const update = { $pull: { invitations: { itemName: itemName, type: invitationType } } };
+
+  InvitationList.findOneAndUpdate(query, update).lean().exec(function(err, invitationList) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to remove invitation from ' + itemName + ' of type ' + invitationType + ' to ' + userName],
+        err: err,
+      });
+    }
+
+    callback(err, invitationList);
+  });
+}
+
+function removeInvitationTypeFromList(userName, invitationType, callback) {
+  const query = { userName: userName };
+  const update = { $pull: { invitations: { type: invitationType } } };
+  const options = { multi: true };
+
+  InvitationList.update(query, update, options).lean().exec(function(err, invitationList) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to remove invitations of type ' + invitationType],
+        err: err,
+      });
+    }
+
+    callback(err, invitationList);
+  });
+}
+
 function setUserLastOnline(sentUserName, sentDate, callback) {
   const query = { userName: sentUserName };
   const update = { lastOnline: sentDate };
@@ -920,11 +1003,6 @@ function setUserLastOnline(sentUserName, sentDate, callback) {
         err: err,
       });
     }
-
-    logger.sendErrorMsg({
-      code: logger.ErrorCodes.db,
-      text: ['Updated ' + sentUserName + ' with ' + sentDate],
-    });
 
     callback(err, user);
   });
@@ -1372,4 +1450,7 @@ exports.updateMissionCompleted = updateMissionCompleted;
 exports.updateMissionReward = updateMissionReward;
 exports.matchPartialUser = matchPartialUser;
 exports.matchPartialRoom = matchPartialRoom;
-exports.getTeam = getTeam;
+exports.addInvitationToList = addInvitationToList;
+exports.removeInvitationFromList = removeInvitationFromList;
+exports.getInvitations = getInvitations;
+exports.removeInvitationTypeFromList = removeInvitationTypeFromList;

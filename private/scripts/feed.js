@@ -530,6 +530,14 @@ function getUser() {
   return getLocalVal('user');
 }
 
+function getTeam() {
+  return getLocalVal('team');
+}
+
+function setTeam(team) {
+  setLocalVal('team', team)
+}
+
 function setUser(user) {
   setLocalVal('user', user);
 }
@@ -1739,6 +1747,7 @@ function onLogin(data = {}) {
   validCommands.clear.func();
   setUser(user.userName);
   setAccessLevel(user.accessLevel);
+  setTeam(user.team);
   queueMessage({
     text: ['Successfully logged in as ' + user.userName],
     text_se: ['Lyckades logga in som ' + user.userName],
@@ -4292,6 +4301,103 @@ function attachCommands() {
     category: 'basic',
     autocomplete: { type: 'users' },
   };
+  validCommands.invitations = {
+    func: function invitationsCommand() {
+      socket.emit('getInvitations');
+    },
+    steps: [
+      function invitationsCommandStepOne(data) {
+        const sentInvitations = data.invitations;
+        const text = [];
+        commandHelper.data = data;
+
+        console.log(data.invitations);
+
+        if (sentInvitations.length > 0) {
+          for (let i = 0; i < sentInvitations.length; i++) {
+            const invitation = sentInvitations[i];
+            const itemNumber = i + 1;
+
+            text.push('<' + itemNumber + '> Join ' + invitation.invitationType + ' ' + invitation.itemName + '. Sent by ' + invitation.sender);
+          }
+
+          queueMessage({ text: createCommandStart('Invitations').concat(text, createCommandEnd()) });
+          queueMessage({
+            text: [
+              'Answer the invite with accept or decline. Example: 1 decline',
+            ],
+            text_se: [
+              'Besvara inbjudan med accept eller decline. Exempel: 1 decline',
+            ],
+          });
+          queueMessage(copyMessage(abortInfo));
+          setInputStart('answer');
+          commandHelper.onStep++;
+        } else {
+          queueMessage({
+            text: ['You have no invitations'],
+            text_se: ['Ni har inga inbjudan'],
+          });
+          resetCommand(false);
+        }
+      },
+      function invitationsCommandStepTwo(phrases) {
+        if (phrases.length > 1) {
+          const itemNumber = phrases[0] - 1;
+          const answer = phrases[1].toLowerCase();
+          const invitation = commandHelper.data.invitations[itemNumber];
+
+          if (['accept', 'a', 'decline', 'd'].indexOf(answer) > -1) {
+            const accepted = ['accept', 'a'].indexOf(answer) > -1 ? true : false;
+
+            switch (invitation.invitationType) {
+            case 'team':
+              socket.emit('teamAnswer', { accepted: accepted, invitation: invitation });
+
+              break;
+            default:
+              break;
+            }
+
+            resetCommand(false);
+          } else {
+            queueMessage({
+              text: ['You have to either accept or decline the invitation'],
+              text_se: ['Ni måste antingen acceptera eller avböja inbjudan'],
+            });
+          }
+        } else {
+          resetCommand(true);
+        }
+      },
+    ],
+    help: [
+      'Shows a list of all your invitations and lets you accept or decline them',
+      'Note that "d" is a shorthand for "decline" and "a" is a shorthand for "accept" Either version is allowed',
+    ],
+    help_se: [
+      'Visar en lista över dina inbjudan och låter dig acceptera eller avböja dem',
+      'Notera att "d" är en förkortning av "decline" och "a" är en förkortning "accept" Bägge är tillåtna',
+    ],
+    instructions: [
+      ' Usage:',
+      '  invitations',
+      '  *number of the invitation* *accept OR a OR decline OR d*',
+      ' Example:',
+      '  invitations',
+      '  1 accept',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  invitations',
+      '  *nummer på inbjudan* *accept ELLR a ELLER decline ELLER d*',
+      ' Exampel:',
+      '  invitations',
+      '  1 accept',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
   validCommands.inviteteam = {
     func: function inviteteamCommand(phrases) {
       const data = { user: { userName: phrases[0] } };
@@ -4300,8 +4406,8 @@ function attachCommands() {
         socket.emit('inviteToTeam', data);
       } else {
         queueMessage({
-          text: ['You are not allowed to invite members to the team or you are not in a team'],
-          text_se: ['Ni har antingen inte tillåtelse att bjuda in medlemmar till teamet eller är inte med i ett team'],
+          text: ['You have to enter a user name. Example: inviteteam bob'],
+          text_se: ['Ni måste skriva in ett användarnamn. Exempel: inviteteam bob'],
         });
       }
     },

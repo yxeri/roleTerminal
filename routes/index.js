@@ -232,6 +232,33 @@ function handle(io) {
         });
       });
     });
+
+    socket.on('getInvitations', function() {
+      manager.userAllowedCommand(socket.id, databasePopulation.commands.invitations.commandName, function(allowErr, allowed, user) {
+        if (allowErr || !allowed) {
+          socket.emit('commandFail');
+
+          return;
+        }
+
+        dbConnector.getInvitations(user.userName, function(err, list) {
+          if (err || list === null) {
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: ['Failed to get invitations'],
+                text_se: ['Misslyckades med att hämta alla inbjudan'],
+              },
+            });
+            socket.emit('commandFail');
+
+            return;
+          }
+
+          socket.emit('commandSuccess', { invitations: list.invitations, freezeStep: true });
+        });
+      });
+    });
   });
 
   return router;

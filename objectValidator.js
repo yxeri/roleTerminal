@@ -8,7 +8,7 @@ function checkKeys(data, expected) {
   for (let i = 0; i < expectedKeys.length; i++) {
     const expectedKey = expectedKeys[i];
 
-    if (!data[expectedKey] || data[expectedKey] === null) {
+    if ((!data[expectedKey] || data[expectedKey] === null) && typeof data[expectedKey] !== 'boolean') {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.general,
         text: ['Key missing: ' + expectedKey],

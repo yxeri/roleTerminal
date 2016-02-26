@@ -30,6 +30,17 @@ function followRoom(params) {
   socket.emit('commandSuccess', { noStepCall: true });
 }
 
+function shouldBeHidden(room, socketId) {
+  const hiddenRooms = [
+    socketId,
+    databasePopulation.rooms.important.roomName,
+    databasePopulation.rooms.broadcast.roomName,
+    databasePopulation.rooms.morse.roomName,
+  ];
+
+  return hiddenRooms.indexOf(room) >= 0 || room.indexOf(appConfig.whisperAppend) >= 0 || room.indexOf(appConfig.deviceAppend) >= 0;
+}
+
 function handle(socket) {
   socket.on('chatMsg', function(data) {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed, user) {
@@ -352,19 +363,6 @@ function handle(socket) {
       return;
     }
 
-    function shouldBeHidden(room) {
-      const hiddenRooms = [
-        socket.id,
-        data.user.userName + appConfig.whisperAppend,
-        data.device.deviceId + appConfig.deviceAppend,
-        databasePopulation.rooms.important.roomName,
-        databasePopulation.rooms.broadcast.roomName,
-        databasePopulation.rooms.morse.roomName,
-      ];
-
-      return hiddenRooms.indexOf(room) >= 0;
-    }
-
     manager.userAllowedCommand(socket.id, databasePopulation.commands.myrooms.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -376,7 +374,7 @@ function handle(socket) {
       for (let i = 0; i < socketRooms.length; i++) {
         const room = socketRooms[i];
 
-        if (!shouldBeHidden(room)) {
+        if (!shouldBeHidden(room, socket.id)) {
           rooms.push(room);
         }
       }
@@ -637,9 +635,48 @@ function handle(socket) {
     });
   });
 
-  socket.on('matchPartialRoom', function(data) {
+  socket.on('matchPartialMyRoom', function(data) {
+    // data.partialName is not checked if it set, to allow the retrieval of all rooms on no input
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
-      console.log(socket.id, user);
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      const itemList = [];
+      const rooms = user.rooms;
+      const partialName = data.partialName;
+
+      for (let i = 0; i < rooms.length; i++) {
+        const room = rooms[i];
+
+        if (!shouldBeHidden(room, socket.id) && (!data.partialName || room.indexOf(partialName) === 0)) {
+          itemList.push(room);
+        }
+      }
+
+      if (itemList.length === 1) {
+        socket.emit('matchFound', { matchedName: itemList[0] });
+      } else {
+        socket.emit('list', {
+          itemList: {
+            itemList: itemList,
+            keepInput: false,
+            replacePhrase: true,
+          },
+        });
+      }
+    });
+  });
+
+  socket.on('matchPartialRoom', function(data) {
+    // data.partialName is not checked if it set, to allow the retrieval of all rooms on no input
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
       dbConnector.matchPartialRoom(data.partialName, user, function(err, rooms) {
         if (err) {
           return;

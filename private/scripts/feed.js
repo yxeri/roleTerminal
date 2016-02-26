@@ -1321,6 +1321,10 @@ function specialKeyPress(event) {
             socket.emit('matchPartialRoom', { partialName: partial });
 
             break;
+          case 'myRooms':
+            socket.emit('matchPartialMyRoom', { partialName: partial });
+
+            break;
           default:
             break;
           }

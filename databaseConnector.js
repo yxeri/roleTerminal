@@ -4,6 +4,7 @@ const ObjectId = require('mongodb').ObjectID;
 const mongoose = require('mongoose');
 const appConfig = require('rolehaven-config').app;
 const logger = require('./logger');
+const objectValidator = require('./objectValidator');
 const dbPath = 'mongodb://' +
                appConfig.dbHost + ':' +
                appConfig.dbPort + '/' +
@@ -1346,21 +1347,29 @@ function getCommand(commandName, callback) {
   });
 }
 
-function matchPartial(filter, sort, itemName, user, queryType, callback) {
+function matchPartial(params) {
+  if (!objectValidator.isValidData(params, { filter: true, sort: true, partialName: true, user: true, queryType: true, callback: true })) {
+    if (params.callback) {
+      params.callback(null, null);
+    }
+
+    return;
+  }
+
   let query;
 
-  if (itemName) {
+  if (params.itemName) {
     query = {
       $and: [
-        { userName: { $regex: '^' + itemName + '.*' } },
-        { visibility: { $lte: user.accessLevel } },
+        { userName: { $regex: '^' + params.partialName + '.*' } },
+        { visibility: { $lte: params.user.accessLevel } },
       ],
     };
   } else {
-    query = { visibility: { $lte: user.accessLevel } };
+    query = { visibility: { $lte: params.user.accessLevel } };
   }
 
-  queryType.find(query, filter).sort(sort).lean().exec(function(err, users) {
+  params.queryType.find(query, params.filter).sort(params.sort).lean().exec(function(err, users) {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
@@ -1369,7 +1378,7 @@ function matchPartial(filter, sort, itemName, user, queryType, callback) {
       });
     }
 
-    callback(err, users);
+    params.callback(err, users);
   });
 }
 
@@ -1377,14 +1386,28 @@ function matchPartialUser(partialUserName, user, callback) {
   const filter = { _id: 0, userName: 1 };
   const sort = { userName: 1 };
 
-  matchPartial(filter, sort, partialUserName, user, User, callback);
+  matchPartial({
+    filter: filter,
+    sort: sort,
+    partialName: partialUserName,
+    user: user,
+    queryType: User,
+    callback: callback,
+  });
 }
 
 function matchPartialRoom(partialRoomName, user, callback) {
   const filter = { _id: 0, roomName: 1 };
   const sort = { roomName: 1 };
 
-  matchPartial(filter, sort, partialRoomName, user, Room, callback);
+  matchPartial({
+    filter: filter,
+    sort: sort,
+    partialName: partialRoomName,
+    user: user,
+    queryType: Room,
+    callback: callback,
+  });
 }
 
 exports.getCommand = getCommand;

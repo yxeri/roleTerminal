@@ -530,14 +530,6 @@ function getUser() {
   return getLocalVal('user');
 }
 
-function getTeam() {
-  return getLocalVal('team');
-}
-
-function setTeam(team) {
-  setLocalVal('team', team)
-}
-
 function setUser(user) {
   setLocalVal('user', user);
 }
@@ -1747,7 +1739,6 @@ function onLogin(data = {}) {
   validCommands.clear.func();
   setUser(user.userName);
   setAccessLevel(user.accessLevel);
-  setTeam(user.team);
   queueMessage({
     text: ['Successfully logged in as ' + user.userName],
     text_se: ['Lyckades logga in som ' + user.userName],
@@ -4311,8 +4302,6 @@ function attachCommands() {
         const text = [];
         commandHelper.data = data;
 
-        console.log(data.invitations);
-
         if (sentInvitations.length > 0) {
           for (let i = 0; i < sentInvitations.length; i++) {
             const invitation = sentInvitations[i];
@@ -4349,10 +4338,15 @@ function attachCommands() {
 
           if (['accept', 'a', 'decline', 'd'].indexOf(answer) > -1) {
             const accepted = ['accept', 'a'].indexOf(answer) > -1 ? true : false;
+            const data = { accepted: accepted, invitation: invitation };
 
             switch (invitation.invitationType) {
             case 'team':
-              socket.emit('teamAnswer', { accepted: accepted, invitation: invitation });
+              socket.emit('teamAnswer', data);
+
+              break;
+            case 'room':
+              socket.emit('roomAnswer', data);
 
               break;
             default:
@@ -4430,6 +4424,43 @@ function attachCommands() {
       '  inviteteam *användarnamn*',
       ' Exempel:',
       '  inviteteam user1',
+    ],
+    accessLevel: 13,
+    category: 'basic',
+  };
+  validCommands.inviteroom = {
+    func: function inviteroomCommand(phrases) {
+      const data = {
+        user: { userName: phrases[0] },
+        room: { roomName: phrases[1] },
+      };
+
+      if (data.user.userName && data.room.roomName) {
+        socket.emit('inviteToRoom', data);
+      } else {
+        queueMessage({
+          text: ['You have to enter a user name and a room name. Example: inviteroom bob room1'],
+          text_se: ['Ni måste skriva in ett användarnamn och ett rumsnamn. Exempel: inviteroom bob rum1'],
+        });
+      }
+    },
+    help: [
+      'Invites another user to a room you are following',
+    ],
+    help_se: [
+      'Bjuder in en annan användare till ett rum ni följer',
+    ],
+    instructions: [
+      ' Usage:',
+      '  inviteroom *user name* *room name*',
+      ' Example:',
+      '  inviteroom user1 room1',
+    ],
+    instructions_se: [
+      ' Användning:',
+      '  inviteroom *användarnamn* *rumsnamn*',
+      ' Exempel:',
+      '  inviteroom user1 room1',
     ],
     accessLevel: 13,
     category: 'basic',

@@ -507,7 +507,7 @@ function getTeam(teamName, callback) {
 
 function getUser(userName, callback) {
   const query = { userName: userName };
-  const filter = { userName: 1, team: 1 };
+  const filter = { _id: 0, password: 0 };
 
   User.findOne(query, filter).lean().exec(function(err, foundUser) {
     if (err) {
@@ -958,7 +958,7 @@ function addInvitationToList(userName, invitation, callback) {
 
 function removeInvitationFromList(userName, itemName, invitationType, callback) {
   const query = { userName: userName };
-  const update = { $pull: { invitations: { itemName: itemName, type: invitationType } } };
+  const update = { $pull: { invitations: { itemName: itemName, invitationType: invitationType } } };
 
   InvitationList.findOneAndUpdate(query, update).lean().exec(function(err, invitationList) {
     if (err) {
@@ -975,7 +975,7 @@ function removeInvitationFromList(userName, itemName, invitationType, callback) 
 
 function removeInvitationTypeFromList(userName, invitationType, callback) {
   const query = { userName: userName };
-  const update = { $pull: { invitations: { type: invitationType } } };
+  const update = { $pull: { invitations: { invitationType: invitationType } } };
   const options = { multi: true };
 
   InvitationList.update(query, update, options).lean().exec(function(err, invitationList) {

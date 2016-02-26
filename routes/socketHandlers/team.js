@@ -277,7 +277,6 @@ function handle(socket) {
   });
 
   socket.on('teamAnswer', function(data) {
-    console.log('teamAnswer', data);
     if (!objectValidator.isValidData(data, { accepted: true, invitation: { itemName: true, sender: true, invitationType: true } })) {
       return;
     }
@@ -320,7 +319,7 @@ function handle(socket) {
           });
         });
       } else {
-        dbConnector.removeInvitationFromList(userName, invitation.itemName, invitation.type, function(err, list) {
+        dbConnector.removeInvitationFromList(userName, invitation.itemName, invitation.invitationType, function(err, list) {
           if (err || list === null) {
             messenger.sendSelfMsg({
               socket: socket,
@@ -340,15 +339,6 @@ function handle(socket) {
             message: {
               text: ['Successfully declined invitation'],
               text_se: ['Lyckades avböja inbjudan'],
-            },
-          });
-          messenger.sendChatMsg({
-            socket: socket,
-            message: {
-              text: [userName + ' has declined your team invite'],
-              text_se: [userName + ' tackade nej till din inbjudan till teamet'],
-              roomName: invitation.sender + appConfig.whisperAppend,
-              userName: 'SYSTEM',
             },
           });
         });

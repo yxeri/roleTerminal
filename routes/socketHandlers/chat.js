@@ -666,6 +666,136 @@ function handle(socket) {
       });
     });
   });
+
+  socket.on('inviteToRoom', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true }, room: { roomName: true } })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteroom.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      const userName = data.user.userName;
+      const roomName = data.room.roomName;
+
+      dbConnector.getUser(userName, function(userErr, invitedUser) {
+        if (userErr || invitedUser === null) {
+          return;
+        } else if (invitedUser.rooms.indexOf(roomName) > -1) {
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['The user is already following the room'],
+              text_se: ['Användaren följer redan rummet'],
+            },
+          });
+
+          return;
+        }
+
+        const invitation = {
+          itemName: roomName,
+          time: new Date(),
+          invitationType: 'room',
+          sender: user.userName,
+        };
+
+        dbConnector.addInvitationToList(userName, invitation, function(invErr, list) {
+          if (invErr || list !== null) {
+            if (list || invErr.code === 11000) {
+              messenger.sendSelfMsg({
+                socket: socket,
+                message: {
+                  text: ['You have already sent an invite to the user'],
+                  text_se: ['Ni har redan skickat en inbjudan till användaren'],
+                },
+              });
+            } else {
+              logger.sendSocketErrorMsg({
+                socket: socket,
+                code: logger.ErrorCodes.general,
+                text: ['Failed to send the invite'],
+                text_se: ['Misslyckades med att skicka inbjudan'],
+                err: invErr,
+              });
+            }
+
+            return;
+          }
+
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Sent an invitation to the user'],
+              text_se: ['Skickade en inbjudan till användaren'],
+            },
+          });
+        });
+      });
+    });
+  });
+
+  socket.on('roomAnswer', function(data) {
+    if (!objectValidator.isValidData(data, { accepted: true, invitation: { itemName: true, sender: true, invitationType: true } })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.invitations.commandName, function(allowErr, allowed, allowedUser) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      const invitation = data.invitation;
+      const userName = allowedUser.userName;
+      const roomName = invitation.itemName;
+      invitation.time = new Date();
+
+      if (data.accepted) {
+        dbConnector.addRoomToUser(userName, roomName, function(roomErr) {
+          if (roomErr) {
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.db,
+              text: ['Failed to follow ' + roomName],
+              err: roomErr,
+            });
+
+            return;
+          }
+
+          followRoom({ socket: socket, userName: userName, newRoom: { roomName: roomName } });
+          dbConnector.removeInvitationFromList(userName, roomName, invitation.invitationType, function(remErr) {
+            if (remErr) {
+              return;
+            }
+          });
+        });
+      } else {
+        dbConnector.removeInvitationFromList(userName, invitation.itemName, invitation.invitationType, function(err, list) {
+          if (err || list === null) {
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: ['Failed to decline invitation'],
+                text_se: ['Misslyckades med att avböja inbjudan'],
+              },
+            });
+
+            return;
+          }
+
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Successfully declined invitation'],
+              text_se: ['Lyckades avböja inbjudan'],
+            },
+          });
+        });
+      }
+    });
+  });
 }
 
 exports.handle = handle;

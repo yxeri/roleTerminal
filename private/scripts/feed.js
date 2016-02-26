@@ -3033,7 +3033,7 @@ function attachCommands() {
     },
     steps: [
       function loginStepOne(phrases) {
-        commandHelper.data.user.password = phrases[0].toLowerCase();
+        commandHelper.data.user.password = phrases[0];
         socket.emit('login', commandHelper.data);
         validCommands[commandHelper.command].abortFunc();
         validCommands.clear.func();

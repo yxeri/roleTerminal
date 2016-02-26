@@ -1348,7 +1348,7 @@ function getCommand(commandName, callback) {
 }
 
 function matchPartial(params) {
-  if (!objectValidator.isValidData(params, { filter: true, sort: true, partialName: true, user: true, queryType: true, callback: true })) {
+  if (!objectValidator.isValidData(params, { filter: true, sort: true, user: true, queryType: true, callback: true })) {
     if (params.callback) {
       params.callback(null, null);
     }
@@ -1358,7 +1358,7 @@ function matchPartial(params) {
 
   let query;
 
-  if (params.itemName) {
+  if (params.partialName) {
     query = {
       $and: [
         { userName: { $regex: '^' + params.partialName + '.*' } },

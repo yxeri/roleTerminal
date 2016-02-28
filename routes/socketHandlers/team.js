@@ -203,6 +203,24 @@ function handle(socket) {
       return;
     }
 
+    function addRoom(userName, roomName) {
+      dbConnector.addRoomToUser(userName, roomName, function(roomErr) {
+        if (roomErr) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to follow team room'],
+            text_se: ['Misslyckades med att följa team-rummet'],
+            err: roomErr,
+          });
+
+          return;
+        }
+
+        socket.join(roomName);
+        socket.emit('follow', { room: { roomName: 'team' } });
+      });
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.createteam.commandName, function(allowErr, allowed, allowedUser) {
       if (allowErr || !allowed) {
         return;
@@ -256,21 +274,34 @@ function handle(socket) {
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket: socket,
-            message: {
-              text: ['Team has been created'],
-              text_se: ['Teamet har skapats'],
-            },
-          });
+          const teamRoom = {
+            roomName: team.teamName + appConfig.teamAppend,
+            accessLevel: databasePopulation.accessLevels.superUser,
+            visibility: databasePopulation.accessLevels.superUser,
+          };
 
-          updateUserTeam(socket, owner, teamName);
-
-          if (admins) {
-            for (let i = 0; i < admins.length; i++) {
-              updateUserTeam(socket, admins[i], teamName);
+          dbConnector.createRoom(teamRoom, databasePopulation.users.superuser, function(errRoom, room) {
+            if (errRoom || room === null) {
+              return;
             }
-          }
+
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: ['Team has been created'],
+                text_se: ['Teamet har skapats'],
+              },
+            });
+            updateUserTeam(socket, owner, teamName);
+            addRoom(user.userName, teamRoom.roomName);
+
+            if (admins) {
+              for (let i = 0; i < admins.length; i++) {
+                updateUserTeam(socket, admins[i], teamName);
+                addRoom(admins[i], teamRoom.roomName);
+              }
+            }
+          });
         });
       });
     });
@@ -289,6 +320,7 @@ function handle(socket) {
 
       const userName = allowedUser.userName;
       const invitation = data.invitation;
+      const roomName = data.invitation.itemName + appConfig.teamAppend;
       invitation.time = new Date();
 
       if (data.accepted) {
@@ -297,25 +329,34 @@ function handle(socket) {
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket: socket,
-            message: {
-              text: ['Joined team ' + invitation.itemName],
-              text_se: ['Gick med i team ' + invitation.itemName],
-            },
-          });
-
-          dbConnector.removeInvitationTypeFromList(userName, invitation.invitationType, function(teamErr) {
-            if (teamErr) {
-              logger.sendErrorMsg({
-                code: logger.ErrorCodes.db,
-                text: ['Failed to remove all invitations of type ' + invitation.invitationType],
-                text_se: ['Misslyckades med att ta bort alla inbjudan av typen ' + invitation.invitationType],
-                err: teamErr,
-              });
-
+          dbConnector.addRoomToUser(userName, roomName, function(errRoom) {
+            if (errRoom) {
               return;
             }
+
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: ['Joined team ' + invitation.itemName],
+                text_se: ['Gick med i team ' + invitation.itemName],
+              },
+            });
+
+            dbConnector.removeInvitationTypeFromList(userName, invitation.invitationType, function(teamErr) {
+              if (teamErr) {
+                logger.sendErrorMsg({
+                  code: logger.ErrorCodes.db,
+                  text: ['Failed to remove all invitations of type ' + invitation.invitationType],
+                  text_se: ['Misslyckades med att ta bort alla inbjudan av typen ' + invitation.invitationType],
+                  err: teamErr,
+                });
+
+                return;
+              }
+            });
+
+            socket.join(roomName);
+            socket.emit('follow', { room: { roomName: 'team' } });
           });
         });
       } else {

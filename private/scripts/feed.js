@@ -1626,6 +1626,8 @@ function hideMessageProperties(message = { }) {
       }
     } else if (roomName.indexOf('-device') >= 0) {
       message.roomName = 'device';
+    } else if (roomName.indexOf('team') >= 0) {
+      message.roomName = 'team';
     }
   }
 

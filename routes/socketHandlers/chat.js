@@ -38,7 +38,7 @@ function shouldBeHidden(room, socketId) {
     databasePopulation.rooms.morse.roomName,
   ];
 
-  return hiddenRooms.indexOf(room) >= 0 || room.indexOf(appConfig.whisperAppend) >= 0 || room.indexOf(appConfig.deviceAppend) >= 0;
+  return hiddenRooms.indexOf(room) >= 0 || room.indexOf(appConfig.whisperAppend) >= 0 || room.indexOf(appConfig.deviceAppend) >= 0 || room.indexOf(appConfig.teamAppend) >= 0;
 }
 
 function handle(socket) {
@@ -49,6 +49,10 @@ function handle(socket) {
       }
 
       data.message.userName = user.userName;
+
+      if (data.message.roomName === 'team') {
+        data.message.roomName = user.team + appConfig.teamAppend;
+      }
 
       messenger.sendChatMsg({ socket: socket, message: data.message });
     });
@@ -187,22 +191,26 @@ function handle(socket) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.switchroom.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.switchroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
 
-      // TODO Move toLowerCase to class
-      data.room.roomName = data.room.roomName.toLowerCase();
+      let roomName = data.room.roomName.toLowerCase();
 
-      if (Object.keys(socket.rooms).indexOf(data.room.roomName) > 0) {
+      if (user.team && roomName === 'team') {
+        roomName = user.team + appConfig.teamAppend;
+        data.room.roomName = 'team';
+      }
+
+      if (Object.keys(socket.rooms).indexOf(roomName) > 0) {
         socket.emit('follow', { room: data.room });
       } else {
         messenger.sendSelfMsg({
           socket: socket,
           message: {
-            text: ['You are not following room ' + data.room.roomName],
-            text_se: ['Ni följer inte rummet' + data.room.roomName],
+            text: ['You are not following room ' + roomName],
+            text_se: ['Ni följer inte rummet' + roomName],
           },
         });
       }
@@ -370,6 +378,10 @@ function handle(socket) {
 
       const rooms = [];
       const socketRooms = Object.keys(socket.rooms);
+
+      if (user.team) {
+        rooms.push('team');
+      }
 
       for (let i = 0; i < socketRooms.length; i++) {
         const room = socketRooms[i];
@@ -646,6 +658,10 @@ function handle(socket) {
       const itemList = [];
       const rooms = user.rooms;
       const partialName = data.partialName;
+
+      if (user.team) {
+        rooms.push('team');
+      }
 
       for (let i = 0; i < rooms.length; i++) {
         const room = rooms[i];

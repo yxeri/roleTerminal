@@ -80,7 +80,10 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
       }
 
       historyMessages.sort(messageSort);
-      historyMessages = historyMessages.slice(-maxLines);
+
+      if (maxLines !== '*') {
+        historyMessages = historyMessages.slice(-maxLines);
+      }
 
       if (missedMsgs) {
         for (let i = historyMessages.length - 1; i > 0; i--) {

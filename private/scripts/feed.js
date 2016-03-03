@@ -3140,12 +3140,12 @@ function attachCommands() {
       const data = {};
 
       if (phrases.length > 0) {
-        if (!isNaN(phrases[0])) {
+        if (!isNaN(phrases[0]) || phrases[0] === '*') {
           data.lines = phrases[0];
         } else {
           data.room = { roomName: phrases[0] };
 
-          if (phrases.length > 1 && !isNaN(phrases[1])) {
+          if (phrases.length > 1 && (!isNaN(phrases[1]) || phrases[1] === '*')) {
             data.lines = phrases[1];
           }
         }

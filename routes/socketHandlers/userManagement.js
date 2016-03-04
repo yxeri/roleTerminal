@@ -69,7 +69,7 @@ function handle(socket, io) {
       };
 
       // TODO Refactor the inner code
-      dbConnector.addUser(userObj, function(err, user) {
+      dbConnector.createUser(userObj, function(err, user) {
         if (err) {
           logger.sendSocketErrorMsg({
             socket: socket,

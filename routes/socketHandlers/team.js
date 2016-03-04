@@ -261,7 +261,7 @@ function handle(socket) {
           return;
         }
 
-        dbConnector.addTeam(data.team, function(err, team) {
+        dbConnector.createTeam(data.team, function(err, team) {
           if (err || team === null) {
             logger.sendSocketErrorMsg({
               socket: socket,

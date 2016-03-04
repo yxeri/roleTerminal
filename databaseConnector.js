@@ -181,7 +181,7 @@ function saveObject(object, objectName, callback) {
   });
 }
 
-function addMission(sentMission, callback) {
+function createMission(sentMission, callback) {
   const newMission = new Mission(sentMission);
 
   saveObject(newMission, 'mission', callback);
@@ -233,7 +233,7 @@ function getAllMissions(callback) {
   });
 }
 
-function addWeather(sentWeather, callback) {
+function createWeather(sentWeather, callback) {
   const newWeather = new Weather(sentWeather);
 
   saveObject(newWeather, 'weather', callback);
@@ -262,7 +262,7 @@ function updateUserTeam(userName, value, callback) {
   updateUserValue(userName, update, callback);
 }
 
-function addTeam(team, callback) {
+function createTeam(team, callback) {
   const newTeam = new Team(team);
   const query = { teamName: team.teamName };
 
@@ -523,7 +523,7 @@ function getUser(userName, callback) {
   });
 }
 
-function addUser(user, callback) {
+function createUser(user, callback) {
   const newUser = new User(user);
 
   getUser(user.userName, function(err, foundUser) {
@@ -1113,7 +1113,7 @@ function getBannedUsers(callback) {
   });
 }
 
-function addEvent(sentReceiverName, sentEndAt, callback) {
+function createEvent(sentReceiverName, sentEndAt, callback) {
   const now = new Date();
   const query = {
     receiverName: sentReceiverName,
@@ -1239,7 +1239,7 @@ function populateDbUsers(sentUsers) {
       for (let i = 0; i < userKeys.length; i++) {
         const user = sentUsers[userKeys[i]];
 
-        addUser(user, callback);
+        createUser(user, callback);
       }
     } else {
       logger.sendInfoMsg('PopulateDb: [success] DB has at least one user');
@@ -1413,7 +1413,7 @@ function matchPartialRoom(partialRoomName, user, callback) {
 exports.getCommand = getCommand;
 exports.getUserById = getUserById;
 exports.authUser = authUser;
-exports.addUser = addUser;
+exports.createUser = createUser;
 exports.updateUserSocketId = updateUserSocketId;
 exports.updateUserLocation = updateUserLocation;
 exports.authUserToRoom = authUserToRoom;
@@ -1435,7 +1435,7 @@ exports.verifyAllUsers = verifyAllUsers;
 exports.banUser = banUser;
 exports.unbanUser = unbanUser;
 exports.getBannedUsers = getBannedUsers;
-exports.addEvent = addEvent;
+exports.createEvent = createEvent;
 exports.getPassedEvents = getPassedEvents;
 exports.getRoom = getRoom;
 exports.banUserFromRoom = banUserFromRoom;
@@ -1462,11 +1462,11 @@ exports.getAllDevices = getAllDevices;
 exports.updateUserMode = updateUserMode;
 exports.getUser = getUser;
 exports.updateUserTeam = updateUserTeam;
-exports.addTeam = addTeam;
+exports.createTeam = createTeam;
 exports.getTeam = getTeam;
-exports.addWeather = addWeather;
+exports.createWeather = createWeather;
 exports.getWeather = getWeather;
-exports.addMission = addMission;
+exports.createMission = createMission;
 exports.getActiveMissions = getActiveMissions;
 exports.getAllMissions = getAllMissions;
 exports.updateMissionCompleted = updateMissionCompleted;

@@ -1188,6 +1188,46 @@ function retrieveCommand(command) {
   };
 }
 
+function isFullscreen() {
+  return (!window.screenTop && !window.screenY);
+}
+
+/**
+ * Goes into full screen with sent element
+ * This is not supported in iOS Safari
+ * @param {object} element - The element which should be maximized to full screen
+ * @returns {undefined} Returns nothing
+ */
+function goFullScreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
+}
+
+function fullscreenResize(keyboardShown) {
+  /**
+   * Used for Android when it shows/hides the keyboard
+   * The soft keyboard will block part of the site without this fix
+   */
+  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
+    background.classList.add('fullscreen');
+
+    if (keyboardShown) {
+      spacer.classList.add('keyboardFix');
+      spacer.classList.remove('fullFix');
+    } else {
+      spacer.classList.remove('keyboardFix');
+      spacer.classList.add('fullFix');
+    }
+
+    scrollView();
+  }
+}
+
 function enterKeyHandler() {
   const commandObj = commandHelper;
   const commands = validCommands;
@@ -1367,6 +1407,21 @@ function specialKeyPress(event) {
       triggerKeysPressed.alt = true;
 
       break;
+    // Left Command key in OS X
+    case 91:
+      triggerKeysPressed.ctrl = true;
+
+      break;
+    // Right Command key in OS X
+    case 93:
+      triggerKeysPressed.ctrl = true;
+
+      break;
+    // Command key in OS X (Firefox)
+    case 224:
+      triggerKeysPressed.ctrl = true;
+
+      break;
     // Delete
     case 46:
       if (getInputText().length === 0) {
@@ -1443,22 +1498,36 @@ function specialKeyPress(event) {
   }
 }
 
+function defaultKeyPress(textChar, event) {
+  if (textChar) {
+    changeModeText();
+  }
+
+  if (triggerAutoComplete(getInputText(), textChar) && commandHelper.command === null) {
+    autoCompleteCommand();
+    // Prevent new whitespace to be printed
+    event.preventDefault();
+  }
+}
+
 function keyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const textChar = String.fromCharCode(keyCode);
 
   if (!keyPressed) {
     switch (keyCode) {
-    default:
-      if (textChar) {
-        changeModeText();
+    case 102:
+      if (triggerKeysPressed.ctrl) {
+        goFullScreen(document.documentElement);
+        fullscreenResize(false);
+        event.preventDefault();
+      } else {
+        defaultKeyPress(textChar, event);
       }
 
-      if (triggerAutoComplete(getInputText(), textChar) && commandHelper.command === null) {
-        autoCompleteCommand();
-        // Prevent new whitespace to be printed
-        event.preventDefault();
-      }
+      break;
+    default:
+      defaultKeyPress(textChar, event);
 
       break;
     }
@@ -1610,46 +1679,6 @@ function printStartMessage() {
       'Ha en bra och produktiv dag',
     ],
   });
-}
-
-function isFullscreen() {
-  return (!window.screenTop && !window.screenY);
-}
-
-/**
- * Goes into full screen with sent element
- * This is not supported in iOS Safari
- * @param {object} element - The element which should be maximized to full screen
- * @returns {undefined} Returns nothing
- */
-function goFullScreen(element) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-  }
-}
-
-function fullscreenResize(keyboardShown) {
-  /**
-   * Used for Android when it shows/hides the keyboard
-   * The soft keyboard will block part of the site without this fix
-   */
-  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
-    background.classList.add('fullscreen');
-
-    if (keyboardShown) {
-      spacer.classList.add('keyboardFix');
-      spacer.classList.remove('fullFix');
-    } else {
-      spacer.classList.remove('keyboardFix');
-      spacer.classList.add('fullFix');
-    }
-
-    scrollView();
-  }
 }
 
 function attachFullscreenListener() {

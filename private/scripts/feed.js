@@ -526,6 +526,22 @@ function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
 }
 
+function setForceFullscreen(forceFullscreen) {
+  setLocalVal('forceFullscreen', forceFullscreen);
+}
+
+function getForceFullscreen() {
+  return getLocalVal('forceFullscreen') === 'true';
+}
+
+function setGpsTracking(gpsTracking) {
+  setLocalVal('gpsTracking', gpsTracking);
+}
+
+function getGpsTracking() {
+  return getLocalVal('gpsTracking') === 'true';
+}
+
 function getUser() {
   return getLocalVal('user');
 }
@@ -933,7 +949,7 @@ function setIntervals() {
     navigator.geolocation.clearWatch(watchId);
   }
 
-  if (isTracking && navigator.geolocation) {
+  if (getGpsTracking() && isTracking && navigator.geolocation) {
     // Gets new geolocation data
     sendLocation();
   }
@@ -1596,6 +1612,66 @@ function printStartMessage() {
   });
 }
 
+function isFullscreen() {
+  return (!window.screenTop && !window.screenY);
+}
+
+/**
+ * Goes into full screen with sent element
+ * This is not supported in iOS Safari
+ * @param {object} element - The element which should be maximized to full screen
+ * @returns {undefined} Returns nothing
+ */
+function goFullScreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
+}
+
+function fullscreenResize(keyboardShown) {
+  /**
+   * Used for Android when it shows/hides the keyboard
+   * The soft keyboard will block part of the site without this fix
+   */
+  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
+    background.classList.add('fullscreen');
+
+    if (keyboardShown) {
+      spacer.classList.add('keyboardFix');
+      spacer.classList.remove('fullFix');
+    } else {
+      spacer.classList.remove('keyboardFix');
+      spacer.classList.add('fullFix');
+    }
+
+    scrollView();
+  }
+}
+
+function attachFullscreenListener() {
+  document.getElementById('background').addEventListener('click', function clickHandler(event) {
+    clicked = !clicked;
+
+    if (clicked) {
+      commandInput.focus();
+    } else {
+      commandInput.blur();
+    }
+
+    if (getForceFullscreen() === true) {
+      // Set whole document to full screen
+      goFullScreen(document.documentElement);
+      fullscreenResize(clicked);
+    }
+
+    event.preventDefault();
+  });
+}
+
 function resetAllLocalVals() {
   removeCommandHistory();
   removeRoom();
@@ -2090,6 +2166,8 @@ function onStartup(data = { storedMessages: {} }) {
 
   setLocalVal('storedMessages', JSON.stringify(storedMessages));
   setLocalVal('defaultLanguage', data.defaultLanguage);
+  setForceFullscreen(data.forceFullscreen);
+  setGpsTracking(data.gpsTracking);
   printStartMessage();
 }
 
@@ -2147,46 +2225,6 @@ function keyReleased(event) {
     keyPressed = false;
 
     break;
-  }
-}
-
-function isFullscreen() {
-  return (!window.screenTop && !window.screenY);
-}
-
-/**
- * Goes into full screen with sent element
- * This is not supported in iOS Safari
- * @param {object} element - The element which should be maximized to full screen
- * @returns {undefined} Returns nothing
- */
-function goFullScreen(element) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-  }
-}
-
-function fullscreenResize(keyboardShown) {
-  /**
-   * Used for Android when it shows/hides the keyboard
-   * The soft keyboard will block part of the site without this fix
-   */
-  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
-    background.classList.add('fullscreen');
-
-    if (keyboardShown) {
-      spacer.classList.add('keyboardFix');
-      spacer.classList.remove('fullFix');
-    } else {
-      spacer.classList.remove('keyboardFix');
-      spacer.classList.add('fullFix');
-    }
-
-    scrollView();
   }
 }
 
@@ -4550,21 +4588,7 @@ function startBoot() {
     setDeviceId(generateDeviceId());
   }
 
-  document.getElementById('background').addEventListener('click', function clickHandler(event) {
-    clicked = !clicked;
-
-    if (clicked) {
-      commandInput.focus();
-    } else {
-      commandInput.blur();
-    }
-
-    // Set whole document to full screen
-    goFullScreen(document.documentElement);
-    fullscreenResize(clicked);
-
-    event.preventDefault();
-  });
+  attachFullscreenListener();
 
   startSocket();
   addEventListener('keypress', keyPress);

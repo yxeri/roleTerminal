@@ -151,6 +151,8 @@ function handle(socket, io) {
         socket.emit('startup', {
           storedMessages: require('rolehaven-config').messages,
           defaultLanguage: appConfig.defaultLanguage,
+          forceFullscreen: appConfig.forceFullscreen,
+          gpsTracking: appConfig.gpsTracking,
         });
       }
     } else {

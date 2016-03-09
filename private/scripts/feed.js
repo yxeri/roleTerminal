@@ -1293,7 +1293,7 @@ function enterKeyHandler() {
             startCommandQueue();
 
             /**
-             * User input commandChar but didn't write
+             * User input commandChar but didn't type
              * a proper command
              */
           } else {
@@ -1617,7 +1617,7 @@ function printWelcomeMessage() {
     text: [
       'Welcome, employee ' + getUser(),
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
-      'You can also retrieve instructions if you use the tab button or write double space without any other input',
+      'You can also retrieve instructions if you use the tab button or type double space without any other input',
       'Learn this valuable skill to increase your productivity!',
       'May you have a productive day',
     ],
@@ -1667,7 +1667,7 @@ function printStartMessage() {
       'Welcome to the Oracle of Organica',
       'Please login to start your productive day!',
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
-      'You can also retrieve instructions if you use the tab button or write double space without any other input',
+      'You can also retrieve instructions if you use the tab button or type double space without any other input',
       'Learn this valuable skill to increase your productivity!',
     ],
     text_se: [
@@ -2420,7 +2420,7 @@ function attachCommands() {
         });
       } else {
         queueMessage({
-          text: ['You forgot to write the message!'],
+          text: ['You forgot to type the message!'],
           text_se: ['Ni glömde skriva in ett meddelande!'],
         });
       }
@@ -2481,7 +2481,7 @@ function attachCommands() {
 
         queueMessage({
           text: [
-            'Write a line and press enter',
+            'Type a line and press enter',
             'Press enter without any input when you are completely done with the message',
           ],
           text_se: [
@@ -2714,8 +2714,8 @@ function attachCommands() {
               text: createCommandStart(commandString).concat([
                 'Prepend commands with ' + commandChars.join('" or "') + ', example: "' + commandChars[0] + 'mode"',
                 'Everything else written and sent will be intepreted as a chat message',
-                'You will no longer need to use msg command to write chat messages',
-                'Use tab or write double space to see available commands and instructions',
+                'You will no longer need to use msg command to type chat messages',
+                'Use tab or type double space to see available commands and instructions',
                 createCommandEnd(commandString.length),
               ]),
               text_se: createCommandStart(commandString).concat([
@@ -2771,7 +2771,7 @@ function attachCommands() {
       '--Cmd mode--',
       'Chat mode is the default mode',
       'Text written will not be automatically be intepreted as chat messages',
-      'You have to use "msg" command to write messages Example: msg hello',
+      'You have to use "msg" command to type messages Example: msg hello',
       'Commands do not have to be prepended with anything. Example: uploadkey',
     ],
     instructions: [
@@ -3514,14 +3514,14 @@ function attachCommands() {
         socket.emit('whisperMsg', data);
       } else {
         queueMessage({
-          text: ['You forgot to write the message!'],
+          text: ['You forgot to type the message!'],
           text_se: ['Ni glömde skriva in ett meddelande!'],
         });
       }
     },
     help: [
       'Send a private message to a user',
-      'The first word that you write will be interpreted as a user name',
+      'The first word that you type will be interpreted as a user name',
       'The rest of the input will be sent to only that user',
     ],
     help_se: [
@@ -3790,7 +3790,7 @@ function attachCommands() {
         commandHelper.onStep++;
         queueMessage({
           text: [
-            'Write a line and press enter',
+            'Type a line and press enter',
             'Press enter without any input when you are completely done with the message',
             'Try to keep the first line short if you want to send it as morse',
           ],
@@ -4106,7 +4106,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: [
-            'You need to write a user name, field name and value',
+            'You need to type a user name, field name and value',
             'Example: updateuser user1 accesslevel 3',
           ],
           text_se: [
@@ -4157,7 +4157,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: [
-            'You need to write a command name, field name and value',
+            'You need to type a command name, field name and value',
             'Example: updatecommand help accesslevel 3',
           ],
           text_se: [
@@ -4207,7 +4207,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: [
-            'You need to write a room name, field name and value',
+            'You need to type a room name, field name and value',
             'Example: updateroom room1 accesslevel 3',
           ],
           text_se: [
@@ -4263,7 +4263,7 @@ function attachCommands() {
       } else {
         queueMessage({
           text: [
-            'You need to write a device Id, field name and value',
+            'You need to type a device Id, field name and value',
             'Example: updatedevice 11jfej433 id betteralias',
           ],
           text_se: [

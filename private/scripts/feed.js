@@ -1,5 +1,7 @@
 'use strict';
 
+const labels = require('./labels');
+
 // Timeout between print of rows (milliseconds)
 const rowTimeout = 40;
 /**
@@ -2362,24 +2364,10 @@ function attachCommands() {
 
       getAll();
     },
-    help: [
-      'Shows a list of available commands',
-    ],
-    help_se: [
-      'Visa en lista av tillgängliga kommandon',
-    ],
-    instructions: [
-      ' Usage:',
-      '  help',
-      ' Example:',
-      '  help',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  help',
-      ' Exempel:',
-      '  help',
-    ],
+    help: labels.help.help,
+    help_se: labels.help_se.help,
+    instructions: labels.instructions.help,
+    instructions_se: labels.instructions_se.help,
     accessLevel: 1,
     category: 'basic',
   };
@@ -2389,8 +2377,8 @@ function attachCommands() {
         mainFeed.removeChild(mainFeed.lastChild);
       }
     },
-    help: ['Clears the terminal view'],
-    help_se: ['Rensar terminalvyn'],
+    help: labels.help.clear,
+    help_se: labels.help_se.clear,
     clearAfterUse: true,
     accessLevel: 13,
     category: 'basic',
@@ -2399,8 +2387,8 @@ function attachCommands() {
     func: function whoamiCommand() {
       socket.emit('whoAmI');
     },
-    help: ['Shows information about the current user'],
-    help_se: ['Visar information om nuvarande användaren'],
+    help: labels.help.whoami,
+    help_se: labels.help_se.whoami,
     accessLevel: 13,
     category: 'basic',
   };
@@ -2425,26 +2413,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Sends a message to your current room',
-      'The room you are in is written out to the left of the marker',
-    ],
-    help_se: [
-      'Skickar ett meddelande till ert nuvarande rum',
-      'Rummet ni är inne i står skrivet längst ner till vänster om markören',
-    ],
-    instructions: [
-      ' Usage:',
-      '  msg *message',
-      ' Example:',
-      ' msg Hello!',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  msg *meddelande*',
-      ' Exempel:',
-      '  msg Hej!',
-    ],
+    help: labels.help.msg,
+    help_se: labels.help_se.msg,
+    instructions: labels.instructions.msg,
+    instructions_se: labels.instructions_se.msg,
     clearAfterUse: true,
     accessLevel: 13,
     category: 'advanced',
@@ -2523,20 +2495,10 @@ function attachCommands() {
         }
       },
     ],
-    help: [
-      'Sends a message to all users in all rooms',
-      'It will prepend the message with "[ALL]"',
-    ],
-    help_se: [
-      'Skicka ett meddelande till alla användare i alla rum',
-      '"[ALL"] kommer att läggas till i början av meddelandet',
-    ],
-    instructions: [
-      'Follow the on-screen instructions',
-    ],
-    instructions_se: [
-      'Följ instruktionerna som ges',
-    ],
+    help: labels.help.broadcast,
+    help_se: labels.help_se.broadcast,
+    instructions: labels.instructions.broadcast,
+    instructions_se: labels.instructions_se.broadcast,
     accessLevel: 13,
     clearAfterUse: true,
     category: 'admin',
@@ -2574,27 +2536,10 @@ function attachCommands() {
         socket.emit('follow', { room: commandHelper.data.room });
       },
     ],
-    help: [
-      'Follows a room and shows you all messages posted in it.',
-      'You will get the messages from this room even if it isn\'t your currently selected one',
-    ],
-    help_se: [
-      'Följer ett rum och visar alla meddelande som skrivs i det',
-      'Ni kommer att få alla meddelande som skickas i detta rum även om ni har ett annat valt som ert nuvarande rum',
-    ],
-    instructions: [
-      ' Usage:',
-      '  follow *room name*',
-      ' Example:',
-      '  follow room1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  follow *rumsnamn*',
-      ' Exempel:',
-      '  follow rum1',
-      '  follow rum2',
-    ],
+    help: labels.help.follow,
+    help_se: labels.help_se.follow,
+    instructions: labels.instructions.follow,
+    instructions_se: labels.instructions_se.follow,
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -2618,20 +2563,10 @@ function attachCommands() {
         });
       }
     },
-    help: ['Stops following a room.'],
-    help_se: ['Slutar följa ett rum'],
-    instructions: [
-      ' Usage:',
-      '  unfollow *room name*',
-      ' Example:',
-      '  unfollow room1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  unfollow *rumsnamn*',
-      ' Exempel:',
-      '  unfollow rum1',
-    ],
+    help: labels.help.unfollow,
+    help_se: labels.help_se.unfollow,
+    instructions: labels.instructions.unfollow,
+    instructions_se: labels.instructions_se.unfollow,
     autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -2668,30 +2603,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Shows a list of users, rooms or devices which you are allowed to see',
-      'You have to input which option you want to list',
-    ],
-    help_se: [
-      'Visar en list över användare, rum eller enheter som ni har tillåtelse att se',
-      'Ni måste skriva in vilken typ ni vill lista',
-    ],
-    instructions: [
-      ' Usage:',
-      '  list *type*',
-      ' Example',
-      '  list rooms',
-      '  list users',
-      '  list devices',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  list *typ*',
-      ' Exempel',
-      '  list rooms',
-      '  list users',
-      '  list devices',
-    ],
+    help: labels.help.list,
+    help_se: labels.help_se.list,
+    instructions: labels.instructions.list,
+    instructions_se: labels.instructions_se.list,
     autocomplete: { type: 'lists' },
     accessLevel: 13,
     category: 'basic',
@@ -2763,31 +2678,9 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Change the input mode. The options are chat or cmd',
-      '--Chat mode--',
-      'Everything written will be interpreted as chat messages',
-      'All commands have to be prepended with "' + commandChars.join('" or "') + '" Example: ' + commandChars[0] + 'uploadkey',
-      '--Cmd mode--',
-      'Chat mode is the default mode',
-      'Text written will not be automatically be intepreted as chat messages',
-      'You have to use "msg" command to type messages Example: msg hello',
-      'Commands do not have to be prepended with anything. Example: uploadkey',
-    ],
-    instructions: [
-      ' Usage:',
-      '  mode *mode*',
-      ' Example:',
-      '  mode chat',
-      '  mode cmd',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  mode *läge*',
-      ' Exempel:',
-      '  mode chat',
-      '  -mode cmd',
-    ],
+    help: labels.help.mode,
+    instructions: labels.instructions.mode,
+    instructions_se: labels.instructions_se.mode,
     autocomplete: { type: 'modes' },
     accessLevel: 13,
     category: 'advanced',
@@ -2917,30 +2810,10 @@ function attachCommands() {
     abortFunc: function registerAbort() {
       hideInput(false);
     },
-    help: [
-      'Registers your user name on the server',
-      'This user name will be your identity in the system',
-      'The name can only contain letters and numbers (a-z, 0-9)',
-      'Don\'t use whitespaces in your name or password!',
-    ],
-    help_se: [
-      'Registrerar ert användarnamn på servern',
-      'Detta användarnamn kommer vara er identitet i systemet',
-      'Namnet kan endast innehålla bokstäver och siffror (a-z, 0-9)',
-      'Använd inte blankstegi ert namn eller lösenord!',
-    ],
-    instructions: [
-      ' Usage:',
-      '  register *user name*',
-      ' Example:',
-      '  register myname',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  register *användarnamn*',
-      ' Exempel:',
-      '  register myname',
-    ],
+    help: labels.help.register,
+    help_se: labels.help_se.register,
+    instructions: labels.instructions.register,
+    instructions_se: labels.instructions_se.register,
     accessLevel: 0,
     category: 'login',
   };
@@ -3029,29 +2902,10 @@ function attachCommands() {
         }
       },
     ],
-    help: [
-      'Creates a chat room',
-      'The rooms name has to be 1 to 6 characters long',
-      'The password is optional',
-      'The name can only contain letters and numbers (a-z, 0-9)',
-    ],
-    help_se: [
-      'Skapar ett chatrum',
-      'Rummets namn måste vara 1 till 6 tecken långt',
-      'Namnet får endast innehålla bokstäver och siffror (a-z, 0-9)',
-    ],
-    instructions: [
-      ' Usage:',
-      '  createroom *room name*',
-      ' Example:',
-      '  createroom myroom banana',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  createroom *rumsnamn*',
-      ' Exempel:',
-      '  createroom myroom',
-    ],
+    help: labels.help.createroom,
+    help_se: labels.help_se.createroom,
+    instructions: labels.instructions.createroom,
+    instructions_se: labels.instructions_se.createroom,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3064,8 +2918,8 @@ function attachCommands() {
 
       socket.emit('myRooms', data);
     },
-    help: ['Shows a list of all rooms you are following'],
-    help_se: ['Visar en lista över alla rum som ni följer'],
+    help: labels.help.myrooms,
+    help_se: labels.help_se.myrooms,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3121,26 +2975,10 @@ function attachCommands() {
     abortFunc: function loginAbort() {
       hideInput(false);
     },
-    help: [
-      'Logs in as a user on this device',
-      'You have to be logged out to login as another user',
-    ],
-    help_se: [
-      'Loggar in som en användare på denna enhet',
-      'Ni måste vara utloggade för att kunna logga in som en annan användare',
-    ],
-    instructions: [
-      ' Usage:',
-      '  login *user name*',
-      ' Example:',
-      '  login user11',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  login *användarnamn*',
-      ' Exempel:',
-      '  login user11',
-    ],
+    help: labels.help.login,
+    help_se: labels.help_se.login,
+    instructions: labels.instructions.login,
+    instructions_se: labels.instructions_se.login,
     clearAfterUse: true,
     accessLevel: 0,
     category: 'login',
@@ -3149,8 +2987,8 @@ function attachCommands() {
     func: function timeCommand() {
       socket.emit('time');
     },
-    help: ['Shows the current time'],
-    help_se: ['Visar nuvarande tiden'],
+    help: labels.help.time,
+    help_se: labels.help_se.time,
     accessLevel: 13,
     category: 'basic',
   };
@@ -3175,34 +3013,10 @@ function attachCommands() {
         socket.emit('locate', { user: { userName: getUser() } });
       }
     },
-    help: [
-      'Shows the last known location of the user',
-      '* is a shortcut for all users. Example: locate *',
-      'Just writing the command without a user name will show your current location. Example: locate',
-      'You need to be connected to the satellites to access this command',
-    ],
-    help_se: [
-      'Visar senaste identifierade position för användaren',
-      '* är en genväg för alla användare. Exempel: locate *',
-      'Om ni bara skriver kommandot utan ett användarnamn så kommer det visa er nuvarande position. Exempel: locate',
-      'Ni måste vara uppkopplade mot satelliterna för att ha tillgång till detta kommando',
-    ],
-    instructions: [
-      ' Usage:',
-      '  locate *optional user name OR "*"*',
-      ' Example:',
-      '  locate user1',
-      '  locate *',
-      '  locate',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  locate *frivilligt användarnamn ELLER "*"*',
-      ' Exempel:',
-      '  locate user1',
-      '  locate *',
-      '  locate',
-    ],
+    help: labels.help.locate,
+    help_se: labels.help_se.locate,
+    instructions: labels.instructions.locate,
+    instructions_se: labels.instructions_se.locate,
     autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'advanced',
@@ -3225,36 +3039,10 @@ function attachCommands() {
 
       socket.emit('history', data);
     },
-    help: [
-      'Clears the screen and retrieves chat messages from server',
-      'The amount you send with the command is the amount of messages that will be returned from each room you follow',
-      'You can retrieve history from a specific room by adding the room name to the input. Example: history room1',
-    ],
-    help_se: [
-      'Rensar skärmen och hämtar chatmeddelanden från servern',
-      'Om ni skriver med ett värde så kommer servern skicka tillbaka så många meddelanden från varje rum ni följer',
-      'Ni kan hämta meddelanden från ett specifikt rum om ni skriver med namnet. Exempel: history rum1',
-    ],
-    instructions: [
-      ' Usage:',
-      '  history *optional number*',
-      '  history *optional room name* *optional number*',
-      ' Example:',
-      '  history',
-      '  history 25',
-      '  history aroom 25',
-      '  history aroom',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  history *frivilligt nummer*',
-      '  history *frivilligt rumsnamn* *frivilligt nummer*',
-      ' Exempel:',
-      '  history',
-      '  history 25',
-      '  history aroom',
-      '  history aroom 25',
-    ],
+    help: labels.help.history,
+    help_se: labels.help_se.history,
+    instructions: labels.instructions.history,
+    instructions_se: labels.instructions_se.history,
     clearAfterUse: true,
     clearBeforeUse: true,
     accessLevel: 1,
@@ -3273,20 +3061,10 @@ function attachCommands() {
         }
       }
     },
-    help: ['Sends a morse encoded message (sound) to all users'],
-    help_se: ['Skicka ett meddelande via morse (ljud) till alla användare'],
-    instructions: [
-      ' Usage:',
-      '  morse *message*',
-      ' Example:',
-      '  morse sos',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  morse *meddelande*',
-      ' Exempel:',
-      '  morse sos',
-    ],
+    help: labels.help.morse,
+    help_se: labels.help_se.morse,
+    instructions: labels.instructions.morse,
+    instructions_se: labels.instructions_se.morse,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3349,16 +3127,10 @@ function attachCommands() {
     abortFunc: function passwordAbort() {
       hideInput(false);
     },
-    help: [
-      'Allows you to change the user password',
-      'Don\'t use whitespace in your password!',
-    ],
-    help_se: [
-      'Tillåter er att ändra ert lösenord',
-      'Använd inte blanksteg i lösenordet!',
-    ],
-    instructions: ['Follow the instructions on the screen'],
-    instructions_se: ['Följ instruktionerna på skärmen'],
+    help: labels.help.password,
+    help_se: labels.help_se.password,
+    instructions: labels.instructions.password,
+    instructions_se: labels.instructions_se.password,
     accessLevel: 13,
     category: 'basic',
   };
@@ -3366,8 +3138,8 @@ function attachCommands() {
     func: function logoutCommand() {
       socket.emit('logout');
     },
-    help: ['Logs out from the current user on this device'],
-    help_se: ['Loggar ut din nuvarande användare från denna enhet'],
+    help: labels.help.logout,
+    help_se: labels.help_se.logout,
     accessLevel: 13,
     category: 'basic',
     clearAfterUse: true,
@@ -3376,8 +3148,8 @@ function attachCommands() {
     func: function rebootCommand() {
       refreshApp();
     },
-    help: ['Reboots terminal'],
-    help_se: ['Startar om terminalen'],
+    help: labels.help.reboot,
+    help_se: labels.help_se.reboot,
     accessLevel: 1,
     category: 'basic',
   };
@@ -3397,34 +3169,10 @@ function attachCommands() {
         socket.emit('unverifiedUsers');
       }
     },
-    help: [
-      'Verifies a user and allows it to connect to the system',
-      'verifyuser without any additional input will show a list of all unverified users. Exempel: verifyuser',
-      'Use "*" to verify all users',
-    ],
-    help_se: [
-      'Verifiera en användare och tillåter denne att koppla upp sig mot systemet',
-      'verifyuser utan några andra tillägg visara en lista över alla icke-verifierade användare. Exempel: verifyuser',
-      'Använd "*" för att verifiera alla icke-verifierade användare',
-    ],
-    instructions: [
-      ' Usage:',
-      '  verifyuser',
-      '  verifyuser *username*',
-      '  verifyuser *',
-      ' Example:',
-      '  verifyuser',
-      '  verifyuser appl1',
-      '  verifyuser *',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  verifyuser *frivilligt användarnamn ELLER "*"*',
-      ' Exempel:',
-      '  verifyuser',
-      '  verifyuser appl1',
-      '  verifyuser *',
-    ],
+    help: labels.help.verifyuser,
+    help_se: labels.help_se.verifyuser,
+    instructions: labels.instructions.verifyuser,
+    instructions_se: labels.instructions_se.verifyuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3439,26 +3187,10 @@ function attachCommands() {
         socket.emit('bannedUsers');
       }
     },
-    help: [
-      'Bans a user and disconnects it from the system',
-      'The user will not be able to log on again',
-    ],
-    help_se: [
-      'Bannar användaren och kopplar från denne från systemet',
-      'Användaren kommer inte kunna logga in igen',
-    ],
-    instructions: [
-      ' Usage:',
-      '  banuser *username*',
-      ' Example:',
-      '  banuser evil1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  banuser *användarnamn*',
-      ' Exempel:',
-      '  banuser evil1',
-    ],
+    help: labels.help.banuser,
+    help_se: labels.help_se.banuser,
+    instructions: labels.instructions.banuser,
+    instructions_se: labels.instructions_se.banuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3473,30 +3205,10 @@ function attachCommands() {
         socket.emit('bannedUsers');
       }
     },
-    help: [
-      'Removes ban on user',
-      'The user will be able to log on again',
-      'unbanuser without any additional input will show a list of all banned users. Example: unbanuser',
-    ],
-    help_se: [
-      'Tar bort en banning från en användare',
-      'Användaren kommer kunna logga in igen',
-      'unbanuser utan tillägg visar en lista över alla bannade användare. Example: unbanuser',
-    ],
-    instructions: [
-      ' Usage:',
-      '  unbanuser *optional username*',
-      ' Example:',
-      '  unbanuser',
-      '  unbanuser evil1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  unbanuser *frivilligt användarnamn*',
-      ' Exempel:',
-      '  unbanuser',
-      '  unbanuser evil1',
-    ],
+    help: labels.help.unbanuser,
+    help_se: labels.help_se.unbanuser,
+    instructions: labels.instructions.unbanuser,
+    instructions_se: labels.instructions_se.unbanuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3519,30 +3231,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Send a private message to a user',
-      'The first word that you type will be interpreted as a user name',
-      'The rest of the input will be sent to only that user',
-    ],
-    help_se: [
-      'Skicka ett privat meddelande till en användare',
-      'Det första ni skriver in kommer att tolkas som användarnamnet',
-      'The rest of the input will be sent to only that user',
-    ],
-    instructions: [
-      ' Usage:',
-      '  whisper *user name* *message*',
-      ' Example:',
-      '  whisper adam hello, adam!',
-      '  whisper user1 sounds good!',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  whisper *användarnamn* *meddelande*',
-      ' Exempel:',
-      '  whisper ada Hej, Ada!',
-      '  whisper user1 Låter bra!',
-    ],
+    help: labels.help.whisper,
+    help_se: labels.help_se.whisper,
+    instructions: labels.instructions.whisper,
+    instructions_se: labels.instructions_se.whisper,
     clearAfterUse: true,
     autocomplete: { type: 'users' },
     accessLevel: 13,
@@ -3714,30 +3406,10 @@ function attachCommands() {
     abortFunc: function hackroomAbort() {
       clearTimeout(commandHelper.data.timer);
     },
-    help: [
-      'ERROR. UNAUTHORIZED COMMAND... AUTHORIZATION OVERRIDDEN. PRINTING INSTRUCTIONS',
-      'This command lets you follow a room without knowing the password',
-      'It will also supress the following notification',
-      'Failing the hack will warn everyone in the room',
-    ],
-    help_se: [
-      'FEL. EJ BEHÖRIGT KOMMANDO... KRINGÅR BEHÖRIGHET. SKRIVER UT INSTRUKTIONER',
-      'Detta kommando låter dig följa rum utan att veta dess lösenord',
-      'Det kommer att stoppa notifikationen som vanligtvis skickas till rum',
-      'Alla i rummet kommer bli notifierade om ni misslyckas med hackningen',
-    ],
-    instructions: [
-      ' Usage:',
-      '  hackroom *room name*',
-      ' Example:',
-      '  hackroom secret',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  hackroom *rumsnamn*',
-      ' Exempel:',
-      '  hackroom secret',
-    ],
+    help: labels.help.hackroom,
+    help_se: labels.help_se.hackroom,
+    instructions: labels.instructions.hackroom,
+    instructions_se: labels.instructions_se.hackroom,
     clearBeforeUse: true,
     accessLevel: 13,
     category: 'hacking',
@@ -3860,16 +3532,10 @@ function attachCommands() {
         }
       },
     ],
-    help: ['Send an important message to a single device or all users'],
-    help_se: ['Skicka ett viktigt meddelande till en enheter eller alla användare'],
-    instructions: [
-      'Follow the on-screen instructions',
-      'Note! Only the first line can be sent as morse code (optional)',
-    ],
-    instructions_se: [
-      'Följ instruktionerna på skärmen',
-      'Notera att endast första raden skickas som morse (frivilligt)',
-    ],
+    help: labels.help.importantmsg,
+    help_se: labels.help_se.importantmsg,
+    instructions: labels.instructions.importantmsg,
+    instructions_se: labels.instructions_se.importantmsg,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3970,16 +3636,10 @@ function attachCommands() {
       });
       resetCommand();
     },
-    help: [
-      'Activate chipper function',
-      'Press enter when you have retrieved confirmation from the external system',
-    ],
-    help_se: [
-      'Aktivera chipperfunktionen',
-      'Tryck på enter-knappen när ni har fått konfirmation från externa systemet',
-    ],
-    instructions: ['Follow the instructions on the screen'],
-    instructions_se: ['Följ instruktionerna på skärmen'],
+    help: labels.help.chipper,
+    help_se: labels.help_se.chipper,
+    instructions: labels.instructions.chipper,
+    instructions_se: labels.instructions_se.chipper,
     accessLevel: 13,
     category: 'hacking',
     clearBeforeUse: true,
@@ -4008,26 +3668,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Switches your current room to another',
-      'You have to already be following the room to switch to it',
-    ],
-    help_se: [
-      'Byter nuvrande rum till ett annat',
-      'Ni måste redan följa rummet för att kunna byta till det',
-    ],
-    instructions: [
-      ' Usage:',
-      '  room *room you are following*',
-      ' Example:',
-      '  room room1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  room *rumsnamn på ett rum ni följer',
-      ' Exempel:',
-      '  room room1',
-    ],
+    help: labels.help.room,
+    help_se: labels.help_se.room,
+    instructions: labels.instructions.room,
+    instructions_se: labels.instructions_se.room,
     autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -4070,26 +3714,10 @@ function attachCommands() {
         resetCommand();
       },
     ],
-    help: [
-      'Removes a room',
-      'You have to be either the owner or an admin of the room to remove it',
-    ],
-    help_se: [
-      'Tar bort ett rum',
-      'Ni måste vara antingen ägaren eller en administratör av rummet för att kunna ta bort det',
-    ],
-    instructions: [
-      ' Usage:',
-      '  removeroom *room name*',
-      ' Example:',
-      '  removeroom room1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  removeroom *rumsnamn*',
-      ' Exempel:',
-      '  removeroom room1',
-    ],
+    help: labels.help.removeroom,
+    help_se: labels.help_se.removeroom,
+    instructions: labels.instructions.removeroom,
+    instructions_se: labels.instructions_se.removeroom,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -4116,30 +3744,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Change fields on a user',
-      'You can change visibility, accesslevel, password or add/remove a group',
-      'Valid fields: visibility, accesslevel, addgroup, removegroup, password',
-    ],
-    help_se: [
-      'Ändra ett fält hos en användare',
-      'Ni kan ändra visibility, accesslevel, password eller lägga till/ta bort en grupp',
-      'Giltiga fält: visibility, accesslevel, addgroup, removegroup, password',
-    ],
-    instructions: [
-      ' Usage:',
-      '  updateuser *user name* *field name* *value*',
-      ' Example:',
-      '  updateuser user1 accesslevel 3',
-      '  updateuser user1 group hackers',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  updateuser *användarnamn* *fältnamn* *värde',
-      ' Exempel:',
-      '  updateuser user1 accesslevel 3',
-      '  update user1 group hackers',
-    ],
+    help: labels.help.updateuser,
+    help_se: labels.help_se.updateuser,
+    instructions: labels.instructions.updateuser,
+    instructions_se: labels.instructions_se.updateuser,
     autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'admin',
@@ -4167,30 +3775,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Change fields on a command',
-      'You can currently change visibility or accesslevel',
-      'Valid fields: visibility, accesslevel',
-    ],
-    help_se: [
-      'Ändra ett fält i ett kommando',
-      'Ni kan ändra visibility eller accesslevel',
-      'Giltiga fält: visibility, accesslevel',
-    ],
-    instructions: [
-      ' Usage:',
-      '  updatecommand *command name* *field name* *value*',
-      ' Example:',
-      '  updatecommand help accesslevel 3',
-      '  updatecommand help visibility 6',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  updatecommand *kommandonamn* *fältnamn* *värde*',
-      ' Exempel:',
-      '  updatecommand help accesslevel 3',
-      '  updatecommand help visibility 6',
-    ],
+    help: labels.help.updatecommand,
+    help_se: labels.help_se.updatecommand,
+    instructions: labels.instructions.updatecommand,
+    instructions_se: labels.instructions_se.updatecommand,
     accessLevel: 13,
     category: 'admin',
   };
@@ -4217,28 +3805,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Change fields on a room',
-      'You can change visibility, accesslevel',
-      'Valid fields: visibility, accesslevel',
-    ],
-    help_se: [
-      'Ändra ett fält på ett rum',
-      'Ni kan ändra visibility, accesslevel',
-      'Giltiga fält: visibility, accesslevel',
-    ],
-    instructions: [
-      ' Usage:',
-      '  updateroom *room name* *field name* *value*',
-      ' Example:',
-      '  updateroom user1 accesslevel 3',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  updateroom *rumsnamn* *fältnamn* *värde*',
-      ' Exempel:',
-      '  updateroom user1 accesslevel 3',
-    ],
+    help: labels.help.updateroom,
+    help_se: labels.help_se.updateroom,
+    instructions: labels.instructions.updateroom,
+    instructions_se: labels.instructions_se.updateroom,
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'admin',
@@ -4247,6 +3817,8 @@ function attachCommands() {
     func: function weatherCommand() {
       socket.emit('weather');
     },
+    help: labels.help.weather,
+    help_se: labels.help_se.weather,
     accessLevel: 1,
     category: 'basic',
   };
@@ -4273,28 +3845,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Change fields on a device',
-      'You can currently change the alias',
-      'Valid fields: alias',
-    ],
-    help_se: [
-      'Ändra fält på en enhet',
-      'Ni kan ändra alias',
-      'Giltiga fält: alias',
-    ],
-    instructions: [
-      ' Usage:',
-      '  updatedevice *device ID* *field name* *value*',
-      ' Example:',
-      '  updatedevice 32r23rj alias betteralias',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  updatedevice *enhets-ID* *fältnamn* *värde*',
-      ' Exempel:',
-      '  updatedevice 32r23rj alias betteralias',
-    ],
+    help: labels.help.updatedevice,
+    help_se: labels.help_se.updatedevice,
+    instructions: labels.instructions.updatedevice,
+    instructions_se: labels.instructions_se.updatedevice,
     autocomplete: { type: 'devices' },
     accessLevel: 13,
     category: 'admin',
@@ -4346,26 +3900,10 @@ function attachCommands() {
         resetCommand(false);
       },
     ],
-    help: [
-      'Create a new team',
-      'You will be able to invite new members to the team',
-    ],
-    help_se: [
-      'Skapa ett nytt team',
-      'Ni kommer att kunna bjuda in nya medlemmar till teamet',
-    ],
-    instructions: [
-      ' Usage:',
-      '  createteam *name*',
-      ' Example:',
-      '  createteam team1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  createteam *namn*',
-      ' Exempel:',
-      '  createteam team1',
-    ],
+    help: labels.help.createteam,
+    help_se: labels.help_se.createteam,
+    instructions: labels.instructions.createteam,
+    instructions_se: labels.instructions_se.createteam,
     accessLevel: 13,
     category: 'basic',
     autocomplete: { type: 'users' },
@@ -4443,30 +3981,10 @@ function attachCommands() {
         }
       },
     ],
-    help: [
-      'Shows a list of all your invitations and lets you accept or decline them',
-      'Note that "d" is a shorthand for "decline" and "a" is a shorthand for "accept" Either version is allowed',
-    ],
-    help_se: [
-      'Visar en lista över dina inbjudan och låter dig acceptera eller avböja dem',
-      'Notera att "d" är en förkortning av "decline" och "a" är en förkortning "accept" Bägge är tillåtna',
-    ],
-    instructions: [
-      ' Usage:',
-      '  invitations',
-      '  *number of the invitation* *accept OR a OR decline OR d*',
-      ' Example:',
-      '  invitations',
-      '  1 accept',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  invitations',
-      '  *nummer på inbjudan* *accept ELLR a ELLER decline ELLER d*',
-      ' Exampel:',
-      '  invitations',
-      '  1 accept',
-    ],
+    help: labels.help.invitations,
+    help_se: labels.help_se.invitations,
+    instructions: labels.instructions.invitations,
+    instructions_se: labels.instructions_se.invitations,
     accessLevel: 13,
     category: 'basic',
   };
@@ -4483,26 +4001,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Invites another user to your team',
-      'You have to be the team leader or an team administrator to invite new members',
-    ],
-    help_se: [
-      'Bjuder in andra användare till ditt team',
-      'Ni måste vara ledare för teamet eller en administratör för teamet för att kunna bjuda in nya medlemmar',
-    ],
-    instructions: [
-      ' Usage:',
-      '  inviteteam *user name*',
-      ' Example:',
-      '  inviteteam user1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  inviteteam *användarnamn*',
-      ' Exempel:',
-      '  inviteteam user1',
-    ],
+    help: labels.help.inviteteam,
+    help_se: labels.help_se.inviteteam,
+    instructions: labels.instructions.inviteteam,
+    instructions_se: labels.instructions_se.inviteteam,
     accessLevel: 13,
     category: 'basic',
   };
@@ -4522,24 +4024,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Invites another user to a room you are following',
-    ],
-    help_se: [
-      'Bjuder in en annan användare till ett rum ni följer',
-    ],
-    instructions: [
-      ' Usage:',
-      '  inviteroom *user name* *room name*',
-      ' Example:',
-      '  inviteroom user1 room1',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  inviteroom *användarnamn* *rumsnamn*',
-      ' Exempel:',
-      '  inviteroom user1 room1',
-    ],
+    help: labels.help.inviteroom,
+    help_se: labels.help_se.inviteroom,
+    instructions: labels.instructions_se.inviteroom,
+    instructions_se: labels.instructions_se.inviteroom,
     accessLevel: 13,
     category: 'basic',
   };
@@ -4571,28 +4059,10 @@ function attachCommands() {
         });
       }
     },
-    help: [
-      'Create a new shortcut for a command and sequence',
-      'The shortcut will appear among other commands when you auto-complete',
-      'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"',
-    ],
-    help_se: [
-      'Skapa en ny genväg för ett kommando och en sekvens',
-      'Genvägen kommer att synas tillsammans med andra kommandon när ni använder autoifyllning',
-      'Nedan kan ni se ett exempel som skickar ett meddelande (via kommandot "msg") när "hello" körs',
-    ],
-    instructions: [
-      ' Usage:',
-      '  alias *alias name* *command name* *sequence*',
-      ' Example:',
-      '  alias hello msg Greetings to all!',
-    ],
-    instructions_se: [
-      ' Användning:',
-      '  alias *namn* *kommandonamn* *sekvens*',
-      ' Exempel:',
-      '  alias hello msg God dag, folket!',
-    ],
+    help: labels.help.alias,
+    help_se: labels.help_se.alias,
+    instructions: labels.instructions.alias,
+    instructions_se: labels.instructions_se.alias,
     accessLevel: 13,
     category: 'basic',
   };

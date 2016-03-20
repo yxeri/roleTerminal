@@ -1,10 +1,15 @@
 'use strict';
 /* eslint-disable camelcase */
 
+const textTools = require('./textTools');
+
 const usageLine = 'Usage:';
 const usageLine_se = 'Användning:';
 const exampleLine = 'Example:';
 const exampleLine_se = 'Exempel';
+const employeeNumber = Math.floor(Math.random() * 120503);
+const randomRelay = textTools.createCharString(4, true);
+let userName = ''; // eslint-disable-line prefer-const
 
 const help = {
   help: ['Shows a list of available commands'],
@@ -486,6 +491,15 @@ const instructions = {
     exampleLine,
     'alias hello msg Greetings to all!',
   ],
+  helpExtra: [
+    'Instructions',
+    'Add -help after a command to get instructions on how to use it. Example: uploadkey -help',
+    'Shortcuts',
+    'Use page up/down to scroll the view',
+    'Press arrow up/down to go through your previous used commands',
+    'Pressing tab or space twice will auto-complete any command you have begun writing.',
+    'Example: "he" and a tab / double space will automatically turn into "help"',
+  ],
 };
 
 const instructions_se = {
@@ -683,9 +697,194 @@ const instructions_se = {
     exampleLine_se,
     'alias hello msg God dag, folket!',
   ],
+  helpExtra: [
+    'Instruktioner',
+    'Lägg till -help efter ett kommando för att få instruktioner på hur det kan användas. Exempel: uploadkey -help',
+    'Genvägar',
+    'Använd page up/down för att skrolla vyn',
+    'Använd pil upp/ner för att gå igenom tidigare använda kommandon',
+    'Tryck på tab-knappen eller två mellanslag i rad för att autoifylla kommandon som ni har börjat skriva',
+    'Exempel: "he" och en tabbning / två mellanslag i rad kommer automatiskt ändra det till "help"',
+  ],
 };
 
+const errors = {
+  commandFail: ['command not found'],
+  aborted: ['Aborting command'],
+  noTracking: [
+    'Unable to connect to the tracking satellites',
+    'Turning off tracking is a major offense',
+    'Organica Re-Education Squads have been sent to scour the area',
+  ],
+  failedRoom: [
+    'Failed to create room',
+    'Room name has to be 1 to 6 characters long',
+    'The room name can only contain letters and numbers (a-z, 0-9)',
+    'Example: createroom myroom',
+  ],
+};
+
+const errors_se = {
+  commandFail: ['Kommandot kunde inte hittas'],
+  aborted: ['Avbryter kommandot'],
+  noTracking: [
+    'Misslyckades med att koppla upp mot spårningsatelliterna',
+    'Att slå av spårningsfunktionen är en grov förseelse',
+    'Organica omskolningsstyrkor har blivit skickade till området',
+  ],
+  failedRoom: [
+    'Misslyckades att skapa rummet',
+    'Rummets namn måste vara 1 till 6 tecken långt',
+    'Rummets namn kan endast innehålla bokstäver och siffror (a-z, 0-9)',
+    'Exempel: createroom myroom',
+  ],
+};
+
+const info = {
+  cancel: ['You can cancel out of the command by typing "exit" or "abort"'],
+  mustRegister: [
+    'You must register a new user or login with an existing user to gain access to more commands',
+    'Use command register or login',
+    'example: register myname',
+    'or login myname',
+  ],
+  welcomeLoggedIn: [
+    `Welcome, employee ${userName}`,
+    'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
+    'You can also retrieve instructions if you use the tab button or type double space without any other input',
+    'Learn this valuable skill to increase your productivity!',
+    'May you have a productive day',
+  ],
+  razorHacked: ['## This terminal has been cracked by your friendly Razor team. Enjoy! ##'],
+  welcome: [
+    'Welcome to the Oracle of Organica',
+    'Please login to start your productive day!',
+    'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
+    'You can also retrieve instructions if you use the tab button or type double space without any other input',
+    'Learn this valuable skill to increase your productivity!',
+  ],
+  pressEnter: ['Press enter to continue'],
+  typeLineEnter: [
+    'Type a line and press enter',
+    'Press enter without any input when you are completely done with the message',
+  ],
+  keepShortMorse: ['Try to keep the first line short if you want to send it as morse'],
+  isThisOk: ['Is this OK? "yes" to accept the message'],
+  preview: ['Preview of the message:'],
+  sendMorse: [
+    'Do you want to send it as morse code too? "yes" to send it as morse too',
+    'Note! Only the first line will be sent as morse',
+  ],
+  congratulations: [
+    `Congratulations, employee #${employeeNumber}`,
+    'Welcome to the Organica Oracle department',
+  ],
+  establishConnection: [
+    textTools.createFullLine(),
+    'Connecting... Could not establish connection to HQ',
+    'Rerouting... Secondary relay ' + randomRelay + ' found',
+    'Connecting to relay ' + randomRelay + '... Connection established',
+    textTools.createFullLine(),
+  ],
+  hackRoomIntro: [
+    'Razor proudly presents:',
+    'Room Access Hacking! (RAH)',
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    textTools.createMixedString(40),
+    ' ',
+    'Please wait.......',
+    'Command interception.........ACTIVATED',
+    'Oracle defense systems.......DISABLED',
+    'Overriding locks.............DONE',
+    'Connecting to database ......DONE',
+  ],
+  useRegister: [
+    textTools.createFullLine(),
+    'Use register to register a new user',
+    'Use login to log in to an existing user',
+    'You have to log in to access most of the system',
+    textTools.createFullLine(),
+  ],
+  whoFrom: [
+    'Who is the message from?',
+    'You can also leave it empty and just press enter',
+  ],
+};
+
+const info_se = {
+  cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
+  mustRegister: [
+    'Ni måste registrera en ny användare eller logga in me en existerande användare för att få tillgång till fler kommandon',
+    'Använd kommando register eller login',
+    'Exempel: register myname',
+    'eller login myname',
+  ],
+  welcomeLoggedIn: [
+    `Välkommen, uppdragstagare ${userName}`,
+    'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva in två mellanslag i rad?',
+    'Ni kan också trycka på tab-knappen eller skriva in tvåmellanslag i rad för att få fram instruktioner',
+    'Lär dig denna värdefulla teknik för att öka din produktivitet!',
+    'Ha en produktiv dag',
+  ],
+  razorHacked: ['## Denna terminal låstes upp av er vänliga Razor-grupp. Ha så kul! ##'],
+  welcome: [
+    'Välkommen till Oraklet av Organica',
+    'Var vänlig och logga in för att starta in produktiva dag!',
+    'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva in två mellanslag i rad?',
+    'Ni kan också trycka på tab-knappen eller skriva in tvåmellanslag i rad för att få fram instruktioner',
+    'Lär dig denna värdefulla teknik för att öka din produktivtet!',
+    'Ha en bra och produktiv dag',
+  ],
+  pressEnter: ['Tryck på enter för att fortsätta'],
+  typeLineEnter: [
+    'Skriv en rad och tryck på enter-knappen',
+    'Tryck på enter-knappen utan något i inmatningsfältet när ni är helt klara med meddelandet',
+  ],
+  keepShortMorse: ['Försök att hålla första raden kort om ni vill skicka meddelandet som morse'],
+  isThisOk: ['Är detta OK? Skriv in "yes" för att acceptera meddelandet'],
+  preview: ['Förhandsgranskning av meddelandet'],
+  sendMorse: [
+    'Vill ni också skicka det som morse? Skriv "yes" för att skicka det som morse',
+    'Notera att endast första raden skickas som morse',
+  ],
+  congratulations: [
+    `Gratulerar, uppdragstagare #${employeeNumber}`,
+    'Välkommen till Organica Orakelavdelningen',
+  ],
+  establishConnection: [
+    textTools.createFullLine(),
+    'Ansluter... Kunde inte etablera en anslutning mot HQ',
+    `Omdirigerar... Sekundär relä ${randomRelay} funnen`,
+    `Ansluter till relä ${randomRelay}... Anslutning etablerad`,
+    textTools.createFullLine(),
+  ],
+  useRegister: [
+    textTools.createFullLine(),
+    'Använd register för att registrera en ny användare',
+    'Använd login för att logga in som en existerande användare',
+    'Ni måste logga in för att få tillgång till majoriteten av systemet',
+    textTools.createFullLine(),
+  ],
+  whoFrom: [
+    'Vem är detta meddelande från?',
+    'Ni kan också lämna det tomt och trycka på enter',
+  ],
+};
+
+module.exports.userName = userName;
 module.exports.help = help;
 module.exports.help_se = help_se;
 module.exports.instructions = instructions;
 module.exports.instructions_se = instructions_se;
+module.exports.errors = errors;
+module.exports.errors_se = errors_se;
+module.exports.info = info;
+module.exports.info_se = info_se;

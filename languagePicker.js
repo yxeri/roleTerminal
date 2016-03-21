@@ -1,10 +1,10 @@
 'use strict';
 
-const appConfig = require('rolehaven-config').app;
+const defaultLanguage = require('rolehaven-config').app.defaultLanguage;
 
 function appendLanguageCode(propertyName) {
-  if (appConfig.defaultLanguage !== '') {
-    return propertyName + '_' + appConfig.defaultLanguage;
+  if (defaultLanguage !== '') {
+    return propertyName + '_' + defaultLanguage;
   }
 
   return propertyName;

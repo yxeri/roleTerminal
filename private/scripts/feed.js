@@ -2939,6 +2939,27 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
+  validCommands.verifyteam = {
+    func: function verifyteamCommand(phrases) {
+      if (phrases.length > 0) {
+        const teamName = phrases[0].toLowerCase();
+
+        if (teamName === '*') {
+          socket.emit('verifyAllTeams');
+        } else {
+          const data = { team: { teamName: teamName } };
+
+          socket.emit('verifyTeam', data);
+        }
+      } else {
+        socket.emit('unverifiedTeams');
+      }
+    },
+    help: labels[appendLanguage('help')].verifyteam,
+    instructions: labels[appendLanguage('instructions')].verifyteam,
+    accessLevel: 13,
+    category: 'admin',
+  };
   validCommands.banuser = {
     func: function banuserCommand(phrases) {
       if (phrases.length > 0) {

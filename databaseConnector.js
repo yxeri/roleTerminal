@@ -88,6 +88,7 @@ const teamSchema = new mongoose.Schema({
   teamName: String,
   owner: String,
   admins: [{ type: String, unique: true }],
+  verified: Boolean,
 }, { collection: 'teams' });
 const weatherSchema = new mongoose.Schema({
   time: { type: Date, unique: true },
@@ -178,6 +179,39 @@ function saveObject(object, objectName, callback) {
     }
 
     callback(saveErr, savedObj);
+  });
+}
+
+function verifyObject(query, object, objectName, callback) {
+  const update = { $set: { verified: true } };
+
+  object.findOneAndUpdate(query, update).lean().exec(function(err, verified) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: [`Failed to verify ${objectName}`],
+        err: err,
+      });
+    }
+
+    callback(err, verified);
+  });
+}
+
+function verifyAllObjects(query, object, objectName, callback) {
+  const update = { $set: { verified: true } };
+  const options = { multi: true };
+
+  object.update(query, update, options).lean().exec(function(err, verified) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: [`Failed to verify all ${objectName}`],
+        err: err,
+      });
+    }
+
+    callback(err, verified);
   });
 }
 
@@ -619,37 +653,25 @@ function updateUserMode(userName, mode, callback) {
 
 function verifyUser(sentUserName, callback) {
   const query = { userName: sentUserName };
-  const newVarupdate = { verified: true };
 
-  User.findOneAndUpdate(query, newVarupdate).lean().exec(function(err, user) {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['Failed to verify user'],
-        err: err,
-      });
-    }
-
-    callback(err, user);
-  });
+  verifyObject(query, User, 'user', callback);
 }
 
 function verifyAllUsers(callback) {
   const query = { verified: false };
-  const update = { $set: { verified: true } };
-  const options = { multi: true };
 
-  User.update(query, update, options).lean().exec(function(err) {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['Failed to verify all user'],
-        err: err,
-      });
-    }
+  verifyAllObjects(query, User, 'users', callback);
+}
 
-    callback(err);
-  });
+function verifyTeam(teamName, callback) {
+  const query = { teamName: teamName };
+  verifyObject(query, Team, 'team', callback);
+}
+
+function verifyAllTeams(callback) {
+  const query = { verified: false };
+
+  verifyAllObjects(query, Team, 'teams', callback);
 }
 
 function getAllDevices(callback) {
@@ -872,8 +894,8 @@ function addRoomToUser(sentUserName, sentRoomName, callback) {
   const query = { userName: sentUserName };
   const update = { $addToSet: { rooms: sentRoomName } };
 
-  User.findOneAndUpdate(query, update).lean().exec(function(err) {
-    if (err) {
+  User.findOneAndUpdate(query, update).lean().exec(function(err, user) {
+    if (err || user === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['Failed to add room to user'],
@@ -881,7 +903,7 @@ function addRoomToUser(sentUserName, sentRoomName, callback) {
       });
     }
 
-    callback(err);
+    callback(err, user);
   });
 }
 
@@ -1024,6 +1046,24 @@ function getUnverifiedUsers(callback) {
     }
 
     callback(err, users);
+  });
+}
+
+function getUnverifiedTeams(callback) {
+  const query = { verified: false };
+  const filter = { _id: 0 };
+  const sort = { teamName: 1 };
+
+  Team.find(query, filter).sort(sort).lean().exec(function(err, teams) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get unverified teams'],
+        err: err,
+      });
+    }
+
+    callback(err, teams);
   });
 }
 
@@ -1477,3 +1517,6 @@ exports.addInvitationToList = addInvitationToList;
 exports.removeInvitationFromList = removeInvitationFromList;
 exports.getInvitations = getInvitations;
 exports.removeInvitationTypeFromList = removeInvitationTypeFromList;
+exports.verifyTeam = verifyTeam;
+exports.verifyAllTeams = verifyAllTeams;
+exports.getUnverifiedTeams = getUnverifiedTeams;

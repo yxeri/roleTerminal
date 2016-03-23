@@ -7,6 +7,7 @@ const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
 const messenger = require('../../messenger');
 const appConfig = require('rolehaven-config').app;
+let io;
 
 function updateUserTeam(socket, userName, teamName, callback) {
   dbConnector.updateUserTeam(userName, teamName, function(err, user) {
@@ -14,16 +15,16 @@ function updateUserTeam(socket, userName, teamName, callback) {
       logger.sendSocketErrorMsg({
         socket: socket,
         code: logger.ErrorCodes.general,
-        text: ['Failed to add member ' + userName + ' to team ' + teamName],
-        text_se: ['Misslyckades med att lägga till medlem ' + userName + ' till teamet ' + teamName],
+        text: [`Failed to add member ${userName} to team ${teamName}`],
+        text_se: [`Misslyckades med att lägga till medlem ${userName} till teamet ${teamName}`],
         err: err,
       });
     } else {
       messenger.sendMsg({
         socket: socket,
         message: {
-          text: ['You have been added to the team ' + teamName],
-          text_se: ['Ni har blivit tillagd i teamet ' + teamName],
+          text: [`You have been added to the team ${teamName}`],
+          text_se: [`Ni har blivit tillagd i teamet ${teamName}`],
           userName: 'SYSTEM',
         },
         sendTo: userName + appConfig.whisperAppend,
@@ -32,6 +33,28 @@ function updateUserTeam(socket, userName, teamName, callback) {
 
     if (callback) {
       callback(err, user);
+    }
+  });
+}
+
+function addTeamRoom(userName, roomName) {
+  dbConnector.addRoomToUser(userName, roomName, function(roomErr, user) {
+    if (roomErr || user === null) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to follow team room'],
+        text_se: ['Misslyckades med att följa team-rummet'],
+        err: roomErr,
+      });
+
+      return;
+    }
+
+    const userSocket = io.sockets.connected[user.socketId];
+
+    if (userSocket) {
+      userSocket.join(roomName);
+      userSocket.emit('follow', { room: { roomName: 'team' } });
     }
   });
 }
@@ -54,7 +77,9 @@ function getTeam(socket, user, callback) {
   });
 }
 
-function handle(socket) {
+function handle(socket, sentIo) {
+  io = sentIo;
+
   socket.on('getTeam', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteteam.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
@@ -203,24 +228,6 @@ function handle(socket) {
       return;
     }
 
-    function addRoom(userName, roomName) {
-      dbConnector.addRoomToUser(userName, roomName, function(roomErr) {
-        if (roomErr) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.db,
-            text: ['Failed to follow team room'],
-            text_se: ['Misslyckades med att följa team-rummet'],
-            err: roomErr,
-          });
-
-          return;
-        }
-
-        socket.join(roomName);
-        socket.emit('follow', { room: { roomName: 'team' } });
-      });
-    }
-
     manager.userAllowedCommand(socket.id, databasePopulation.commands.createteam.commandName, function(allowErr, allowed, allowedUser) {
       if (allowErr || !allowed) {
         return;
@@ -239,6 +246,8 @@ function handle(socket) {
       const teamName = data.team.teamName;
       const owner = data.team.owner;
       const admins = data.team.admins;
+      const team = data.team;
+      team.verified = false;
 
       dbConnector.getUser(owner, function(userErr, user) {
         if (userErr) {
@@ -254,15 +263,15 @@ function handle(socket) {
         } else if (user === null) {
           logger.sendSocketErrorMsg({
             socket: socket, code: logger.ErrorCodes.general,
-            text: ['User with the name ' + owner + ' does not exist. Failed to create team'],
-            text_se: ['Användare med namnet ' + owner + ' existerar inte. Misslyckades med att skapa teamet'],
+            text: [`User with the name ${owner} does not exist. Failed to create team`],
+            text_se: [`Användare med namnet ${owner} existerar inte. Misslyckades med att skapa teamet`],
           });
 
           return;
         }
 
-        dbConnector.createTeam(data.team, function(err, team) {
-          if (err || team === null) {
+        dbConnector.createTeam(data.team, function(err, createdTeam) {
+          if (err || createdTeam === null) {
             logger.sendSocketErrorMsg({
               socket: socket,
               code: logger.ErrorCodes.db,
@@ -275,7 +284,7 @@ function handle(socket) {
           }
 
           const teamRoom = {
-            roomName: team.teamName + appConfig.teamAppend,
+            roomName: createdTeam.teamName + appConfig.teamAppend,
             accessLevel: databasePopulation.accessLevels.superUser,
             visibility: databasePopulation.accessLevels.superUser,
           };
@@ -292,16 +301,174 @@ function handle(socket) {
                 text_se: ['Teamet har skapats'],
               },
             });
+          });
+
+          if (appConfig.teamVerify) {
+            const message = {};
+            message.time = new Date();
+            message.roomName = databasePopulation.rooms.admin.roomName;
+
+            messenger.sendMsg({
+              socket: socket,
+              message: {
+                userName: 'SYSTEM',
+                text: [`Team ${createdTeam.teamName} needs to be verified`],
+                text_se: [`Teamet ${createdTeam.teamName} måste bli verifierad`],
+              },
+              sendTo: message.roomName,
+            });
+
+            messenger.sendSelfMsg({
+              socket: socket,
+              message: {
+                text: ['Your team has to be verified before it can be used'],
+                text_se: ['Ert team måste bli verifierad innan det kan användas'],
+              },
+            });
+          } else {
             updateUserTeam(socket, owner, teamName);
-            addRoom(user.userName, teamRoom.roomName);
+            addTeamRoom(user.userName, teamRoom.roomName);
 
             if (admins) {
               for (let i = 0; i < admins.length; i++) {
                 updateUserTeam(socket, admins[i], teamName);
-                addRoom(admins[i], teamRoom.roomName);
+                addTeamRoom(admins[i], teamRoom.roomName);
               }
             }
+          }
+        });
+      });
+    });
+  });
+
+  socket.on('verifyTeam', function(data) {
+    if (!objectValidator.isValidData(data, { team: { teamName: true } })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyteam.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      dbConnector.verifyTeam(data.team.teamName, function(err, team) {
+        if (err || team === null) {
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to verify team'],
+            text_se: ['Misslyckades med att verifiera teamet'],
+            err: err,
           });
+
+          return;
+        }
+
+        const teamName = team.teamName;
+        const owner = team.owner;
+        const admins = team.admins;
+        const roomName = teamName + appConfig.teamAppend;
+
+        updateUserTeam(socket, owner, teamName);
+        addTeamRoom(owner, roomName);
+
+        if (admins) {
+          for (let i = 0; i < admins.length; i++) {
+            updateUserTeam(socket, admins[i], teamName);
+            addTeamRoom(admins[i], roomName);
+          }
+        }
+
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: [`Team ${teamName} has been verified`],
+            text_se: [`Teamet ${teamName} har blivit verifierad`],
+          },
+        });
+      });
+    });
+  });
+
+  socket.on('verifyAllTeams', function() {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyteam.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      dbConnector.getUnverifiedUsers(function(err, teams) {
+        if (err || teams === null) {
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to verify all user'],
+            text_se: ['Misslyckades med att verifiera alla användare'],
+            err: err,
+          });
+
+          return;
+        }
+
+        dbConnector.verifyAllTeams(function(verifyErr) {
+          if (verifyErr) {
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.general,
+              text: ['Failed to verify all teams'],
+              text_se: ['Misslyckades med att verifiera alla team'],
+              err: verifyErr,
+            });
+
+            return;
+          }
+
+          messenger.sendSelfMsg({
+            socket: socket,
+            message: {
+              text: ['Teams have been verified'],
+              text_se: ['Teamen har blivit verifierade'],
+            },
+          });
+          // TODO Send message to verified user
+        });
+      });
+    });
+  });
+
+  socket.on('unverifiedTeams', function() {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyteam.commandName, function(allowErr, allowed) {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      dbConnector.getUnverifiedTeams(function(err, teams) {
+        if (err || teams === null) {
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get unverified teams'],
+            text_se: ['Misslyckades med hämtningen av icke-verifierade team'],
+            err: err,
+          });
+
+          return;
+        }
+
+        let teamsString = '';
+
+        for (let i = 0; i < teams.length; i++) {
+          teamsString += teams[i].teamName;
+
+          if (i !== teams.length - 1) {
+            teamsString += ' | ';
+          }
+        }
+
+        messenger.sendSelfMsg({
+          socket: socket,
+          message: {
+            text: [teamsString],
+          },
         });
       });
     });
@@ -314,7 +481,6 @@ function handle(socket) {
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.invitations.commandName, function(allowErr, allowed, allowedUser) {
       if (allowErr || !allowed) {
-        console.log(allowErr, allowed);
         return;
       }
 

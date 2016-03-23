@@ -157,6 +157,11 @@ const help = {
     'The shortcut will appear among other commands when you auto-complete',
     'The below example "hello" will use command "msg" to send the chat message "Greetings to all!"',
   ],
+  verifyteam: [
+    'Verifies a team and allows it to be used in the system',
+    'verifyteam without any additional input will show a list of all unverified teams. Exempel: verifyteam',
+    'Use "*" to verify all teams',
+  ],
 };
 
 const help_se = {
@@ -217,7 +222,7 @@ const help_se = {
   reboot: ['Startar om terminalen'],
   verifyuser: [
     'Verifiera en användare och tillåter denne att koppla upp sig mot systemet',
-    'verifyuser utan några andra tillägg visara en lista över alla icke-verifierade användare. Exempel: verifyuser',
+    'verifyuser utan några andra tillägg visar en lista över alla icke-verifierade användare. Exempel: verifyuser',
     'Använd "*" för att verifiera alla icke-verifierade användare',
   ],
   banuser: [
@@ -292,6 +297,11 @@ const help_se = {
     'Skapa en ny genväg för ett kommando och en sekvens',
     'Genvägen kommer att synas tillsammans med andra kommandon när ni använder autoifyllning',
     'Nedan kan ni se ett exempel som skickar ett meddelande (via kommandot "msg") när "hello" körs',
+  ],
+  verifyteam: [
+    'Verifiera ett team och tillåter det att användas i systemet',
+    'verifyteam utan några andra tillägg visar en lista över alla icke-verifierade användare. Exempel: verifyteam',
+    'Använd "*" för att verifiera alla icke-verifierade team',
   ],
 };
 
@@ -500,6 +510,16 @@ const instructions = {
     'Pressing tab or space twice will auto-complete any command you have begun writing.',
     'Example: "he" and a tab / double space will automatically turn into "help"',
   ],
+  verifyteam: [
+    usageLine,
+    'verifyteam',
+    'verifyteam *team name*',
+    'verifyteam *',
+    exampleLine,
+    'verifyteam',
+    'verifyteam Appl 1',
+    'verifyteam *',
+  ],
 };
 
 const instructions_se = {
@@ -705,6 +725,14 @@ const instructions_se = {
     'Använd pil upp/ner för att gå igenom tidigare använda kommandon',
     'Tryck på tab-knappen eller två mellanslag i rad för att autoifylla kommandon som ni har börjat skriva',
     'Exempel: "he" och en tabbning / två mellanslag i rad kommer automatiskt ändra det till "help"',
+  ],
+  verifyteam: [
+    usageLine_se,
+    'verifyteam *frivilligt teamnamn ELLER "*"*',
+    exampleLine_se,
+    'verifyteam',
+    'verifyteam Appl 1',
+    'verifyteam *',
   ],
 };
 

@@ -2280,7 +2280,7 @@ function attachCommands() {
           commandHelper.data.message.customSender = phrase;
         }
 
-        queueMessage({ text: labels[appendLanguage('commandStep')].typeLineEnter });
+        queueMessage({ text: labels[appendLanguage('info')].typeLineEnter });
         commandHelper.onStep++;
       },
       function broadcastStepTwo(phrases) {
@@ -2295,9 +2295,9 @@ function attachCommands() {
           dataText = copyString(message.text);
           commandHelper.onStep++;
 
-          queueMessage({ text: labels[appendLanguage('commandStep')].preview });
+          queueMessage({ text: labels[appendLanguage('info')].preview });
           queueMessage({ text: prependBroadcastMessage({ sender: message.customSender }).concat(dataText, textTools.createFullLine()) });
-          queueMessage({ text: labels[appendLanguage('commandStep')].isThisOk });
+          queueMessage({ text: labels[appendLanguage('info')].isThisOk });
         }
       },
       function broadcastStepThree(phrases) {
@@ -2584,7 +2584,7 @@ function attachCommands() {
         const password = phrases ? phrases[0] : undefined;
 
         if (password === commandHelper.data.user.password) {
-          queueMessage({ text: labels[appendLanguage('commandStep')].congratulations });
+          queueMessage({ text: labels[appendLanguage('info')].congratulations });
           socket.emit('register', commandHelper.data);
           validCommands[commandHelper.command].abortFunc();
           resetCommand(false);

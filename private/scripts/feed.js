@@ -4,7 +4,7 @@ const labels = require('./labels');
 const textTools = require('./textTools');
 
 // Timeout between print of rows (milliseconds)
-const rowTimeout = 40;
+const rowTimeout = 30;
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMessageQueue

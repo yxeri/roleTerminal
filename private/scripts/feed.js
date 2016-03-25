@@ -1573,7 +1573,7 @@ function printStartMessage() {
 
   queueMessage(organicaLogo);
   queueMessage({
-    // text: labels[],
+    text: labels[appendLanguage('info')].establishConnection,
     extraClass: 'upperCase',
   });
   queueMessage({ text: labels[appendLanguage('info')].welcome });

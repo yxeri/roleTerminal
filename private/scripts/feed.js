@@ -1103,13 +1103,15 @@ function autoCompleteCommand() {
 
 function printHelpMessage(command) {
   const helpMsg = { text: [] };
+  const helpText = labels[appendLanguage('help')][command];
+  const instructionsText = labels[appendLanguage('instructions')][command];
 
-  if (command.help) {
-    helpMsg.text = helpMsg.text.concat(command.help);
+  if (helpText) {
+    helpMsg.text = helpMsg.text.concat(helpText);
   }
 
-  if (command.instructions) {
-    helpMsg.text = helpMsg.text.concat(command.instructions);
+  if (instructionsText) {
+    helpMsg.text = helpMsg.text.concat(instructionsText);
   }
 
   if (helpMsg.text.length > 0) {
@@ -2208,8 +2210,6 @@ function attachCommands() {
 
       getAll();
     },
-    help: labels[appendLanguage('help')].help,
-    instructions: labels[appendLanguage('instructions')].help,
     accessLevel: 1,
     category: 'basic',
   };
@@ -2219,7 +2219,6 @@ function attachCommands() {
         mainFeed.removeChild(mainFeed.lastChild);
       }
     },
-    help: labels[appendLanguage('help')].clear,
     clearAfterUse: true,
     accessLevel: 13,
     category: 'basic',
@@ -2228,7 +2227,6 @@ function attachCommands() {
     func: function whoamiCommand() {
       socket.emit('whoAmI');
     },
-    help: labels[appendLanguage('help')].whoami,
     accessLevel: 13,
     category: 'basic',
   };
@@ -2253,8 +2251,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].msg,
-    instructions: labels[appendLanguage('instructions')].msg,
     clearAfterUse: true,
     accessLevel: 13,
     category: 'advanced',
@@ -2309,8 +2305,6 @@ function attachCommands() {
         }
       },
     ],
-    help: labels[appendLanguage('help')].broadcast,
-    instructions: labels[appendLanguage('instructions')].broadcast,
     accessLevel: 13,
     clearAfterUse: true,
     category: 'admin',
@@ -2348,8 +2342,6 @@ function attachCommands() {
         socket.emit('follow', { room: commandHelper.data.room });
       },
     ],
-    help: labels[appendLanguage('help')].follow,
-    instructions: labels[appendLanguage('instructions')].follow,
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -2373,8 +2365,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].unfollow,
-    instructions: labels[appendLanguage('instructions')].unfollow,
     autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -2411,8 +2401,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].list,
-    instructions: labels[appendLanguage('instructions')].list,
     autocomplete: { type: 'lists' },
     accessLevel: 13,
     category: 'basic',
@@ -2484,8 +2472,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].mode,
-    instructions: labels[appendLanguage('instructions')].mode,
     autocomplete: { type: 'modes' },
     accessLevel: 13,
     category: 'advanced',
@@ -2606,8 +2592,6 @@ function attachCommands() {
     abortFunc: function registerAbort() {
       hideInput(false);
     },
-    help: labels[appendLanguage('help')].register,
-    instructions: labels[appendLanguage('instructions')].register,
     accessLevel: 0,
     category: 'login',
   };
@@ -2683,8 +2667,6 @@ function attachCommands() {
         }
       },
     ],
-    help: labels[appendLanguage('help')].createroom,
-    instructions: labels[appendLanguage('instructions')].createroom,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2697,7 +2679,6 @@ function attachCommands() {
 
       socket.emit('myRooms', data);
     },
-    help: labels[appendLanguage('help')].myrooms,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -2753,8 +2734,6 @@ function attachCommands() {
     abortFunc: function loginAbort() {
       hideInput(false);
     },
-    help: labels[appendLanguage('help')].login,
-    instructions: labels[appendLanguage('instructions')].login,
     clearAfterUse: true,
     accessLevel: 0,
     category: 'login',
@@ -2763,7 +2742,6 @@ function attachCommands() {
     func: function timeCommand() {
       socket.emit('time');
     },
-    help: labels[appendLanguage('help')].time,
     accessLevel: 13,
     category: 'basic',
   };
@@ -2788,8 +2766,6 @@ function attachCommands() {
         socket.emit('locate', { user: { userName: getUser() } });
       }
     },
-    help: labels[appendLanguage('help')].locate,
-    instructions: labels[appendLanguage('instructions')].locate,
     autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'advanced',
@@ -2812,8 +2788,6 @@ function attachCommands() {
 
       socket.emit('history', data);
     },
-    help: labels[appendLanguage('help')].history,
-    instructions: labels[appendLanguage('instructions')].history,
     clearAfterUse: true,
     clearBeforeUse: true,
     accessLevel: 1,
@@ -2832,8 +2806,6 @@ function attachCommands() {
         }
       }
     },
-    help: labels[appendLanguage('help')].morse,
-    instructions: labels[appendLanguage('instructions')].morse,
     accessLevel: 13,
     category: 'admin',
   };
@@ -2896,8 +2868,6 @@ function attachCommands() {
     abortFunc: function passwordAbort() {
       hideInput(false);
     },
-    help: labels[appendLanguage('help')].password,
-    instructions: labels[appendLanguage('instructions')].password,
     accessLevel: 13,
     category: 'basic',
   };
@@ -2905,7 +2875,6 @@ function attachCommands() {
     func: function logoutCommand() {
       socket.emit('logout');
     },
-    help: labels[appendLanguage('help')].logout,
     accessLevel: 13,
     category: 'basic',
     clearAfterUse: true,
@@ -2914,7 +2883,6 @@ function attachCommands() {
     func: function rebootCommand() {
       refreshApp();
     },
-    help: labels[appendLanguage('help')].reboot,
     accessLevel: 1,
     category: 'basic',
   };
@@ -2934,8 +2902,6 @@ function attachCommands() {
         socket.emit('unverifiedUsers');
       }
     },
-    help: labels[appendLanguage('help')].verifyuser,
-    instructions: labels[appendLanguage('instructions')].verifyuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -2955,8 +2921,6 @@ function attachCommands() {
         socket.emit('unverifiedTeams');
       }
     },
-    help: labels[appendLanguage('help')].verifyteam,
-    instructions: labels[appendLanguage('instructions')].verifyteam,
     accessLevel: 13,
     category: 'admin',
   };
@@ -2971,8 +2935,6 @@ function attachCommands() {
         socket.emit('bannedUsers');
       }
     },
-    help: labels[appendLanguage('help')].banuser,
-    instructions: labels[appendLanguage('instructions')].banuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -2987,8 +2949,6 @@ function attachCommands() {
         socket.emit('bannedUsers');
       }
     },
-    help: labels[appendLanguage('help')].unbanuser,
-    instructions: labels[appendLanguage('instructions')].unbanuser,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3011,8 +2971,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].whisper,
-    instructions: labels[appendLanguage('instructions')].whisper,
     clearAfterUse: true,
     autocomplete: { type: 'users' },
     accessLevel: 13,
@@ -3160,8 +3118,6 @@ function attachCommands() {
     abortFunc: function hackroomAbort() {
       clearTimeout(commandHelper.data.timer);
     },
-    help: labels[appendLanguage('help')].hackroom,
-    instructions: labels[appendLanguage('instructions')].hackroom,
     clearBeforeUse: true,
     accessLevel: 13,
     category: 'hacking',
@@ -3259,8 +3215,6 @@ function attachCommands() {
         }
       },
     ],
-    help: labels[appendLanguage('help')].importantmsg,
-    instructions: labels[appendLanguage('instructions')].importantmsg,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3356,8 +3310,6 @@ function attachCommands() {
       });
       resetCommand();
     },
-    help: labels[appendLanguage('help')].chipper,
-    instructions: labels[appendLanguage('instructions')].chipper,
     accessLevel: 13,
     category: 'hacking',
     clearBeforeUse: true,
@@ -3386,8 +3338,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].room,
-    instructions: labels[appendLanguage('instructions')].room,
     autocomplete: { type: 'myRooms' },
     accessLevel: 13,
     category: 'advanced',
@@ -3430,8 +3380,6 @@ function attachCommands() {
         resetCommand();
       },
     ],
-    help: labels[appendLanguage('help')].removeroom,
-    instructions: labels[appendLanguage('instructions')].removeroom,
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3458,8 +3406,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].updateuser,
-    instructions: labels[appendLanguage('instructions')].updateuser,
     autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'admin',
@@ -3487,8 +3433,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].updatecommand,
-    instructions: labels[appendLanguage('instructions')].updatecommand,
     accessLevel: 13,
     category: 'admin',
   };
@@ -3515,8 +3459,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].updateroom,
-    instructions: labels[appendLanguage('instructions')].updateroom,
     autocomplete: { type: 'rooms' },
     accessLevel: 13,
     category: 'admin',
@@ -3525,7 +3467,6 @@ function attachCommands() {
     func: function weatherCommand() {
       socket.emit('weather');
     },
-    help: labels[appendLanguage('help')].weather,
     accessLevel: 1,
     category: 'basic',
   };
@@ -3552,8 +3493,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].updatedevice,
-    instructions: labels[appendLanguage('instructions')].updatedevice,
     autocomplete: { type: 'devices' },
     accessLevel: 13,
     category: 'admin',
@@ -3605,8 +3544,6 @@ function attachCommands() {
         resetCommand(false);
       },
     ],
-    help: labels[appendLanguage('help')].createteam,
-    instructions: labels[appendLanguage('instructions')].createteam,
     accessLevel: 13,
     category: 'basic',
     autocomplete: { type: 'users' },
@@ -3680,8 +3617,6 @@ function attachCommands() {
         }
       },
     ],
-    help: labels[appendLanguage('help')].invitations,
-    instructions: labels[appendLanguage('instructions')].invitations,
     accessLevel: 13,
     category: 'basic',
   };
@@ -3698,8 +3633,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].inviteteam,
-    instructions: labels[appendLanguage('instructions')].inviteteam,
     accessLevel: 13,
     category: 'basic',
   };
@@ -3719,8 +3652,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].inviteroom,
-    instructions: labels[appendLanguage('instructions')].inviteroom,
     accessLevel: 13,
     category: 'basic',
   };
@@ -3752,8 +3683,6 @@ function attachCommands() {
         });
       }
     },
-    help: labels[appendLanguage('help')].alias,
-    instructions: labels[appendLanguage('instructions')].alias,
     accessLevel: 13,
     category: 'basic',
   };

@@ -7,9 +7,13 @@ const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
 const messenger = require('../../messenger');
 const appConfig = require('rolehaven-config').app;
-let io;
 
-function updateUserTeam(socket, userName, teamName, callback) {
+function updateUserTeam(data) {
+  const socket = data.socket;
+  const userName = data.userName;
+  const teamName = data.teamName;
+  const callback = data.callback;
+
   dbConnector.updateUserTeam(userName, teamName, function(err, user) {
     if (err || user === null) {
       logger.sendSocketErrorMsg({
@@ -37,7 +41,11 @@ function updateUserTeam(socket, userName, teamName, callback) {
   });
 }
 
-function addTeamRoom(userName, roomName) {
+function addUserTeamRoom(data) {
+  const roomName = data.roomName;
+  const userName = data.userName;
+  const io = data.io;
+
   dbConnector.addRoomToUser(userName, roomName, function(roomErr, user) {
     if (roomErr || user === null) {
       logger.sendErrorMsg({
@@ -59,7 +67,11 @@ function addTeamRoom(userName, roomName) {
   });
 }
 
-function getTeam(socket, user, callback) {
+function getTeam(data) {
+  const socket = data.socket;
+  const user = data.user;
+  const callback = data.callback;
+
   dbConnector.getTeam(user.team, function(err, team) {
     let newErr;
 
@@ -77,19 +89,21 @@ function getTeam(socket, user, callback) {
   });
 }
 
-function handle(socket, sentIo) {
-  io = sentIo;
-
+function handle(socket, io) {
   socket.on('getTeam', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteteam.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
       }
 
-      getTeam(socket, user, function(err) {
-        if (err) {
-          return;
-        }
+      getTeam({
+        socket: socket,
+        user: user,
+        callback: function(err) {
+          if (err) {
+            return;
+          }
+        },
       });
     });
   });
@@ -148,77 +162,81 @@ function handle(socket, sentIo) {
         return;
       }
 
-      getTeam(socket, user, function(err, team) {
-        if (err) {
-          return;
-        } else if (team.owner !== user.userName && team.admins.indexOf(user.userName) === -1) {
-          logger.sendSocketErrorMsg({
-            socket: socket,
-            code: logger.ErrorCodes.general,
-            text: ['You are not an admin of the team. You are not allowed to add new team members'],
-            text_se: ['Ni är inte en admin av teamet. Ni har inte tillåtelse att lägga till nya medlemmar'],
-            err: err,
-          });
-
-          return;
-        }
-
-        const userName = data.user.userName;
-
-        dbConnector.getUser(userName, function(userErr, invitedUser) {
-          if (userErr) {
+      getTeam({
+        socket: socket,
+        user: user,
+        callback: function(err, team) {
+          if (err) {
             return;
-          } else if (invitedUser.team) {
-            messenger.sendSelfMsg({
+          } else if (team.owner !== user.userName && team.admins.indexOf(user.userName) === -1) {
+            logger.sendSocketErrorMsg({
               socket: socket,
-              message: {
-                text: ['The user is already part of a team'],
-                text_se: ['Användaren är redan med i ett team'],
-              },
+              code: logger.ErrorCodes.general,
+              text: ['You are not an admin of the team. You are not allowed to add new team members'],
+              text_se: ['Ni är inte en admin av teamet. Ni har inte tillåtelse att lägga till nya medlemmar'],
+              err: err,
             });
 
             return;
           }
 
-          const invitation = {
-            itemName: user.team,
-            time: new Date(),
-            invitationType: 'team',
-            sender: user.userName,
-          };
+          const userName = data.user.userName;
 
-          dbConnector.addInvitationToList(userName, invitation, function(invErr, list) {
-            if (invErr || list !== null) {
-              if (list || invErr.code === 11000) {
-                messenger.sendSelfMsg({
-                  socket: socket,
-                  message: {
-                    text: ['You have already sent an invite to the user'],
-                    text_se: ['Ni har redan skickat en inbjudan till användaren'],
-                  },
-                });
-              } else {
-                logger.sendSocketErrorMsg({
-                  socket: socket,
-                  code: logger.ErrorCodes.general,
-                  text: ['Failed to send the invite'],
-                  text_se: ['Misslyckades med att skicka inbjudan'],
-                  err: err,
-                });
-              }
+          dbConnector.getUser(userName, function(userErr, invitedUser) {
+            if (userErr) {
+              return;
+            } else if (invitedUser.team) {
+              messenger.sendSelfMsg({
+                socket: socket,
+                message: {
+                  text: ['The user is already part of a team'],
+                  text_se: ['Användaren är redan med i ett team'],
+                },
+              });
 
               return;
             }
 
-            messenger.sendSelfMsg({
-              socket: socket,
-              message: {
-                text: ['Sent an invitation to the user'],
-                text_se: ['Skickade en inbjudan till användaren'],
-              },
+            const invitation = {
+              itemName: user.team,
+              time: new Date(),
+              invitationType: 'team',
+              sender: user.userName,
+            };
+
+            dbConnector.addInvitationToList(userName, invitation, function(invErr, list) {
+              if (invErr || list !== null) {
+                if (list || invErr.code === 11000) {
+                  messenger.sendSelfMsg({
+                    socket: socket,
+                    message: {
+                      text: ['You have already sent an invite to the user'],
+                      text_se: ['Ni har redan skickat en inbjudan till användaren'],
+                    },
+                  });
+                } else {
+                  logger.sendSocketErrorMsg({
+                    socket: socket,
+                    code: logger.ErrorCodes.general,
+                    text: ['Failed to send the invite'],
+                    text_se: ['Misslyckades med att skicka inbjudan'],
+                    err: err,
+                  });
+                }
+
+                return;
+              }
+
+              messenger.sendSelfMsg({
+                socket: socket,
+                message: {
+                  text: ['Sent an invitation to the user'],
+                  text_se: ['Skickade en inbjudan till användaren'],
+                },
+              });
             });
           });
-        });
+        },
       });
     });
   });
@@ -326,13 +344,29 @@ function handle(socket, sentIo) {
               },
             });
           } else {
-            updateUserTeam(socket, owner, teamName);
-            addTeamRoom(user.userName, teamRoom.roomName);
+            updateUserTeam({
+              socket: socket,
+              userName: owner,
+              teamName: teamName,
+            });
+            addUserTeamRoom({
+              io: io,
+              userName: user.userName,
+              roomName: teamRoom.roomName,
+            });
 
             if (admins) {
               for (let i = 0; i < admins.length; i++) {
-                updateUserTeam(socket, admins[i], teamName);
-                addTeamRoom(admins[i], teamRoom.roomName);
+                updateUserTeam({
+                  socket: socket,
+                  userName: admins[i],
+                  teamName: teamName,
+                });
+                addUserTeamRoom({
+                  io: io,
+                  userName: admins[i],
+                  roomName: teamRoom.roomName,
+                });
               }
             }
           }
@@ -369,13 +403,29 @@ function handle(socket, sentIo) {
         const admins = team.admins;
         const roomName = teamName + appConfig.teamAppend;
 
-        updateUserTeam(socket, owner, teamName);
-        addTeamRoom(owner, roomName);
+        updateUserTeam({
+          socket: socket,
+          userName: owner,
+          teamName: teamName,
+        });
+        addUserTeamRoom({
+          io: io,
+          userName: owner,
+          roomName: roomName,
+        });
 
         if (admins) {
           for (let i = 0; i < admins.length; i++) {
-            updateUserTeam(socket, admins[i], teamName);
-            addTeamRoom(admins[i], roomName);
+            updateUserTeam({
+              socket: socket,
+              userName: admins[i],
+              teamName: teamName,
+            });
+            addUserTeamRoom({
+              io: io,
+              userName: admins[i],
+              roomName: roomName,
+            });
           }
         }
 
@@ -490,40 +540,45 @@ function handle(socket, sentIo) {
       invitation.time = new Date();
 
       if (data.accepted) {
-        updateUserTeam(socket, userName, invitation.itemName, function(err, user) {
-          if (err || user === null) {
-            return;
-          }
-
-          dbConnector.addRoomToUser(userName, roomName, function(errRoom) {
-            if (errRoom) {
+        updateUserTeam({
+          socket: socket,
+          userName: userName,
+          teamName: invitation.itemName,
+          callback: function(err, user) {
+            if (err || user === null) {
               return;
             }
 
-            messenger.sendSelfMsg({
-              socket: socket,
-              message: {
-                text: ['Joined team ' + invitation.itemName],
-                text_se: ['Gick med i team ' + invitation.itemName],
-              },
-            });
-
-            dbConnector.removeInvitationTypeFromList(userName, invitation.invitationType, function(teamErr) {
-              if (teamErr) {
-                logger.sendErrorMsg({
-                  code: logger.ErrorCodes.db,
-                  text: ['Failed to remove all invitations of type ' + invitation.invitationType],
-                  text_se: ['Misslyckades med att ta bort alla inbjudan av typen ' + invitation.invitationType],
-                  err: teamErr,
-                });
-
+            dbConnector.addRoomToUser(userName, roomName, function(errRoom) {
+              if (errRoom) {
                 return;
               }
-            });
 
-            socket.join(roomName);
-            socket.emit('follow', { room: { roomName: 'team' } });
-          });
+              messenger.sendSelfMsg({
+                socket: socket,
+                message: {
+                  text: [`Joined team ${invitation.itemName}`],
+                  text_se: [`Gick med i team ${invitation.itemName}`],
+                },
+              });
+
+              dbConnector.removeInvitationTypeFromList(userName, invitation.invitationType, function(teamErr) {
+                if (teamErr) {
+                  logger.sendErrorMsg({
+                    code: logger.ErrorCodes.db,
+                    text: [`Failed to remove all invitations of type ${invitation.invitationType}`],
+                    text_se: [`Misslyckades med att ta bort alla inbjudan av typen ${invitation.invitationType}`],
+                    err: teamErr,
+                  });
+
+                  return;
+                }
+              });
+
+              socket.join(roomName);
+              socket.emit('follow', { room: { roomName: 'team' } });
+            });
+          },
         });
       } else {
         dbConnector.removeInvitationFromList(userName, invitation.itemName, invitation.invitationType, function(err, list) {

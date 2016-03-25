@@ -41,7 +41,7 @@ function shouldBeHidden(room, socketId) {
   return hiddenRooms.indexOf(room) >= 0 || room.indexOf(appConfig.whisperAppend) >= 0 || room.indexOf(appConfig.deviceAppend) >= 0 || room.indexOf(appConfig.teamAppend) >= 0;
 }
 
-function handle(socket) {
+function handle(socket, io) {
   socket.on('chatMsg', function(data) {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
@@ -507,6 +507,29 @@ function handle(socket) {
 
           return;
         }
+
+        dbConnector.removeRoomFromAllUsers(roomNameLower, function(roomErr, roomUsers) {
+          if (roomErr) {
+            logger.sendSocketErrorMsg({
+              socket: socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to remove room from all users'],
+              text_se: ['Misslyckades med att ta bort rummet från alla användare'],
+              err: roomErr,
+            });
+          }
+
+          const connectedIds = io.sockets.adapter.rooms[roomNameLower].sockets;
+          const allSockets = io.sockets.connected;
+
+          for (let i = 0; i < connectedIds.length; i++) {
+            const userSocket = allSockets[connectedIds[i]];
+
+            userSocket.leave(roomNameLower);
+          }
+
+          socket.broadcast.to(roomNameLower).emit('unfollow', { room: data.room });
+        });
 
         messenger.sendSelfMsg({
           socket: socket,

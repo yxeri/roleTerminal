@@ -890,6 +890,23 @@ function getUserLocation(sentUser, sentUserName, callback) {
   });
 }
 
+function getUsersFollowingRoom(roomName, callback) {
+  const query = { rooms: { $in: [roomName] } };
+  const filter = { rooms: 1, socketId: 1 };
+
+  User.find(query, filter).lean().exec(function(err, users) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: [`Failed to get users following room ${roomName}`],
+        err: err,
+      });
+    }
+
+    callback(err, users);
+  });
+}
+
 function addRoomToUser(sentUserName, sentRoomName, callback) {
   const query = { userName: sentUserName };
   const update = { $addToSet: { rooms: sentRoomName } };
@@ -915,12 +932,30 @@ function removeRoomFromUser(sentUserName, sentRoomName, callback) {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to remove room from user'],
+        text: [`Failed to remove room ${sentRoomName} from user`],
         err: err,
       });
     }
 
     callback(err, user);
+  });
+}
+
+function removeRoomFromAllUsers(roomName, callback) {
+  const query = { rooms: { $in: [roomName] } };
+  const update = { $pull: { rooms: roomName } };
+  const options = { multi: true };
+
+  User.update(query, update, options).lean().exec(function(err, users) {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: [`Failed to remove room ${roomName} from all users`],
+        err: err,
+      });
+    }
+
+    callback(err, users);
   });
 }
 
@@ -1520,3 +1555,5 @@ exports.removeInvitationTypeFromList = removeInvitationTypeFromList;
 exports.verifyTeam = verifyTeam;
 exports.verifyAllTeams = verifyAllTeams;
 exports.getUnverifiedTeams = getUnverifiedTeams;
+exports.getUsersFollowingRoom = getUsersFollowingRoom;
+exports.removeRoomFromAllUsers = removeRoomFromAllUsers;

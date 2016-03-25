@@ -3,10 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier');
-const minifier = require('node-minify');
 const logger = require('./logger');
 const appConfig = require('rolehaven-config').app;
 const browserify = require('browserify');
+const UglifyJs = require('uglify-js');
 
 /**
  * Minifies a HTML file
@@ -46,69 +46,47 @@ function htmlMinify(inPath, outPath) {
   });
 }
 
-/**
- * Minifies Javascript or CSS files
- * @param {string} inPath Private directory path for the file
- * @param {string} outPath Public directory path for the file
- * @param {string} minifierType Type of the file, either js or css
- * @returns {undefined} Returns undefined
- */
-function nodeMinify(inPath, outPath, minifierType, extension) {
-  function removeTranspiledTemp(filePath) {
-    fs.stat(filePath, function(err) {
-      if (err) {
-        return;
-      }
+function jsMinify(inPath, outPath) {
+  const transpilePath = inPath + '-transpile';
+  let file;
 
-      fs.unlink(filePath, function(unlinkErr) {
-        if (unlinkErr) {
-          console.log('Failed to remove temp file');
-        } else {
-          console.log('Successfully removed', filePath);
+  browserify(inPath, { debug: true }).transform('babelify', { presets: ['es2015'], compact: false }).bundle().pipe(
+    file = fs.createWriteStream(transpilePath)
+  );
+
+  file.on('finish', function() {
+    console.log(`Transpiled to ${transpilePath}`);
+
+    const stream = fs.createWriteStream(outPath);
+
+    stream.once('open', function(fd) {
+      stream.write(UglifyJs.minify(transpilePath).code);
+      stream.end();
+      console.log(`Minified to ${outPath}`);
+
+      fs.stat(transpilePath, function(err) {
+        if (err) {
+          console.log('Failed to open temp file to remove');
+
+          return;
         }
+
+        fs.unlink(transpilePath, function(unlinkErr) {
+          if (unlinkErr) {
+            console.log('Failed to remove temp file');
+
+            return;
+          }
+
+          console.log('Successfully removed', transpilePath);
+        });
       });
     });
-  }
+  });
+}
 
-  function minify(sourcePath, callback) {
-    new minifier.minify({ // eslint-disable-line
-      type: minifierType,
-      fileIn: sourcePath,
-      fileOut: outPath,
-      options: ['--mangle', '--compress unsafe=true'],
-      callback: function(err) {
-        if (err) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.general,
-            text: ['Minify error'],
-            err: err,
-          });
-        } else {
-          logger.sendInfoMsg('Minified ' + inPath);
-        }
-
-        if (callback) {
-          callback(sourcePath);
-        }
-      },
-    });
-  }
-
-  if (extension === 'js' && appConfig.transpileEs6 === true) {
-    const transpilePath = inPath + '-transpile';
-    let file;
-
-    browserify(inPath, { debug: true }).transform('babelify', { presets: ['es2015'], compact: false }).bundle().pipe(
-      file = fs.createWriteStream(transpilePath)
-    );
-
-    file.on('finish', function() {
-      console.log('Transpiled ', transpilePath);
-      minify(transpilePath, removeTranspiledTemp);
-    });
-  } else {
-    minify(inPath);
-  }
+function cssMinify(inPath, outPath) {
+  fs.createReadStream(inPath).pipe(fs.createWriteStream(outPath));
 }
 
 /**
@@ -148,18 +126,14 @@ function checkDir(dirPath, callback) {
  */
 function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
-  let type = '';
+
 
   if (extension === 'html') {
     htmlMinify(filePath, outPath);
   } else if (extension === 'js') {
-    type = appConfig.mode === 'dev' ? 'no-compress' : 'uglifyjs';
-
-    nodeMinify(filePath, outPath, type, extension);
+    jsMinify(filePath, outPath);
   } else if (extension === 'css') {
-    type = appConfig.mode === 'dev' ? 'no-compress' : 'sqwish';
-
-    nodeMinify(filePath, outPath, type);
+    cssMinify(filePath, outPath);
   }
 }
 
@@ -181,16 +155,18 @@ function minifyDir(pathObj, extension) {
     fs.readdir(pathObj.privatePath, function(readErr, files) {
       if (readErr) {
         console.log(readErr);
-      } else {
-        files.forEach(function(file) {
-          const fullInPath = path.join(pathObj.privatePath, file);
-          const fullOutPath = path.join(pathObj.publicPath, file);
 
-          if (path.extname(file).substr(1) === extension) {
-            minifyFile(fullInPath, fullOutPath);
-          }
-        });
+        return
       }
+
+      files.forEach(function(file) {
+        const fullInPath = path.join(pathObj.privatePath, file);
+        const fullOutPath = path.join(pathObj.publicPath, file);
+
+        if (path.extname(file).substr(1) === extension) {
+          minifyFile(fullInPath, fullOutPath);
+        }
+      });
     });
   });
 }

@@ -1559,19 +1559,19 @@ function createCommandEnd() {
 }
 
 function printWelcomeMessage() {
-  const organicaLogo = copyMessage(storedMessages.organica);
+  const mainLogo = copyMessage(storedMessages.mainLogo);
   const razorLogo = copyMessage(storedMessages.razor);
 
-  queueMessage(organicaLogo);
+  queueMessage(mainLogo);
   queueMessage({ text: labels[appendLanguage('info')].welcomeLoggedIn });
   queueMessage({ text: labels[appendLanguage('info')].razorHacked });
   queueMessage(razorLogo);
 }
 
 function printStartMessage() {
-  const organicaLogo = copyMessage(storedMessages.organica);
+  const mainLogo = copyMessage(storedMessages.mainLogo);
 
-  queueMessage(organicaLogo);
+  queueMessage(mainLogo);
   queueMessage({
     text: labels[appendLanguage('info')].establishConnection,
     extraClass: 'upperCase',

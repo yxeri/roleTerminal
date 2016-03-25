@@ -60,3 +60,4 @@ module.exports.createBinaryString = createBinaryString;
 module.exports.createLine = createLine;
 module.exports.createFullLine = createFullLine;
 module.exports.createMixedString = createMixedString;
+module.exports.createRandString = createRandString;

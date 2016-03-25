@@ -810,8 +810,8 @@ const info = {
   establishConnection: [
     textTools.createFullLine(),
     'Connecting... Could not establish connection to HQ',
-    'Rerouting... Secondary relay ' + randomRelay + ' found',
-    'Connecting to relay ' + randomRelay + '... Connection established',
+    `Rerouting... Secondary relay ${randomRelay} found`,
+    `Connecting to relay ${randomRelay}... Connection established`,
     textTools.createFullLine(),
   ],
   hackRoomIntro: [

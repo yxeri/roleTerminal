@@ -3,8 +3,6 @@
 const labels = require('./labels');
 const textTools = require('./textTools');
 
-// Timeout between print of rows (milliseconds)
-const rowTimeout = 30;
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMessageQueue
@@ -122,6 +120,10 @@ const commandHelper = {
 };
 const triggerKeysPressed = [];
 const commands = {};
+// Timeout between print of rows (milliseconds)
+const rowTimeout = 30;
+// Will skip some flavour text and make print out happen faster, if true
+let fastMode = false;
 let storedMessages = {};
 let audioCtx;
 let oscillator;
@@ -382,9 +384,18 @@ function createRow(message) {
 
   if (currentText && currentText.length > 0) {
     const text = currentText.shift();
+    let timeout;
+
+    if (fastMode) {
+      timeout = 20;
+    } else if (message.timeout) {
+      timeout = message.timeout;
+    } else {
+      timeout = rowTimeout;
+    }
 
     printRow(text, message);
-    setTimeout(createRow, rowTimeout, message);
+    setTimeout(createRow, timeout, message);
   } else {
     if (message.morseCode) {
       printRow(message.morseCode, { time: message.time });
@@ -487,6 +498,14 @@ function setRoom(room) {
 
 function removeRoom() {
   removeLocalVal('room');
+}
+
+function getFastMode() {
+  return getLocalVal('fastMode') === 'true';
+}
+
+function setFastMode(isOn) {
+  setLocalVal('fastMode', isOn);
 }
 
 function getAccessLevel() {
@@ -971,6 +990,10 @@ function getCommandAccessLevel(commandName) {
   return commands[commandName] ? commands[commandName].accessLevel : 1;
 }
 
+function getCommandVisibility(commandName) {
+  return commands[commandName] ? commands[commandName].visibility : 1;
+}
+
 function getCommand(commandName) {
   const aliases = getAliases();
   let command;
@@ -1040,8 +1063,9 @@ function autoCompleteCommand() {
 
       for (let j = 0; j < partialCommand.length; j++) {
         const commandAccesssLevel = getCommandAccessLevel(allCommands[i]);
+        const commandVisibility = getCommandVisibility(allCommands[i]);
 
-        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && partialCommand.charAt(j) === allCommands[i].charAt(j)) {
+        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && getAccessLevel() >= commandVisibility && partialCommand.charAt(j) === allCommands[i].charAt(j)) {
           matches = true;
         } else {
           matches = false;
@@ -1536,24 +1560,28 @@ function createCommandEnd() {
 }
 
 function printWelcomeMessage() {
-  const mainLogo = copyMessage(storedMessages.mainLogo);
-  const razorLogo = copyMessage(storedMessages.razor);
+  if (!fastMode) {
+    const mainLogo = copyMessage(storedMessages.mainLogo);
+    const razorLogo = copyMessage(storedMessages.razor);
 
-  queueMessage(mainLogo);
-  queueMessage({ text: labels[appendLanguage('info')].welcomeLoggedIn });
-  queueMessage({ text: labels[appendLanguage('info')].razorHacked });
-  queueMessage(razorLogo);
+    queueMessage(mainLogo);
+    queueMessage({ text: labels[appendLanguage('info')].welcomeLoggedIn });
+    queueMessage({ text: labels[appendLanguage('info')].razorHacked });
+    queueMessage(razorLogo);
+  }
 }
 
 function printStartMessage() {
-  const mainLogo = copyMessage(storedMessages.mainLogo);
+  if (!fastMode) {
+    const mainLogo = copyMessage(storedMessages.mainLogo);
 
-  queueMessage(mainLogo);
-  queueMessage({
-    text: labels[appendLanguage('info')].establishConnection,
-    extraClass: 'upperCase',
-  });
-  queueMessage({ text: labels[appendLanguage('info')].welcome });
+    queueMessage(mainLogo);
+    queueMessage({
+      text: labels[appendLanguage('info')].establishConnection,
+      extraClass: 'upperCase',
+    });
+    queueMessage({ text: labels[appendLanguage('info')].welcome });
+  }
 }
 
 function attachFullscreenListener() {
@@ -1904,7 +1932,10 @@ function onLogout() {
   commands.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
-  printStartMessage();
+
+  if (commands) {
+    printStartMessage();
+  }
 }
 
 function onUpdateCommands(data = { commands: [] }) {
@@ -2150,16 +2181,15 @@ function attachCommands() {
       function getCommands() {
         const allCommands = [];
         // TODO Change from Object.keys for compatibility with older Android
-        const keys = Object.keys(allCommands);
-        let command;
-        let commandAccessLevel;
+        const keys = Object.keys(commands);
 
         for (let i = 0; i < keys.length; i++) {
-          command = allCommands[keys[i]];
-          commandAccessLevel = command.accessLevel;
+          const commandName = keys[i];
+          const commandAccessLevel = getCommandAccessLevel(commandName);
+          const commandVisibility = getCommandVisibility(commandName);
 
-          if (isNaN(commandAccessLevel) || commandAccessLevel <= getAccessLevel()) {
-            allCommands.push(keys[i]);
+          if (getAccessLevel() >= commandAccessLevel && getAccessLevel() >= commandVisibility) {
+            allCommands.push(commandName);
           }
         }
 
@@ -3661,12 +3691,40 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
+  commands.settings = {
+    func: function settingsCommand(phrases = []) {
+      if (phrases.length > 1) {
+        const setting = phrases[0];
+        const value = phrases[1];
+
+        switch (setting) {
+        case 'fastmode':
+          fastMode = value === 'on' || value === true ? true : false;
+          setFastMode(fastMode);
+
+          if (fastMode) {
+            queueMessage({ text: labels[appendLanguage('info')].fastModeOn });
+          } else {
+            queueMessage({ text: labels[appendLanguage('info')].fastModeOff });
+          }
+
+          break;
+        default:
+          break;
+        }
+      }
+    },
+    accessLevel: 1,
+    visibility: 13,
+    category: 'admin',
+  };
 }
 
 // Sets everything relevant when a user enters the site
 function startBoot() {
   oldAndroid = isOldAndroid();
   storedMessages = getLocalVal('storedMessages') !== null ? JSON.parse(getLocalVal('storedMessages')) : {};
+  fastMode = getFastMode();
 
   downgradeOlderDevices();
   attachCommands();

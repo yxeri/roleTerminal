@@ -162,6 +162,13 @@ const help = {
     'verifyteam without any additional input will show a list of all unverified teams. Exempel: verifyteam',
     'Use "*" to verify all teams',
   ],
+  settings: [
+    'Local settings for the terminal',
+    'This should only be used on off-game terminals',
+    'It might change behaviour and looks that will make the terminal look more off-game',
+    'Available settings:',
+    'fastmode - removes flavour text and speeds up print',
+  ],
 };
 
 const help_se = {
@@ -302,6 +309,13 @@ const help_se = {
     'Verifiera ett team och tillåter det att användas i systemet',
     'verifyteam utan några andra tillägg visar en lista över alla icke-verifierade användare. Exempel: verifyteam',
     'Använd "*" för att verifiera alla icke-verifierade team',
+  ],
+  settings: [
+    'Lokala inställningar för terminalen',
+    'Settings borde endast användas på off-gameterminaler',
+    'Det kan ändra beteende och utseende som kan få terminalen att se mer off-game ut',
+    'Tillgängliga inställningar:',
+    'fastmode - tar bort flavour text och ökar farten på utskriften',
   ],
 };
 
@@ -520,6 +534,13 @@ const instructions = {
     'verifyteam Appl 1',
     'verifyteam *',
   ],
+  settings: [
+    usageLine,
+    'settings *setting* *value*',
+    exampleLine,
+    'settings fastmode on',
+    'settings fastmode off',
+  ],
 };
 
 const instructions_se = {
@@ -734,6 +755,13 @@ const instructions_se = {
     'verifyteam Appl 1',
     'verifyteam *',
   ],
+  settings: [
+    usageLine_se,
+    'settings *inställning* *värde*',
+    exampleLine_se,
+    'settings fastmode on',
+    'settings fastmode off',
+  ],
 };
 
 const errors = {
@@ -845,6 +873,12 @@ const info = {
     'Who is the message from?',
     'You can also leave it empty and just press enter',
   ],
+  fastModeOn: [
+    'Fast mode is on',
+    'Flavour text will be skipped',
+    'Speed of print out has been increased',
+  ],
+  fastModeOff: ['Fast mode is now turned off'],
 };
 
 const info_se = {
@@ -905,6 +939,12 @@ const info_se = {
     'Vem är detta meddelande från?',
     'Ni kan också lämna det tomt och trycka på enter',
   ],
+  fastModeOn: [
+    'Fast mode är på',
+    'All flavour text hoppas över',
+    'Text skrivs ut snabbare',
+  ],
+  fastModeOff: ['Fast mode är nu avslaget'],
 };
 
 module.exports.userName = userName;

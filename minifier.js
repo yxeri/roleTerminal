@@ -59,10 +59,16 @@ function jsMinify(inPath, outPath) {
 
     const stream = fs.createWriteStream(outPath);
 
-    stream.once('open', function(fd) {
-      stream.write(UglifyJs.minify(transpilePath).code);
+    stream.once('open', function() {
+      if (appConfig.mode !== 'dev') {
+        stream.write(UglifyJs.minify(transpilePath).code);
+        console.log(`Minified to ${outPath}`);
+      } else {
+        fs.createReadStream(transpilePath).pipe(fs.createWriteStream(outPath));
+        console.log(`Moved to ${outPath}`);
+      }
+
       stream.end();
-      console.log(`Minified to ${outPath}`);
 
       fs.stat(transpilePath, function(err) {
         if (err) {
@@ -126,7 +132,6 @@ function checkDir(dirPath, callback) {
  */
 function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
-
 
   if (extension === 'html') {
     htmlMinify(filePath, outPath);

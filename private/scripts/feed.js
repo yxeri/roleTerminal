@@ -45,7 +45,7 @@ const modeField = document.getElementById('mode');
 const spacer = document.getElementById('spacer');
 const background = document.getElementById('background');
 // Socket.io
-const socket = io(); // eslint-disable-line
+const socket = io(); // eslint-disable-line no-undef
 // Queue of all the sounds that will be handled and played
 const soundQueue = [];
 const commandTime = 1000;
@@ -120,8 +120,8 @@ const commandHelper = {
   data: null,
   hideInput: false,
 };
-const validCommands = {};
 const triggerKeysPressed = [];
+const commands = {};
 let storedMessages = {};
 let audioCtx;
 let oscillator;
@@ -308,7 +308,7 @@ function linkUser(elem) {
 }
 
 function linkRoom(elem) {
-  validCommands.room.func([elem.textContent]);
+  commands.room.func([elem.textContent]);
 }
 
 function scrollView() {
@@ -702,30 +702,6 @@ function playMorse(morseCode) {
   setTimeout(finishSoundQueue, soundTimeout, (2 * morseCode.length), morseCode);
 }
 
-/*
- * Taken from http://stackoverflow.com/questions/639695/
- * how-to-convert-latitude-or-longitude-to-meters/11172685#11172685
- * generally used geo measurement function
- * @param {number} lat1 - Latitude for first coordinate
- * @param {number} lon1 - Longitude for first coordinate
- * @param {number} lat2 - Latitude for second coordinate
- * @param {number} lon2 - Longitude for second coordinate
- * @returns {number} Returns distances in meters between the coordinates
- */
-// function measureDistance(lat1, lon1, lat2, lon2) {
-//
-//  // Radius of earth in KM
-//  const R = 6378.137;
-//  const dLat = (lat2 - lat1) * Math.PI / 180;
-//  const dLon = (lon2 - lon1) * Math.PI / 180;
-//  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-//          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//  const d = R * c;
-//  return d * 1000; // meters
-// }
-
 function parseMorse(text) {
   let morseCode;
   let morseCodeText = '';
@@ -992,17 +968,17 @@ function startCommandQueue() {
 }
 
 function getCommandAccessLevel(commandName) {
-  return validCommands[commandName] ? validCommands[commandName].accessLevel : 1;
+  return commands[commandName] ? commands[commandName].accessLevel : 1;
 }
 
 function getCommand(commandName) {
   const aliases = getAliases();
   let command;
 
-  if (validCommands[commandName]) {
-    command = validCommands[commandName];
+  if (commands[commandName]) {
+    command = commands[commandName];
   } else if (aliases[commandName]) {
-    command = validCommands[aliases[commandName][0]];
+    command = commands[aliases[commandName][0]];
   }
 
   return command;
@@ -1014,16 +990,16 @@ function combineSequences(commandName, phrases) {
   return aliases[commandName] ? aliases[commandName].concat(phrases.slice(1)) : phrases.slice(1);
 }
 
-function expandPartialMatch(commands, partialMatch, sign) {
-  const firstCommand = commands[0];
+function expandPartialMatch(matchedCommands, partialMatch, sign) {
+  const firstCommand = matchedCommands[0];
   let expanded = '';
   let matched = true;
 
   for (let i = partialMatch.length; i < firstCommand.length; i++) {
     const commandChar = firstCommand.charAt(i);
 
-    for (let j = 0; j < commands.length; j++) {
-      if (commands[j].charAt(i) !== commandChar) {
+    for (let j = 0; j < matchedCommands.length; j++) {
+      if (matchedCommands[j].charAt(i) !== commandChar) {
         matched = false;
 
         break;
@@ -1041,7 +1017,7 @@ function expandPartialMatch(commands, partialMatch, sign) {
 function autoCompleteCommand() {
   const phrases = trimSpace(getInputText().toLowerCase()).split(' ');
   // TODO Change from Object.keys for compatibility with older Android
-  const commands = Object.keys(validCommands).concat(Object.keys(getAliases()));
+  const allCommands = Object.keys(commands).concat(Object.keys(getAliases()));
   const matched = [];
   const sign = phrases[0].charAt(0);
   let newText = '';
@@ -1059,13 +1035,13 @@ function autoCompleteCommand() {
       partialCommand = partialCommand.slice(1);
     }
 
-    for (let i = 0; i < commands.length; i++) {
+    for (let i = 0; i < allCommands.length; i++) {
       matches = false;
 
       for (let j = 0; j < partialCommand.length; j++) {
-        const commandAccesssLevel = getCommandAccessLevel(commands[i]);
+        const commandAccesssLevel = getCommandAccessLevel(allCommands[i]);
 
-        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && partialCommand.charAt(j) === commands[i].charAt(j)) {
+        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && partialCommand.charAt(j) === allCommands[i].charAt(j)) {
           matches = true;
         } else {
           matches = false;
@@ -1075,7 +1051,7 @@ function autoCompleteCommand() {
       }
 
       if (matches) {
-        matched.push(commands[i]);
+        matched.push(allCommands[i]);
       }
     }
 
@@ -1097,7 +1073,7 @@ function autoCompleteCommand() {
 
     // No input? Show all available commands
   } else if (partialCommand.length === 0) {
-    validCommands.help.func();
+    commands.help.func();
   }
 }
 
@@ -1195,7 +1171,6 @@ function fullscreenResize(keyboardShown) {
 
 function enterKeyHandler() {
   const commandObj = commandHelper;
-  const commands = validCommands;
   const user = getUser();
   const inputText = getInputText();
   let phrases;
@@ -1243,7 +1218,7 @@ function enterKeyHandler() {
             }
 
             if (command.command.clearBeforeUse) {
-              validCommands.clear.func();
+              commands.clear.func();
             }
 
             queueCommand(command.command.func, combineSequences(command.commandName, phrases), printUsedCommand(command.command.clearAfterUse, inputText));
@@ -1316,7 +1291,7 @@ function specialKeyPress(event) {
         autoCompleteCommand();
         changeModeText();
       } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
-        const command = validCommands[commandHelper.command] || retrieveCommand(phrases[0]).command;
+        const command = commands[commandHelper.command] || retrieveCommand(phrases[0]).command;
         const partial = commandHelper.command ? phrases[0] : phrases[1];
 
         if (command && command.autocomplete) {
@@ -1521,16 +1496,16 @@ function populateMenu() {
     },
     commands: {
       itemName: 'CMDS',
-      func: validCommands.help.func,
+      func: commands.help.func,
     },
     users: {
       itemName: 'USERS',
-      func: validCommands.list.func,
+      func: commands.list.func,
       funcParam: 'users',
     },
     rooms: {
       itemName: 'ROOMS',
-      func: validCommands.list.func,
+      func: commands.list.func,
       funcParam: 'rooms',
     },
   };
@@ -1691,7 +1666,7 @@ function onImportantMsg(data = {}) {
     queueMessage(message);
 
     if (message.morse) {
-      validCommands.morse.func(message.text.slice(0, 1), message.morse.local);
+      commands.morse.func(message.text.slice(0, 1), message.morse.local);
     }
   }
 }
@@ -1746,7 +1721,7 @@ function onLogin(data = {}) {
   const user = data.user;
   const mode = user.mode ? user.mode : cmdMode;
 
-  validCommands.clear.func();
+  commands.clear.func();
   setUser(user.userName);
   setAccessLevel(user.accessLevel);
   queueMessage({
@@ -1754,7 +1729,7 @@ function onLogin(data = {}) {
     text_se: [`Lyckades logga in som ${user.userName}`],
   });
   printWelcomeMessage();
-  validCommands.mode.func([mode]);
+  commands.mode.func([mode]);
 
   socket.emit('updateDeviceSocketId', {
     device: {
@@ -1779,7 +1754,7 @@ function onCommandSuccess(data = {}) {
       commandHelper.onStep++;
     }
 
-    validCommands[commandHelper.command].steps[commandHelper.onStep](data, socket);
+    commands[commandHelper.command].steps[commandHelper.onStep](data, socket);
   } else {
     resetCommand(false);
   }
@@ -1787,7 +1762,7 @@ function onCommandSuccess(data = {}) {
 
 function onCommandFail() {
   if (commandHelper.command !== null) {
-    const abortFunc = validCommands[commandHelper.command].abortFunc;
+    const abortFunc = commands[commandHelper.command].abortFunc;
 
     if (abortFunc) {
       abortFunc();
@@ -1802,7 +1777,7 @@ function onReconnectSuccess(data) {
     const mode = data.user.mode ? data.user.mode : cmdMode;
     const room = getRoom();
 
-    validCommands.mode.func([mode], false);
+    commands.mode.func([mode], false);
     setAccessLevel(data.user.accessLevel);
 
     if (!data.firstConnection) {
@@ -1815,7 +1790,7 @@ function onReconnectSuccess(data) {
       printWelcomeMessage();
 
       if (room) {
-        validCommands.room.func([room]);
+        commands.room.func([room]);
       }
     }
 
@@ -1926,18 +1901,18 @@ function onBan() {
 }
 
 function onLogout() {
-  validCommands.clear.func();
+  commands.clear.func();
   resetAllLocalVals();
   socket.emit('followPublic');
   printStartMessage();
 }
 
 function onUpdateCommands(data = { commands: [] }) {
-  const commands = data.commands;
+  const newCommands = data.commands;
 
-  for (let i = 0; i < commands.length; i++) {
-    const newCommand = commands[i];
-    const oldCommand = validCommands[newCommand.commandName];
+  for (let i = 0; i < newCommands.length; i++) {
+    const newCommand = newCommands[i];
+    const oldCommand = commands[newCommand.commandName];
 
     if (oldCommand) {
       oldCommand.accessLevel = newCommand.accessLevel;
@@ -2170,25 +2145,25 @@ function isTouchDevice() {
 }
 
 function attachCommands() {
-  validCommands.help = {
+  commands.help = {
     func: function helpCommand(phrases) {
       function getCommands() {
-        const commands = [];
+        const allCommands = [];
         // TODO Change from Object.keys for compatibility with older Android
-        const keys = Object.keys(validCommands);
+        const keys = Object.keys(allCommands);
         let command;
         let commandAccessLevel;
 
         for (let i = 0; i < keys.length; i++) {
-          command = validCommands[keys[i]];
+          command = allCommands[keys[i]];
           commandAccessLevel = command.accessLevel;
 
           if (isNaN(commandAccessLevel) || commandAccessLevel <= getAccessLevel()) {
-            commands.push(keys[i]);
+            allCommands.push(keys[i]);
           }
         }
 
-        return commands.concat(Object.keys(getAliases())).sort();
+        return allCommands.concat(Object.keys(getAliases())).sort();
       }
 
       function getAll() {
@@ -2213,7 +2188,7 @@ function attachCommands() {
     accessLevel: 1,
     category: 'basic',
   };
-  validCommands.clear = {
+  commands.clear = {
     func: function clearCommand() {
       while (mainFeed.childNodes.length > 1) {
         mainFeed.removeChild(mainFeed.lastChild);
@@ -2223,14 +2198,14 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.whoami = {
+  commands.whoami = {
     func: function whoamiCommand() {
       socket.emit('whoAmI');
     },
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.msg = {
+  commands.msg = {
     func: function msgCommand(phrases) {
       let writtenMsg;
 
@@ -2255,7 +2230,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.broadcast = {
+  commands.broadcast = {
     func: function broadcastCommand() {
       commandHelper.data = {
         message: {
@@ -2309,7 +2284,7 @@ function attachCommands() {
     clearAfterUse: true,
     category: 'admin',
   };
-  validCommands.follow = {
+  commands.follow = {
     func: function followCommand(phrases) {
       if (phrases.length > 0) {
         const room = {
@@ -2346,7 +2321,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.unfollow = {
+  commands.unfollow = {
     func: function unfollowCommand(phrases) {
       if (phrases.length > 0) {
         const room = {
@@ -2369,7 +2344,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.list = {
+  commands.list = {
     func: function listCommand(phrases = []) {
       if (phrases.length > 0) {
         const listOption = phrases[0].toLowerCase();
@@ -2405,7 +2380,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.mode = {
+  commands.mode = {
     func: function modeCommand(phrases, verbose) {
       let commandString;
 
@@ -2476,7 +2451,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.register = {
+  commands.register = {
     func: function registerCommand(phrases) {
       const data = {};
 
@@ -2572,7 +2547,7 @@ function attachCommands() {
         if (password === commandHelper.data.user.password) {
           queueMessage({ text: labels[appendLanguage('info')].congratulations });
           socket.emit('register', commandHelper.data);
-          validCommands[commandHelper.command].abortFunc();
+          commands[commandHelper.command].abortFunc();
           resetCommand(false);
         } else {
           queueMessage({
@@ -2595,7 +2570,7 @@ function attachCommands() {
     accessLevel: 0,
     category: 'login',
   };
-  validCommands.createroom = {
+  commands.createroom = {
     func: function createroomCommand(phrases = ['']) {
       const roomName = phrases[0].toLowerCase();
 
@@ -2670,7 +2645,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.myrooms = {
+  commands.myrooms = {
     func: function myroomsCommand() {
       const data = { user: {}, device: {} };
 
@@ -2682,7 +2657,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.login = {
+  commands.login = {
     func: function loginCommand(phrases) {
       const data = { user: {} };
 
@@ -2726,8 +2701,8 @@ function attachCommands() {
       function loginStepOne(phrases) {
         commandHelper.data.user.password = phrases[0];
         socket.emit('login', commandHelper.data);
-        validCommands[commandHelper.command].abortFunc();
-        validCommands.clear.func();
+        commands[commandHelper.command].abortFunc();
+        commands.clear.func();
         resetCommand();
       },
     ],
@@ -2738,14 +2713,14 @@ function attachCommands() {
     accessLevel: 0,
     category: 'login',
   };
-  validCommands.time = {
+  commands.time = {
     func: function timeCommand() {
       socket.emit('time');
     },
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.locate = {
+  commands.locate = {
     func: function locateCommand(phrases) {
       if (!isTracking) {
         queueMessage({
@@ -2770,7 +2745,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.history = {
+  commands.history = {
     func: function historyCommand(phrases) {
       const data = {};
 
@@ -2793,7 +2768,7 @@ function attachCommands() {
     accessLevel: 1,
     category: 'advanced',
   };
-  validCommands.morse = {
+  commands.morse = {
     func: function morseCommand(phrases, local) {
       if (phrases && phrases.length > 0) {
         const morseCodeText = parseMorse(phrases.join(' ').toLowerCase());
@@ -2809,7 +2784,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.password = {
+  commands.password = {
     func: function passwordCommand() {
       commandHelper.hideInput = true;
 
@@ -2871,7 +2846,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.logout = {
+  commands.logout = {
     func: function logoutCommand() {
       socket.emit('logout');
     },
@@ -2879,14 +2854,14 @@ function attachCommands() {
     category: 'basic',
     clearAfterUse: true,
   };
-  validCommands.reboot = {
+  commands.reboot = {
     func: function rebootCommand() {
       refreshApp();
     },
     accessLevel: 1,
     category: 'basic',
   };
-  validCommands.verifyuser = {
+  commands.verifyuser = {
     func: function verifyuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2905,7 +2880,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.verifyteam = {
+  commands.verifyteam = {
     func: function verifyteamCommand(phrases) {
       if (phrases.length > 0) {
         const teamName = phrases[0].toLowerCase();
@@ -2924,7 +2899,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.banuser = {
+  commands.banuser = {
     func: function banuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2938,7 +2913,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.unbanuser = {
+  commands.unbanuser = {
     func: function unbanuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
@@ -2952,7 +2927,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.whisper = {
+  commands.whisper = {
     func: function whisperCommand(phrases) {
       const data = {};
 
@@ -2976,7 +2951,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.hackroom = {
+  commands.hackroom = {
     func: function hackroomCommand(phrases) {
       const data = {};
       const razLogoCopy = copyMessage(storedMessages.razor);
@@ -3122,7 +3097,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'hacking',
   };
-  validCommands.importantmsg = {
+  commands.importantmsg = {
     func: function importantmsgCommand() {
       const data = {
         message: {
@@ -3162,7 +3137,7 @@ function attachCommands() {
             socket.emit('verifyDevice', commandHelper.data);
           } else {
             commandHelper.onStep++;
-            validCommands[commandHelper.command].steps[commandHelper.onStep]();
+            commands[commandHelper.command].steps[commandHelper.onStep]();
           }
         }
       },
@@ -3218,7 +3193,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.chipper = {
+  commands.chipper = {
     func: function chipperCommand() {
       queueMessage({
         text: [
@@ -3258,7 +3233,7 @@ function attachCommands() {
             'Ansluter till externt system .....',
           ],
         });
-        setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 2000);
+        setTimeout(commands[commandObj.command].steps[commandObj.onStep], 2000);
       },
       function chipperStepTwo() {
         const commandObj = commandHelper;
@@ -3277,7 +3252,7 @@ function attachCommands() {
             extraClass: 'importantMsg',
           });
 
-          validCommands[commandObj.command].abortFunc();
+          commands[commandObj.command].abortFunc();
         };
 
         if (commandObj.data.timer === undefined) {
@@ -3286,7 +3261,7 @@ function attachCommands() {
 
         queueMessage({ text: [textTools.createBinaryString(36)] });
 
-        commandObj.data.printTimer = setTimeout(validCommands[commandObj.command].steps[commandObj.onStep], 250);
+        commandObj.data.printTimer = setTimeout(commands[commandObj.command].steps[commandObj.onStep], 250);
       },
     ],
     abortFunc: function chipperAbort() {
@@ -3297,7 +3272,7 @@ function attachCommands() {
         clearTimeout(commandObj.data.timer);
       }
 
-      validCommands.clear.func();
+      commands.clear.func();
       queueMessage({
         text: [
           'Control has been released',
@@ -3314,7 +3289,7 @@ function attachCommands() {
     category: 'hacking',
     clearBeforeUse: true,
   };
-  validCommands.room = {
+  commands.room = {
     func: function roomCommand(phrases) {
       const data = { room: {} };
 
@@ -3342,7 +3317,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.removeroom = {
+  commands.removeroom = {
     func: function removeroomCommand(phrases) {
       const data = { room: {} };
 
@@ -3383,7 +3358,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'advanced',
   };
-  validCommands.updateuser = {
+  commands.updateuser = {
     func: function updateuserCommand(phrases) {
       const data = { user: {} };
 
@@ -3410,7 +3385,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.updatecommand = {
+  commands.updatecommand = {
     func: function updatecommandCommand(phrases) {
       const data = {};
 
@@ -3436,7 +3411,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.updateroom = {
+  commands.updateroom = {
     func: function updateroomCommand(phrases) {
       const data = { room: {} };
 
@@ -3463,14 +3438,14 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.weather = {
+  commands.weather = {
     func: function weatherCommand() {
       socket.emit('weather');
     },
     accessLevel: 1,
     category: 'basic',
   };
-  validCommands.updatedevice = {
+  commands.updatedevice = {
     func: function updatedeviceCommand(phrases) {
       const data = { device: {} };
 
@@ -3497,7 +3472,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'admin',
   };
-  validCommands.createteam = {
+  commands.createteam = {
     func: function createteamCommand(phrases) {
       const data = { team: { teamName: '' } };
 
@@ -3548,7 +3523,7 @@ function attachCommands() {
     category: 'basic',
     autocomplete: { type: 'users' },
   };
-  validCommands.invitations = {
+  commands.invitations = {
     func: function invitationsCommand() {
       socket.emit('getInvitations');
     },
@@ -3620,7 +3595,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.inviteteam = {
+  commands.inviteteam = {
     func: function inviteteamCommand(phrases) {
       const data = { user: { userName: phrases[0] } };
 
@@ -3636,7 +3611,7 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.inviteroom = {
+  commands.inviteroom = {
     func: function inviteroomCommand(phrases) {
       const data = {
         user: { userName: phrases[0] },
@@ -3655,12 +3630,12 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  validCommands.alias = {
+  commands.alias = {
     func: function aliasCommand(phrases) {
       const aliasName = phrases.shift();
       const sequence = phrases;
       const aliases = getAliases();
-      const commandKeys = Object.keys(validCommands);
+      const commandKeys = Object.keys(commands);
 
       if (aliasName && sequence && commandKeys.indexOf(aliasName) === -1) {
         aliases[aliasName] = sequence;

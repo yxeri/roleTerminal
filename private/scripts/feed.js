@@ -597,7 +597,7 @@ function resetCommand(aborted) {
   commandHelper.allowAutoComplete = false;
 
   if (aborted) {
-    queueMessage({ text: labels[appendLanguage('errors')].aborted });
+    queueMessage({ text: labels.retrieveMessage(appendLanguage('errors'), 'aborted') });
   }
 
   setInputStart(room);
@@ -841,7 +841,7 @@ function sendLocation() {
         isTracking = false;
         clearTimeout(trackingInterval);
         queueMessage({
-          text: labels[appendLanguage('errors')].noTracking,
+          text: labels.retrieveMessage(appendLanguage('errors'), 'noTracking'),
           extraClass: 'importantMsg',
         });
       }
@@ -1103,8 +1103,8 @@ function autoCompleteCommand() {
 
 function printHelpMessage(command) {
   const helpMsg = { text: [] };
-  const helpText = labels[appendLanguage('help')][command];
-  const instructionsText = labels[appendLanguage('instructions')][command];
+  const helpText = labels.retrieveMessage(appendLanguage('help'), command);
+  const instructionsText = labels.retrieveMessage(appendLanguage('instructions'), command);
 
   if (helpText) {
     helpMsg.text = helpMsg.text.concat(helpText);
@@ -1234,7 +1234,7 @@ function enterKeyHandler() {
            * Print the help and instruction parts of the command
            */
           if (phrases[1] === '-help') {
-            printHelpMessage(command.command);
+            printHelpMessage(command.commandName);
           } else {
             if (command.command.steps) {
               commandObj.command = command.commandName;
@@ -1262,12 +1262,12 @@ function enterKeyHandler() {
              */
           } else {
             queueMessage({
-              text: [`${phrases[0]}: ${labels[appendLanguage('errors')].commandFail}`],
+              text: [`${phrases[0]}: ${labels.retrieveMessage(appendLanguage('errors'), 'commandFail')}`],
             });
           }
         } else if (user === null) {
           queueMessage({ text: [phrases.toString()] });
-          queueMessage({ text: labels[appendLanguage('info')].mustRegister });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'mustRegister') });
 
           /**
            * Sent command was not found.
@@ -1275,7 +1275,7 @@ function enterKeyHandler() {
            */
         } else if (command.commandName.length > 0) {
           queueMessage({
-            text: [`- ${phrases[0]}: ${labels[appendLanguage('errors')].commandFail}`],
+            text: [`- ${phrases[0]}: ${labels.retrieveMessage(appendLanguage('errors'), 'commandFail')}`],
           });
         }
       } else {
@@ -1565,8 +1565,8 @@ function printWelcomeMessage() {
     const razorLogo = copyMessage(storedMessages.razor);
 
     queueMessage(mainLogo);
-    queueMessage({ text: labels[appendLanguage('info')].welcomeLoggedIn });
-    queueMessage({ text: labels[appendLanguage('info')].razorHacked });
+    queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'welcomeLoggedIn') });
+    queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'razorHacked') });
     queueMessage(razorLogo);
   }
 }
@@ -1577,10 +1577,10 @@ function printStartMessage() {
 
     queueMessage(mainLogo);
     queueMessage({
-      text: labels[appendLanguage('info')].establishConnection,
+      text: labels.retrieveMessage(appendLanguage('info'), 'establishConnection'),
       extraClass: 'upperCase',
     });
-    queueMessage({ text: labels[appendLanguage('info')].welcome });
+    queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'welcome') });
   }
 }
 
@@ -2200,7 +2200,7 @@ function attachCommands() {
         const allCommands = getCommands();
 
         if (getUser() === null) {
-          queueMessage({ text: labels[appendLanguage('info')].useRegister });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'useRegister') });
         }
 
         queueMessage({
@@ -2210,7 +2210,7 @@ function attachCommands() {
       }
 
       if (undefined === phrases || phrases.length === 0) {
-        queueMessage({ text: createCommandStart('help').concat(labels[appendLanguage('instructions')].helpExtra) });
+        queueMessage({ text: createCommandStart('help').concat(labels.retrieveMessage(appendLanguage('instructions'), 'helpExtra')) });
       }
 
       getAll();
@@ -2270,8 +2270,8 @@ function attachCommands() {
         },
       };
 
-      queueMessage({ text: labels[appendLanguage('info')].whoFrom });
-      queueMessage({ text: labels[appendLanguage('info')].cancel });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'whoFrom') });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
       setInputStart('broadcast');
     },
     steps: [
@@ -2281,7 +2281,7 @@ function attachCommands() {
           commandHelper.data.message.customSender = phrase;
         }
 
-        queueMessage({ text: labels[appendLanguage('info')].typeLineEnter });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'typeLineEnter') });
         commandHelper.onStep++;
       },
       function broadcastStepTwo(phrases) {
@@ -2296,9 +2296,9 @@ function attachCommands() {
           dataText = copyString(message.text);
           commandHelper.onStep++;
 
-          queueMessage({ text: labels[appendLanguage('info')].preview });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'preview') });
           queueMessage({ text: prependBroadcastMessage({ sender: message.customSender }).concat(dataText, textTools.createFullLine()) });
-          queueMessage({ text: labels[appendLanguage('info')].isThisOk });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'isThisOk') });
         }
       },
       function broadcastStepThree(phrases) {
@@ -2542,7 +2542,7 @@ function attachCommands() {
             'Använd inte blanksteg i ert lösenord!',
           ],
         });
-        queueMessage({ text: labels[appendLanguage('info')].cancel });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
         setInputStart('password');
         commandHelper.onStep++;
       },
@@ -2575,7 +2575,7 @@ function attachCommands() {
         const password = phrases ? phrases[0] : undefined;
 
         if (password === commandHelper.data.user.password) {
-          queueMessage({ text: labels[appendLanguage('info')].congratulations });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'congratulations') });
           socket.emit('register', commandHelper.data);
           commands[commandHelper.command].abortFunc();
           resetCommand(false);
@@ -2626,11 +2626,11 @@ function attachCommands() {
           hideInput(true);
         } else {
           resetCommand(true);
-          queueMessage({ text: labels[appendLanguage('errors')].failedRoom });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('errors'), 'failedRoom') });
         }
       } else {
         resetCommand(true);
-        queueMessage({ text: labels[appendLanguage('errors')].failedRoom });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('errors'), 'failedRoom') });
       }
     },
     steps: [
@@ -2825,7 +2825,7 @@ function attachCommands() {
 
       hideInput(true);
       setInputStart('Old passwd');
-      queueMessage({ text: labels[appendLanguage('info')].cancel });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
       queueMessage({
         text: ['Enter your current password'],
         text_se: ['Skriv in ert nuvarande lösenord'],
@@ -3000,9 +3000,9 @@ function attachCommands() {
         // TODO: razorLogo should be moved to DB or other place
         queueMessage(razLogoCopy);
         // TODO: Message about abort should be sent from a common function for all commands
-        queueMessage({ text: labels[appendLanguage('info')].hackRoomIntro });
-        queueMessage({ text: labels[appendLanguage('info')].cancel });
-        queueMessage({ text: labels[appendLanguage('info')].pressEnter });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'hackRoomIntro') });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'pressEnter') });
 
         setInputStart('Start');
       } else {
@@ -3143,7 +3143,7 @@ function attachCommands() {
       };
       commandHelper.data = data;
 
-      queueMessage({ text: labels[appendLanguage('info')].cancel });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
       queueMessage({
         text: [
           'Do you want to send it to a specific device?',
@@ -3178,8 +3178,8 @@ function attachCommands() {
       },
       function importantmsgStepTwo() {
         commandHelper.onStep++;
-        queueMessage({ text: labels[appendLanguage('info')].typeLineEnter });
-        queueMessage({ text: labels[appendLanguage('info')].keepShortMorse });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'typeLineEnter') });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'keepShortMorse') });
       },
       function importantmsgStepThree(phrases) {
         const message = commandHelper.data.message;
@@ -3192,12 +3192,12 @@ function attachCommands() {
           const dataText = copyString(message.text);
           commandHelper.onStep++;
 
-          queueMessage({ text: labels[appendLanguage('info')].preview });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'preview') });
           queueMessage({
             text: dataText,
             extraClass: 'importantMsg',
           });
-          queueMessage({ text: labels[appendLanguage('info')].isThisOk });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'isThisOk') });
         }
       },
       function importantmsgStepFour(phrases) {
@@ -3205,7 +3205,7 @@ function attachCommands() {
           if (phrases[0].toLowerCase() === 'yes') {
             commandHelper.onStep++;
 
-            queueMessage({ text: labels[appendLanguage('info')].sendMorse });
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'sendMorse') });
           } else {
             resetCommand(true);
           }
@@ -3249,8 +3249,8 @@ function attachCommands() {
         ],
         extraClass: 'importantMsg',
       });
-      queueMessage({ text: labels[appendLanguage('info')].cancel });
-      queueMessage({ text: labels[appendLanguage('info')].pressEnter });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
+      queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'pressEnter') });
       setInputStart('Chipper');
     },
     steps: [
@@ -3514,7 +3514,7 @@ function attachCommands() {
       if (phrases.length > 0) {
         data.team.teamName = phrases.join(' ');
         commandHelper.data = data;
-        queueMessage({ text: labels[appendLanguage('info')].cancel });
+        queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
         setInputStart('owner');
         socket.emit('teamExists', commandHelper.data);
       } else {
@@ -3581,7 +3581,7 @@ function attachCommands() {
             text: ['Answer the invite with accept or decline. Example: 1 decline'],
             text_se: ['Besvara inbjudan med accept eller decline. Exempel: 1 decline'],
           });
-          queueMessage({ text: labels[appendLanguage('info')].cancel });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'cancel') });
           setInputStart('answer');
           commandHelper.onStep++;
         } else {
@@ -3708,19 +3708,19 @@ function attachCommands() {
           setFastMode(fastMode);
 
           if (fastMode) {
-            queueMessage({ text: labels[appendLanguage('info')].fastModeOn });
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'fastModeOn') });
           } else {
-            queueMessage({ text: labels[appendLanguage('info')].fastModeOff });
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'fastModeOff') });
           }
 
           break;
         default:
-          queueMessage({ text: labels[appendLanguage('errors')].invalidSetting });
+          queueMessage({ text: labels.retrieveMessage(appendLanguage('errors'), 'invalidSetting') });
 
           break;
         }
       } else {
-        queueMessage({ text: labels[appendLanguage('errors')].settingUsage });
+        queueMessage({ text: labels.retrieveMesssage(appendLanguage('errors'), 'settingUsage') });
       }
     },
     accessLevel: 1,

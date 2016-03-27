@@ -2602,27 +2602,32 @@ function attachCommands() {
   };
   commands.createroom = {
     func: function createroomCommand(phrases = ['']) {
-      const roomName = phrases[0].toLowerCase();
+      if (phrases.length > 0) {
+        const roomName = phrases[0].toLowerCase();
 
-      if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName)) {
-        const data = { room: {} };
-        data.room.roomName = roomName;
-        data.room.owner = getUser();
-        commandHelper.data = data;
-        commandHelper.hideInput = true;
+        if (roomName.length > 0 && roomName.length <= 6 && isTextAllowed(roomName)) {
+          const data = { room: {} };
+          data.room.roomName = roomName;
+          data.room.owner = getUser();
+          commandHelper.data = data;
+          commandHelper.hideInput = true;
 
-        queueMessage({
-          text: [
-            'Enter a password for the room',
-            'Leave it empty if you don\'t want to password protect the room',
-          ],
-          text_se: [
-            'Skriv in ett lösenord för rummet',
-            'Ni kan lämna det tomt om ni inte vill skydda rummet med ett lösenord',
-          ],
-        });
-        setInputStart('Set passwd');
-        hideInput(true);
+          queueMessage({
+            text: [
+              'Enter a password for the room',
+              'Leave it empty if you don\'t want to password protect the room',
+            ],
+            text_se: [
+              'Skriv in ett lösenord för rummet',
+              'Ni kan lämna det tomt om ni inte vill skydda rummet med ett lösenord',
+            ],
+          });
+          setInputStart('Set passwd');
+          hideInput(true);
+        } else {
+          resetCommand(true);
+          queueMessage({ text: labels[appendLanguage('errors')].failedRoom });
+        }
       } else {
         resetCommand(true);
         queueMessage({ text: labels[appendLanguage('errors')].failedRoom });

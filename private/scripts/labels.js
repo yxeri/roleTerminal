@@ -953,8 +953,6 @@ const all = {
 };
 
 function retrieveMessage(category, value) {
-  console.log('stuff', category, value);
-
   if (all[category]) {
     const text = all[category][value];
     if (text && text !== null) {

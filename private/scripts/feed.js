@@ -1274,6 +1274,7 @@ function enterKeyHandler() {
            * Print the failed input
            */
         } else if (command.commandName.length > 0) {
+          pushCommandHistory(phrases.join(' '));
           queueMessage({
             text: [`- ${phrases[0]}: ${labels.retrieveMessage(appendLanguage('errors'), 'commandFail')}`],
           });

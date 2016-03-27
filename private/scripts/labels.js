@@ -778,6 +778,11 @@ const errors = {
     'The room name can only contain letters and numbers (a-z, 0-9)',
     'Example: createroom myroom',
   ],
+  invalidSetting: ['Invalid setting'],
+  settingUsage: [
+    'You have to type the name of the setting and value',
+    'Exemple: settings fastmode on',
+  ],
 };
 
 const errors_se = {
@@ -793,6 +798,11 @@ const errors_se = {
     'Rummets namn måste vara 1 till 6 tecken långt',
     'Rummets namn kan endast innehålla bokstäver och siffror (a-z, 0-9)',
     'Exempel: createroom myroom',
+  ],
+  invalidSetting: ['Ogiltig inställning'],
+  settingUsage: [
+    'Ni måste skriva in namnet på inställningen och värdet',
+    'Exempel: settings fastmode on',
   ],
 };
 

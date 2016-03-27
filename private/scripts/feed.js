@@ -3710,8 +3710,12 @@ function attachCommands() {
 
           break;
         default:
+          queueMessage({ text: labels[appendLanguage('errors')].invalidSetting });
+
           break;
         }
+      } else {
+        queueMessage({ text: labels[appendLanguage('errors')].settingUsage });
       }
     },
     accessLevel: 1,

@@ -323,9 +323,15 @@ function scrollView() {
 }
 
 // Adds time stamp and room name to a string from a message if they are set
-function generateFullRow(sentText, message) {
+function createRow(message) {
   const rowObj = document.createElement('li');
   const roomName = message.roomName;
+  const extraClass = message.extraClass;
+
+  if (extraClass) {
+    // classList doesn't work on older devices, thus the usage of className
+    rowObj.className += ' ' + extraClass;
+  }
 
   if (message.time && !message.skipTime) {
     rowObj.appendChild(generateSpan({
@@ -349,31 +355,21 @@ function generateFullRow(sentText, message) {
     rowObj.appendChild(generateLink(message.userName, 'user', linkUser));
   }
 
-  rowObj.appendChild(generateSpan({
-    text: sentText,
+  return rowObj;
+}
+
+function addText(text, row, message) {
+  row.appendChild(generateSpan({
+    text: text,
     linkable: message.linkable,
     keepInput: message.keepInput,
     replacePhrase: message.replacePhrase,
   }));
-
-  return rowObj;
 }
 
-function printRow(text, message) {
-  const row = generateFullRow(text, message);
-  const extraClass = message.extraClass;
-
-  if (extraClass) {
-    // classList doesn't work on older devices, thus the usage of className
-    row.className += ' ' + extraClass;
-  }
-
-  mainFeed.appendChild(row);
-  scrollView();
-}
-
-function createRow(message) {
+function addRow(message) {
   const defaultLanguage = getDefaultLanguage();
+  const columns = message.columns ? message.columns : 1;
   // Set text depending on default language set. Empty means English
   let currentText = defaultLanguage === '' ? message.text : message[`text_${defaultLanguage}`];
 
@@ -383,7 +379,7 @@ function createRow(message) {
   }
 
   if (currentText && currentText.length > 0) {
-    const text = currentText.shift();
+    const row = createRow(message);
     let timeout;
 
     if (fastMode) {
@@ -394,11 +390,25 @@ function createRow(message) {
       timeout = rowTimeout;
     }
 
-    printRow(text, message);
-    setTimeout(createRow, timeout, message);
+    for (let i = 0; i < columns; i++) {
+      const text = currentText.shift();
+
+      addText(text, row, message);
+
+      if (currentText.length <= 0) {
+        break;
+      }
+    }
+
+    mainFeed.appendChild(row);
+    scrollView();
+    setTimeout(addRow, timeout, message);
   } else {
     if (message.morseCode) {
-      printRow(message.morseCode, { time: message.time });
+      const row = createRow(message.morseCode, { time: message.time });
+
+      mainFeed.appendChild(row);
+      scrollView();
     }
 
     consumeMessageShortQueue(); // eslint-disable-line no-use-before-define
@@ -409,7 +419,7 @@ function consumeMessageShortQueue() {
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
 
-    createRow(message, consumeMessageShortQueue);
+    addRow(message, consumeMessageShortQueue);
   } else {
     printing = false;
     consumeMessageQueue(); // eslint-disable-line no-use-before-define
@@ -2078,6 +2088,8 @@ function onList(data = { itemList: [] }) {
       linkable: data.itemList.linkable || true,
       keepInput: data.itemList.keepInput || true,
       replacePhrase: data.itemList.replacePhrase || false,
+      columns: data.columns,
+      extraClass: 'columns',
     },
   });
 }

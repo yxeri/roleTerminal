@@ -198,6 +198,7 @@ function sendList(params) {
   const socket = params.socket;
   const data = {
     itemList: params.itemList,
+    columns: params.columns,
   };
 
   socket.emit('list', data);

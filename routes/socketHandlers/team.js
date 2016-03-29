@@ -504,20 +504,16 @@ function handle(socket, io) {
           return;
         }
 
-        let teamsString = '';
+        const teamArray = [];
 
         for (let i = 0; i < teams.length; i++) {
-          teamsString += teams[i].teamName;
-
-          if (i !== teams.length - 1) {
-            teamsString += ' | ';
-          }
+          teamArray.push(`Team: ${teams[i].teamName}. Owner: ${teams[i].owner}`);
         }
 
         messenger.sendSelfMsg({
           socket: socket,
           message: {
-            text: [teamsString],
+            text: teamArray,
           },
         });
       });

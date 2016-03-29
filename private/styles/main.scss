@@ -1,18 +1,27 @@
+$text-color: #00ffcc;
+$shadow-color: #008766;
+$back-color: #001e15;
+$sub-text-color: #ff0026;
+$sub-shadow-color: #870016;
+$sub-back-color: #1e0100;
+$imp-text-color: #002d25;
+$imp-back-color: #00ffcc;
+
 html {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  background-color: #001e15;
+  background-color: $back-color;
   -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
-  background-color: #001e15;
-  color: #00ffcc;
-  text-shadow: 1px 1px 4px #008766;
+  background-color: $back-color;
+  color: $text-color;
+  text-shadow: 1px 1px 4px $shadow-color;
   font-family: monospace;
   font-size: 1.2em;
   letter-spacing: .05em;
@@ -43,7 +52,7 @@ pre {
   padding: 0 .2em 0 .8em;
   position: fixed;
   bottom: 0;
-  background-color: #001e15;
+  background-color: $back-color;
   border-top: 2px solid;
   overflow: hidden;
 }
@@ -129,10 +138,71 @@ pre {
   border: 0;
 }
 
+.subliminal {
+  position: relative;
+  width: 100%;
+}
+
+.subliminal:before {
+  content: attr(subMsg);
+  position: absolute;
+  left: 0;
+  padding-left: .8em;
+  width: 100%;
+  background-color: $sub-back-color;
+  color: $sub-text-color;
+  text-shadow: 1px 1px 4px $sub-shadow-color;
+  opacity: 0;
+  -webkit-animation: brightness 8s linear infinite;
+  animation: brightness 8s linear infinite;
+}
+
+.columns {
+}
+
+.columns span {
+}
+
+@-webkit-keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
+}
+
+@keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
+}
+
 .importantMsg {
-  color: #002d25;
+  color: $imp-text-color;
   text-shadow: none;
-  background-color: #00ffcc;
+  background-color: $imp-back-color;
   font-size: 1.2em;
   text-transform: uppercase;
   font-weight: bold;
@@ -143,13 +213,8 @@ pre {
   font-weight: bold;
 }
 
-.whisperMsg {
-}
-
 .boxShadow {
   z-index: 1;
-  /*-webkit-box-shadow: inset 0 0 25px 1px #000000;*/
-  /*box-shadow: inset 0 0 25px 1px #000000;*/
 }
 
 .link {
@@ -209,12 +274,6 @@ pre {
   text-transform: uppercase;
 }
 
-.brightnessAnim {
-  opacity: 1;
-  -webkit-animation: brightness 20s linear infinite 10s;
-  animation: brightness 20s linear infinite 10s;
-}
-
 .menuButton {
   padding: 0 .2em 0 .2em;
   border-left: 2px solid;
@@ -243,6 +302,10 @@ pre {
   .logo {
     font-size: .8em;
   }
+
+  .glitch:before {
+      padding-left: .4em;
+  }
 }
 
 @media (max-width: 414px) {
@@ -261,55 +324,11 @@ pre {
   .logo {
     font-size: .6em;
   }
+
+  .glitch:before {
+    padding-left: .2em;
+  }
 }
 
 @media (max-height: 414px) and (max-width: 736px) , (max-height: 736px) and (max-width: 414px) {
-}
-
-@-webkit-keyframes brightness {
-  from {
-    opacity: 1;
-  }
-  1% {
-    opacity: .5;
-  }
-  2% {
-    opacity: .9;
-  }
-  3% {
-    opacity: .1;
-  }
-  4% {
-    opacity: .8;
-  }
-  10% {
-    opacity: .9;
-  }
-  30% {
-    opacity: 1;
-  }
-}
-
-@keyframes brightness {
-  from {
-    opacity: 1;
-  }
-  1% {
-    opacity: .5;
-  }
-  2% {
-    opacity: .9;
-  }
-  3% {
-    opacity: .1;
-  }
-  4% {
-    opacity: .8;
-  }
-  10% {
-    opacity: .9;
-  }
-  30% {
-    opacity: 1;
-  }
 }

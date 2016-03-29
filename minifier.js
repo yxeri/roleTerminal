@@ -7,6 +7,7 @@ const logger = require('./logger');
 const appConfig = require('rolehaven-config').app;
 const browserify = require('browserify');
 const UglifyJs = require('uglify-js');
+const sass = require('node-sass');
 
 /**
  * Minifies a HTML file
@@ -92,7 +93,41 @@ function jsMinify(inPath, outPath) {
 }
 
 function cssMinify(inPath, outPath) {
-  fs.createReadStream(inPath).pipe(fs.createWriteStream(outPath));
+  const cssPath = outPath.replace('.scss', '.css');
+
+  sass.render({
+    file: inPath,
+  }, function(err, result) {
+    if (err || result === null) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.general,
+        text: [
+          'Failed to render scss',
+          inPath,
+        ],
+        err: err,
+      });
+
+      return;
+    }
+
+    fs.writeFile(cssPath, result.css, function(writeErr) {
+      if (writeErr) {
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.general,
+          text: [
+            'Failed to write css',
+            cssPath,
+          ],
+          err: writeErr,
+        });
+
+        return;
+      }
+
+      logger.sendInfoMsg(`Wrote ${cssPath}`);
+    });
+  });
 }
 
 /**
@@ -137,7 +172,7 @@ function minifyFile(filePath, outPath) {
     htmlMinify(filePath, outPath);
   } else if (extension === 'js') {
     jsMinify(filePath, outPath);
-  } else if (extension === 'css') {
+  } else if (extension === 'scss') {
     cssMinify(filePath, outPath);
   }
 }
@@ -161,7 +196,7 @@ function minifyDir(pathObj, extension) {
       if (readErr) {
         console.log(readErr);
 
-        return
+        return;
       }
 
       files.forEach(function(file) {

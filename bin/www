@@ -22,7 +22,7 @@ function resolvePath(dir, secondDir) {
  */
 function minifyDirs() {
   minifier.minifyDir(resolvePath(appConfig.viewsPath), 'html');
-  minifier.minifyDir(resolvePath(appConfig.stylesPath), 'css');
+  minifier.minifyDir(resolvePath(appConfig.stylesPath), 'scss');
   minifier.minifyDir(resolvePath(appConfig.scriptsPath), 'js');
 }
 
@@ -32,14 +32,16 @@ function moveRequired() {
   fs.readdir(pathObj.privatePath, function(readErr, files) {
     if (readErr) {
       console.log(readErr);
-    } else {
-      files.forEach(function(file) {
-        const fullPrivatePath = path.join(pathObj.privatePath, file);
-        const fullPublicPath = path.join(pathObj.publicPath, file);
 
-        fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
-      });
+      return;
     }
+
+    files.forEach(function(file) {
+      const fullPrivatePath = path.join(pathObj.privatePath, file);
+      const fullPublicPath = path.join(pathObj.publicPath, file);
+
+      fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
+    });
   });
 }
 

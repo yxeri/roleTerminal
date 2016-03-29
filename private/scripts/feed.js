@@ -330,7 +330,7 @@ function createRow(message) {
 
   if (extraClass) {
     // classList doesn't work on older devices, thus the usage of className
-    rowObj.className += ' ' + extraClass;
+    rowObj.classList.add(extraClass);
   }
 
   if (message.time && !message.skipTime) {
@@ -516,6 +516,7 @@ function getFastMode() {
 
 function setFastMode(isOn) {
   setLocalVal('fastMode', isOn);
+  fastMode = isOn;
 }
 
 function getAccessLevel() {

@@ -212,23 +212,33 @@ function sendMorse(params) {
   const roomName = params.message.roomName || databasePopulation.rooms.morse.roomName;
   const morseCode = params.message.morseCode;
   const socket = params.socket;
-  const message = {
-    morseCode: morseCode,
-    time: new Date(),
-    roomName: roomName,
-  };
+  const silent = params.silent;
 
   if (!params.local) {
-    socket.broadcast.emit('morse', { morseCode: morseCode });
+    socket.broadcast.emit('morse', {
+      morseCode: morseCode,
+      silent: silent,
+    });
   }
 
-  socket.emit('morse', { morseCode: morseCode });
-
-  addMsgToHistory(roomName, message, socket, function(err) {
-    if (err) {
-      return;
-    }
+  socket.emit('morse', {
+    morseCode: morseCode,
+    silent: silent,
   });
+
+  if (!silent) {
+    const morseMessage = {
+      text: [morseCode],
+      time: new Date(),
+      roomName: roomName,
+    };
+
+    addMsgToHistory(roomName, morseMessage, socket, function(err) {
+      if (err) {
+        return;
+      }
+    });
+  }
 }
 
 exports.sendImportantMsg = sendImportantMsg;

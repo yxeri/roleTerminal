@@ -687,7 +687,7 @@ function setGain(value) {
   gainNode.gain.value = value;
 }
 
-function playMorse(morseCode) {
+function playMorse(morseCode, silent) {
   let duration;
   let shouldPlay;
 
@@ -695,10 +695,13 @@ function playMorse(morseCode) {
     const cleanMorse = morseCode.replace(/#/g, '');
 
     soundQueue.splice(0, timeouts);
-    queueMessage({
-      text: [`Morse code message received: ${cleanMorse}`],
-      text_se: [`Morse mottaget: ${cleanMorse}`],
-    });
+
+    if (!silent) {
+      queueMessage({
+        text: [`Morse code message received: ${cleanMorse}`],
+        text_se: [`Morse mottaget: ${cleanMorse}`],
+      });
+    }
   }
 
   if (soundQueue.length === 0) {
@@ -1882,7 +1885,7 @@ function onDisconnectUser() {
 }
 
 function onMorse(data = {}) {
-  playMorse(data.morseCode);
+  playMorse(data.morseCode, data.silent);
 }
 
 function onTime(data = {}) {
@@ -2820,13 +2823,24 @@ function attachCommands() {
   commands.morse = {
     func: function morseCommand(phrases, local) {
       if (phrases && phrases.length > 0) {
-        const morseCodeText = parseMorse(phrases.join(' ').toLowerCase());
+        const data = {
+          local: local,
+        };
+        const morsePhrases = phrases;
+
+        for (let i = 0; i < phrases.length; i++) {
+          if (phrases[i] === '-s' || phrases[i] === '-silent') {
+            morsePhrases.splice(i, 1);
+            data.silent = true;
+          }
+        }
+
+        const morseCodeText = parseMorse(morsePhrases.join(' ').toLowerCase());
 
         if (morseCodeText.length > 0) {
-          socket.emit('morse', {
-            morseCode: morseCodeText,
-            local: local,
-          });
+          data.morseCode = morseCodeText;
+
+          socket.emit('morse', data);
         }
       }
     },

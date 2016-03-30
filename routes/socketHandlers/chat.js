@@ -462,7 +462,6 @@ function handle(socket, io) {
     });
   });
 
-  // TODO morse class?
   socket.on('morse', function(data) {
     if (!objectValidator.isValidData(data, { morseCode: true })) {
       return;
@@ -479,6 +478,7 @@ function handle(socket, io) {
         message: {
           morseCode: data.morseCode,
         },
+        silent: data.silent,
       });
     });
   });
@@ -508,7 +508,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.removeRoomFromAllUsers(roomNameLower, function(roomErr, roomUsers) {
+        dbConnector.removeRoomFromAllUsers(roomNameLower, function(roomErr) {
           if (roomErr) {
             logger.sendSocketErrorMsg({
               socket: socket,

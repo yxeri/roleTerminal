@@ -55,27 +55,27 @@ pre {
   background-color: $back-color;
   border-top: 2px solid;
   overflow: hidden;
-}
 
-#menu li {
-  padding: .4em 0 .4em 0;
-  margin-left: 1em;
-  display: block;
-  float: left;
-}
+  li {
+    padding: .4em 0 .4em 0;
+    margin-left: 1em;
+    display: block;
+    float: left;
+  }
 
-#menu li:first-child {
-  margin-left: 0;
+  li:first-child {
+    margin-left: 0;
+  }
 }
 
 #inputContainer {
   padding: 0 .8em 0 .8em;
   display: table;
   width: 99%;
-}
 
-#inputContainer span {
-  display: table-cell;
+  span {
+    display: table-cell;
+  }
 }
 
 #inputStart {
@@ -121,16 +121,18 @@ pre {
   overflow-x: hidden;
 }
 
-#mainFeed li {
-  padding: 0 .8em 0 .8em;
-}
+#mainFeed {
+  li {
+    padding: 0 .8em 0 .8em;
+  }
 
-#mainFeed li span {
-  margin-right: .5em;
-}
+  li span {
+    margin-right: .5em;
+  }
 
-#mainFeed li span:last-child {
-  margin: 0;
+  li span:last-child {
+    margin: 0;
+  }
 }
 
 #hiddenInput {
@@ -155,48 +157,6 @@ pre {
   opacity: 0;
   -webkit-animation: brightness 8s linear infinite;
   animation: brightness 8s linear infinite;
-}
-
-.columns {
-}
-
-.columns span {
-}
-
-@-webkit-keyframes brightness {
-  from {
-    opacity: 0;
-  }
-  89% {
-    opacity: 0;
-  }
-  90% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 1;
-  }
-  93% {
-    opacity: 0;
-  }
-}
-
-@keyframes brightness {
-  from {
-    opacity: 0;
-  }
-  89% {
-    opacity: 0;
-  }
-  90% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 1;
-  }
-  93% {
-    opacity: 0;
-  }
 }
 
 .importantMsg {
@@ -331,4 +291,40 @@ pre {
 }
 
 @media (max-height: 414px) and (max-width: 736px) , (max-height: 736px) and (max-width: 414px) {
+}
+
+@-webkit-keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
+}
+
+@keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
 }

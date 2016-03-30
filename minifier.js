@@ -56,36 +56,44 @@ function jsMinify(inPath, outPath) {
   );
 
   file.on('finish', function() {
-    console.log(`Transpiled to ${transpilePath}`);
+    logger.sendInfoMsg(`Transpiled to ${transpilePath}`);
 
     const stream = fs.createWriteStream(outPath);
 
     stream.once('open', function() {
       if (appConfig.mode !== 'dev') {
         stream.write(UglifyJs.minify(transpilePath).code);
-        console.log(`Minified to ${outPath}`);
+        logger.sendInfoMsg(`Minified to ${outPath}`);
       } else {
         fs.createReadStream(transpilePath).pipe(fs.createWriteStream(outPath));
-        console.log(`Moved to ${outPath}`);
+        logger.sendInfoMsg(`Moved to ${outPath}`);
       }
 
       stream.end();
 
       fs.stat(transpilePath, function(err) {
         if (err) {
-          console.log('Failed to open temp file to remove');
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['Failed to open temp file to remove'],
+            err: err,
+          });
 
           return;
         }
 
         fs.unlink(transpilePath, function(unlinkErr) {
           if (unlinkErr) {
-            console.log('Failed to remove temp file');
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.general,
+              text: ['Failed to remove temp file'],
+              err: err,
+            });
 
             return;
           }
 
-          console.log('Successfully removed', transpilePath);
+          logger.sendInfoMsg(`Successfully removed ${transpilePath}`);
         });
       });
     });
@@ -97,6 +105,7 @@ function cssMinify(inPath, outPath) {
 
   sass.render({
     file: inPath,
+    outputStyle: 'compressed',
   }, function(err, result) {
     if (err || result === null) {
       logger.sendErrorMsg({
@@ -187,14 +196,28 @@ function minifyFile(filePath, outPath) {
 function minifyDir(pathObj, extension) {
   checkDir(pathObj.publicPath, function(err) {
     if (err) {
-      console.log(err);
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.general,
+        text: [
+          'Failed to check if directory exists',
+          pathObj.publicPath,
+        ],
+        err: err,
+      });
 
       return;
     }
 
     fs.readdir(pathObj.privatePath, function(readErr, files) {
       if (readErr) {
-        console.log(readErr);
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.general,
+          text: [
+            'Failed to read directory',
+            pathObj.privatePath,
+          ],
+          err: readErr,
+        });
 
         return;
       }

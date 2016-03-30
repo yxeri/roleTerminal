@@ -315,7 +315,7 @@ function linkRoom(elem) {
 
 function scrollView() {
   if (!oldAndroid) {
-    spacer.scrollIntoView(false);
+    spacer.scrollIntoView();
   } else {
     // Compatibility fix for old Android
     window.scrollTo(0, document.body.scrollHeight);

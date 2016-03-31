@@ -19,11 +19,10 @@ roleTerminal has a separate configuration module, found at roleHaven-config](htt
 
 ## Shortcuts
 * Tab to show all available commands
-** Typing two spaces has the same effect and will show all available commands
+* Typing two spaces has the same effect as tab and will show all available commands
 * Arrow up and down to go through the command history
-* Arrow left and right to move the blinking marker
-* Tab after typing one or more letters to auto-complete it into a command (if it finds a match)
-** Typing two spaces has the same effect and will auto-complete (useful for devices without a tab button)
+* Tab after typing one or more letters to auto-complete it into a command (Example: typing he followed by a tab will output help)
+* Typing two spaces has the same effect and will auto-complete (useful for devices without a tab button)
 * -help typed after a command will show instructions on how to use it (Example: enterroom -help)
 
 ## Development contributors

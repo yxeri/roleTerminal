@@ -446,8 +446,17 @@ function handle(socket, io) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
+        return;
+      } else if (data.room && Object.keys(socket.rooms).indexOf(data.room.roomName) < 0) {
+        logger.sendSocketErrorMsg({
+          socket: socket,
+          code: logger.ErrorCodes.general,
+          text: [`${user.userName} is not following room ${data.room.roomName}. Unable to retrieve history`],
+          text_se: [`${user.userName} följer inte rummet ${data.room.roomName}. Misslyckades med hämtningen av historik`],
+        });
+
         return;
       }
 

@@ -9,17 +9,16 @@ const fs = require('fs');
 const minifier = require('./minifier');
 const appConfig = require('rolehaven-config').app;
 const logger = require('./logger');
+const dbConnector = require('./databaseConnector');
+const databasePopulation = require('rolehaven-config').databasePopulation;
 const app = express();
-let appSpecific;
 
 /**
- * Watches for files changes in the private directory and adds new changes to public. Used in dev mode
+ * Watches for files changes in the private directory and adds new changes to public.
+ * Used in dev mode. It should not be used in production
  * Note! fs.watch is unstable. Recursive might only work in OS X
- *
- * @returns {undefined} Returns undefined
  */
 function watchPrivate() {
-  // fs.watch is unstable. Recursive only works in OS X.
   fs.watch(appConfig.privateBase, { persistant: true, recursive: true }, function(triggeredEvent, filePath) {
     const fullPath = path.join(appConfig.privateBase, filePath);
 
@@ -35,25 +34,10 @@ function watchPrivate() {
         }
 
         minifier.minifyFile(fullPath, path.join(appConfig.publicBase, filePath));
-        logger.sendInfoMsg('Event: ' + triggeredEvent + '. File: ' + fullPath);
+        logger.sendInfoMsg(`Event: ${triggeredEvent}. File: ${fullPath}`);
       });
     }
   });
-}
-
-try {
-  /*
-   * appSpecific.js contains code that is specific for the current app.
-   * Add whatever you need in there that should not be part of the base server.
-   */
-  appSpecific = require('./appSpecific');
-} catch (e) {
-  logger.sendErrorMsg({
-    code: logger.ErrorCodes.general,
-    text: ['appSpecific.js is missing. Check the documentation (code or standalone) for more information'],
-  });
-
-throw e;
 }
 
 app.io = socketIo();
@@ -83,8 +67,13 @@ if (appConfig.watchDir === true) {
   watchPrivate();
 }
 
-appSpecific();
+dbConnector.populateDbUsers(databasePopulation.users);
+dbConnector.populateDbRooms(databasePopulation.rooms, databasePopulation.users.superuser);
+dbConnector.populateDbCommands(databasePopulation.commands);
 
+/*
+ * Catches all exceptions and keeps the server running
+ */
 process.on('uncaughtException', function(err) {
   console.log('Caught exception', err);
   console.log(err.stack);

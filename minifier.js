@@ -10,10 +10,9 @@ const UglifyJs = require('uglify-js');
 const sass = require('node-sass');
 
 /**
- * Minifies a HTML file
+ * Minifies and compresses a HTML file and writes it to the public directory
  * @param {string} inPath Private directory path for the file
  * @param {string} outPath Public directory path for the file
- * @returns {undefined} Returns undefined
  */
 function htmlMinify(inPath, outPath) {
   fs.readFile(inPath, 'utf8', function(readError, readFile) {
@@ -47,6 +46,12 @@ function htmlMinify(inPath, outPath) {
   });
 }
 
+/**
+ * Minifies and compresses a Javascript file and writes it to the public directory
+ * It will also transpile the files from ES6 to function on more browsers
+ * @param {string} inPath Private directory path for the file
+ * @param {string} outPath Public directory path for the file
+ */
 function jsMinify(inPath, outPath) {
   const transpilePath = inPath + '-transpile';
   let file;
@@ -100,6 +105,11 @@ function jsMinify(inPath, outPath) {
   });
 }
 
+/**
+ * Minifies and compresses a CSS file and writes it to the public directory
+ * @param {string} inPath Private directory path for the file
+ * @param {string} outPath Public directory path for the file
+ */
 function cssMinify(inPath, outPath) {
   const cssPath = outPath.replace('.scss', '.css');
 
@@ -144,7 +154,6 @@ function cssMinify(inPath, outPath) {
  * Creates it if it doesn't exist
  * @param {string} dirPath Directory path to check
  * @param {function} callback Callback
- * @returns {undefined} Returns undefined
  */
 function checkDir(dirPath, callback) {
   fs.stat(dirPath, function(err) {
@@ -172,7 +181,6 @@ function checkDir(dirPath, callback) {
  * Minifies a file by calling the correct funtion based on its extension
  * @param {string} filePath File path
  * @param {string} outPath Directory path where the minified file will be moved to
- * @returns {undefined} Returns undefined
  */
 function minifyFile(filePath, outPath) {
   const extension = path.extname(filePath).substr(1);
@@ -186,12 +194,10 @@ function minifyFile(filePath, outPath) {
   }
 }
 
-// TODO Use logger instead of console.log
 /**
  * Goes through a directory and minifies all files with a specific extension
  * @param {string} pathObj Contaisn public (.publicPath) and private (.privatePath) directory path for the file
  * @param {string} extension Extension of the file
- * @returns {undefined} Returns undefined
  */
 function minifyDir(pathObj, extension) {
   checkDir(pathObj.publicPath, function(err) {

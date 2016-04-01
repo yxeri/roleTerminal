@@ -79,7 +79,7 @@ function handle(socket, io) {
   });
 
   socket.on('broadcastMsg', function(data) {
-    if (!objectValidator.isValidData(data, { message: { text: true, owner: true } })) {
+    if (!objectValidator.isValidData(data, { message: { text: true } })) {
       return;
     }
 

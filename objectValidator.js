@@ -2,6 +2,12 @@
 
 const logger = require('./logger');
 
+/**
+ * Checks if the sent object has the expected structure. It will returns false if it doesn't
+ * @param data The object that was sent
+ * @param expected The expected structure of the object
+ * @returns {boolean} Returns true if data has the expected structure
+ */
 function checkKeys(data, expected) {
   const expectedKeys = Object.keys(expected);
 
@@ -28,6 +34,12 @@ function checkKeys(data, expected) {
   return true;
 }
 
+/**
+ * Calls checkKeys to check if the data has the expected structure
+ * @param data Sent object
+ * @param expected Expected structure of the object
+ * @returns {boolean} Returns false if the data doesn't have the expected structure
+ */
 function isValidData(data, expected) {
   if ((!data || data === null) || (!expected || expected === null)) {
     logger.sendErrorMsg({

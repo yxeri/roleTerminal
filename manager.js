@@ -5,6 +5,9 @@ const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('./logger.js');
 const appConfig = require('rolehaven-config').app;
 
+/*
+ * Sort messages based on timestamp
+ */
 const messageSort = function(a, b) {
   if (a.time < b.time) {
     return -1;
@@ -15,18 +18,34 @@ const messageSort = function(a, b) {
   return 0;
 };
 
+/**
+ * Gets user by sent socket ID from socket.io
+ * @param socketId Users ID in the socket from socket.io
+ * @param callback Function callback
+ */
 function getUserById(socketId, callback) {
   dbConnector.getUserById(socketId, function(err, user) {
     callback(err, user);
   });
 }
 
+/**
+ * Gets a command
+ * @param commandName String Name of the command to retrieve
+ * @param callback Function callback
+ */
 function getCommand(commandName, callback) {
   dbConnector.getCommand(commandName, function(err, command) {
     callback(err, command);
   });
 }
 
+/**
+ * Checks if the user is allowed to use the command
+ * @param socketId The users socket ID from socket.io
+ * @param commandName Name of the command
+ * @param callback Function callback
+ */
 function userAllowedCommand(socketId, commandName, callback) {
   let isAllowed = false;
   const callbackFunc = function(err, user) {
@@ -54,13 +73,12 @@ function userAllowedCommand(socketId, commandName, callback) {
 }
 
 /**
- *
- * @param {array} rooms History from these rooms will retrieved
- * @param {int} lines Amount of lines returned for each room
- * @param {boolean} missedMsgs If true, only messages that the user missed since last login are sent
- * @param {date} lastOnline Last time user was online. Used to determine which missed messages to send
- * @param {function} callback Callback
- * @returns {undefined} Returns undefined
+ * Gets history (messages) from one or more rooms
+ * @param rooms The rooms to retrieve the history from
+ * @param lines How many message to retrieve
+ * @param missedMsgs Set to true if only the messages since the users last connection should be returned
+ * @param lastOnline Date of the last time the user was online
+ * @param callback Function callback
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
   dbConnector.getHistoryFromRooms(rooms, function(err, history) {
@@ -103,11 +121,10 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
 }
 
 /**
- *
- * @param {object} newRoom Room name to create
- * @param {object} user User who added the room
- * @param {function} callback Callback
- * @returns {undefined} Returns undefined
+ * Creates a new chat room and adds the user who created it to it
+ * @param newRoom Object of the new room
+ * @param user Object of the user
+ * @param callback Function callback
  */
 function createRoom(newRoom, user, callback) {
   newRoom.roomName = newRoom.roomName.toLowerCase();
@@ -136,6 +153,12 @@ function createRoom(newRoom, user, callback) {
   });
 }
 
+/**
+ * Updates user's socket ID in the database
+ * @param socketId User's socket ID for socket.io
+ * @param userName User's name
+ * @param callback Function callback
+ */
 function updateUserSocketId(socketId, userName, callback) {
   dbConnector.updateUserSocketId(userName, socketId, function(err, user) {
     if (err) {
@@ -150,6 +173,12 @@ function updateUserSocketId(socketId, userName, callback) {
   });
 }
 
+/**
+ * Joins the user's socket to all sent rooms and added standard rooms
+ * @param rooms Rooms for the user to join
+ * @param socket socket.io socket
+ * @param device DeviceID of the user
+ */
 function joinRooms(rooms, socket, device) {
   const allRooms = rooms;
 

@@ -26,12 +26,19 @@ const ErrorCodes = {
   },
 };
 
+/**
+ * Prints error message to server log
+ * @param code Error code
+ * @param text Array Text to be printed
+ * @param err Thrown error
+ */
 function printErrorMsg(code, text, err) {
   console.log('[ERROR]', code.text, text, '- Error:', err || '');
 }
 
 /**
- * Prints an error message to the log
+ * Prepares the error message and prints it
+ * @param data Contains error code and array with text to be printed
  */
 function sendErrorMsg(data) {
   if (!objectValidator.isValidData(data, { code: true, text: true })) {
@@ -46,7 +53,8 @@ function sendErrorMsg(data) {
 }
 
 /**
- * Sends an error message to the sent socket and prints it to the log
+ * Prepares the errmor message and prints it both server log and to client
+ * @param data Contains socket from socket.io, error code and array with text to be printed
  */
 function sendSocketErrorMsg(data) {
   if (!objectValidator.isValidData(data, { socket: true, code: true, text: true })) {
@@ -68,6 +76,10 @@ function sendSocketErrorMsg(data) {
   printErrorMsg(code, text, err);
 }
 
+/**
+ * Prints info message to server log
+ * @param text Array Text to be printed
+ */
 function sendInfoMsg(text) {
   console.log('[INFO]', text);
 }

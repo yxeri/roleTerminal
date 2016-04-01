@@ -5,6 +5,7 @@ const manager = require('../../manager');
 const messenger = require('../../messenger');
 const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
+const objectValidator = require('../../objectValidator');
 
 function handle(socket) {
   socket.on('getCommands', function() {
@@ -32,6 +33,10 @@ function handle(socket) {
   });
 
   socket.on('updateCommand', function(data) {
+    if (!objectValidator.isValidData(data, { command: { commandName: true }, field: true, value: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updatecommand.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;

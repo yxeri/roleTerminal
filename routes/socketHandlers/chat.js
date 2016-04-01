@@ -43,6 +43,10 @@ function shouldBeHidden(room, socketId) {
 
 function handle(socket, io) {
   socket.on('chatMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -59,6 +63,10 @@ function handle(socket, io) {
   });
 
   socket.on('whisperMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, roomName: true, whisper: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whisper.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -71,6 +79,10 @@ function handle(socket, io) {
   });
 
   socket.on('broadcastMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true, owner: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.broadcast.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -551,6 +563,10 @@ function handle(socket, io) {
   });
 
   socket.on('importantMsg', function(data) {
+    if (!objectValidator.isValidData(data, { message: { text: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.importantmsg.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;

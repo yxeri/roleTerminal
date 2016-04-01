@@ -15,6 +15,7 @@ const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../logger');
 const messenger = require('../messenger');
 const deviceManagement = require('./socketHandlers/deviceManagement');
+const objectValidator = require('../objectValidator');
 
 function generateWeatherReport(jsonObj) {
   const weatherRep = {};
@@ -68,36 +69,42 @@ function handle(io) {
       dbConnector.getUserById(socket.id, function(err, user) {
         if (err || user === null) {
           console.log('User has disconnected. Couldn\'t retrieve user name');
-        } else {
-          dbConnector.updateUserSocketId(user.userName, '', function(userErr, socketUser) {
-            if (userErr || socketUser === null) {
-              console.log('Failed to reset user socket ID', userErr);
+
+          return;
+        }
+
+        dbConnector.updateUserSocketId(user.userName, '', function(userErr, socketUser) {
+          if (userErr || socketUser === null) {
+            console.log('Failed to reset user socket ID', userErr);
+
+            return;
+          }
+
+          dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
+            if (userOnlineErr || settedUser === null) {
+              console.log('Failed to set last online');
 
               return;
             }
 
-            dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
-              if (userOnlineErr || settedUser === null) {
-                console.log('Failed to set last online');
-
-                return;
+            dbConnector.updateUserOnline(settedUser.userName, false, function(onlineErr, updatedUser) {
+              if (onlineErr || updatedUser === null) {
+                console.log('Failed to update online', onlineErr);
               }
-
-              dbConnector.updateUserOnline(settedUser.userName, false, function(onlineErr, updatedUser) {
-                if (onlineErr || updatedUser === null) {
-                  console.log('Failed to update online', onlineErr);
-                }
-              });
             });
           });
+        });
 
-          console.log(socket.id, user.userName, 'has disconnected');
-        }
+        console.log(socket.id, user.userName, 'has disconnected');
       });
     });
 
     // TODO This should be moved
     socket.on('locate', function(data) {
+      if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+        return;
+      }
+
       manager.userAllowedCommand(socket.id, databasePopulation.commands.locate.commandName, function(allowErr, allowed, user) {
         if (allowErr || !allowed) {
           return;
@@ -212,13 +219,16 @@ function handle(io) {
      * to the device room
      */
     socket.on('updateDeviceSocketId', function(data) {
+      if (!objectValidator.isValidData(data, { user: { userName: true }, device: { deviceId: true } })) {
+        return;
+      }
+
       const deviceId = data.device.deviceId;
-      const socketId = data.user.socketId;
       const userName = data.user.userName;
 
       socket.join(deviceId + appConfig.deviceAppend);
 
-      dbConnector.updateDeviceSocketId(deviceId, socketId, userName, function(err, device) {
+      dbConnector.updateDeviceSocketId(deviceId, socket.id, userName, function(err, device) {
         if (err || device === null) {
           return;
         }

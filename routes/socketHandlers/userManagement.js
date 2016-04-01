@@ -14,6 +14,10 @@ function isTextAllowed(text) {
 
 function handle(socket, io) {
   socket.on('userExists', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
         socket.emit('commandFail');
@@ -52,6 +56,10 @@ function handle(socket, io) {
   });
 
   socket.on('register', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true, password: true, registerDevice: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
         return;
@@ -141,6 +149,10 @@ function handle(socket, io) {
 
   // TODO Rename to reflect the function
   socket.on('updateId', function(data) {
+    if (!objectValidator.isValidData(data, { user: true })) {
+      return;
+    }
+
     if (data.user.userName === null) {
       const publicRoom = databasePopulation.rooms.public.roomName;
 
@@ -190,6 +202,10 @@ function handle(socket, io) {
   });
 
   socket.on('updateLocation', function(data) {
+    if (!objectValidator.isValidData(data, { position: true })) {
+      return;
+    }
+
     dbConnector.getUserById(socket.id, function(err, user) {
       if (err || user === null) {
         logger.sendErrorMsg({
@@ -214,13 +230,16 @@ function handle(socket, io) {
   });
 
   socket.on('login', function(data) {
-    const user = data.user;
+    if (!objectValidator.isValidData(data, { user: { userName: true, password: true } })) {
+      return;
+    }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.login.commandName, function(allowErr, allowed) {
-      if (allowErr || !allowed || !user.userName || !user.password) {
+      if (allowErr || !allowed) {
         return;
       }
 
+      const user = data.user;
       const userName = user.userName.toLowerCase();
 
       dbConnector.authUser(userName, user.password, function(err, authUser) {
@@ -254,13 +273,12 @@ function handle(socket, io) {
           return;
         }
 
-        const oldSocket = io.sockets.connected[authUser.socketId];
-
         manager.updateUserSocketId(socket.id, userName, function(idErr) {
           if (idErr) {
             return;
           }
 
+          const oldSocket = io.sockets.connected[authUser.socketId];
           const rooms = authUser.rooms;
 
           if (oldSocket) {
@@ -304,6 +322,10 @@ function handle(socket, io) {
   });
 
   socket.on('checkPassword', function(data) {
+    if (!objectValidator.isValidData(data, { oldPassword: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -335,6 +357,10 @@ function handle(socket, io) {
   });
 
   socket.on('changePassword', function(data) {
+    if (!objectValidator.isValidData(data, { oldPassword: true, newPassword: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -439,6 +465,10 @@ function handle(socket, io) {
   });
 
   socket.on('verifyUser', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -557,6 +587,10 @@ function handle(socket, io) {
   });
 
   socket.on('ban', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.banuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -620,6 +654,10 @@ function handle(socket, io) {
   });
 
   socket.on('unban', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -695,6 +733,10 @@ function handle(socket, io) {
   });
 
   socket.on('updateUser', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true }, field: true, value: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updateuser.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -765,6 +807,10 @@ function handle(socket, io) {
   });
 
   socket.on('updateMode', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true }, mode: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.mode.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
         return;
@@ -791,7 +837,7 @@ function handle(socket, io) {
 
   socket.on('whoAmI', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, function(allowErr, allowed, user) {
-      if (allowErr || !allowed) {
+      if (allowErr || !allowed || !user) {
         return;
       }
 
@@ -808,7 +854,13 @@ function handle(socket, io) {
   });
 
   socket.on('matchPartialUser', function(data) {
+    // data.partialName is not checked if it set, to allow the retrieval of all users on no input
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
+      if (allowErr || !allowed || !user) {
+        return;
+      }
+
       dbConnector.matchPartialUser(data.partialName, user, function(err, users) {
         if (err) {
           return;

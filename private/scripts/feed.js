@@ -1779,7 +1779,6 @@ function onLogin(data = {}) {
       deviceId: getDeviceId(),
     },
     user: {
-      socketId: socket.id,
       userName: getUser(),
     },
   });
@@ -1847,7 +1846,6 @@ function onReconnectSuccess(data) {
         deviceId: getDeviceId(),
       },
       user: {
-        socketId: socket.id,
         userName: getUser(),
       },
     });
@@ -3043,11 +3041,15 @@ function attachCommands() {
     },
     steps: [
       function hackroomStepOne() {
+        const data = {
+          room: { roomName: commandHelper.data.roomName },
+        };
+
         queueMessage({
           text: ['Checking room access...'],
           text_se: ['Undersöker rummet...'],
         });
-        socket.emit('roomHackable', commandHelper.data.roomName);
+        socket.emit('roomHackable', data);
       },
       function hackroomStepTwo() {
         const commandObj = commandHelper;
@@ -3801,7 +3803,6 @@ function startBoot() {
     socket.emit('updateDeviceSocketId', {
       device: { deviceId: getDeviceId() },
       user: {
-        socketId: socket.id,
         userName: 'NO_USER_LOGGED_IN',
       },
     });

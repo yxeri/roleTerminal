@@ -4,10 +4,13 @@ const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
+const objectValidator = require('../../objectValidator');
 
 function handle(socket) {
-  socket.on('roomHackable', function(roomName) {
-    const roomNameLower = roomName.toLowerCase();
+  socket.on('roomHackable', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.hackroom.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed || !user) {
@@ -21,7 +24,9 @@ function handle(socket) {
         return;
       }
 
-      dbConnector.getRoom(roomNameLower, function(err, room) {
+      const roomName = data.room.roomName.toLowerCase();
+
+      dbConnector.getRoom(roomName, function(err, room) {
         if (err || room === null || user.accessLevel < room.visibility) {
           logger.sendSocketErrorMsg({
             socket: socket,
@@ -41,29 +46,35 @@ function handle(socket) {
   });
 
   socket.on('hackRoom', function(data) {
+    if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.hackroom.commandName, function(allowErr, allowed, user) {
-      if (allowed) {
-        const roomName = data.room.roomName.toLowerCase();
-
-        dbConnector.addRoomToUser(user.userName, roomName, function(err) {
-          if (err) {
-            logger.sendSocketErrorMsg({
-              socket: socket,
-              code: logger.ErrorCodes.db,
-              text: ['Failed to follow the room'],
-              text_se: ['Misslyckades med att följa rummet'],
-              err: err,
-            });
-
-            return;
-          }
-
-          const room = { roomName: roomName };
-
-          socket.join(roomName);
-          socket.emit('follow', { room: room });
-        });
+      if (allowErr || !allowed || !user) {
+        return;
       }
+
+      const roomName = data.room.roomName.toLowerCase();
+
+      dbConnector.addRoomToUser(user.userName, roomName, function(err) {
+        if (err) {
+          logger.sendSocketErrorMsg({
+            socket: socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to follow the room'],
+            text_se: ['Misslyckades med att följa rummet'],
+            err: err,
+          });
+
+          return;
+        }
+
+        const room = { roomName: roomName };
+
+        socket.join(roomName);
+        socket.emit('follow', { room: room });
+      });
     });
   });
 }

@@ -5,6 +5,7 @@ const manager = require('../../manager');
 const messenger = require('../../messenger');
 const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
+const objectValidator = require('../../objectValidator');
 
 function handle(socket) {
   // TODO Sub-command?
@@ -69,6 +70,10 @@ function handle(socket) {
   });
 
   socket.on('updateDevice', function(data) {
+    if (!objectValidator.isValidData(data, { device: { deviceId: true }, field: true, value: true })) {
+      return;
+    }
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updatedevice.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
         return;
@@ -125,6 +130,11 @@ function handle(socket) {
   });
 
   socket.on('verifyDevice', function(data) {
+    // TODO Check if either device.alias or device.deviceId is set
+    if (!objectValidator.isValidData(data, { device: true })) {
+      return;
+    }
+
     dbConnector.getDevice(data.device, function(err, device) {
       if (err || device === null) {
         messenger.sendSelfMsg({

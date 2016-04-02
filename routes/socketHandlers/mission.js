@@ -6,6 +6,10 @@ const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
 
 function handle(socket) {
+  /**
+   * Returns all missions
+   * Emits missions
+   */
   socket.on('getAllMissions', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.jobs.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {
@@ -30,6 +34,10 @@ function handle(socket) {
     });
   });
 
+  /**
+   * Returns all active (not yet completed) missions
+   * Emits missions
+   */
   socket.on('getActiveMissions', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.jobs.commandName, function(allowErr, allowed) {
       if (allowErr || !allowed) {

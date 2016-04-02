@@ -7,6 +7,10 @@ const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
 
 function handle(socket) {
+  /**
+   * Checks if a room is hackable (user needs to have high enough access level versus the rooms visibility)
+   * Emits commandFail or commandSuccess if the user's access level is higher than the room's visibility
+   */
   socket.on('roomHackable', function(data) {
     if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
       return;
@@ -45,6 +49,10 @@ function handle(socket) {
     });
   });
 
+  /**
+   * Joins room to user's socket
+   * Emits follow
+   */
   socket.on('hackRoom', function(data) {
     if (!objectValidator.isValidData(data, { room: { roomName: true } })) {
       return;

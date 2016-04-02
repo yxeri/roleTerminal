@@ -16,7 +16,6 @@ const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../logger');
 const messenger = require('../messenger');
 const deviceHandler = require('./socketHandlers/device');
-const objectValidator = require('../objectValidator');
 
 function handle(io) {
   router.get('/', function(req, res) {
@@ -83,35 +82,6 @@ function handle(io) {
         });
 
         logger.sendInfoMsg(`${socket.id} ${user.userName} has disconnected`);
-      });
-    });
-
-    // TODO This should be moved
-    /**
-     * Updates socketID and user name on a device in the database
-     */
-    socket.on('updateDeviceSocketId', function(data) {
-      if (!objectValidator.isValidData(data, { user: { userName: true }, device: { deviceId: true } })) {
-        return;
-      }
-
-      const deviceId = data.device.deviceId;
-      const userName = data.user.userName;
-
-      socket.join(deviceId + appConfig.deviceAppend);
-
-      dbConnector.updateDeviceSocketId(deviceId, socket.id, userName, function(err, device) {
-        if (err || device === null) {
-          return;
-        }
-
-        messenger.sendSelfMsg({
-          socket: socket,
-          message: {
-            text: ['Device has been updated'],
-            text_se: ['Enheten har uppdaterats'],
-          },
-        });
       });
     });
 

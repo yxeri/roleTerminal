@@ -6,9 +6,13 @@ const messenger = require('../../messenger');
 const databasePopulation = require('rolehaven-config').databasePopulation;
 const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
+const appConfig = require('rolehaven-config').app;
 
 function handle(socket) {
-  // TODO Sub-command?
+  /**
+   * Returns all devices from database, if the user has high enough access level
+   * Emits list
+   */
   socket.on('listDevices', function() {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
       if (allowErr || !allowed) {
@@ -35,8 +39,6 @@ function handle(socket) {
           return;
         }
 
-        // TODO Send objects through list?
-
         const allDevices = [];
 
         if (devices.length > 0) {
@@ -44,14 +46,14 @@ function handle(socket) {
             const device = devices[i];
             let deviceString = '';
 
-            deviceString += 'DeviceID: ' + device.deviceId + '\t';
+            deviceString += `DeviceID: ${device.deviceId}${'\t'}`;
 
             if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
-              deviceString += 'Alias: ' + device.deviceAlias + '\t';
+              deviceString += `Alias: ${device.deviceAlias}${'\t'}`;
             }
 
             if (device.lastUser && device.lastUser !== null) {
-              deviceString += 'Last user: ' + device.lastUser;
+              deviceString += `Last user: ${device.lastUser}`;
             }
 
             allDevices.push(deviceString);
@@ -69,6 +71,9 @@ function handle(socket) {
     });
   });
 
+  /**
+   * Updates a field on a device in the database
+   */
   socket.on('updateDevice', function(data) {
     if (!objectValidator.isValidData(data, { device: { deviceId: true }, field: true, value: true })) {
       return;
@@ -90,13 +95,12 @@ function handle(socket) {
             errMsg += '. Alias already exists';
           }
 
-          messenger.sendSelfMsg({
+          logger.sendSocketErrorMsg({
             socket: socket,
-            message: {
-              text: [errMsg],
-            },
+            text: [errMsg],
+            err: err,
+            code: logger.ErrorCodes.general,
           });
-          console.log(errMsg, err);
 
           return;
         }
@@ -119,8 +123,8 @@ function handle(socket) {
         messenger.sendSelfMsg({
           socket: socket,
           message: {
-            text: ['Invalid field. Device doesn\'t have ' + field],
-            text_se: ['Inkorrekt fält. Enheter har inte fältet ' + field],
+            text: [`Invalid field. Device doesn't have ${field}`],
+            text_se: [`Inkorrekt fält. Enheter har inte fältet ${field}`],
           },
         });
 
@@ -129,6 +133,10 @@ function handle(socket) {
     });
   });
 
+  /**
+   * Checks if the device is in the database
+   * Emits commandFail or commandSuccess if the device was found
+   */
   socket.on('verifyDevice', function(data) {
     // TODO Check if either device.alias or device.deviceId is set
     if (!objectValidator.isValidData(data, { device: true })) {
@@ -157,6 +165,34 @@ function handle(socket) {
         },
       });
       socket.emit('commandSuccess', data);
+    });
+  });
+
+  /**
+   * Updates socketID and user name on a device in the database
+   */
+  socket.on('updateDeviceSocketId', function(data) {
+    if (!objectValidator.isValidData(data, { user: { userName: true }, device: { deviceId: true } })) {
+      return;
+    }
+
+    const deviceId = data.device.deviceId;
+    const userName = data.user.userName;
+
+    socket.join(deviceId + appConfig.deviceAppend);
+
+    dbConnector.updateDeviceSocketId(deviceId, socket.id, userName, function(err, device) {
+      if (err || device === null) {
+        return;
+      }
+
+      messenger.sendSelfMsg({
+        socket: socket,
+        message: {
+          text: ['Device has been updated'],
+          text_se: ['Enheten har uppdaterats'],
+        },
+      });
     });
   });
 }

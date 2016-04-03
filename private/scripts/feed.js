@@ -910,7 +910,6 @@ function isScreenOff() {
 /**
  * Set intervals at boot and recreate them when the window is focused
  * This is to make sure that nothing has been killed in the background
- * @returns {undefined} Returns nothing
  */
 function setIntervals() {
   if (trackingInterval !== null) {
@@ -935,6 +934,16 @@ function setIntervals() {
      */
     isScreenOffInterval = setInterval(isScreenOff, screenOffIntervalTime);
   }
+}
+
+/**
+ * Resets intervals and keyPressed (to not have it true after a user tabbed out and into the site)
+ */
+function refocus() {
+  keyPressed = false;
+  triggerKeysPressed.ctrl = false;
+  triggerKeysPressed.alt = false;
+  setIntervals();
 }
 
 function startAudio() {
@@ -3786,7 +3795,7 @@ function startBoot() {
   // Needed for some special keys. They are not detected with keypress
   addEventListener('keydown', specialKeyPress);
   addEventListener('keyup', keyReleased);
-  window.addEventListener('focus', setIntervals);
+  window.addEventListener('focus', refocus);
 
   resetPreviousCommandPointer();
   generateMap();

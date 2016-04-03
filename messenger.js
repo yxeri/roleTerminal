@@ -6,6 +6,13 @@ const appConfig = require('rolehaven-config').app;
 const logger = require('./logger');
 const objectValidator = require('./objectValidator');
 
+/**
+ * Add a sent message to a room's history in the database
+ * @param roomName Name of the room
+ * @param message Message to be added
+ * @param socket Socket.io socket
+ * @param callback Function callback
+ */
 function addMsgToHistory(roomName, message, socket, callback) {
   dbConnector.addMsgToHistory(roomName, message, function(err, history) {
     if (err || history === null) {
@@ -28,6 +35,11 @@ function addMsgToHistory(roomName, message, socket, callback) {
   });
 }
 
+/**
+ * Send a message to the user's socket
+ * Emits message
+ * @param params Contains socket (socket.io socket) and message (required: text)
+ */
 function sendSelfMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true } })) {
     return;
@@ -38,6 +50,11 @@ function sendSelfMsg(params) {
   params.socket.emit('message', { message: message });
 }
 
+/**
+ * Sends multiple message to the user's socket
+ * Emits messages
+ * @param params Contains socket (socket.io socket) and messages
+ */
 function sendSelfMsgs(params) {
   if (!objectValidator.isValidData(params, { socket: true, messages: true })) {
     return;
@@ -50,13 +67,19 @@ function sendSelfMsgs(params) {
   params.socket.emit('messages', data);
 }
 
+/**
+ * Checks if the socket is following a room
+ * @param socket Socket.io socket
+ * @param roomName Name of the room
+ * @returns {boolean} Returns true if the socket is following the room
+ */
 function isSocketFollowingRoom(socket, roomName) {
   if (Object.keys(socket.rooms).indexOf(roomName) === -1) {
     sendSelfMsg({
       socket: socket,
       message: {
-        text: ['You are not following room ' + roomName],
-        text_se: ['Ni följer inte rummet ' + roomName],
+        text: [`You are not following room ${roomName}`],
+        text_se: [`Ni följer inte rummet ${roomName}`],
       },
     });
 
@@ -66,6 +89,11 @@ function isSocketFollowingRoom(socket, roomName) {
   return true;
 }
 
+/**
+ * Sends a message to a room. The message will not be stored in history
+ * Emits message
+ * @param params Contains socket (socket.io socket), message (required: text, userName) and sendTo (room name)
+ */
 function sendMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true }, sendTo: true })) {
     return;
@@ -80,6 +108,12 @@ function sendMsg(params) {
   socket.broadcast.to(data.sendTo).emit('message', data);
 }
 
+/**
+ * Sends a message with the importantMsg class. It can be sent to all connected sockets or one specific device (if toOneDevice is set)
+ * It is stored in a separate histories collection for important messages
+ * Emits importantMsg
+ * @param params Contains socket (socket.io socket), message (required: text, userName) and optional toOneDevice (boolean. True will send it to specific device)
+ */
 function sendImportantMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
     return;
@@ -113,6 +147,11 @@ function sendImportantMsg(params) {
   });
 }
 
+/**
+ * Sends a message to a room and stores it in history
+ * Emits message
+ * @param params Contains socket (socket.io), message (required: text, roomName, userName)
+ */
 function sendChatMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
     return;
@@ -136,6 +175,11 @@ function sendChatMsg(params) {
   });
 }
 
+/**
+ * Sends a message to a whisper room (*user name*-whisper), which is followed by a single user, and stores it in history
+ * Emits message
+ * @param params Contains socket (socket.io), message (required: text, roomName, userName)
+ */
 function sendWhisperMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
     return;
@@ -167,6 +211,12 @@ function sendWhisperMsg(params) {
   });
 }
 
+/**
+ * Sends a message with broadcastMsg class to all connected sockets
+ * It is stored in a separate broadcast history
+ * Emits message
+ * @param params Contains socket (socket.io), message (required: text, user name)
+ */
 function sendBroadcastMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
     return;
@@ -190,6 +240,11 @@ function sendBroadcastMsg(params) {
   });
 }
 
+/**
+ * Send an array of strings with an optional title
+ * Emits list
+ * @param params Contains socket (socket.io), itemList (required: itemList, listTitle) and optional columns
+ */
 function sendList(params) {
   if (!objectValidator.isValidData(params, { socket: true, itemList: { itemList: true, listTitle: true } })) {
     return;
@@ -204,6 +259,10 @@ function sendList(params) {
   socket.emit('list', data);
 }
 
+/**
+ * Send morse code to all sockets and store in history
+ * @param params Contains socket (socket.io), message (required: morseCode)
+ */
 function sendMorse(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { morseCode: true } })) {
     return;

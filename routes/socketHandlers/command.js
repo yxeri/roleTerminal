@@ -8,6 +8,10 @@ const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
 
 function handle(socket) {
+  /**
+   * Gets all commands available to the user
+   * Emits updateCommands
+   */
   socket.on('getCommands', function() {
     dbConnector.getAllCommands(function(err, commands) {
       if (err || commands === null || commands.length === 0) {
@@ -32,6 +36,10 @@ function handle(socket) {
     });
   });
 
+  /**
+   * Updates a command's field in the database and emits the change to all sockets
+   * Emits updateCommands
+   */
   socket.on('updateCommand', function(data) {
     if (!objectValidator.isValidData(data, { command: { commandName: true }, field: true, value: true })) {
       return;

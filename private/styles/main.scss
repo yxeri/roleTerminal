@@ -140,12 +140,12 @@ pre {
   border: 0;
 }
 
-.subliminal {
+.baseSubliminal {
   position: relative;
   width: 100%;
 }
 
-.subliminal:before {
+.baseSubliminalBefore {
   content: attr(subMsg);
   position: absolute;
   left: 0;
@@ -155,8 +155,46 @@ pre {
   color: $sub-text-color;
   text-shadow: 1px 1px 4px $sub-shadow-color;
   opacity: 0;
-  -webkit-animation: brightness 8s linear infinite;
-  animation: brightness 8s linear infinite;
+}
+
+.subliminal {
+  @extend .baseSubliminal;
+}
+
+.subliminal:before {
+  @extend .baseSubliminalBefore;
+  -webkit-animation: brightness 16s linear infinite 6s;
+  animation: brightness 16s linear infinite 6s;
+}
+
+.subliminalFast {
+  @extend .baseSubliminal;
+}
+
+.subliminalFast:before {
+  @extend .baseSubliminalBefore;
+  -webkit-animation: brightness 14s linear infinite 4s;
+  animation: brightness 14s linear infinite 4s;
+}
+
+.subliminalSlow {
+  @extend .baseSubliminal;
+}
+
+.subliminalSlow:before {
+  @extend .baseSubliminalBefore;
+  -webkit-animation: brightness 18s linear infinite 8s;
+  animation: brightness 18s linear infinite 8s;
+}
+
+.subliminalInstant {
+  @extend .baseSubliminal;
+}
+
+.subliminalInstant:before {
+  @extend .baseSubliminalBefore;
+  -webkit-animation: brightness 18s linear 1;
+  animation: brightness 18s linear 1;
 }
 
 .importantMsg {
@@ -297,16 +335,16 @@ pre {
   from {
     opacity: 0;
   }
-  89% {
-    opacity: 0;
-  }
-  90% {
+  1% {
     opacity: 1;
   }
-  92% {
+  2% {
     opacity: 1;
   }
-  93% {
+  3% {
+    opacity: 1;
+  }
+  4% {
     opacity: 0;
   }
 }
@@ -315,16 +353,16 @@ pre {
   from {
     opacity: 0;
   }
-  89% {
-    opacity: 0;
-  }
-  90% {
+  1% {
     opacity: 1;
   }
-  92% {
+  2% {
     opacity: 1;
   }
-  93% {
+  3% {
+    opacity: 1;
+  }
+  4% {
     opacity: 0;
   }
 }

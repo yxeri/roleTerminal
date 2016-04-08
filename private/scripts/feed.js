@@ -122,6 +122,14 @@ const triggerKeysPressed = [];
 const commands = {};
 // Timeout between print of rows (milliseconds)
 const rowTimeout = 30;
+// Class names of animations in css
+const animations = [
+  'subliminal',
+  'subliminalFast',
+  'subliminalSlow',
+];
+// Index of the animation to be retrieved from animations array
+let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
 let fastMode = false;
 let storedMessages = {};
@@ -323,14 +331,29 @@ function scrollView() {
 }
 
 // Adds time stamp and room name to a string from a message if they are set
-function createRow(message) {
+function createRow(message, subText) {
   const rowObj = document.createElement('li');
   const roomName = message.roomName;
   const extraClass = message.extraClass;
 
   if (extraClass) {
-    // classList doesn't work on older devices, thus the usage of className
     rowObj.classList.add(extraClass);
+  }
+
+  if (subText && message.msgAnimation) {
+    if (message.msgAnimation.instantAnimation) {
+      rowObj.classList.add('subliminalInstant');
+    } else {
+      rowObj.classList.add(animations[animationPosition]);
+
+      if (message.msgAnimation.fixedAnimationSpeed === true) {
+        animationPosition = 0;
+      } else {
+        animationPosition = (animationPosition >= animations.length) ? 0 : animationPosition + 1;
+      }
+    }
+
+    rowObj.setAttribute('subMsg', subText);
   }
 
   if (message.time && !message.skipTime) {
@@ -372,14 +395,26 @@ function addRow(message) {
   const columns = message.columns ? message.columns : 1;
   // Set text depending on default language set. Empty means English
   let currentText = defaultLanguage === '' ? message.text : message[`text_${defaultLanguage}`];
+  let currentSubText = defaultLanguage === '' ? message.subText : message[`subText_${defaultLanguage}`];
 
   // Fallback to English if there is no text in the default language
   if (!currentText) {
     currentText = message.text;
   }
 
+  // Fallback to English if there is no text in the default language
+  if (!currentSubText) {
+    currentSubText = message.subText;
+  }
+
   if (currentText && currentText.length > 0) {
-    const row = createRow(message);
+    let subText;
+
+    if (currentSubText && currentSubText.length > 0) {
+      subText = currentSubText.shift();
+    }
+
+    const row = createRow(message, subText);
     let timeout;
 
     if (fastMode) {

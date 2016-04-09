@@ -340,7 +340,7 @@ function createRow(message, subText) {
     rowObj.classList.add(extraClass);
   }
 
-  if (subText && message.msgAnimation) {
+  if (message.msgAnimation) {
     if (message.msgAnimation.instantAnimation) {
       rowObj.classList.add('subliminalInstant');
     } else {
@@ -353,7 +353,9 @@ function createRow(message, subText) {
       }
     }
 
-    rowObj.setAttribute('subMsg', subText);
+    if (subText) {
+      rowObj.setAttribute('subMsg', subText);
+    }
   }
 
   if (message.time && !message.skipTime) {

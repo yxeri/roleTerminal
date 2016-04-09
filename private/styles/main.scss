@@ -193,8 +193,11 @@ pre {
 
 .subliminalInstant:before {
   @extend .baseSubliminalBefore;
-  -webkit-animation: brightness 18s linear 1;
-  animation: brightness 18s linear 1;
+  opacity: 1;
+  -webkit-animation: instantBrightness 1s linear 1;
+  -webkit-animation-fill-mode: forwards;
+  animation: instantBrightness 1s linear 1;
+  animation-fill-mode: forwards;
 }
 
 .importantMsg {
@@ -338,9 +341,6 @@ pre {
   1% {
     opacity: 1;
   }
-  2% {
-    opacity: 1;
-  }
   3% {
     opacity: 1;
   }
@@ -356,13 +356,36 @@ pre {
   1% {
     opacity: 1;
   }
-  2% {
-    opacity: 1;
-  }
   3% {
     opacity: 1;
   }
   4% {
     opacity: 0;
+  }
+}
+
+@-webkit-keyframes instantBrightness {
+  from {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes instantBrightness {
+  from {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    display: none;
   }
 }

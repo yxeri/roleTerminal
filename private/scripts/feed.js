@@ -37,11 +37,13 @@ const pausePositionTime = 40000;
  * Android 4.1.* would otherwise give JS errors
  */
 const mainFeed = document.getElementById('mainFeed');
-const commandInput = document.getElementById('cmdInput');
+const cmdInput = document.getElementById('cmdInput');
 const inputStart = document.getElementById('inputStart');
 const modeField = document.getElementById('mode');
 const spacer = document.getElementById('spacer');
 const background = document.getElementById('background');
+const menu = document.getElementById('menu');
+const menuList = document.getElementById('menuList');
 // Socket.io
 const socket = io(); // eslint-disable-line no-undef
 // Queue of all the sounds that will be handled and played
@@ -128,7 +130,6 @@ const animations = [
   'subliminalFast',
   'subliminalSlow',
 ];
-const menuList = document.getElementById('menuList');
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
@@ -189,11 +190,11 @@ function appendLanguage(propertyName) {
 }
 
 function getInputText() {
-  return commandInput.value;
+  return cmdInput.value;
 }
 
 function setCommandInput(text) {
-  commandInput.value = text;
+  cmdInput.value = text;
 }
 
 function getInputStart() {
@@ -252,7 +253,7 @@ function generateSpan(params = { text: '' }) {
         setCommandInput(`${text} `);
       }
 
-      commandInput.focus();
+      cmdInput.focus();
       event.stopPropagation();
     });
   }
@@ -278,7 +279,7 @@ function generateLink(text, className, func) {
     clicked = true;
 
     func(this);
-    commandInput.focus();
+    cmdInput.focus();
     event.stopPropagation();
   });
 
@@ -479,9 +480,9 @@ function findOneReplace(text, find, replaceWith) {
 
 function hideInput(hide) {
   if (hide) {
-    commandInput.setAttribute('type', 'password');
+    cmdInput.setAttribute('type', 'password');
   } else {
-    commandInput.setAttribute('type', 'text');
+    cmdInput.setAttribute('type', 'text');
   }
 }
 
@@ -553,8 +554,39 @@ function getFastMode() {
 }
 
 function setFastMode(isOn) {
-  setLocalVal('fastMode', isOn);
   fastMode = isOn;
+
+  setLocalVal('fastMode', isOn);
+}
+
+function isHiddenCursor() {
+  return getLocalVal('hiddenCursor') === 'true';
+}
+
+function setHiddenCursor(isHidden) {
+  if (isHidden) {
+    background.classList.add('hideCursor');
+  } else {
+    background.classList.remove('hideCursor');
+  }
+
+  setLocalVal('hiddenCursor', isHidden);
+}
+
+function isHiddenBottomMenu() {
+  return getLocalVal('hiddenBottomMenu') === 'true';
+}
+
+function setHiddenBottomMenu(isHidden) {
+  if (isHidden) {
+    menu.classList.add('hide');
+    cmdInput.classList.remove('menuBottomPadding');
+  } else {
+    menu.classList.remove('hide');
+    cmdInput.classList.add('menuBottomPadding');
+  }
+
+  setLocalVal('hiddenBottomMenu', isHidden);
 }
 
 function getAccessLevel() {
@@ -1552,7 +1584,7 @@ function attachMenuListener(menuItem, func, funcParam) {
     menuItem.addEventListener('click', function menuListener(event) {
       func([funcParam]);
       clicked = true;
-      commandInput.focus();
+      cmdInput.focus();
       event.stopPropagation();
     });
   }
@@ -1646,13 +1678,13 @@ function printStartMessage() {
 }
 
 function attachFullscreenListener() {
-  document.getElementById('background').addEventListener('click', function clickHandler(event) {
+  background.addEventListener('click', function clickHandler(event) {
     clicked = !clicked;
 
     if (clicked) {
-      commandInput.focus();
+      cmdInput.focus();
     } else {
-      commandInput.blur();
+      cmdInput.blur();
     }
 
     if (getForceFullscreen() === true) {
@@ -2224,7 +2256,6 @@ function keyReleased(event) {
 function downgradeOlderDevices() {
   if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid || /Vita/.test(navigator.userAgent)) {
     document.getElementById('overlay').className = '';
-    document.getElementById('background').className = '';
   }
 }
 
@@ -3776,17 +3807,36 @@ function attachCommands() {
     func: function settingsCommand(phrases = []) {
       if (phrases.length > 1) {
         const setting = phrases[0];
-        const value = phrases[1];
+        const value = phrases[1] === 'on' || value === true ? true : false;
 
         switch (setting) {
         case 'fastmode':
-          fastMode = value === 'on' || value === true ? true : false;
           setFastMode(fastMode);
 
-          if (fastMode) {
+          if (value) {
             queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'fastModeOn') });
           } else {
             queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'fastModeOff') });
+          }
+
+          break;
+        case 'hiddencursor':
+          setHiddenCursor(value);
+
+          if (value) {
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'hiddenCursorOn') });
+          } else {
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'hiddenCursorOff') });
+          }
+
+          break;
+        case 'hiddenbottommenu':
+          setHiddenBottomMenu(value);
+
+          if (value) {
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'hiddenBottomMenuOn') });
+          } else {
+            queueMessage({ text: labels.retrieveMessage(appendLanguage('info'), 'hiddenBottomMenuOff') });
           }
 
           break;
@@ -3816,17 +3866,23 @@ function startBoot() {
   populateMenu();
   socket.emit('getCommands');
 
-  if (!isTouchDevice()) {
-    commandInput.focus();
+  if (isHiddenCursor()) {
+    setHiddenCursor(true);
   }
 
-  // TODO: Move this
+  if (isHiddenBottomMenu()) {
+    setHiddenBottomMenu(true);
+  }
+
+  if (!isTouchDevice()) {
+    cmdInput.focus();
+  }
+
   if (!getDeviceId()) {
     setDeviceId(textTools.createDeviceId());
   }
 
   attachFullscreenListener();
-
   startSocket();
   addEventListener('keypress', keyPress);
   // Needed for some special keys. They are not detected with keypress

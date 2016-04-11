@@ -12,7 +12,7 @@
   <body>
     <!-- Required for Android 2.2. Browser will crash if there is only one input field -->
     <input disabled="true" id="hiddenInput" />
-    <div id="overlay" class="boxShadow"></div>
+    <div id="overlay"></div>
       <div id="background">
         <ul class="feed" id="mainFeed">
           <!-- Required for Safari to render text -->
@@ -21,7 +21,7 @@
           </li>
         </ul>
         <div id="inputContainer">
-          <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
+          <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" class="menuBottomPadding" value="" autocorrect="off" autocapitalize="none" />
         </div>
         <div id="menu">
           <!-- List items are generated with JS -->

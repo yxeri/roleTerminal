@@ -884,6 +884,10 @@ const all = {
       'Speed of print out has been increased',
     ],
     fastModeOff: ['Fast mode is now turned off'],
+    hiddenCursorOn: ['Mouse cursor is now hidden'],
+    hiddenCursorOff: ['Mouse cursor is now visible'],
+    hiddenBottomMenuOn: ['Bottom menu is now hidden'],
+    hiddenBottomMenuOff: ['Bottom menu is now visible'],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -949,6 +953,10 @@ const all = {
       'Text skrivs ut snabbare',
     ],
     fastModeOff: ['Fast mode är nu avslaget'],
+    hiddenCursorOn: ['Muspekaren är nu dold'],
+    hiddenCursorOff: ['Muspekaren är nu synlig'],
+    hiddenBottomMenuOn: ['Undermenyn är nu dold'],
+    hiddenBottomMenuOff: ['Undermenyn är nu synlig'],
   },
 };
 

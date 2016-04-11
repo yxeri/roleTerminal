@@ -128,6 +128,7 @@ const animations = [
   'subliminalFast',
   'subliminalSlow',
 ];
+const menuList = document.getElementById('menuList');
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
@@ -1595,7 +1596,6 @@ function populateMenu() {
     },
   };
 
-  const menuList = document.getElementById('menuList');
   const menuItemsKeys = Object.keys(menuItems);
 
   for (let i = 0; i < menuItemsKeys.length; i++) {

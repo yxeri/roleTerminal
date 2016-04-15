@@ -82,4 +82,4 @@ function handle(socket) {
   });
 }
 
-module.exports = handle;
+exports.handle = handle;

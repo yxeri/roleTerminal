@@ -130,6 +130,7 @@ const animations = [
   'subliminalFast',
   'subliminalSlow',
 ];
+const audio = new Audio();
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
@@ -174,6 +175,36 @@ let reconnecting = false;
 let oldAndroid;
 let trackingInterval = null;
 let isScreenOffInterval = null;
+
+function playAudio(params) {
+  if (params.path) {
+    audio.src = params.path;
+  }
+
+  if (params.startTime) {
+    audio.currentTime = params.startTime;
+  }
+
+  if (params.volume) {
+    audio.volume = params.volume;
+  }
+
+  audio.play();
+}
+
+function pauseAudio() {
+  audio.pause();
+}
+
+function resetAudio() {
+  audio.pause();
+  audio.currentTime = 0;
+  audio.volume = 1;
+}
+
+function changeAudioVolume(level) {
+  audio.volume = level;
+}
 
 function getLocalVal(name) {
   return localStorage.getItem(name);
@@ -1016,7 +1047,7 @@ function refocus() {
   setIntervals();
 }
 
-function startAudio() {
+function buildMorsePlayer() {
   // Not supported in Spartan nor IE11 or lower
   if (window.AudioContext || window.webkitAudioContext) {
     if (window.AudioContext) {
@@ -3853,6 +3884,14 @@ function attachCommands() {
     visibility: 13,
     category: 'admin',
   };
+  commands.radio = {
+    func: function radioCommand() {
+      playAudio({ path: 'http://69.4.232.118:80/live;' });
+    },
+    visibility: 0,
+    accessLevel: 0,
+    category: 'basic',
+  };
 }
 
 // Sets everything relevant when a user enters the site
@@ -3893,7 +3932,7 @@ function startBoot() {
   resetPreviousCommandPointer();
   generateMap();
   setIntervals();
-  startAudio();
+  buildMorsePlayer();
 
   // TODO: Move this
   if (!getAccessLevel()) {

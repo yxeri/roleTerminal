@@ -12,24 +12,23 @@
   <body>
     <!-- Required for Android 2.2. Browser will crash if there is only one input field -->
     <input disabled="true" id="hiddenInput" />
-    <div id="overlay"></div>
-      <div id="background">
-        <ul class="feed" id="mainFeed">
-          <!-- Required for Safari to render text -->
-          <li>
-            <pre>&nbsp;</pre>
-          </li>
-        </ul>
-        <div id="inputContainer">
-          <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" class="menuBottomPadding" value="" autocorrect="off" autocapitalize="none" />
-        </div>
-        <div id="menu">
-          <!-- List items are generated with JS -->
-          <ul id="menuList">
-          </ul>
-        </div>
-        <div id="spacer"><span>&nbsp;</span></div>
+    <div id="background">
+      <ul class="feed" id="mainFeed">
+        <!-- Required for Safari to render text -->
+        <li>
+          <pre>&nbsp;</pre>
+        </li>
+      </ul>
+      <div id="inputContainer">
+        <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" class="menuBottomPadding" value="" autocorrect="off" autocapitalize="none" />
       </div>
+      <div id="menu">
+        <!-- List items are generated with JS -->
+        <ul id="menuList">
+        </ul>
+      </div>
+      <div id="spacer"><span>&nbsp;</span></div>
+    </div>
     <script src={{socketPath}}></script>
     <script src="scripts/feed.js" charset="utf-8"></script>
 </body>

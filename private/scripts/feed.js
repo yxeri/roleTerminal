@@ -2251,15 +2251,7 @@ function keyReleased(event) {
   }
 }
 
-/*
- * Removes some visual effects for better performance on older devices
  */
-function downgradeOlderDevices() {
-  if (/iP(hone|ad|od)\sOS\s[0-7]/.test(navigator.userAgent) || oldAndroid || /Vita/.test(navigator.userAgent)) {
-    document.getElementById('overlay').className = '';
-  }
-}
-
 function isOldAndroid() {
   return /Android\s[0-3]/.test(navigator.userAgent);
 }
@@ -3870,7 +3862,6 @@ function startBoot() {
   storedMessages = getLocalVal('storedMessages') !== null ? JSON.parse(getLocalVal('storedMessages')) : {};
   fastMode = getFastMode();
 
-  downgradeOlderDevices();
   attachCommands();
   populateMenu();
   socket.emit('getCommands');

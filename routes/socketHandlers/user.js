@@ -161,7 +161,6 @@ function handle(socket, io) {
 
       if (data.firstConnection) {
         socket.emit('startup', {
-          storedMessages: require('rolehaven-config').messages,
           defaultLanguage: appConfig.defaultLanguage,
           forceFullscreen: appConfig.forceFullscreen,
           gpsTracking: appConfig.gpsTracking,

@@ -512,14 +512,6 @@ function copyString(text) {
   return '';
 }
 
-function copyMessage(textObj) {
-  if (textObj && textObj !== null) {
-    return JSON.parse(JSON.stringify(textObj));
-  }
-
-  return { text: [''] };
-}
-
 function getAliases() {
   const aliases = getLocalVal('aliases');
 
@@ -2180,18 +2172,9 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
 }
 
 /**
- *
- * @param params Contains storedMessage containing messages to be stored in localStorage
+ * Starting config values sent from server config
  */
-function onStartup(params = { storedMessages: {} }) {
-  const keys = Object.keys(params.storedMessages);
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    storedMessages[key] = params.storedMessages[key];
-  }
-
-  setLocalVal('storedMessages', JSON.stringify(storedMessages));
+function onStartup(params = { }) {
   setLocalVal('defaultLanguage', params.defaultLanguage);
   setForceFullscreen(params.forceFullscreen);
   setGpsTracking(params.gpsTracking);

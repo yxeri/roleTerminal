@@ -4,9 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier');
 const logger = require('./logger');
-const appConfig = require('rolehaven-config').app;
-const browserify = require('browserify');
-const UglifyJs = require('uglify-js');
 const sass = require('node-sass');
 
 /**
@@ -43,65 +40,6 @@ function htmlMinify(inPath, outPath) {
           }
         });
     }
-  });
-}
-
-/**
- * Minifies and compresses a Javascript file and writes it to the public directory
- * It will also transpile the files from ES6 to function on more browsers
- * @param {string} inPath Private directory path for the file
- * @param {string} outPath Public directory path for the file
- */
-function jsMinify(inPath, outPath) {
-  const transpilePath = inPath + '-transpile';
-  let file;
-
-  browserify(inPath, { debug: true }).transform('babelify', { presets: ['es2015'], compact: false }).bundle().pipe(
-    file = fs.createWriteStream(transpilePath)
-  );
-
-  file.on('finish', function() {
-    logger.sendInfoMsg(`Transpiled to ${transpilePath}`);
-
-    const stream = fs.createWriteStream(outPath);
-
-    stream.once('open', function() {
-      if (appConfig.mode !== 'dev') {
-        stream.write(UglifyJs.minify(transpilePath).code);
-        logger.sendInfoMsg(`Minified to ${outPath}`);
-      } else {
-        fs.createReadStream(transpilePath).pipe(fs.createWriteStream(outPath));
-        logger.sendInfoMsg(`Moved to ${outPath}`);
-      }
-
-      stream.end();
-
-      fs.stat(transpilePath, function(err) {
-        if (err) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.general,
-            text: ['Failed to open temp file to remove'],
-            err: err,
-          });
-
-          return;
-        }
-
-        fs.unlink(transpilePath, function(unlinkErr) {
-          if (unlinkErr) {
-            logger.sendErrorMsg({
-              code: logger.ErrorCodes.general,
-              text: ['Failed to remove temp file'],
-              err: err,
-            });
-
-            return;
-          }
-
-          logger.sendInfoMsg(`Successfully removed ${transpilePath}`);
-        });
-      });
-    });
   });
 }
 
@@ -187,8 +125,6 @@ function minifyFile(filePath, outPath) {
 
   if (extension === 'html') {
     htmlMinify(filePath, outPath);
-  } else if (extension === 'js') {
-    jsMinify(filePath, outPath);
   } else if (extension === 'scss') {
     cssMinify(filePath, outPath);
   }

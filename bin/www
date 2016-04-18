@@ -27,30 +27,6 @@ function resolvePath(dir, secondDir) {
 function minifyDirs() {
   minifier.minifyDir(resolvePath(appConfig.viewsPath), 'html');
   minifier.minifyDir(resolvePath(appConfig.stylesPath), 'scss');
-  minifier.minifyDir(resolvePath(appConfig.scriptsPath), 'js');
-}
-
-/**
- * Moves files from the private required directory to the public script directory
- * These are files which shouldn't be minified or altered but are needed for the client
- */
-function moveRequired() {
-  const pathObj = resolvePath(appConfig.requiredPath, appConfig.scriptsPath);
-
-  fs.readdir(pathObj.privatePath, function(readErr, files) {
-    if (readErr) {
-      console.log(readErr);
-
-      return;
-    }
-
-    files.forEach(function(file) {
-      const fullPrivatePath = path.join(pathObj.privatePath, file);
-      const fullPublicPath = path.join(pathObj.publicPath, file);
-
-      fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
-    });
-  });
 }
 
 /*
@@ -68,7 +44,6 @@ fs.stat(path.resolve(appConfig.publicBase), function(err) {
   }
 
   minifyDirs();
-  moveRequired();
 });
 
 // Sets server port

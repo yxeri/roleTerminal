@@ -10,7 +10,7 @@ cp ./private/required/* ./public/scripts
 # cp ./private/sounds/* ./public/sounds
 
 # Browserifies all JS to a bundle, minifies it and moves it to public
-./node_modules/browserify/bin/cmd.js ./private/scripts/* -t [ babelify --presets [ es2015 ] --compact="false" ] | ./node_modules/uglify-js/bin/uglifyjs > ./public/scripts/feed.js
+./node_modules/browserify/bin/cmd.js ./private/scripts/* -t [ babelify --presets [ es2015 ] --compact="false" ] | ./node_modules/uglify-js/bin/uglifyjs --compress --mangle -- > ./public/scripts/feed.js
 
 # Compiles and compresses sass to css and moves them to public
 for file in ./private/styles/*

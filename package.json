@@ -1,6 +1,6 @@
 {
   "name": "roleTerminal",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "description": "RoleTerminal is part of an initiative to create a platform to be used in-game during LARPs",
   "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
   "private": true,
@@ -16,7 +16,7 @@
     "url": "https://github.com/yxeri/roleTerminal/issues"
   },
   "license": "Apache-2.0",
-  "devDependencies" : {
+  "devDependencies": {
     "babel-preset-es2015": "6.1.18",
     "babelify": "7.2.0",
     "browserify": "12.0.1",

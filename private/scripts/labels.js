@@ -9,7 +9,7 @@ const exampleLine = 'Example:';
 const exampleLine_se = 'Exempel';
 const employeeNumber = Math.floor(Math.random() * 120503);
 const randomRelay = textTools.createCharString(4, true);
-let userName = ''; // eslint-disable-line prefer-const
+let defaultLanguage;
 
 const all = {
   help: {
@@ -810,7 +810,7 @@ const all = {
       'or login myname',
     ],
     welcomeLoggedIn: [
-      `Welcome, employee ${userName}`,
+      `Welcome, employee`,
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
       'You can also retrieve instructions if you use the tab button or type double space without any other input',
       'Learn this valuable skill to increase your productivity!',
@@ -888,6 +888,11 @@ const all = {
     hiddenCursorOff: ['Mouse cursor is now visible'],
     hiddenBottomMenuOn: ['Bottom menu is now hidden'],
     hiddenBottomMenuOff: ['Bottom menu is now visible'],
+    youHaveBeenBanned: [
+      'You have been banned from the system',
+      'Contact your nearest Organica IT Support Center for re-education',
+      '## or your nearest friendly Razor member. Bring a huge bribe ##',
+    ],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -898,7 +903,7 @@ const all = {
       'eller login myname',
     ],
     welcomeLoggedIn: [
-      `Välkommen, uppdragstagare ${userName}`,
+      `Välkommen, uppdragstagare`,
       'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva in två mellanslag i rad?',
       'Ni kan också trycka på tab-knappen eller skriva in tvåmellanslag i rad för att få fram instruktioner',
       'Lär dig denna värdefulla teknik för att öka din produktivitet!',
@@ -957,6 +962,41 @@ const all = {
     hiddenCursorOff: ['Muspekaren är nu synlig'],
     hiddenBottomMenuOn: ['Undermenyn är nu dold'],
     hiddenBottomMenuOff: ['Undermenyn är nu synlig'],
+    youHaveBeenBanned: [
+      'Ni har blivit bannade från systemet',
+      'Kontakta ert närmaste Organica IT-supportcenter för omskolning',
+      '## eller er närmaste vänliga Razor-medlem. Ta med en stor mängd mutor ##',
+    ],
+  },
+  weather: {
+    snow: 'Snow',
+    snowRain: 'Snow & rain',
+    rain: 'Acid rain',
+    drizzle: 'Drizzle',
+    freezeRain: 'Freezing rain',
+    freezeDrizzle: 'Freezing Drizzle',
+    light: 'Light',
+    moderate: 'Moderate',
+    high: 'High',
+  },
+  weather_se: {
+    snow: 'Snö',
+    snowRain: 'Snö & regn',
+    rain: 'Frätande regn',
+    drizzle: 'Duggregn',
+    freezeRain: 'Iskallt regn',
+    freezeDrizzle: 'Iskallt duggregn',
+    light: 'Låg',
+    moderate: 'Medel',
+    high: 'Hög',
+  },
+  broadcast: {
+    broadcast: 'broadcast',
+    broadcastFrom: 'broadcast from:',
+  },
+  broadcast_se: {
+    broadcast: 'allmänt meddelande',
+    broadcastFrom: 'allmänt meddelande från:',
   },
   logos: {
     christmas: {
@@ -1046,25 +1086,82 @@ const all = {
   },
 };
 
-function retrieveText(category, value) {
-  if (all[category]) {
-    const text = all[category][value];
-    if (text && text !== null) {
-      return JSON.parse(JSON.stringify(text));
-    }
+/**
+ * Appends a language code to property name. Example: errors_se. No appended language code is the default
+ * If no object with the property name and appended language code is found it will fall back to default
+ * @param propertyName
+ * @param sentLanguage
+ * @returns {*}
+ */
+function appendLanguage(propertyName, sentLanguage) {
+  const language = sentLanguage ? sentLanguage : defaultLanguage;
+  const languagePropertyName = language ? `${propertyName}_${language}` : propertyName;
+
+  if (all[languagePropertyName]) {
+    return languagePropertyName;
   }
 
-  return [''];
+  return propertyName;
 }
 
-function retrieveMessage(category, value) {
-  if (all[category]) {
-    return JSON.parse(JSON.stringify(all[category][value]));
+
+/**
+ * Retrieves correct property from objects in labels. Returns null if a property is not found
+ * @param sentCategory
+ * @param value
+ * @returns {*}
+ */
+function getLabel(sentCategory, value, language) {
+  const fullCategory = all[appendLanguage(sentCategory, language)];
+
+  if (fullCategory && fullCategory[value]) {
+    return JSON.parse(JSON.stringify(fullCategory[value]));
   }
 
-  return { text: [''] };
+  return null;
 }
 
-module.exports.userName = userName;
-module.exports.retrieveText = retrieveText;
-module.exports.retrieveMessage = retrieveMessage;
+/**
+ * Returns a single string
+ * @param sentCategory
+ * @param value
+ * @returns {string}
+ */
+function getString(sentCategory, value, language) {
+  const label = getLabel(sentCategory, value, language);
+
+  return label ? label : '';
+}
+
+/**
+ * Returns an array with strings. The strings are meant to be printed in order
+ * @param sentCategory
+ * @param value
+ * @returns {string[]}
+ */
+function getText(sentCategory, value, language) {
+  const label = getLabel(sentCategory, value, language);
+
+  return label ? label : [''];
+}
+
+/**
+ * Returns a message object.
+ * @param sentCategory
+ * @param value
+ * @returns {{text: string[]}}
+ */
+function getMessage(sentCategory, value, language) {
+  const label = getLabel(sentCategory, value, language);
+
+  return label ? label : { text: [''] };
+}
+
+function setLanguage(languageCode) {
+  defaultLanguage = languageCode;
+}
+
+module.exports.getText = getText;
+module.exports.getMessage = getMessage;
+module.exports.getString = getString;
+module.exports.setLanguage = setLanguage;

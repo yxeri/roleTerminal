@@ -5,40 +5,10 @@ const socketIo = require('socket.io');
 const path = require('path');
 const morgan = require('morgan');
 const compression = require('compression');
-const fs = require('fs');
-const minifier = require('./minifier');
 const appConfig = require('rolehaven-config').app;
-const logger = require('./logger');
 const dbConnector = require('./databaseConnector');
 const databasePopulation = require('rolehaven-config').databasePopulation;
 const app = express();
-
-/**
- * Watches for files changes in the private directory and adds new changes to public.
- * Used in dev mode. It should not be used in production
- * Note! fs.watch is unstable. Recursive might only work in OS X
- */
-function watchPrivate() {
-  fs.watch(appConfig.privateBase, { persistant: true, recursive: true }, function(triggeredEvent, filePath) {
-    const fullPath = path.join(appConfig.privateBase, filePath);
-
-    if ((triggeredEvent === 'rename' || triggeredEvent === 'change') && path.extname(fullPath) !== '.tmp' && fullPath.indexOf('___') < 0 && fullPath.indexOf('-transpile') < 0) {
-      fs.readFile(fullPath, function(err) {
-        if (err) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.general,
-            text: ['fs.watch error. Automatic update of changed files disabled'],
-          });
-
-          return;
-        }
-
-        minifier.minifyFile(fullPath, path.join(appConfig.publicBase, filePath));
-        logger.sendInfoMsg(`Event: ${triggeredEvent}. File: ${fullPath}`);
-      });
-    }
-  });
-}
 
 app.io = socketIo();
 
@@ -61,10 +31,6 @@ for (let i = 0; i < appConfig.routes.length; i++) {
   const route = appConfig.routes[i];
 
   app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
-}
-
-if (appConfig.watchDir === true) {
-  watchPrivate();
 }
 
 dbConnector.populateDbUsers(databasePopulation.users);

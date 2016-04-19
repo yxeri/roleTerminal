@@ -16,11 +16,11 @@ echo "Browserifying and compressing JS, compiling and compressing SASS to CSS, c
 # Compiles and compresses sass to css and moves them to public
 for file in ./private/styles/*
 do
-  ./node_modules/node-sass/bin/node-sass -o ./public/styles "$file" --output-style=compressed
+  ./node_modules/node-sass/bin/node-sass --output-style=compressed "$file" -o ./public/styles
 done
 
 # Compresses HTML files and moves them to public
 for file in ./private/views/*
 do
-  ./node_modules/html-minifier/cli.js -o ./public/views/$(basename '$file') "$file" --remove-comments --collapse-whitespace
+  ./node_modules/html-minifier/cli.js --remove-comments --collapse-whitespace "$file" -o ./public/views/$(basename "$file")
 done

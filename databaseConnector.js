@@ -12,7 +12,11 @@ const dbPath = 'mongodb://' +
 
 mongoose.connect(dbPath, function(err) {
   if (err) {
-    logger.sendErrorMsg(logger.ErrorCodes.db, 'Failed to connect to database', err);
+    logger.sendErrorMsg({
+      code: logger.ErrorCodes.db,
+      text: ['Failed to connect to database'],
+      err: err,
+    });
   } else {
     logger.sendInfoMsg('Connection established to database');
   }

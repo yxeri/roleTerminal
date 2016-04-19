@@ -124,7 +124,7 @@ const commandHelper = {
 const triggerKeysPressed = [];
 const commands = {};
 // Timeout between print of rows (milliseconds)
-const rowTimeout = 30;
+const rowTimeout = 40;
 // Class names of animations in css
 const animations = [
   'subliminal',

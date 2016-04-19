@@ -1923,6 +1923,8 @@ function onReconnectSuccess(data) {
         text_se: ['Lyckades återansluta'],
         extraClass: 'importantMsg',
       });
+    } else {
+      printStartMessage();
     }
   }
 
@@ -2171,7 +2173,6 @@ function onStartup(params = { }) {
   setDefaultLanguage(params.defaultLanguage);
   setForceFullscreen(params.forceFullscreen);
   setGpsTracking(params.gpsTracking);
-  printStartMessage();
 }
 
 // function onMissions(data = []) {

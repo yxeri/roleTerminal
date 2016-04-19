@@ -157,15 +157,15 @@ function handle(socket, io) {
       const publicRoom = databasePopulation.rooms.public.roomName;
 
       socket.join(publicRoom);
-      socket.emit('reconnectSuccess', { anonUser: true, firstConnection: data.firstConnection });
-
-      if (data.firstConnection) {
-        socket.emit('startup', {
-          defaultLanguage: appConfig.defaultLanguage,
-          forceFullscreen: appConfig.forceFullscreen,
-          gpsTracking: appConfig.gpsTracking,
-        });
-      }
+      socket.emit('reconnectSuccess', {
+        anonUser: true,
+        firstConnection: data.firstConnection,
+      });
+      socket.emit('startup', {
+        defaultLanguage: appConfig.defaultLanguage,
+        forceFullscreen: appConfig.forceFullscreen,
+        gpsTracking: appConfig.gpsTracking,
+      });
     } else {
       manager.updateUserSocketId(socket.id, data.user.userName, function(idErr, user) {
         if (idErr) {
@@ -183,6 +183,11 @@ function handle(socket, io) {
         socket.emit('reconnectSuccess', {
           firstConnection: data.firstConnection,
           user: user,
+        });
+        socket.emit('startup', {
+          defaultLanguage: appConfig.defaultLanguage,
+          forceFullscreen: appConfig.forceFullscreen,
+          gpsTracking: appConfig.gpsTracking,
         });
         manager.getHistory(allRooms, Infinity, true, user.lastOnline, function(histErr, missedMessages) {
           if (histErr) {

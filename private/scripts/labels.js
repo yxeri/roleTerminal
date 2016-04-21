@@ -810,7 +810,7 @@ const all = {
       'or login myname',
     ],
     welcomeLoggedIn: [
-      `Welcome, employee`,
+      'Welcome, employee',
       'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
       'You can also retrieve instructions if you use the tab button or type double space without any other input',
       'Learn this valuable skill to increase your productivity!',
@@ -903,7 +903,7 @@ const all = {
       'eller login myname',
     ],
     welcomeLoggedIn: [
-      `Välkommen, uppdragstagare`,
+      'Välkommen, uppdragstagare',
       'Visste ni att ni kan autoifylla kommandon genom att trycka på tab-knappen eller skriva in två mellanslag i rad?',
       'Ni kan också trycka på tab-knappen eller skriva in tvåmellanslag i rad för att få fram instruktioner',
       'Lär dig denna värdefulla teknik för att öka din produktivitet!',
@@ -1090,11 +1090,10 @@ const all = {
  * Appends a language code to property name. Example: errors_se. No appended language code is the default
  * If no object with the property name and appended language code is found it will fall back to default
  * @param propertyName
- * @param sentLanguage
+ * @param language
  * @returns {*}
  */
-function appendLanguage(propertyName, sentLanguage) {
-  const language = sentLanguage ? sentLanguage : defaultLanguage;
+function appendLanguage(propertyName, language = defaultLanguage) {
   const languagePropertyName = language ? `${propertyName}_${language}` : propertyName;
 
   if (all[languagePropertyName]) {
@@ -1130,7 +1129,7 @@ function getLabel(sentCategory, value, language) {
 function getString(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
 
-  return label ? label : '';
+  return label || '';
 }
 
 /**
@@ -1142,7 +1141,7 @@ function getString(sentCategory, value, language) {
 function getText(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
 
-  return label ? label : [''];
+  return label || [''];
 }
 
 /**
@@ -1154,7 +1153,7 @@ function getText(sentCategory, value, language) {
 function getMessage(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
 
-  return label ? label : { text: [''] };
+  return label || { text: [''] };
 }
 
 function setLanguage(languageCode) {

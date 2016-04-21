@@ -32,12 +32,12 @@ function handle(socket) {
    * Locate command. Returns location for one or more users
    * Emits locationMsg
    */
-  socket.on('locate', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+  socket.on('locate', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.locate.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.locate.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
       }
@@ -45,8 +45,8 @@ function handle(socket) {
       const locationData = {};
 
       // Return all user locations
-      if (data.user.userName === '*') {
-        dbConnector.getAllUserLocations(data.user, function(err, users) {
+      if (params.user.userName === '*') {
+        dbConnector.getAllUserLocations(params.user, (err, users) => {
           if (err || users === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
 
@@ -65,7 +65,7 @@ function handle(socket) {
           socket.emit('locationMsg', locationData);
         });
       } else {
-        dbConnector.getUserLocation(user, data.user.userName, function(err, foundUser) {
+        dbConnector.getUserLocation(user, params.user.userName, (err, foundUser) => {
           if (err || foundUser === null) {
             logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
           } else if (foundUser.position !== undefined) {
@@ -74,7 +74,7 @@ function handle(socket) {
 
             socket.emit('locationMsg', locationData);
           } else {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, 'Unable to locate ' + data.user.userName);
+            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, `Unable to locate ${params.user.userName}`);
           }
         });
       }

@@ -8,7 +8,7 @@ const appConfig = require('rolehaven-config').app;
 /*
  * Sort messages based on timestamp
  */
-const messageSort = function(a, b) {
+const messageSort = (a, b) => {
   if (a.time < b.time) {
     return -1;
   } else if (a.time > b.time) {
@@ -24,7 +24,7 @@ const messageSort = function(a, b) {
  * @param callback Function callback
  */
 function getUserById(socketId, callback) {
-  dbConnector.getUserById(socketId, function(err, user) {
+  dbConnector.getUserById(socketId, (err, user) => {
     callback(err, user);
   });
 }
@@ -35,7 +35,7 @@ function getUserById(socketId, callback) {
  * @param callback Function callback
  */
 function getCommand(commandName, callback) {
-  dbConnector.getCommand(commandName, function(err, command) {
+  dbConnector.getCommand(commandName, (err, command) => {
     callback(err, command);
   });
 }
@@ -48,11 +48,11 @@ function getCommand(commandName, callback) {
  */
 function userAllowedCommand(socketId, commandName, callback) {
   let isAllowed = false;
-  const callbackFunc = function(err, user) {
+  const callbackFunc = (err, user) => {
     if (err) {
       callback(err);
     } else {
-      getCommand(commandName, function(cmdErr, command) {
+      getCommand(commandName, (cmdErr, command) => {
         if (cmdErr) {
           callback(cmdErr);
         } else {
@@ -81,14 +81,14 @@ function userAllowedCommand(socketId, commandName, callback) {
  * @param callback Function callback
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
-  dbConnector.getHistoryFromRooms(rooms, function(err, history) {
+  dbConnector.getHistoryFromRooms(rooms, (err, history) => {
     let historyMessages = [];
 
     if (err || history === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['Failed to get history'],
-        err: err,
+        err,
       });
     } else {
       const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
@@ -122,27 +122,28 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
 
 /**
  * Creates a new chat room and adds the user who created it to it
- * @param newRoom Object of the new room
+ * @param sentRoom Object of the new room
  * @param user Object of the user
  * @param callback Function callback
  */
-function createRoom(newRoom, user, callback) {
-  newRoom.roomName = newRoom.roomName.toLowerCase();
+function createRoom(sentRoom, user, callback) {
+  const newRoom = sentRoom;
+  newRoom.roomName = sentRoom.roomName.toLowerCase();
 
-  dbConnector.createRoom(newRoom, null, function(err, room) {
+  dbConnector.createRoom(newRoom, null, (err, room) => {
     if (err || room === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to create room for user ' + user.userName],
-        err: err,
+        text: [`Failed to create room for user ${user.userName}`],
+        err,
       });
       callback(err);
     } else {
-      dbConnector.addRoomToUser(user.userName, room.roomName, function(roomErr) {
+      dbConnector.addRoomToUser(user.userName, room.roomName, (roomErr) => {
         if (roomErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
-            text: ['Failed to add user ' + user.userName + ' to its room'],
+            text: [`Failed to add user ${user.userName} to its room`],
             err: roomErr,
           });
         }
@@ -160,12 +161,12 @@ function createRoom(newRoom, user, callback) {
  * @param callback Function callback
  */
 function updateUserSocketId(socketId, userName, callback) {
-  dbConnector.updateUserSocketId(userName, socketId, function(err, user) {
+  dbConnector.updateUserSocketId(userName, socketId, (err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['Failed to update Id'],
-        err: err,
+        err,
       });
     }
 

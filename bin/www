@@ -8,7 +8,7 @@ const appConfig = require('rolehaven-config').app;
 app.set('port', appConfig.port);
 
 // Starts Express server
-const server = app.listen(app.get('port'), function() {
+const server = app.listen(app.get('port'), () => {
 });
 
 // SocketIO

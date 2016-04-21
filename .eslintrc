@@ -8,6 +8,7 @@
     // Printing info in Node
     "no-console": 0,
     // Strict is needed in Node
-    "strict": 0
+    "strict": 0,
+    "max-len": 0
   }
 }

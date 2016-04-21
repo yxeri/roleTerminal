@@ -40,7 +40,7 @@ dbConnector.populateDbCommands(databasePopulation.commands);
 /*
  * Catches all exceptions and keeps the server running
  */
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', (err) => {
   console.log('Caught exception', err);
   console.log(err.stack);
 });

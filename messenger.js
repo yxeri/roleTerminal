@@ -14,19 +14,19 @@ const objectValidator = require('./objectValidator');
  * @param callback Function callback
  */
 function addMsgToHistory(roomName, message, socket, callback) {
-  dbConnector.addMsgToHistory(roomName, message, function(err, history) {
+  dbConnector.addMsgToHistory(roomName, message, (err, history) => {
     if (err || history === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['Failed to add message to history'],
-        err: err,
+        err,
       });
       logger.sendSocketErrorMsg({
-        socket: socket,
+        socket,
         code: logger.ErrorCodes.db,
         text: ['Failed to send the message'],
         text_se: ['Misslyckades med att skicka meddelandet'],
-        err: err,
+        err,
       });
       callback(err || {});
     } else {
@@ -47,7 +47,7 @@ function sendSelfMsg(params) {
 
   const message = params.message;
 
-  params.socket.emit('message', { message: message });
+  params.socket.emit('message', { message });
 }
 
 /**
@@ -76,7 +76,7 @@ function sendSelfMsgs(params) {
 function isSocketFollowingRoom(socket, roomName) {
   if (Object.keys(socket.rooms).indexOf(roomName) === -1) {
     sendSelfMsg({
-      socket: socket,
+      socket,
       message: {
         text: [`You are not following room ${roomName}`],
         text_se: [`Ni följer inte rummet ${roomName}`],
@@ -127,7 +127,7 @@ function sendImportantMsg(params) {
   data.message.extraClass = 'importantMsg';
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
+  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
       return;
     }
@@ -165,7 +165,7 @@ function sendChatMsg(params) {
   };
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
+  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
       return;
     }
@@ -193,14 +193,14 @@ function sendWhisperMsg(params) {
   data.message.extraClass = 'whisperMsg';
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
+  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
       return;
     }
 
     const senderRoomName = data.message.userName + appConfig.whisperAppend;
 
-    addMsgToHistory(senderRoomName, data.message, socket, function(senderErr) {
+    addMsgToHistory(senderRoomName, data.message, socket, (senderErr) => {
       if (senderErr) {
         return;
       }
@@ -230,7 +230,7 @@ function sendBroadcastMsg(params) {
   data.message.roomName = databasePopulation.rooms.broadcast.roomName;
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, function(err) {
+  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
       return;
     }
@@ -273,26 +273,25 @@ function sendMorse(params) {
   const socket = params.socket;
   const silent = params.silent;
 
+  const morseObj = {
+    morseCode,
+    silent,
+  };
+
   if (!params.local) {
-    socket.broadcast.emit('morse', {
-      morseCode: morseCode,
-      silent: silent,
-    });
+    socket.broadcast.emit('morse', morseObj);
   }
 
-  socket.emit('morse', {
-    morseCode: morseCode,
-    silent: silent,
-  });
+  socket.emit('morse', morseObj);
 
   if (!silent) {
     const morseMessage = {
       text: [morseCode],
       time: new Date(),
-      roomName: roomName,
+      roomName,
     };
 
-    addMsgToHistory(roomName, morseMessage, socket, function(err) {
+    addMsgToHistory(roomName, morseMessage, socket, (err) => {
       if (err) {
         return;
       }

@@ -55,42 +55,42 @@ const dash = '-';
 const morseSeparator = '#';
 // TODO Convert to arrays with amounts pointing to either - or .
 const morseCodes = {
-  'a': '.-',
-  'b': '-...',
-  'c': '-.-.',
-  'd': '-..',
-  'e': '.',
-  'f': '..-.',
-  'g': '--.',
-  'h': '....',
-  'i': '..',
-  'j': '.---',
-  'k': '-.-',
-  'l': '.-..',
-  'm': '--',
-  'n': '-.',
-  'o': '---',
-  'p': '.--.',
-  'q': '--.-',
-  'r': '.-.',
-  's': '...',
-  't': '-',
-  'u': '..-',
-  'v': '...-',
-  'w': '.--',
-  'x': '-..-',
-  'y': '-.--',
-  'z': '--..',
-  '1': '.----',
-  '2': '..---',
-  '3': '...--',
-  '4': '....-',
-  '5': '.....',
-  '6': '-....',
-  '7': '--...',
-  '8': '---..',
-  '9': '----.',
-  '0': '-----',
+  a: '.-',
+  b: '-...',
+  c: '-.-.',
+  d: '-..',
+  e: '.',
+  f: '..-.',
+  g: '--.',
+  h: '....',
+  i: '..',
+  j: '.---',
+  k: '-.-',
+  l: '.-..',
+  m: '--',
+  n: '-.',
+  o: '---',
+  p: '.--.',
+  q: '--.-',
+  r: '.-.',
+  s: '...',
+  t: '-',
+  u: '..-',
+  v: '...-',
+  w: '.--',
+  x: '-..-',
+  y: '-.--',
+  z: '--..',
+  1: '.----',
+  2: '..---',
+  3: '...--',
+  4: '....-',
+  5: '.....',
+  6: '-....',
+  7: '--...',
+  8: '---..',
+  9: '----.',
+  0: '-----',
   // Symbolizes space betwen words
   '#': morseSeparator,
 };
@@ -220,7 +220,7 @@ function replaceLastInputPhrase(text) {
 }
 
 function beautifyNumb(number) {
-  return number > 9 ? number : '0' + number;
+  return number > 9 ? number : `0${number}`;
 }
 
 function generateSpan(params = { text: '' }) {
@@ -234,8 +234,7 @@ function generateSpan(params = { text: '' }) {
   // TODO Refactor this and generateLink()
   if (linkable) {
     spanObj.classList.add('link');
-
-    spanObj.addEventListener('click', function spanClick(event) {
+    spanObj.addEventListener('click', (event) => {
       clicked = true;
 
 
@@ -251,7 +250,6 @@ function generateSpan(params = { text: '' }) {
       event.stopPropagation();
     });
   }
-
   spanObj.appendChild(document.createTextNode(text));
 
   if (className) {
@@ -264,8 +262,8 @@ function generateSpan(params = { text: '' }) {
 // TODO Refactor this and if case for linkable in generateSpan()
 function generateLink(text, className, func) {
   const spanObj = generateSpan({
-    text: text,
-    className: className,
+    text,
+    className,
   });
   spanObj.classList.add('link');
 
@@ -293,17 +291,17 @@ function generateTimeStamp(date, full, year) {
 
   const mins = beautifyNumb(newDate.getMinutes());
   const hours = beautifyNumb(newDate.getHours());
-  timeStamp = hours + ':' + mins;
+  timeStamp = `${hours}:${mins}`;
 
   if (full) {
     const month = beautifyNumb(newDate.getMonth());
     const day = beautifyNumb(newDate.getDate());
-    timeStamp = day + '/' + month + ' ' + timeStamp;
+    timeStamp = `${day}/${month} ${timeStamp}`;
   }
 
   if (year) {
     const fullYear = newDate.getFullYear();
-    timeStamp = fullYear + ' ' + timeStamp;
+    timeStamp = `${fullYear} ${timeStamp}`;
   }
 
   return timeStamp;
@@ -381,7 +379,7 @@ function createRow(message, subText) {
 
 function addText(text, row, message) {
   row.appendChild(generateSpan({
-    text: text,
+    text,
     linkable: message.linkable,
     keepInput: message.keepInput,
     replacePhrase: message.replacePhrase,
@@ -682,9 +680,9 @@ function refreshApp() {
 
 function queueCommand(command, data, commandMsg) {
   commandQueue.push({
-    command: command,
-    data: data,
-    commandMsg: commandMsg,
+    command,
+    data,
+    commandMsg,
   });
 }
 
@@ -810,7 +808,7 @@ function parseMorse(text) {
     morseCode = morseCodes[filteredText.charAt(i)];
 
     for (let j = 0; j < morseCode.length; j++) {
-      morseCodeText += morseCode[j] + ' ';
+      morseCodeText += `${morseCode[j]} `;
     }
 
     morseCodeText += '   ';
@@ -872,7 +870,7 @@ function locateOnMap(latitude, longitude) {
   }
 
   if (x !== undefined && y !== undefined) {
-    return x + '' + y;
+    return `${x}${y}`;
   }
 
   return textTools.createLine(3);
@@ -906,12 +904,12 @@ function sendLocation() {
       trackingInterval = setTimeout(sendLocation, pausePositionTime);
     };
 
-    watchId = navigator.geolocation.watchPosition(function watchPosition() {
+    watchId = navigator.geolocation.watchPosition(() => {
       // FIXME This is broken and doesn't do anything
       // if (position !== undefined) {
       //  positions.push(position);
       // }
-    }, function watchPositionCallback(err) {
+    }, (err) => {
       if (err.code === err.PERMISSION_DENIED) {
         isTracking = false;
         clearTimeout(trackingInterval);
@@ -1119,6 +1117,8 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
       return commandChars.indexOf(sign) >= 0 ? sign + partialMatch + expanded : partialMatch + expanded;
     }
   }
+
+  return '';
 }
 
 function autoCompleteCommand() {
@@ -1233,7 +1233,7 @@ function retrieveCommand(command) {
 
   return {
     command: getCommand(commandName),
-    commandName: commandName,
+    commandName,
   };
 }
 
@@ -1380,154 +1380,171 @@ function specialKeyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-    // Backspace
-    case 8:
-      if (getInputText().length <= 1) {
-        clearModeText();
-      } else {
-        changeModeText();
+      // Backspace
+      case 8: {
+        if (getInputText().length <= 1) {
+          clearModeText();
+        } else {
+          changeModeText();
+        }
+
+        break;
       }
+      // Tab
+      case 9: {
+        const phrases = getInputText().split(' ');
 
-      break;
+        keyPressed = true;
 
-    // Tab
-    case 9:
-      const phrases = getInputText().split(' ');
+        if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
+          autoCompleteCommand();
+          changeModeText();
+        } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
+          const command = commands[commandHelper.command] || retrieveCommand(phrases[0]).command;
+          const partial = commandHelper.command ? phrases[0] : phrases[1];
 
-      keyPressed = true;
+          if (command && command.autocomplete) {
+            switch (command.autocomplete.type) {
+              case 'users': {
+                socket.emit('matchPartialUser', { partialName: partial });
 
-      if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
-        autoCompleteCommand();
-        changeModeText();
-      } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
-        const command = commands[commandHelper.command] || retrieveCommand(phrases[0]).command;
-        const partial = commandHelper.command ? phrases[0] : phrases[1];
+                break;
+              }
+              case 'rooms': {
+                socket.emit('matchPartialRoom', { partialName: partial });
 
-        if (command && command.autocomplete) {
-          switch (command.autocomplete.type) {
-          case 'users':
-            socket.emit('matchPartialUser', { partialName: partial });
+                break;
+              }
+              case 'myRooms': {
+                socket.emit('matchPartialMyRoom', { partialName: partial });
 
-            break;
-          case 'rooms':
-            socket.emit('matchPartialRoom', { partialName: partial });
-
-            break;
-          case 'myRooms':
-            socket.emit('matchPartialMyRoom', { partialName: partial });
-
-            break;
-          default:
-            break;
+                break;
+              }
+              default: {
+                break;
+              }
+            }
           }
         }
+
+        event.preventDefault();
+
+        break;
       }
+      // Enter
+      case 13: {
+        enterKeyHandler();
 
-      event.preventDefault();
+        event.preventDefault();
 
-      break;
-    // Enter
-    case 13:
-      enterKeyHandler();
-
-      event.preventDefault();
-
-      break;
-    // Ctrl
-    case 17:
-      triggerKeysPressed.ctrl = true;
-
-      break;
-    // Alt
-    case 18:
-      triggerKeysPressed.alt = true;
-
-      break;
-    // Left Command key in OS X
-    case 91:
-      triggerKeysPressed.ctrl = true;
-
-      break;
-    // Right Command key in OS X
-    case 93:
-      triggerKeysPressed.ctrl = true;
-
-      break;
-    // Command key in OS X (Firefox)
-    case 224:
-      triggerKeysPressed.ctrl = true;
-
-      break;
-    // Delete
-    case 46:
-      if (getInputText().length === 0) {
-        clearModeText();
-      } else {
-        changeModeText();
+        break;
       }
+      // Ctrl
+      case 17: {
+        triggerKeysPressed.ctrl = true;
 
-      event.preventDefault();
+        break;
+      }
+      // Alt
+      case 18: {
+        triggerKeysPressed.alt = true;
 
-      break;
-    // Page up
-    case 33:
-      window.scrollBy(0, -window.innerHeight);
+        break;
+      }
+      // Left Command key in OS X
+      case 91: {
+        triggerKeysPressed.ctrl = true;
 
-      event.preventDefault();
+        break;
+      }
+      // Right Command key in OS X
+      case 93: {
+        triggerKeysPressed.ctrl = true;
 
-      break;
-    // Page down
-    case 34:
-      window.scrollBy(0, window.innerHeight);
+        break;
+      }
+      // Command key in OS X (Firefox)
+      case 224: {
+        triggerKeysPressed.ctrl = true;
 
-      event.preventDefault();
+        break;
+      }
+      // Delete
+      case 46: {
+        if (getInputText().length === 0) {
+          clearModeText();
+        } else {
+          changeModeText();
+        }
 
-      break;
-    // Up arrow
-    case 38:
-      keyPressed = true;
+        event.preventDefault();
 
-      if (triggerKeysPressed.ctrl) {
+        break;
+      }
+      // Page up
+      case 33: {
         window.scrollBy(0, -window.innerHeight);
-      } else {
-        if (!commandHelper.keysBlocked && commandHelper.command === null) {
-          if (previousCommandPointer > 0) {
-            clearInput();
-            previousCommandPointer--;
-            setCommandInput(commandHistory[previousCommandPointer]);
-          }
-        }
+
+        event.preventDefault();
+
+        break;
       }
-
-      event.preventDefault();
-
-      break;
-    // Down arrow
-    case 40:
-      keyPressed = true;
-
-      if (triggerKeysPressed.ctrl) {
+      // Page down
+      case 34: {
         window.scrollBy(0, window.innerHeight);
-      } else {
-        if (!commandHelper.keysBlocked && commandHelper.command === null) {
-          if (previousCommandPointer < commandHistory.length - 1) {
-            clearInput();
-            previousCommandPointer++;
-            setCommandInput(commandHistory[previousCommandPointer]);
-          } else if (previousCommandPointer === commandHistory.length - 1) {
-            clearInput();
-            previousCommandPointer++;
-          } else {
-            clearInput();
+
+        event.preventDefault();
+
+        break;
+      }
+      // Up arrow
+      case 38: {
+        keyPressed = true;
+
+        if (triggerKeysPressed.ctrl) {
+          window.scrollBy(0, -window.innerHeight);
+        } else {
+          if (!commandHelper.keysBlocked && commandHelper.command === null) {
+            if (previousCommandPointer > 0) {
+              clearInput();
+              previousCommandPointer--;
+              setCommandInput(commandHistory[previousCommandPointer]);
+            }
           }
         }
+
+        event.preventDefault();
+
+        break;
       }
+      // Down arrow
+      case 40: {
+        keyPressed = true;
 
-      event.preventDefault();
+        if (triggerKeysPressed.ctrl) {
+          window.scrollBy(0, window.innerHeight);
+        } else {
+          if (!commandHelper.keysBlocked && commandHelper.command === null) {
+            if (previousCommandPointer < commandHistory.length - 1) {
+              clearInput();
+              previousCommandPointer++;
+              setCommandInput(commandHistory[previousCommandPointer]);
+            } else if (previousCommandPointer === commandHistory.length - 1) {
+              clearInput();
+              previousCommandPointer++;
+            } else {
+              clearInput();
+            }
+          }
+        }
 
-      break;
-    default:
-      break;
+        event.preventDefault();
+
+        break;
+      }
+      default: {
+        break;
+      }
     }
   } else {
     event.preventDefault();
@@ -1552,27 +1569,29 @@ function keyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-    case 102:
-      if (triggerKeysPressed.ctrl) {
-        goFullScreen(document.documentElement);
-        fullscreenResize(false);
-        event.preventDefault();
-      } else {
-        defaultKeyPress(textChar, event);
+      case 102: {
+        if (triggerKeysPressed.ctrl) {
+          goFullScreen(document.documentElement);
+          fullscreenResize(false);
+          event.preventDefault();
+        } else {
+          defaultKeyPress(textChar, event);
+        }
+
+        break;
       }
+      default: {
+        defaultKeyPress(textChar, event);
 
-      break;
-    default:
-      defaultKeyPress(textChar, event);
-
-      break;
+        break;
+      }
     }
   }
 }
 
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
-    menuItem.addEventListener('click', function menuListener(event) {
+    menuItem.addEventListener('click', (event) => {
       func([funcParam]);
       clicked = true;
       cmdInput.focus();
@@ -1634,7 +1653,7 @@ function populateMenu() {
 function createCommandStart(commandName) {
   return [
     textTools.createFullLine(),
-    ' ' + commandName.toUpperCase(),
+    ` ${commandName.toUpperCase()}`,
     textTools.createFullLine(),
   ];
 }
@@ -1669,7 +1688,7 @@ function printStartMessage() {
 }
 
 function attachFullscreenListener() {
-  background.addEventListener('click', function clickHandler(event) {
+  background.addEventListener('click', (event) => {
     clicked = !clicked;
 
     if (clicked) {
@@ -1698,16 +1717,17 @@ function resetAllLocalVals() {
 }
 
 function hideMessageProperties(message = { }) {
+  const modifiedMessage = message;
   const roomName = message.roomName;
 
   // TODO Change blank user and room to booleans instead of string removal
   if (message.extraClass === 'importantMsg') {
-    message.roomName = '';
-    message.userName = '';
-    message.skipTime = true;
+    modifiedMessage.roomName = '';
+    modifiedMessage.userName = '';
+    modifiedMessage.skipTime = true;
   } else if (message.extraClass === 'broadcastMsg') {
-    message.roomName = '';
-    message.userName = '';
+    modifiedMessage.roomName = '';
+    modifiedMessage.userName = '';
   }
 
   if (roomName && roomName !== null) {
@@ -1715,18 +1735,18 @@ function hideMessageProperties(message = { }) {
 
     if (whisperIndex >= 0) {
       if (message.userName === getUser()) {
-        message.roomName = roomName.substring(0, whisperIndex);
+        modifiedMessage.roomName = roomName.substring(0, whisperIndex);
       } else {
-        message.roomName = 'whisper';
+        modifiedMessage.roomName = 'whisper';
       }
     } else if (roomName.indexOf('-device') >= 0) {
-      message.roomName = 'device';
+      modifiedMessage.roomName = 'device';
     } else if (roomName.indexOf('team') >= 0) {
-      message.roomName = 'team';
+      modifiedMessage.roomName = 'team';
     }
   }
 
-  return message;
+  return modifiedMessage;
 }
 
 function prependBroadcastMessage(data = {}) {
@@ -1742,12 +1762,14 @@ function prependBroadcastMessage(data = {}) {
 }
 
 function addMessageSpecialProperties(message = {}) {
+  const modifiedMessage = message;
+
   if (message.extraClass === 'broadcastMsg') {
-    message.text = prependBroadcastMessage({ sender: message.customSender }).concat(message.text);
-    message.text.push(textTools.createFullLine());
+    modifiedMessage.text = prependBroadcastMessage({ sender: message.customSender }).concat(message.text);
+    modifiedMessage.text.push(textTools.createFullLine());
   }
 
-  return message;
+  return modifiedMessage;
 }
 
 function onMessage(data = { message: {} }) {
@@ -2039,71 +2061,83 @@ function onWeather(report) {
     const month = beautifyNumb(time.getMonth() + 1);
     const temperature = Math.round(weatherInstance.temperature);
     const windSpeed = Math.round(weatherInstance.gust);
-    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : weatherInstance.precipitation + 'mm ';
+    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : `${weatherInstance.precipitation}mm `;
     let coverage;
     let precipType;
     weatherString = '';
 
     switch (weatherInstance.precipType) {
-    // None
-    case 0:
-      break;
-    // Snow
-    case 1:
-      precipType = labels.getString('weather', 'snow');
+      // None
+      case 0: {
+        break;
+      }
+      // Snow
+      case 1: {
+        precipType = labels.getString('weather', 'snow');
 
-      break;
-    // Snow + rain
-    case 2:
-      precipType = labels.getString('weather', 'snowRain');
+        break;
+      }
+      // Snow + rain
+      case 2: {
+        precipType = labels.getString('weather', 'snowRain');
 
-      break;
-    // Rain
-    case 3:
-      precipType = labels.getString('weather', 'rain');
+        break;
+      }
+      // Rain
+      case 3: {
+        precipType = labels.getString('weather', 'rain');
 
-      break;
-    // Drizzle
-    case 4:
-      precipType = labels.getString('weather', 'drizzle');
+        break;
+      }
+      // Drizzle
+      case 4: {
+        precipType = labels.getString('weather', 'drizzle');
 
-      break;
-    // Freezing rain
-    case 5:
-      precipType = labels.getString('weather', 'freezeRain');
+        break;
+      }
+      // Freezing rain
+      case 5: {
+        precipType = labels.getString('weather', 'freezeRain');
 
-      break;
-    // Freezing drizzle
-    case 6:
-      precipType = labels.getString('weather', 'freezeDrizzle');
+        break;
+      }
+      // Freezing drizzle
+      case 6: {
+        precipType = labels.getString('weather', 'freezeDrizzle');
 
-      break;
-    default:
-      break;
+        break;
+      }
+      default: {
+        break;
+      }
     }
 
     switch (weatherInstance.cloud) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-      coverage = labels.getString('weather', 'light');
+      case 0:
+      case 1:
+      case 2:
+      case 3: {
+        coverage = labels.getString('weather', 'light');
 
-      break;
-    case 4:
-    case 5:
-    case 6:
-      coverage = labels.getString('weather', 'moderate');
+        break;
+      }
+      case 4:
+      case 5:
+      case 6: {
+        coverage = labels.getString('weather', 'moderate');
 
-      break;
-    case 7:
-    case 8:
-    case 9:
-      coverage = labels.getString('weather', 'high');
+        break;
+      }
+      case 7:
+      case 8:
+      case 9: {
+        coverage = labels.getString('weather', 'high');
 
-      break;
-    default:
-      break;
+        break;
+      }
+      default: {
+        break;
+      }
     }
 
     weatherString += `${day}/${month} ${hours}:00${'\t'}`;
@@ -2139,7 +2173,7 @@ function onWhoami(data) {
     createCommandEnd('whoami'),
   ]);
 
-  queueMessage({ text: text });
+  queueMessage({ text });
 }
 
 function onList(data = { itemList: [] }) {
@@ -2219,20 +2253,23 @@ function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
   switch (keyCode) {
-  // Ctrl
-  case 17:
-    triggerKeysPressed.ctrl = false;
+    // Ctrl
+    case 17: {
+      triggerKeysPressed.ctrl = false;
 
-    break;
-  // Alt
-  case 18:
-    triggerKeysPressed.alt = false;
+      break;
+    }
+    // Alt
+    case 18: {
+      triggerKeysPressed.alt = false;
 
-    break;
-  default:
-    keyPressed = false;
+      break;
+    }
+    default: {
+      keyPressed = false;
 
-    break;
+      break;
+    }
   }
 }
 
@@ -2398,7 +2435,7 @@ function attachCommands() {
           roomName: phrases[0].toLowerCase(),
         };
 
-        commandHelper.data = { room: room };
+        commandHelper.data = { room };
         commandHelper.hideInput = true;
         hideInput(true);
 
@@ -2439,7 +2476,7 @@ function attachCommands() {
           room.exited = true;
         }
 
-        socket.emit('unfollow', { room: room });
+        socket.emit('unfollow', { room });
       } else {
         queueMessage({
           text: ['You have to specify which room to unfollow'],
@@ -2567,7 +2604,7 @@ function attachCommands() {
 
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
           data.user = {
-            userName: userName,
+            userName,
             registerDevice: getDeviceId(),
           };
           commandHelper.data = data;
@@ -2848,7 +2885,7 @@ function attachCommands() {
       } else if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
-        socket.emit('locate', { user: { userName: userName } });
+        socket.emit('locate', { user: { userName } });
       } else {
         socket.emit('locate', { user: { userName: getUser() } });
       }
@@ -2884,7 +2921,7 @@ function attachCommands() {
     func: function morseCommand(phrases, local) {
       if (phrases && phrases.length > 0) {
         const data = {
-          local: local,
+          local,
         };
         const morsePhrases = phrases;
 
@@ -2992,7 +3029,7 @@ function attachCommands() {
         if (userName === '*') {
           socket.emit('verifyAllUsers');
         } else {
-          const data = { user: { userName: userName } };
+          const data = { user: { userName } };
 
           socket.emit('verifyUser', data);
         }
@@ -3011,7 +3048,7 @@ function attachCommands() {
         if (teamName === '*') {
           socket.emit('verifyAllTeams');
         } else {
-          const data = { team: { teamName: teamName } };
+          const data = { team: { teamName } };
 
           socket.emit('verifyTeam', data);
         }
@@ -3026,7 +3063,7 @@ function attachCommands() {
     func: function banuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
-        const data = { user: { userName: userName } };
+        const data = { user: { userName } };
 
         socket.emit('ban', data);
       } else {
@@ -3040,7 +3077,7 @@ function attachCommands() {
     func: function unbanuserCommand(phrases) {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
-        const data = { user: { userName: userName } };
+        const data = { user: { userName } };
 
         socket.emit('unban', data);
       } else {
@@ -3132,7 +3169,7 @@ function attachCommands() {
             message: {
               text: [
                 'WARNING! Intrustion attempt detected!',
-                'User ' + getUser() + ' tried breaking in',
+                `User ${getUser()} tried breaking in`,
               ],
               user: 'SYSTEM',
             },
@@ -3256,7 +3293,7 @@ function attachCommands() {
           const deviceId = phrases[0];
 
           if (deviceId.length > 0) {
-            commandHelper.data.device = { deviceId: deviceId };
+            commandHelper.data.device = { deviceId };
             queueMessage({
               text: ['Searching for device...'],
               text_se: ['Letar efter enheten...'],
@@ -3665,7 +3702,7 @@ function attachCommands() {
             const invitation = sentInvitations[i];
             const itemNumber = i + 1;
 
-            text.push('<' + itemNumber + '> Join ' + invitation.invitationType + ' ' + invitation.itemName + '. Sent by ' + invitation.sender);
+            text.push(`<${itemNumber}> Join ${invitation.invitationType} ${invitation.itemName}. Sent by ${invitation.sender}`);
           }
 
           queueMessage({ text: createCommandStart('Invitations').concat(text, createCommandEnd()) });
@@ -3691,20 +3728,23 @@ function attachCommands() {
           const invitation = commandHelper.data.invitations[itemNumber];
 
           if (['accept', 'a', 'decline', 'd'].indexOf(answer) > -1) {
-            const accepted = ['accept', 'a'].indexOf(answer) > -1 ? true : false;
-            const data = { accepted: accepted, invitation: invitation };
+            const accepted = ['accept', 'a'].indexOf(answer) > -1;
+            const data = { accepted, invitation };
 
             switch (invitation.invitationType) {
-            case 'team':
-              socket.emit('teamAnswer', data);
+              case 'team': {
+                socket.emit('teamAnswer', data);
 
-              break;
-            case 'room':
-              socket.emit('roomAnswer', data);
+                break;
+              }
+              case 'room': {
+                socket.emit('roomAnswer', data);
 
-              break;
-            default:
-              break;
+                break;
+              }
+              default: {
+                break;
+              }
             }
 
             resetCommand(false);
@@ -3792,43 +3832,47 @@ function attachCommands() {
     func: function settingsCommand(phrases = []) {
       if (phrases.length > 1) {
         const setting = phrases[0];
-        const value = phrases[1] === 'on' || value === true ? true : false;
+        const value = phrases[1] === 'on';
 
         switch (setting) {
-        case 'fastmode':
-          setFastMode(fastMode);
+          case 'fastmode': {
+            setFastMode(fastMode);
 
-          if (value) {
-            queueMessage({ text: labels.getText('info', 'fastModeOn') });
-          } else {
-            queueMessage({ text: labels.getText('info', 'fastModeOff') });
+            if (value) {
+              queueMessage({ text: labels.getText('info', 'fastModeOn') });
+            } else {
+              queueMessage({ text: labels.getText('info', 'fastModeOff') });
+            }
+
+            break;
           }
+          case 'hiddencursor': {
+            setHiddenCursor(value);
 
-          break;
-        case 'hiddencursor':
-          setHiddenCursor(value);
+            if (value) {
+              queueMessage({ text: labels.getText('info', 'hiddenCursorOn') });
+            } else {
+              queueMessage({ text: labels.getText('info', 'hiddenCursorOff') });
+            }
 
-          if (value) {
-            queueMessage({ text: labels.getText('info', 'hiddenCursorOn') });
-          } else {
-            queueMessage({ text: labels.getText('info', 'hiddenCursorOff') });
+            break;
           }
+          case 'hiddenbottommenu': {
+            setHiddenBottomMenu(value);
 
-          break;
-        case 'hiddenbottommenu':
-          setHiddenBottomMenu(value);
+            if (value) {
+              queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOn') });
+            } else {
+              queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOff') });
+            }
 
-          if (value) {
-            queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOn') });
-          } else {
-            queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOff') });
+            break;
           }
+          default: {
+            queueMessage({ text: labels.getText('errors', 'invalidSetting') });
 
-          break;
-        default:
-          queueMessage({ text: labels.getText('errors', 'invalidSetting') });
-
-          break;
+            break;
+          }
         }
       } else {
         queueMessage({ text: labels.retrieveMesssage('errors', 'settingUsage') });

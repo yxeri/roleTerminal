@@ -135,6 +135,7 @@ const animations = [
 let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
 let fastMode = false;
+let disableCommands = false;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -595,6 +596,15 @@ function setGpsTracking(gpsTracking) {
 
 function getGpsTracking() {
   return getLocalVal('gpsTracking') === 'true';
+}
+
+function setDisableCommands(disable) {
+  disableCommands = disable;
+  setLocalVal('disableCommands', disable);
+}
+
+function getDisableCommands() {
+  return getLocalVal('disableCommands') === 'true';
 }
 
 function getUser() {
@@ -1310,7 +1320,7 @@ function enterKeyHandler() {
       if (phrases[0].length > 0) {
         const command = retrieveCommand(phrases[0]);
 
-        if (command.command && (isNaN(command.command.accessLevel) || getAccessLevel() >= command.command.accessLevel)) {
+        if (!disableCommands && (command.command && (isNaN(command.command.accessLevel) || getAccessLevel() >= command.command.accessLevel))) {
           // Store the command for usage with up/down arrows
           pushCommandHistory(phrases.join(' '));
 
@@ -2207,6 +2217,7 @@ function onStartup(params = { }) {
   setDefaultLanguage(params.defaultLanguage);
   setForceFullscreen(params.forceFullscreen);
   setGpsTracking(params.gpsTracking);
+  setDisableCommands(params.disableCommands);
 }
 
 // function onMissions(data = []) {
@@ -3896,6 +3907,7 @@ function attachCommands() {
 function startBoot() {
   oldAndroid = isOldAndroid();
   fastMode = getFastMode();
+  disableCommands = getDisableCommands();
 
   attachCommands();
   populateMenu();

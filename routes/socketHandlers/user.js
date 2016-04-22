@@ -165,6 +165,7 @@ function handle(socket, io) {
         defaultLanguage: appConfig.defaultLanguage,
         forceFullscreen: appConfig.forceFullscreen,
         gpsTracking: appConfig.gpsTracking,
+        disableCommands: appConfig.disableCommands,
       });
     } else {
       manager.updateUserSocketId(socket.id, params.user.userName, (idErr, user) => {

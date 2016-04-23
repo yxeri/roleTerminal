@@ -153,6 +153,15 @@ function handle(socket, io) {
       return;
     }
 
+    const config = {
+      defaultLanguage: appConfig.defaultLanguage,
+      forceFullscreen: appConfig.forceFullscreen,
+      gpsTracking: appConfig.gpsTracking,
+      disableCommands: appConfig.disableCommands,
+      hideRoomNames: appConfig.hideRoomNames,
+      hideTimeStamp: appConfig.hideTimeStamp,
+    };
+
     if (params.user.userName === null) {
       const publicRoom = databasePopulation.rooms.public.roomName;
 
@@ -161,12 +170,7 @@ function handle(socket, io) {
         anonUser: true,
         firstConnection: params.firstConnection,
       });
-      socket.emit('startup', {
-        defaultLanguage: appConfig.defaultLanguage,
-        forceFullscreen: appConfig.forceFullscreen,
-        gpsTracking: appConfig.gpsTracking,
-        disableCommands: appConfig.disableCommands,
-      });
+      socket.emit('startup', config);
     } else {
       manager.updateUserSocketId(socket.id, params.user.userName, (idErr, user) => {
         if (idErr) {
@@ -185,11 +189,7 @@ function handle(socket, io) {
           firstConnection: params.firstConnection,
           user,
         });
-        socket.emit('startup', {
-          defaultLanguage: appConfig.defaultLanguage,
-          forceFullscreen: appConfig.forceFullscreen,
-          gpsTracking: appConfig.gpsTracking,
-        });
+        socket.emit('startup', config);
         manager.getHistory(allRooms, Infinity, true, user.lastOnline, (histErr, missedMessages) => {
           if (histErr) {
             return;

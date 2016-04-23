@@ -136,6 +136,8 @@ let animationPosition = 0;
 // Will skip some flavour text and make print out happen faster, if true
 let fastMode = false;
 let disableCommands = false;
+let hideRoomNames = false;
+let hideTimeStamp = false;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -353,14 +355,14 @@ function createRow(message, subText) {
     }
   }
 
-  if (message.time && !message.skipTime) {
+  if (!hideTimeStamp && message.time && !message.skipTime) {
     rowObj.appendChild(generateSpan({
       text: generateTimeStamp(message.time),
       extraClass: 'timestamp',
     }));
   }
 
-  if (roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
+  if (!hideRoomNames && roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
     if (noLinkRooms.indexOf(roomName.toLowerCase()) > -1) {
       rowObj.appendChild(generateSpan({
         text: roomName,
@@ -605,6 +607,24 @@ function setDisableCommands(disable) {
 
 function getDisableCommands() {
   return getLocalVal('disableCommands') === 'true';
+}
+
+function setHideRoomNames(hide) {
+  hideRoomNames = hide;
+  setLocalVal('hideRoomNames', hide);
+}
+
+function getHideRoomNames() {
+  return getLocalVal('hideRoomNames') === 'true';
+}
+
+function setHideTimeStamp(hide) {
+  hideTimeStamp = hide;
+  setLocalVal('hideTimeStamp', hide);
+}
+
+function getHideTimeStamp() {
+  return getLocalVal('hideTimeStamp') === 'true';
 }
 
 function getUser() {
@@ -2218,6 +2238,8 @@ function onStartup(params = { }) {
   setForceFullscreen(params.forceFullscreen);
   setGpsTracking(params.gpsTracking);
   setDisableCommands(params.disableCommands);
+  setHideRoomNames(params.hideRoomNames);
+  setHideTimeStamp(params.hideTimeStamp);
 }
 
 // function onMissions(data = []) {
@@ -3908,6 +3930,8 @@ function startBoot() {
   oldAndroid = isOldAndroid();
   fastMode = getFastMode();
   disableCommands = getDisableCommands();
+  hideRoomNames = getHideRoomNames();
+  hideTimeStamp = getHideTimeStamp();
 
   attachCommands();
   populateMenu();

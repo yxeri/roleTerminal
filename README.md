@@ -1,4 +1,5 @@
 # roleTerminal
+![Build status](https://api.travis-ci.org/yxeri/roleTerminal.svg)
 
 roleTerminal is an initiative to create a platform to be used in-game during LARPs. It has so far been used on two post-apocalyptic LARP events, 
 [Blodsband reloaded](http://bbreloaded.se) and [Rex](http://www.rexlajv.se), and will be used at [Ockulta Medborgarbyrån](http://www.ockultamedborgarbyran.com).

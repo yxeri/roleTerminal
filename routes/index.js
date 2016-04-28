@@ -4,17 +4,17 @@ const express = require('express');
 const router = new express.Router();
 const chatHandler = require('./socketHandlers/chat');
 const userHandler = require('./socketHandlers/user');
-const dbConnector = require('../databaseConnector');
+const dbConnector = require('../dbConnectors/databaseConnector');
 const commandHandler = require('./socketHandlers/command');
 const teamHandler = require('./socketHandlers/team');
 const hackingHandler = require('./socketHandlers/hacking');
 const utilityHandler = require('./socketHandlers/utility');
 const locationHandler = require('./socketHandlers/location');
-const manager = require('../manager');
-const appConfig = require('rolehaven-config').app;
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const logger = require('../logger');
-const messenger = require('../messenger');
+const manager = require('../socketHelpers/manager');
+const appConfig = require('../config/defaults/config').app;
+const databasePopulation = require('../config/defaults/config').databasePopulation;
+const logger = require('../utils/logger');
+const messenger = require('../socketHelpers/messenger');
 const deviceHandler = require('./socketHandlers/device');
 
 function handle(io) {

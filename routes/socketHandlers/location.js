@@ -1,10 +1,10 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
-const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const logger = require('../../logger');
-const objectValidator = require('../../objectValidator');
+const dbConnector = require('../../dbConnectors/databaseConnector');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const logger = require('../../utils/logger');
+const objectValidator = require('../../utils/objectValidator');
 
 /**
  * Prepares a position

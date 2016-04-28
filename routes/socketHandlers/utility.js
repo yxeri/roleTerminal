@@ -1,9 +1,9 @@
 'use strict';
 
-const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const appConfig = require('rolehaven-config').app;
-const logger = require('../../logger');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const appConfig = require('../../config/defaults/config').app;
+const logger = require('../../utils/logger');
 const http = require('http');
 
 /**

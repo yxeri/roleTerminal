@@ -1,12 +1,12 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
-const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const appConfig = require('rolehaven-config').app;
-const logger = require('../../logger');
-const messenger = require('../../messenger');
-const objectValidator = require('../../objectValidator');
+const dbConnector = require('../../dbConnectors/databaseConnector');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const appConfig = require('../../config/defaults/config').app;
+const logger = require('../../utils/logger');
+const messenger = require('../../socketHelpers/messenger');
+const objectValidator = require('../../utils/objectValidator');
 
 function followRoom(params) {
   const socket = params.socket;

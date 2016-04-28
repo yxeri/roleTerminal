@@ -1,9 +1,9 @@
 'use strict';
 
-const manager = require('../../manager');
+const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const appConfig = require('../../config/defaults/config').app;
-const logger = require('../../logger');
+const logger = require('../../utils/logger');
 const http = require('http');
 
 /**

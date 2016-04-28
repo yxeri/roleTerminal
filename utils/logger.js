@@ -1,6 +1,6 @@
 'use strict';
 
-const messenger = require('./messenger');
+const messenger = require('./../socketHelpers/messenger');
 const languagePicker = require('./languagePicker');
 const objectValidator = require('./objectValidator');
 

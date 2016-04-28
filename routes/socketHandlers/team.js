@@ -1,11 +1,11 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
+const dbConnector = require('../../dbConnectors/databaseConnector');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
-const manager = require('../../manager');
-const logger = require('../../logger');
-const objectValidator = require('../../objectValidator');
-const messenger = require('../../messenger');
+const manager = require('../../socketHelpers/manager');
+const logger = require('../../utils/logger');
+const objectValidator = require('../../utils/objectValidator');
+const messenger = require('../../socketHelpers/messenger');
 const appConfig = require('../../config/defaults/config').app;
 
 function updateUserTeam(params) {

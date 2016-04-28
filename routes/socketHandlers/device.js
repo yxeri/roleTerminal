@@ -1,11 +1,11 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
-const manager = require('../../manager');
-const messenger = require('../../messenger');
+const dbConnector = require('../../dbConnectors/databaseConnector');
+const manager = require('../../socketHelpers/manager');
+const messenger = require('../../socketHelpers/messenger');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
-const logger = require('../../logger');
-const objectValidator = require('../../objectValidator');
+const logger = require('../../utils/logger');
+const objectValidator = require('../../utils/objectValidator');
 const appConfig = require('../../config/defaults/config').app;
 
 function handle(socket) {

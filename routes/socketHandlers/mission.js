@@ -1,9 +1,9 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
-const manager = require('../../manager');
+const dbConnector = require('../../dbConnectors/databaseConnector');
+const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
-const logger = require('../../logger');
+const logger = require('../../utils/logger');
 
 function handle(socket) {
   /**

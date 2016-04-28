@@ -391,7 +391,7 @@ function addText(text, row, message) {
 
 function addRow(message) {
   const defaultLanguage = getDefaultLanguage();
-  const columns = message.columns ? message.columns : 1;
+  const columns = message.columns || 1;
   // Set text depending on default language set. Empty means English
   let currentText = defaultLanguage === '' ? message.text : message[`text_${defaultLanguage}`];
   let currentSubText = defaultLanguage === '' ? message.subText : message[`subText_${defaultLanguage}`];
@@ -687,7 +687,7 @@ function setInputStart(text) {
 }
 
 function resetCommand(aborted) {
-  const room = getRoom() ? getRoom() : defaultInputStart;
+  const room = getRoom() || defaultInputStart;
   commandHelper.command = null;
   commandHelper.onStep = 0;
   commandHelper.maxSteps = 0;
@@ -1881,7 +1881,7 @@ function onUnfollow(data = { room: { roomName: '' } }) {
 
 function onLogin(data = {}) {
   const user = data.user;
-  const mode = user.mode ? user.mode : cmdMode;
+  const mode = user.mode || cmdMode;
 
   commands.clear.func();
   setUser(user.userName);
@@ -1935,7 +1935,7 @@ function onCommandFail() {
 
 function onReconnectSuccess(data) {
   if (!data.anonUser) {
-    const mode = data.user.mode ? data.user.mode : cmdMode;
+    const mode = data.user.mode || cmdMode;
     const room = getRoom();
 
     commands.mode.func([mode], false);
@@ -2628,11 +2628,11 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.register = {
-    func: function registerCommand(phrases) {
+    func: function registerCommand(phrases = []) {
       const data = {};
 
       if (getUser() === null) {
-        const userName = phrases ? phrases[0] : undefined;
+        const userName = phrases[0];
 
         if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
           data.user = {
@@ -2692,8 +2692,8 @@ function attachCommands() {
         setInputStart('password');
         commandHelper.onStep++;
       },
-      function registerStepTwo(phrases) {
-        const password = phrases ? phrases[0] : undefined;
+      function registerStepTwo(phrases = []) {
+        const password = phrases[0];
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
           commandHelper.data.user.password = password;
@@ -2717,8 +2717,8 @@ function attachCommands() {
           });
         }
       },
-      function registerStepThree(phrases) {
-        const password = phrases ? phrases[0] : undefined;
+      function registerStepThree(phrases = []) {
+        const password = phrases[0];
 
         if (password === commandHelper.data.user.password) {
           queueMessage({ text: labels.getText('info', 'congratulations') });

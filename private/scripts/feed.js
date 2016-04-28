@@ -2171,12 +2171,11 @@ function onWeather(report) {
     }
 
     weatherString += `${day}/${month} ${hours}:00${'\t'}`;
-    weatherString += `Temperature: ${temperature}${'\xB0C\t'}`;
-    weatherString += `Visibility: ${weatherInstance.visibility}km ${'\t'}`;
-    weatherString += `Wind direction: ${weatherInstance.windDirection}${'\xB0\t'}`;
-    weatherString += `Wind speed: ${windSpeed}m/s${'\t'}`;
-    weatherString += `Blowout risk: ${weatherInstance.thunder}%${'\t'}`;
-    weatherString += `Pollution coverage: ${coverage}${'\t'}`;
+    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C\t'}`;
+    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km ${'\t'}`;
+    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0\t'}`;
+    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s${'\t'}`;
+    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage}${'\t'}`;
 
     if (precipType) {
       weatherString += precipitation;

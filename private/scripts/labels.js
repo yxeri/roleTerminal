@@ -978,6 +978,11 @@ const all = {
     light: 'Light',
     moderate: 'Moderate',
     high: 'High',
+    temperature: 'Temperature',
+    visibility: 'Visibility',
+    direction: 'Wind direction',
+    speed: 'Wind speed',
+    pollution: 'Pollution',
   },
   weather_se: {
     snow: 'Snö',
@@ -989,6 +994,11 @@ const all = {
     light: 'Låg',
     moderate: 'Medel',
     high: 'Hög',
+    temperature: 'Temperatur',
+    visibility: 'Synlighet',
+    direction: 'Vindriktning',
+    speed: 'Vindstyrka',
+    pollution: 'Förorening',
   },
   broadcast: {
     broadcast: 'broadcast',

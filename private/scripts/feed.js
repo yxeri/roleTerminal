@@ -797,17 +797,17 @@ function playMorse(morseCode, silent) {
     soundTimeout = 0;
   }
 
-  for (let i = 0; i < morseCode.length; i++) {
+  for (const code of morseCode) {
     shouldPlay = false;
     duration = 0;
 
-    if (dot === morseCode[i]) {
+    if (dot === code) {
       duration = 50;
       shouldPlay = true;
-    } else if (dash === morseCode[i]) {
+    } else if (dash === code) {
       duration = 150;
       shouldPlay = true;
-    } else if (morseSeparator === morseCode[i]) {
+    } else if (morseSeparator === code) {
       duration = 50;
     } else {
       duration = 75;

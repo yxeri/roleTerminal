@@ -93,8 +93,8 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
     } else {
       const maxLines = lines === null || isNaN(lines) ? appConfig.historyLines : lines;
 
-      for (let i = 0; i < history.length; i++) {
-        historyMessages = historyMessages.concat(history[i].messages);
+      for (const roomHistory of history) {
+        historyMessages = historyMessages.concat(roomHistory.messages);
       }
 
       historyMessages.sort(messageSort);
@@ -191,9 +191,7 @@ function joinRooms(rooms, socket, device) {
     allRooms.push(device + appConfig.deviceAppend);
   }
 
-  for (let i = 0; i < allRooms.length; i++) {
-    const room = allRooms[i];
-
+  for (const room of allRooms) {
     socket.join(room);
   }
 }

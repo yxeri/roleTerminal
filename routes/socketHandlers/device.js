@@ -39,26 +39,23 @@ function handle(socket) {
           return;
         }
 
-        const allDevices = [];
+        const allDevices = devices.map(device => {
+          let deviceString = '';
 
-        if (devices.length > 0) {
-          for (let i = 0; i < devices.length; i++) {
-            const device = devices[i];
-            let deviceString = '';
+          deviceString += `DeviceID: ${device.deviceId}${'\t'}`;
 
-            deviceString += `DeviceID: ${device.deviceId}${'\t'}`;
-
-            if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
-              deviceString += `Alias: ${device.deviceAlias}${'\t'}`;
-            }
-
-            if (device.lastUser && device.lastUser !== null) {
-              deviceString += `Last user: ${device.lastUser}`;
-            }
-
-            allDevices.push(deviceString);
+          if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
+            deviceString += `Alias: ${device.deviceAlias}${'\t'}`;
           }
 
+          if (device.lastUser && device.lastUser !== null) {
+            deviceString += `Last user: ${device.lastUser}`;
+          }
+
+          return deviceString;
+        });
+
+        if (allDevices.length > 0) {
           messenger.sendList({
             socket,
             itemList: {

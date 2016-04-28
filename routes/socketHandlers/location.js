@@ -53,11 +53,10 @@ function handle(socket) {
             return;
           }
 
-          for (let i = 0; i < users.length; i++) {
-            const currentUser = users[i];
+          for (const currentUser of users) {
             const userName = currentUser.userName;
 
-            if (users[i].position !== undefined) {
+            if (currentUser.position !== undefined) {
               locationData[userName] = createUserPosition(currentUser);
             }
           }

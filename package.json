@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "prestart": "./prestart.sh",
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "DEBUG=eslint:cli-engine eslint *.js"
   },
   "repository": {
     "type": "git",

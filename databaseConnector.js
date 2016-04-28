@@ -2,7 +2,7 @@
 
 const ObjectId = require('mongodb').ObjectID;
 const mongoose = require('mongoose');
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('./config/defaults/config').app;
 const logger = require('./logger');
 const objectValidator = require('./objectValidator');
 const dbPath = `mongodb://${appConfig.dbHost}:${appConfig.dbPort}/${appConfig.dbName}`;

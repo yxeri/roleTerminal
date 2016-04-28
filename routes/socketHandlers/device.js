@@ -3,10 +3,10 @@
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
 const messenger = require('../../messenger');
-const databasePopulation = require('rolehaven-config').databasePopulation;
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../logger');
 const objectValidator = require('../../objectValidator');
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('../../config/defaults/config').app;
 
 function handle(socket) {
   /**

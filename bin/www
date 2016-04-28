@@ -2,7 +2,7 @@
 'use strict';
 
 const app = require('../app');
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('../config/defaults/config').app;
 
 // Sets server port
 app.set('port', appConfig.port);

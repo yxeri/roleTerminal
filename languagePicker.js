@@ -1,6 +1,6 @@
 'use strict';
 
-const defaultLanguage = require('rolehaven-config').app.defaultLanguage;
+const defaultLanguage = require('./config/defaults/config').app.defaultLanguage;
 
 /**
  * Appends property name with the set default language in the configuration

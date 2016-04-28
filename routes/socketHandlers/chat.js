@@ -2,8 +2,8 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const appConfig = require('rolehaven-config').app;
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const appConfig = require('../../config/defaults/config').app;
 const logger = require('../../logger');
 const messenger = require('../../messenger');
 const objectValidator = require('../../objectValidator');

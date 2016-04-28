@@ -1,9 +1,9 @@
 'use strict';
 
 const dbConnector = require('./databaseConnector');
-const databasePopulation = require('rolehaven-config').databasePopulation;
+const databasePopulation = require('./config/defaults/config').databasePopulation;
 const logger = require('./logger.js');
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('./config/defaults/config').app;
 
 /*
  * Sort messages based on timestamp

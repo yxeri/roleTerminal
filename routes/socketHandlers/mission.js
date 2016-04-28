@@ -2,7 +2,7 @@
 
 const dbConnector = require('../../databaseConnector');
 const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../logger');
 
 function handle(socket) {

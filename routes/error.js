@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = new express.Router();
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('../config/defaults/config').app;
 
 function handle() {
   router.get('/', (req, res) => {

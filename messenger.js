@@ -1,8 +1,8 @@
 'use strict';
 
 const dbConnector = require('./databaseConnector');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const appConfig = require('rolehaven-config').app;
+const databasePopulation = require('./config/defaults/config').databasePopulation;
+const appConfig = require('./config/defaults/config').app;
 const logger = require('./logger');
 const objectValidator = require('./objectValidator');
 

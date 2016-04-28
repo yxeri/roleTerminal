@@ -5,9 +5,9 @@ const socketIo = require('socket.io');
 const path = require('path');
 const morgan = require('morgan');
 const compression = require('compression');
-const appConfig = require('rolehaven-config').app;
+const appConfig = require('./config/defaults/config').app;
 const dbConnector = require('./databaseConnector');
-const databasePopulation = require('rolehaven-config').databasePopulation;
+const databasePopulation = require('./config/defaults/config').databasePopulation;
 const app = express();
 
 app.io = socketIo();
@@ -27,9 +27,7 @@ app.use(express.static(path.join(__dirname, appConfig.publicBase)));
 /*
  * Add all request paths and corresponding file paths to Express
  */
-for (let i = 0; i < appConfig.routes.length; i++) {
-  const route = appConfig.routes[i];
-
+for (const route of appConfig.routes) {
   app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
 }
 

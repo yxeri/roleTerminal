@@ -49,6 +49,7 @@ function handle(socket) {
    * Weather command. Returns weather for coming days. Weather is retrieved from external source
    * Emits weather
    */
+   // TODO Should average values across hours
   socket.on('weather', () => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.weather.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
@@ -91,7 +92,7 @@ function handle(socket) {
             }
           }
 
-          socket.emit('weather', report);
+          socket.emit('weather', report.splice(0, appConfig.maxWeatherReports));
         });
       }).on('error', (err) => {
         logger.sendErrorMsg({

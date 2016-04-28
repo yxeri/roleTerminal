@@ -1,7 +1,7 @@
 'use strict';
 
 let config = {
-;
+};
 
 function setConfig(sentConfig) {
   config = sentConfig;

@@ -5,9 +5,9 @@ const socketIo = require('socket.io');
 const path = require('path');
 const morgan = require('morgan');
 const compression = require('compression');
-const appConfig = require('./../config/defaults/config').app;
-const dbConnector = require('./../dbConnectors/databaseConnector');
-const databasePopulation = require('./../config/defaults/config').databasePopulation;
+const appConfig = require('./config/defaults/config').app;
+const dbConnector = require('./dbConnectors/databaseConnector');
+const databasePopulation = require('./config/defaults/config').databasePopulation;
 const app = express();
 
 app.io = socketIo();

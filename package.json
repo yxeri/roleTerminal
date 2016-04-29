@@ -1,13 +1,13 @@
 {
   "name": "roleTerminal",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "description": "RoleTerminal is part of an initiative to create a platform to be used in-game during LARPs",
   "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
   "private": true,
   "scripts": {
     "prestart": "./prestart.sh",
     "start": "node ./bin/www",
-    "test": "DEBUG=eslint:cli-engine eslint *.js",
+    "test": "DEBUG=eslint:cli-engine eslint *.js && ./prestart.sh",
     "nsp": "nsp check"
   },
   "repository": {

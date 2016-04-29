@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Installs config from external source
-wget $CONFIGPATH/appConfig.js -O ./config/modified/appConfig.js
-wget $CONFIGPATH/databasePopulation.js -O ./config/modified/databasePopulation.js
+configSize=${#CONFIGPATH}
+
+# Installs config from external source, if CONFIGPATH is set
+if (($configSize > 0)); then
+  wget $CONFIGPATH/appConfig.js -O ./config/modified/appConfig.js
+  wget $CONFIGPATH/databasePopulation.js -O ./config/modified/databasePopulation.js
+fi
 
 mkdir -p ./public/scripts ./public/views ./public/styles ./public/sounds
 

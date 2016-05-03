@@ -499,11 +499,7 @@ function queueMessage(message) {
 }
 
 function copyString(text) {
-  if (text && text !== null) {
-    return JSON.parse(JSON.stringify(text));
-  }
-
-  return '';
+  return text && text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
 function getAliases() {
@@ -642,11 +638,7 @@ function removeUser() {
 function getCommandHistory() {
   const commandHistory = getLocalVal('cmdHistory');
 
-  if (commandHistory && commandHistory !== null) {
-    return JSON.parse(commandHistory);
-  }
-
-  return [];
+  return commandHistory && commandHistory !== null ? JSON.parse(commandHistory) : [];
 }
 
 function setCommandHistory(commandHistory) {
@@ -797,17 +789,17 @@ function playMorse(morseCode, silent) {
     soundTimeout = 0;
   }
 
-  for (let i = 0; i < morseCode.length; i++) {
+  for (const code of morseCode) {
     shouldPlay = false;
     duration = 0;
 
-    if (dot === morseCode[i]) {
+    if (dot === code) {
       duration = 50;
       shouldPlay = true;
-    } else if (dash === morseCode[i]) {
+    } else if (dash === code) {
       duration = 150;
       shouldPlay = true;
-    } else if (morseSeparator === morseCode[i]) {
+    } else if (morseSeparator === code) {
       duration = 50;
     } else {
       duration = 75;
@@ -981,7 +973,6 @@ function sendLocation() {
  * We check the time between heartbeats and if the time i
  * over 10 seconds (example: when screen is turned off and then on)
  * we force them to reconnect
- * @returns {undefined} Returns nothing
  */
 function isScreenOff() {
   const now = (new Date()).getTime();
@@ -1172,14 +1163,14 @@ function autoCompleteCommand() {
       partialCommand = partialCommand.slice(1);
     }
 
-    for (let i = 0; i < allCommands.length; i++) {
+    for (const command of allCommands) {
       matches = false;
 
       for (let j = 0; j < partialCommand.length; j++) {
-        const commandAccesssLevel = getCommandAccessLevel(allCommands[i]);
-        const commandVisibility = getCommandVisibility(allCommands[i]);
+        const commandAccesssLevel = getCommandAccessLevel(command);
+        const commandVisibility = getCommandVisibility(command);
 
-        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && getAccessLevel() >= commandVisibility && partialCommand.charAt(j) === allCommands[i].charAt(j)) {
+        if ((isNaN(commandAccesssLevel) || getAccessLevel() >= commandAccesssLevel) && getAccessLevel() >= commandVisibility && partialCommand.charAt(j) === command.charAt(j)) {
           matches = true;
         } else {
           matches = false;
@@ -1189,7 +1180,7 @@ function autoCompleteCommand() {
       }
 
       if (matches) {
-        matched.push(allCommands[i]);
+        matched.push(command);
       }
     }
 
@@ -1327,9 +1318,7 @@ function enterKeyHandler() {
         resetCommand(true);
       } else {
         if (!commandHelper.hideInput) {
-          queueMessage({
-            text: [inputText],
-          });
+          queueMessage({ text: [inputText] });
         }
 
         commands[commandObj.command].steps[commandObj.onStep](phrases, socket);
@@ -1533,14 +1522,10 @@ function specialKeyPress(event) {
 
         if (triggerKeysPressed.ctrl) {
           window.scrollBy(0, -window.innerHeight);
-        } else {
-          if (!commandHelper.keysBlocked && commandHelper.command === null) {
-            if (previousCommandPointer > 0) {
-              clearInput();
-              previousCommandPointer--;
-              setCommandInput(commandHistory[previousCommandPointer]);
-            }
-          }
+        } else if (!commandHelper.keysBlocked && commandHelper.command === null && previousCommandPointer > 0) {
+          clearInput();
+          previousCommandPointer--;
+          setCommandInput(commandHistory[previousCommandPointer]);
         }
 
         event.preventDefault();
@@ -1668,10 +1653,7 @@ function populateMenu() {
     },
   };
 
-  const menuItemsKeys = Object.keys(menuItems);
-
-  for (let i = 0; i < menuItemsKeys.length; i++) {
-    const key = menuItemsKeys[i];
+  for (const key of Object.keys(menuItems)) {
     const menuItem = menuItems[key];
     const listItem = createMenuItem(menuItem);
 
@@ -2015,12 +1997,8 @@ function onTime(data = {}) {
 }
 
 function onLocationMsg(locationData) {
-  // TODO Change from Object.keys for compatibility with older Android
-  const locationKeys = Object.keys(locationData);
-
-  for (let i = 0; i < locationKeys.length; i++) {
+  for (const user of Object.keys(locationData)) {
     let text = '';
-    const user = locationKeys[i];
     const userLocation = locationData[user];
     const latitude = userLocation.latitude.toFixed(6);
     const longitude = userLocation.longitude.toFixed(6);

@@ -101,10 +101,11 @@ function handle(socket, io) {
         }
 
 
-        const newRoom = {};
-        newRoom.roomName = user.userName + appConfig.whisperAppend;
-        newRoom.visibility = 12;
-        newRoom.accessLevel = 12;
+        const newRoom = {
+          roomName: user.userName + appConfig.whisperAppend,
+          visibility: 12,
+          accessLevel: 12,
+        };
 
         manager.createRoom(newRoom, user, (createErr) => {
           if (createErr) {
@@ -121,9 +122,10 @@ function handle(socket, io) {
         });
 
         if (appConfig.userVerify) {
-          const message = {};
-          message.time = new Date();
-          message.roomName = databasePopulation.rooms.admin.roomName;
+          const message = {
+            time: new Date(),
+            roomName: databasePopulation.rooms.admin.roomName,
+          };
 
           messenger.sendMsg({
             socket,
@@ -289,9 +291,9 @@ function handle(socket, io) {
           if (oldSocket) {
             const oldRooms = Object.keys(oldSocket.rooms);
 
-            for (let i = 1; i < oldRooms.length; i++) {
-              if (oldRooms[i].indexOf(appConfig.deviceAppend) < 0) {
-                oldSocket.leave(oldRooms[i]);
+            for (const oldRoom of oldRooms) {
+              if (oldRoom.indexOf(appConfig.deviceAppend) < 0) {
+                oldSocket.leave(oldRoom);
               }
             }
 
@@ -450,9 +452,9 @@ function handle(socket, io) {
 
           const rooms = Object.keys(socket.rooms);
 
-          for (let i = 1; i < rooms.length; i++) {
-            if (rooms[i].indexOf(appConfig.deviceAppend) < 0) {
-              socket.leave(rooms[i]);
+          for (const room of rooms) {
+            if (room.indexOf(appConfig.deviceAppend) < 0) {
+              socket.leave(room);
             }
           }
 
@@ -571,6 +573,7 @@ function handle(socket, io) {
           return;
         }
 
+        // TODO Should send a list, not a string
         let usersString = '';
 
         for (let i = 0; i < users.length; i++) {
@@ -638,12 +641,10 @@ function handle(socket, io) {
             return;
           }
 
-          const rooms = Object.keys(socket.rooms);
-
           socket.to(bannedSocketId).emit('ban');
 
-          for (let i = 1; i < rooms.length; i++) {
-            socket.leave(rooms[i]);
+          for (const room of Object.keys(socket.rooms)) {
+            socket.leave(room);
           }
 
           messenger.sendSelfMsg({
@@ -713,6 +714,7 @@ function handle(socket, io) {
           return;
         }
 
+        // TODO Should send a list, not a string
         let usersString = '';
 
         for (let i = 0; i < users.length; i++) {
@@ -871,12 +873,7 @@ function handle(socket, io) {
           return;
         }
 
-        const itemList = [];
-        const userKeys = Object.keys(users);
-
-        for (let i = 0; i < userKeys.length; i++) {
-          itemList.push(users[userKeys[i]].userName);
-        }
+        const itemList = Object.keys(users).map(userKey => users[userKey].userName);
 
         if (itemList.length === 1) {
           socket.emit('matchFound', { matchedName: itemList[0] });

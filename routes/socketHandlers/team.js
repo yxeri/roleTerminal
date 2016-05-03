@@ -357,15 +357,15 @@ function handle(socket, io) {
             });
 
             if (admins) {
-              for (let i = 0; i < admins.length; i++) {
+              for (const admin of admins) {
                 updateUserTeam({
                   socket,
-                  userName: admins[i],
+                  userName: admin,
                   teamName,
                 });
                 addUserTeamRoom({
                   io,
-                  userName: admins[i],
+                  userName: admin,
                   roomName: teamRoom.roomName,
                 });
               }
@@ -416,15 +416,15 @@ function handle(socket, io) {
         });
 
         if (admins) {
-          for (let i = 0; i < admins.length; i++) {
+          for (const admin of admins) {
             updateUserTeam({
               socket,
-              userName: admins[i],
+              userName: admin,
               teamName,
             });
             addUserTeamRoom({
               io,
-              userName: admins[i],
+              userName: admin,
               roomName,
             });
           }
@@ -505,16 +505,10 @@ function handle(socket, io) {
           return;
         }
 
-        const teamArray = [];
-
-        for (let i = 0; i < teams.length; i++) {
-          teamArray.push(`Team: ${teams[i].teamName}. Owner: ${teams[i].owner}`);
-        }
-
         messenger.sendSelfMsg({
           socket,
           message: {
-            text: teamArray,
+            text: teams.map(team => `Team: ${team.teamName}. Owner: ${team.owner}`),
           },
         });
       });

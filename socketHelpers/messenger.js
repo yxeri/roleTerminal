@@ -60,11 +60,9 @@ function sendSelfMsgs(params) {
     return;
   }
 
-  const data = {
-    messages: params.messages,
-  };
+  const messages = params.messages;
 
-  params.socket.emit('messages', data);
+  params.socket.emit('messages', { messages });
 }
 
 /**
@@ -272,7 +270,6 @@ function sendMorse(params) {
   const morseCode = params.message.morseCode;
   const socket = params.socket;
   const silent = params.silent;
-
   const morseObj = {
     morseCode,
     silent,

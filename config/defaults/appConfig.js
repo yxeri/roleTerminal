@@ -27,31 +27,6 @@ const disableCommandsEnv = convertToBoolean(process.env.DISABLECOMMANDS);
 const hideRoomNamesEnv = convertToBoolean(process.env.HIDEROOMNAMES);
 const hideTimeStampEnv = convertToBoolean(process.env.HIDETIMESTAMP);
 
-config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
-config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
-config.longitude = process.env.LONGITUDE || modifiedConfig.longitude || '15.198645';
-
-// Amount of messages retrieved with the history command
-config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;
-
-// Amount of messages sent at a time to client
-config.chunkLength = process.env.MAXCHUNK || modifiedConfig.chunkLength || 10;
-
-// Does the user have to be verified before being able to login?
-config.userVerify = userVerifyEnv !== undefined ? userVerifyEnv : modifiedConfig.userVerify;
-
-if (config.userVerify === undefined) {
-  config.userVerify = false;
-}
-
-
-// Does the team have to be verified before being created?
-config.teamVerify = teamVerifyEnv !== undefined ? teamVerifyEnv : modifiedConfig.teamVerify;
-
-if (config.teamVerify === undefined) {
-  config.teamVerify = false;
-}
-
 // Title of the site
 config.title = process.env.TITLE || modifiedConfig.title || 'roleHaven';
 
@@ -99,7 +74,7 @@ config.port = process.env.PORT || modifiedConfig.port || 8888;
  * Note! Android 2.2 fails when using cdn
  */
 config.socketPath = (process.env.SOCKETPATH === 'cdn' || modifiedConfig.socketPath === 'cdn') ?
-                    'https://cdn.socket.io/socket.io-1.4.5.js' : (process.env.SOCKETPATH || modifiedConfig.socketPath || '/scripts/socket.io-1.4.5.js');
+  'https://cdn.socket.io/socket.io-1.4.5.js' : (process.env.SOCKETPATH || modifiedConfig.socketPath || '/scripts/socket.io-1.4.5.js');
 
 /**
  * Server mode. Options:
@@ -137,6 +112,32 @@ config.routes = modifiedConfig.routes || [
     filePath: './routes/error.js',
   },
 ];
+
+// Instance specific
+
+config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
+config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
+config.longitude = process.env.LONGITUDE || modifiedConfig.longitude || '15.198645';
+
+// Amount of messages retrieved with the history command
+config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;
+
+// Amount of messages sent at a time to client
+config.chunkLength = process.env.MAXCHUNK || modifiedConfig.chunkLength || 10;
+
+// Does the user have to be verified before being able to login?
+config.userVerify = userVerifyEnv !== undefined ? userVerifyEnv : modifiedConfig.userVerify;
+
+if (config.userVerify === undefined) {
+  config.userVerify = false;
+}
+
+// Does the team have to be verified before being created?
+config.teamVerify = teamVerifyEnv !== undefined ? teamVerifyEnv : modifiedConfig.teamVerify;
+
+if (config.teamVerify === undefined) {
+  config.teamVerify = false;
+}
 
 /**
  * Appended to the user name to create a room which is used to store private

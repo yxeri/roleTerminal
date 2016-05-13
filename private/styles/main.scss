@@ -282,12 +282,6 @@ pre {
   display: none;
 }
 
-@media (max-height: 768px) and (max-width: 1024px) {
-  body {
-    overflow: scroll;
-  }
-}
-
 @media (max-width: 736px) {
   #mainFeed li {
     padding: 0 .4em 0 .4em;

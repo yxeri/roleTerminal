@@ -893,6 +893,7 @@ const all = {
       'Contact your nearest Organica IT Support Center for re-education',
       '## or your nearest friendly Razor member. Bring a huge bribe ##',
     ],
+    lostConnection: ['Lost connection'],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -967,6 +968,7 @@ const all = {
       'Kontakta ert närmaste Organica IT-supportcenter för omskolning',
       '## eller er närmaste vänliga Razor-medlem. Ta med en stor mängd mutor ##',
     ],
+    lostConnection: ['Förlorat anslutningen'],
   },
   weather: {
     snow: 'Snow',

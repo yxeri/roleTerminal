@@ -177,6 +177,7 @@ let reconnecting = false;
 let oldAndroid;
 let trackingInterval = null;
 let isScreenOffInterval = null;
+let serverDownTimeout = null;
 
 function getLocalVal(name) {
   return localStorage.getItem(name);
@@ -1819,15 +1820,29 @@ function onImportantMsg(data = {}) {
  * Triggers when the connection is lost and then re-established
  */
 function onReconnect() {
+  clearTimeout(serverDownTimeout);
   reconnect();
 }
 
 function onDisconnect() {
+  const serverDown = () => {
+    if (getUser()) {
+      printWelcomeMessage();
+    } else {
+      printStartMessage();
+    }
+
+    queueMessage({
+      text: labels.getText('info', 'lostConnection'),
+      extraClass: 'importantMsg',
+    });
+  };
+
   queueMessage({
-    text: ['Lost connection'],
-    text_se: ['Förlorat anslutningen'],
+    text: labels.getText('info', 'lostConnection'),
     extraClass: 'importantMsg',
   });
+  serverDownTimeout = setTimeout(serverDown, 60000);
 }
 
 function onFollow(data = { room: {} }) {

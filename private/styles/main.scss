@@ -282,6 +282,10 @@ pre {
   display: none;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 @media (max-width: 736px) {
   #mainFeed li {
     padding: 0 .4em 0 .4em;

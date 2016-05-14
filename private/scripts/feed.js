@@ -573,6 +573,22 @@ function setHiddenBottomMenu(isHidden) {
   setLocalVal('hiddenBottomMenu', isHidden);
 }
 
+function isHiddenCmdInput() {
+  return getLocalVal('hiddenCmdInput') === 'true';
+}
+
+function setHiddenCmdInput(isHidden) {
+  const cmdContainer = document.getElementById('inputContainer');
+
+  if (isHidden) {
+    cmdContainer.classList.add('invisible');
+  } else {
+    cmdContainer.classList.remove('invisible');
+  }
+
+  setLocalVal('hiddenCmdInput', isHidden);
+}
+
 function getAccessLevel() {
   return parseInt(getLocalVal('accessLevel'), 10);
 }
@@ -3893,6 +3909,17 @@ function attachCommands() {
 
             break;
           }
+          case 'hiddencmdinput': {
+            setHiddenCmdInput(value);
+
+            if (value) {
+              queueMessage({ text: labels.getText('info', 'hiddenCmdInputOn') });
+            } else {
+              queueMessage({ text: labels.getText('info', 'hiddenCmdInputOff') });
+            }
+
+            break;
+          }
           default: {
             queueMessage({ text: labels.getText('errors', 'invalidSetting') });
 
@@ -3932,6 +3959,7 @@ function startBoot() {
 
   setHiddenCursor(isHiddenCursor());
   setHiddenBottomMenu(isHiddenBottomMenu());
+  setHiddenCmdInput(isHiddenCmdInput());
 
   if (!isTouchDevice()) {
     cmdInput.focus();

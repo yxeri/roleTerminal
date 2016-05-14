@@ -894,6 +894,8 @@ const all = {
       '## or your nearest friendly Razor member. Bring a huge bribe ##',
     ],
     lostConnection: ['Lost connection'],
+    hiddenCmdInputOn: ['Command input is now hidden'],
+    hiddenCmdInputOff: ['Command input is now visible'],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -969,6 +971,8 @@ const all = {
       '## eller er närmaste vänliga Razor-medlem. Ta med en stor mängd mutor ##',
     ],
     lostConnection: ['Förlorat anslutningen'],
+    hiddenCmdInputOn: ['Kommandoraden är nu dold'],
+    hiddenCmdInputOff: ['Kommandoraden är nu synlig'],
   },
   weather: {
     snow: 'Snow',

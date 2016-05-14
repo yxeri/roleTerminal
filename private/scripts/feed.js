@@ -3927,7 +3927,7 @@ function attachCommands() {
           }
         }
       } else {
-        queueMessage({ text: labels.retrieveMesssage('errors', 'settingUsage') });
+        queueMessage({ text: labels.getText('errors', 'settingUsage') });
       }
     },
     accessLevel: 1,

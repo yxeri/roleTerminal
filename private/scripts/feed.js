@@ -1861,18 +1861,13 @@ function onDisconnect() {
     } else {
       printStartMessage();
     }
-
-    queueMessage({
-      text: labels.getText('info', 'lostConnection'),
-      extraClass: 'importantMsg',
-    });
   };
 
   queueMessage({
     text: labels.getText('info', 'lostConnection'),
     extraClass: 'importantMsg',
   });
-  serverDownTimeout = setTimeout(serverDown, 60000);
+  serverDownTimeout = setTimeout(serverDown, 300000);
 }
 
 function onFollow(data = { room: {} }) {

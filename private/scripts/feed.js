@@ -2652,7 +2652,7 @@ function attachCommands() {
       if (getUser() === null) {
         const userName = phrases[0];
 
-        if (userName && userName.length >= 3 && userName.length <= 6 && isTextAllowed(userName)) {
+        if (userName && userName.length >= 2 && userName.length <= 6 && isTextAllowed(userName)) {
           data.user = {
             userName,
             registerDevice: getDeviceId(),
@@ -2665,13 +2665,13 @@ function attachCommands() {
           resetCommand(true);
           queueMessage({
             text: [
-              'Name has to be 3 to 6 characters long',
+              'Name has to be 2 to 6 characters long',
               'The name can only contain letters and numbers (a-z, 0-9)',
               'Don\'t use whitespace in your name!',
               'example: register myname',
             ],
             text_se: [
-              'Namnet behöver vara 3 till 6 tecken långt',
+              'Namnet behöver vara 2 till 6 tecken långt',
               'Namnet får endast innehålla bokstäver och nummer (a-z, 0-9)',
               'Använd inte blanksteg i ert namn!',
               'Exempel: register myname',

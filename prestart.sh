@@ -8,6 +8,12 @@ if (($configSize > 0)); then
   wget $CONFIGPATH/databasePopulation.js -O ./config/modified/databasePopulation.js
 fi
 
+if ((${#MODE} == "dev")); then
+  compressFlags=""
+else
+  compressFlags="--compress --mangle"
+fi
+
 mkdir -p ./public/scripts ./public/views ./public/styles ./public/sounds
 
 # Copies required JS files to public, such as socket.io
@@ -16,7 +22,7 @@ cp ./private/required/* ./public/scripts
 echo "Browserifying and compressing JS, compiling and compressing SASS to CSS, compressing and moving view files"
 
 # Browserifies all JS to a bundle, minifies it and moves it to public
-browserify ./private/scripts/* -t [ babelify --presets [ es2015 ] --compact='false' ] | uglifyjs --compress --mangle -- > ./public/scripts/bundle.js
+browserify ./private/scripts/* -t [ babelify --presets [ es2015 ] --compact='false' ] | uglifyjs $compressFlags -- > ./public/scripts/bundle.js
 
 # Compiles and compresses sass to css and moves them to public
 for file in ./private/styles/*

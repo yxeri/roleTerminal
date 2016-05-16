@@ -113,7 +113,6 @@ const mapHelper = {
   xGrids: {},
   yGrids: {},
 };
-const defaultInputStart = 'RAZCMD';
 const commandHelper = {
   maxSteps: 0,
   onStep: 0,
@@ -134,11 +133,6 @@ const animations = [
 ];
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
-// Will skip some flavour text and make print out happen faster, if true
-let fastMode = false;
-let disableCommands = false;
-let hideRoomNames = false;
-let hideTimeStamp = false;
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -147,6 +141,7 @@ let previousCommandPointer;
 let watchId = null;
 // Is geolocation tracking on?
 let isTracking = true;
+let firstConnection = true;
 let positions = [];
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
@@ -180,6 +175,18 @@ let trackingInterval = null;
 let isScreenOffInterval = null;
 let serverDownTimeout = null;
 
+function setLocalVal(name, item) {
+  localStorage.setItem(name, item);
+}
+
+function removeLocalVal(name) {
+  localStorage.removeItem(name);
+}
+
+function isTextAllowed(text) {
+  return /^[a-zA-Z0-9]+$/g.test(text);
+}
+
 function getLocalVal(name) {
   return localStorage.getItem(name);
 }
@@ -202,6 +209,30 @@ function getInputStart() {
 
 function clearInput() {
   setCommandInput('');
+}
+
+function getFastMode() {
+  return getLocalVal('fastMode') === 'true';
+}
+
+function setFastMode(isOn) {
+  setLocalVal('fastMode', isOn);
+}
+
+function setHideRoomNames(hide) {
+  setLocalVal('hideRoomNames', hide);
+}
+
+function getHideRoomNames() {
+  return getLocalVal('hideRoomNames') === 'true';
+}
+
+function setHideTimeStamp(hide) {
+  setLocalVal('hideTimeStamp', hide);
+}
+
+function getHideTimeStamp() {
+  return getLocalVal('hideTimeStamp') === 'true';
 }
 
 function appendInputText(text) {
@@ -241,7 +272,6 @@ function generateSpan(params = { text: '' }) {
     spanObj.classList.add('link');
     spanObj.addEventListener('click', (event) => {
       clicked = true;
-
 
       if (replacePhrase) {
         replaceLastInputPhrase(`${text} `);
@@ -357,14 +387,14 @@ function createRow(message, subText) {
     }
   }
 
-  if (!hideTimeStamp && message.time && !message.skipTime) {
+  if (!getHideTimeStamp() && message.time && !message.skipTime) {
     rowObj.appendChild(generateSpan({
       text: generateTimeStamp(message.time),
       extraClass: 'timestamp',
     }));
   }
 
-  if (!hideRoomNames && roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
+  if (!getHideRoomNames() && roomName && hideRooms.indexOf(roomName.toLowerCase()) === -1) {
     if (noLinkRooms.indexOf(roomName.toLowerCase()) > -1) {
       rowObj.appendChild(generateSpan({
         text: roomName,
@@ -418,7 +448,7 @@ function addRow(message) {
     const row = createRow(message, subText);
     let timeout;
 
-    if (fastMode) {
+    if (getFastMode()) {
       timeout = 20;
     } else if (message.timeout) {
       timeout = message.timeout;
@@ -483,18 +513,6 @@ function hideInput(hide) {
   }
 }
 
-function setLocalVal(name, item) {
-  localStorage.setItem(name, item);
-}
-
-function removeLocalVal(name) {
-  localStorage.removeItem(name);
-}
-
-function isTextAllowed(text) {
-  return /^[a-zA-Z0-9]+$/g.test(text);
-}
-
 function queueMessage(message) {
   messageQueue.push(message);
   consumeMessageQueue();
@@ -532,16 +550,6 @@ function setRoom(room) {
 
 function removeRoom() {
   removeLocalVal('room');
-}
-
-function getFastMode() {
-  return getLocalVal('fastMode') === 'true';
-}
-
-function setFastMode(isOn) {
-  fastMode = isOn;
-
-  setLocalVal('fastMode', isOn);
 }
 
 function isHiddenCursor() {
@@ -629,30 +637,11 @@ function getGpsTracking() {
 }
 
 function setDisableCommands(disable) {
-  disableCommands = disable;
   setLocalVal('disableCommands', disable);
 }
 
 function getDisableCommands() {
   return getLocalVal('disableCommands') === 'true';
-}
-
-function setHideRoomNames(hide) {
-  hideRoomNames = hide;
-  setLocalVal('hideRoomNames', hide);
-}
-
-function getHideRoomNames() {
-  return getLocalVal('hideRoomNames') === 'true';
-}
-
-function setHideTimeStamp(hide) {
-  hideTimeStamp = hide;
-  setLocalVal('hideTimeStamp', hide);
-}
-
-function getHideTimeStamp() {
-  return getLocalVal('hideTimeStamp') === 'true';
 }
 
 function getUser() {
@@ -700,6 +689,18 @@ function getMode() {
   return getLocalVal('mode');
 }
 
+function getStaticInputStart() {
+  return getLocalVal('staticInputStart') === 'true';
+}
+
+function setStaticInputStart(isStatic) {
+  setLocalVal('staticInputStart', isStatic);
+}
+
+function setDefaultInputStart(value) {
+  setLocalVal('defaultInputStart', value);
+}
+
 function setDefaultLanguage(languageCode) {
   setLocalVal('defaultLanguage', languageCode);
   labels.setLanguage(languageCode);
@@ -710,8 +711,12 @@ function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
+function getDefaultInputStart() {
+  return getLocalVal('defaultInputStart');
+}
+
 function resetCommand(aborted) {
-  const room = getRoom() || defaultInputStart;
+  const room = getStaticInputStart() ? getDefaultInputStart() : (getRoom() || getDefaultInputStart());
   commandHelper.command = null;
   commandHelper.onStep = 0;
   commandHelper.maxSteps = 0;
@@ -783,7 +788,11 @@ function pushCommandHistory(command) {
 
 function enterRoom(roomName) {
   setRoom(roomName);
-  setInputStart(roomName);
+
+  if (!getStaticInputStart()) {
+    setInputStart(roomName);
+  }
+
   queueMessage({
     text: [`Entered ${roomName}`],
     text_se: [`Gick in i ${roomName}`],
@@ -801,9 +810,6 @@ function setGain(value) {
 }
 
 function playMorse(morseCode, silent) {
-  let duration;
-  let shouldPlay;
-
   function finishSoundQueue(timeouts) {
     const cleanMorse = morseCode.replace(/#/g, '');
 
@@ -816,6 +822,9 @@ function playMorse(morseCode, silent) {
       });
     }
   }
+
+  let duration;
+  let shouldPlay;
 
   if (soundQueue.length === 0) {
     soundTimeout = 0;
@@ -887,7 +896,6 @@ function generateMap() {
 }
 
 function locateOnMap(latitude, longitude) {
-  // TODO Change from Object.keys for compatibility with older Android
   const xKeys = Object.keys(mapHelper.xGrids);
   const yKeys = Object.keys(mapHelper.yGrids);
   let x;
@@ -1361,7 +1369,7 @@ function enterKeyHandler() {
       if (phrases[0].length > 0) {
         const command = retrieveCommand(phrases[0]);
 
-        if (!disableCommands && (command.command && (isNaN(command.command.accessLevel) || getAccessLevel() >= command.command.accessLevel))) {
+        if (!getDisableCommands() && (command.command && (isNaN(command.command.accessLevel) || getAccessLevel() >= command.command.accessLevel))) {
           // Store the command for usage with up/down arrows
           pushCommandHistory(phrases.join(' '));
 
@@ -1636,6 +1644,34 @@ function keyPress(event) {
   }
 }
 
+/**
+ * Indicates that a key has been released and sets the corresponding flag
+ * @param event key event from JS
+ */
+function keyReleased(event) {
+  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+  switch (keyCode) {
+    // Ctrl
+    case 17: {
+      triggerKeysPressed.ctrl = false;
+
+      break;
+    }
+    // Alt
+    case 18: {
+      triggerKeysPressed.alt = false;
+
+      break;
+    }
+    default: {
+      keyPressed = false;
+
+      break;
+    }
+  }
+}
+
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
     menuItem.addEventListener('click', (event) => {
@@ -1707,7 +1743,7 @@ function createCommandEnd() {
 }
 
 function printWelcomeMessage() {
-  if (!fastMode) {
+  if (!getFastMode()) {
     const mainLogo = labels.getMessage('logos', 'mainLogo');
     const razorLogo = labels.getMessage('logos', 'razor');
 
@@ -1719,7 +1755,7 @@ function printWelcomeMessage() {
 }
 
 function printStartMessage() {
-  if (!fastMode) {
+  if (!getFastMode()) {
     const mainLogo = labels.getMessage('logos', 'mainLogo');
 
     queueMessage(mainLogo);
@@ -1756,7 +1792,7 @@ function resetAllLocalVals() {
   removeRoom();
   removeUser();
   setAccessLevel(0);
-  setInputStart(defaultInputStart);
+  setInputStart(getDefaultInputStart());
   previousCommandPointer = 0;
 }
 
@@ -1814,521 +1850,6 @@ function addMessageSpecialProperties(message = {}) {
   }
 
   return modifiedMessage;
-}
-
-function onMessage(data = { message: {} }) {
-  const message = addMessageSpecialProperties(hideMessageProperties(data.message));
-
-  queueMessage(message);
-}
-
-function onMessages(data = { messages: [] }) {
-  const messages = data.messages;
-
-  for (let i = 0; i < messages.length; i++) {
-    const message = addMessageSpecialProperties(hideMessageProperties(messages[i]));
-
-    queueMessage(message);
-  }
-}
-
-function onImportantMsg(data = {}) {
-  const message = data.message;
-
-  if (message) {
-    message.extraClass = 'importantMsg';
-    message.skipTime = true;
-
-    queueMessage(message);
-
-    if (message.morse) {
-      commands.morse.func(message.text.slice(0, 1), message.morse.local);
-    }
-  }
-}
-
-/*
- * Triggers when the connection is lost and then re-established
- */
-function onReconnect() {
-  clearTimeout(serverDownTimeout);
-  reconnect();
-}
-
-function onDisconnect() {
-  const serverDown = () => {
-    if (getUser()) {
-      printWelcomeMessage();
-    } else {
-      printStartMessage();
-    }
-  };
-
-  queueMessage({
-    text: labels.getText('info', 'lostConnection'),
-    extraClass: 'importantMsg',
-  });
-  serverDownTimeout = setTimeout(serverDown, 300000);
-}
-
-function onFollow(data = { room: {} }) {
-  const room = data.room;
-
-  if (room.entered) {
-    enterRoom(room.roomName);
-  } else {
-    queueMessage({
-      text: [`Following ${room.roomName}`],
-      text_se: [`Följer ${room.roomName}`],
-    });
-  }
-}
-
-function onUnfollow(data = { room: { roomName: '' } }) {
-  const room = data.room;
-
-  queueMessage({
-    text: [`Stopped following ${room.roomName}`],
-    text_se: [`Slutade följa ${room.roomName}`],
-  });
-
-  if (room.exited) {
-    socket.emit('follow', {
-      room: {
-        roomName: 'public',
-        entered: true,
-      },
-    });
-  }
-}
-
-function onLogin(data = {}) {
-  const user = data.user;
-  const mode = user.mode || cmdMode;
-
-  commands.clear.func();
-  setUser(user.userName);
-  setAccessLevel(user.accessLevel);
-  queueMessage({
-    text: [`Successfully logged in as ${user.userName}`],
-    text_se: [`Lyckades logga in som ${user.userName}`],
-  });
-  printWelcomeMessage();
-  commands.mode.func([mode]);
-
-  socket.emit('updateDeviceSocketId', {
-    device: {
-      deviceId: getDeviceId(),
-    },
-    user: {
-      userName: getUser(),
-    },
-  });
-  socket.emit('follow', {
-    room: {
-      roomName: 'public',
-      entered: true,
-    },
-  });
-}
-
-function onCommandSuccess(data = {}) {
-  if (!data.noStepCall) {
-    if (!data.freezeStep) {
-      commandHelper.onStep++;
-    }
-
-    commands[commandHelper.command].steps[commandHelper.onStep](data, socket);
-  } else {
-    resetCommand(false);
-  }
-}
-
-function onCommandFail() {
-  if (commandHelper.command !== null) {
-    const abortFunc = commands[commandHelper.command].abortFunc;
-
-    if (abortFunc) {
-      abortFunc();
-    }
-
-    resetCommand(true);
-  }
-}
-
-function onReconnectSuccess(data) {
-  if (!data.anonUser) {
-    const mode = data.user.mode || cmdMode;
-    const room = getRoom();
-
-    commands.mode.func([mode], false);
-    setAccessLevel(data.user.accessLevel);
-
-    if (!data.firstConnection) {
-      queueMessage({
-        text: ['Re-established connection'],
-        text_se: ['Lyckades återansluta'],
-        extraClass: 'importantMsg',
-      });
-    } else {
-      printWelcomeMessage();
-
-      if (room) {
-        commands.room.func([room]);
-      }
-    }
-
-    queueMessage({
-      text: ['Retrieving missed messages (if any)'],
-      text_se: ['Hämtar missade meddelanden (om det finns några)'],
-    });
-
-    socket.emit('updateDeviceSocketId', {
-      device: {
-        deviceId: getDeviceId(),
-      },
-      user: {
-        userName: getUser(),
-      },
-    });
-  } else {
-    if (!data.firstConnection) {
-      queueMessage({
-        text: ['Re-established connection'],
-        text_se: ['Lyckades återansluta'],
-        extraClass: 'importantMsg',
-      });
-    } else {
-      printStartMessage();
-    }
-  }
-
-  reconnecting = false;
-}
-
-function onDisconnectUser() {
-  const currentUser = getUser();
-
-  // There is no saved local user. We don't need to print this
-  if (currentUser && currentUser !== null) {
-    queueMessage({
-      text: [
-        `Didn't find user ${currentUser} in database`,
-        'Resetting local configuration',
-      ],
-      text_se: [
-        `Kunde inte hitta användaren ${currentUser} i databasen`,
-        'Återställer lokala konfigurationen',
-      ],
-    });
-  }
-
-  resetAllLocalVals();
-}
-
-function onMorse(data = {}) {
-  playMorse(data.morseCode, data.silent);
-}
-
-function onTime(data = {}) {
-  queueMessage({
-    text: [`Time: ${generateTimeStamp(data.time, true, true)}`],
-    text_en: [`Tid: ${generateTimeStamp(data.time, true, true)}`],
-  });
-}
-
-function onLocationMsg(locationData) {
-  for (const user of Object.keys(locationData)) {
-    let text = '';
-    const userLocation = locationData[user];
-    const latitude = userLocation.latitude.toFixed(6);
-    const longitude = userLocation.longitude.toFixed(6);
-    const heading = userLocation.heading !== null ? Math.round(userLocation.heading) : null;
-    const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
-    const mapLocation = locateOnMap(latitude, longitude);
-
-    text += `User: ${user}${'\t'}`;
-    text += `Time: ${generateTimeStamp(userLocation.timestamp, true)}${'\t'}`;
-    text += `Location: ${mapLocation}${'\t'}`;
-
-    if (mapLocation !== '---') {
-      text += `Accuracy: ${accuracy} meters${'\t'}`;
-      text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
-
-      if (heading !== null) {
-        text += `Heading: ${heading} deg.`;
-      }
-    }
-
-    queueMessage({ text: [text] });
-  }
-}
-
-function onBan() {
-  queueMessage({
-    text: labels.getText('info', 'youHaveBeenBanned'),
-    extraClass: 'importantMsg',
-  });
-  resetAllLocalVals();
-}
-
-function onLogout() {
-  commands.clear.func();
-  resetAllLocalVals();
-  socket.emit('followPublic');
-
-  if (commands) {
-    printStartMessage();
-  }
-}
-
-function onUpdateCommands(data = { commands: [] }) {
-  const newCommands = data.commands;
-
-  for (let i = 0; i < newCommands.length; i++) {
-    const newCommand = newCommands[i];
-    const oldCommand = commands[newCommand.commandName];
-
-    if (oldCommand) {
-      oldCommand.accessLevel = newCommand.accessLevel;
-      oldCommand.category = newCommand.category;
-      oldCommand.visibility = newCommand.visibility;
-      oldCommand.authGroup = newCommand.authGroup;
-    }
-  }
-}
-
-function onWeather(report) {
-  const weather = [];
-  let weatherString = '';
-
-  for (let i = 0; i < report.length; i++) {
-    const weatherInstance = report[i];
-    const time = new Date(weatherInstance.time);
-    const hours = beautifyNumb(time.getHours());
-    const day = beautifyNumb(time.getDate());
-    const month = beautifyNumb(time.getMonth() + 1);
-    const temperature = Math.round(weatherInstance.temperature);
-    const windSpeed = Math.round(weatherInstance.gust);
-    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : `${weatherInstance.precipitation}mm `;
-    let coverage;
-    let precipType;
-    weatherString = '';
-
-    switch (weatherInstance.precipType) {
-      // None
-      case 0: {
-        break;
-      }
-      // Snow
-      case 1: {
-        precipType = labels.getString('weather', 'snow');
-
-        break;
-      }
-      // Snow + rain
-      case 2: {
-        precipType = labels.getString('weather', 'snowRain');
-
-        break;
-      }
-      // Rain
-      case 3: {
-        precipType = labels.getString('weather', 'rain');
-
-        break;
-      }
-      // Drizzle
-      case 4: {
-        precipType = labels.getString('weather', 'drizzle');
-
-        break;
-      }
-      // Freezing rain
-      case 5: {
-        precipType = labels.getString('weather', 'freezeRain');
-
-        break;
-      }
-      // Freezing drizzle
-      case 6: {
-        precipType = labels.getString('weather', 'freezeDrizzle');
-
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    switch (weatherInstance.cloud) {
-      case 0:
-      case 1:
-      case 2:
-      case 3: {
-        coverage = labels.getString('weather', 'light');
-
-        break;
-      }
-      case 4:
-      case 5:
-      case 6: {
-        coverage = labels.getString('weather', 'moderate');
-
-        break;
-      }
-      case 7:
-      case 8:
-      case 9: {
-        coverage = labels.getString('weather', 'high');
-
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    weatherString += `${day}/${month} ${hours}:00${'\t'}`;
-    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C\t'}`;
-    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km ${'\t'}`;
-    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0\t'}`;
-    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s${'\t'}`;
-    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage}${'\t'}`;
-
-    if (precipType) {
-      weatherString += precipitation;
-      weatherString += precipType;
-    }
-
-    weather.push(weatherString);
-  }
-
-  queueMessage({ text: weather });
-}
-
-function onUpdateDeviceId(newId) {
-  setDeviceId(newId);
-}
-
-function onWhoami(data) {
-  const team = data.user.team || '';
-  const text = createCommandStart('whoami').concat([
-    `User: ${data.user.userName}`,
-    `Access level: ${data.user.accessLevel}`,
-    `Team: ${team}`,
-    `Device ID: ${getDeviceId()}`,
-    createCommandEnd('whoami'),
-  ]);
-
-  queueMessage({ text });
-}
-
-function onList(data = { itemList: [] }) {
-  const itemList = data.itemList.itemList;
-  const title = data.itemList.listTitle;
-
-  if (title) {
-    onMessage({ message: { text: createCommandStart(title) } });
-  }
-
-  onMessage({
-    message: {
-      text: itemList,
-      linkable: data.itemList.linkable || true,
-      keepInput: data.itemList.keepInput || true,
-      replacePhrase: data.itemList.replacePhrase || false,
-      columns: data.columns,
-      extraClass: 'columns',
-    },
-  });
-}
-
-function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
-  replaceLastInputPhrase(`${data.matchedName} `);
-}
-
-/**
- * Starting config values sent from server config
- */
-function onStartup(params = { }) {
-  setDefaultLanguage(params.defaultLanguage);
-  setForceFullscreen(params.forceFullscreen);
-  setGpsTracking(params.gpsTracking);
-  setDisableCommands(params.disableCommands);
-  setHideRoomNames(params.hideRoomNames);
-  setHideTimeStamp(params.hideTimeStamp);
-}
-
-// function onMissions(data = []) {
-  // for (let i = 0; i < data.length; i++) {
-  //
-  // }
-// }
-
-function startSocket() {
-  if (socket) {
-    socket.on('message', onMessage);
-    socket.on('messages', onMessages);
-    socket.on('importantMsg', onImportantMsg);
-    socket.on('reconnect', onReconnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('follow', onFollow);
-    socket.on('unfollow', onUnfollow);
-    socket.on('login', onLogin);
-    socket.on('commandSuccess', onCommandSuccess);
-    socket.on('commandFail', onCommandFail);
-    socket.on('reconnectSuccess', onReconnectSuccess);
-    socket.on('disconnectUser', onDisconnectUser);
-    socket.on('morse', onMorse);
-    socket.on('time', onTime);
-    socket.on('locationMsg', onLocationMsg);
-    socket.on('ban', onBan);
-    socket.on('logout', onLogout);
-    socket.on('updateCommands', onUpdateCommands);
-    socket.on('weather', onWeather);
-    socket.on('updateDeviceId', onUpdateDeviceId);
-    socket.on('whoAmI', onWhoami);
-    socket.on('list', onList);
-    socket.on('matchFound', onMatchFound);
-    socket.on('startup', onStartup);
-    // socket.on('missions', onMissions);
-  }
-}
-
-/**
- * Indicates that a key has been released and sets the corresponding flag
- * @param event key event from JS
- */
-function keyReleased(event) {
-  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
-
-  switch (keyCode) {
-    // Ctrl
-    case 17: {
-      triggerKeysPressed.ctrl = false;
-
-      break;
-    }
-    // Alt
-    case 18: {
-      triggerKeysPressed.alt = false;
-
-      break;
-    }
-    default: {
-      keyPressed = false;
-
-      break;
-    }
-  }
-}
-
-/**
- * @returns {boolean} Returns true if userAgent contains Android 0-3
- */
-function isOldAndroid() {
-  return /Android\s[0-3]/.test(navigator.userAgent);
 }
 
 // TODO Not all Android devices have touch screens
@@ -3887,7 +3408,7 @@ function attachCommands() {
 
         switch (setting) {
           case 'fastmode': {
-            setFastMode(fastMode);
+            setFastMode(value);
 
             if (value) {
               queueMessage({ text: labels.getText('info', 'fastModeOn') });
@@ -3965,65 +3486,540 @@ function attachCommands() {
   };
 }
 
-// Sets everything relevant when a user enters the site
-function startBoot() {
-  oldAndroid = isOldAndroid();
-  fastMode = getFastMode();
-  disableCommands = getDisableCommands();
-  hideRoomNames = getHideRoomNames();
-  hideTimeStamp = getHideTimeStamp();
+function onMessage(data = { message: {} }) {
+  const message = addMessageSpecialProperties(hideMessageProperties(data.message));
 
-  attachCommands();
-  populateMenu();
-  labels.setLanguage(getDefaultLanguage());
-  socket.emit('getCommands');
+  queueMessage(message);
+}
 
+function onMessages(data = { messages: [] }) {
+  const messages = data.messages;
+
+  for (let i = 0; i < messages.length; i++) {
+    const message = addMessageSpecialProperties(hideMessageProperties(messages[i]));
+
+    queueMessage(message);
+  }
+}
+
+function onImportantMsg(data = {}) {
+  const message = data.message;
+
+  if (message) {
+    message.extraClass = 'importantMsg';
+    message.skipTime = true;
+
+    queueMessage(message);
+
+    if (message.morse) {
+      commands.morse.func(message.text.slice(0, 1), message.morse.local);
+    }
+  }
+}
+
+/*
+ * Triggers when the connection is lost and then re-established
+ */
+function onReconnect() {
+  clearTimeout(serverDownTimeout);
+  reconnect();
+}
+
+function onDisconnect() {
+  const serverDown = () => {
+    if (getUser()) {
+      printWelcomeMessage();
+    } else {
+      printStartMessage();
+    }
+  };
+
+  queueMessage({
+    text: labels.getText('info', 'lostConnection'),
+    extraClass: 'importantMsg',
+  });
+  serverDownTimeout = setTimeout(serverDown, 300000);
+}
+
+function onFollow(data = { room: {} }) {
+  const room = data.room;
+
+  if (room.entered) {
+    enterRoom(room.roomName);
+  } else {
+    queueMessage({
+      text: [`Following ${room.roomName}`],
+      text_se: [`Följer ${room.roomName}`],
+    });
+  }
+}
+
+function onUnfollow(data = { room: { roomName: '' } }) {
+  const room = data.room;
+
+  queueMessage({
+    text: [`Stopped following ${room.roomName}`],
+    text_se: [`Slutade följa ${room.roomName}`],
+  });
+
+  if (room.exited) {
+    socket.emit('follow', {
+      room: {
+        roomName: 'public',
+        entered: true,
+      },
+    });
+  }
+}
+
+function onLogin(data = {}) {
+  const user = data.user;
+  const mode = user.mode || cmdMode;
+
+  commands.clear.func();
+  setUser(user.userName);
+  setAccessLevel(user.accessLevel);
+  queueMessage({
+    text: [`Successfully logged in as ${user.userName}`],
+    text_se: [`Lyckades logga in som ${user.userName}`],
+  });
+  printWelcomeMessage();
+  commands.mode.func([mode]);
+
+  socket.emit('updateDeviceSocketId', {
+    device: {
+      deviceId: getDeviceId(),
+    },
+    user: {
+      userName: getUser(),
+    },
+  });
+  socket.emit('follow', {
+    room: {
+      roomName: 'public',
+      entered: true,
+    },
+  });
+}
+
+function onCommandSuccess(data = {}) {
+  if (!data.noStepCall) {
+    if (!data.freezeStep) {
+      commandHelper.onStep++;
+    }
+
+    commands[commandHelper.command].steps[commandHelper.onStep](data, socket);
+  } else {
+    resetCommand(false);
+  }
+}
+
+function onCommandFail() {
+  if (commandHelper.command !== null) {
+    const abortFunc = commands[commandHelper.command].abortFunc;
+
+    if (abortFunc) {
+      abortFunc();
+    }
+
+    resetCommand(true);
+  }
+}
+
+function onReconnectSuccess(data) {
+  if (!data.anonUser) {
+    const mode = data.user.mode || cmdMode;
+    const room = getRoom();
+
+    commands.mode.func([mode], false);
+    setAccessLevel(data.user.accessLevel);
+
+    if (!data.firstConnection) {
+      queueMessage({
+        text: labels.getText('info', 'reestablished'),
+        extraClass: 'importantMsg',
+      });
+    } else {
+      printWelcomeMessage();
+
+      if (room) {
+        commands.room.func([room]);
+      }
+    }
+
+    queueMessage({
+      text: ['Retrieving missed messages (if any)'],
+      text_se: ['Hämtar missade meddelanden (om det finns några)'],
+    });
+
+    socket.emit('updateDeviceSocketId', {
+      device: {
+        deviceId: getDeviceId(),
+      },
+      user: {
+        userName: getUser(),
+      },
+    });
+  } else {
+    if (!data.firstConnection) {
+      queueMessage({
+        text: ['Re-established connection'],
+        text_se: ['Lyckades återansluta'],
+        extraClass: 'importantMsg',
+      });
+    } else {
+      printStartMessage();
+    }
+  }
+
+  reconnecting = false;
+}
+
+function onDisconnectUser() {
+  const currentUser = getUser();
+
+  // There is no saved local user. We don't need to print this
+  if (currentUser && currentUser !== null) {
+    queueMessage({
+      text: [
+        `Didn't find user ${currentUser} in database`,
+        'Resetting local configuration',
+      ],
+      text_se: [
+        `Kunde inte hitta användaren ${currentUser} i databasen`,
+        'Återställer lokala konfigurationen',
+      ],
+    });
+  }
+
+  resetAllLocalVals();
+}
+
+function onMorse(data = {}) {
+  playMorse(data.morseCode, data.silent);
+}
+
+function onTime(data = {}) {
+  queueMessage({
+    text: [`Time: ${generateTimeStamp(data.time, true, true)}`],
+    text_en: [`Tid: ${generateTimeStamp(data.time, true, true)}`],
+  });
+}
+
+function onLocationMsg(locationData) {
+  for (const user of Object.keys(locationData)) {
+    let text = '';
+    const userLocation = locationData[user];
+    const latitude = userLocation.latitude.toFixed(6);
+    const longitude = userLocation.longitude.toFixed(6);
+    const heading = userLocation.heading !== null ? Math.round(userLocation.heading) : null;
+    const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
+    const mapLocation = locateOnMap(latitude, longitude);
+
+    text += `User: ${user}${'\t'}`;
+    text += `Time: ${generateTimeStamp(userLocation.timestamp, true)}${'\t'}`;
+    text += `Location: ${mapLocation}${'\t'}`;
+
+    if (mapLocation !== '---') {
+      text += `Accuracy: ${accuracy} meters${'\t'}`;
+      text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
+
+      if (heading !== null) {
+        text += `Heading: ${heading} deg.`;
+      }
+    }
+
+    queueMessage({ text: [text] });
+  }
+}
+
+function onBan() {
+  queueMessage({
+    text: labels.getText('info', 'youHaveBeenBanned'),
+    extraClass: 'importantMsg',
+  });
+  resetAllLocalVals();
+}
+
+function onLogout() {
+  commands.clear.func();
+  resetAllLocalVals();
+  socket.emit('followPublic');
+
+  if (commands) {
+    printStartMessage();
+  }
+}
+
+function onUpdateCommands(data = { commands: [] }) {
+  const newCommands = data.commands;
+
+  for (let i = 0; i < newCommands.length; i++) {
+    const newCommand = newCommands[i];
+    const oldCommand = commands[newCommand.commandName];
+
+    if (oldCommand) {
+      oldCommand.accessLevel = newCommand.accessLevel;
+      oldCommand.category = newCommand.category;
+      oldCommand.visibility = newCommand.visibility;
+      oldCommand.authGroup = newCommand.authGroup;
+    }
+  }
+}
+
+function onWeather(report) {
+  const weather = [];
+  let weatherString = '';
+
+  for (let i = 0; i < report.length; i++) {
+    const weatherInstance = report[i];
+    const time = new Date(weatherInstance.time);
+    const hours = beautifyNumb(time.getHours());
+    const day = beautifyNumb(time.getDate());
+    const month = beautifyNumb(time.getMonth() + 1);
+    const temperature = Math.round(weatherInstance.temperature);
+    const windSpeed = Math.round(weatherInstance.gust);
+    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : `${weatherInstance.precipitation}mm `;
+    let coverage;
+    let precipType;
+    weatherString = '';
+
+    switch (weatherInstance.precipType) {
+      // None
+      case 0: {
+        break;
+      }
+      // Snow
+      case 1: {
+        precipType = labels.getString('weather', 'snow');
+
+        break;
+      }
+      // Snow + rain
+      case 2: {
+        precipType = labels.getString('weather', 'snowRain');
+
+        break;
+      }
+      // Rain
+      case 3: {
+        precipType = labels.getString('weather', 'rain');
+
+        break;
+      }
+      // Drizzle
+      case 4: {
+        precipType = labels.getString('weather', 'drizzle');
+
+        break;
+      }
+      // Freezing rain
+      case 5: {
+        precipType = labels.getString('weather', 'freezeRain');
+
+        break;
+      }
+      // Freezing drizzle
+      case 6: {
+        precipType = labels.getString('weather', 'freezeDrizzle');
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    switch (weatherInstance.cloud) {
+      case 0:
+      case 1:
+      case 2:
+      case 3: {
+        coverage = labels.getString('weather', 'light');
+
+        break;
+      }
+      case 4:
+      case 5:
+      case 6: {
+        coverage = labels.getString('weather', 'moderate');
+
+        break;
+      }
+      case 7:
+      case 8:
+      case 9: {
+        coverage = labels.getString('weather', 'high');
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    weatherString += `${day}/${month} ${hours}:00${'\t'}`;
+    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C\t'}`;
+    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km ${'\t'}`;
+    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0\t'}`;
+    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s${'\t'}`;
+    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage}${'\t'}`;
+
+    if (precipType) {
+      weatherString += precipitation;
+      weatherString += precipType;
+    }
+
+    weather.push(weatherString);
+  }
+
+  queueMessage({ text: weather });
+}
+
+function onUpdateDeviceId(newId) {
+  setDeviceId(newId);
+}
+
+function onWhoami(data) {
+  const team = data.user.team || '';
+  const text = createCommandStart('whoami').concat([
+    `User: ${data.user.userName}`,
+    `Access level: ${data.user.accessLevel}`,
+    `Team: ${team}`,
+    `Device ID: ${getDeviceId()}`,
+    createCommandEnd('whoami'),
+  ]);
+
+  queueMessage({ text });
+}
+
+function onList(data = { itemList: [] }) {
+  const itemList = data.itemList.itemList;
+  const title = data.itemList.listTitle;
+
+  if (title) {
+    onMessage({ message: { text: createCommandStart(title) } });
+  }
+
+  onMessage({
+    message: {
+      text: itemList,
+      linkable: data.itemList.linkable || true,
+      keepInput: data.itemList.keepInput || true,
+      replacePhrase: data.itemList.replacePhrase || false,
+      columns: data.columns,
+      extraClass: 'columns',
+    },
+  });
+}
+
+function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
+  replaceLastInputPhrase(`${data.matchedName} `);
+}
+
+/**
+ * Called from server on client connection
+ * Sets configuration properties from server and starts the rest of the app
+ */
+function onStartup(params = { }) {
+  setDefaultLanguage(params.defaultLanguage);
+  setForceFullscreen(params.forceFullscreen);
+  setGpsTracking(params.gpsTracking);
+  setDisableCommands(params.disableCommands);
+  setHideRoomNames(params.hideRoomNames);
+  setHideTimeStamp(params.hideTimeStamp);
+  setStaticInputStart(params.staticInputStart);
+  setDefaultInputStart(params.defaultInputStart);
   setHiddenCursor(isHiddenCursor());
   setHiddenBottomMenu(isHiddenBottomMenu());
   setHiddenCmdInput(isHiddenCmdInput());
   setThinnerView(isThinnerView());
 
-  if (!isTouchDevice()) {
-    cmdInput.focus();
-  }
+  socket.emit('getCommands');
+  labels.setLanguage(getDefaultLanguage());
 
-  if (!getDeviceId()) {
-    setDeviceId(textTools.createDeviceId());
-  }
+  if (firstConnection) {
+    attachCommands();
+    populateMenu();
 
-  attachFullscreenListener();
-  startSocket();
-  addEventListener('keypress', keyPress);
-  // Needed for some special keys. They are not detected with keypress
-  addEventListener('keydown', specialKeyPress);
-  addEventListener('keyup', keyReleased);
-  window.addEventListener('focus', refocus);
+    if (!isTouchDevice()) {
+      cmdInput.focus();
+    }
 
-  resetPreviousCommandPointer();
-  generateMap();
-  setIntervals();
-  buildMorsePlayer();
+    if (!getDeviceId()) {
+      setDeviceId(textTools.createDeviceId());
+    }
 
-  // TODO: Move this
-  if (!getAccessLevel()) {
-    setAccessLevel(0);
-  }
+    attachFullscreenListener();
+    addEventListener('keypress', keyPress);
+    // Needed for some special keys. They are not detected with keypress
+    addEventListener('keydown', specialKeyPress);
+    addEventListener('keyup', keyReleased);
+    window.addEventListener('focus', refocus);
 
-  if (!getUser()) {
-    setInputStart(defaultInputStart);
-    socket.emit('updateDeviceSocketId', {
+    resetPreviousCommandPointer();
+    generateMap();
+    setIntervals();
+    buildMorsePlayer();
+
+    if (!getAccessLevel()) {
+      setAccessLevel(0);
+    }
+
+    if (!getUser()) {
+      setInputStart(getDefaultInputStart());
+      socket.emit('updateDeviceSocketId', {
+        device: { deviceId: getDeviceId() },
+        user: {
+          userName: 'NO_USER_LOGGED_IN',
+        },
+      });
+    }
+
+    socket.emit('updateId', {
+      user: { userName: getUser() },
+      firstConnection: true,
       device: { deviceId: getDeviceId() },
-      user: {
-        userName: 'NO_USER_LOGGED_IN',
-      },
     });
-  }
 
-  socket.emit('updateId', {
-    user: { userName: getUser() },
-    firstConnection: true,
-    device: { deviceId: getDeviceId() },
-  });
+    firstConnection = false;
+  }
 }
 
-startBoot();
+// function onMissions(data = []) {
+  // for (let i = 0; i < data.length; i++) {
+  //
+  // }
+// }
+
+function startSocket() {
+  if (socket) {
+    socket.on('message', onMessage);
+    socket.on('messages', onMessages);
+    socket.on('importantMsg', onImportantMsg);
+    socket.on('reconnect', onReconnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('follow', onFollow);
+    socket.on('unfollow', onUnfollow);
+    socket.on('login', onLogin);
+    socket.on('commandSuccess', onCommandSuccess);
+    socket.on('commandFail', onCommandFail);
+    socket.on('reconnectSuccess', onReconnectSuccess);
+    socket.on('disconnectUser', onDisconnectUser);
+    socket.on('morse', onMorse);
+    socket.on('time', onTime);
+    socket.on('locationMsg', onLocationMsg);
+    socket.on('ban', onBan);
+    socket.on('logout', onLogout);
+    socket.on('updateCommands', onUpdateCommands);
+    socket.on('weather', onWeather);
+    socket.on('updateDeviceId', onUpdateDeviceId);
+    socket.on('whoAmI', onWhoami);
+    socket.on('list', onList);
+    socket.on('matchFound', onMatchFound);
+    socket.on('startup', onStartup);
+    // socket.on('missions', onMissions);
+  }
+}
+
+startSocket();

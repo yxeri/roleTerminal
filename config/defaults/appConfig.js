@@ -26,6 +26,7 @@ const teamVerifyEnv = convertToBoolean(process.env.REQUIRETEAMVERIFY);
 const disableCommandsEnv = convertToBoolean(process.env.DISABLECOMMANDS);
 const hideRoomNamesEnv = convertToBoolean(process.env.HIDEROOMNAMES);
 const hideTimeStampEnv = convertToBoolean(process.env.HIDETIMESTAMP);
+const staticInputStartEnv = convertToBoolean(process.env.STATICINPUTSTART);
 
 // Title of the site
 config.title = process.env.TITLE || modifiedConfig.title || 'roleHaven';
@@ -113,7 +114,14 @@ config.routes = modifiedConfig.routes || [
   },
 ];
 
+/**
+ * Custom set of flags to be used on the client
+ */
+config.customFlags = modifiedConfig.customFlags;
+
+//
 // Instance specific
+//
 
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
 config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
@@ -227,6 +235,19 @@ if (config.hideTimeStamp === undefined) {
   config.hideTimeStamp = false;
 }
 
+/**
+ * Amount of weather reports that will be sent to the client
+ */
 config.maxWeatherReports = process.env.MAXWEATHERREPORTS || modifiedConfig.maxWeatherReports || 8;
+
+/**
+ * Should the input start be static? Normal behaviour is to set input star to the room name that the user is in
+ */
+config.staticInputStart = staticInputStartEnv !== undefined ? staticInputStartEnv : modifiedConfig.staticInputStart;
+
+/**
+ * The string that will be shown in the beginning of the command input
+ */
+config.defaultInputStart = process.env.DEFAULTINPUTSTART || modifiedConfig.defaultInputStart || 'RAZCMD';
 
 module.exports = config;

@@ -898,6 +898,7 @@ const all = {
     hiddenCmdInputOff: ['Command input is now visible'],
     thinnerViewOn: ['View is now thinner'],
     thinnerViewOff: ['View is now normal'],
+    reestablished: ['Re-established connection'],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -977,6 +978,7 @@ const all = {
     hiddenCmdInputOff: ['Kommandoraden är nu synlig'],
     thinnerViewOn: ['Vyn är nu smalare'],
     thinnerViewOff: ['Vyn är nu normal'],
+    reestablished: ['Lyckades återansluta'],
   },
   weather: {
     snow: 'Snow',

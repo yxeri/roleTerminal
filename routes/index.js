@@ -26,14 +26,17 @@ function handle(io) {
   });
 
   io.on('connection', (socket) => {
-    userHandler.handle(socket, io);
-    chatHandler.handle(socket, io);
-    commandHandler.handle(socket, io);
-    deviceHandler.handle(socket, io);
-    teamHandler.handle(socket, io);
-    hackingHandler.handle(socket, io);
-    utilityHandler.handle(socket, io);
-    locationHandler.handle(socket, io);
+    socket.emit('startup', {
+      defaultLanguage: appConfig.defaultLanguage,
+      forceFullscreen: appConfig.forceFullscreen,
+      gpsTracking: appConfig.gpsTracking,
+      disableCommands: appConfig.disableCommands,
+      hideRoomNames: appConfig.hideRoomNames,
+      hideTimeStamp: appConfig.hideTimeStamp,
+      staticInputStart: appConfig.staticInputStart,
+      defaultInputStart: appConfig.defaultInputStart,
+      customFlags: appConfig.customFlags,
+    });
 
     socket.on('disconnect', () => {
       dbConnector.getUserById(socket.id, (err, user) => {
@@ -116,6 +119,15 @@ function handle(io) {
         });
       });
     });
+
+    userHandler.handle(socket, io);
+    chatHandler.handle(socket, io);
+    commandHandler.handle(socket, io);
+    deviceHandler.handle(socket, io);
+    teamHandler.handle(socket, io);
+    hackingHandler.handle(socket, io);
+    utilityHandler.handle(socket, io);
+    locationHandler.handle(socket, io);
   });
 
   return router;

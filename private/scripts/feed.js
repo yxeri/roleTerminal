@@ -3,6 +3,7 @@
 const labels = require('./labels');
 const textTools = require('./textTools');
 const audio = require('./audio');
+const zalgoGenerator = require('./zalgoGenerator');
 
 /**
  * Number of messages that will be processed and printed

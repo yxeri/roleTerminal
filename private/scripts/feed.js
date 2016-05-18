@@ -3536,7 +3536,6 @@ function onDisconnect() {
 
   queueMessage({
     text: labels.getText('info', 'lostConnection'),
-    extraClass: 'importantMsg',
   });
   serverDownTimeout = setTimeout(serverDown, 300000);
 }
@@ -3637,7 +3636,6 @@ function onReconnectSuccess(data) {
     if (!data.firstConnection) {
       queueMessage({
         text: labels.getText('info', 'reestablished'),
-        extraClass: 'importantMsg',
       });
     } else {
       printWelcomeMessage();

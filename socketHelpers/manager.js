@@ -64,6 +64,10 @@ function userAllowedCommand(socketId, commandName, callback) {
           }
         }
 
+        if (isAllowed) {
+          dbConnector.incrementCommandUsage(commandName);
+        }
+
         callback(cmdErr, isAllowed, user);
       });
     }

@@ -72,6 +72,7 @@ const commandSchema = new mongoose.Schema({
   visibility: Number,
   authGroup: String,
   category: String,
+  timesUsed: Number,
 }, { collection: 'commands' });
 const scheduledEventSchema = new mongoose.Schema({
   receiverName: String,
@@ -214,6 +215,23 @@ function verifyAllObjects(query, object, objectName, callback) {
 
     callback(err, verified);
   });
+}
+
+function incrementCommandUsage(commandName, callback) {
+  const query = { commandName };
+  const update = { $inc: { timesUsed: 1 } };
+
+  Command.findOneAndUpdate(query, update).lean().exec(
+    (err, device) => {
+      if (err) {
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.db,
+          text: ['Failed to increment command usage'],
+          err,
+        });
+      }
+    }
+  );
 }
 
 function createMission(sentMission, callback) {
@@ -1558,3 +1576,4 @@ exports.verifyAllTeams = verifyAllTeams;
 exports.getUnverifiedTeams = getUnverifiedTeams;
 exports.getUsersFollowingRoom = getUsersFollowingRoom;
 exports.removeRoomFromAllUsers = removeRoomFromAllUsers;
+exports.incrementCommandUsage = incrementCommandUsage;

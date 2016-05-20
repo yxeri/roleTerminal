@@ -46,7 +46,7 @@ function sendErrorMsg(data) {
   }
 
   const code = data.code;
-  const text = data[languagePicker.appendLanguageCode('text')];
+  const text = data.text;
   const err = data.err;
 
   printErrorMsg(code, text, err);
@@ -63,7 +63,7 @@ function sendSocketErrorMsg(data) {
 
   const socket = data.socket;
   const code = data.code;
-  const text = data[languagePicker.appendLanguageCode('text')];
+  const text = data.text;
   const err = data.err;
   text[0] = `[${code.num}] ${text[0]}`;
 

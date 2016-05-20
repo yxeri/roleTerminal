@@ -46,9 +46,14 @@ function handle(socket) {
 
       // Return all user locations
       if (params.user.userName === '*') {
-        dbConnector.getAllUserLocations(params.user, (err, users) => {
+        dbConnector.getAllUserLocations(user, (err, users) => {
           if (err || users === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to get user location'],
+              err,
+            });
 
             return;
           }

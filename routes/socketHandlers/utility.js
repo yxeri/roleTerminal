@@ -1,9 +1,9 @@
 'use strict';
 
-const manager = require('../../manager');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const appConfig = require('rolehaven-config').app;
-const logger = require('../../logger');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const appConfig = require('../../config/defaults/config').app;
+const logger = require('../../utils/logger');
 const http = require('http');
 
 /**
@@ -32,8 +32,8 @@ function handle(socket) {
    * Time command. Returns current date
    * Emits time
    */
-  socket.on('time', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.time.commandName, function(allowErr, allowed) {
+  socket.on('time', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.time.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
@@ -49,8 +49,9 @@ function handle(socket) {
    * Weather command. Returns weather for coming days. Weather is retrieved from external source
    * Emits weather
    */
-  socket.on('weather', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.weather.commandName, function(allowErr, allowed) {
+   // TODO Should average values across hours
+  socket.on('weather', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.weather.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
@@ -64,14 +65,14 @@ function handle(socket) {
         url = `http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/version/1/geopoint/lat/${lat}/lon/${lon}/data.json`;
       }
 
-      http.get(url, function(resp) {
+      http.get(url, (resp) => {
         let body = '';
 
-        resp.on('data', function(chunk) {
+        resp.on('data', (chunk) => {
           body += chunk;
         });
 
-        resp.on('end', function() {
+        resp.on('end', () => {
           const response = JSON.parse(body);
           const times = response.timeseries;
           const now = new Date();
@@ -91,13 +92,13 @@ function handle(socket) {
             }
           }
 
-          socket.emit('weather', report);
+          socket.emit('weather', report.splice(0, appConfig.maxWeatherReports));
         });
-      }).on('error', function(err) {
+      }).on('error', (err) => {
         logger.sendErrorMsg({
           code: logger.ErrorCodes.general,
           text: ['Failed to get weather status'],
-          err: err,
+          err,
         });
       });
     });

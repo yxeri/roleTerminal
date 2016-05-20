@@ -1,45 +1,45 @@
 'use strict';
 
-const dbConnector = require('../../databaseConnector');
-const databasePopulation = require('rolehaven-config').databasePopulation;
-const manager = require('../../manager');
-const logger = require('../../logger');
-const appConfig = require('rolehaven-config').app;
-const messenger = require('../../messenger');
-const objectValidator = require('../../objectValidator');
+const dbConnector = require('../../dbConnectors/databaseConnector');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
+const manager = require('../../socketHelpers/manager');
+const logger = require('../../utils/logger');
+const appConfig = require('../../config/defaults/config').app;
+const messenger = require('../../socketHelpers/messenger');
+const objectValidator = require('../../utils/objectValidator');
 
 function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
 }
 
 function handle(socket, io) {
-  socket.on('userExists', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+  socket.on('userExists', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
-      if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed || !params || !params.user || !isTextAllowed(params.user.userName)) {
         socket.emit('commandFail');
 
         return;
       }
 
-      dbConnector.getUser(data.user.userName, function(err, foundUser) {
+      dbConnector.getUser(params.user.userName, (err, foundUser) => {
         if (err) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.db,
             text: ['Failed to check if user exists'],
             text_se: ['Misslyckades med att försöka hitta användaren'],
-            err: err,
+            err,
           });
           socket.emit('commandFail');
 
           return;
         } else if (foundUser !== null) {
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
               text: ['User with that name already exists'],
               text_se: ['En användare med det namnet existerar redan'],
@@ -55,45 +55,45 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('register', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true, password: true, registerDevice: true } })) {
+  socket.on('register', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true, password: true, registerDevice: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, function(allowErr, allowed) {
-      if (allowErr || !allowed || !data || !data.user || !isTextAllowed(data.user.userName)) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed || !params || !params.user || !isTextAllowed(params.user.userName)) {
         return;
       }
 
-      const userName = data.user.userName.toLowerCase();
+      const userName = params.user.userName.toLowerCase();
       const userObj = {
-        userName: userName,
+        userName,
         socketId: '',
-        password: data.user.password,
-        registerDevice: data.user.registerDevice,
+        password: params.user.password,
+        registerDevice: params.user.registerDevice,
         mode: appConfig.defaultMode,
         verified: false,
         rooms: [databasePopulation.rooms.public.roomName],
       };
 
       // TODO Refactor the inner code
-      dbConnector.createUser(userObj, function(err, user) {
+      dbConnector.createUser(userObj, (err, user) => {
         if (err) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.db,
             text: ['Failed to register user'],
             text_se: ['Misslyckades med att registrera användare'],
-            err: err,
+            err,
           });
 
           return;
         } else if (user === null) {
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
-              text: [userName + ' already exists'],
-              text_se: [userName + ' existerar redan'],
+              text: [`${userName} already exists`],
+              text_se: [`${userName} existerar redan`],
             },
           });
 
@@ -101,42 +101,44 @@ function handle(socket, io) {
         }
 
 
-        const newRoom = {};
-        newRoom.roomName = user.userName + appConfig.whisperAppend;
-        newRoom.visibility = 12;
-        newRoom.accessLevel = 12;
+        const newRoom = {
+          roomName: user.userName + appConfig.whisperAppend,
+          visibility: 12,
+          accessLevel: 12,
+        };
 
-        manager.createRoom(newRoom, user, function(createErr) {
+        manager.createRoom(newRoom, user, (createErr) => {
           if (createErr) {
             return;
           }
         });
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
-            text: [user.userName + ' has been registered'],
-            text_se: [user.userName + ' har blivit registerad'],
+            text: [`${user.userName} has been registered`],
+            text_se: [`${user.userName} har blivit registerad`],
           },
         });
 
         if (appConfig.userVerify) {
-          const message = {};
-          message.time = new Date();
-          message.roomName = databasePopulation.rooms.admin.roomName;
+          const message = {
+            time: new Date(),
+            roomName: databasePopulation.rooms.admin.roomName,
+          };
 
           messenger.sendMsg({
-            socket: socket,
+            socket,
             message: {
               userName: 'SYSTEM',
-              text: ['User ' + user.userName + ' needs to be verified'],
-              text_se: ['Användaren ' + user.userName + ' måste bli verifierad'],
+              text: [`User ${user.userName} needs to be verified`],
+              text_se: [`Användaren ${user.userName} måste bli verifierad`],
             },
             sendTo: message.roomName,
           });
 
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
               text: ['You will need to be verified before you can login'],
               text_se: ['Ni måste bli verifierad innan ni kan logga in'],
@@ -148,26 +150,21 @@ function handle(socket, io) {
   });
 
   // TODO Rename to reflect the function
-  socket.on('updateId', function(data) {
-    if (!objectValidator.isValidData(data, { user: true })) {
+  socket.on('updateId', (params) => {
+    if (!objectValidator.isValidData(params, { user: true })) {
       return;
     }
 
-    if (data.user.userName === null) {
+    if (params.user.userName === null) {
       const publicRoom = databasePopulation.rooms.public.roomName;
 
       socket.join(publicRoom);
-      socket.emit('reconnectSuccess', { anonUser: true, firstConnection: data.firstConnection });
-
-      if (data.firstConnection) {
-        socket.emit('startup', {
-          defaultLanguage: appConfig.defaultLanguage,
-          forceFullscreen: appConfig.forceFullscreen,
-          gpsTracking: appConfig.gpsTracking,
-        });
-      }
+      socket.emit('reconnectSuccess', {
+        anonUser: true,
+        firstConnection: params.firstConnection,
+      });
     } else {
-      manager.updateUserSocketId(socket.id, data.user.userName, function(idErr, user) {
+      manager.updateUserSocketId(socket.id, params.user.userName, (idErr, user) => {
         if (idErr) {
           return;
         } else if (user === null) {
@@ -179,19 +176,19 @@ function handle(socket, io) {
 
         const allRooms = user.rooms;
 
-        manager.joinRooms(allRooms, socket, data.device.deviceId);
+        manager.joinRooms(allRooms, socket, params.device.deviceId);
         socket.emit('reconnectSuccess', {
-          firstConnection: data.firstConnection,
-          user: user,
+          firstConnection: params.firstConnection,
+          user,
         });
-        manager.getHistory(allRooms, Infinity, true, user.lastOnline, function(histErr, missedMessages) {
+        manager.getHistory(allRooms, Infinity, true, user.lastOnline, (histErr, missedMessages) => {
           if (histErr) {
             return;
           }
 
           while (missedMessages.length) {
             messenger.sendSelfMsgs({
-              socket: socket,
+              socket,
               messages: missedMessages.splice(0, appConfig.chunkLength),
             });
           }
@@ -200,23 +197,23 @@ function handle(socket, io) {
     }
   });
 
-  socket.on('updateLocation', function(data) {
-    if (!objectValidator.isValidData(data, { position: true })) {
+  socket.on('updateLocation', (params) => {
+    if (!objectValidator.isValidData(params, { position: true })) {
       return;
     }
 
-    dbConnector.getUserById(socket.id, function(err, user) {
+    dbConnector.getUserById(socket.id, (err, user) => {
       if (err || user === null) {
         logger.sendErrorMsg({
           code: logger.ErrorCodes.db,
           text: ['Failed to update location'],
-          err: err,
+          err,
         });
 
         return;
       }
 
-      dbConnector.updateUserLocation(user.userName, data.position, function(userErr) {
+      dbConnector.updateUserLocation(user.userName, params.position, (userErr) => {
         if (userErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -228,33 +225,33 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('login', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true, password: true } })) {
+  socket.on('login', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true, password: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.login.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.login.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const user = data.user;
+      const user = params.user;
       const userName = user.userName.toLowerCase();
 
-      dbConnector.authUser(userName, user.password, function(err, authUser) {
+      dbConnector.authUser(userName, user.password, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to login'],
             text_se: ['Misslyckades med att logga in'],
-            err: err,
+            err,
           });
 
           return;
         } else if (appConfig.userVerify && !authUser.verified) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['The user has not yet been verified. Failed to login'],
             text_se: ['Användaren har ännu inte blivit verifierad. Inloggningen misslyckades'],
@@ -263,7 +260,7 @@ function handle(socket, io) {
           return;
         } else if (authUser.banned) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['The user has been banned. Failed to login'],
             text_se: ['Användaren är bannad. Inloggningen misslyckades'],
@@ -272,7 +269,7 @@ function handle(socket, io) {
           return;
         }
 
-        manager.updateUserSocketId(socket.id, userName, function(idErr) {
+        manager.updateUserSocketId(socket.id, userName, (idErr) => {
           if (idErr) {
             return;
           }
@@ -283,9 +280,9 @@ function handle(socket, io) {
           if (oldSocket) {
             const oldRooms = Object.keys(oldSocket.rooms);
 
-            for (let i = 1; i < oldRooms.length; i++) {
-              if (oldRooms[i].indexOf(appConfig.deviceAppend) < 0) {
-                oldSocket.leave(oldRooms[i]);
+            for (const oldRoom of oldRooms) {
+              if (oldRoom.indexOf(appConfig.deviceAppend) < 0) {
+                oldSocket.leave(oldRoom);
               }
             }
 
@@ -309,7 +306,7 @@ function handle(socket, io) {
           socket.emit('login', { user: authUser });
         });
 
-        dbConnector.setUserLastOnline(user.userName, new Date(), function(userOnlineErr, settedUser) {
+        dbConnector.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
           if (userOnlineErr || settedUser === null) {
             console.log('Failed to set last online');
 
@@ -320,24 +317,24 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('checkPassword', function(data) {
-    if (!objectValidator.isValidData(data, { oldPassword: true })) {
+  socket.on('checkPassword', (params) => {
+    if (!objectValidator.isValidData(params, { oldPassword: true })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
+      dbConnector.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Incorrect password'],
             text_se: ['Felaktigt lösenord'],
-            err: err,
+            err,
           });
           socket.emit('commandFail');
 
@@ -345,7 +342,7 @@ function handle(socket, io) {
         }
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
             text: ['Enter your new password'],
             text_se: ['Skriv in ert nya lösenord'],
@@ -355,17 +352,17 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('changePassword', function(data) {
-    if (!objectValidator.isValidData(data, { oldPassword: true, newPassword: true })) {
+  socket.on('changePassword', (params) => {
+    if (!objectValidator.isValidData(params, { oldPassword: true, newPassword: true })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
-      } else if (!data.newPassword) {
+      } else if (!params.newPassword) {
         logger.sendSocketErrorMsg({
-          socket: socket,
+          socket,
           code: logger.ErrorCodes.general,
           text: ['Failed to update password. No new password sent'],
           text_se: ['Misslyckades med att uppdatera lösenordet. Inget nytt lösenord skickades'],
@@ -374,23 +371,23 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.authUser(user.userName, data.oldPassword, function(err, authUser) {
+      dbConnector.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to update password'],
             text_se: ['Misslyckades med att uppdatera lösenordet'],
-            err: err,
+            err,
           });
 
           return;
         }
 
-        dbConnector.updateUserPassword(authUser.userName, data.newPassword, function(userErr, updatedUser) {
+        dbConnector.updateUserPassword(authUser.userName, params.newPassword, (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendSocketErrorMsg({
-              socket: socket,
+              socket,
               code: logger.ErrorCodes.general,
               text: ['Failed to update password'],
               text_se: ['Misslyckades med att uppdatera lösenordet'],
@@ -401,7 +398,7 @@ function handle(socket, io) {
           }
 
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
               text: ['Password has been successfully changed!'],
               text_se: ['Lösenordet har ändrats!'],
@@ -412,26 +409,26 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('logout', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.logout.commandName, function(allowErr, allowed, user) {
+  socket.on('logout', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.logout.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         return;
       }
 
       const userName = user.userName;
 
-      dbConnector.updateUserSocketId(userName, '', function(err, socketUser) {
+      dbConnector.updateUserSocketId(userName, '', (err, socketUser) => {
         if (err || socketUser === null) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.general,
             text: ['Failed to reset user socket ID'],
-            err: err,
+            err,
           });
 
           return;
         }
 
-        dbConnector.updateUserOnline(userName, false, function(userErr, updatedUser) {
+        dbConnector.updateUserOnline(userName, false, (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.general,
@@ -444,15 +441,15 @@ function handle(socket, io) {
 
           const rooms = Object.keys(socket.rooms);
 
-          for (let i = 1; i < rooms.length; i++) {
-            if (rooms[i].indexOf(appConfig.deviceAppend) < 0) {
-              socket.leave(rooms[i]);
+          for (const room of rooms) {
+            if (room.indexOf(appConfig.deviceAppend) < 0) {
+              socket.leave(room);
             }
           }
 
           socket.emit('logout');
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
               text: ['You have been logged out'],
               text_se: ['Ni har blivit urloggade'],
@@ -463,37 +460,37 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('verifyUser', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+  socket.on('verifyUser', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const userNameLower = data.user.userName.toLowerCase();
+      const userNameLower = params.user.userName.toLowerCase();
 
       if (userNameLower !== undefined) {
-        dbConnector.verifyUser(userNameLower, function(err, user) {
+        dbConnector.verifyUser(userNameLower, (err, user) => {
           if (err || user === null) {
             logger.sendSocketErrorMsg({
-              socket: socket,
+              socket,
               code: logger.ErrorCodes.general,
               text: ['Failed to verify user'],
               text_se: ['Misslyckades med att verifiera användaren'],
-              err: err,
+              err,
             });
 
             return;
           }
 
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
-              text: ['User ' + user.userName + ' has been verified'],
-              text_se: ['Användaren ' + user.userName + ' har blivit verifierad'],
+              text: [`User ${user.userName} has been verified`],
+              text_se: [`Användaren ${user.userName} har blivit verifierad`],
             },
           });
         });
@@ -501,29 +498,29 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('verifyAllUsers', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
+  socket.on('verifyAllUsers', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      dbConnector.getUnverifiedUsers(function(err, users) {
+      dbConnector.getUnverifiedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to verify all user'],
             text_se: ['Misslyckades med att verifiera alla användare'],
-            err: err,
+            err,
           });
 
           return;
         }
 
-        dbConnector.verifyAllUsers(function(verifyErr) {
+        dbConnector.verifyAllUsers((verifyErr) => {
           if (verifyErr) {
             logger.sendSocketErrorMsg({
-              socket: socket,
+              socket,
               code: logger.ErrorCodes.general,
               text: ['Failed to verify all user'],
               text_se: ['Misslyckades med att verifiera alla användare'],
@@ -534,7 +531,7 @@ function handle(socket, io) {
           }
 
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
               text: ['Users have been verified'],
               text_se: ['Användarna har blivit verifierade'],
@@ -546,25 +543,26 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('unverifiedUsers', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, function(allowErr, allowed) {
+  socket.on('unverifiedUsers', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.verifyuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      dbConnector.getUnverifiedUsers(function(err, users) {
+      dbConnector.getUnverifiedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to get unverified users'],
             text_se: ['Misslyckades med hämtningen av icke-verifierade användare'],
-            err: err,
+            err,
           });
 
           return;
         }
 
+        // TODO Should send a list, not a string
         let usersString = '';
 
         for (let i = 0; i < users.length; i++) {
@@ -576,7 +574,7 @@ function handle(socket, io) {
         }
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
             text: [usersString],
           },
@@ -585,22 +583,22 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('ban', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+  socket.on('ban', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.banuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.banuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const userNameLower = data.user.userName.toLowerCase();
+      const userNameLower = params.user.userName.toLowerCase();
 
-      dbConnector.banUser(userNameLower, function(err, user) {
+      dbConnector.banUser(userNameLower, (err, user) => {
         if (err || user === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to ban user'],
             text_se: ['Misslyckades med att banna användaren'],
@@ -612,39 +610,37 @@ function handle(socket, io) {
         const bannedSocketId = user.socketId;
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
-            text: ['User ' + userNameLower + ' has been banned'],
-            text_se: ['Användaren ' + userNameLower + ' har blivit bannad'],
+            text: [`User ${userNameLower} has been banned`],
+            text_se: [`Användaren ${userNameLower} har blivit bannad`],
           },
         });
 
-        dbConnector.updateUserSocketId(userNameLower, '', function(userErr, updatedUser) {
+        dbConnector.updateUserSocketId(userNameLower, '', (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendSocketErrorMsg({
-              socket: socket,
+              socket,
               code: logger.ErrorCodes.general,
-              text: ['Failed to disconnect user ' + userNameLower],
-              text_se: ['Misslyckades med att koppla från användaren ' + userNameLower],
+              text: [`Failed to disconnect user ${userNameLower}`],
+              text_se: [`Misslyckades med att koppla från användaren ${userNameLower}`],
               err: userErr,
             });
 
             return;
           }
 
-          const rooms = Object.keys(socket.rooms);
-
           socket.to(bannedSocketId).emit('ban');
 
-          for (let i = 1; i < rooms.length; i++) {
-            socket.leave(rooms[i]);
+          for (const room of Object.keys(socket.rooms)) {
+            socket.leave(room);
           }
 
           messenger.sendSelfMsg({
-            socket: socket,
+            socket,
             message: {
-              text: ['User ' + userNameLower + ' has been disconnected'],
-              text_se: ['Användaren ' + userNameLower + ' har blivit urloggad'],
+              text: [`User ${userNameLower} has been disconnected`],
+              text_se: [`Användaren ${userNameLower} har blivit urloggad`],
             },
           });
         });
@@ -652,61 +648,62 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('unban', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true } })) {
+  socket.on('unban', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const userNameLower = data.user.userName.toLowerCase();
+      const userNameLower = params.user.userName.toLowerCase();
 
-      dbConnector.unbanUser(userNameLower, function(err, user) {
+      dbConnector.unbanUser(userNameLower, (err, user) => {
         if (err || user === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to unban user'],
             text_se: ['Misslyckades med att unbanna användaren'],
-            err: err,
+            err,
           });
 
           return;
         }
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
-            text: ['Ban on user ' + userNameLower + ' has been removed'],
-            text_se: ['Ban på användaren ' + userNameLower + ' har blivit borttaget'],
+            text: [`Ban on user ${userNameLower} has been removed`],
+            text_se: [`Ban på användaren ${userNameLower} har blivit borttaget`],
           },
         });
       });
     });
   });
 
-  socket.on('bannedUsers', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, function(allowErr, allowed) {
+  socket.on('bannedUsers', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.unbanuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      dbConnector.getBannedUsers(function(err, users) {
+      dbConnector.getBannedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to get all banned users'],
             text_se: ['Misslyckades med att hämta en lista över alla bannade användare'],
-            err: err,
+            err,
           });
 
           return;
         }
 
+        // TODO Should send a list, not a string
         let usersString = '';
 
         for (let i = 0; i < users.length; i++) {
@@ -718,7 +715,7 @@ function handle(socket, io) {
         }
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
             text: [usersString],
           },
@@ -727,38 +724,38 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('updateUserTeam', function() {
+  socket.on('updateUserTeam', () => {
 
   });
 
-  socket.on('updateUser', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true }, field: true, value: true })) {
+  socket.on('updateUser', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true }, field: true, value: true })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.updateuser.commandName, function(allowErr, allowed) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.updateuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const userName = data.user.userName;
-      const field = data.field;
-      const value = data.value;
-      const callback = function(err, user) {
+      const userName = params.user.userName;
+      const field = params.field;
+      const value = params.value;
+      const callback = (err, user) => {
         if (err || user === null) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to update user'],
             text_se: ['Misslyckades med att uppdatera användaren'],
-            err: err,
+            err,
           });
 
           return;
         }
 
         messenger.sendSelfMsg({
-          socket: socket,
+          socket,
           message: {
             text: ['User has been updated'],
             text_se: ['Användaren har blivit uppdaterad'],
@@ -767,65 +764,65 @@ function handle(socket, io) {
       };
 
       switch (field) {
-      case 'visibility':
-        dbConnector.updateUserVisibility(userName, value, callback);
+        case 'visibility':
+          dbConnector.updateUserVisibility(userName, value, callback);
 
-        break;
-      case 'accesslevel':
-        dbConnector.updateUserAccessLevel(userName, value, callback);
+          break;
+        case 'accesslevel':
+          dbConnector.updateUserAccessLevel(userName, value, callback);
 
-        break;
-      case 'addgroup':
+          break;
+        case 'addgroup':
 
-        break;
-      case 'removegroup':
+          break;
+        case 'removegroup':
 
-        break;
-      case 'password':
-        dbConnector.updateUserPassword(userName, value, callback);
+          break;
+        case 'password':
+          dbConnector.updateUserPassword(userName, value, callback);
 
-        break;
-      default:
-        logger.sendSocketErrorMsg({
-          socket: socket,
-          code: logger.ErrorCodes.general,
-          text: ['Invalid field. User doesn\'t have ' + field],
-          text_se: ['Inkorrekt fält. Användare har inte fältet ' + field],
-        });
-        messenger.sendSelfMsg({
-          socket: socket,
-          message: {
-            text: ['Invalid field. User doesn\'t have ' + field],
-            text_se: ['Inkorrekt fält. Användare har inte fältet ' + field],
-          },
-        });
+          break;
+        default:
+          logger.sendSocketErrorMsg({
+            socket,
+            code: logger.ErrorCodes.general,
+            text: [`Invalid field. User doesn't have ${field}`],
+            text_se: [`Inkorrekt fält. Användare har inte fältet ${field}`],
+          });
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: [`Invalid field. User doesn't have ${field}`],
+              text_se: [`Inkorrekt fält. Användare har inte fältet ${field}`],
+            },
+          });
 
-        break;
+          break;
       }
     });
   });
 
-  socket.on('updateMode', function(data) {
-    if (!objectValidator.isValidData(data, { user: { userName: true }, mode: true })) {
+  socket.on('updateMode', (params) => {
+    if (!objectValidator.isValidData(params, { user: { userName: true }, mode: true })) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.mode.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.mode.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
       }
 
       const userName = user.userName;
-      const value = data.mode;
+      const value = params.mode;
 
-      dbConnector.updateUserMode(userName, value, function(err) {
+      dbConnector.updateUserMode(userName, value, (err) => {
         if (err) {
           logger.sendSocketErrorMsg({
-            socket: socket,
+            socket,
             code: logger.ErrorCodes.general,
             text: ['Failed to store new user mode'],
             text_se: ['Misslyckades med att lagra nya användarläget'],
-            err: err,
+            err,
           });
 
           return;
@@ -834,13 +831,13 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('whoAmI', function() {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, function(allowErr, allowed, user) {
+  socket.on('whoAmI', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         return;
       }
 
-      const data = {
+      const params = {
         user: {
           userName: user.userName,
           accessLevel: user.accessLevel,
@@ -848,36 +845,31 @@ function handle(socket, io) {
         },
       };
 
-      socket.emit('whoAmI', data);
+      socket.emit('whoAmI', params);
     });
   });
 
-  socket.on('matchPartialUser', function(data) {
-    // data.partialName is not checked if it set, to allow the retrieval of all users on no input
+  socket.on('matchPartialUser', (params) => {
+    // params.partialName is not checked if it set, to allow the retrieval of all users on no input
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, function(allowErr, allowed, user) {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         return;
       }
 
-      dbConnector.matchPartialUser(data.partialName, user, function(err, users) {
+      dbConnector.matchPartialUser(params.partialName, user, (err, users) => {
         if (err) {
           return;
         }
 
-        const itemList = [];
-        const userKeys = Object.keys(users);
-
-        for (let i = 0; i < userKeys.length; i++) {
-          itemList.push(users[userKeys[i]].userName);
-        }
+        const itemList = Object.keys(users).map(userKey => users[userKey].userName);
 
         if (itemList.length === 1) {
           socket.emit('matchFound', { matchedName: itemList[0] });
         } else {
           socket.emit('list', {
             itemList: {
-              itemList: itemList,
+              itemList,
               keepInput: false,
               replacePhrase: true,
             },

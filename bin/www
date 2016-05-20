@@ -1,81 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const app = require('../app');
-const path = require('path');
-const logger = require('../logger');
-const minifier = require('../minifier');
-const appConfig = require('rolehaven-config').app;
-
-/**
- * Creates full paths to the public and private directory of specific file types
- * @param dir Required. Private (optional public) directory name. It will be used in the private directory path. It will also be set in the public path, if secondDir is not set
- * @param secondDir Optional. Public directory name
- * @returns {{publicPath, privatePath}} Returns object with public and private path to the sent directories
- */
-function resolvePath(dir, secondDir) {
-  const privatePath = path.resolve(path.join(appConfig.privateBase, dir));
-  const publicPath = path.resolve(path.join(appConfig.publicBase, secondDir || dir));
-
-  return { publicPath: publicPath, privatePath: privatePath };
-}
-
-/**
- * Minifies all files in the directories with a specific extension
- */
-function minifyDirs() {
-  minifier.minifyDir(resolvePath(appConfig.viewsPath), 'html');
-  minifier.minifyDir(resolvePath(appConfig.stylesPath), 'scss');
-  minifier.minifyDir(resolvePath(appConfig.scriptsPath), 'js');
-}
-
-/**
- * Moves files from the private required directory to the public script directory
- * These are files which shouldn't be minified or altered but are needed for the client
- */
-function moveRequired() {
-  const pathObj = resolvePath(appConfig.requiredPath, appConfig.scriptsPath);
-
-  fs.readdir(pathObj.privatePath, function(readErr, files) {
-    if (readErr) {
-      console.log(readErr);
-
-      return;
-    }
-
-    files.forEach(function(file) {
-      const fullPrivatePath = path.join(pathObj.privatePath, file);
-      const fullPublicPath = path.join(pathObj.publicPath, file);
-
-      fs.createReadStream(fullPrivatePath).pipe(fs.createWriteStream(fullPublicPath));
-    });
-  });
-}
-
-/*
- * Checks if the public directory and create if it doesn't
- */
-fs.stat(path.resolve(appConfig.publicBase), function(err) {
-  if (err) {
-    fs.mkdir(path.resolve(appConfig.publicBase), function(dirErr) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.general,
-        text: ['Mkdir error'],
-        err: dirErr,
-      });
-    });
-  }
-
-  minifyDirs();
-  moveRequired();
-});
+const app = require('./../app');
+const appConfig = require('../config/defaults/config').app;
 
 // Sets server port
 app.set('port', appConfig.port);
 
 // Starts Express server
-const server = app.listen(app.get('port'), function() {
+const server = app.listen(app.get('port'), () => {
 });
 
 // SocketIO

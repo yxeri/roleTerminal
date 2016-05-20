@@ -1,3 +1,10 @@
 language: node_js
 node_js:
   - "stable"
+
+# Since we're caching node_modules we have to clean up stale packages
+before_install:
+  - npm prune
+cache:
+  directories:
+    - node_modules

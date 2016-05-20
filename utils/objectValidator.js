@@ -17,7 +17,7 @@ function checkKeys(data, expected) {
     if ((!data[expectedKey] || data[expectedKey] === null) && typeof data[expectedKey] !== 'boolean') {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.general,
-        text: ['Key missing: ' + expectedKey],
+        text: [`Key missing: ${expectedKey}`],
       });
 
       return false;
@@ -55,7 +55,7 @@ function isValidData(data, expected) {
   if (!isValid) {
     logger.sendErrorMsg({
       code: logger.ErrorCodes.general,
-      text: ['Expected: ' + JSON.stringify(expected)],
+      text: [`Expected: ${JSON.stringify(expected)}`],
     });
   }
 

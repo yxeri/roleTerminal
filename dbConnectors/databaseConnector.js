@@ -217,21 +217,19 @@ function verifyAllObjects(query, object, objectName, callback) {
   });
 }
 
-function incrementCommandUsage(commandName, callback) {
+function incrementCommandUsage(commandName) {
   const query = { commandName };
   const update = { $inc: { timesUsed: 1 } };
 
-  Command.findOneAndUpdate(query, update).lean().exec(
-    (err, device) => {
-      if (err) {
-        logger.sendErrorMsg({
-          code: logger.ErrorCodes.db,
-          text: ['Failed to increment command usage'],
-          err,
-        });
-      }
+  Command.findOneAndUpdate(query, update).lean().exec((err) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to increment command usage'],
+        err,
+      });
     }
-  );
+  });
 }
 
 function createMission(sentMission, callback) {

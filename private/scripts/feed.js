@@ -956,36 +956,35 @@ function preparePosition(position) {
   return preparedPosition; // geolocation
 }
 
+function retrievePosition() {
+  const clearingWatch = function clearingWatch() {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+    trackingInterval = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
+  };
+
+  watchId = navigator.geolocation.watchPosition((position) => {
+    if (position !== undefined) {
+      positions.push(position);
+    }
+  }, (err) => {
+    if (err) {
+      isTracking = false;
+      clearTimeout(trackingInterval);
+      queueMessage({
+        text: labels.getText('errors', 'noTracking'),
+        extraClass: 'importantMsg',
+      });
+    }
+  }, { enableHighAccuracy: true });
+
+  if (isTracking) {
+    trackingInterval = setTimeout(clearingWatch, watchPositionTime);
+  }
+}
+
 function sendLocation() {
   let mostAccuratePos;
-
-  function retrievePosition() {
-    const clearingWatch = function clearingWatch() {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-      trackingInterval = setTimeout(sendLocation, pausePositionTime);
-    };
-
-    watchId = navigator.geolocation.watchPosition(() => {
-      // FIXME This is broken and doesn't do anything
-      // if (position !== undefined) {
-      //  positions.push(position);
-      // }
-    }, (err) => {
-      if (err.code === err.PERMISSION_DENIED) {
-        isTracking = false;
-        clearTimeout(trackingInterval);
-        queueMessage({
-          text: labels.getText('errors', 'noTracking'),
-          extraClass: 'importantMsg',
-        });
-      }
-    }, { enableHighAccuracy: true });
-
-    if (isTracking) {
-      trackingInterval = setTimeout(clearingWatch, watchPositionTime);
-    }
-  }
 
   if (getUser() !== null && positions.length > 0) {
     mostAccuratePos = positions[positions.length - 1];
@@ -3708,23 +3707,18 @@ function onLocationMsg(locationData) {
   for (const user of Object.keys(locationData)) {
     let text = '';
     const userLocation = locationData[user];
-    const latitude = userLocation.latitude.toFixed(6);
-    const longitude = userLocation.longitude.toFixed(6);
-    const heading = userLocation.heading !== null ? Math.round(userLocation.heading) : null;
+    const latitude = userLocation.coords.latitude.toFixed(6);
+    const longitude = userLocation.coords.longitude.toFixed(6);
+    const heading = userLocation.coords.heading !== null ? Math.round(userLocation.coords.heading) : null;
     const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
-    const mapLocation = locateOnMap(latitude, longitude);
 
     text += `User: ${user}${'\t'}`;
     text += `Time: ${generateTimeStamp(userLocation.timestamp, true)}${'\t'}`;
-    text += `Location: ${mapLocation}${'\t'}`;
+    text += `Accuracy: ${accuracy} ${accuracy !== 'BAD' ? 'meters' : ''}${'\t'}`;
+    text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
 
-    if (mapLocation !== '---') {
-      text += `Accuracy: ${accuracy} meters${'\t'}`;
-      text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
-
-      if (heading !== null) {
-        text += `Heading: ${heading} deg.`;
-      }
+    if (heading !== null) {
+      text += `Heading: ${heading} deg.`;
     }
 
     queueMessage({ text: [text] });

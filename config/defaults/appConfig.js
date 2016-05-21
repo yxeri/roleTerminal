@@ -123,6 +123,8 @@ config.customFlags = modifiedConfig.customFlags;
 // Instance specific
 //
 
+config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
+
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
 config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
 config.longitude = process.env.LONGITUDE || modifiedConfig.longitude || '15.198645';

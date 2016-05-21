@@ -95,24 +95,6 @@ const morseCodes = {
   // Symbolizes space betwen words
   '#': morseSeparator,
 };
-/**
- * Stores everything related to the map area
- * The map area will be separated into grids
- * The size of each grid is dependent of the map size
- * (which is set with coordinates) and max amount of X and Y grids
- */
-const mapHelper = {
-  leftLong: 15.1857261,
-  rightLong: 15.2045467,
-  topLat: 59.7609695,
-  bottomLat: 59.7465301,
-  xGridsMax: 24,
-  yGridsMax: 36,
-  xSize: 0,
-  ySize: 0,
-  xGrids: {},
-  yGrids: {},
-};
 const commandHelper = {
   maxSteps: 0,
   onStep: 0,
@@ -142,6 +124,8 @@ let watchId = null;
 // Is geolocation tracking on?
 let isTracking = true;
 let firstConnection = true;
+let viewIsSplit = false;
+let map;
 let positions = [];
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
@@ -566,20 +550,18 @@ function shouldHideCursor(isHidden) {
   setLocalVal('hiddenCursor', isHidden);
 }
 
-function isHiddenBottomMenu() {
-  return getLocalVal('hiddenBottomMenu') === 'true';
+function isHiddenMenu() {
+  return getLocalVal('hiddenMenu') === 'true';
 }
 
-function shouldHideBottomMenu(isHidden) {
+function shouldHideMenu(isHidden) {
   if (isHidden) {
     menu.classList.add('hide');
-    cmdInput.classList.remove('menuBottomPadding');
   } else {
     menu.classList.remove('hide');
-    cmdInput.classList.add('menuBottomPadding');
   }
 
-  setLocalVal('hiddenBottomMenu', isHidden);
+  setLocalVal('hiddenMenu', isHidden);
 }
 
 function isHiddenCmdInput() {
@@ -878,64 +860,6 @@ function parseMorse(text) {
   }
 
   return morseCodeText;
-}
-
-function generateMap() {
-  const startLetter = 'A';
-  mapHelper.xSize = (mapHelper.rightLong - mapHelper.leftLong) / parseFloat(mapHelper.xGridsMax);
-  mapHelper.ySize = (mapHelper.topLat - mapHelper.bottomLat) / parseFloat(mapHelper.yGridsMax);
-
-  for (let xGrid = 0; xGrid < mapHelper.xGridsMax; xGrid++) {
-    const currentChar = String.fromCharCode(startLetter.charCodeAt(0) + xGrid);
-    mapHelper.xGrids[currentChar] = mapHelper.leftLong + parseFloat(mapHelper.xSize * xGrid);
-  }
-
-  for (let yGrid = 0; yGrid < mapHelper.yGridsMax; yGrid++) {
-    mapHelper.yGrids[yGrid] = mapHelper.topLat - parseFloat(mapHelper.ySize * yGrid);
-  }
-}
-
-function locateOnMap(latitude, longitude) {
-  const xKeys = Object.keys(mapHelper.xGrids);
-  const yKeys = Object.keys(mapHelper.yGrids);
-  let x;
-  let y;
-
-  if (longitude >= mapHelper.leftLong && longitude <= mapHelper.rightLong && latitude <= mapHelper.topLat && latitude >= mapHelper.bottomLat) {
-    for (let xGrid = 0; xGrid < xKeys.length; xGrid++) {
-      const nextXGrid = mapHelper.xGrids[xKeys[xGrid + 1]];
-
-      if (longitude < nextXGrid) {
-        x = xKeys[xGrid];
-
-        break;
-      } else if (longitude === (nextXGrid + parseFloat(mapHelper.xSize))) {
-        x = xKeys[xGrid + 1];
-
-        break;
-      }
-    }
-
-    for (let yGrid = 0; yGrid < yKeys.length; yGrid++) {
-      const nextYGrid = mapHelper.yGrids[yKeys[yGrid + 1]];
-
-      if (latitude > nextYGrid) {
-        y = yKeys[yGrid];
-
-        break;
-      } else if (latitude === (nextYGrid - parseFloat(mapHelper.ySize))) {
-        y = yKeys[yGrid + 1];
-
-        break;
-      }
-    }
-  }
-
-  if (x !== undefined && y !== undefined) {
-    return `${x}${y}`;
-  }
-
-  return textTools.createLine(3);
 }
 
 /**
@@ -1541,7 +1465,7 @@ function specialKeyPress(event) {
       }
       // Page up
       case 33: {
-        window.scrollBy(0, -window.innerHeight);
+        background.scrollTop -= window.innerHeight;
 
         event.preventDefault();
 
@@ -1549,7 +1473,7 @@ function specialKeyPress(event) {
       }
       // Page down
       case 34: {
-        window.scrollBy(0, window.innerHeight);
+        background.scrollTop += window.innerHeight;
 
         event.preventDefault();
 
@@ -1560,7 +1484,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          window.scrollBy(0, -window.innerHeight);
+          background.scrollTop -= window.innerHeight;
         } else if (!commandHelper.keysBlocked && commandHelper.command === null && previousCommandPointer > 0) {
           clearInput();
           previousCommandPointer--;
@@ -1576,7 +1500,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          window.scrollBy(0, window.innerHeight);
+          background.scrollTop += window.innerHeight;
         } else {
           if (!commandHelper.keysBlocked && commandHelper.command === null) {
             if (previousCommandPointer < commandHistory.length - 1) {
@@ -1857,6 +1781,29 @@ function addMessageSpecialProperties(message = {}) {
  */
 function isTouchDevice() {
   return ((/iP(hone|ad|od)/.test(navigator.userAgent) || /Android/.test(navigator.userAgent)));
+}
+
+function splitView(shouldSplit, secondDiv) {
+  if (shouldSplit) {
+    secondDiv.classList.remove('hide');
+
+    if (isTouchDevice()) {
+      background.classList.add('halfView');
+    } else {
+      background.classList.add('halfView');
+    }
+
+    if (window.innerHeight > window.innerWidth) {
+      background.classList.add('halfViewPortrait');
+    }
+  } else {
+    secondDiv.classList.add('hide');
+    background.classList.remove('halfView');
+    background.classList.remove('halfViewMobile');
+    background.classList.remove('halfViewPortrait');
+  }
+
+  viewIsSplit = shouldSplit;
 }
 
 // TODO Major refactoring needed to break up legacy structure. It is not very pretty or understandable right now
@@ -3428,13 +3375,13 @@ function attachCommands() {
 
             break;
           }
-          case 'hiddenbottommenu': {
-            shouldHideBottomMenu(value);
+          case 'hiddenmenu': {
+            shouldHideMenu(value);
 
             if (value) {
-              queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOn') });
+              queueMessage({ text: labels.getText('info', 'hiddenMenuOn') });
             } else {
-              queueMessage({ text: labels.getText('info', 'hiddenBottomMenuOff') });
+              queueMessage({ text: labels.getText('info', 'hiddenMenuOff') });
             }
 
             break;
@@ -3482,6 +3429,103 @@ function attachCommands() {
     visibility: 0,
     accessLevel: 0,
     category: 'basic',
+  };
+  commands.map = {
+    func: (phrases = []) => {
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {
+            lat: 59.7529831,
+            lng: 15.1914996,
+          },
+          zoom: 14,
+          disableDefaultUI: true,
+          draggable: false,
+          fullscreenControl: false,
+          keyboardShortcuts: false,
+          mapTypeControl: false,
+          noClear: true,
+          zoomControl: false,
+          disableDoubleClickZoom: true,
+          panControl: false,
+          overviewMapControl: false,
+          rotateControl: false,
+          scaleControl: false,
+          scrollWheel: false,
+          streetViewControl: false,
+          backgroundColor: '#001e15',
+          styles: [
+            {
+              featureType: 'all',
+              elementType: 'all',
+              stylers: [
+                { color: '#001e15' },
+              ],
+            }, {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [
+                { color: '#00ffcc' },
+              ],
+            }, {
+              featureType: 'road',
+              elementType: 'labels',
+              stylers: [
+                { visibility: 'off' },
+              ],
+            }, {
+              featureType: 'poi',
+              elementType: 'all',
+              stylers: [
+                { visibility: 'off' },
+              ],
+            }, {
+              featureType: 'administrative',
+              elementType: 'all',
+              stylers: [
+                { visibility: 'off' },
+              ],
+            }, {
+              featureType: 'water',
+              elementType: 'all',
+              stylers: [
+                { color: '#00ffcc' },
+              ],
+            },
+          ],
+        });
+      }
+
+      if (phrases.length > 0) {
+        const choice = phrases[0];
+        const mapDiv = document.getElementById('map');
+
+        switch (choice) {
+          case 'on': {
+            splitView(true, mapDiv);
+
+            break;
+          }
+          case 'off': {
+            splitView(false, mapDiv);
+
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+
+        scrollView();
+
+        if (!map) {
+          initMap();
+        }
+      }
+    },
+    accessLevel: 1,
+    visibility: 1,
+    category: 'advanced',
   };
 }
 
@@ -3923,7 +3967,7 @@ function onStartup(params = { }) {
   shouldStaticInputStart(params.staticInputStart);
   setDefaultInputStart(params.defaultInputStart);
   shouldHideCursor(isHiddenCursor());
-  shouldHideBottomMenu(isHiddenBottomMenu());
+  shouldHideMenu(isHiddenMenu());
   shouldHideCmdInput(isHiddenCmdInput());
   shouldThinView(isThinView());
 
@@ -3936,6 +3980,8 @@ function onStartup(params = { }) {
 
     if (!isTouchDevice()) {
       cmdInput.focus();
+    } else {
+      background.classList.add('fullscreen');
     }
 
     if (!getDeviceId()) {
@@ -3950,7 +3996,6 @@ function onStartup(params = { }) {
     window.addEventListener('focus', refocus);
 
     resetPreviousCommandPointer();
-    generateMap();
     setIntervals();
     buildMorsePlayer();
 

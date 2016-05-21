@@ -21,6 +21,7 @@ function handle(io) {
   router.get('/', (req, res) => {
     res.render('index', {
       title: appConfig.title,
+      gMapsKey: appConfig.gMapsKey,
       socketPath: appConfig.socketPath,
     });
   });

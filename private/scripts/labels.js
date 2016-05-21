@@ -886,8 +886,8 @@ const all = {
     fastModeOff: ['Fast mode is now turned off'],
     hiddenCursorOn: ['Mouse cursor is now hidden'],
     hiddenCursorOff: ['Mouse cursor is now visible'],
-    hiddenBottomMenuOn: ['Bottom menu is now hidden'],
-    hiddenBottomMenuOff: ['Bottom menu is now visible'],
+    hiddenMenuOn: ['Menu is now hidden'],
+    hiddenMenuOff: ['Menu is now visible'],
     youHaveBeenBanned: [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support Center for re-education',
@@ -966,8 +966,8 @@ const all = {
     fastModeOff: ['Fast mode är nu avslaget'],
     hiddenCursorOn: ['Muspekaren är nu dold'],
     hiddenCursorOff: ['Muspekaren är nu synlig'],
-    hiddenBottomMenuOn: ['Undermenyn är nu dold'],
-    hiddenBottomMenuOff: ['Undermenyn är nu synlig'],
+    hiddenMenuOn: ['Menyn är nu dold'],
+    hiddenMenuOff: ['Menyn är nu synlig'],
     youHaveBeenBanned: [
       'Ni har blivit bannade från systemet',
       'Kontakta ert närmaste Organica IT-supportcenter för omskolning',

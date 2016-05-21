@@ -8,6 +8,8 @@ $imp-text-color: #002d25;
 $imp-back-color: #00ffcc;
 
 html {
+  margin: 0;
+  padding: 0;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -15,9 +17,13 @@ html {
   user-select: none;
   background-color: $back-color;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 body {
+  padding: 0;
   margin: 0;
   background-color: $back-color;
   color: $text-color;
@@ -26,8 +32,10 @@ body {
   font-size: 1.2em;
   letter-spacing: .05em;
   white-space: pre-wrap;
-  overflow: hidden;
   -webkit-text-size-adjust: 100%;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 ul {
@@ -47,23 +55,29 @@ pre {
   margin: 0;
 }
 
+#background {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
 #menu {
   width: 100%;
   position: fixed;
-  bottom: 0;
+  z-index: 10;
+  top: 0;
   background-color: $back-color;
-  border-top: 2px solid;
-  overflow: hidden;
+  border-bottom: 2px solid;
 
   li {
     padding: .4em 0 .4em 0;
-    margin-left: 1em;
-    display: block;
+    margin-right: 1em;
     float: left;
   }
 
-  li:first-child {
-    margin-left: 0;
+  li:last-child {
+    margin-right: 0;
   }
 }
 
@@ -72,6 +86,7 @@ pre {
 }
 
 #inputContainer {
+  overflow: hidden;
   padding: 0 .8em 0 .8em;
   display: table;
   width: 99%;
@@ -110,11 +125,10 @@ pre {
   content: '$';
 }
 
-#background {
-  overflow-x: hidden;
-}
-
 #mainFeed {
+  overflow: hidden;
+  padding-top: 2em;
+
   li {
     padding: 0 .8em 0 .8em;
   }
@@ -128,9 +142,48 @@ pre {
   }
 }
 
-#hiddenInput {
-  visibility: hidden;
-  border: 0;
+#map {
+  padding-top: 2em;
+  position: fixed;
+  height: 100%;
+  width: 50%;
+  overflow: hidden;
+  background-color: #00865e;
+
+  a {
+    display: none;
+  }
+
+  > div {
+    display: none
+  }
+
+  > div:first-child {
+    display: inherit;
+
+    > div {
+      display: none;
+    }
+
+    div:first-child {
+      display:inherit;
+    }
+  }
+}
+
+#spacer {
+  height: .4em;
+}
+
+.halfView {
+  position: fixed;
+  right: 0;
+  width: 50% !important;
+}
+
+.halfViewPortrait {
+  height: 50% !important;
+  width: 100% !important;
 }
 
 .menuBottomPadding {
@@ -261,7 +314,7 @@ pre {
 }
 
 .fullscreen {
-  overflow: scroll;
+  overflow-y: scroll !important;
 }
 
 .upperCase {
@@ -292,6 +345,10 @@ pre {
 }
 
 @media (max-width: 736px) {
+  #spacer {
+    height: .2em;
+  }
+
   #mainFeed li {
     padding: 0 .4em 0 .4em;
   }
@@ -314,6 +371,10 @@ pre {
 }
 
 @media (max-width: 414px) {
+  #spacer {
+    heigh: .1em;
+  }
+
   #mainFeed li {
     padding: 0 .2em 0 .2em;
   }

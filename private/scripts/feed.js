@@ -288,7 +288,7 @@ function generateLink(text, className, func) {
   });
   spanObj.classList.add('link');
 
-  spanObj.addEventListener('click', function linkClickHandler(event) {
+  spanObj.addEventListener('click', (event) => {
     clicked = true;
 
     func(this);
@@ -883,7 +883,7 @@ function preparePosition(position) {
 }
 
 function retrievePosition() {
-  const clearingWatch = function clearingWatch() {
+  const clearingWatch = () => {
     navigator.geolocation.clearWatch(watchId);
     watchId = null;
     trackingInterval = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
@@ -1813,7 +1813,7 @@ function splitView(shouldSplit, secondDiv) {
 // TODO Major refactoring needed to break up legacy structure. It is not very pretty or understandable right now
 function attachCommands() {
   commands.help = {
-    func: function helpCommand(phrases) {
+    func: (phrases) => {
       function getCommands() {
         const allCommands = [];
         // TODO Change from Object.keys for compatibility with older Android
@@ -1855,7 +1855,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.clear = {
-    func: function clearCommand() {
+    func: () => {
       while (mainFeed.childNodes.length > 1) {
         mainFeed.removeChild(mainFeed.lastChild);
       }
@@ -1865,14 +1865,14 @@ function attachCommands() {
     category: 'basic',
   };
   commands.whoami = {
-    func: function whoamiCommand() {
+    func: () => {
       socket.emit('whoAmI');
     },
     accessLevel: 13,
     category: 'basic',
   };
   commands.msg = {
-    func: function msgCommand(phrases) {
+    func: (phrases) => {
       let writtenMsg;
 
       if (phrases && phrases.length > 0) {
@@ -1897,7 +1897,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.broadcast = {
-    func: function broadcastCommand() {
+    func: () => {
       commandHelper.data = {
         message: {
           text: [],
@@ -1911,7 +1911,7 @@ function attachCommands() {
       setInputStart('broadcast');
     },
     steps: [
-      function broadcastStepOne(phrases) {
+      (phrases) => {
         if (phrases.length > 0 && phrases[0] !== '') {
           const phrase = phrases.join(' ');
           commandHelper.data.message.customSender = phrase;
@@ -1920,7 +1920,7 @@ function attachCommands() {
         queueMessage({ text: labels.getText('info', 'typeLineEnter') });
         commandHelper.onStep++;
       },
-      function broadcastStepTwo(phrases) {
+      (phrases) => {
         const message = commandHelper.data.message;
         let dataText;
 
@@ -1937,7 +1937,7 @@ function attachCommands() {
           queueMessage({ text: labels.getText('info', 'isThisOk') });
         }
       },
-      function broadcastStepThree(phrases) {
+      (phrases) => {
         if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
           socket.emit('broadcastMsg', commandHelper.data);
           resetCommand();
@@ -1951,7 +1951,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.follow = {
-    func: function followCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const room = {
           roomName: phrases[0].toLowerCase(),
@@ -1975,7 +1975,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function followStepOne(phrases) {
+      (phrases) => {
         if (phrases.length > 0) {
           commandHelper.data.room.password = phrases[0];
         }
@@ -1988,7 +1988,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.unfollow = {
-    func: function unfollowCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const room = {
           roomName: phrases[0].toLowerCase(),
@@ -2011,7 +2011,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.list = {
-    func: function listCommand(phrases = []) {
+    func: (phrases = []) => {
       if (phrases.length > 0) {
         const listOption = phrases[0].toLowerCase();
 
@@ -2047,7 +2047,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.mode = {
-    func: function modeCommand(phrases, verbose) {
+    func: (phrases, verbose) => {
       let commandString;
 
       if (phrases.length > 0) {
@@ -2118,7 +2118,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.register = {
-    func: function registerCommand(phrases = []) {
+    func: (phrases = []) => {
       const data = {};
 
       if (getUser() === null) {
@@ -2165,7 +2165,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function registerStepOne() {
+      () => {
         queueMessage({
           text: [
             'Input a password and press enter',
@@ -2182,7 +2182,7 @@ function attachCommands() {
         setInputStart('password');
         commandHelper.onStep++;
       },
-      function registerStepTwo(phrases = []) {
+      (phrases = []) => {
         const password = phrases[0];
 
         if (phrases && password.length >= 3 && isTextAllowed(password)) {
@@ -2207,7 +2207,7 @@ function attachCommands() {
           });
         }
       },
-      function registerStepThree(phrases = []) {
+      (phrases = []) => {
         const password = phrases[0];
 
         if (password === commandHelper.data.user.password) {
@@ -2230,14 +2230,14 @@ function attachCommands() {
         }
       },
     ],
-    abortFunc: function registerAbort() {
+    abortFunc: () => {
       hideInput(false);
     },
     accessLevel: 0,
     category: 'login',
   };
   commands.createroom = {
-    func: function createroomCommand(phrases = ['']) {
+    func: (phrases = ['']) => {
       if (phrases.length > 0) {
         const roomName = phrases[0].toLowerCase();
 
@@ -2270,7 +2270,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function createroomStepOne(phrases = ['']) {
+      (phrases = ['']) => {
         const password = phrases[0];
         commandHelper.onStep++;
 
@@ -2288,7 +2288,7 @@ function attachCommands() {
           resetCommand(false);
         }
       },
-      function createroomStepTwo(phrases = ['']) {
+      (phrases = ['']) => {
         const password = phrases[0];
 
         if (password === commandHelper.data.room.password) {
@@ -2317,7 +2317,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.myrooms = {
-    func: function myroomsCommand() {
+    func: () => {
       const data = { user: {}, device: {} };
 
       data.user.userName = getUser();
@@ -2329,7 +2329,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.login = {
-    func: function loginCommand(phrases) {
+    func: (phrases) => {
       const data = { user: {} };
 
       if (getUser() !== null) {
@@ -2369,7 +2369,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function loginStepOne(phrases) {
+      (phrases) => {
         commandHelper.data.user.password = phrases[0];
         socket.emit('login', commandHelper.data);
         commands[commandHelper.command].abortFunc();
@@ -2377,7 +2377,7 @@ function attachCommands() {
         resetCommand();
       },
     ],
-    abortFunc: function loginAbort() {
+    abortFunc: () => {
       hideInput(false);
     },
     clearAfterUse: true,
@@ -2385,14 +2385,14 @@ function attachCommands() {
     category: 'login',
   };
   commands.time = {
-    func: function timeCommand() {
+    func: () => {
       socket.emit('time');
     },
     accessLevel: 13,
     category: 'basic',
   };
   commands.locate = {
-    func: function locateCommand(phrases) {
+    func: (phrases) => {
       if (!isTracking) {
         queueMessage({
           text: [
@@ -2417,7 +2417,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.history = {
-    func: function historyCommand(phrases) {
+    func: (phrases) => {
       const data = {};
 
       if (phrases.length > 0) {
@@ -2440,7 +2440,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.morse = {
-    func: function morseCommand(phrases, local) {
+    func: (phrases, local) => {
       if (phrases && phrases.length > 0) {
         const data = {
           local,
@@ -2467,7 +2467,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.password = {
-    func: function passwordCommand() {
+    func: () => {
       commandHelper.hideInput = true;
 
       hideInput(true);
@@ -2479,7 +2479,7 @@ function attachCommands() {
       });
     },
     steps: [
-      function passwordStepOne(phrases = ['']) {
+      (phrases = ['']) => {
         const data = {};
         const oldPassword = phrases[0];
         data.oldPassword = oldPassword;
@@ -2489,7 +2489,7 @@ function attachCommands() {
         setInputStart('New pass');
         socket.emit('checkPassword', data);
       },
-      function passwordStepTwo(phrases = []) {
+      (phrases = []) => {
         commandHelper.data.newPassword = phrases[0];
         commandHelper.onStep++;
 
@@ -2499,7 +2499,7 @@ function attachCommands() {
           text_se: ['Skriv in ert nya lösenord igen'],
         });
       },
-      function passwordStepThree(phrases = []) {
+      (phrases = []) => {
         const repeatedPassword = phrases[0];
 
         if (repeatedPassword === commandHelper.data.newPassword) {
@@ -2522,14 +2522,14 @@ function attachCommands() {
         }
       },
     ],
-    abortFunc: function passwordAbort() {
+    abortFunc: () => {
       hideInput(false);
     },
     accessLevel: 13,
     category: 'basic',
   };
   commands.logout = {
-    func: function logoutCommand() {
+    func: () => {
       socket.emit('logout');
     },
     accessLevel: 13,
@@ -2537,14 +2537,14 @@ function attachCommands() {
     clearAfterUse: true,
   };
   commands.reboot = {
-    func: function rebootCommand() {
+    func: () => {
       refreshApp();
     },
     accessLevel: 1,
     category: 'basic',
   };
   commands.verifyuser = {
-    func: function verifyuserCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
 
@@ -2563,7 +2563,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.verifyteam = {
-    func: function verifyteamCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const teamName = phrases[0].toLowerCase();
 
@@ -2582,7 +2582,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.banuser = {
-    func: function banuserCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
         const data = { user: { userName } };
@@ -2596,7 +2596,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.unbanuser = {
-    func: function unbanuserCommand(phrases) {
+    func: (phrases) => {
       if (phrases.length > 0) {
         const userName = phrases[0].toLowerCase();
         const data = { user: { userName } };
@@ -2610,7 +2610,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.whisper = {
-    func: function whisperCommand(phrases) {
+    func: (phrases) => {
       const data = {};
 
       if (phrases.length > 1) {
@@ -2634,7 +2634,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.hackroom = {
-    func: function hackroomCommand(phrases) {
+    func: (phrases) => {
       const data = {};
       const razorLogo = labels.getMessage('logos', 'razor');
 
@@ -2661,7 +2661,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function hackroomStepOne() {
+      () => {
         const data = {
           room: { roomName: commandHelper.data.roomName },
         };
@@ -2672,7 +2672,7 @@ function attachCommands() {
         });
         socket.emit('roomHackable', data);
       },
-      function hackroomStepTwo() {
+      () => {
         const commandObj = commandHelper;
         const timeout = 28000;
         const timerEnded = function timerEnded() {
@@ -2725,7 +2725,7 @@ function attachCommands() {
           text_en: [`Sekvens: ${commandObj.data.code}`],
         });
       },
-      function hackroomStepThree(phrases) {
+      (phrases) => {
         const commandObj = commandHelper;
         const phrase = phrases.join(' ').trim();
 
@@ -2776,7 +2776,7 @@ function attachCommands() {
         }
       },
     ],
-    abortFunc: function hackroomAbort() {
+    abortFunc: () => {
       clearTimeout(commandHelper.data.timer);
     },
     clearBeforeUse: true,
@@ -2784,7 +2784,7 @@ function attachCommands() {
     category: 'hacking',
   };
   commands.importantmsg = {
-    func: function importantmsgCommand() {
+    func: () => {
       const data = {
         message: {
           text: [],
@@ -2810,7 +2810,7 @@ function attachCommands() {
       setInputStart('imprtntMsg');
     },
     steps: [
-      function importantmsgStepOne(phrases) {
+      (phrases) => {
         if (phrases.length > 0) {
           const deviceId = phrases[0];
 
@@ -2827,12 +2827,12 @@ function attachCommands() {
           }
         }
       },
-      function importantmsgStepTwo() {
+      () => {
         commandHelper.onStep++;
         queueMessage({ text: labels.getText('info', 'typeLineEnter') });
         queueMessage({ text: labels.getText('info', 'keepShortMorse') });
       },
-      function importantmsgStepThree(phrases) {
+      (phrases) => {
         const message = commandHelper.data.message;
 
         if (phrases.length > 0 && phrases[0] !== '') {
@@ -2851,7 +2851,7 @@ function attachCommands() {
           queueMessage({ text: labels.getText('info', 'isThisOk') });
         }
       },
-      function importantmsgStepFour(phrases) {
+      (phrases) => {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
             commandHelper.onStep++;
@@ -2862,7 +2862,7 @@ function attachCommands() {
           }
         }
       },
-      function importantmsgStepFive(phrases) {
+      (phrases) => {
         if (phrases.length > 0) {
           if (phrases[0].toLowerCase() === 'yes') {
             commandHelper.data.morse = {
@@ -2880,7 +2880,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.chipper = {
-    func: function chipperCommand() {
+    func: () => {
       queueMessage({
         text: [
           textTools.createFullLine(),
@@ -2905,7 +2905,7 @@ function attachCommands() {
       setInputStart('Chipper');
     },
     steps: [
-      function chipperStepOne() {
+      () => {
         const commandObj = commandHelper;
         commandObj.data = {};
         commandObj.onStep++;
@@ -2921,7 +2921,7 @@ function attachCommands() {
         });
         setTimeout(commands[commandObj.command].steps[commandObj.onStep], 2000);
       },
-      function chipperStepTwo() {
+      () => {
         const commandObj = commandHelper;
         const stopFunc = function stopFunc() {
           queueMessage({
@@ -2950,7 +2950,7 @@ function attachCommands() {
         commandObj.data.printTimer = setTimeout(commands[commandObj.command].steps[commandObj.onStep], 250);
       },
     ],
-    abortFunc: function chipperAbort() {
+    abortFunc: () => {
       const commandObj = commandHelper;
 
       if (commandObj.data) {
@@ -2976,7 +2976,7 @@ function attachCommands() {
     clearBeforeUse: true,
   };
   commands.room = {
-    func: function roomCommand(phrases) {
+    func: (phrases) => {
       const data = { room: {} };
 
       if (phrases.length > 0) {
@@ -3004,7 +3004,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.removeroom = {
-    func: function removeroomCommand(phrases) {
+    func: (phrases) => {
       const data = { room: {} };
 
       if (phrases.length > 0) {
@@ -3033,7 +3033,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function removeroomStepOne(phrases) {
+      (phrases) => {
         if (phrases[0].toLowerCase() === 'yes') {
           socket.emit('removeRoom', commandHelper.data);
         }
@@ -3045,7 +3045,7 @@ function attachCommands() {
     category: 'advanced',
   };
   commands.updateuser = {
-    func: function updateuserCommand(phrases) {
+    func: (phrases) => {
       const data = { user: {} };
 
       if (phrases.length > 2) {
@@ -3072,7 +3072,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.updatecommand = {
-    func: function updatecommandCommand(phrases) {
+    func: (phrases) => {
       const data = {};
 
       if (phrases.length > 2) {
@@ -3098,7 +3098,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.updateroom = {
-    func: function updateroomCommand(phrases) {
+    func: (phrases) => {
       const data = { room: {} };
 
       if (phrases.length > 2) {
@@ -3125,14 +3125,14 @@ function attachCommands() {
     category: 'admin',
   };
   commands.weather = {
-    func: function weatherCommand() {
+    func: () => {
       socket.emit('weather');
     },
     accessLevel: 1,
     category: 'basic',
   };
   commands.updatedevice = {
-    func: function updatedeviceCommand(phrases) {
+    func: (phrases) => {
       const data = { device: {} };
 
       if (phrases.length > 2) {
@@ -3159,7 +3159,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.createteam = {
-    func: function createteamCommand(phrases) {
+    func: (phrases) => {
       const data = { team: { teamName: '' } };
 
       if (phrases.length > 0) {
@@ -3177,7 +3177,7 @@ function attachCommands() {
       }
     },
     steps: [
-      function creeateTeamStepOne() {
+      () => {
         queueMessage({
           text: [
             'Are you the owner of the team? Leave it empty and press enter, if you are. Enter the name of the user that is the owner, if you are not',
@@ -3191,7 +3191,7 @@ function attachCommands() {
         commandHelper.allowAutoComplete = true;
         commandHelper.onStep++;
       },
-      function createTeamStepTwo(phrases) {
+      (phrases) => {
         if (phrases[0] !== '') {
           const owner = phrases[0];
 
@@ -3210,11 +3210,11 @@ function attachCommands() {
     autocomplete: { type: 'users' },
   };
   commands.invitations = {
-    func: function invitationsCommand() {
+    func: () => {
       socket.emit('getInvitations');
     },
     steps: [
-      function invitationsCommandStepOne(data) {
+      (data) => {
         const sentInvitations = data.invitations;
         const text = [];
         commandHelper.data = data;
@@ -3243,7 +3243,7 @@ function attachCommands() {
           resetCommand(false);
         }
       },
-      function invitationsCommandStepTwo(phrases) {
+      (phrases) => {
         if (phrases.length > 1) {
           const itemNumber = phrases[0] - 1;
           const answer = phrases[1].toLowerCase();
@@ -3285,7 +3285,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.inviteteam = {
-    func: function inviteteamCommand(phrases) {
+    func: (phrases) => {
       const data = { user: { userName: phrases[0] } };
 
       if (data.user.userName) {
@@ -3301,7 +3301,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.inviteroom = {
-    func: function inviteroomCommand(phrases) {
+    func: (phrases) => {
       const data = {
         user: { userName: phrases[0] },
         room: { roomName: phrases[1] },
@@ -3320,7 +3320,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.alias = {
-    func: function aliasCommand(phrases) {
+    func: (phrases) => {
       const aliasName = phrases.shift();
       const sequence = phrases;
       const aliases = getAliases();
@@ -3351,7 +3351,7 @@ function attachCommands() {
     category: 'basic',
   };
   commands.settings = {
-    func: function settingsCommand(phrases = []) {
+    func: (phrases = []) => {
       if (phrases.length > 1) {
         const setting = phrases[0];
         const value = phrases[1] === 'on';
@@ -3427,7 +3427,7 @@ function attachCommands() {
     category: 'admin',
   };
   commands.radio = {
-    func: function radioCommand() {
+    func: () => {
       audio.playAudio({ path: 'http://69.4.232.118:80/live;' });
     },
     visibility: 0,
@@ -4046,12 +4046,6 @@ function onStartup(params = { }) {
     firstConnection = false;
   }
 }
-
-// function onMissions(data = []) {
-  // for (let i = 0; i < data.length; i++) {
-  //
-  // }
-// }
 
 function startSocket() {
   if (socket) {

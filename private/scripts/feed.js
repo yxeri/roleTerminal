@@ -3455,7 +3455,7 @@ function attachCommands() {
           overviewMapControl: false,
           rotateControl: false,
           scaleControl: false,
-          scrollWheel: false,
+          scrollwheel: false,
           streetViewControl: false,
           backgroundColor: '#001e15',
           styles: [

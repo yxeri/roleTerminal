@@ -46,9 +46,14 @@ function handle(socket) {
 
       // Return all user locations
       if (params.user.userName === '*') {
-        dbConnector.getAllUserLocations(params.user, (err, users) => {
+        dbConnector.getAllUserLocations(user, (err, users) => {
           if (err || users === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to get user location'],
+              err,
+            });
 
             return;
           }
@@ -66,14 +71,23 @@ function handle(socket) {
       } else {
         dbConnector.getUserLocation(user, params.user.userName, (err, foundUser) => {
           if (err || foundUser === null) {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.db, 'Failed to get user location', err);
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to get user location'],
+              err,
+            });
           } else if (foundUser.position !== undefined) {
             const userName = foundUser.userName;
             locationData[userName] = createUserPosition(foundUser);
 
             socket.emit('locationMsg', locationData);
           } else {
-            logger.sendSocketErrorMsg(socket, logger.ErrorCodes.notFound, `Unable to locate ${params.user.userName}`);
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.notFound,
+              text: [`Unable to locate ${params.user.userName}`],
+            });
           }
         });
       }

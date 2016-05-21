@@ -10,8 +10,6 @@
     <title>{{title}}</title>
   </head>
   <body>
-    <!-- Required for Android 2.2. Browser will crash if there is only one input field -->
-    <input disabled="true" id="hiddenInput" />
     <div id="background">
       <ul class="feed" id="mainFeed">
         <!-- Required for Safari to render text -->
@@ -20,16 +18,18 @@
         </li>
       </ul>
       <div id="inputContainer">
-        <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" class="menuBottomPadding" value="" autocorrect="off" autocapitalize="none" />
+        <span id="inputStart"></span><span id="mode"></span><input id="cmdInput" value="" autocorrect="off" autocapitalize="none" />
       </div>
-      <div id="menu">
-        <!-- List items are generated with JS -->
-        <ul id="menuList">
-        </ul>
-      </div>
-      <div id="spacer"><span>&nbsp;</span></div>
+      <div id="spacer"></div>
+    </div>
+    <div id="map" class="hide"></div>
+    <div id="menu">
+      <!-- List items are generated with JS -->
+      <ul id="menuList">
+      </ul>
     </div>
     <script src={{socketPath}}></script>
     <script src="scripts/bundle.js" charset="utf-8"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" async defer></script>
 </body>
 </html>

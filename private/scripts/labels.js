@@ -762,7 +762,7 @@ const all = {
     ],
   },
   errors: {
-    commandFail: ['command not found. Use msg command if you meant to send a message. Press tab or type two spaces to see available commands'],
+    commandFail: ['command not found. Use msg command if you meant to send a message'],
     aborted: ['Aborting command'],
     noTracking: [
       'Unable to connect to the tracking satellites',
@@ -782,7 +782,7 @@ const all = {
     ],
   },
   errors_se: {
-    commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande. Tryck på tab-knappen eller skriv in två blanksteg för att se tillgängliga kommandon'],
+    commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande'],
     aborted: ['Avbryter kommandot'],
     noTracking: [
       'Misslyckades med att koppla upp mot spårningsatelliterna',
@@ -886,13 +886,19 @@ const all = {
     fastModeOff: ['Fast mode is now turned off'],
     hiddenCursorOn: ['Mouse cursor is now hidden'],
     hiddenCursorOff: ['Mouse cursor is now visible'],
-    hiddenBottomMenuOn: ['Bottom menu is now hidden'],
-    hiddenBottomMenuOff: ['Bottom menu is now visible'],
+    hiddenMenuOn: ['Menu is now hidden'],
+    hiddenMenuOff: ['Menu is now visible'],
     youHaveBeenBanned: [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support Center for re-education',
       '## or your nearest friendly Razor member. Bring a huge bribe ##',
     ],
+    lostConnection: ['[ Lost connection ]'],
+    hiddenCmdInputOn: ['Command input is now hidden'],
+    hiddenCmdInputOff: ['Command input is now visible'],
+    thinnerViewOn: ['View is now thinner'],
+    thinnerViewOff: ['View is now normal'],
+    reestablished: ['[ Re-established connection ]'],
   },
   info_se: {
     cancel_se: ['Ni kan avbryta kommandot genom att skriva "exit" eller "abort"'],
@@ -960,13 +966,19 @@ const all = {
     fastModeOff: ['Fast mode är nu avslaget'],
     hiddenCursorOn: ['Muspekaren är nu dold'],
     hiddenCursorOff: ['Muspekaren är nu synlig'],
-    hiddenBottomMenuOn: ['Undermenyn är nu dold'],
-    hiddenBottomMenuOff: ['Undermenyn är nu synlig'],
+    hiddenMenuOn: ['Menyn är nu dold'],
+    hiddenMenuOff: ['Menyn är nu synlig'],
     youHaveBeenBanned: [
       'Ni har blivit bannade från systemet',
       'Kontakta ert närmaste Organica IT-supportcenter för omskolning',
       '## eller er närmaste vänliga Razor-medlem. Ta med en stor mängd mutor ##',
     ],
+    lostConnection: ['[ Förlorat anslutningen ]'],
+    hiddenCmdInputOn: ['Kommandoraden är nu dold'],
+    hiddenCmdInputOff: ['Kommandoraden är nu synlig'],
+    thinnerViewOn: ['Vyn är nu smalare'],
+    thinnerViewOff: ['Vyn är nu normal'],
+    reestablished: ['[ Lyckades återansluta ]'],
   },
   weather: {
     snow: 'Snow',

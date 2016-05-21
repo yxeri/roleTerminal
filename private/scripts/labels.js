@@ -762,7 +762,7 @@ const all = {
     ],
   },
   errors: {
-    commandFail: ['command not found. Use msg command if you meant to send a message. Press tab or type two spaces to see available commands'],
+    commandFail: ['command not found. Use msg command if you meant to send a message'],
     aborted: ['Aborting command'],
     noTracking: [
       'Unable to connect to the tracking satellites',
@@ -782,7 +782,7 @@ const all = {
     ],
   },
   errors_se: {
-    commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande. Tryck på tab-knappen eller skriv in två blanksteg för att se tillgängliga kommandon'],
+    commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande'],
     aborted: ['Avbryter kommandot'],
     noTracking: [
       'Misslyckades med att koppla upp mot spårningsatelliterna',

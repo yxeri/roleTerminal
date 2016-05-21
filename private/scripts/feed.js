@@ -125,7 +125,9 @@ let watchId = null;
 let isTracking = true;
 let firstConnection = true;
 let viewIsSplit = false;
+let secondView = null;
 let map;
+let isLandscape = window.innerWidth > window.innerHeight;
 let positions = [];
 /**
  * Used by isScreenOff() to force reconnect when phone screen is off
@@ -1786,24 +1788,26 @@ function isTouchDevice() {
 function splitView(shouldSplit, secondDiv) {
   if (shouldSplit) {
     secondDiv.classList.remove('hide');
+    background.classList.add('halfView');
 
-    if (isTouchDevice()) {
-      background.classList.add('halfView');
+    if (!isLandscape) {
+      background.classList.add('halfHeight');
+      secondDiv.classList.add('halfHeight');
     } else {
-      background.classList.add('halfView');
-    }
-
-    if (window.innerHeight > window.innerWidth) {
-      background.classList.add('halfViewPortrait');
+      background.classList.add('halfWidth');
+      secondDiv.classList.add('halfWidth');
     }
   } else {
     secondDiv.classList.add('hide');
     background.classList.remove('halfView');
-    background.classList.remove('halfViewMobile');
-    background.classList.remove('halfViewPortrait');
+    background.classList.remove('halfWidth');
+    background.classList.remove('halfHeight');
+    secondDiv.classList.remove('halfWidth');
+    secondDiv.classList.remove('halfHeight');
   }
 
   viewIsSplit = shouldSplit;
+  secondView = secondDiv;
 }
 
 // TODO Major refactoring needed to break up legacy structure. It is not very pretty or understandable right now
@@ -3433,7 +3437,7 @@ function attachCommands() {
   commands.map = {
     func: (phrases = []) => {
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), { // eslint-disable-line no-undef
           center: {
             lat: 59.7529831,
             lng: 15.1914996,
@@ -3993,7 +3997,27 @@ function onStartup(params = { }) {
     // Needed for some special keys. They are not detected with keypress
     addEventListener('keydown', specialKeyPress);
     addEventListener('keyup', keyReleased);
+    addEventListener('orientationchange', () => {
+      isLandscape = !isLandscape;
+
+      if (viewIsSplit) {
+        if (!isLandscape) {
+          background.classList.remove('halfWidth');
+          secondView.classList.remove('halfWidth');
+          background.classList.add('halfHeight');
+          secondView.classList.add('halfHeight');
+        } else {
+          background.classList.remove('halfHeight');
+          secondView.classList.remove('halfHeight');
+          background.classList.add('halfWidth');
+          secondView.classList.add('halfWidth');
+        }
+      }
+
+      scrollView();
+    });
     window.addEventListener('focus', refocus);
+
 
     resetPreviousCommandPointer();
     setIntervals();

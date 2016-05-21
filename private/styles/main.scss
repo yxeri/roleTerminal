@@ -145,8 +145,7 @@ pre {
 #map {
   padding-top: 2em;
   position: fixed;
-  height: 100%;
-  width: 50%;
+  left: 0;
   overflow: hidden;
   background-color: #00865e;
 
@@ -178,10 +177,15 @@ pre {
 .halfView {
   position: fixed;
   right: 0;
-  width: 50% !important;
+  bottom: 0;
 }
 
-.halfViewPortrait {
+.halfWidth {
+  width: 50% !important;
+  height: 100% !important;
+}
+
+.halfHeight {
   height: 50% !important;
   width: 100% !important;
 }

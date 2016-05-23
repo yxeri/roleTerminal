@@ -197,34 +197,6 @@ function handle(socket, io) {
     }
   });
 
-  socket.on('updateLocation', (params) => {
-    if (!objectValidator.isValidData(params, { position: true })) {
-      return;
-    }
-
-    dbConnector.getUserById(socket.id, (err, user) => {
-      if (err || user === null) {
-        logger.sendErrorMsg({
-          code: logger.ErrorCodes.db,
-          text: ['Failed to update location'],
-          err,
-        });
-
-        return;
-      }
-
-      dbConnector.updateUserLocation(user.userName, params.position, (userErr) => {
-        if (userErr) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.db,
-            text: ['Failed to update location'],
-            err: userErr,
-          });
-        }
-      });
-    });
-  });
-
   socket.on('login', (params) => {
     if (!objectValidator.isValidData(params, { user: { userName: true, password: true } })) {
       return;

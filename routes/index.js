@@ -37,6 +37,9 @@ function handle(io) {
       staticInputStart: appConfig.staticInputStart,
       defaultInputStart: appConfig.defaultInputStart,
       customFlags: appConfig.customFlags,
+      latitude: appConfig.latitude,
+      longitude: appConfig.longitude,
+      defaultZoomLevel: appConfig.defaultZoomLevel,
     });
 
     socket.on('disconnect', () => {

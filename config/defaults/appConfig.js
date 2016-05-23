@@ -128,6 +128,7 @@ config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
 config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
 config.longitude = process.env.LONGITUDE || modifiedConfig.longitude || '15.198645';
+config.defaultZoomLevel = process.env.DEFAULTZOOMLEVEL || modifiedConfig.defaultZoomLevel || 15;
 
 // Amount of messages retrieved with the history command
 config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;

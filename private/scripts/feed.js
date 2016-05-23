@@ -113,6 +113,7 @@ const animations = [
   'subliminalFast',
   'subliminalSlow',
 ];
+const mapMarkers = {};
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 let audioCtx;
@@ -695,6 +696,30 @@ function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
+function setCoordinates(longitude, latitude) {
+  setLocalVal('longitude', longitude);
+  setLocalVal('latitude', latitude);
+
+  if (map) {
+    map.setCenter(new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude)));
+  }
+}
+
+function getCoordinates() {
+  return {
+    latitude: parseFloat(getLocalVal('latitude')),
+    longitude: parseFloat(getLocalVal('longitude')),
+  };
+}
+
+function setDefaultZoomLevel(zoomLevel) {
+  setLocalVal('defaultZoomLevel', zoomLevel);
+}
+
+function getDefaultZoomLevel() {
+  return parseInt(getLocalVal('defaultZoomLevel'));
+}
+
 function getDefaultInputStart() {
   return getLocalVal('defaultInputStart');
 }
@@ -892,6 +917,19 @@ function retrievePosition() {
   watchId = navigator.geolocation.watchPosition((position) => {
     if (position !== undefined) {
       positions.push(position);
+
+      if (!mapMarkers.I) {
+        mapMarkers.I = new google.maps.Marker({
+          position: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          },
+          title: '!',
+          label: '!',
+        });
+      } else {
+        mapMarkers.I.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+      }
     }
   }, (err) => {
     if (err) {
@@ -926,7 +964,10 @@ function sendLocation() {
 
     positions = [];
 
-    socket.emit('updateLocation', { position: preparePosition(mostAccuratePos) });
+    socket.emit('updateLocation', {
+      type: 'user',
+      position: preparePosition(mostAccuratePos),
+    });
   }
 
   retrievePosition();
@@ -2405,14 +2446,11 @@ function attachCommands() {
           ],
         });
       } else if (phrases.length > 0) {
-        const userName = phrases[0].toLowerCase();
-
-        socket.emit('locate', { user: { userName } });
+        socket.emit('locate', { mapPosition: { positionName: phrases[0].toLowerCase() } });
       } else {
-        socket.emit('locate', { user: { userName: getUser() } });
+        socket.emit('locate', { mapPosition: { positionName: getUser() } });
       }
     },
-    autocomplete: { type: 'users' },
     accessLevel: 13,
     category: 'advanced',
   };
@@ -3436,13 +3474,15 @@ function attachCommands() {
   };
   commands.map = {
     func: (phrases = []) => {
+      const gameCoords = getCoordinates();
+
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), { // eslint-disable-line no-undef
+        map = new google.maps.Map(document.getElementById('map'), {
           center: {
-            lat: 59.7529831,
-            lng: 15.1914996,
+            lat: gameCoords.latitude,
+            lng: gameCoords.longitude,
           },
-          zoom: 14,
+          zoom: getDefaultZoomLevel(),
           disableDefaultUI: true,
           draggable: false,
           fullscreenControl: false,
@@ -3455,7 +3495,7 @@ function attachCommands() {
           overviewMapControl: false,
           rotateControl: false,
           scaleControl: false,
-          scrollWheel: false,
+          scrollwheel: false,
           streetViewControl: false,
           backgroundColor: '#001e15',
           styles: [
@@ -3498,6 +3538,10 @@ function attachCommands() {
             },
           ],
         });
+
+        for (const markerName of Object.keys(mapMarkers)) {
+          mapMarkers[markerName].setMap(map);
+        }
       }
 
       if (phrases.length > 0) {
@@ -3524,6 +3568,7 @@ function attachCommands() {
 
         if (!map) {
           initMap();
+          socket.emit('getMapPositions', { types: ['static', 'users'] });
         }
       }
     },
@@ -3753,12 +3798,12 @@ function onTime(data = {}) {
 
 function onLocationMsg(locationData) {
   for (const user of Object.keys(locationData)) {
-    let text = '';
     const userLocation = locationData[user];
     const latitude = userLocation.coords.latitude.toFixed(6);
     const longitude = userLocation.coords.longitude.toFixed(6);
     const heading = userLocation.coords.heading !== null ? Math.round(userLocation.coords.heading) : null;
     const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
+    let text = '';
 
     text += `User: ${user}${'\t'}`;
     text += `Time: ${generateTimeStamp(userLocation.timestamp, true)}${'\t'}`;
@@ -3957,6 +4002,31 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
   replaceLastInputPhrase(`${data.matchedName} `);
 }
 
+function onMapPositions(mapPositions = []) {
+  for (const mapPosition of mapPositions) {
+    const positionName = mapPosition.positionName;
+    const latitude = parseFloat(mapPosition.position.latitude);
+    const longitude = parseFloat(mapPosition.position.longitude);
+
+    if (mapMarkers[positionName]) {
+      mapMarkers[positionName].setPosition(new google.maps.LatLng(latitude, longitude));
+    } else {
+      mapMarkers[positionName] = new google.maps.Marker({
+        position: {
+          lat: latitude,
+          lng: longitude,
+        },
+        title: positionName,
+        label: positionName[0],
+      });
+
+      if (map) {
+        mapMarkers[positionName].setMap(map);
+      }
+    }
+  }
+}
+
 /**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
@@ -3974,6 +4044,8 @@ function onStartup(params = { }) {
   shouldHideMenu(isHiddenMenu());
   shouldHideCmdInput(isHiddenCmdInput());
   shouldThinView(isThinView());
+  setCoordinates(params.longitude, params.latitude);
+  setDefaultZoomLevel(params.defaultZoomLevel);
 
   socket.emit('getCommands');
   labels.setLanguage(getDefaultLanguage());
@@ -4073,6 +4145,7 @@ function startSocket() {
     socket.on('list', onList);
     socket.on('matchFound', onMatchFound);
     socket.on('startup', onStartup);
+    socket.on('mapPositions', onMapPositions);
     // socket.on('missions', onMissions);
   }
 }

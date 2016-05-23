@@ -6,13 +6,8 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 
-/**
- * Prepares a position
- * @param position
- * @returns {}
- */
-function createUserPosition(user) {
-  const position = user.position;
+function createUserPosition(mapPosition) {
+  const position = mapPosition.position;
   const timestamp = new Date(position.timestamp);
   const locObj = {};
   const coords = {};
@@ -33,7 +28,7 @@ function handle(socket) {
    * Emits locationMsg
    */
   socket.on('locate', (params) => {
-    if (!objectValidator.isValidData(params, { user: { userName: true } })) {
+    if (!objectValidator.isValidData(params, { mapPosition: { positionName: true } })) {
       return;
     }
 
@@ -42,12 +37,13 @@ function handle(socket) {
         return;
       }
 
+      const positionName = params.mapPosition.positionName;
       const locationData = {};
 
       // Return all user locations
-      if (params.user.userName === '*') {
-        dbConnector.getAllUserLocations(user, (err, users) => {
-          if (err || users === null) {
+      if (positionName === '*') {
+        dbConnector.getAllUserPositions(user, (err, mapPositions) => {
+          if (err || mapPositions === null) {
             logger.sendSocketErrorMsg({
               socket,
               code: logger.ErrorCodes.db,
@@ -58,39 +54,102 @@ function handle(socket) {
             return;
           }
 
-          for (const currentUser of users) {
-            const userName = currentUser.userName;
-
-            if (currentUser.position !== undefined) {
-              locationData[userName] = createUserPosition(currentUser);
-            }
+          for (const userLocation of mapPositions) {
+            const userName = userLocation.positionName;
+            locationData[userName] = createUserPosition(userLocation);
           }
 
           socket.emit('locationMsg', locationData);
         });
       } else {
-        dbConnector.getUserLocation(user, params.user.userName, (err, foundUser) => {
-          if (err || foundUser === null) {
+        dbConnector.getUserPosition(user, positionName, (err, mapPosition) => {
+          if (err || mapPosition === null) {
             logger.sendSocketErrorMsg({
               socket,
               code: logger.ErrorCodes.db,
               text: ['Failed to get user location'],
               err,
             });
-          } else if (foundUser.position !== undefined) {
-            const userName = foundUser.userName;
-            locationData[userName] = createUserPosition(foundUser);
+          } else if (mapPosition !== null) {
+            const userName = mapPosition.positionName;
+            locationData[userName] = createUserPosition(mapPosition);
 
             socket.emit('locationMsg', locationData);
           } else {
             logger.sendSocketErrorMsg({
               socket,
               code: logger.ErrorCodes.notFound,
-              text: [`Unable to locate ${params.user.userName}`],
+              text: [`Unable to locate ${positionName}`],
             });
           }
         });
       }
+    });
+  });
+
+  socket.on('updateLocation', (params) => {
+    if (!objectValidator.isValidData(params, { position: true })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      dbConnector.updatePosition({
+        positionName: user.userName,
+        position: params.position,
+        callback: (userErr, position) => {
+          if (userErr) {
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.db,
+              text: ['Failed to update location'],
+              err: userErr,
+            });
+          }
+
+          socket.broadcast.emit('mapPositions', [createUserPosition(position)]);
+        },
+      });
+    });
+  });
+
+  socket.on('getMapPositions', (params) => {
+    if (!objectValidator.isValidData(params, { types: true })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      const types = params.types;
+
+      function getPositions(type, positions) {
+        if (type === 'static') {
+          dbConnector.getStaticPositions((err, staticPositions) => {
+            if (err) {
+              return;
+            }
+
+            getPositions(types.shift(), positions.concat(staticPositions));
+          });
+        } else if (type === 'users') {
+          dbConnector.getAllUserPositions(user, (err, userPositions) => {
+            if (err) {
+              return;
+            }
+
+            getPositions(types.shift(), positions.concat(userPositions));
+          });
+        } else {
+          socket.emit('mapPositions', positions);
+        }
+      }
+
+      getPositions(types.shift(), []);
     });
   });
 }

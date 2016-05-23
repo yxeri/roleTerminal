@@ -388,6 +388,12 @@ config.commands = {
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
+  map: modifiedDatabasePop.commands.map || {
+    commandName: 'map',
+    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.basic,
+    category: 'basic',
+  },
 };
 
 module.exports = config;

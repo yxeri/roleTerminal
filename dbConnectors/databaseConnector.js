@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema({
   accessLevel: { type: Number, default: 1 },
   visibility: { type: Number, default: 1 },
   rooms: [{ type: String, unique: true }],
-  position: {},
   lastOnline: Date,
   verified: { type: Boolean, default: false },
   banned: { type: Boolean, default: false },
@@ -126,6 +125,12 @@ const invitationListSchema = new mongoose.Schema({
     time: Date,
   }],
 }, { collection: 'invitationLists' });
+const mapPositionSchema = new mongoose.Schema({
+  positionName: { type: String, unique: true },
+  deviceId: String,
+  position: {},
+  isStatic: { type: Boolean, default: false },
+}, { collection: 'mapPositions' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -137,6 +142,7 @@ const Team = mongoose.model('Team', teamSchema);
 const Weather = mongoose.model('Weather', weatherSchema);
 const Mission = mongoose.model('Mission', missionSchema);
 const InvitationList = mongoose.model('InvitationList', invitationListSchema);
+const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName };
@@ -656,10 +662,31 @@ function updateUserOnline(userName, value, callback) {
   updateUserValue(userName, update, callback);
 }
 
-function updateUserLocation(userName, sentPosition, callback) {
-  const update = { position: sentPosition };
+function updatePosition(params) {
+  const positionName = params.positionName;
+  const position = params.position;
+  const isStatic = params.isStatic;
+  const callback = params.callback;
 
-  updateUserValue(userName, update, callback);
+  const query = { positionName };
+  const update = { position };
+  const options = { upsert: true, new: true };
+
+  if (typeof isStatic !== 'undefined') {
+    update.isStatic = isStatic;
+  }
+
+  MapPosition.update(query, update, options).lean().exec((err, mapPosition) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to update map position'],
+        err,
+      });
+    }
+
+    callback(err, mapPosition);
+  });
 }
 
 function updateUserMode(userName, mode, callback) {
@@ -867,43 +894,88 @@ function getAllRooms(sentUser, callback) {
   });
 }
 
-function getAllUserLocations(sentUser, callback) {
+function getStaticPositions(callback) {
+  const query = { isStatic: true };
+
+  MapPosition.find(query).lean().exec((err, staticPositions) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get static positions'],
+        err,
+      });
+    }
+
+    callback(err, staticPositions);
+  });
+}
+
+function getAllUserPositions(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
   const sort = { userName: 1 };
-  const filter = { _id: 0, userName: 1, position: 1 };
+  const filter = { _id: 0, userName: 1 };
 
   User.find(query, filter).sort(sort).lean().exec((err, users) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to get all user locations'],
+        text: ['Failed to get all users and positions'],
         err,
       });
-    }
+    } else if (users !== null) {
+      const userNames = users.map(user => user.userName);
+      const mapQuery = { positionName: { $in: userNames } };
 
-    callback(err, users);
+      MapPosition.find(mapQuery).lean().exec((mapErr, userPositions) => {
+        if (mapErr) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get all user positions'],
+            err,
+          });
+        }
+
+        callback(err, userPositions);
+      });
+    } else {
+      callback(err, null);
+    }
   });
 }
 
-function getUserLocation(sentUser, sentUserName, callback) {
+function getUserPositions(sentUser, sentUserName, callback) {
   const query = {
     $and: [
       { visibility: { $lte: sentUser.accessLevel } },
       { userName: sentUserName },
     ],
   };
-  const filter = { _id: 0, userName: 1, position: 1 };
+  const filter = { _id: 0 };
 
   User.findOne(query, filter).lean().exec((err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: ['Failed to get all user locations'],
+        text: ['Failed to get user and positions'],
         err,
       });
-    }
+    } else if (user !== null) {
+      const mapQuery = { positionName: sentUserName };
 
-    callback(err, user);
+      MapPosition.findOne(mapQuery).lean().exec((mapErr, mapPosition) => {
+        if (mapErr) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to get user positions'],
+            err,
+          });
+        }
+
+        callback(mapErr, mapPosition);
+      });
+    } else {
+      callback(err, null);
+    }
   });
 }
 
@@ -1507,13 +1579,13 @@ exports.getUserById = getUserById;
 exports.authUser = authUser;
 exports.createUser = createUser;
 exports.updateUserSocketId = updateUserSocketId;
-exports.updateUserLocation = updateUserLocation;
+exports.updatePosition = updatePosition;
 exports.authUserToRoom = authUserToRoom;
 exports.createRoom = createRoom;
 exports.getAllUsers = getAllUsers;
 exports.getAllRooms = getAllRooms;
-exports.getAllUserLocations = getAllUserLocations;
-exports.getUserLocation = getUserLocation;
+exports.getAllUserPositions = getAllUserPositions;
+exports.getUserPosition = getUserPositions;
 exports.addRoomToUser = addRoomToUser;
 exports.removeRoomFromUser = removeRoomFromUser;
 exports.addMsgToHistory = addMsgToHistory;
@@ -1575,3 +1647,4 @@ exports.getUnverifiedTeams = getUnverifiedTeams;
 exports.getUsersFollowingRoom = getUsersFollowingRoom;
 exports.removeRoomFromAllUsers = removeRoomFromAllUsers;
 exports.incrementCommandUsage = incrementCommandUsage;
+exports.getStaticPositions = getStaticPositions;

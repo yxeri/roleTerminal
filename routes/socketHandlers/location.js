@@ -6,22 +6,6 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 
-function createUserPosition(mapPosition) {
-  const position = mapPosition.position;
-  const timestamp = new Date(position.timestamp);
-  const locObj = {};
-  const coords = {};
-
-  coords.latitude = position.latitude;
-  coords.longitude = position.longitude;
-  coords.heading = position.heading;
-  locObj.coords = coords;
-  locObj.timestamp = timestamp;
-  locObj.accuracy = position.accuracy;
-
-  return locObj;
-}
-
 function handle(socket) {
   /**
    * Locate command. Returns location for one or more users
@@ -56,7 +40,7 @@ function handle(socket) {
 
           for (const userLocation of mapPositions) {
             const userName = userLocation.positionName;
-            locationData[userName] = createUserPosition(userLocation);
+            locationData[userName] = userLocation;
           }
 
           socket.emit('locationMsg', locationData);
@@ -72,7 +56,7 @@ function handle(socket) {
             });
           } else if (mapPosition !== null) {
             const userName = mapPosition.positionName;
-            locationData[userName] = createUserPosition(mapPosition);
+            locationData[userName] = mapPosition;
 
             socket.emit('locationMsg', locationData);
           } else {
@@ -100,16 +84,30 @@ function handle(socket) {
       dbConnector.updatePosition({
         positionName: user.userName,
         position: params.position,
-        callback: (userErr, position) => {
+        callback: (userErr) => {
           if (userErr) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.db,
-              text: ['Failed to update location'],
+              text: ['Failed to update position'],
               err: userErr,
             });
+
+            return;
           }
 
-          socket.broadcast.emit('mapPositions', [createUserPosition(position)]);
+          dbConnector.getPosition(user.userName, (err, position) => {
+            if (err) {
+              logger.sendErrorMsg({
+                code: logger.ErrorCodes.db,
+                text: ['Failed to broadcast new user position'],
+                err: userErr,
+              });
+
+              return;
+            }
+
+            socket.broadcast.emit('mapPositions', [position]);
+          });
         },
       });
     });

@@ -915,6 +915,22 @@ function getAllRooms(sentUser, callback) {
   });
 }
 
+function getPosition(positionName, callback) {
+  const query = { positionName };
+
+  MapPosition.findOne(query).lean().exec((err, position) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: [`Failed to get position ${positionName}`],
+        err,
+      });
+    }
+
+    callback(err, position);
+  });
+}
+
 function getStaticPositions(callback) {
   const query = { isStatic: true };
 
@@ -1670,3 +1686,4 @@ exports.removeRoomFromAllUsers = removeRoomFromAllUsers;
 exports.incrementCommandUsage = incrementCommandUsage;
 exports.getStaticPositions = getStaticPositions;
 exports.updateDeviceLastAlive = updateDeviceLastAlive;
+exports.getPosition = getPosition;

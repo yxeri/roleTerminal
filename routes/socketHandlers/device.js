@@ -117,22 +117,15 @@ function handle(socket) {
 
           return;
         }
-
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Device has been updated'],
-            text_se: ['Enheten har uppdaterats'],
-          },
-        });
       };
 
       switch (field) {
-        case 'alias':
+        case 'alias': {
           dbConnector.updateDeviceAlias(deviceId, value, callback);
 
           break;
-        default:
+        }
+        default: {
           messenger.sendSelfMsg({
             socket,
             message: {
@@ -142,6 +135,7 @@ function handle(socket) {
           });
 
           break;
+        }
       }
     });
   });
@@ -198,14 +192,6 @@ function handle(socket) {
       if (err || device === null) {
         return;
       }
-
-      messenger.sendSelfMsg({
-        socket,
-        message: {
-          text: ['Device has been updated'],
-          text_se: ['Enheten har uppdaterats'],
-        },
-      });
     });
   });
 }

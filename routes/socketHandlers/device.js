@@ -49,7 +49,11 @@ function handle(socket) {
           }
 
           if (device.lastUser && device.lastUser !== null) {
-            deviceString += `Last user: ${device.lastUser}`;
+            deviceString += `Last user: ${device.lastUser}${'\t'}`;
+          }
+
+          if (device.lastAlive && device.lastAlive !== null) {
+            deviceString += `Last alive: ${device.lastAlive}`;
           }
 
           return deviceString;
@@ -65,6 +69,18 @@ function handle(socket) {
           });
         }
       });
+    });
+  });
+
+  socket.on('updateDeviceLastAlive', (params) => {
+    if (!objectValidator.isValidData(params, { device: { deviceId: true, lastAlive: true } })) {
+      return;
+    }
+
+    dbConnector.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, (err) => {
+      if (err) {
+        return;
+      }
     });
   });
 

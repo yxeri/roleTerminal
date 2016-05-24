@@ -84,6 +84,7 @@ const deviceSchema = new mongoose.Schema({
   socketId: String,
   deviceAlias: { type: String, unique: true },
   lastUser: String,
+  lastAlive: Date,
 }, { collection: 'devices' });
 const teamSchema = new mongoose.Schema({
   teamName: String,
@@ -389,6 +390,26 @@ function updateDeviceSocketId(deviceId, socketId, user, callback) {
       } else {
         callback(err, device);
       }
+    }
+  );
+}
+
+function updateDeviceLastAlive(deviceId, value, callback) {
+  const query = { deviceId };
+  const update = { $set: { lastAlive: value } };
+  const options = { new: true };
+
+  Device.findOneAndUpdate(query, update, options).lean().exec(
+    (err, device) => {
+      if (err) {
+        logger.sendErrorMsg({
+          code: logger.ErrorCodes.db,
+          text: ['Failed to update device Id'],
+          err,
+        });
+      }
+
+      callback(err, device);
     }
   );
 }
@@ -1648,3 +1669,4 @@ exports.getUsersFollowingRoom = getUsersFollowingRoom;
 exports.removeRoomFromAllUsers = removeRoomFromAllUsers;
 exports.incrementCommandUsage = incrementCommandUsage;
 exports.getStaticPositions = getStaticPositions;
+exports.updateDeviceLastAlive = updateDeviceLastAlive;

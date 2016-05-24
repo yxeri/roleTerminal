@@ -4064,6 +4064,10 @@ function onStartup(params = { }) {
       setDeviceId(textTools.createDeviceId());
     }
 
+    setInterval(() => {
+      socket.emit('updateDeviceLastAlive', { device: { deviceId: getDeviceId(), lastAlive: new Date() } });
+    }, 5000);
+
     attachFullscreenListener();
     addEventListener('keypress', keyPress);
     // Needed for some special keys. They are not detected with keypress

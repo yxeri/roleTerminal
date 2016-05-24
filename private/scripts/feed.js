@@ -306,7 +306,7 @@ function generateTimeStamp(date, full, year) {
   let timeStamp;
 
   // Splitting of date is a fix for NaN on Android 2.*
-  if (isNaN(newDate.getMinutes)) {
+  if (isNaN(newDate.getMinutes())) {
     const splitDate = date.split(/[-T:\.]+/);
     newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
@@ -3798,15 +3798,15 @@ function onTime(data = {}) {
 
 function onLocationMsg(locationData) {
   for (const user of Object.keys(locationData)) {
-    const userLocation = locationData[user];
-    const latitude = userLocation.coords.latitude.toFixed(6);
-    const longitude = userLocation.coords.longitude.toFixed(6);
-    const heading = userLocation.coords.heading !== null ? Math.round(userLocation.coords.heading) : null;
-    const accuracy = userLocation.accuracy < 1000 ? Math.ceil(userLocation.accuracy) : 'BAD';
+    const position = locationData[user].position;
+    const latitude = position.latitude;
+    const longitude = position.longitude;
+    const heading = !isNaN(position.heading) && position.heading !== null ? Math.round(position.heading) : null;
+    const accuracy = position.accuracy < 1000 ? Math.ceil(position.accuracy) : 'BAD';
     let text = '';
 
     text += `User: ${user}${'\t'}`;
-    text += `Time: ${generateTimeStamp(userLocation.timestamp, true)}${'\t'}`;
+    text += `Time: ${generateTimeStamp(position.timestamp, true)}${'\t'}`;
     text += `Accuracy: ${accuracy} ${accuracy !== 'BAD' ? 'meters' : ''}${'\t'}`;
     text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
 
@@ -4064,6 +4064,10 @@ function onStartup(params = { }) {
       setDeviceId(textTools.createDeviceId());
     }
 
+    setInterval(() => {
+      socket.emit('updateDeviceLastAlive', { device: { deviceId: getDeviceId(), lastAlive: new Date() } });
+    }, 5000);
+
     attachFullscreenListener();
     addEventListener('keypress', keyPress);
     // Needed for some special keys. They are not detected with keypress
@@ -4089,7 +4093,6 @@ function onStartup(params = { }) {
       scrollView();
     });
     window.addEventListener('focus', refocus);
-
 
     resetPreviousCommandPointer();
     setIntervals();

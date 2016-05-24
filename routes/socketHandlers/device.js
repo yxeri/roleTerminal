@@ -49,7 +49,11 @@ function handle(socket) {
           }
 
           if (device.lastUser && device.lastUser !== null) {
-            deviceString += `Last user: ${device.lastUser}`;
+            deviceString += `Last user: ${device.lastUser}${'\t'}`;
+          }
+
+          if (device.lastAlive && device.lastAlive !== null) {
+            deviceString += `Last alive: ${device.lastAlive}`;
           }
 
           return deviceString;
@@ -65,6 +69,18 @@ function handle(socket) {
           });
         }
       });
+    });
+  });
+
+  socket.on('updateDeviceLastAlive', (params) => {
+    if (!objectValidator.isValidData(params, { device: { deviceId: true, lastAlive: true } })) {
+      return;
+    }
+
+    dbConnector.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, (err) => {
+      if (err) {
+        return;
+      }
     });
   });
 
@@ -101,22 +117,15 @@ function handle(socket) {
 
           return;
         }
-
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Device has been updated'],
-            text_se: ['Enheten har uppdaterats'],
-          },
-        });
       };
 
       switch (field) {
-        case 'alias':
+        case 'alias': {
           dbConnector.updateDeviceAlias(deviceId, value, callback);
 
           break;
-        default:
+        }
+        default: {
           messenger.sendSelfMsg({
             socket,
             message: {
@@ -126,6 +135,7 @@ function handle(socket) {
           });
 
           break;
+        }
       }
     });
   });
@@ -182,14 +192,6 @@ function handle(socket) {
       if (err || device === null) {
         return;
       }
-
-      messenger.sendSelfMsg({
-        socket,
-        message: {
-          text: ['Device has been updated'],
-          text_se: ['Enheten har uppdaterats'],
-        },
-      });
     });
   });
 }

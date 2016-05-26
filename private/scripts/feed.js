@@ -123,7 +123,7 @@ let soundTimeout = 0;
 let previousCommandPointer;
 let watchId = null;
 // Is geolocation tracking on?
-let isTracking = true;
+let isTracking = false;
 let firstConnection = true;
 let viewIsSplit = false;
 let secondView = null;
@@ -916,6 +916,7 @@ function retrievePosition() {
 
   watchId = navigator.geolocation.watchPosition((position) => {
     if (position !== undefined) {
+      isTracking = true;
       positions.push(position);
 
       if (!mapMarkers.I) {
@@ -999,7 +1000,7 @@ function setIntervals() {
     navigator.geolocation.clearWatch(watchId);
   }
 
-  if (getGpsTracking() && isTracking && navigator.geolocation) {
+  if (getGpsTracking() && navigator.geolocation) {
     // Gets new geolocation data
     sendLocation();
   }

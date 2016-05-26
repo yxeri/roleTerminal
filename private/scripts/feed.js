@@ -123,7 +123,7 @@ let soundTimeout = 0;
 let previousCommandPointer;
 let watchId = null;
 // Is geolocation tracking on?
-let isTracking = true;
+let isTracking = false;
 let firstConnection = true;
 let viewIsSplit = false;
 let secondView = null;
@@ -717,7 +717,7 @@ function setDefaultZoomLevel(zoomLevel) {
 }
 
 function getDefaultZoomLevel() {
-  return parseInt(getLocalVal('defaultZoomLevel'));
+  return parseInt(getLocalVal('defaultZoomLevel'), 10);
 }
 
 function getDefaultInputStart() {
@@ -916,6 +916,7 @@ function retrievePosition() {
 
   watchId = navigator.geolocation.watchPosition((position) => {
     if (position !== undefined) {
+      isTracking = true;
       positions.push(position);
 
       if (!mapMarkers.I) {
@@ -932,14 +933,7 @@ function retrievePosition() {
       }
     }
   }, (err) => {
-    if (err) {
-      isTracking = false;
-      clearTimeout(trackingInterval);
-      queueMessage({
-        text: labels.getText('errors', 'noTracking'),
-        extraClass: 'importantMsg',
-      });
-    }
+    console.log(err);
   }, { enableHighAccuracy: true });
 
   if (isTracking) {
@@ -1006,7 +1000,7 @@ function setIntervals() {
     navigator.geolocation.clearWatch(watchId);
   }
 
-  if (getGpsTracking() && isTracking && navigator.geolocation) {
+  if (getGpsTracking() && navigator.geolocation) {
     // Gets new geolocation data
     sendLocation();
   }
@@ -2432,28 +2426,6 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  commands.locate = {
-    func: (phrases) => {
-      if (!isTracking) {
-        queueMessage({
-          text: [
-            'Tracking not available',
-            'You are not connected to the satellites',
-          ],
-          text_se: [
-            'Spårning är inte tillgänglig',
-            'Ni är inte uppkopplade mot satelliterna',
-          ],
-        });
-      } else if (phrases.length > 0) {
-        socket.emit('locate', { mapPosition: { positionName: phrases[0].toLowerCase() } });
-      } else {
-        socket.emit('locate', { mapPosition: { positionName: getUser() } });
-      }
-    },
-    accessLevel: 13,
-    category: 'advanced',
-  };
   commands.history = {
     func: (phrases) => {
       const data = {};
@@ -3755,7 +3727,6 @@ function onReconnectSuccess(data) {
       queueMessage({
         text: ['Re-established connection'],
         text_se: ['Lyckades återansluta'],
-        extraClass: 'importantMsg',
       });
     } else {
       printStartMessage();
@@ -4004,6 +3975,10 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
 
 function onMapPositions(mapPositions = []) {
   for (const mapPosition of mapPositions) {
+    if (mapPosition.positionName.toLowerCase() === getUser().toLowerCase()) {
+      continue;
+    }
+
     const positionName = mapPosition.positionName;
     const latitude = parseFloat(mapPosition.position.latitude);
     const longitude = parseFloat(mapPosition.position.longitude);

@@ -932,14 +932,7 @@ function retrievePosition() {
       }
     }
   }, (err) => {
-    if (err) {
-      isTracking = false;
-      clearTimeout(trackingInterval);
-      queueMessage({
-        text: labels.getText('errors', 'noTracking'),
-        extraClass: 'importantMsg',
-      });
-    }
+    console.log(err);
   }, { enableHighAccuracy: true });
 
   if (isTracking) {
@@ -2432,28 +2425,6 @@ function attachCommands() {
     accessLevel: 13,
     category: 'basic',
   };
-  commands.locate = {
-    func: (phrases) => {
-      if (!isTracking) {
-        queueMessage({
-          text: [
-            'Tracking not available',
-            'You are not connected to the satellites',
-          ],
-          text_se: [
-            'Spårning är inte tillgänglig',
-            'Ni är inte uppkopplade mot satelliterna',
-          ],
-        });
-      } else if (phrases.length > 0) {
-        socket.emit('locate', { mapPosition: { positionName: phrases[0].toLowerCase() } });
-      } else {
-        socket.emit('locate', { mapPosition: { positionName: getUser() } });
-      }
-    },
-    accessLevel: 13,
-    category: 'advanced',
-  };
   commands.history = {
     func: (phrases) => {
       const data = {};
@@ -3755,7 +3726,6 @@ function onReconnectSuccess(data) {
       queueMessage({
         text: ['Re-established connection'],
         text_se: ['Lyckades återansluta'],
-        extraClass: 'importantMsg',
       });
     } else {
       printStartMessage();
@@ -4004,6 +3974,10 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
 
 function onMapPositions(mapPositions = []) {
   for (const mapPosition of mapPositions) {
+    if (mapPosition.positionName.toLowerCase() === getUser().toLowerCase()) {
+      continue;
+    }
+
     const positionName = mapPosition.positionName;
     const latitude = parseFloat(mapPosition.position.latitude);
     const longitude = parseFloat(mapPosition.position.longitude);

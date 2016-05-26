@@ -764,11 +764,6 @@ const all = {
   errors: {
     commandFail: ['command not found. Use msg command if you meant to send a message'],
     aborted: ['Aborting command'],
-    noTracking: [
-      'Unable to connect to the tracking satellites',
-      'Turning off tracking is a major offense',
-      'Organica Re-Education Squads have been sent to scour the area',
-    ],
     failedRoom: [
       'Failed to create room',
       'Room name has to be 1 to 6 characters long',
@@ -784,11 +779,6 @@ const all = {
   errors_se: {
     commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande'],
     aborted: ['Avbryter kommandot'],
-    noTracking: [
-      'Misslyckades med att koppla upp mot spårningsatelliterna',
-      'Att slå av spårningsfunktionen är en grov förseelse',
-      'Organica omskolningsstyrkor har blivit skickade till området',
-    ],
     failedRoom: [
       'Misslyckades att skapa rummet',
       'Rummets namn måste vara 1 till 6 tecken långt',

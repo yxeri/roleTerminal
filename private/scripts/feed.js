@@ -717,7 +717,7 @@ function setDefaultZoomLevel(zoomLevel) {
 }
 
 function getDefaultZoomLevel() {
-  return parseInt(getLocalVal('defaultZoomLevel'));
+  return parseInt(getLocalVal('defaultZoomLevel'), 10);
 }
 
 function getDefaultInputStart() {

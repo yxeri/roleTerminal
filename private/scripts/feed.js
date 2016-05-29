@@ -696,19 +696,43 @@ function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
-function setCoordinates(longitude, latitude) {
-  setLocalVal('longitude', longitude);
-  setLocalVal('latitude', latitude);
+function setCenterCoordinates(longitude, latitude) {
+  setLocalVal('centerLong', longitude);
+  setLocalVal('centerLat', latitude);
 
   if (map) {
     map.setCenter(new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude)));
   }
 }
 
-function getCoordinates() {
+function getCenterCoordinates() {
   return {
-    latitude: parseFloat(getLocalVal('latitude')),
-    longitude: parseFloat(getLocalVal('longitude')),
+    latitude: parseFloat(getLocalVal('centerLat')),
+    longitude: parseFloat(getLocalVal('centerLong')),
+  };
+}
+
+function setCornerOneCoordinates(longitude, latitude) {
+  setLocalVal('cornerOneLong', longitude);
+  setLocalVal('cornerOneLat', latitude);
+}
+
+function getCornerOneCoordinates() {
+  return {
+    latitude: parseFloat(getLocalVal('cornerOneLat')),
+    longitude: parseFloat(getLocalVal('cornerOneLong')),
+  };
+}
+
+function setCornerTwoCoordinates(longitude, latitude) {
+  setLocalVal('cornerTwoLong', longitude);
+  setLocalVal('cornerTwoLat', latitude);
+}
+
+function getCornerTwoCoordinates() {
+  return {
+    latitude: parseFloat(getLocalVal('cornerTwoLat')),
+    longitude: parseFloat(getLocalVal('cornerTwoLong')),
   };
 }
 
@@ -3446,13 +3470,16 @@ function attachCommands() {
   };
   commands.map = {
     func: (phrases = []) => {
-      const gameCoords = getCoordinates();
+      const centerCoords = getCenterCoordinates();
+      const cornerOneCoords = getCornerOneCoordinates();
+      const cornerTwoCoords = getCornerTwoCoordinates();
+      const bounds = new google.maps.LatLngBounds();
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: {
-            lat: gameCoords.latitude,
-            lng: gameCoords.longitude,
+            lat: centerCoords.latitude,
+            lng: centerCoords.longitude,
           },
           zoom: getDefaultZoomLevel(),
           disableDefaultUI: true,
@@ -3510,6 +3537,10 @@ function attachCommands() {
             },
           ],
         });
+
+        bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
+        bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
+        map.fitBounds(bounds);
 
         for (const markerName of Object.keys(mapMarkers)) {
           mapMarkers[markerName].setMap(map);
@@ -4019,7 +4050,9 @@ function onStartup(params = { }) {
   shouldHideMenu(isHiddenMenu());
   shouldHideCmdInput(isHiddenCmdInput());
   shouldThinView(isThinView());
-  setCoordinates(params.longitude, params.latitude);
+  setCenterCoordinates(params.centerLong, params.centerLat);
+  setCornerOneCoordinates(params.cornerOneLong, params.cornerOneLat);
+  setCornerTwoCoordinates(params.cornerTwoLong, params.cornerTwoLat);
   setDefaultZoomLevel(params.defaultZoomLevel);
 
   socket.emit('getCommands');

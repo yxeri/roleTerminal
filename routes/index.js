@@ -37,8 +37,12 @@ function handle(io) {
       staticInputStart: appConfig.staticInputStart,
       defaultInputStart: appConfig.defaultInputStart,
       customFlags: appConfig.customFlags,
-      latitude: appConfig.latitude,
-      longitude: appConfig.longitude,
+      centerLat: appConfig.centerLat,
+      centerLong: appConfig.centerLong,
+      cornerOneLat: appConfig.cornerOneLat,
+      cornerOneLong: appConfig.cornerOneLong,
+      cornerTwoLat: appConfig.cornerTwoLat,
+      cornerTwoLong: appConfig.cornerTwoLong,
       defaultZoomLevel: appConfig.defaultZoomLevel,
     });
 

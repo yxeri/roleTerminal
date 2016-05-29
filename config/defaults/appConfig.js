@@ -126,8 +126,12 @@ config.customFlags = modifiedConfig.customFlags;
 config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
 
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
-config.latitude = process.env.LATITUDE || modifiedConfig.latitude || '59.751429';
-config.longitude = process.env.LONGITUDE || modifiedConfig.longitude || '15.198645';
+config.centerLat = process.env.CENTERLAT || modifiedConfig.centerLat || '59.751429';
+config.centerLong = process.env.CENTERLONG || modifiedConfig.centerLong || '15.198645';
+config.cornerOneLat = process.env.CORNERONELAT || modifiedConfig.cornerOneLat || '67.3926316';
+config.cornerOneLong = process.env.CORNERONELONG || modifiedConfig.cornerOneLong || '24.0936037';
+config.cornerTwoLat = process.env.CORNERTWOLAT || modifiedConfig.cornerTwoLat || '56.0734274';
+config.cornerTwoLong = process.env.CORNERTWOLONG || modifiedConfig.cornerTwoLong || '11.0290993';
 config.defaultZoomLevel = process.env.DEFAULTZOOMLEVEL || modifiedConfig.defaultZoomLevel || 15;
 
 // Amount of messages retrieved with the history command

@@ -6,7 +6,7 @@ const textTools = require('./textTools');
 const usageLine = 'Usage:';
 const usageLine_se = 'Användning:';
 const exampleLine = 'Example:';
-const exampleLine_se = 'Exempel';
+const exampleLine_se = 'Exempel:';
 const employeeNumber = Math.floor(Math.random() * 120503);
 const randomRelay = textTools.createCharString(4, true);
 let defaultLanguage;
@@ -170,6 +170,13 @@ const all = {
       'Available settings:',
       'fastmode - removes flavour text and speeds up print',
     ],
+    radio: [
+      'Listen in on a radio transmission',
+      'Available options:',
+      'list - lists all available channels',
+      'off - turn off the radio',
+      'on *channel* - tunes the radio to that channel',
+    ],
   },
   help_se: {
     help: ['Visa en lista av tillgängliga kommandon'],
@@ -316,6 +323,9 @@ const all = {
       'Det kan ändra beteende och utseende som kan få terminalen att se mer off-game ut',
       'Tillgängliga inställningar:',
       'fastmode - tar bort flavour text och ökar farten på utskriften',
+    ],
+    radio: [
+      'Lyssna på en radiosändning',
     ],
   },
   instructions: {
@@ -540,6 +550,15 @@ const all = {
       'settings fastmode on',
       'settings fastmode off',
     ],
+    radio: [
+      usageLine,
+      'radio *choice* *optional value*',
+      'radio on *channel*',
+      exampleLine,
+      'radio list',
+      'radio on metal',
+      'radio off',
+    ],
   },
   instructions_se: {
     help: [
@@ -759,6 +778,15 @@ const all = {
       exampleLine_se,
       'settings fastmode on',
       'settings fastmode off',
+    ],
+    radio: [
+      usageLine_se,
+      'radio *val* *frivilligt val*',
+      'radio on *kanal*',
+      exampleLine_se,
+      'radio list',
+      'radio on metal',
+      'radio off',
     ],
   },
   errors: {

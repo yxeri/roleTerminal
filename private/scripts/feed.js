@@ -3473,8 +3473,50 @@ function attachCommands() {
     category: 'admin',
   };
   commands.radio = {
-    func: () => {
-      audio.playAudio({ path: 'http://69.4.232.118:80/live;' });
+    func: (phrases = []) => {
+      if (phrases.length === 0) {
+        queueMessage({
+          text: labels.getText('instructions', 'radio'),
+        });
+
+        return;
+      }
+
+      const channels = {
+        metal: 'http://69.4.232.118:80/live;',
+      };
+      const choice = phrases[0];
+      let path;
+
+      switch (choice) {
+        case 'on': {
+          const chosenChannel = phrases[1];
+          path = channels[chosenChannel];
+
+          break;
+        }
+        case 'list': {
+          queueMessage({ text: Object.keys(channels) });
+
+          break;
+        }
+        case 'off': {
+          audio.resetAudio();
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
+      if (path) {
+        audio.playAudio({ path });
+      } else {
+        queueMessage({
+          text: labels.getText('instructions', 'radio'),
+        });
+      }
     },
     visibility: 0,
     accessLevel: 0,

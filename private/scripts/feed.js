@@ -3493,6 +3493,14 @@ function attachCommands() {
           const chosenChannel = phrases[1];
           path = channels[chosenChannel];
 
+          if (path) {
+            audio.playAudio({ path });
+          } else {
+            queueMessage({
+              text: labels.getText('instructions', 'radio'),
+            });
+          }
+
           break;
         }
         case 'list': {
@@ -3508,14 +3516,6 @@ function attachCommands() {
         default: {
           break;
         }
-      }
-
-      if (path) {
-        audio.playAudio({ path });
-      } else {
-        queueMessage({
-          text: labels.getText('instructions', 'radio'),
-        });
       }
     },
     visibility: 0,

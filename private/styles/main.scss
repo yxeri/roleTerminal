@@ -31,7 +31,6 @@ body {
   font-family: monospace;
   font-size: 1.2em;
   letter-spacing: .05em;
-  white-space: pre-wrap;
   -webkit-text-size-adjust: 100%;
   height: 100%;
   width: 100%;
@@ -143,8 +142,6 @@ pre {
 }
 
 #map {
-  padding-top: 2em;
-  position: fixed;
   left: 0;
   overflow: hidden;
   background-color: #00865e;
@@ -159,6 +156,7 @@ pre {
 
   > div:first-child {
     display: inherit;
+    top: 2em !important;
 
     > div {
       display: none;

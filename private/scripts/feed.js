@@ -1040,6 +1040,18 @@ function setIntervals() {
   }
 }
 
+function realignMap() {
+  const bounds = new google.maps.LatLngBounds();
+  const cornerOneCoords = getCornerOneCoordinates();
+  const cornerTwoCoords = getCornerTwoCoordinates();
+
+  google.maps.event.trigger(map, 'resize');
+  bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
+  bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
+  map.fitBounds(bounds);
+  map.setCenter(map.getCenter());
+}
+
 /**
  * Resets intervals and keyPressed (to not have it true after a user tabbed out and into the site)
  */
@@ -3471,9 +3483,6 @@ function attachCommands() {
   commands.map = {
     func: (phrases = []) => {
       const centerCoords = getCenterCoordinates();
-      const cornerOneCoords = getCornerOneCoordinates();
-      const cornerTwoCoords = getCornerTwoCoordinates();
-      const bounds = new google.maps.LatLngBounds();
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -3538,13 +3547,11 @@ function attachCommands() {
           ],
         });
 
-        bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
-        bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
-        map.fitBounds(bounds);
-
         for (const markerName of Object.keys(mapMarkers)) {
           mapMarkers[markerName].setMap(map);
         }
+
+        google.maps.event.addListener(map, 'idle', () => { realignMap(); });
       }
 
       if (phrases.length > 0) {

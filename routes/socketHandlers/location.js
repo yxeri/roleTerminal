@@ -5,6 +5,7 @@ const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
+const mapCreator = require('../../utils/mapCreator');
 
 function handle(socket) {
   /**
@@ -84,6 +85,7 @@ function handle(socket) {
       dbConnector.updatePosition({
         positionName: user.userName,
         position: params.position,
+        type: 'user',
         callback: (userErr) => {
           if (userErr) {
             logger.sendErrorMsg({
@@ -126,28 +128,60 @@ function handle(socket) {
       const types = params.types;
 
       function getPositions(type, positions) {
-        if (type === 'static') {
-          dbConnector.getStaticPositions((err, staticPositions) => {
-            if (err) {
-              return;
-            }
+        switch (type) {
+          case 'static': {
+            dbConnector.getStaticPositions((err, staticPositions) => {
+              if (err) {
+                return;
+              }
 
-            getPositions(types.shift(), positions.concat(staticPositions));
-          });
-        } else if (type === 'users') {
-          dbConnector.getAllUserPositions(user, (err, userPositions) => {
-            if (err) {
-              return;
-            }
+              getPositions(types.shift(), positions.concat(staticPositions));
+            });
 
-            getPositions(types.shift(), positions.concat(userPositions));
-          });
-        } else {
-          socket.emit('mapPositions', positions);
+            break;
+          }
+          case 'users': {
+            dbConnector.getAllUserPositions(user, (err, userPositions) => {
+              if (err) {
+                return;
+              }
+
+              getPositions(types.shift(), positions.concat(userPositions));
+            });
+
+            break;
+          }
+          default: {
+            socket.emit('mapPositions', positions);
+
+            break;
+          }
         }
       }
 
       getPositions(types.shift(), []);
+    });
+  });
+
+  socket.on('getGooglePositions', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      mapCreator.getGooglePositions((err, googlePositions) => {
+        if (err || googlePositions === null) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.general,
+            text: ['Failed to get world positions'],
+            err,
+          });
+
+          return;
+        }
+
+        socket.emit('mapPositions', googlePositions);
+      });
     });
   });
 }

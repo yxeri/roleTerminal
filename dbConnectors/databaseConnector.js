@@ -131,6 +131,7 @@ const mapPositionSchema = new mongoose.Schema({
   deviceId: String,
   position: {},
   isStatic: { type: Boolean, default: false },
+  type: String,
 }, { collection: 'mapPositions' });
 
 const User = mongoose.model('User', userSchema);

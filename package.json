@@ -1,6 +1,6 @@
 {
   "name": "roleTerminal",
-  "version": "4.11.3",
+  "version": "4.11.4",
   "description": "RoleTerminal is part of an initiative to create a platform to be used in-game during LARPs",
   "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
   "private": true,
@@ -45,6 +45,7 @@
     "mongoose": "4.4.12",
     "morgan": "1.7.0",
     "node-sass": "3.6.0",
-    "socket.io": "1.4.5"
+    "socket.io": "1.4.5",
+    "xml2json": "0.9.1"
   }
 }

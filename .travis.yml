@@ -1,7 +1,14 @@
 language: node_js
 node_js:
-  - "stable"
-
+  - "5"
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 # Since we're caching node_modules we have to clean up stale packages
 before_install:
   - npm prune

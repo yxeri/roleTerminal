@@ -124,6 +124,7 @@ config.customFlags = modifiedConfig.customFlags;
 //
 
 config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
+config.mapLayersPath = process.env.MAPLAYERSPATH || modifiedConfig.mapLayersPath || 'https://www.google.com/maps/d/kml?hl=en_US&app=mp&mid=1j97gNHqYj-6M10RbW9CGAVNxUV4&forcekml=1&cid=mp&cv=jm93Tu_hxIY.en_US.';
 
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
 config.centerLat = process.env.CENTERLAT || modifiedConfig.centerLat || '59.3534372';

@@ -114,6 +114,8 @@ const animations = [
   'subliminalSlow',
 ];
 const mapMarkers = {};
+const mapPolygons = {};
+let mapOverview = false;
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 let audioCtx;
@@ -1040,14 +1042,23 @@ function setIntervals() {
   }
 }
 
-function realignMap() {
+function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();
-  const cornerOneCoords = getCornerOneCoordinates();
-  const cornerTwoCoords = getCornerTwoCoordinates();
 
   google.maps.event.trigger(map, 'resize');
-  bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
-  bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
+
+  if (markers) {
+    for (const marker of Object.keys(markers)) {
+      bounds.extend(markers[marker].getPosition());
+    }
+  } else {
+    const cornerOneCoords = getCornerOneCoordinates();
+    const cornerTwoCoords = getCornerTwoCoordinates();
+
+    bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
+    bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
+  }
+
   map.fitBounds(bounds);
   map.setCenter(map.getCenter());
 }
@@ -3593,21 +3604,48 @@ function attachCommands() {
           mapMarkers[markerName].setMap(map);
         }
 
-        google.maps.event.addListener(map, 'idle', () => { realignMap(); });
+        for (const markerName of Object.keys(mapPolygons)) {
+          mapPolygons[markerName].setMap(map);
+        }
+
+        map.addListener('idle', () => {
+          realignMap(mapOverview ? mapMarkers : undefined);
+        });
       }
 
       if (phrases.length > 0) {
         const choice = phrases[0];
+        const value = phrases[1];
         const mapDiv = document.getElementById('map');
 
         switch (choice) {
           case 'on': {
             splitView(true, mapDiv);
 
+            if (value && value === 'overview') {
+              mapOverview = true;
+            } else {
+              mapOverview = false;
+            }
+
+            if (!map) {
+              initMap();
+              socket.emit('getMapPositions', { types: ['static', 'users'] });
+              socket.emit('getGooglePositions', { types: ['static', 'users', 'world'] });
+            }
+
+            realignMap(mapOverview ? mapMarkers : undefined);
+
             break;
           }
           case 'off': {
             splitView(false, mapDiv);
+
+            break;
+          }
+          case 'list': {
+            console.log(mapMarkers);
+            console.log(mapPolygons);
 
             break;
           }
@@ -3617,11 +3655,6 @@ function attachCommands() {
         }
 
         scrollView();
-
-        if (!map) {
-          initMap();
-          socket.emit('getMapPositions', { types: ['static', 'users'] });
-        }
       }
     },
     accessLevel: 1,
@@ -4062,8 +4095,26 @@ function onMapPositions(mapPositions = []) {
     const positionName = mapPosition.positionName;
     const latitude = parseFloat(mapPosition.position.latitude);
     const longitude = parseFloat(mapPosition.position.longitude);
+    const polygon = mapPosition.position.polygon;
 
-    if (mapMarkers[positionName]) {
+    if (polygon) {
+      if (mapPolygons[positionName]) {
+        mapPolygons[positionName].setPaths(polygon);
+      } else {
+        mapPolygons[positionName] = new google.maps.Polygon({
+          paths: polygon,
+          strokeColor: '#FF0000',
+          strokeOpacity: .8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+        });
+
+        if (map) {
+          mapPolygons[positionName].setMap(map);
+        }
+      }
+    } else if (mapMarkers[positionName]) {
       mapMarkers[positionName].setPosition(new google.maps.LatLng(latitude, longitude));
     } else {
       mapMarkers[positionName] = new google.maps.Marker({

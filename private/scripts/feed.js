@@ -747,6 +747,14 @@ function getDefaultZoomLevel() {
   return parseInt(getLocalVal('defaultZoomLevel'), 10);
 }
 
+function setRadioChannels(radioChannels) {
+  setLocalVal('radioChannels', JSON.stringify(radioChannels));
+}
+
+function getRadioChannels() {
+  return JSON.parse(getLocalVal('radioChannels'));
+}
+
 function getDefaultInputStart() {
   return getLocalVal('defaultInputStart');
 }
@@ -3494,19 +3502,15 @@ function attachCommands() {
         return;
       }
 
-      const channels = {
-        metal: 'http://69.4.232.118:80/live;',
-      };
+      const channels = getRadioChannels();
       const choice = phrases[0];
-      let path;
 
       switch (choice) {
         case 'on': {
-          const chosenChannel = phrases[1];
-          path = channels[chosenChannel];
+          const chosenChannel = phrases[1].toLowerCase();
 
-          if (path) {
-            audio.playAudio({ path });
+          if (channels[chosenChannel] && channels[chosenChannel].url) {
+            audio.playAudio({ path: channels[chosenChannel].url });
           } else {
             queueMessage({
               text: labels.getText('instructions', 'radio'),
@@ -4190,6 +4194,7 @@ function onStartup(params = { }) {
   setCornerOneCoordinates(params.cornerOneLong, params.cornerOneLat);
   setCornerTwoCoordinates(params.cornerTwoLong, params.cornerTwoLat);
   setDefaultZoomLevel(params.defaultZoomLevel);
+  setRadioChannels(params.radioChannels);
 
   socket.emit('getCommands');
   labels.setLanguage(getDefaultLanguage());

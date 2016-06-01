@@ -115,6 +115,7 @@ const animations = [
 ];
 const mapMarkers = {};
 const mapPolygons = {};
+const mapLines = {};
 let mapOverview = false;
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
@@ -3537,6 +3538,12 @@ function attachCommands() {
     func: (phrases = []) => {
       const centerCoords = getCenterCoordinates();
 
+      function setMap(collection) {
+        for (const markerName of Object.keys(collection)) {
+          collection[markerName].setMap(map);
+        }
+      }
+
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: {
@@ -3600,13 +3607,9 @@ function attachCommands() {
           ],
         });
 
-        for (const markerName of Object.keys(mapMarkers)) {
-          mapMarkers[markerName].setMap(map);
-        }
-
-        for (const markerName of Object.keys(mapPolygons)) {
-          mapPolygons[markerName].setMap(map);
-        }
+        setMap(mapMarkers);
+        setMap(mapPolygons);
+        setMap(mapLines);
 
         map.addListener('idle', () => {
           realignMap(mapOverview ? mapMarkers : undefined);
@@ -3631,7 +3634,7 @@ function attachCommands() {
             if (!map) {
               initMap();
               socket.emit('getMapPositions', { types: ['static', 'users'] });
-              socket.emit('getGooglePositions', { types: ['static', 'users', 'world'] });
+              socket.emit('getGooglePositions', { types: ['world'] });
             }
 
             realignMap(mapOverview ? mapMarkers : undefined);
@@ -3646,6 +3649,22 @@ function attachCommands() {
           case 'list': {
             console.log(mapMarkers);
             console.log(mapPolygons);
+            console.log(mapLines);
+
+            break;
+          }
+          case 'locate': {
+            if (value) {
+              const marker = mapMarkers[value];
+
+              if (marker) {
+                // stuff
+              } else {
+                queueMessage({ text: labels.getText('error', 'unableToFindMap') });
+              }
+            } else {
+              queueMessage({ text: labels.getText('error', 'locateValueMissing') });
+            }
 
             break;
           }
@@ -4095,16 +4114,33 @@ function onMapPositions(mapPositions = []) {
     const positionName = mapPosition.positionName;
     const latitude = parseFloat(mapPosition.position.latitude);
     const longitude = parseFloat(mapPosition.position.longitude);
-    const polygon = mapPosition.position.polygon;
+    const coordsCollection = mapPosition.position.coordsCollection;
+    const geometry = mapPosition.geometry;
 
-    if (polygon) {
+    if (geometry === 'line') {
+      if (mapLines[positionName]) {
+        mapLines[positionName].setPath(coordsCollection);
+      } else {
+        mapLines[positionName] = new google.maps.Polyline({
+          path: coordsCollection,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+        });
+
+        if (map) {
+          mapLines[positionName].setMap(map);
+        }
+      }
+    } else if (geometry === 'polygon') {
       if (mapPolygons[positionName]) {
-        mapPolygons[positionName].setPaths(polygon);
+        mapPolygons[positionName].setPaths(coordsCollection);
       } else {
         mapPolygons[positionName] = new google.maps.Polygon({
-          paths: polygon,
+          paths: coordsCollection,
           strokeColor: '#FF0000',
-          strokeOpacity: .8,
+          strokeOpacity: 0.8,
           strokeWeight: 2,
           fillColor: '#FF0000',
           fillOpacity: 0.35,

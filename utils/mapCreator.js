@@ -8,24 +8,37 @@ function convertToJson(xml) {
   return JSON.parse(xml2json.toJson(xml));
 }
 
+function parseCoords(string) {
+  return string.replace(/0\.0 |0\.0/g, '').replace(/,$/g, '').split(',');
+}
+
+function createCoordsCollection(coords) {
+  const coordsCollection = [];
+
+  for (let i = 0; i < coords.length; i += 2) {
+    coordsCollection.push({
+      lat: parseFloat(coords[i + 1]),
+      lng: parseFloat(coords[i]),
+    });
+  }
+
+  return coordsCollection;
+}
+
 function createPosition(placemark) {
   const position = {};
+  let geometry = '';
 
   if (placemark.Polygon) {
-    const coords = placemark.Polygon.outerBoundaryIs.LinearRing.coordinates.replace(/0\.0 |0\.0/g, '').replace(/,$/g, '').split(',');
-    const polygon = [];
-
-    for (let pol = 0; pol < coords.length; pol += 2) {
-      polygon.push({
-        lat: parseFloat(coords[pol + 1]),
-        lng: parseFloat(coords[pol]),
-      });
-    }
-
-    position.polygon = polygon;
+    position.coordsCollection = createCoordsCollection(parseCoords(placemark.Polygon.outerBoundaryIs.LinearRing.coordinates));
+    geometry = 'polygon';
+  } else if (placemark.LineString) {
+    position.coordsCollection = createCoordsCollection(parseCoords(placemark.LineString.coordinates));
+    geometry = 'line';
   } else if (placemark.Point) {
     position.latitude = placemark.Point.coordinates.split(',')[1];
     position.longitude = placemark.Point.coordinates.split(',')[0];
+    geometry = 'point';
   }
 
   return {
@@ -33,6 +46,7 @@ function createPosition(placemark) {
     position,
     isStatic: true,
     type: 'world',
+    geometry,
   };
 }
 

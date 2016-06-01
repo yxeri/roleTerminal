@@ -116,7 +116,7 @@ const animations = [
 const mapMarkers = {};
 const mapPolygons = {};
 const mapLines = {};
-let mapOverview = false;
+let mapView = '';
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 let audioCtx;
@@ -747,6 +747,14 @@ function getDefaultZoomLevel() {
   return parseInt(getLocalVal('defaultZoomLevel'), 10);
 }
 
+function setRadioChannels(radioChannels) {
+  setLocalVal('radioChannels', JSON.stringify(radioChannels));
+}
+
+function getRadioChannels() {
+  return JSON.parse(getLocalVal('radioChannels'));
+}
+
 function getDefaultInputStart() {
   return getLocalVal('defaultInputStart');
 }
@@ -1045,22 +1053,28 @@ function setIntervals() {
 
 function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();
+  let centerPos = map.getCenter();
 
   google.maps.event.trigger(map, 'resize');
 
-  if (markers) {
+  if (mapView === 'overview') {
     for (const marker of Object.keys(markers)) {
       bounds.extend(markers[marker].getPosition());
     }
+
+    map.fitBounds(bounds);
+  } else if (mapView === 'me') {
+    centerPos = mapMarkers.I.getPosition();
   } else {
     const cornerOneCoords = getCornerOneCoordinates();
     const cornerTwoCoords = getCornerTwoCoordinates();
 
     bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
     bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
+
+    map.fitBounds(bounds);
   }
 
-  map.fitBounds(bounds);
   map.setCenter(map.getCenter());
 }
 
@@ -3494,19 +3508,15 @@ function attachCommands() {
         return;
       }
 
-      const channels = {
-        metal: 'http://69.4.232.118:80/live;',
-      };
+      const channels = getRadioChannels();
       const choice = phrases[0];
-      let path;
 
       switch (choice) {
         case 'on': {
-          const chosenChannel = phrases[1];
-          path = channels[chosenChannel];
+          const chosenChannel = phrases[1].toLowerCase();
 
-          if (path) {
-            audio.playAudio({ path });
+          if (channels[chosenChannel] && channels[chosenChannel].url) {
+            audio.playAudio({ path: channels[chosenChannel].url });
           } else {
             queueMessage({
               text: labels.getText('instructions', 'radio'),
@@ -3516,7 +3526,7 @@ function attachCommands() {
           break;
         }
         case 'list': {
-          queueMessage({ text: Object.keys(channels) });
+          queueMessage({ text: Object.keys(channels).map((channel) => channels[channel].name) });
 
           break;
         }
@@ -3612,7 +3622,7 @@ function attachCommands() {
         setMap(mapLines);
 
         map.addListener('idle', () => {
-          realignMap(mapOverview ? mapMarkers : undefined);
+          realignMap(mapMarkers);
         });
       }
 
@@ -3625,10 +3635,10 @@ function attachCommands() {
           case 'on': {
             splitView(true, mapDiv);
 
-            if (value && value === 'overview') {
-              mapOverview = true;
+            if (value) {
+              mapView = value;
             } else {
-              mapOverview = false;
+              mapView = '';
             }
 
             if (!map) {
@@ -3637,7 +3647,7 @@ function attachCommands() {
               socket.emit('getGooglePositions', { types: ['world'] });
             }
 
-            realignMap(mapOverview ? mapMarkers : undefined);
+            realignMap(mapMarkers);
 
             break;
           }
@@ -4123,8 +4133,7 @@ function onMapPositions(mapPositions = []) {
       } else {
         mapLines[positionName] = new google.maps.Polyline({
           path: coordsCollection,
-          geodesic: true,
-          strokeColor: '#FF0000',
+          strokeColor: '#008766',
           strokeOpacity: 1.0,
           strokeWeight: 2,
         });
@@ -4139,10 +4148,10 @@ function onMapPositions(mapPositions = []) {
       } else {
         mapPolygons[positionName] = new google.maps.Polygon({
           paths: coordsCollection,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
+          strokeColor: '#008766',
+          strokeOpacity: 0.9,
           strokeWeight: 2,
-          fillColor: '#FF0000',
+          fillColor: '#00ffcc',
           fillOpacity: 0.35,
         });
 
@@ -4160,6 +4169,7 @@ function onMapPositions(mapPositions = []) {
         },
         title: positionName,
         label: positionName[0],
+        opacity: 0.9,
       });
 
       if (map) {
@@ -4190,6 +4200,7 @@ function onStartup(params = { }) {
   setCornerOneCoordinates(params.cornerOneLong, params.cornerOneLat);
   setCornerTwoCoordinates(params.cornerTwoLong, params.cornerTwoLat);
   setDefaultZoomLevel(params.defaultZoomLevel);
+  setRadioChannels(params.radioChannels);
 
   socket.emit('getCommands');
   labels.setLanguage(getDefaultLanguage());

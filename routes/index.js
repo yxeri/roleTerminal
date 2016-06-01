@@ -44,6 +44,7 @@ function handle(io) {
       cornerTwoLat: appConfig.cornerTwoLat,
       cornerTwoLong: appConfig.cornerTwoLong,
       defaultZoomLevel: appConfig.defaultZoomLevel,
+      radioChannels: appConfig.radioChannels,
     });
 
     socket.on('disconnect', () => {

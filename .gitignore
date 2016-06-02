@@ -1,4 +1,5 @@
 objects
+config/modified/
 # Remove this if node_modules needs to be jammed into git repository
 # for docker caching reasons
 node_modules

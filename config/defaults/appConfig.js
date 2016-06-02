@@ -129,13 +129,13 @@ config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
 config.mapLayersPath = process.env.MAPLAYERSPATH || modifiedConfig.mapLayersPath || 'https://www.google.com/maps/d/kml?hl=en_US&app=mp&mid=1j97gNHqYj-6M10RbW9CGAVNxUV4&forcekml=1&cid=mp&cv=jm93Tu_hxIY.en_US.';
 
 config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
-config.centerLat = process.env.CENTERLAT || modifiedConfig.centerLat || '59.3534372';
-config.centerLong = process.env.CENTERLONG || modifiedConfig.centerLong || '18.0044666';
-config.cornerOneLat = process.env.CORNERONELAT || modifiedConfig.cornerOneLat || '67.3926316';
-config.cornerOneLong = process.env.CORNERONELONG || modifiedConfig.cornerOneLong || '24.0936037';
-config.cornerTwoLat = process.env.CORNERTWOLAT || modifiedConfig.cornerTwoLat || '55.699443';
-config.cornerTwoLong = process.env.CORNERTWOLONG || modifiedConfig.cornerTwoLong || '10.3777913';
-config.defaultZoomLevel = process.env.DEFAULTZOOMLEVEL || modifiedConfig.defaultZoomLevel || 15;
+config.centerLat = parseFloat(process.env.CENTERLAT || modifiedConfig.centerLat || 59.3534372);
+config.centerLong = parseFloat(process.env.CENTERLONG || modifiedConfig.centerLong || 18.0044666);
+config.cornerOneLat = parseFloat(process.env.CORNERONELAT || modifiedConfig.cornerOneLat || 67.3926316);
+config.cornerOneLong = parseFloat(process.env.CORNERONELONG || modifiedConfig.cornerOneLong || 24.0936037);
+config.cornerTwoLat = parseFloat(process.env.CORNERTWOLAT || modifiedConfig.cornerTwoLat || 55.699443);
+config.cornerTwoLong = parseFloat(process.env.CORNERTWOLONG || modifiedConfig.cornerTwoLong || 10.3777913);
+config.defaultZoomLevel = parseInt(process.env.DEFAULTZOOMLEVEL || modifiedConfig.defaultZoomLevel || 15, 10);
 
 // Amount of messages retrieved with the history command
 config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;

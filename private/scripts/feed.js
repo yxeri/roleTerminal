@@ -960,8 +960,9 @@ function retrievePosition() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           },
-          title: '!',
-          label: '!',
+          title: 'You',
+          opacity: 0.9,
+          icon: '/images/mapiconyou.png',
         });
       } else {
         mapMarkers.I.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
@@ -1063,8 +1064,10 @@ function realignMap(markers) {
     }
 
     map.fitBounds(bounds);
-  } else if (mapView === 'me') {
+    centerPos = bounds.getCenter();
+  } else if (mapView === 'me' && mapMarkers.I) {
     centerPos = mapMarkers.I.getPosition();
+    map.setZoom(17);
   } else {
     const cornerOneCoords = getCornerOneCoordinates();
     const cornerTwoCoords = getCornerTwoCoordinates();
@@ -1073,9 +1076,10 @@ function realignMap(markers) {
     bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
 
     map.fitBounds(bounds);
+    centerPos = bounds.getCenter();
   }
 
-  map.setCenter(map.getCenter());
+  map.setCenter(centerPos);
 }
 
 /**
@@ -4168,8 +4172,8 @@ function onMapPositions(mapPositions = []) {
           lng: longitude,
         },
         title: positionName,
-        label: positionName[0],
         opacity: 0.9,
+        icon: '/images/mapicon.png',
       });
 
       if (map) {

@@ -4060,12 +4060,12 @@ function onWeather(report) {
       }
     }
 
-    weatherString += `${day}/${month} ${hours}:00${'\t'}`;
-    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C\t'}`;
-    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km ${'\t'}`;
-    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0\t'}`;
-    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s${'\t'}`;
-    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage}${'\t'}`;
+    weatherString += `${day}/${month} ${hours}:00: `;
+    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C'} `;
+    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km `;
+    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0'} `;
+    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s `;
+    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage} `;
 
     if (precipType) {
       weatherString += precipitation;

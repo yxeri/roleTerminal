@@ -56,8 +56,8 @@ function handle(socket) {
         return;
       }
 
-      const lat = appConfig.latitude;
-      const lon = appConfig.longitude;
+      const lat = appConfig.centerLat.toFixed(2);
+      const lon = appConfig.centerLong.toFixed(2);
       const hoursAllowed = [0, 4, 8, 12, 16, 20];
       let url = '';
 

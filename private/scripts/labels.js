@@ -803,6 +803,8 @@ const all = {
       'You have to type the name of the setting and value',
       'Exemple: settings fastmode on',
     ],
+    locateValueMissing: ['You have to enter a name to search for on the map'],
+    unableToFindMap: ['Unable to find the position on the map'],
   },
   errors_se: {
     commandFail: ['Kommandot kunde inte hittas. Använd msg-kommandot om ni menade att skicka ett meddelande'],
@@ -818,6 +820,8 @@ const all = {
       'Ni måste skriva in namnet på inställningen och värdet',
       'Exempel: settings fastmode on',
     ],
+    locateValueMissing: ['Ni måste skriva in namnet på det ni söker på kartan'],
+    unableToFindMap: ['Kunde inte hitta positionen på kartan'],
   },
   info: {
     cancel: ['You can cancel out of the command by typing "exit" or "abort"'],

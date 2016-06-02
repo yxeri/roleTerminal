@@ -1064,8 +1064,10 @@ function realignMap(markers) {
     }
 
     map.fitBounds(bounds);
-  } else if (mapView === 'me') {
+    centerPos = bounds.getCenter();
+  } else if (mapView === 'me' && mapMarkers.I) {
     centerPos = mapMarkers.I.getPosition();
+    map.setZoom(17);
   } else {
     const cornerOneCoords = getCornerOneCoordinates();
     const cornerTwoCoords = getCornerTwoCoordinates();
@@ -1074,9 +1076,10 @@ function realignMap(markers) {
     bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
 
     map.fitBounds(bounds);
+    centerPos = bounds.getCenter();
   }
 
-  map.setCenter(map.getCenter());
+  map.setCenter(centerPos);
 }
 
 /**

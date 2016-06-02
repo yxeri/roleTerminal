@@ -4089,6 +4089,7 @@ function onWhoami(data) {
     `Access level: ${data.user.accessLevel}`,
     `Team: ${team}`,
     `Device ID: ${getDeviceId()}`,
+    `Location: ${mapMarkers.I ? mapMarkers.I.getPosition() : 'Unknown'}`,
     createCommandEnd('whoami'),
   ]);
 

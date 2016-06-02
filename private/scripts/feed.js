@@ -960,8 +960,9 @@ function retrievePosition() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           },
-          title: '!',
-          label: '!',
+          title: 'You',
+          opacity: 0.9,
+          icon: '/images/mapiconyou.png',
         });
       } else {
         mapMarkers.I.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
@@ -4168,8 +4169,8 @@ function onMapPositions(mapPositions = []) {
           lng: longitude,
         },
         title: positionName,
-        label: positionName[0],
         opacity: 0.9,
+        icon: '/images/mapicon.png',
       });
 
       if (map) {

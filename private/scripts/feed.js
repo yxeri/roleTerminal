@@ -4,57 +4,137 @@ const labels = require('./labels');
 const textTools = require('./textTools');
 const audio = require('./audio');
 const zalgoGenerator = require('./zalgoGenerator');
+const mapTools = require('./mapTools');
 
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMessageQueue
+ * @type {number}
  */
 const messagesPerQueue = 5;
 /**
  * Queue of all the message objects that will be handled and printed
+ * @type {object[]}
  */
 const messageQueue = [];
+/**
+ * Queue of all the commands used by the user that will be handled and printed
+ * @type {object[]}
+ */
 const commandQueue = [];
 /**
  * Char that is prepended on commands in chat mode
+ * @type {string[]}
  */
 const commandChars = ['-', '/'];
+/**
+ * String representation of command mode
+ * @type {string}
+ */
 const cmdMode = 'cmd';
+/**
+ * String representation of chat mode
+ * @type {string}
+ */
 const chatMode = 'chat';
+/**
+ * Room names which should be hidden in the output
+ * @type {string[]}
+ */
 const hideRooms = [
   'broadcast',
   'important',
   'morse',
 ];
+/**
+ * Room names which should not be clickable
+ * @type {string[]}
+ */
 const noLinkRooms = [
   'whisper',
 ];
-// Interval/timeout times in milliseconds
-const screenOffIntervalTime = 1000;
-const watchPositionTime = 15000;
-const pausePositionTime = 40000;
 /**
+ * Check every * amount of milliseconds to see if Javascript is still responding
+ * It will trigger a function if the response is delayed
+ * @type {number}
+ */
+const screenOffIntervalTime = 1000;
+/**
+ * Get GPS coordinates for * amount of milliseconds
+ * @type {number}
+ */
+const watchPositionTime = 15000;
+/**
+ * Get GPS coordinates every * milliseconds
+ * @type {number}
+ */
+const pausePositionTime = 40000;
+/*
  * DOM element init
  * Initiation of DOM elements has to be done here.
  * Android 4.1.* would otherwise give JS errors
  */
+/**
+ * List where all the output is printed too
+ * @type {Element}
+ */
 const mainFeed = document.getElementById('mainFeed');
+/**
+ * User input field
+ * @type {Element}
+ */
 const cmdInput = document.getElementById('cmdInput');
+/**
+ * The span infront of the input field
+ * @type {Element}
+ */
 const inputStart = document.getElementById('inputStart');
+/**
+ * Span showing the current mode the user is in
+ * @type {Element}
+ */
 const modeField = document.getElementById('mode');
+/**
+ * Adds padding to the bottom. Scrolling of the view targets this element
+ * @type {Element}
+ */
 const spacer = document.getElementById('spacer');
+/**
+ * Div containing mainFeed, inputContainer and spacer
+ * @type {Element}
+ */
 const background = document.getElementById('background');
+/**
+ * Menu with a list of clickable options
+ * @type {Element}
+ */
 const menu = document.getElementById('menu');
+/**
+ * List with clickable options
+ * @type {Element}
+ */
 const menuList = document.getElementById('menuList');
-// Socket.io
+/**
+ * Socket.IO
+ */
 const socket = io(); // eslint-disable-line no-undef
-// Queue of all the sounds that will be handled and played
+/**
+ * Queue of all sounds to be consumed and played
+ * @type {object[]}
+ */
 const soundQueue = [];
+/**
+ * Timeout between each command to be run
+ * @type {number}
+ */
 const commandTime = 1000;
 const dot = '.';
 const dash = '-';
+/**
+ * Symbolizes space between words in morse string
+ * @type {string}
+ */
 const morseSeparator = '#';
-// TODO Convert to arrays with amounts pointing to either - or .
 const morseCodes = {
   a: '.-',
   b: '-...',
@@ -92,7 +172,6 @@ const morseCodes = {
   8: '---..',
   9: '----.',
   0: '-----',
-  // Symbolizes space betwen words
   '#': morseSeparator,
 };
 const commandHelper = {
@@ -105,20 +184,20 @@ const commandHelper = {
 };
 const triggerKeysPressed = [];
 const commands = {};
-// Timeout between print of rows (milliseconds)
+/**
+ * Timeout between print of rows (milliseconds)
+ * @type {number}
+ */
 const rowTimeout = 40;
-// Class names of animations in css
+/**
+ * Class names of animations in css
+ * @type {string[]}
+ */
 const animations = [
   'subliminal',
   'subliminalFast',
   'subliminalSlow',
 ];
-const mapMarkers = {};
-const mapPolygons = {};
-const mapLines = {};
-const mapLabels = {};
-let markerClusterer;
-let mapView = '';
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
 let audioCtx;
@@ -132,7 +211,6 @@ let isTracking = false;
 let firstConnection = true;
 let viewIsSplit = false;
 let secondView = null;
-let map;
 let isLandscape = window.innerWidth > window.innerHeight;
 let positions = [];
 /**
@@ -705,9 +783,10 @@ function setCenterCoordinates(longitude, latitude) {
   setLocalVal('centerLong', longitude);
   setLocalVal('centerLat', latitude);
 
-  if (map) {
-    map.setCenter(new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude)));
-  }
+  mapTools.setMapCenter({
+    latitude,
+    longitude,
+  });
 }
 
 function getCenterCoordinates() {
@@ -956,19 +1035,10 @@ function retrievePosition() {
       isTracking = true;
       positions.push(position);
 
-      if (!mapMarkers.I) {
-        mapMarkers.I = new google.maps.Marker({
-          position: {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          },
-          title: 'You',
-          opacity: 0.9,
-          icon: '/images/mapiconyou.png',
-        });
-      } else {
-        mapMarkers.I.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-      }
+      mapTools.setUserPosition({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
     }
   }, (err) => {
     console.log(err);
@@ -1052,45 +1122,6 @@ function setIntervals() {
      */
     isScreenOffInterval = setInterval(isScreenOff, screenOffIntervalTime);
   }
-}
-
-function toggleMapLabels() {
-  for (const markerName of Object.keys(mapMarkers)) {
-    if (mapLabels[markerName] && mapLabels[markerName].getMap() !== mapMarkers[markerName].getMap()) {
-      mapLabels[markerName].setMap(mapMarkers[markerName].getMap());
-    }
-  }
-}
-
-function realignMap(markers) {
-  const bounds = new google.maps.LatLngBounds();
-  let centerPos = map.getCenter();
-
-  google.maps.event.trigger(map, 'resize');
-
-  if (mapView === 'overview') {
-    for (const marker of Object.keys(markers)) {
-      bounds.extend(markers[marker].getPosition());
-    }
-
-    map.fitBounds(bounds);
-    centerPos = bounds.getCenter();
-  } else if (mapView === 'me' && mapMarkers.I) {
-    centerPos = mapMarkers.I.getPosition();
-    map.setZoom(18);
-  } else {
-    const cornerOneCoords = getCornerOneCoordinates();
-    const cornerTwoCoords = getCornerTwoCoordinates();
-
-    bounds.extend(new google.maps.LatLng(cornerOneCoords.latitude, cornerOneCoords.longitude));
-    bounds.extend(new google.maps.LatLng(cornerTwoCoords.latitude, cornerTwoCoords.longitude));
-
-    map.fitBounds(bounds);
-    centerPos = bounds.getCenter();
-  }
-
-  map.setCenter(centerPos);
-  toggleMapLabels();
 }
 
 /**
@@ -3561,110 +3592,6 @@ function attachCommands() {
   };
   commands.map = {
     func: (phrases = []) => {
-      const centerCoords = getCenterCoordinates();
-
-      function setMap(collection) {
-        for (const markerName of Object.keys(collection)) {
-          collection[markerName].setMap(map);
-        }
-      }
-
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {
-            lat: centerCoords.latitude,
-            lng: centerCoords.longitude,
-          },
-          zoom: getDefaultZoomLevel(),
-          disableDefaultUI: true,
-          draggable: false,
-          fullscreenControl: false,
-          keyboardShortcuts: false,
-          mapTypeControl: false,
-          noClear: true,
-          zoomControl: false,
-          disableDoubleClickZoom: true,
-          panControl: false,
-          overviewMapControl: false,
-          rotateControl: false,
-          scaleControl: false,
-          scrollwheel: false,
-          streetViewControl: false,
-          backgroundColor: '#001e15',
-          styles: [
-            {
-              featureType: 'all',
-              elementType: 'all',
-              stylers: [
-                { color: '#001e15' },
-              ],
-            }, {
-              featureType: 'road',
-              elementType: 'geometry',
-              stylers: [
-                { color: '#00ffcc' },
-              ],
-            }, {
-              featureType: 'road',
-              elementType: 'labels',
-              stylers: [
-                { visibility: 'off' },
-              ],
-            }, {
-              featureType: 'poi',
-              elementType: 'all',
-              stylers: [
-                { visibility: 'off' },
-              ],
-            }, {
-              featureType: 'administrative',
-              elementType: 'all',
-              stylers: [
-                { visibility: 'off' },
-              ],
-            }, {
-              featureType: 'water',
-              elementType: 'all',
-              stylers: [
-                { color: '#00ffcc' },
-              ],
-            },
-          ],
-        });
-
-        setMap(mapMarkers);
-        setMap(mapPolygons);
-        setMap(mapLines);
-        setMap(mapLabels);
-
-        markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-          gridSize: 12,
-          maxZoom: 15,
-          zoomOnClick: false,
-          styles: [{
-            width: 36,
-            height: 36,
-            iconAnchor: [18, 18],
-            textSize: 12,
-            url: 'images/m.png',
-          }],
-        });
-
-        map.addListener('idle', () => {
-          realignMap(mapMarkers);
-        });
-
-        document.getElementById('map').addEventListener('click', (event) => {
-          event.target.classList.add('hide');
-        });
-
-        google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
-          for (const marker of cluster.getMarkers()) {
-            marker.setMap(map);
-          }
-        });
-      }
-
       if (phrases.length > 0) {
         const choice = phrases[0];
         const value = phrases[1];
@@ -3675,19 +3602,23 @@ function attachCommands() {
             splitView(true, mapDiv);
 
             if (value) {
-              mapView = value;
+              mapTools.setMapView(value);
             } else {
-              mapView = '';
+              mapTools.setMapView('');
             }
 
-            if (!map) {
-              initMap();
+            if (!mapTools.getMap()) {
+              mapTools.createMap({
+                centerCoordinates: getCenterCoordinates(),
+                zoomLevel: getDefaultZoomLevel(),
+                elementId: 'map',
+              });
               socket.emit('getMapPositions', { types: ['static', 'users'] });
               socket.emit('getGooglePositions', { types: ['world'] });
             }
-            
-            markerClusterer.resetViewport();
-            realignMap(mapMarkers);
+
+            mapTools.resetClusters();
+            mapTools.realignMap();
 
             break;
           }
@@ -3696,25 +3627,18 @@ function attachCommands() {
 
             break;
           }
-          case 'list': {
-            console.log(mapMarkers);
-            console.log(mapPolygons);
-            console.log(mapLines);
-
-            break;
-          }
           case 'locate': {
-            if (value) {
-              const marker = mapMarkers[value];
-
-              if (marker) {
-                // stuff
-              } else {
-                queueMessage({ text: labels.getText('error', 'unableToFindMap') });
-              }
-            } else {
-              queueMessage({ text: labels.getText('error', 'locateValueMissing') });
-            }
+            // if (value) {
+            //   const marker = mapMarkers[value];
+            //
+            //   if (marker) {
+            //     // stuff
+            //   } else {
+            //     queueMessage({ text: labels.getText('error', 'unableToFindMap') });
+            //   }
+            // } else {
+            //   queueMessage({ text: labels.getText('error', 'locateValueMissing') });
+            // }
 
             break;
           }
@@ -4120,12 +4044,13 @@ function onUpdateDeviceId(newId) {
 
 function onWhoami(data) {
   const team = data.user.team || '';
+  const userMarker = mapTools.getThisUserMarker();
   const text = createCommandStart('whoami').concat([
     `User: ${data.user.userName}`,
     `Access level: ${data.user.accessLevel}`,
     `Team: ${team}`,
     `Device ID: ${getDeviceId()}`,
-    `Location: ${mapMarkers.I ? mapMarkers.I.getPosition() : 'Unknown'}`,
+    `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
     createCommandEnd('whoami'),
   ]);
 
@@ -4167,74 +4092,41 @@ function onMapPositions(mapPositions = []) {
     const longitude = parseFloat(mapPosition.position.longitude);
     const coordsCollection = mapPosition.position.coordsCollection;
     const geometry = mapPosition.geometry;
+    const type = mapPosition.type;
 
     if (geometry === 'line') {
-      if (mapLines[positionName]) {
-        mapLines[positionName].setPath(coordsCollection);
-      } else {
-        mapLines[positionName] = new google.maps.Polyline({
-          path: coordsCollection,
-          strokeColor: '#008766',
-          strokeOpacity: 1.0,
-          strokeWeight: 2,
-        });
-
-        if (map) {
-          mapLines[positionName].setMap(map);
-        }
-      }
+      mapTools.setLinePosition({
+        coordsCollection,
+        positionName,
+      });
     } else if (geometry === 'polygon') {
-      if (mapPolygons[positionName]) {
-        mapPolygons[positionName].setPaths(coordsCollection);
-      } else {
-        mapPolygons[positionName] = new google.maps.Polygon({
-          paths: coordsCollection,
-          strokeColor: '#008766',
-          strokeOpacity: 0.9,
-          strokeWeight: 2,
-          fillColor: '#00ffcc',
-          fillOpacity: 0.35,
-        });
-
-        if (map) {
-          mapPolygons[positionName].setMap(map);
-        }
-      }
-    } else if (mapMarkers[positionName]) {
-      mapMarkers[positionName].setPosition(new google.maps.LatLng(latitude, longitude));
+      mapTools.setPolygonPosition({
+        positionName,
+        coordsCollection,
+      });
+    } else if (geometry === 'point') {
+      mapTools.setMarkerPosition({
+        positionName,
+        position: {
+          latitude,
+          longitude,
+        },
+      });
+    } else if (type && type === 'user') {
+      mapTools.setMarkerPosition({
+        positionName,
+        position: {
+          latitude,
+          longitude,
+        },
+        hideLabel: true,
+      });
     } else {
-      const icon = {
-        url: '/images/mapicon.png',
-        size: new google.maps.Size(16, 16),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(8, 8),
-      };
-
-      mapMarkers[positionName] = new google.maps.Marker({
-        position: new google.maps.LatLng(latitude, longitude),
-        title: positionName,
-        opacity: 0.9,
-        icon,
-      });
-      mapLabels[positionName] = new MapLabel({
-        text: positionName,
-        position: new google.maps.LatLng(latitude, longitude),
-        align: 'right',
-      });
-
-      if (map) {
-        mapMarkers[positionName].setMap(map);
-
-        if (mapLabels[positionName]) {
-          mapLabels[positionName].setMap(map);
-        }
-
-        markerClusterer.addMarker(mapMarkers[positionName]);
-      }
+      console.log(mapPosition);
     }
   }
 
-  toggleMapLabels();
+  mapTools.toggleMapLabels();
 }
 
 /**
@@ -4259,6 +4151,7 @@ function onStartup(params = { }) {
   setCornerTwoCoordinates(params.cornerTwoLong, params.cornerTwoLat);
   setDefaultZoomLevel(params.defaultZoomLevel);
   setRadioChannels(params.radioChannels);
+  mapTools.setCornerCoords(getCornerOneCoordinates(), getCornerTwoCoordinates());
 
   socket.emit('getCommands');
   labels.setLanguage(getDefaultLanguage());

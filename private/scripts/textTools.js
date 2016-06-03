@@ -54,10 +54,10 @@ function createFullLine() {
   return createLine(lineLength);
 }
 
-module.exports.createDeviceId = createDeviceId;
-module.exports.createCharString = createCharString;
-module.exports.createBinaryString = createBinaryString;
-module.exports.createLine = createLine;
-module.exports.createFullLine = createFullLine;
-module.exports.createMixedString = createMixedString;
-module.exports.createRandString = createRandString;
+exports.createDeviceId = createDeviceId;
+exports.createCharString = createCharString;
+exports.createBinaryString = createBinaryString;
+exports.createLine = createLine;
+exports.createFullLine = createFullLine;
+exports.createMixedString = createMixedString;
+exports.createRandString = createRandString;

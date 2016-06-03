@@ -166,5 +166,5 @@ function randomMultiZalgoPhrase(params = {}) {
   return words.join(' ');
 }
 
-module.exports.createZalgoPhrase = createZalgoPhrase;
-module.exports.randomMultiZalgoPhrase = randomMultiZalgoPhrase;
+exports.createZalgoPhrase = createZalgoPhrase;
+exports.randomMultiZalgoPhrase = randomMultiZalgoPhrase;

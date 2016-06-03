@@ -688,10 +688,14 @@ function updatePosition(params) {
   const positionName = params.positionName;
   const position = params.position;
   const isStatic = params.isStatic;
+  const type = params.type;
   const callback = params.callback;
 
   const query = { positionName };
-  const update = { position };
+  const update = {
+    position,
+    type,
+  };
   const options = { upsert: true, new: true };
 
   if (typeof isStatic !== 'undefined') {

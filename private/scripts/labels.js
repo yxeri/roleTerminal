@@ -1204,7 +1204,7 @@ function setLanguage(languageCode) {
   defaultLanguage = languageCode;
 }
 
-module.exports.getText = getText;
-module.exports.getMessage = getMessage;
-module.exports.getString = getString;
-module.exports.setLanguage = setLanguage;
+exports.getText = getText;
+exports.getMessage = getMessage;
+exports.getString = getString;
+exports.setLanguage = setLanguage;

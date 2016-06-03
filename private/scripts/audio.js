@@ -32,7 +32,7 @@ function changeAudioVolume(level) {
   audio.volume = level;
 }
 
-module.exports.playAudio = playAudio;
-module.exports.pauseAudio = pauseAudio;
-module.exports.resetAudio = resetAudio;
-module.exports.changeAudioVolume = changeAudioVolume;
+exports.playAudio = playAudio;
+exports.pauseAudio = pauseAudio;
+exports.resetAudio = resetAudio;
+exports.changeAudioVolume = changeAudioVolume;

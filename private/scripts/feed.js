@@ -3640,6 +3640,7 @@ function attachCommands() {
         markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
           gridSize: 12,
           maxZoom: 15,
+          zoomOnClick: false,
           styles: [{
             width: 36,
             height: 36,
@@ -3648,8 +3649,19 @@ function attachCommands() {
             url: 'images/m.png',
           }],
         });
+
         map.addListener('idle', () => {
           realignMap(mapMarkers);
+        });
+
+        document.getElementById('map').addEventListener('click', (event) => {
+          event.target.classList.add('hide');
+        });
+
+        google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
+          for (const marker of cluster.getMarkers()) {
+            marker.setMap(map);
+          }
         });
       }
 
@@ -3673,7 +3685,8 @@ function attachCommands() {
               socket.emit('getMapPositions', { types: ['static', 'users'] });
               socket.emit('getGooglePositions', { types: ['world'] });
             }
-
+            
+            markerClusterer.resetViewport();
             realignMap(mapMarkers);
 
             break;

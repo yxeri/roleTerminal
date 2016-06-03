@@ -116,6 +116,8 @@ const animations = [
 const mapMarkers = {};
 const mapPolygons = {};
 const mapLines = {};
+const mapLabels = {};
+let markerClusterer;
 let mapView = '';
 // Index of the animation to be retrieved from animations array
 let animationPosition = 0;
@@ -1052,6 +1054,14 @@ function setIntervals() {
   }
 }
 
+function toggleMapLabels() {
+  for (const markerName of Object.keys(mapMarkers)) {
+    if (mapLabels[markerName] && mapLabels[markerName].getMap() !== mapMarkers[markerName].getMap()) {
+      mapLabels[markerName].setMap(mapMarkers[markerName].getMap());
+    }
+  }
+}
+
 function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();
   let centerPos = map.getCenter();
@@ -1067,7 +1077,7 @@ function realignMap(markers) {
     centerPos = bounds.getCenter();
   } else if (mapView === 'me' && mapMarkers.I) {
     centerPos = mapMarkers.I.getPosition();
-    map.setZoom(17);
+    map.setZoom(18);
   } else {
     const cornerOneCoords = getCornerOneCoordinates();
     const cornerTwoCoords = getCornerTwoCoordinates();
@@ -1080,6 +1090,7 @@ function realignMap(markers) {
   }
 
   map.setCenter(centerPos);
+  toggleMapLabels();
 }
 
 /**
@@ -3624,7 +3635,19 @@ function attachCommands() {
         setMap(mapMarkers);
         setMap(mapPolygons);
         setMap(mapLines);
+        setMap(mapLabels);
 
+        markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
+          gridSize: 12,
+          maxZoom: 15,
+          styles: [{
+            width: 36,
+            height: 36,
+            iconAnchor: [18, 18],
+            textSize: 12,
+            url: 'images/m.png',
+          }],
+        });
         map.addListener('idle', () => {
           realignMap(mapMarkers);
         });
@@ -4167,21 +4190,38 @@ function onMapPositions(mapPositions = []) {
     } else if (mapMarkers[positionName]) {
       mapMarkers[positionName].setPosition(new google.maps.LatLng(latitude, longitude));
     } else {
+      const icon = {
+        url: '/images/mapicon.png',
+        size: new google.maps.Size(16, 16),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(8, 8),
+      };
+
       mapMarkers[positionName] = new google.maps.Marker({
-        position: {
-          lat: latitude,
-          lng: longitude,
-        },
+        position: new google.maps.LatLng(latitude, longitude),
         title: positionName,
         opacity: 0.9,
-        icon: '/images/mapicon.png',
+        icon,
+      });
+      mapLabels[positionName] = new MapLabel({
+        text: positionName,
+        position: new google.maps.LatLng(latitude, longitude),
+        align: 'right',
       });
 
       if (map) {
         mapMarkers[positionName].setMap(map);
+
+        if (mapLabels[positionName]) {
+          mapLabels[positionName].setMap(map);
+        }
+
+        markerClusterer.addMarker(mapMarkers[positionName]);
       }
     }
   }
+
+  toggleMapLabels();
 }
 
 /**

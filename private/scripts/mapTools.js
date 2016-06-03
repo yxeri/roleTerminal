@@ -68,6 +68,7 @@ function setMarkerPosition(params) {
       markerName: positionName,
       title: positionName,
       hideLabel: params.hideLabel,
+      iconUrl: params.iconUrl,
     });
   }
 }
@@ -232,9 +233,9 @@ function createMarkerClusterer() {
     maxZoom: 15,
     zoomOnClick: false,
     styles: [{
-      width: 36,
-      height: 36,
-      iconAnchor: [18, 18],
+      width: 26,
+      height: 26,
+      iconAnchor: [13, 13],
       textSize: 12,
       url: 'images/m.png',
     }],

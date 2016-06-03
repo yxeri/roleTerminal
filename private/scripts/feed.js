@@ -4119,10 +4119,9 @@ function onMapPositions(mapPositions = []) {
           latitude,
           longitude,
         },
+        iconUrl: 'images/mapiconuser.png',
         hideLabel: true,
       });
-    } else {
-      console.log(mapPosition);
     }
   }
 

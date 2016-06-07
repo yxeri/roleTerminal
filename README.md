@@ -11,9 +11,6 @@ Master contains the latest stable release. Develop contains the latest unstable 
 ## Deployment
 There's a container available at [Docker hub](https://hub.docker.com/r/yxeri/roleterminal/). Docker is the preferred method of deployment of the app.
 
-The envar CONFIGPATH has to be set to a valid location for the module [roleHaven-config](https://github.com/yxeri/roleHaven-config) (a fork of your own or one
-of the existing ones). It will be installed with npm.
-
 ## Configuration
 
 roleTerminal has a separate configuration module, found at roleHaven-config](https://github.com/yxeri/roleHaven-config). 
@@ -25,6 +22,9 @@ roleTerminal has a separate configuration module, found at roleHaven-config](htt
 * Tab after typing one or more letters to auto-complete it into a command (Example: typing he followed by a tab will output help)
 * Typing two spaces has the same effect and will auto-complete (useful for devices without a tab button)
 * -help typed after a command will show instructions on how to use it (Example: enterroom -help)
+
+## Project owner
+* Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 
 ## Development contributors
 * Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)

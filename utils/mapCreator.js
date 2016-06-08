@@ -16,9 +16,22 @@ function createCoordsCollection(coords) {
   const coordsCollection = [];
 
   for (let i = 0; i < coords.length; i += 2) {
+    let latitude = coords[i + 1];
+    let longitude = coords[i];
+
+    /**
+     * Google Maps bugs out and will sometimes send large integer instead of double (64.5565 becomes 645565)
+     * This adds a dot where needed
+     */
+    if (!isNaN(coords[i].substr(0, 2)) && coords[i].charAt(2) !== '.') {
+      longitude = `${coords[i].substr(0, 2)}.${coords[i].substr(2)}`;
+    } else if (!isNaN(coords[i + 1].substr(0, 2)) && coords[i + 1].charAt(2) !== '.') {
+      latitude = `${coords[i + 1].substr(0, 2)}.${coords[i + 1].substr(2)}`;
+    }
+
     coordsCollection.push({
-      lat: parseFloat(coords[i + 1]),
-      lng: parseFloat(coords[i]),
+      lat: parseFloat(latitude),
+      lng: parseFloat(longitude),
     });
   }
 

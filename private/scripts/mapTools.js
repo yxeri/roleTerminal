@@ -9,6 +9,22 @@ let markerClusterer;
 let mapView = '';
 let map;
 
+function setMapView(view) {
+  mapView = view;
+}
+
+function getPolygonCenter(coordsCollection) {
+  const bounds = new google.maps.LatLngBounds();
+
+  for (const coords of coordsCollection) {
+    bounds.extend(new google.maps.LatLng(coords.lat, coords.lng));
+  }
+
+  const center = bounds.getCenter();
+
+  return { latitude: center.lat(), longitude: center.lng() };
+}
+
 function createLabel(params) {
   const positionName = params.positionName;
   const position = params.position;
@@ -16,7 +32,7 @@ function createLabel(params) {
   mapLabels[positionName] = new MapLabel({
     text: positionName,
     position: new google.maps.LatLng(position.latitude, position.longitude),
-    align: 'right',
+    align: params.align || 'right',
   });
 
   mapLabels[positionName].setMap(map || null);
@@ -86,10 +102,12 @@ function createPolygon(params) {
     fillOpacity: 0.35,
   });
 
-  if (params.hasLabel) {
+  if (!params.hideLabel) {
     // TODO Should center the label inside the polygon
     createLabel({
       positionName,
+      position: getPolygonCenter(coordsCollection),
+      align: 'center',
     });
   }
 
@@ -171,7 +189,7 @@ function toggleMapLabels() {
   }
 }
 
-function realignMap() {
+function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();
   let centerPos = map.getCenter();
 
@@ -187,6 +205,15 @@ function realignMap() {
   } else if (mapView === 'me' && mapMarkers.I) {
     centerPos = mapMarkers.I.getPosition();
     map.setZoom(18);
+  } else if (mapView === 'cluster') {
+    if (markers) {
+      for (const marker of markers) {
+        bounds.extend(marker.getPosition());
+      }
+
+      map.fitBounds(bounds);
+      centerPos = bounds.getCenter();
+    }
   } else {
     bounds.extend(new google.maps.LatLng(cornerCoords.cornerOne.latitude, cornerCoords.cornerOne.longitude));
     bounds.extend(new google.maps.LatLng(cornerCoords.cornerTwo.latitude, cornerCoords.cornerTwo.longitude));
@@ -207,29 +234,26 @@ function setMap(collections) {
   }
 }
 
-function attachMapListeners(elementId) {
+function attachMapListeners() {
   map.addListener('idle', () => {
     realignMap();
   });
 
-  document.getElementById(elementId).addEventListener('click', (event) => {
-    if (map.getZoom() > 10) {
-      event.target.classList.add('hide');
-    }
-  });
-
   google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
-    if (map.getZoom() > 10) {
-      for (const marker of cluster.getMarkers()) {
-        marker.setMap(map);
-      }
+    const bounds = new google.maps.LatLngBounds();
+
+    for (const marker of cluster.getMarkers()) {
+      bounds.extend(marker.getPosition());
     }
+
+    setMapView('cluster');
+    realignMap(cluster.getMarkers());
   });
 }
 
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-    gridSize: 12,
+    gridSize: 11,
     maxZoom: 15,
     zoomOnClick: false,
     styles: [{
@@ -310,10 +334,6 @@ function createMap(params) {
   setMap([mapMarkers, mapPolygons, mapLines, mapLabels]);
   createMarkerClusterer();
   attachMapListeners(elementId);
-}
-
-function setMapView(view) {
-  mapView = view;
 }
 
 function resetClusters() {

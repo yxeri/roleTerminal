@@ -23,15 +23,18 @@
       <div id="spacer"></div>
     </div>
     <div id="map" class="hide"></div>
+    <div id="central" class="hide">
+      <canvas id="canvas"></canvas>
+    </div>
     <div id="menu">
       <!-- List items are generated with JS -->
       <ul id="menuList">
       </ul>
     </div>
     <script src={{socketPath}}></script>
-    <script src="scripts/bundle.js" charset="utf-8"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" async defer></script>
     <script src="scripts/maplabel.js"></script>
     <script src="scripts/markerclusterer.js"></script>
+    <script src="scripts/bundle.js" charset="utf-8"></script>
 </body>
 </html>

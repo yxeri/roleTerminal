@@ -142,7 +142,6 @@ pre {
 }
 
 #map {
-  left: 0;
   overflow: hidden;
   background-color: #00865e;
 
@@ -170,6 +169,11 @@ pre {
 
 #spacer {
   height: .4em;
+}
+
+#central {
+  position: fixed;
+  top: 2em;
 }
 
 .halfView {

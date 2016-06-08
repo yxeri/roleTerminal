@@ -5,6 +5,7 @@ const textTools = require('./textTools');
 const audio = require('./audio');
 const zalgoGenerator = require('./zalgoGenerator');
 const mapTools = require('./mapTools');
+const painter = require('./painter');
 
 /**
  * Number of messages that will be processed and printed
@@ -1949,8 +1950,19 @@ function splitView(shouldSplit, secondDiv) {
     secondDiv.classList.remove('halfHeight');
   }
 
+  /**
+   * If the view is already split and it should split, meaning that a second view already exists
+   */
+  if (viewIsSplit && secondDiv !== secondView) {
+    secondView.classList.add('hide');
+    secondView.classList.remove('halfWidth');
+    secondView.classList.remove('halfHeight');
+  }
+
   viewIsSplit = shouldSplit;
   secondView = secondDiv;
+
+  scrollView();
 }
 
 // TODO Major refactoring needed to break up legacy structure. It is not very pretty or understandable right now
@@ -3646,8 +3658,205 @@ function attachCommands() {
             break;
           }
         }
+      }
+    },
+    accessLevel: 1,
+    visibility: 1,
+    category: 'advanced',
+  };
+  commands.central = {
+    func: (phrases = []) => {
+      const choice = phrases[0];
+      const centralDiv = document.getElementById('central');
 
-        scrollView();
+      switch (choice) {
+        case 'on': {
+          splitView(true, centralDiv);
+          painter.drawCanvas();
+          painter.createCircle({
+            objId: 's1',
+            x: 40,
+            y: 40,
+            radius: 20,
+            shouldStroke: true,
+          });
+          painter.createCircle({
+            objId: 's2',
+            x: 440,
+            y: 40,
+            radius: 20,
+            shouldStroke: true,
+          });
+          painter.createCircle({
+            objId: 's3',
+            x: 40,
+            y: 440,
+            radius: 20,
+            shouldStroke: true,
+          });
+          painter.createCircle({
+            objId: 's4',
+            x: 440,
+            y: 440,
+            radius: 20,
+            shouldStroke: true,
+          });
+          painter.createCircle({
+            objId: 'p1',
+            x: 190,
+            y: 190,
+            radius: 20,
+            shouldStroke: true,
+            shouldFill: true,
+          });
+          painter.createCircle({
+            objId: 'p2',
+            x: 290,
+            y: 190,
+            radius: 20,
+            shouldStroke: true,
+            shouldFill: true,
+          });
+          painter.createCircle({
+            objId: 'p3',
+            x: 190,
+            y: 290,
+            radius: 20,
+            shouldStroke: true,
+            shouldFill: true,
+          });
+          painter.createCircle({
+            objId: 'p4',
+            x: 290,
+            y: 290,
+            radius: 20,
+            shouldStroke: true,
+            shouldFill: true,
+          });
+
+          painter.createLine({
+            fromObjId: 's1',
+            toObjId: 'p1',
+          });
+          painter.createLine({
+            fromObjId: 's1',
+            toObjId: 'p2',
+          });
+          painter.createLine({
+            fromObjId: 's1',
+            toObjId: 'p3',
+          });
+          painter.createLine({
+            fromObjId: 's1',
+            toObjId: 's2',
+          });
+          painter.createLine({
+            fromObjId: 's1',
+            toObjId: 's3',
+          });
+
+          painter.createLine({
+            fromObjId: 's2',
+            toObjId: 'p1',
+          });
+          painter.createLine({
+            fromObjId: 's2',
+            toObjId: 'p2',
+          });
+          painter.createLine({
+            fromObjId: 's2',
+            toObjId: 'p4',
+          });
+          painter.createLine({
+            fromObjId: 's2',
+            toObjId: 's4',
+          });
+
+          painter.createLine({
+            fromObjId: 's3',
+            toObjId: 'p1',
+          });
+          painter.createLine({
+            fromObjId: 's3',
+            toObjId: 'p3',
+          });
+          painter.createLine({
+            fromObjId: 's3',
+            toObjId: 'p4',
+          });
+          painter.createLine({
+            fromObjId: 's3',
+            toObjId: 's4',
+          });
+
+          painter.createLine({
+            fromObjId: 's4',
+            toObjId: 'p2',
+          });
+          painter.createLine({
+            fromObjId: 's4',
+            toObjId: 'p3',
+          });
+          painter.createLine({
+            fromObjId: 's4',
+            toObjId: 'p4',
+          });
+
+          // painter.createCircle({
+          //   objId: 'test1',
+          //   x: 450,
+          //   y: 450,
+          //   radius: 20,
+          //   shouldStroke: true,
+          //   shouldFill: true,
+          // });
+          // painter.createCircle({
+          //   objId: 'test1',
+          //   x: 550,
+          //   y: 550,
+          //   radius: 20,
+          //   shouldStroke: true,
+          //   shouldFill: true,
+          // });
+
+          // painter.createRect({
+          //   objId: 'test2',
+          //   x: 550,
+          //   y: 450,
+          //   width: 50,
+          //   height: 50,
+          //   shouldFill: true,
+          //   shouldStroke: true,
+          // });
+          // painter.createRect({
+          //   objId: 'test3',
+          //   x: 570,
+          //   y: 470,
+          //   width: 50,
+          //   height: 50,
+          //   shouldFill: true,
+          //   shouldStroke: true,
+          // });
+          // painter.createRect({
+          //   objId: 'test3',
+          //   x: 650,
+          //   y: 470,
+          //   width: 50,
+          //   height: 50,
+          //   shouldFill: true,
+          //   shouldStroke: true,
+          // });
+
+          break;
+        }
+        case 'off': {
+          splitView(false, centralDiv);
+
+          break;
+        }
+        default: {
+          break;
+        }
       }
     },
     accessLevel: 1,

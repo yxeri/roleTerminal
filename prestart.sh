@@ -4,6 +4,7 @@ configSize=${#CONFIGPATH}
 
 # Installs config from external source, if CONFIGPATH is set
 if (($configSize > 0)); then
+  mkdir ./config/modified
   wget $CONFIGPATH/appConfig.js -O ./config/modified/appConfig.js
   wget $CONFIGPATH/databasePopulation.js -O ./config/modified/databasePopulation.js
 fi

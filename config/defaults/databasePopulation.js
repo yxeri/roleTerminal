@@ -1,7 +1,13 @@
 'use strict';
 
-const modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation;
 const config = {};
+let modifiedDatabasePop;
+
+try {
+  modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation;
+} catch (err) {
+  modifiedDatabasePop = {};
+}
 
 const generatePass = function generatePass() {
   const randomString = '023456789abcdefghijkmnopqrstuvwxyz';

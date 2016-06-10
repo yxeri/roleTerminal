@@ -33,6 +33,10 @@ function createLabel(params) {
     text: positionName,
     position: new google.maps.LatLng(position.latitude, position.longitude),
     align: params.align || 'right',
+    fontFamily: 'monospace',
+    fontColor: '#00ffcc',
+    strokeColor: '#001e15',
+    fontSize: 12,
   });
 
   mapLabels[positionName].setMap(map || null);
@@ -256,6 +260,7 @@ function createMarkerClusterer() {
     gridSize: 11,
     maxZoom: 15,
     zoomOnClick: false,
+    singleSize: true,
     styles: [{
       width: 26,
       height: 26,

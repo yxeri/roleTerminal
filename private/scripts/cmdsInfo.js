@@ -39,6 +39,11 @@ commands.list = {
   accessLevel: 13,
   category: 'basic',
   commandName: 'list',
+  options: {
+    users: { description: 'List users' },
+    rooms: { description: 'List rooms' },
+    devices: { description: 'List devices' },
+  },
 };
 
 module.exports = commands;

@@ -107,6 +107,11 @@ commands.radio = {
   accessLevel: 0,
   category: 'basic',
   commandName: 'radio',
+  options: {
+    on: { description: 'Turn on the radio' },
+    list: { description: 'List all channels' },
+    off: { description: 'Turn off the radio' },
+  },
 };
 
 commands.help = {

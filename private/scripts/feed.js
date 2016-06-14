@@ -73,6 +73,10 @@ let keyPressed = false;
 let trackingInterval = null;
 let isScreenOffInterval = null;
 let serverDownTimeout = null;
+/**
+ * @type {HTMLElement}
+ */
+let thisCommandItem = null;
 
 function queueCommand(command, data, commandMsg) {
   commandQueue.push({
@@ -384,6 +388,76 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
   return '';
 }
 
+// TODO autoCompleteCommand should use this
+/**
+ * @param {string} partial
+ * @param {string[]} items
+ * @returns {string[]}
+ */
+function match(partial, items) {
+  const matched = [];
+  let matches = false;
+
+  for (const name of items) {
+    for (let i = 0; i < partial.length; i++) {
+      if (partial.charAt(i) === name.charAt(i)) {
+        matches = true;
+      } else {
+        matches = false;
+
+        break;
+      }
+    }
+
+    if (matches) {
+      matched.push(name);
+    }
+  }
+
+  return matched;
+}
+
+/**
+ * @param {string[]} phrases
+ * @param {Object} options
+ */
+function autoCompleteOption(phrases = [], options = {}) {
+  const option = options[`${phrases[phrases.length - 2]}`];
+  const partial = phrases[phrases.length - 1];
+  /**
+   * @type {string[]}
+   */
+  let matched = [];
+
+  if (option && option.next) {
+    const nextKeys = Object.keys(option.next);
+    matched = match(partial, nextKeys);
+
+    if (matched.length === 1) {
+      domManipulator.replaceLastInputPhrase(`${matched[0]} `);
+    } else if (matched.length > 0) {
+      messenger.queueMessage({ text: [matched.join('\t')] });
+    } else if (nextKeys.length > 0) {
+      if (partial !== '') {
+        domManipulator.setCommandInput(`${domManipulator.getInputText()} `);
+      }
+
+      messenger.queueMessage({ text: [nextKeys.join('\t')] });
+    }
+  } else if (phrases.length <= 2) {
+    const firstLevelOptions = Object.keys(options);
+    matched = match(partial, firstLevelOptions);
+
+    if (matched.length === 1) {
+      domManipulator.replaceLastInputPhrase(`${matched[0]} `);
+    } else if (matched.length > 0) {
+      messenger.queueMessage({ text: [matched.join('\t')] });
+    } else if (partial === '') {
+      messenger.queueMessage({ text: [firstLevelOptions.join('\t')] });
+    }
+  }
+}
+
 function autoCompleteCommand() {
   const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
   // TODO Change from Object.keys for compatibility with older Android
@@ -615,6 +689,17 @@ function enterKeyHandler() {
   domManipulator.clearModeText();
 }
 
+function updateThisCommandItem() {
+  // const command = commandHandler.getCommand(domManipulator.getInputText().split(' ')[0]);
+  // const span = thisCommandItem.firstElementChild;
+
+  // if (command) {
+  //   span.textContent = command.commandName.toUpperCase();
+  // } else {
+  //   span.textContent = '';
+  // }
+}
+
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const commandHistory = storage.getCommandHistory();
@@ -640,9 +725,9 @@ function specialKeyPress(event) {
         if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
           autoCompleteCommand();
           domManipulator.changeModeText();
-        } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
-          const command = commandHelper.command ? commandHandler.getCommand(commandHelper.command) : commandHandler.getCommand(phrases[0]);
-          const partial = commandHelper.command ? phrases[0] : phrases[1];
+        } else if (commandHelper.allowAutoComplete) {
+          const command = commandHandler.getCommand(commandHelper.command);
+          const partial = phrases[0];
 
           if (command && command.autocomplete) {
             switch (command.autocomplete.type) {
@@ -666,6 +751,11 @@ function specialKeyPress(event) {
               }
             }
           }
+        } else if (phrases.length >= 2) {
+          const command = commandHandler.getCommand(phrases[0]);
+          const options = command.options;
+
+          autoCompleteOption(phrases, options, phrases.length);
         }
 
         event.preventDefault();
@@ -852,6 +942,8 @@ function keyReleased(event) {
       break;
     }
   }
+
+  updateThisCommandItem();
 }
 
 function attachMenuListener(menuItem, func, funcParam) {
@@ -899,6 +991,10 @@ function populateMenu() {
   for (const key of Object.keys(menuItems)) {
     const menuItem = menuItems[key];
     const listItem = createMenuItem(menuItem);
+
+    if (listItem.id === 'thisCommand') {
+      thisCommandItem = listItem;
+    }
 
     attachMenuListener(listItem, menuItem.func, menuItem.funcParam);
     domManipulator.addMenuItem(listItem);

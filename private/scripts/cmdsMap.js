@@ -80,16 +80,16 @@ commands.map = {
   accessLevel: 1,
   visibility: 1,
   category: 'advanced',
-  options: [
-    {
-      on: 'Show map',
-      zoomin: 'Increase zoom',
-      zoomout: 'Decrease zoom',
-    }, {
-      overview: 'World map',
-      me: 'Your location',
-    },
-  ],
+  options: {
+    on: { description: 'Show map', next: {
+      overview: { description: 'World map' },
+      me: { description: 'Your location' },
+    } },
+    off: { description: 'Turn off map' },
+    zoomin: { description: 'Increase zoom' },
+    zoomout: { description: 'Decrease zoom' },
+    locate: { description: 'Locate person or place' },
+  },
   commandName: 'map',
 };
 

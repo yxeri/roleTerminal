@@ -176,6 +176,10 @@ commands.mode = {
   accessLevel: 13,
   category: 'advanced',
   commandName: 'mode',
+  options: {
+    chat: { description: 'Chat mode' },
+    cmd: { description: 'Command mode' },
+  },
 };
 
 module.exports = commands;

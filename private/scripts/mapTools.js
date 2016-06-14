@@ -218,7 +218,7 @@ function realignMap(markers) {
       map.fitBounds(bounds);
       centerPos = bounds.getCenter();
     }
-  } else {
+  } else if (mapView === 'area') {
     bounds.extend(new google.maps.LatLng(cornerCoords.cornerOne.latitude, cornerCoords.cornerOne.longitude));
     bounds.extend(new google.maps.LatLng(cornerCoords.cornerTwo.latitude, cornerCoords.cornerTwo.longitude));
 
@@ -360,6 +360,16 @@ function setCornerCoords(cornerOneCoords, cornerTwoCoords) {
   cornerCoords.cornerTwo = cornerTwoCoords;
 }
 
+function increaseZoom() {
+  mapView = '';
+  map.setZoom(map.getZoom() + 1);
+}
+
+function decreaseZoom() {
+  mapView = '';
+  map.setZoom(map.getZoom() - 1);
+}
+
 exports.setMarkerPosition = setMarkerPosition;
 exports.setLinePosition = setLinePosition;
 exports.setPolygonPosition = setPolygonPosition;
@@ -374,3 +384,5 @@ exports.getMap = getMap;
 exports.toggleMapLabels = toggleMapLabels;
 exports.setMapCenter = setMapCenter;
 exports.setCornerCoords = setCornerCoords;
+exports.increaseZoom = increaseZoom;
+exports.decreaseZoom = decreaseZoom;

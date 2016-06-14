@@ -57,7 +57,7 @@ function createMarker(params) {
       lat: position.latitude,
       lng: position.longitude,
     },
-    title: params.title,
+    title: `${params.title}${'\n'}${params.description}`,
     opacity: params.opacity || 0.9,
     icon,
   });
@@ -89,6 +89,7 @@ function setMarkerPosition(params) {
       title: positionName,
       hideLabel: params.hideLabel,
       iconUrl: params.iconUrl,
+      description: params.description,
     });
   }
 }
@@ -257,15 +258,16 @@ function attachMapListeners() {
 
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-    gridSize: 11,
+    gridSize: 13,
     maxZoom: 15,
     zoomOnClick: false,
     singleSize: true,
+    averageCenter: true,
     styles: [{
-      width: 26,
-      height: 26,
-      iconAnchor: [13, 13],
-      textSize: 12,
+      width: 22,
+      height: 22,
+      iconAnchor: [11, 11],
+      textSize: 11,
       url: 'images/m.png',
     }],
   });
@@ -295,6 +297,8 @@ function createMap(params) {
     scrollwheel: false,
     streetViewControl: false,
     backgroundColor: '#001e15',
+    minZoom: 2,
+    maxZoom: 18,
     styles: [
       {
         featureType: 'all',

@@ -1522,6 +1522,7 @@ function onMapPositions(mapPositions = []) {
     const coordsCollection = mapPosition.position.coordsCollection;
     const geometry = mapPosition.geometry;
     const type = mapPosition.type;
+    const description = mapPosition.description;
 
     if (geometry === 'line') {
       mapTools.setLinePosition({
@@ -1540,6 +1541,7 @@ function onMapPositions(mapPositions = []) {
           latitude,
           longitude,
         },
+        description,
       });
     } else if (type && type === 'user') {
       mapTools.setMarkerPosition({

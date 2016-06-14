@@ -38,6 +38,10 @@ function createCoordsCollection(coords) {
   return coordsCollection;
 }
 
+/**
+ * @param {Object} placemark
+ * @returns {{positionName: string, position: {latitude: Number, longitude: Number}, isStatic: boolean, type: string, geometry: string, description: string}}
+ */
 function createPosition(placemark) {
   const position = {};
   let geometry = '';
@@ -60,6 +64,7 @@ function createPosition(placemark) {
     isStatic: true,
     type: 'world',
     geometry,
+    description: placemark.description ? placemark.description.replace(/<br>/g, '') : 'No information',
   };
 }
 

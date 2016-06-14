@@ -690,14 +690,14 @@ function enterKeyHandler() {
 }
 
 function updateThisCommandItem() {
-  // const command = commandHandler.getCommand(domManipulator.getInputText().split(' ')[0]);
-  // const span = thisCommandItem.firstElementChild;
+  const command = commandHandler.getCommand(domManipulator.getInputText().split(' ')[0]);
+  const span = thisCommandItem.firstElementChild;
 
-  // if (command) {
-  //   span.textContent = command.commandName.toUpperCase();
-  // } else {
-  //   span.textContent = '';
-  // }
+  if (command) {
+    span.textContent = command.commandName.toUpperCase();
+  } else {
+    span.textContent = '';
+  }
 }
 
 function specialKeyPress(event) {
@@ -965,6 +965,7 @@ function createMenuItem(menuItem) {
     span.classList.add(menuItem.extraClass);
   }
 
+  listItem.setAttribute('id', menuItem.elementId);
   listItem.classList.add('link');
   span.appendChild(document.createTextNode(menuItem.itemName));
   listItem.appendChild(span);
@@ -978,13 +979,16 @@ function populateMenu() {
       itemName: 'EXEC',
       extraClass: 'menuButton',
       func: enterKeyHandler,
+      elementId: 'runCommand',
     },
     commands: {
       itemName: 'CMDS',
       func: commandHandler.getCommand('help').func,
+      elementId: 'commands',
     },
     thisCommand: {
       itemName: '',
+      elementId: 'thisCommand',
     },
   };
 

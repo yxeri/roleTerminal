@@ -1,7 +1,8 @@
-'use strict';
-
 const audio = new Audio();
 
+/**
+ * @param {Object} params
+ */
 function playAudio(params) {
   if (params.path) {
     audio.src = params.path;
@@ -28,6 +29,9 @@ function resetAudio() {
   audio.volume = 1;
 }
 
+/**
+ * @param {Number} level
+ */
 function changeAudioVolume(level) {
   audio.volume = level;
 }

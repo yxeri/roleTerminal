@@ -16,7 +16,6 @@ const commandCollections = [
   require('./cmdsUser'),
   require('./cmdsUtility'),
 ];
-
 const commandHelper = {
   maxSteps: 0,
   onStep: 0,
@@ -32,6 +31,9 @@ const commandHelper = {
 const commandChars = ['-', '/'];
 const commands = {};
 
+/**
+ * @param {boolean} aborted
+ */
 function resetCommand(aborted) {
   const room = storage.getStaticInputStart() ? storage.getDefaultInputStart() : (storage.getRoom() || storage.getDefaultInputStart());
   commandHelper.command = null;
@@ -50,6 +52,10 @@ function resetCommand(aborted) {
   domManipulator.hideInput(false);
 }
 
+/**
+ * @param {string} command
+ * @returns {string}
+ */
 function trimCommandChar(command) {
   let cmdName = command;
 
@@ -86,28 +92,47 @@ function triggerCommand(params) {
   }
 }
 
+/**
+ * @param {string} command
+ * @returns {Number}
+ */
 function getCommandAccessLevel(command) {
   return commands[command] ? commands[command].accessLevel : 1;
 }
 
+/**
+ * @param {string} command
+ * @returns {Number}
+ */
 function getCommandVisibility(command) {
   return commands[command] ? commands[command].visibility : 1;
 }
 
+/**
+ * @returns {string[]}
+ */
 function getCommandChars() {
   return commandChars;
 }
 
+/**
+ * @param {string} char
+ * @returns {boolean}
+ */
 function isCommandChar(char) {
   return commandChars.indexOf(char) >= 0;
 }
 
+/**
+ * @returns {string[]}
+ */
 function getCommands() {
   return Object.keys(commands);
 }
 
 /**
  * @param {string} command
+ * @returns {Object}
  */
 function getCommand(command) {
   const cmdName = trimCommandChar(command);
@@ -115,16 +140,25 @@ function getCommand(command) {
   return commands[cmdName];
 }
 
+/**
+ * @param {string} command
+ */
 function abortCommand(command) {
   if (commands[command] && commands[command].abortFunc) {
     commands[command].abortFunc();
   }
 }
 
+/**
+ * @param {string[]} cmdParams
+ */
 function triggerCommandStep(cmdParams) {
   commands[commandHelper.command].steps[commandHelper.onStep](cmdParams, socketHandler.getSocket());
 }
 
+/**
+ * @param {Object} command
+ */
 function updateCommand(command) {
   const existingCommand = commands[command.commandName];
 

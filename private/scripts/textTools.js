@@ -2,18 +2,42 @@
 
 const labels = require('./labels');
 
-// Removed l, I and 1 to decrease user errors when reading the random strings
+/**
+ * Removed l, I and 1 to decrease user errors when reading the random strings
+ * @type {string}
+ */
 const chars = 'abcdefghjkmnopqrstuvwxyz';
+/**
+ * @type {string}
+ */
 const numbers = '023456789';
+/**
+ * @type {string}
+ */
 const specials = '/\\!<>*';
+/**
+ * @type {string}
+ */
 const binary = '01';
+/**
+ * @type {Number}
+ */
 const lineLength = 29;
 
+/**
+ * @returns {Number|string}
+ */
 function beautifyNumb(number) {
   return number > 9 ? number : `0${number}`;
 }
 
-// Takes date and returns shorter readable time
+/**
+ * Takes date and returns shorter readable time
+ * @param {Date} date
+ * @param {boolean} full
+ * @param {boolean} year
+ * @returns {string}
+ */
 function generateTimeStamp(date, full, year) {
   let newDate = new Date(date);
   let timeStamp;
@@ -42,19 +66,37 @@ function generateTimeStamp(date, full, year) {
   return timeStamp;
 }
 
+/**
+ * @returns {boolean}
+ */
 function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
 }
 
+/**
+ * @param {string} text
+ * @param {string} find
+ * @param {string} replaceWith
+ * @returns {string}
+ */
 function findOneReplace(text, find, replaceWith) {
   return text.replace(new RegExp(find), replaceWith);
 }
 
-// Needed for Android 2.1. trim() is not supported
+/**
+ * Needed for Android 2.1. trim() is not supported
+ * @returns {string}
+ */
 function trimSpace(sentText) {
   return findOneReplace(sentText, /^\s+|\s+$/, '');
 }
 
+/**
+ * @param {string} selection
+ * @param {Number} length
+ * @param {boolean} upperCase
+ * @returns {string}
+ */
 function createRandString(selection, length, upperCase) {
   const randomLength = selection.length;
   let result = '';
@@ -72,22 +114,37 @@ function createRandString(selection, length, upperCase) {
   return result;
 }
 
+/**
+ * @returns {string}
+ */
 function createDeviceId() {
   return createRandString(numbers + chars, 15, false);
 }
 
+/**
+ * @returns {string}
+ */
 function createCharString(length, upperCase) {
   return createRandString(chars, length, upperCase);
 }
 
+/**
+ * @returns {string}
+ */
 function createBinaryString(length) {
   return createRandString(binary, length);
 }
 
+/**
+ * @returns {string}
+ */
 function createMixedString(length, upperCase) {
   return createRandString(numbers + chars + specials, length, upperCase);
 }
 
+/**
+ * @returns {string}
+ */
 function createLine(length) {
   let line = '';
 
@@ -98,10 +155,16 @@ function createLine(length) {
   return line;
 }
 
+/**
+ * @returns {string}
+ */
 function createFullLine() {
   return createLine(lineLength);
 }
 
+/**
+ * @returns {string[]}
+ */
 function createCommandStart(commandName) {
   return [
     createFullLine(),
@@ -110,10 +173,17 @@ function createCommandStart(commandName) {
   ];
 }
 
+/**
+ * @returns {string}
+ */
 function createCommandEnd() {
   return createFullLine();
 }
 
+/**
+ * @param {Object} data
+ * @returns {string[]}
+ */
 function prependBroadcastMessage(data = {}) {
   const title = {};
 
@@ -126,6 +196,10 @@ function prependBroadcastMessage(data = {}) {
   return createCommandStart(title.text);
 }
 
+/**
+ * @param {Object} message
+ * @returns {Object}
+ */
 function addMessageSpecialProperties(message = {}) {
   const modifiedMessage = message;
 

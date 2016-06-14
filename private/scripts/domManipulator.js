@@ -2,41 +2,56 @@ const storage = require('./storage');
 const commandHandler = require('./commandHandler');
 const textTools = require('./textTools');
 
+/**
+ * @type {HTMLElement}
+ */
 const menu = document.getElementById('menu');
+/**
+ * @type {HTMLElement}
+ */
 const mainFeed = document.getElementById('mainFeed');
 /**
  * User input field
- * @type {Element}
+ * @type {HTMLElement}
  */
 const cmdInput = document.getElementById('cmdInput');
 /**
  * The span infront of the input field
- * @type {Element}
+ * @type {HTMLElement}
  */
 const inputStart = document.getElementById('inputStart');
 /**
  * Span showing the current mode the user is in
- * @type {Element}
+ * @type {HTMLElement}
  */
 const modeField = document.getElementById('mode');
 /**
  * Adds padding to the bottom. Scrolling of the view targets this element
- * @type {Element}
+ * @type {HTMLElement}
  */
 const spacer = document.getElementById('spacer');
 /**
  * List with clickable options
- * @type {Element}
+ * @type {HTMLElement}
  */
 const menuList = document.getElementById('menuList');
 /**
  * Div containing mainFeed, inputContainer and spacer
- * @type {Element}
+ * @type {HTMLElement}
  */
 let mainView = document.getElementById('background');
+/**
+ * @type {HTMLElement}
+ */
 let secondView = null;
+/**
+ * @type {boolean}
+ */
 let oldAndroid;
 
+/**
+ * @param {boolean} hide
+ */
 function hideInput(hide) {
   if (hide) {
     cmdInput.setAttribute('type', 'password');
@@ -45,14 +60,23 @@ function hideInput(hide) {
   }
 }
 
+/**
+ * @returns {string}
+ */
 function getInputText() {
   return cmdInput.value;
 }
 
+/**
+ * @param {string} text
+ */
 function setCommandInput(text) {
   cmdInput.value = text;
 }
 
+/**
+ * @returns {string}
+ */
 function getInputStart() {
   return inputStart.textContent;
 }
@@ -61,6 +85,9 @@ function clearInput() {
   setCommandInput('');
 }
 
+/**
+ * @param {string} text
+ */
 function replaceLastInputPhrase(text) {
   const phrases = getInputText().split(' ');
   phrases[phrases.length - 1] = text;
@@ -77,6 +104,9 @@ function scrollView() {
   }
 }
 
+/**
+ * @param {string} text
+ */
 function setModeText(text) {
   modeField.textContent = `[${text}]`;
 }
@@ -85,11 +115,16 @@ function clearModeText() {
   modeField.textContent = '';
 }
 
+/**
+ * @returns {string}
+ */
 function getModeText() {
-  return modeField.textContent; // String
+  return modeField.textContent;
 }
 
-// TODO: Change name to setInputStartText or similar
+/**
+ * @param {string} text
+ */
 function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
@@ -108,18 +143,30 @@ function changeModeText() {
   }
 }
 
+/**
+ * @param {HTMLElement} view
+ */
 function setSecondView(view) {
   secondView = view;
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function getSecondView() {
   return secondView;
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function getMainView() {
   return mainView;
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function getSpacer() {
   return spacer;
 }
@@ -132,10 +179,16 @@ function blurInput() {
   cmdInput.blur();
 }
 
+/**
+ * @param {HTMLElement} item
+ */
 function addMenuItem(item) {
   menuList.appendChild(item);
 }
 
+/**
+ * @param {HTMLElement} view
+ */
 function setMainView(view) {
   mainView = view;
 }
@@ -146,6 +199,9 @@ function clearMainFeed() {
   }
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function getMenu() {
   return menu;
 }

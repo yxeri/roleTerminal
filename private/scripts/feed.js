@@ -13,33 +13,33 @@ const clickHandler = require('./clickHandler');
 
 /**
  * Queue of all the commands used by the user that will be handled and printed
- * @type {object[]}
+ * @type {Object[]}
  */
 const commandQueue = [];
 /**
  * Check every * amount of milliseconds to see if Javascript is still responding
  * It will trigger a function if the response is delayed
- * @type {number}
+ * @type {Number}
  */
 const screenOffIntervalTime = 1000;
 /**
  * Get GPS coordinates for * amount of milliseconds
- * @type {number}
+ * @type {Number}
  */
 const watchPositionTime = 15000;
 /**
  * Get GPS coordinates every * milliseconds
- * @type {number}
+ * @type {Number}
  */
 const pausePositionTime = 40000;
 /**
  * Queue of all sounds to be consumed and played
- * @type {object[]}
+ * @type {Object[]}
  */
 const soundQueue = [];
 /**
  * Timeout between each command to be run
- * @type {number}
+ * @type {Number}
  */
 const commandTime = 1000;
 const dot = '.';

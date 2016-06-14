@@ -24,7 +24,7 @@ commands.register = {
       const userName = phrases[0];
 
       if (userName && userName.length >= 2 && userName.length <= 6 && textTools.isTextAllowed(userName)) {
-        const commandHelper = commandHandler.getCommandHelper();
+        const commandHelper = commandHandler.commandHelper;
         data.user = {
           userName,
           registerDevice: storage.getDeviceId(),
@@ -80,13 +80,13 @@ commands.register = {
       });
       messenger.queueMessage({ text: labels.getText('info', 'cancel') });
       domManipulator.setInputStart('password');
-      commandHandler.getCommandHelper().onStep++;
+      commandHandler.commandHelper.onStep++;
     },
     (phrases = []) => {
       const password = phrases[0];
 
       if (phrases && password.length >= 3 && textTools.isTextAllowed(password)) {
-        const commandHelper = commandHandler.getCommandHelper();
+        const commandHelper = commandHandler.commandHelper;
 
         commandHelper.data.user.password = password;
         messenger.queueMessage({
@@ -110,7 +110,7 @@ commands.register = {
       }
     },
     (phrases = []) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const password = phrases[0];
 
       if (password === commandHelper.data.user.password) {
@@ -138,6 +138,7 @@ commands.register = {
   },
   accessLevel: 0,
   category: 'login',
+  commandName: 'register',
 };
 
 commands.login = {
@@ -157,7 +158,7 @@ commands.login = {
       });
       commandHandler.resetCommand();
     } else if (phrases.length > 0) {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       data.user.userName = phrases[0].toLowerCase();
       commandHelper.data = data;
       commandHelper.hideInput = true;
@@ -184,7 +185,7 @@ commands.login = {
   },
   steps: [
     (phrases) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       commandHelper.data.user.password = phrases[0];
 
       socketHandler.emit('login', commandHelper.data);
@@ -199,11 +200,12 @@ commands.login = {
   clearAfterUse: true,
   accessLevel: 0,
   category: 'login',
+  commandName: 'login',
 };
 
 commands.password = {
   func: () => {
-    commandHandler.getCommandHelper().hideInput = true;
+    commandHandler.commandHelper.hideInput = true;
 
     domManipulator.hideInput(true);
     domManipulator.setInputStart('Old passwd');
@@ -215,7 +217,7 @@ commands.password = {
   },
   steps: [
     (phrases = ['']) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const data = {};
       const oldPassword = phrases[0];
       data.oldPassword = oldPassword;
@@ -226,7 +228,7 @@ commands.password = {
       socketHandler.emit('checkPassword', data);
     },
     (phrases = []) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       commandHelper.data.newPassword = phrases[0];
       commandHelper.onStep++;
 
@@ -237,7 +239,7 @@ commands.password = {
       });
     },
     (phrases = []) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const repeatedPassword = phrases[0];
 
       if (repeatedPassword === commandHelper.data.newPassword) {
@@ -265,6 +267,7 @@ commands.password = {
   },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'password',
 };
 
 commands.logout = {
@@ -274,6 +277,7 @@ commands.logout = {
   accessLevel: 13,
   category: 'basic',
   clearAfterUse: true,
+  commandName: 'logout',
 };
 
 module.exports = commands;

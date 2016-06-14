@@ -524,7 +524,7 @@ function fullscreenResize(keyboardShown) {
 }
 
 function enterKeyHandler() {
-  const commandHelper = commandHandler.getCommandHelper();
+  const commandHelper = commandHandler.commandHelper;
   const user = storage.getUser();
   const inputText = domManipulator.getInputText();
   let phrases;
@@ -618,7 +618,7 @@ function enterKeyHandler() {
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const commandHistory = storage.getCommandHistory();
-  const commandHelper = commandHandler.getCommandHelper();
+  const commandHelper = commandHandler.commandHelper;
 
   if (!keyPressed) {
     switch (keyCode) {
@@ -635,14 +635,13 @@ function specialKeyPress(event) {
       // Tab
       case 9: {
         const phrases = domManipulator.getInputText().split(' ');
-
         keyPressed = true;
 
         if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
           autoCompleteCommand();
           domManipulator.changeModeText();
         } else if (commandHelper.allowAutoComplete || phrases.length === 2) {
-          const command = commandHandler.getCommand(commandHelper.command) || commandHandler.getCommand(phrases[0]);
+          const command = commandHelper.command ? commandHandler.getCommand(commandHelper.command) : commandHandler.getCommand(phrases[0]);
           const partial = commandHelper.command ? phrases[0] : phrases[1];
 
           if (command && command.autocomplete) {
@@ -794,7 +793,7 @@ function defaultKeyPress(textChar, event) {
     domManipulator.changeModeText();
   }
 
-  if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.getCommandHelper().command === null) {
+  if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
     autoCompleteCommand();
     // Prevent new whitespace to be printed
     event.preventDefault();
@@ -892,15 +891,8 @@ function populateMenu() {
       itemName: 'CMDS',
       func: commandHandler.getCommand('help').func,
     },
-    users: {
-      itemName: 'USERS',
-      func: commandHandler.getCommand('list').func,
-      funcParam: 'users',
-    },
-    rooms: {
-      itemName: 'ROOMS',
-      func: commandHandler.getCommand('list').func,
-      funcParam: 'rooms',
+    thisCommand: {
+      itemName: '',
     },
   };
 
@@ -1124,7 +1116,7 @@ function onLogin(data = {}) {
 }
 
 function onCommandSuccess(data = {}) {
-  const commandHelper = commandHandler.getCommandHelper();
+  const commandHelper = commandHandler.commandHelper;
 
   if (!data.noStepCall) {
     if (!data.freezeStep) {
@@ -1138,7 +1130,7 @@ function onCommandSuccess(data = {}) {
 }
 
 function onCommandFail() {
-  const commandHelper = commandHandler.getCommandHelper();
+  const commandHelper = commandHandler.commandHelper;
 
   if (commandHelper.command !== null) {
     commandHandler.abortCommand(commandHelper.command);

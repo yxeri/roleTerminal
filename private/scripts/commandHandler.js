@@ -6,15 +6,15 @@ const socketHandler = require('./socketHandler');
 
 const commandCollections = [
   // require('./bbr'),
-  require('./admin'),
-  require('./chat'),
-  require('./info'),
-  require('./local'),
-  require('./map'),
-  require('./satellite'),
-  require('./team'),
-  require('./user'),
-  require('./utility'),
+  require('./cmdsAdmin'),
+  require('./cmdsChat'),
+  require('./cmdsInfo'),
+  require('./cmdsLocal'),
+  require('./cmdsMap'),
+  require('./cmdsSatellite'),
+  require('./cmdsTeam'),
+  require('./cmdsUser'),
+  require('./cmdsUtility'),
 ];
 
 const commandHelper = {
@@ -86,10 +86,6 @@ function triggerCommand(params) {
   }
 }
 
-function getCommandHelper() {
-  return commandHelper;
-}
-
 function getCommandAccessLevel(command) {
   return commands[command] ? commands[command].accessLevel : 1;
 }
@@ -137,13 +133,13 @@ function updateCommand(command) {
     existingCommand.category = command.category;
     existingCommand.visibility = command.visibility;
     existingCommand.authGroup = command.authGroup;
+    existingCommand.commandName = command.commandName;
   }
 }
 
 collectCommands();
 
 exports.triggerCommand = triggerCommand;
-exports.getCommandHelper = getCommandHelper;
 exports.resetCommand = resetCommand;
 exports.getCommandAccessLevel = getCommandAccessLevel;
 exports.getCommandVisibility = getCommandVisibility;
@@ -154,3 +150,4 @@ exports.abortCommand = abortCommand;
 exports.triggerCommandStep = triggerCommandStep;
 exports.getCommand = getCommand;
 exports.updateCommand = updateCommand;
+exports.commandHelper = commandHelper;

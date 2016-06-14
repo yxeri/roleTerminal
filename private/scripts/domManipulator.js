@@ -98,7 +98,7 @@ function changeModeText() {
   const inputText = getInputText();
   const mode = storage.getMode();
 
-  if (storage.getUser() && !commandHandler.getCommandHelper().command) {
+  if (storage.getUser() && !commandHandler.commandHelper.command) {
     // TODO msg command text in comparison should not be hard coded
     if ((mode === 'chat' && commandHandler.isCommandChar(inputText.charAt(0))) || (mode === 'cmd' && textTools.trimSpace(inputText).split(' ')[0] !== 'msg')) {
       setModeText('CMD');

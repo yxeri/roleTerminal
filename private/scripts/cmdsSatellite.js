@@ -201,6 +201,7 @@ commands.central = {
   accessLevel: 1,
   visibility: 1,
   category: 'advanced',
+  commandName: 'central',
 };
 
 module.exports = commands;

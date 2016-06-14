@@ -14,7 +14,7 @@ commands.invitations = {
   },
   steps: [
     (data) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const sentInvitations = data.invitations;
       const text = [];
       commandHelper.data = data;
@@ -47,7 +47,7 @@ commands.invitations = {
       if (phrases.length > 1) {
         const itemNumber = phrases[0] - 1;
         const answer = phrases[1].toLowerCase();
-        const invitation = commandHandler.getCommandHelper().data.invitations[itemNumber];
+        const invitation = commandHandler.commandHelper.data.invitations[itemNumber];
 
         if (['accept', 'a', 'decline', 'd'].indexOf(answer) > -1) {
           const accepted = ['accept', 'a'].indexOf(answer) > -1;
@@ -83,6 +83,7 @@ commands.invitations = {
   ],
   accessLevel: 13,
   category: 'basic',
+  commandName: 'invitations',
 };
 
 commands.time = {
@@ -91,6 +92,7 @@ commands.time = {
   },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'time',
 };
 
 commands.weather = {
@@ -99,6 +101,7 @@ commands.weather = {
   },
   accessLevel: 1,
   category: 'basic',
+  commandName: 'weather',
 };
 
 commands.mode = {
@@ -172,6 +175,7 @@ commands.mode = {
   autocomplete: { type: 'modes' },
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'mode',
 };
 
 module.exports = commands;

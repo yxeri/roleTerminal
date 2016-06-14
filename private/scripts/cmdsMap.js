@@ -19,7 +19,7 @@ commands.map = {
           if (value) {
             mapTools.setMapView(value);
           } else {
-            mapTools.setMapView('');
+            mapTools.setMapView('area');
           }
 
           if (!mapTools.getMap()) {
@@ -39,6 +39,20 @@ commands.map = {
         }
         case 'off': {
           layoutChanger.splitView(false, mapDiv);
+
+          break;
+        }
+        case 'zoomin': {
+          if (mapTools.getMap()) {
+            mapTools.increaseZoom();
+          }
+
+          break;
+        }
+        case 'zoomout': {
+          if (mapTools.getMap()) {
+            mapTools.decreaseZoom();
+          }
 
           break;
         }
@@ -66,6 +80,17 @@ commands.map = {
   accessLevel: 1,
   visibility: 1,
   category: 'advanced',
+  options: [
+    {
+      on: 'Show map',
+      zoomin: 'Increase zoom',
+      zoomout: 'Decrease zoom',
+    }, {
+      overview: 'World map',
+      me: 'Your location',
+    },
+  ],
+  commandName: 'map',
 };
 
 module.exports = commands;

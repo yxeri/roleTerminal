@@ -9,7 +9,7 @@ const commands = {};
 
 commands.createteam = {
   func: (phrases) => {
-    const commandHelper = commandHandler.getCommandHelper();
+    const commandHelper = commandHandler.commandHelper;
     const data = { team: { teamName: '' } };
 
     if (phrases.length > 0) {
@@ -28,7 +28,7 @@ commands.createteam = {
   },
   steps: [
     () => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
 
       messenger.queueMessage({
         text: [
@@ -44,7 +44,7 @@ commands.createteam = {
       commandHelper.onStep++;
     },
     (phrases) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
 
       if (phrases[0] !== '') {
         const owner = phrases[0];
@@ -62,6 +62,7 @@ commands.createteam = {
   accessLevel: 13,
   category: 'basic',
   autocomplete: { type: 'users' },
+  commandName: 'createteam',
 };
 
 commands.inviteteam = {
@@ -79,6 +80,7 @@ commands.inviteteam = {
   },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'inviteteam',
 };
 
 module.exports = commands;

@@ -21,6 +21,7 @@ commands.verifyuser = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'verifyuser',
 };
 
 commands.verifyteam = {
@@ -41,6 +42,7 @@ commands.verifyteam = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'verifyteam',
 };
 commands.banuser = {
   func: (phrases) => {
@@ -55,6 +57,7 @@ commands.banuser = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'banuser',
 };
 commands.unbanuser = {
   func: (phrases) => {
@@ -69,6 +72,7 @@ commands.unbanuser = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'unbanuser',
 };
 commands.updateuser = {
   func: (phrases) => {
@@ -96,6 +100,7 @@ commands.updateuser = {
   autocomplete: { type: 'users' },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'updateuser',
 };
 commands.updatecommand = {
   func: (phrases) => {
@@ -122,6 +127,7 @@ commands.updatecommand = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'updatecommand',
 };
 commands.updateroom = {
   func: (phrases) => {
@@ -149,6 +155,7 @@ commands.updateroom = {
   autocomplete: { type: 'rooms' },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'updateroom',
 };
 commands.updatedevice = {
   func: (phrases) => {
@@ -176,6 +183,7 @@ commands.updatedevice = {
   autocomplete: { type: 'devices' },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'updatedevice',
 };
 
 module.exports = commands;

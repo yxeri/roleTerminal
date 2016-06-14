@@ -101,6 +101,7 @@ commands.history = {
   clearBeforeUse: true,
   accessLevel: 1,
   category: 'advanced',
+  commandName: 'history',
 };
 
 commands.morse = {
@@ -129,6 +130,7 @@ commands.morse = {
   },
   accessLevel: 13,
   category: 'admin',
+  commandName: 'morse',
 };
 
 commands.msg = {
@@ -155,11 +157,12 @@ commands.msg = {
   clearAfterUse: true,
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'msg',
 };
 
 commands.broadcast = {
   func: () => {
-    commandHandler.getCommandHelper().data = {
+    commandHandler.commandHelper.data = {
       message: {
         text: [],
         title: [],
@@ -175,14 +178,14 @@ commands.broadcast = {
     (phrases) => {
       if (phrases.length > 0 && phrases[0] !== '') {
         const phrase = phrases.join(' ');
-        commandHandler.getCommandHelper().data.message.customSender = phrase;
+        commandHandler.commandHelper.data.message.customSender = phrase;
       }
 
       messenger.queueMessage({ text: labels.getText('info', 'typeLineEnter') });
-      commandHandler.getCommandHelper().onStep++;
+      commandHandler.commandHelper.onStep++;
     },
     (phrases) => {
-      const message = commandHandler.getCommandHelper().data.message;
+      const message = commandHandler.commandHelper.data.message;
       let dataText;
 
       if (phrases.length > 0 && phrases[0] !== '') {
@@ -191,7 +194,7 @@ commands.broadcast = {
         message.text.push(phrase);
       } else {
         dataText = copyString(message.text);
-        commandHandler.getCommandHelper().onStep++;
+        commandHandler.commandHelper.onStep++;
 
         messenger.queueMessage({ text: labels.getText('info', 'preview') });
         messenger.queueMessage({ text: textTools.prependBroadcastMessage({ sender: message.customSender }).concat(dataText, textTools.createFullLine()) });
@@ -200,7 +203,7 @@ commands.broadcast = {
     },
     (phrases) => {
       if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('broadcastMsg', commandHandler.getCommandHelper().data);
+        socketHandler.emit('broadcastMsg', commandHandler.commandHelper.data);
         commandHandler.resetCommand();
       } else {
         commandHandler.resetCommand(true);
@@ -210,6 +213,7 @@ commands.broadcast = {
   accessLevel: 13,
   clearAfterUse: true,
   category: 'admin',
+  commandName: 'broadcast',
 };
 
 commands.whisper = {
@@ -235,6 +239,7 @@ commands.whisper = {
   autocomplete: { type: 'users' },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'whisper',
 };
 
 commands.importantmsg = {
@@ -246,7 +251,7 @@ commands.importantmsg = {
         hideName: true,
       },
     };
-    commandHandler.getCommandHelper().data = data;
+    commandHandler.commandHelper.data = data;
 
     messenger.queueMessage({ text: labels.getText('info', 'cancel') });
     messenger.queueMessage({
@@ -266,7 +271,7 @@ commands.importantmsg = {
   steps: [
     (phrases) => {
       if (phrases.length > 0) {
-        const commandHelper = commandHandler.getCommandHelper();
+        const commandHelper = commandHandler.commandHelper;
         const deviceId = phrases[0];
 
         if (deviceId.length > 0) {
@@ -283,14 +288,14 @@ commands.importantmsg = {
       }
     },
     () => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
 
       commandHelper.onStep++;
       messenger.queueMessage({ text: labels.getText('info', 'typeLineEnter') });
       messenger.queueMessage({ text: labels.getText('info', 'keepShortMorse') });
     },
     (phrases) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const message = commandHelper.data.message;
 
       if (phrases.length > 0 && phrases[0] !== '') {
@@ -312,7 +317,7 @@ commands.importantmsg = {
     (phrases) => {
       if (phrases.length > 0) {
         if (phrases[0].toLowerCase() === 'yes') {
-          commandHandler.getCommandHelper().onStep++;
+          commandHandler.commandHelper.onStep++;
 
           messenger.queueMessage({ text: labels.getText('info', 'sendMorse') });
         } else {
@@ -322,7 +327,7 @@ commands.importantmsg = {
     },
     (phrases) => {
       if (phrases.length > 0) {
-        const commandHelper = commandHandler.getCommandHelper();
+        const commandHelper = commandHandler.commandHelper;
 
         if (phrases[0].toLowerCase() === 'yes') {
           commandHelper.data.morse = {
@@ -338,6 +343,7 @@ commands.importantmsg = {
   ],
   accessLevel: 13,
   category: 'admin',
+  commandName: 'importantmsg',
 };
 
 commands.room = {
@@ -367,6 +373,7 @@ commands.room = {
   autocomplete: { type: 'myRooms' },
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'room',
 };
 
 commands.removeroom = {
@@ -375,7 +382,7 @@ commands.removeroom = {
 
     if (phrases.length > 0) {
       data.room.roomName = phrases[0].toLowerCase();
-      commandHandler.getCommandHelper().data = data;
+      commandHandler.commandHelper.data = data;
 
       messenger.queueMessage({
         text: [
@@ -401,7 +408,7 @@ commands.removeroom = {
   steps: [
     (phrases) => {
       if (phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('removeRoom', commandHandler.getCommandHelper().data);
+        socketHandler.emit('removeRoom', commandHandler.commandHelper.data);
       }
 
       commandHandler.resetCommand();
@@ -409,6 +416,7 @@ commands.removeroom = {
   ],
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'removeroom',
 };
 
 commands.createroom = {
@@ -420,8 +428,8 @@ commands.createroom = {
         const data = { room: {} };
         data.room.roomName = roomName;
         data.room.owner = storage.getUser();
-        commandHandler.getCommandHelper().data = data;
-        commandHandler.getCommandHelper().hideInput = true;
+        commandHandler.commandHelper.data = data;
+        commandHandler.commandHelper.hideInput = true;
 
         messenger.queueMessage({
           text: [
@@ -446,7 +454,7 @@ commands.createroom = {
   },
   steps: [
     (phrases = ['']) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const password = phrases[0];
       commandHelper.onStep++;
 
@@ -465,7 +473,7 @@ commands.createroom = {
       }
     },
     (phrases = ['']) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const password = phrases[0];
 
       if (password === commandHelper.data.room.password) {
@@ -492,6 +500,7 @@ commands.createroom = {
   ],
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'createroom',
 };
 
 commands.myrooms = {
@@ -505,6 +514,7 @@ commands.myrooms = {
   },
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'myrooms',
 };
 
 commands.inviteroom = {
@@ -525,12 +535,13 @@ commands.inviteroom = {
   },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'inviteroom',
 };
 
 commands.follow = {
   func: (phrases) => {
     if (phrases.length > 0) {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
       const room = {
         roomName: phrases[0].toLowerCase(),
       };
@@ -554,7 +565,7 @@ commands.follow = {
   },
   steps: [
     (phrases) => {
-      const commandHelper = commandHandler.getCommandHelper();
+      const commandHelper = commandHandler.commandHelper;
 
       if (phrases.length > 0) {
         commandHelper.data.room.password = phrases[0];
@@ -566,6 +577,7 @@ commands.follow = {
   autocomplete: { type: 'rooms' },
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'follow',
 };
 
 commands.unfollow = {
@@ -590,6 +602,7 @@ commands.unfollow = {
   autocomplete: { type: 'myRooms' },
   accessLevel: 13,
   category: 'advanced',
+  commandName: 'unfollow',
 };
 
 module.exports = commands;

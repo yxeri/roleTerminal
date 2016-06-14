@@ -50,6 +50,7 @@ commands.alias = {
   },
   accessLevel: 13,
   category: 'basic',
+  commandName: 'alias',
 };
 
 commands.radio = {
@@ -67,6 +68,14 @@ commands.radio = {
 
     switch (choice) {
       case 'on': {
+        if (!phrases[1]) {
+          messenger.queueMessage({
+            text: labels.getText('instructions', 'radio'),
+          });
+
+          break;
+        }
+
         const chosenChannel = phrases[1].toLowerCase();
 
         if (channels[chosenChannel] && channels[chosenChannel].url) {
@@ -97,6 +106,7 @@ commands.radio = {
   visibility: 0,
   accessLevel: 0,
   category: 'basic',
+  commandName: 'radio',
 };
 
 commands.help = {
@@ -104,7 +114,7 @@ commands.help = {
     function getCommands() {
       const allCommands = [];
       // TODO Change from Object.keys for compatibility with older Android
-      const keys = Object.keys(commands);
+      const keys = commandHandler.getCommands();
 
       for (let i = 0; i < keys.length; i++) {
         const commandName = keys[i];
@@ -140,6 +150,7 @@ commands.help = {
   },
   accessLevel: 1,
   category: 'basic',
+  commandName: 'help',
 };
 
 commands.clear = {
@@ -149,6 +160,7 @@ commands.clear = {
   clearAfterUse: true,
   accessLevel: 13,
   category: 'basic',
+  commandName: 'clear',
 };
 
 commands.settings = {
@@ -226,6 +238,7 @@ commands.settings = {
   accessLevel: 1,
   visibility: 13,
   category: 'admin',
+  commandName: 'settings',
 };
 
 module.exports = commands;

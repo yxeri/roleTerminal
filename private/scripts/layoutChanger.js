@@ -65,6 +65,11 @@ function toggleIsLandscape() {
   isLandscape = !isLandscape;
 }
 
+function isViewSplit() {
+  return viewIsSplit;
+}
+
 exports.splitView = splitView;
 exports.changeOrientation = changeOrientation;
 exports.toggleIsLandscape = toggleIsLandscape;
+exports.isViewSplit = isViewSplit;

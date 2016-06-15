@@ -190,7 +190,7 @@ commands.login = {
 
       socketHandler.emit('login', commandHelper.data);
       commandHandler.abortCommand(commandHelper.command);
-      commandHandler.triggerCommand('clear');
+      commandHandler.triggerCommand({ cmd: 'clear' });
       commandHandler.resetCommand();
     },
   ],

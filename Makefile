@@ -1,10 +1,14 @@
 build:
-	docker build --force-rm -t roleooc .
+	docker build --force-rm -t roleterminal .
 rmi:
-	docker rmi roleooc
+	docker rmi roleterminal
 compose:
-	docker-compose build && docker-compose up -d
-boot2open:
-	open http://$(shell boot2docker ip):8888
-boot2logs:
-	docker logs roleooc_roleooc_1
+	docker-compose up --build
+open:
+	open http://localhost:8888
+logs:
+	docker-compose logs
+clean:
+	docker-compose rm --all
+
+.PHONY: build rmi compose open logs

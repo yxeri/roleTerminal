@@ -17,12 +17,6 @@ fi
 
 mkdir -p ./public/scripts ./public/views ./public/styles ./public/sounds ./public/images
 
-# Copies required JS files to public, such as socket.io
-cp ./private/required/* ./public/scripts
-
-# Copies images to public
-cp ./private/images/* ./public/images
-
 echo "Browserifying and compressing JS, compiling and compressing SASS to CSS, compressing and moving view files"
 
 # Browserifies all JS to a bundle, minifies it and moves it to public

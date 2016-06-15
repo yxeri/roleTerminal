@@ -1,12 +1,12 @@
 'use strict';
 
 const config = {};
-let modifiedDatabasePop;
+let modifiedDatabasePop = {};
 
 try {
   modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation;
 } catch (err) {
-  modifiedDatabasePop = {};
+  console.log(err);
 }
 
 const generatePass = function generatePass() {

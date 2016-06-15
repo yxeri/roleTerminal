@@ -1,11 +1,11 @@
 'use strict';
 
-let modifiedConfig = require('../modified/appConfig').config;
+let modifiedConfig = {};
 
 try {
   modifiedConfig = require('../modified/appConfig').config;
 } catch (err) {
-  modifiedConfig = {};
+  console.log(err);
 }
 
 function convertToBoolean(envar) {

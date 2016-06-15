@@ -10,5 +10,10 @@
     // Strict is needed in Node
     "strict": 0,
     "max-len": 0
+  },
+  "globals": {
+    "google": false,
+    "MapLabel": false,
+    "MarkerClusterer": false
   }
 }

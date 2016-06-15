@@ -6,7 +6,7 @@ let modifiedDatabasePop = {};
 try {
   modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation;
 } catch (err) {
-  console.log(err);
+  console.log('Did not find modified databasePopulation. Using defaults');
 }
 
 const generatePass = function generatePass() {

@@ -5,7 +5,7 @@ let modifiedConfig = {};
 try {
   modifiedConfig = require('../modified/appConfig').config;
 } catch (err) {
-  console.log(err);
+  console.log('Did not find modified appConfig. Using defaults');
 }
 
 function convertToBoolean(envar) {

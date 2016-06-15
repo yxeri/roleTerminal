@@ -283,7 +283,7 @@ commands.importantmsg = {
           socketHandler.emit('verifyDevice', commandHelper.data);
         } else {
           commandHelper.onStep++;
-          commands[commandHelper.command].steps[commandHelper.onStep]();
+          commandHandler.triggerCommandStep();
         }
       }
     },

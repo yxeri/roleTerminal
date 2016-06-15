@@ -2,6 +2,7 @@ const mapTools = require('./mapTools');
 const socketHandler = require('./socketHandler');
 const storage = require('./storage');
 const layoutChanger = require('./layoutChanger');
+const messenger = require('./messenger');
 
 const commands = {};
 
@@ -56,6 +57,16 @@ commands.map = {
 
           break;
         }
+        case 'info': {
+          const searchString = phrases.slice(1).join(' ').toLowerCase();
+          const infoText = mapTools.getInfoText(searchString);
+
+          if (infoText) {
+            messenger.queueMessage({ text: [infoText.title, infoText.description] });
+          }
+
+          break;
+        }
         case 'locate': {
           // if (value) {
           //   const marker = mapMarkers[value];
@@ -89,6 +100,7 @@ commands.map = {
     zoomin: { description: 'Increase zoom' },
     zoomout: { description: 'Decrease zoom' },
     locate: { description: 'Locate person or place' },
+    info: { description: 'Show information for the location' },
   },
   commandName: 'map',
 };

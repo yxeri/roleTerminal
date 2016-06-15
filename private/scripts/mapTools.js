@@ -1,5 +1,6 @@
 'use strict';
 
+const markerInfo = document.getElementById('markerInfo');
 const mapMarkers = {};
 const mapPolygons = {};
 const mapLines = {};
@@ -8,6 +9,7 @@ const cornerCoords = {};
 let markerClusterer;
 let mapView = '';
 let map;
+let overlay;
 
 function setMapView(view) {
   mapView = view;
@@ -27,9 +29,10 @@ function getPolygonCenter(coordsCollection) {
 
 function createLabel(params) {
   const positionName = params.positionName;
+  const itemName = params.positionName.toLowerCase();
   const position = params.position;
 
-  mapLabels[positionName] = new MapLabel({
+  mapLabels[itemName] = new MapLabel({
     text: positionName,
     position: new google.maps.LatLng(position.latitude, position.longitude),
     align: params.align || 'right',
@@ -39,7 +42,7 @@ function createLabel(params) {
     fontSize: 12,
   });
 
-  mapLabels[positionName].setMap(map || null);
+  mapLabels[itemName].setMap(map || null);
 }
 
 function createMarker(params) {
@@ -57,14 +60,15 @@ function createMarker(params) {
       lat: position.latitude,
       lng: position.longitude,
     },
-    title: `${params.title}${'\n'}${params.description}`,
     opacity: params.opacity || 0.9,
     icon,
   });
+  mapMarkers[markerName].addedDesc = `${params.description}`;
+  mapMarkers[markerName].addedTitle = params.title;
 
   if (!params.hideLabel) {
     createLabel({
-      positionName: markerName,
+      positionName: params.title,
       position,
     });
   }
@@ -74,18 +78,30 @@ function createMarker(params) {
   if (!params.ignoreCluster && markerClusterer) {
     markerClusterer.addMarker(mapMarkers[markerName]);
   }
+
+  google.maps.event.addListener(mapMarkers[markerName], 'click', () => {
+    const marker = mapMarkers[markerName];
+    const projection = overlay.getProjection();
+    const xy = projection.fromLatLngToContainerPixel(marker.getPosition());
+
+    markerInfo.classList.remove('hide');
+    markerInfo.style.left = `${xy.x}px`;
+    markerInfo.style.top = `${xy.y}px`;
+    markerInfo.textContent = `${marker.addedTitle}.${'\n'}${marker.addedDesc}`;
+  });
 }
 
 function setMarkerPosition(params) {
   const positionName = params.positionName;
+  const markerName = params.positionName.toLowerCase();
   const position = params.position;
 
-  if (mapMarkers[positionName]) {
-    mapMarkers[positionName].setPosition(new google.maps.LatLng(position.latitude, position.longitude));
+  if (mapMarkers[markerName]) {
+    mapMarkers[markerName].setPosition(new google.maps.LatLng(position.latitude, position.longitude));
   } else {
     createMarker({
       position,
-      markerName: positionName,
+      markerName,
       title: positionName,
       hideLabel: params.hideLabel,
       iconUrl: params.iconUrl,
@@ -228,7 +244,7 @@ function realignMap(markers) {
   }
 
   map.setCenter(centerPos);
-  toggleMapLabels();
+  markerInfo.classList.add('hide');
 }
 
 function setMap(collections) {
@@ -240,10 +256,6 @@ function setMap(collections) {
 }
 
 function attachMapListeners() {
-  map.addListener('idle', () => {
-    realignMap();
-  });
-
   google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
     const bounds = new google.maps.LatLngBounds();
 
@@ -253,6 +265,14 @@ function attachMapListeners() {
 
     setMapView('cluster');
     realignMap(cluster.getMarkers());
+  });
+
+  google.maps.event.addListener(map, 'click', () => {
+    markerInfo.classList.add('hide');
+  });
+
+  google.maps.event.addListener(map, 'idle', () => {
+    toggleMapLabels();
   });
 }
 
@@ -343,6 +363,10 @@ function createMap(params) {
   setMap([mapMarkers, mapPolygons, mapLines, mapLabels]);
   createMarkerClusterer();
   attachMapListeners(elementId);
+
+  overlay = new google.maps.OverlayView();
+  overlay.draw = () => {};
+  overlay.setMap(map);
 }
 
 function resetClusters() {
@@ -374,6 +398,20 @@ function decreaseZoom() {
   map.setZoom(map.getZoom() - 1);
 }
 
+/**
+ * @param {string} markerName
+ * @returns {{title: string, description: string}}
+ */
+function getInfoText(markerName) {
+  const marker = mapMarkers[markerName];
+
+  if (!marker) {
+    return null;
+  }
+
+  return { title: marker.addedTitle, description: marker.addedDesc };
+}
+
 exports.setMarkerPosition = setMarkerPosition;
 exports.setLinePosition = setLinePosition;
 exports.setPolygonPosition = setPolygonPosition;
@@ -390,3 +428,4 @@ exports.setMapCenter = setMapCenter;
 exports.setCornerCoords = setCornerCoords;
 exports.increaseZoom = increaseZoom;
 exports.decreaseZoom = decreaseZoom;
+exports.getInfoText = getInfoText;

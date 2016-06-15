@@ -116,7 +116,7 @@ commands.register = {
       if (password === commandHelper.data.user.password) {
         messenger.queueMessage({ text: labels.getText('info', 'congratulations') });
         socketHandler.emit('register', commandHelper.data);
-        commands[commandHelper.command].abortFunc();
+        commandHandler.abortCommand(commandHelper.command);
         commandHandler.resetCommand(false);
       } else {
         messenger.queueMessage({
@@ -189,8 +189,8 @@ commands.login = {
       commandHelper.data.user.password = phrases[0];
 
       socketHandler.emit('login', commandHelper.data);
-      commands[commandHelper.command].abortFunc();
-      commands.clear.func();
+      commandHandler.abortCommand(commandHelper.command);
+      commandHandler.triggerCommand('clear');
       commandHandler.resetCommand();
     },
   ],

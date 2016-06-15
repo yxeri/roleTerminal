@@ -33,8 +33,12 @@ commands.map = {
             socketHandler.emit('getGooglePositions', { types: ['world'] });
           }
 
-          mapTools.resetClusters();
-          mapTools.realignMap();
+          if (mapTools.getMap()) {
+            mapTools.resetClusters();
+            mapTools.realignMap();
+          } else {
+            messenger.queueMessage({ text: ['Map data is still loading. Please try again in a couple of seconds'] });
+          }
 
           break;
         }
@@ -44,41 +48,33 @@ commands.map = {
           break;
         }
         case 'zoomin': {
-          if (mapTools.getMap()) {
+          if (mapTools.getMap() && layoutChanger.isViewSplit) {
             mapTools.increaseZoom();
           }
 
           break;
         }
         case 'zoomout': {
-          if (mapTools.getMap()) {
+          if (mapTools.getMap() && layoutChanger.isViewSplit) {
             mapTools.decreaseZoom();
           }
 
           break;
         }
         case 'info': {
-          const searchString = phrases.slice(1).join(' ').toLowerCase();
-          const infoText = mapTools.getInfoText(searchString);
+          if (mapTools.getMap() && phrases.length > 1) {
+            const searchString = phrases.slice(1).join(' ').toLowerCase();
+            const infoText = mapTools.getInfoText(searchString);
 
-          if (infoText) {
-            messenger.queueMessage({ text: [infoText.title, infoText.description] });
+            if (infoText) {
+              messenger.queueMessage({ text: [infoText.title, infoText.description] });
+            }
           }
 
           break;
         }
         case 'locate': {
-          // if (value) {
-          //   const marker = mapMarkers[value];
-          //
-          //   if (marker) {
-          //     // stuff
-          //   } else {
-          //     queueMessage({ text: labels.getText('error', 'unableToFindMap') });
-          //   }
-          // } else {
-          //   queueMessage({ text: labels.getText('error', 'locateValueMissing') });
-          // }
+          // TODO
 
           break;
         }

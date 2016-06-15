@@ -294,6 +294,10 @@ function createMarkerClusterer() {
 }
 
 function createMap(params) {
+  if (!google) {
+    return;
+  }
+
   const elementId = params.elementId;
 
   map = new google.maps.Map(document.getElementById(elementId), {

@@ -62,19 +62,6 @@ let printing = false;
  */
 let shortMessageQueue = [];
 
-function appendInputText(text) {
-  const currentInputText = domManipulator.getInputText();
-  let appendText = '';
-
-  if (currentInputText[currentInputText.length - 1] !== ' ') {
-    appendText = ' ';
-  }
-
-  appendText += text;
-
-  domManipulator.setCommandInput(currentInputText + appendText);
-}
-
 function generateSpan(params = { text: '' }) {
   const text = params.text;
   const linkable = params.linkable;
@@ -92,12 +79,11 @@ function generateSpan(params = { text: '' }) {
       if (replacePhrase) {
         domManipulator.replaceLastInputPhrase(`${text} `);
       } else if (keepInput) {
-        appendInputText(`${text} `);
+        domManipulator.appendInputText(`${text} `);
       } else {
         domManipulator.setCommandInput(`${text} `);
       }
 
-      domManipulator.focusInput();
       event.stopPropagation();
     });
   }

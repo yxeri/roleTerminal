@@ -67,16 +67,12 @@ let positions = [];
 let lastScreenOff = (new Date()).getTime();
 let commmandUsed = false;
 /**
- * Used to block repeat of some key presses
+ * Used to block repeat of key presses
  */
-let keyPressed = false;
-let trackingInterval = null;
-let isScreenOffInterval = null;
-let serverDownTimeout = null;
-/**
- * @type {HTMLElement}
- */
-let thisCommandItem = null;
+let keyPressed;
+let trackingInterval;
+let isScreenOffInterval;
+let serverDownTimeout;
 
 function queueCommand(command, data, commandMsg) {
   commandQueue.push({
@@ -664,17 +660,6 @@ function enterKeyHandler() {
   domManipulator.clearModeText();
 }
 
-function updateThisCommandItem() {
-  const command = commandHandler.getCommand(domManipulator.getInputText().split(' ')[0]);
-  const span = thisCommandItem.firstElementChild;
-
-  if (command) {
-    span.textContent = command.commandName.toUpperCase();
-  } else {
-    span.textContent = '';
-  }
-}
-
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const commandHistory = storage.getCommandHistory();
@@ -682,16 +667,6 @@ function specialKeyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-      // Backspace
-      case 8: {
-        if (domManipulator.getInputText().length <= 1) {
-          domManipulator.clearModeText();
-        } else {
-          domManipulator.changeModeText();
-        }
-
-        break;
-      }
       // Tab
       case 9: {
         const phrases = domManipulator.getInputText().split(' ');
@@ -775,18 +750,6 @@ function specialKeyPress(event) {
 
         break;
       }
-      // Delete
-      case 46: {
-        if (domManipulator.getInputText().length === 0) {
-          domManipulator.clearModeText();
-        } else {
-          domManipulator.changeModeText();
-        }
-
-        event.preventDefault();
-
-        break;
-      }
       // Page up
       case 33: {
         domManipulator.getMainView().scrollTop -= window.innerHeight;
@@ -854,10 +817,6 @@ function specialKeyPress(event) {
 }
 
 function defaultKeyPress(textChar, event) {
-  if (textChar) {
-    domManipulator.changeModeText();
-  }
-
   if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
     autoCompleteCommand();
     // Prevent new whitespace to be printed
@@ -868,6 +827,8 @@ function defaultKeyPress(textChar, event) {
 function keyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const textChar = String.fromCharCode(keyCode);
+
+  domManipulator.focusInput();
 
   if (!keyPressed) {
     switch (keyCode) {
@@ -918,7 +879,13 @@ function keyReleased(event) {
     }
   }
 
-  updateThisCommandItem();
+  if (domManipulator.getInputText().length === 0) {
+    domManipulator.clearModeText();
+  } else {
+    domManipulator.changeModeText();
+  }
+
+  domManipulator.updateThisCommandItem();
 }
 
 function attachMenuListener(menuItem, func, funcParam) {
@@ -926,7 +893,6 @@ function attachMenuListener(menuItem, func, funcParam) {
     menuItem.addEventListener('click', (event) => {
       func([funcParam]);
       clickHandler.setClicked(true);
-      domManipulator.focusInput();
       event.stopPropagation();
     });
   }
@@ -948,6 +914,49 @@ function createMenuItem(menuItem) {
   return listItem;
 }
 
+function createSubMenuItem(subItems) {
+  const ulElem = document.createElement('ul');
+
+  for (const item of subItems) {
+    const liElem = document.createElement('li');
+    const span = document.createElement('span');
+
+    liElem.classList.add('link');
+    span.appendChild(document.createTextNode(item.toUpperCase()));
+    liElem.appendChild(span);
+    ulElem.classList.add('subMenu');
+    ulElem.appendChild(liElem);
+
+    liElem.addEventListener('click', () => {
+      domManipulator.appendInputText(span.textContent.toLowerCase());
+      domManipulator.removeSubMenu();
+    });
+  }
+
+  return ulElem;
+}
+
+function thisCommandOptions() {
+  const command = commandHandler.getCommand(domManipulator.getThisCommandItem().children[0].textContent.toLowerCase());
+  const options = command.options;
+
+  if (options) {
+    const input = textTools.trimSpace(domManipulator.getInputText()).split(' ');
+
+    if (input.length > 1) {
+      const currentOption = options[input[input.length - 1]];
+
+      if (currentOption && currentOption.next) {
+        domManipulator.addSubMenuItem('thisCommand', createSubMenuItem(Object.keys(currentOption.next)));
+      }
+    } else {
+      const firstLevelOptions = Object.keys(options);
+
+      domManipulator.addSubMenuItem('thisCommand', createSubMenuItem(firstLevelOptions));
+    }
+  }
+}
+
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -963,6 +972,7 @@ function populateMenu() {
     },
     thisCommand: {
       itemName: '',
+      func: thisCommandOptions,
       elementId: 'thisCommand',
     },
   };
@@ -972,7 +982,7 @@ function populateMenu() {
     const listItem = createMenuItem(menuItem);
 
     if (listItem.id === 'thisCommand') {
-      thisCommandItem = listItem;
+      domManipulator.setThisCommandItem(listItem);
     }
 
     attachMenuListener(listItem, menuItem.func, menuItem.funcParam);

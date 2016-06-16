@@ -13,7 +13,7 @@ let defaultLanguage;
 
 const all = {
   help: {
-    help: ['Shows a list of available commands'],
+    help: ['Shows a list of available commands, helpful information or help for a specific command'],
     whoami: ['Shows information about the current user'],
     clear: ['Clears the terminal view'],
     msg: [
@@ -179,7 +179,7 @@ const all = {
     ],
   },
   help_se: {
-    help: ['Visa en lista av tillgängliga kommandon'],
+    help: ['Visa en lista av tillgängliga kommandon, hjälpsam information eller hjälp för ett specifikt kommando'],
     whoami: ['Visar information om nuvarande användaren'],
     clear: ['Rensar terminalvyn'],
     msg: [
@@ -332,8 +332,11 @@ const all = {
     help: [
       usageLine,
       'help',
+      'help *command name*',
       exampleLine,
       'help',
+      'help mode',
+      'help radio',
     ],
     msg: [
       usageLine,
@@ -564,8 +567,11 @@ const all = {
     help: [
       usageLine_se,
       'help',
+      'help *kommandonamn*',
       exampleLine_se,
       'help',
+      'help mode',
+      'help radio',
     ],
     msg: [
       usageLine_se,

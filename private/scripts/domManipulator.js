@@ -48,6 +48,10 @@ let secondView = null;
  * @type {boolean}
  */
 let oldAndroid;
+/**
+ * @type {HTMLElement}
+ */
+let thisCommandItem;
 
 /**
  * @param {boolean} hide
@@ -67,11 +71,23 @@ function getInputText() {
   return cmdInput.value;
 }
 
+function updateThisCommandItem() {
+  const command = commandHandler.getCommand(getInputText().split(' ')[0]);
+  const span = thisCommandItem.firstElementChild;
+
+  if (command) {
+    span.textContent = command.commandName.toUpperCase();
+  } else {
+    span.textContent = '';
+  }
+}
+
 /**
  * @param {string} text
  */
 function setCommandInput(text) {
   cmdInput.value = text;
+  updateThisCommandItem();
 }
 
 /**
@@ -186,6 +202,14 @@ function addMenuItem(item) {
   menuList.appendChild(item);
 }
 
+function addSubMenuItem(elementId, item) {
+  const element = Array.from(menuList.children).find((elem) => elem.id === elementId);
+
+  if (element) {
+    element.appendChild(item);
+  }
+}
+
 /**
  * @param {HTMLElement} view
  */
@@ -204,6 +228,33 @@ function clearMainFeed() {
  */
 function getMenu() {
   return menu;
+}
+
+function setThisCommandItem(item) {
+  thisCommandItem = item;
+}
+
+function getThisCommandItem() {
+  return thisCommandItem;
+}
+
+function appendInputText(text) {
+  const currentInputText = getInputText();
+  let appendText = '';
+
+  if (currentInputText[currentInputText.length - 1] !== ' ') {
+    appendText = ' ';
+  }
+
+  appendText += text;
+
+  setCommandInput(currentInputText + appendText);
+}
+
+function removeSubMenu() {
+  const commandList = menuList.lastChild;
+
+  commandList.removeChild(commandList.lastChild);
 }
 
 exports.setInputStart = setInputStart;
@@ -227,3 +278,9 @@ exports.setMainView = setMainView;
 exports.getInputStart = getInputStart;
 exports.clearMainFeed = clearMainFeed;
 exports.getMenu = getMenu;
+exports.addSubMenuItem = addSubMenuItem;
+exports.setThisCommandItem = setThisCommandItem;
+exports.getThisCommandItem = getThisCommandItem;
+exports.appendInputText = appendInputText;
+exports.updateThisCommandItem = updateThisCommandItem;
+exports.removeSubMenu = removeSubMenu;

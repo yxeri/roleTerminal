@@ -37,8 +37,7 @@ function addMsgToHistory(roomName, message, socket, callback) {
 
 /**
  * Send a message to the user's socket
- * Emits message
- * @param params Contains socket (socket.io socket) and message (required: text)
+ * @param {{socket: Object, message: {text: string[]}}} params
  */
 function sendSelfMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true } })) {
@@ -52,8 +51,7 @@ function sendSelfMsg(params) {
 
 /**
  * Sends multiple message to the user's socket
- * Emits messages
- * @param params Contains socket (socket.io socket) and messages
+ * @param {{socket: Object, messages: Object[]}} params
  */
 function sendSelfMsgs(params) {
   if (!objectValidator.isValidData(params, { socket: true, messages: true })) {

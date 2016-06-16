@@ -6,6 +6,7 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 const mapCreator = require('../../utils/mapCreator');
+const messenger = require('../../socketHelpers/messenger');
 
 function handle(socket) {
   /**
@@ -82,6 +83,18 @@ function handle(socket) {
         return;
       }
 
+      dbConnector.updateUserIsTracked(user.userName, true, (trackingErr) => {
+        if (trackingErr) {
+          logger.sendErrorMsg({
+            code: logger.ErrorCodes.db,
+            text: ['Failed to update user isTracking'],
+            err: trackingErr,
+          });
+
+          return;
+        }
+      });
+
       dbConnector.updatePosition({
         positionName: user.userName,
         position: params.position,
@@ -108,7 +121,25 @@ function handle(socket) {
               return;
             }
 
-            socket.broadcast.emit('mapPositions', [position]);
+            dbConnector.getAllUsers(user, (allErr, users) => {
+              if (allErr) {
+                logger.sendErrorMsg({
+                  code: logger.ErrorCodes.db,
+                  text: ['Failed to get all users to broadcast new user position to'],
+                  err: userErr,
+                });
+
+                return;
+              }
+
+              for (const socketUser of users) {
+                if (socketUser.socketId && socket.id !== socketUser.socketId && socketUser.isTracked) {
+                  socket.broadcast.to(socketUser.socketId).emit('mapPositions', [position]);
+                }
+              }
+
+              socket.broadcast.emit('mapPositions', [position]);
+            });
           });
         },
       });
@@ -141,13 +172,27 @@ function handle(socket) {
             break;
           }
           case 'users': {
-            dbConnector.getAllUserPositions(user, (err, userPositions) => {
-              if (err) {
-                return;
-              }
+            if (user.isTracked) {
+              dbConnector.getAllUserPositions(user, (err, userPositions) => {
+                if (err) {
+                  return;
+                }
 
-              getPositions(types.shift(), positions.concat(userPositions));
-            });
+                getPositions(types.shift(), positions.concat(userPositions));
+              });
+            } else {
+              messenger.sendSelfMsg({
+                socket,
+                message: {
+                  text: [
+                    'DETECTED: TRACKING DISABLED',
+                    'UNABLE TO RETRIEVE USER LOCATIONS',
+                    'DISABLING TRACKING IS A MAJOR OFFENSE',
+                    'REPORT IN FOR IMMEDIATE RE-EDUCATION SESSION',
+                  ],
+                },
+              });
+            }
 
             break;
           }

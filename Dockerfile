@@ -25,7 +25,5 @@ RUN ./node_modules/browserify/bin/cmd.js private/scripts/* -t [ babelify --prese
 # Minifies transpiled code and outputs it to public
 RUN ./node_modules/uglify-js/bin/uglifyjs --compress --mangle --output /usr/src/app/public/scripts/bundle.min.js -- /usr/src/app/public/scripts/bundle.js
 
-CMD ['/bin/html-css-minify.sh']
-
 # Retrieves external config and runs npm start
-CMD [ '/bin/docker-start.sh' ]
+CMD [ "./docker-start.sh" ]

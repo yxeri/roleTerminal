@@ -3,13 +3,13 @@
 # Compiles and compresses sass to css and moves them to public
 for file in ./private/styles/*
 do
-  node-sass --output-style=compressed "$file" -o ./public/styles
+  ./node_modules/node-sass/bin/node-sass --output-style=compressed "$file" -o ./public/styles
 done
 
 # Compresses HTML files and moves them to public
 for file in ./private/views/*
 do
-  html-minifier --remove-comments --collapse-whitespace "$file" -o ./public/views/$(basename "$file")
+  ./node_modules/html-minifier/cli.js --remove-comments --collapse-whitespace "$file" -o ./public/views/$(basename "$file")
 done
 
 configSize=${#CONFIGPATH}

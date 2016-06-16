@@ -5,3 +5,4 @@ config/modified/
 # for docker caching reasons
 node_modules
 npm-debug.log
+docker-compose.override.yml

@@ -1514,6 +1514,7 @@ function onMapPositions(mapPositions = []) {
         coordsCollection,
       });
     } else if (geometry === 'point') {
+      commandHandler.addSpecialMapOption(positionName, 'location');
       mapTools.setMarkerPosition({
         positionName,
         position: {
@@ -1523,6 +1524,7 @@ function onMapPositions(mapPositions = []) {
         description,
       });
     } else if (type && type === 'user') {
+      commandHandler.addSpecialMapOption(positionName, 'user');
       mapTools.setMarkerPosition({
         positionName,
         position: {

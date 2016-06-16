@@ -171,7 +171,32 @@ function updateCommand(command) {
   }
 }
 
+/**
+ * Generated command options
+ * Triggered by commandHandler
+ */
+function addSpecialHelpOptions() {
+  for (const command of getCommands()) {
+    commands.help.options[command] = { description: command };
+  }
+}
+
+/**
+ * Generated command options.
+ * Triggered by emitted mapPositions
+ * @param {string} positionName
+ * @param {string} type
+ */
+function addSpecialMapOption(positionName, type) {
+  if (type === 'user') {
+    commands.map.options.user.next[positionName] = { description: `User: ${positionName}` };
+  } else if (type === 'location') {
+    commands.map.options.location.next[positionName] = { description: `Location: ${positionName}` };
+  }
+}
+
 collectCommands();
+addSpecialHelpOptions();
 
 exports.triggerCommand = triggerCommand;
 exports.resetCommand = resetCommand;
@@ -185,3 +210,4 @@ exports.triggerCommandStep = triggerCommandStep;
 exports.getCommand = getCommand;
 exports.updateCommand = updateCommand;
 exports.commandHelper = commandHelper;
+exports.addSpecialMapOption = addSpecialMapOption;

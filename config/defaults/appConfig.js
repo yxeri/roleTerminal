@@ -24,7 +24,6 @@ function convertToBoolean(envar) {
 
 const config = {};
 const userVerifyEnv = convertToBoolean(process.env.REQUIREVERIFY);
-const transpileEs6Env = convertToBoolean(process.env.TRANSPILE);
 const revealFailedHackEnv = convertToBoolean(process.env.REVEALFAILEDHACK);
 const forceFullscreenEnv = convertToBoolean(process.env.FORCEFULLSCREEN);
 const gpsTrackingEnv = convertToBoolean(process.env.GPSTRACKING);
@@ -88,15 +87,6 @@ config.socketPath = (process.env.SOCKETPATH === 'cdn' || modifiedConfig.socketPa
  * prod, dev
  */
 config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
-
-/**
- * Should the client-side code be transpiled from es6 to 5?
- */
-config.transpileEs6 = transpileEs6Env !== undefined ? transpileEs6Env : modifiedConfig.transpileEs6;
-
-if (config.transpileEs6 === undefined) {
-  config.transpileEs6 = true;
-}
 
 /**
  * Array of route paths

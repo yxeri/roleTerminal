@@ -23,6 +23,7 @@ function handle(io) {
       title: appConfig.title,
       gMapsKey: appConfig.gMapsKey,
       socketPath: appConfig.socketPath,
+      mainJs: appConfig.mode === 'dev' ? 'scripts/bundle.js' : 'scripts/bundle.min.js',
     });
   });
 

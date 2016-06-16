@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
   team: String,
   authGroups: [{ type: String, unique: true }],
   mode: String,
+  isTracked: Boolean,
 }, { collection: 'users' });
 const roomSchema = new mongoose.Schema({
   roomName: { type: String, unique: true },
@@ -315,8 +316,14 @@ function getWeather(sentTime, callback) {
   });
 }
 
+function updateUserIsTracked(userName, value, callback) {
+  const update = { $set: { isTracked: value } };
+
+  updateUserValue(userName, update, callback);
+}
+
 function updateUserTeam(userName, value, callback) {
-  const update = { team: value };
+  const update = { $set: { team: value } };
 
   updateUserValue(userName, update, callback);
 }
@@ -849,6 +856,9 @@ function createRoom(sentRoom, sentUser, callback) {
   });
 }
 
+/**
+ * @param {Object} sentUser
+ */
 function getAllUsers(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
   const sort = { userName: 1 };
@@ -1692,3 +1702,4 @@ exports.incrementCommandUsage = incrementCommandUsage;
 exports.getStaticPositions = getStaticPositions;
 exports.updateDeviceLastAlive = updateDeviceLastAlive;
 exports.getPosition = getPosition;
+exports.updateUserIsTracked = updateUserIsTracked;

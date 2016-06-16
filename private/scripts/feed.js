@@ -667,16 +667,6 @@ function specialKeyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-      // Backspace
-      case 8: {
-        if (domManipulator.getInputText().length <= 1) {
-          domManipulator.clearModeText();
-        } else {
-          domManipulator.changeModeText();
-        }
-
-        break;
-      }
       // Tab
       case 9: {
         const phrases = domManipulator.getInputText().split(' ');
@@ -760,18 +750,6 @@ function specialKeyPress(event) {
 
         break;
       }
-      // Delete
-      case 46: {
-        if (domManipulator.getInputText().length === 0) {
-          domManipulator.clearModeText();
-        } else {
-          domManipulator.changeModeText();
-        }
-
-        event.preventDefault();
-
-        break;
-      }
       // Page up
       case 33: {
         domManipulator.getMainView().scrollTop -= window.innerHeight;
@@ -839,10 +817,6 @@ function specialKeyPress(event) {
 }
 
 function defaultKeyPress(textChar, event) {
-  if (textChar) {
-    domManipulator.changeModeText();
-  }
-
   if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
     autoCompleteCommand();
     // Prevent new whitespace to be printed
@@ -905,6 +879,12 @@ function keyReleased(event) {
     }
   }
 
+  if (domManipulator.getInputText().length === 0) {
+    domManipulator.clearModeText();
+  } else {
+    domManipulator.changeModeText();
+  }
+
   domManipulator.updateThisCommandItem();
 }
 
@@ -913,7 +893,6 @@ function attachMenuListener(menuItem, func, funcParam) {
     menuItem.addEventListener('click', (event) => {
       func([funcParam]);
       clickHandler.setClicked(true);
-      domManipulator.focusInput();
       event.stopPropagation();
     });
   }
@@ -935,6 +914,49 @@ function createMenuItem(menuItem) {
   return listItem;
 }
 
+function createSubMenuItem(subItems) {
+  const ulElem = document.createElement('ul');
+
+  for (const item of subItems) {
+    const liElem = document.createElement('li');
+    const span = document.createElement('span');
+
+    liElem.classList.add('link');
+    span.appendChild(document.createTextNode(item.toUpperCase()));
+    liElem.appendChild(span);
+    ulElem.classList.add('subMenu');
+    ulElem.appendChild(liElem);
+
+    liElem.addEventListener('click', () => {
+      domManipulator.appendInputText(span.textContent.toLowerCase());
+      domManipulator.removeSubMenu();
+    });
+  }
+
+  return ulElem;
+}
+
+function thisCommandOptions() {
+  const command = commandHandler.getCommand(domManipulator.getThisCommandItem().children[0].textContent.toLowerCase());
+  const options = command.options;
+
+  if (options) {
+    const input = textTools.trimSpace(domManipulator.getInputText()).split(' ');
+
+    if (input.length > 1) {
+      const currentOption = options[input[input.length - 1]];
+
+      if (currentOption && currentOption.next) {
+        domManipulator.addSubMenuItem('thisCommand', createSubMenuItem(Object.keys(currentOption.next)));
+      }
+    } else {
+      const firstLevelOptions = Object.keys(options);
+
+      domManipulator.addSubMenuItem('thisCommand', createSubMenuItem(firstLevelOptions));
+    }
+  }
+}
+
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -950,6 +972,7 @@ function populateMenu() {
     },
     thisCommand: {
       itemName: '',
+      func: thisCommandOptions,
       elementId: 'thisCommand',
     },
   };

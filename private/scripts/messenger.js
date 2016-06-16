@@ -3,6 +3,7 @@ const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const textTools = require('./textTools');
 const clickHandler = require('./clickHandler');
+const labels = require('./labels');
 
 // TODO mainFeed should be moved out of here
 /**
@@ -285,4 +286,23 @@ function queueMessage(message) {
   consumeMessageQueue();
 }
 
+function printHelpMessage(command) {
+  const helpMsg = { text: [] };
+  const helpText = labels.getText('help', command);
+  const instructionsText = labels.getText('instructions', command);
+
+  if (helpText) {
+    helpMsg.text = helpMsg.text.concat(helpText);
+  }
+
+  if (instructionsText) {
+    helpMsg.text = helpMsg.text.concat(instructionsText);
+  }
+
+  if (helpMsg.text.length > 0) {
+    queueMessage(helpMsg);
+  }
+}
+
 exports.queueMessage = queueMessage;
+exports.printHelpMessage = printHelpMessage;

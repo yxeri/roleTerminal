@@ -523,24 +523,6 @@ function autoCompleteCommand() {
   }
 }
 
-function printHelpMessage(command) {
-  const helpMsg = { text: [] };
-  const helpText = labels.getText('help', command);
-  const instructionsText = labels.getText('instructions', command);
-
-  if (helpText) {
-    helpMsg.text = helpMsg.text.concat(helpText);
-  }
-
-  if (instructionsText) {
-    helpMsg.text = helpMsg.text.concat(instructionsText);
-  }
-
-  if (helpMsg.text.length > 0) {
-    messenger.queueMessage(helpMsg);
-  }
-}
-
 function printUsedCommand(clearAfterUse, inputText) {
   if (clearAfterUse) {
     return null;
@@ -629,24 +611,17 @@ function enterKeyHandler() {
           // Store the command for usage with up/down arrows
           pushCommandHistory(phrases.join(' '));
 
-          /**
-           * Print the help and instruction parts of the command
-           */
-          if (phrases[1] === '-help') {
-            printHelpMessage(command.commandName);
-          } else {
-            if (command.steps) {
-              commandHelper.command = command.commandName;
-              commandHelper.maxSteps = command.steps.length;
-            }
-
-            if (command.clearBeforeUse) {
-              commandHandler.triggerCommand({ cmd: 'clear' });
-            }
-
-            queueCommand(command.func, combineSequences(command.commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
-            startCommandQueue();
+          if (command.steps) {
+            commandHelper.command = command.commandName;
+            commandHelper.maxSteps = command.steps.length;
           }
+
+          if (command.clearBeforeUse) {
+            commandHandler.triggerCommand({ cmd: 'clear' });
+          }
+
+          queueCommand(command.func, combineSequences(command.commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
+          startCommandQueue();
           /**
            * User is logged in and in chat mode
            */

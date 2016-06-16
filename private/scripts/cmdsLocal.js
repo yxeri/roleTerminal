@@ -149,13 +149,15 @@ commands.help = {
 
     if (undefined === phrases || phrases.length === 0) {
       messenger.queueMessage({ text: textTools.createCommandStart('help').concat(labels.getText('instructions', 'helpExtra')) });
+      getAll();
+    } else if (phrases.length >= 1) {
+      messenger.printHelpMessage(phrases[0]);
     }
-
-    getAll();
   },
   accessLevel: 1,
   category: 'basic',
   commandName: 'help',
+  options: {},
 };
 
 commands.clear = {

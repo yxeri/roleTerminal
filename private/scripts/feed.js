@@ -67,16 +67,12 @@ let positions = [];
 let lastScreenOff = (new Date()).getTime();
 let commmandUsed = false;
 /**
- * Used to block repeat of some key presses
+ * Used to block repeat of key presses
  */
-let keyPressed = false;
-let trackingInterval = null;
-let isScreenOffInterval = null;
-let serverDownTimeout = null;
-/**
- * @type {HTMLElement}
- */
-let thisCommandItem = null;
+let keyPressed;
+let trackingInterval;
+let isScreenOffInterval;
+let serverDownTimeout;
 
 function queueCommand(command, data, commandMsg) {
   commandQueue.push({
@@ -664,17 +660,6 @@ function enterKeyHandler() {
   domManipulator.clearModeText();
 }
 
-function updateThisCommandItem() {
-  const command = commandHandler.getCommand(domManipulator.getInputText().split(' ')[0]);
-  const span = thisCommandItem.firstElementChild;
-
-  if (command) {
-    span.textContent = command.commandName.toUpperCase();
-  } else {
-    span.textContent = '';
-  }
-}
-
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const commandHistory = storage.getCommandHistory();
@@ -918,7 +903,7 @@ function keyReleased(event) {
     }
   }
 
-  updateThisCommandItem();
+  domManipulator.updateThisCommandItem();
 }
 
 function attachMenuListener(menuItem, func, funcParam) {
@@ -972,7 +957,7 @@ function populateMenu() {
     const listItem = createMenuItem(menuItem);
 
     if (listItem.id === 'thisCommand') {
-      thisCommandItem = listItem;
+      domManipulator.setThisCommandItem(listItem);
     }
 
     attachMenuListener(listItem, menuItem.func, menuItem.funcParam);

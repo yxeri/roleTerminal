@@ -48,6 +48,10 @@ let secondView = null;
  * @type {boolean}
  */
 let oldAndroid;
+/**
+ * @type {HTMLElement}
+ */
+let thisCommandItem;
 
 /**
  * @param {boolean} hide
@@ -206,6 +210,21 @@ function getMenu() {
   return menu;
 }
 
+function updateThisCommandItem() {
+  const command = commandHandler.getCommand(getInputText().split(' ')[0]);
+  const span = thisCommandItem.firstElementChild;
+
+  if (command) {
+    span.textContent = command.commandName.toUpperCase();
+  } else {
+    span.textContent = '';
+  }
+}
+
+function setThisCommandItem(item) {
+  thisCommandItem = item;
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -227,3 +246,5 @@ exports.setMainView = setMainView;
 exports.getInputStart = getInputStart;
 exports.clearMainFeed = clearMainFeed;
 exports.getMenu = getMenu;
+exports.updateThisCommandItem = updateThisCommandItem;
+exports.setThisCommandItem = setThisCommandItem;

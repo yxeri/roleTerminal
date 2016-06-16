@@ -854,6 +854,8 @@ function keyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const textChar = String.fromCharCode(keyCode);
 
+  domManipulator.focusInput();
+
   if (!keyPressed) {
     switch (keyCode) {
       case 102: {

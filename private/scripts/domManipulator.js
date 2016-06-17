@@ -254,7 +254,9 @@ function appendInputText(text) {
 function removeSubMenu() {
   const commandList = menuList.lastChild;
 
-  commandList.removeChild(commandList.lastChild);
+  if (commandList.lastChild.tagName === 'UL') {
+    commandList.removeChild(commandList.lastChild);
+  }
 }
 
 exports.setInputStart = setInputStart;

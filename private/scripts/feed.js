@@ -655,6 +655,7 @@ function enterKeyHandler() {
     }
   }
 
+  domManipulator.removeSubMenu();
   resetPreviousCommandPointer();
   domManipulator.clearInput();
   domManipulator.clearModeText();
@@ -829,6 +830,7 @@ function keyPress(event) {
   const textChar = String.fromCharCode(keyCode);
 
   domManipulator.focusInput();
+  domManipulator.removeSubMenu();
 
   if (!keyPressed) {
     switch (keyCode) {

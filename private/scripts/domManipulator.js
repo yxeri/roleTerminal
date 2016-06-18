@@ -36,6 +36,10 @@ const spacer = document.getElementById('spacer');
  */
 const menuList = document.getElementById('menuList');
 /**
+ * @type {HTMLElement}
+ */
+const videoHolder = document.getElementById('videoHolder');
+/**
  * Div containing mainFeed, inputContainer and spacer
  * @type {HTMLElement}
  */
@@ -259,6 +263,10 @@ function removeSubMenu() {
   }
 }
 
+function getVideoHolder() {
+  return videoHolder;
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -286,3 +294,4 @@ exports.getThisCommandItem = getThisCommandItem;
 exports.appendInputText = appendInputText;
 exports.updateThisCommandItem = updateThisCommandItem;
 exports.removeSubMenu = removeSubMenu;
+exports.getVideoHolder = getVideoHolder;

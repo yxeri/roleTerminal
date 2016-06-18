@@ -6,6 +6,7 @@ const mapPolygons = {};
 const mapLines = {};
 const mapLabels = {};
 const cornerCoords = {};
+const maxShortDescLength = 320;
 let markerClusterer;
 let mapView = '';
 let map;
@@ -63,7 +64,8 @@ function createMarker(params) {
     opacity: params.opacity || 0.9,
     icon,
   });
-  mapMarkers[markerName].addedDesc = `${params.description}`;
+  mapMarkers[markerName].addedShortDesc = params.description.length > maxShortDescLength ? `${params.description.slice(0, maxShortDescLength)}...` : `${params.description}`;
+  mapMarkers[markerName].addedExpandedDesc = params.description.length > maxShortDescLength ? `${params.description.slice(maxShortDescLength)}` : undefined;
   mapMarkers[markerName].addedTitle = params.title;
 
   if (!params.hideLabel) {
@@ -87,7 +89,7 @@ function createMarker(params) {
     markerInfo.classList.remove('hide');
     markerInfo.style.left = `${xy.x}px`;
     markerInfo.style.top = `${xy.y}px`;
-    markerInfo.textContent = `${marker.addedTitle}.${'\n'}${marker.addedDesc}`;
+    markerInfo.textContent = `${marker.addedTitle}.${'\n'}${marker.addedShortDesc}`;
   });
 }
 
@@ -408,12 +410,17 @@ function decreaseZoom() {
  */
 function getInfoText(markerName) {
   const marker = mapMarkers[markerName];
+  let description = marker.addedShortDesc;
+
+  if (description.addedExpandedDesc) {
+    description = marker.addedShortDesc.slice(0, marker.addedShortDesc.length - 3) + marker.addedExpandedDesc;
+  }
 
   if (!marker) {
     return null;
   }
 
-  return { title: marker.addedTitle, description: marker.addedDesc };
+  return { title: marker.addedTitle, description };
 }
 
 exports.setMarkerPosition = setMarkerPosition;

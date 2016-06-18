@@ -10,6 +10,7 @@ const messenger = require('./messenger');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const clickHandler = require('./clickHandler');
+const videoPlayer = require('./videoPlayer');
 
 /**
  * Queue of all the commands used by the user that will be handled and printed
@@ -1553,6 +1554,23 @@ function onMapPositions(mapPositions = []) {
 }
 
 /**
+ * @param {{videoPath: string}} params
+ */
+function onVideoMessage(params = {}) {
+  const videoPath = params.videoPath;
+
+  if (videoPath) {
+    videoPlayer.setVideo(videoPath);
+    videoPlayer.loadVideo();
+
+    videoPlayer.getPlayer().addEventListener('canplaythrough', () => {
+      layoutChanger.splitView(true, domManipulator.getVideoHolder());
+      videoPlayer.playVideo();
+    });
+  }
+}
+
+/**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
  */
@@ -1663,4 +1681,5 @@ socketHandler.startSocket({
   matchFound: onMatchFound,
   startup: onStartup,
   mapPositions: onMapPositions,
+  videoMessage: onVideoMessage,
 });

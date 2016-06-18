@@ -53,6 +53,11 @@ pre {
   margin: 0;
 }
 
+video {
+  width: 100%;
+  height: auto;
+}
+
 #background {
   overflow: hidden;
   position: fixed;
@@ -143,6 +148,7 @@ pre {
 }
 
 #map {
+  top: 2em;
   overflow: hidden;
   background-color: #00865e;
 
@@ -156,7 +162,6 @@ pre {
 
   > div:first-child {
     display: inherit;
-    top: 2em !important;
 
     > div {
       display: none;
@@ -187,6 +192,11 @@ pre {
   background-color: $back-color;
   z-index: 10;
   max-width: 15em;
+}
+
+#videoHolder {
+  position: fixed;
+  top: 2em;
 }
 
 .halfView {

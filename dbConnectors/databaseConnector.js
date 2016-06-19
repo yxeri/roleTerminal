@@ -134,6 +134,11 @@ const mapPositionSchema = new mongoose.Schema({
   isStatic: { type: Boolean, default: false },
   type: String,
 }, { collection: 'mapPositions' });
+const gameUserSchema = new mongoose.Schema({
+  userName: { type: String, unique: true },
+  password: String,
+  passwordHint: String,
+}, { collection: 'gameUsers' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -146,6 +151,7 @@ const Weather = mongoose.model('Weather', weatherSchema);
 const Mission = mongoose.model('Mission', missionSchema);
 const InvitationList = mongoose.model('InvitationList', invitationListSchema);
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
+const GameUser = mongoose.model('GameUser', gameUserSchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName };
@@ -326,6 +332,41 @@ function updateUserTeam(userName, value, callback) {
   const update = { $set: { team: value } };
 
   updateUserValue(userName, update, callback);
+}
+
+function createGameUser(gameUser, callback) {
+  const newGameUser = new GameUser(gameUser);
+  const query = { userName: gameUser.userName };
+
+  GameUser.findOne(query).lean().exec((err, foundGameUser) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to check if game user already exists'],
+        err,
+      });
+    } else if (foundGameUser === null) {
+      saveObject(newGameUser, 'gameUser', callback);
+    } else {
+      callback(err, null);
+    }
+  });
+}
+
+function getGameUser(userName, callback) {
+  const query = { userName };
+
+  GameUser.findOne(query).lean().exec((err, foundGameUser) => {
+    if (err || foundGameUser === null) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get game user'],
+        err,
+      });
+    }
+
+    callback(err, foundGameUser);
+  });
 }
 
 function createTeam(team, callback) {
@@ -1703,3 +1744,5 @@ exports.getStaticPositions = getStaticPositions;
 exports.updateDeviceLastAlive = updateDeviceLastAlive;
 exports.getPosition = getPosition;
 exports.updateUserIsTracked = updateUserIsTracked;
+exports.createGameUser = createGameUser;
+exports.getGameUser = getGameUser;

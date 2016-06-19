@@ -187,14 +187,12 @@ function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
 /**
  * Creates and returns a zalgofied string. The amount of zalgo is randomised based on the sent percentage
  * @static
- * @param {{phrase: string, maxUpper: Number, maxMiddle: Number, maxLower: Number, percentage: Number}} params -
- * <pre>
- * <p>phrase - String to be zalgofied</p>
- * maxUpper - Max amount of zalgo characters to be appended on top
- * maxMiddle - Max amount of zalgo characters to be appended in the middle
- * maxLower - Max amount of zalgo characters to be appended on the bottom
- * percentage - Chance of zalgo being added
- * </pre>
+ * @param {Object} params - Parameters
+ * @param {string} params.phrase - String to be zalgofied
+ * @param {Number} params.maxUpper - Max amount of zalgo characters to be appended on top
+ * @param {Number} params.maxMiddle - Max amount of zalgo characters to be appended in the middle
+ * @param {Number} params.maxLower - Max amount of zalgo characters to be appended on the bottom
+ * @param {Number} params.percentage - Chance of zalgo being added
  * @returns {string} - Zalgofied string
  */
 function randomMultiZalgoPhrase(params = {}) {

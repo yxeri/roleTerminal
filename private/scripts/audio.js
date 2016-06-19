@@ -4,12 +4,10 @@ const audio = new Audio();
 
 /**
  * @static
- * @param {{path: string, startTime: Number, volume: Number}} params -
- * <pre>
- * path - Path to the file
- * startTime - Starting time of the audio
- * volume - Volume for the audio
- * </pre>
+ * @param {Object} params - Parameters
+ * @param {string} params.path - Path to the file
+ * @param {Number} params.startTime - Starting time of the audio
+ * @param {Number} params.volume - Volume for the audio
  */
 function playAudio(params) {
   if (params.path) {

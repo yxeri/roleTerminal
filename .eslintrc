@@ -10,7 +10,8 @@
     // Strict is needed in Node
     "strict": 0,
     "max-len": 0,
-    "valid-jsdoc": "error"
+    "require-jsdoc": "error",
+    "valid-jsdoc": ["error", { "requireReturn": false }]
   },
   "globals": {
     "google": false,

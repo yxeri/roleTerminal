@@ -133,19 +133,22 @@ const lowerZalgo = [
 ];
 
 /**
+ * Returns random number between min and max
  * @private
- * @param {Number} max
- * @param {Number} min
- * @returns {Number}
+ * @param {Number} max - Max number value
+ * @param {Number} min - Min number value
+ * @returns {Number} - Random number between min and max
  */
 function randomNumber(max, min) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
 /**
+ * Returns a random zalgo character
  * @private
- * @param {string[]} array
- * @param {Number} amount
+ * @param {string[]} array - Array with zalgo characters
+ * @param {Number} amount - Amount of zalgo characters to append
+ * @returns {string} - Zalgo string
  */
 function retrieveChars(array, amount) {
   let zalgoString = '';
@@ -158,11 +161,13 @@ function retrieveChars(array, amount) {
 }
 
 /**
+ * Creates and returns a zalgofied string
  * @static
- * @param {string} phrase
- * @param {Number} maxUpper
- * @param {Number} maxMiddle
- * @param {Number} maxLower
+ * @param {string} phrase - Original string to be zalgofied
+ * @param {Number} maxUpper - Max amount of zalgo characters to be appended on the top
+ * @param {Number} maxMiddle - Max amount of zalgo characters to be appended in the middle
+ * @param {Number} maxLower - Max amount of zalgo characters to be appended on the bottom
+ * @returns {string} - Zalgofied string
  */
 function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
   let zalgoString = '';
@@ -180,8 +185,17 @@ function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
 }
 
 /**
+ * Creates and returns a zalgofied string. The amount of zalgo is randomised based on the sent percentage
  * @static
- * @param {{phrase: string, maxUpper: Number, maxMiddle: Number, maxLower: Number, percentage: Number, words: string}} params
+ * @param {{phrase: string, maxUpper: Number, maxMiddle: Number, maxLower: Number, percentage: Number}} params -
+ * <pre>
+ * <p>phrase - String to be zalgofied</p>
+ * maxUpper - Max amount of zalgo characters to be appended on top
+ * maxMiddle - Max amount of zalgo characters to be appended in the middle
+ * maxLower - Max amount of zalgo characters to be appended on the bottom
+ * percentage - Chance of zalgo being added
+ * </pre>
+ * @returns {string} - Zalgofied string
  */
 function randomMultiZalgoPhrase(params = {}) {
   const phrase = params.phrase;

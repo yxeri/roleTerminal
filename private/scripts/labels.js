@@ -1,4 +1,4 @@
-'use strict';
+/** @module */
 /* eslint-disable camelcase */
 
 const textTools = require('./textTools');

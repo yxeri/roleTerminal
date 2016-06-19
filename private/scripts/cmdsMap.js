@@ -1,3 +1,5 @@
+/** @module */
+
 const mapTools = require('./mapTools');
 const socketHandler = require('./socketHandler');
 const storage = require('./storage');

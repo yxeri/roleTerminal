@@ -1,3 +1,5 @@
+/** @module */
+
 const labels = require('./labels');
 const storage = require('./storage');
 const textTools = require('./textTools');

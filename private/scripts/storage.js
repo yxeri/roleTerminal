@@ -1,8 +1,11 @@
+/** @module */
+
 const labels = require('./labels');
 const mapTools = require('./mapTools');
 const domManipulator = require('./domManipulator');
 
 /**
+ * @private
  * @param {string} name
  * @param {} item
  */
@@ -11,6 +14,7 @@ function setLocalVal(name, item) {
 }
 
 /**
+ * @private
  * @param {string} name
  * @returns {}
  */
@@ -19,6 +23,7 @@ function getLocalVal(name) {
 }
 
 /**
+ * @private
  * @param {string} name
  */
 function removeLocalVal(name) {
@@ -26,6 +31,8 @@ function removeLocalVal(name) {
 }
 
 /**
+ * Get default language
+ * @static
  * @returns {string}
  */
 function getDefaultLanguage() {
@@ -33,6 +40,7 @@ function getDefaultLanguage() {
 }
 
 /**
+ * @static
  * @param {string} languageCode
  */
 function setDefaultLanguage(languageCode) {
@@ -41,6 +49,7 @@ function setDefaultLanguage(languageCode) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getFastMode() {
@@ -48,6 +57,7 @@ function getFastMode() {
 }
 
 /**
+ * @static
  * @param {boolean} isOn
  */
 function setFastMode(isOn) {
@@ -55,6 +65,7 @@ function setFastMode(isOn) {
 }
 
 /**
+ * @static
  * @param {boolean} hide
  */
 function shouldHideRoomNames(hide) {
@@ -62,6 +73,7 @@ function shouldHideRoomNames(hide) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getHideRoomNames() {
@@ -69,6 +81,7 @@ function getHideRoomNames() {
 }
 
 /**
+ * @static
  * @param {boolean} hide
  */
 function shouldHideTimeStamp(hide) {
@@ -76,6 +89,7 @@ function shouldHideTimeStamp(hide) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getHideTimeStamp() {
@@ -83,6 +97,8 @@ function getHideTimeStamp() {
 }
 
 /**
+ * @public
+ * @static
  * @returns {Object}
  */
 function getAliases() {
@@ -92,6 +108,7 @@ function getAliases() {
 }
 
 /**
+ * @static
  * @param {Object} aliases
  */
 function setAliases(aliases) {
@@ -99,6 +116,7 @@ function setAliases(aliases) {
 }
 
 /**
+ * @static
  * @returns {string}
  */
 function getDeviceId() {
@@ -106,6 +124,7 @@ function getDeviceId() {
 }
 
 /**
+ * @static
  * @param {string} deviceId
  */
 function setDeviceId(deviceId) {
@@ -113,6 +132,7 @@ function setDeviceId(deviceId) {
 }
 
 /**
+ * @static
  * @returns {string}
  */
 function getRoom() {
@@ -120,17 +140,22 @@ function getRoom() {
 }
 
 /**
+ * @static
  * @param {string} room
  */
 function setRoom(room) {
   setLocalVal('room', room);
 }
 
+/**
+ * @static
+ */
 function removeRoom() {
   removeLocalVal('room');
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function isHiddenCursor() {
@@ -138,6 +163,7 @@ function isHiddenCursor() {
 }
 
 /**
+ * @static
  * @param {boolean} isHidden
  */
 function shouldHideCursor(isHidden) {
@@ -153,6 +179,7 @@ function shouldHideCursor(isHidden) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function isHiddenMenu() {
@@ -160,6 +187,7 @@ function isHiddenMenu() {
 }
 
 /**
+ * @static
  * @param {boolean} isHidden
  */
 function shouldHideMenu(isHidden) {
@@ -175,6 +203,7 @@ function shouldHideMenu(isHidden) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function isHiddenCmdInput() {
@@ -182,6 +211,7 @@ function isHiddenCmdInput() {
 }
 
 /**
+ * @static
  * @param {boolean} isHidden
  */
 function shouldHideCmdInput(isHidden) {
@@ -197,6 +227,7 @@ function shouldHideCmdInput(isHidden) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function isThinView() {
@@ -204,6 +235,7 @@ function isThinView() {
 }
 
 /**
+ * @static
  * @param {boolean} isThinner
  */
 function shouldThinView(isThinner) {
@@ -217,6 +249,7 @@ function shouldThinView(isThinner) {
 }
 
 /**
+ * @static
  * @returns {Number}
  */
 function getAccessLevel() {
@@ -224,6 +257,7 @@ function getAccessLevel() {
 }
 
 /**
+ * @static
  * @param {Number} accessLevel
  */
 function setAccessLevel(accessLevel) {
@@ -231,6 +265,7 @@ function setAccessLevel(accessLevel) {
 }
 
 /**
+ * @static
  * @param {boolean} forceFullscreen
  */
 function shouldForceFullscreen(forceFullscreen) {
@@ -238,6 +273,7 @@ function shouldForceFullscreen(forceFullscreen) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getForceFullscreen() {
@@ -245,6 +281,7 @@ function getForceFullscreen() {
 }
 
 /**
+ * @static
  * @param {boolean} gpsTracking
  */
 function shouldGpsTrack(gpsTracking) {
@@ -252,6 +289,7 @@ function shouldGpsTrack(gpsTracking) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getGpsTracking() {
@@ -259,6 +297,7 @@ function getGpsTracking() {
 }
 
 /**
+ * @static
  * @param {boolean}
  */
 function shouldDisableCommands(disable) {
@@ -266,6 +305,7 @@ function shouldDisableCommands(disable) {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getDisableCommands() {
@@ -273,6 +313,7 @@ function getDisableCommands() {
 }
 
 /**
+ * @static
  * @returns {string}
  */
 function getUser() {
@@ -280,17 +321,22 @@ function getUser() {
 }
 
 /**
+ * @static
  * @param {string} user
  */
 function setUser(user) {
   setLocalVal('user', user);
 }
 
+/**
+ * @static
+ */
 function removeUser() {
   removeLocalVal('user');
 }
 
 /**
+ * @static
  * @returns {string[]}
  */
 function getCommandHistory() {
@@ -300,17 +346,23 @@ function getCommandHistory() {
 }
 
 /**
+ * @public
+ * @static
  * @param {string[]} commandHistory
  */
 function setCommandHistory(commandHistory) {
   setLocalVal('cmdHistory', JSON.stringify(commandHistory));
 }
 
+/**
+ * @static
+ */
 function removeCommandHistory() {
   removeLocalVal('cmdHistory');
 }
 
 /**
+ * @static
  * @param {string} mode
  */
 function setMode(mode) {
@@ -318,6 +370,7 @@ function setMode(mode) {
 }
 
 /**
+ * @static
  * @returns {string}
  */
 function getMode() {
@@ -325,6 +378,7 @@ function getMode() {
 }
 
 /**
+ * @static
  * @returns {boolean}
  */
 function getStaticInputStart() {
@@ -332,6 +386,7 @@ function getStaticInputStart() {
 }
 
 /**
+ * @static
  * @param {boolean} isStatic
  */
 function shouldStaticInputStart(isStatic) {
@@ -339,6 +394,7 @@ function shouldStaticInputStart(isStatic) {
 }
 
 /**
+ * @static
  * @param {string} value
  */
 function setDefaultInputStart(value) {
@@ -346,6 +402,7 @@ function setDefaultInputStart(value) {
 }
 
 /**
+ * @static
  * @param {Number} longitude
  * @param {Number} latitude
  */
@@ -360,6 +417,7 @@ function setCenterCoordinates(longitude, latitude) {
 }
 
 /**
+ * @static
  * @returns {{latitude: Number, longitude: Number}}
  */
 function getCenterCoordinates() {
@@ -370,6 +428,7 @@ function getCenterCoordinates() {
 }
 
 /**
+ * @static
  * @param {Number} longitude
  * @param {Number} latitude
  */
@@ -379,6 +438,7 @@ function setCornerOneCoordinates(longitude, latitude) {
 }
 
 /**
+ * @static
  * @returns {{latitude: Number, longitude: Number}}
  */
 function getCornerOneCoordinates() {
@@ -389,6 +449,7 @@ function getCornerOneCoordinates() {
 }
 
 /**
+ * @static
  * @param {Number} longitude
  * @param {Number} latitude
  */
@@ -398,6 +459,7 @@ function setCornerTwoCoordinates(longitude, latitude) {
 }
 
 /**
+ * @static
  * @returns {{latitude: Number, longitude: Number}}
  */
 function getCornerTwoCoordinates() {
@@ -408,6 +470,7 @@ function getCornerTwoCoordinates() {
 }
 
 /**
+ * @static
  * @param {Number} zoomLevel
  */
 function setDefaultZoomLevel(zoomLevel) {
@@ -415,6 +478,7 @@ function setDefaultZoomLevel(zoomLevel) {
 }
 
 /**
+ * @static
  * @returns {Number}
  */
 function getDefaultZoomLevel() {
@@ -422,20 +486,24 @@ function getDefaultZoomLevel() {
 }
 
 /**
- * @param {{name: string, url: string}[]} radioChannels
+ * Sets radio channels
+ * @static
+ * @param {{name: string, url: string}} radioChannels
  */
 function setRadioChannels(radioChannels) {
   setLocalVal('radioChannels', JSON.stringify(radioChannels));
 }
 
 /**
- * @returns {{name: string, url: string}[]}
+ * @static
+ * @returns {{name: string, url: string}}
  */
 function getRadioChannels() {
   return JSON.parse(getLocalVal('radioChannels'));
 }
 
 /**
+ * @static
  * @returns {string}
  */
 function getDefaultInputStart() {

@@ -1,5 +1,9 @@
-'use strict';
+/** @module */
 
+/**
+ * @private
+ * @type {string[]}
+ */
 const upperZalgo = [
   '\u030d', // Ì
   '\u030e', // ÌŽ
@@ -52,6 +56,10 @@ const upperZalgo = [
   '\u0346', // Í†
   '\u031a', // Ìš
 ];
+/**
+ * @private
+ * @type {string[]}
+ */
 const middleZalgo = [
   '\u0315', // Ì•
   '\u031b', // Ì›
@@ -77,6 +85,10 @@ const middleZalgo = [
   '\u0361', // Í¡
   '\u0489', // Ò‰_
 ];
+/**
+ * @private
+ * @type {string[]}
+ */
 const lowerZalgo = [
   '\u0316', // Ì–
   '\u0317', // Ì—
@@ -120,10 +132,21 @@ const lowerZalgo = [
   '\u0323', // Ì£
 ];
 
+/**
+ * @private
+ * @param {Number} max
+ * @param {Number} min
+ * @returns {Number}
+ */
 function randomNumber(max, min) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+/**
+ * @private
+ * @param {string[]} array
+ * @param {Number} amount
+ */
 function retrieveChars(array, amount) {
   let zalgoString = '';
 
@@ -134,6 +157,13 @@ function retrieveChars(array, amount) {
   return zalgoString;
 }
 
+/**
+ * @static
+ * @param {string} phrase
+ * @param {Number} maxUpper
+ * @param {Number} maxMiddle
+ * @param {Number} maxLower
+ */
 function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
   let zalgoString = '';
 
@@ -149,6 +179,10 @@ function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
   return zalgoString;
 }
 
+/**
+ * @static
+ * @param {{phrase: string, maxUpper: Number, maxMiddle: Number, maxLower: Number, percentage: Number, words: string}} params
+ */
 function randomMultiZalgoPhrase(params = {}) {
   const phrase = params.phrase;
   const maxUpper = params.maxUpper;

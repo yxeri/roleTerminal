@@ -1,3 +1,5 @@
+/** @module */
+
 const domManipulator = require('./domManipulator');
 
 let viewIsSplit = false;

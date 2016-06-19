@@ -1,4 +1,4 @@
-'use strict';
+/** @module */
 
 const markerInfo = document.getElementById('markerInfo');
 const mapMarkers = {};

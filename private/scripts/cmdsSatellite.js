@@ -1,3 +1,5 @@
+/** @module */
+
 const painter = require('./painter');
 const layoutChanger = require('./layoutChanger');
 

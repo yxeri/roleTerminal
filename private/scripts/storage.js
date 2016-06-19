@@ -510,6 +510,24 @@ function getDefaultInputStart() {
   return getLocalVal('defaultInputStart');
 }
 
+/**
+ * @static
+ * @param {boolean} shouldLoad - Should video load?
+ */
+function shouldLoadVideo(shouldLoad) {
+  setLocalVal('loadVideo', shouldLoad);
+}
+
+/**
+ * @static
+ * @returns {boolean} - Should video load?
+ */
+function getLoadVideo() {
+  return getLocalVal('loadVideo') === true;
+}
+
+exports.shouldLoadVideo = shouldLoadVideo;
+exports.getLoadVideo = getLoadVideo;
 exports.getDefaultLanguage = getDefaultLanguage;
 exports.setDefaultLanguage = setDefaultLanguage;
 exports.getFastMode = getFastMode;

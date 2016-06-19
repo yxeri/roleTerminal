@@ -387,9 +387,10 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
 
 // TODO autoCompleteCommand should use this
 /**
- * @param {string} partial
- * @param {string[]} items
- * @returns {string[]}
+ * Match partial string against one to many strings and return matches
+ * @param {string} partial - Partial string to match
+ * @param {string[]} items - All matchable items
+ * @returns {string[]} - Matched strings
  */
 function match(partial, items) {
   const matched = [];
@@ -415,8 +416,10 @@ function match(partial, items) {
 }
 
 /**
- * @param {string[]} phrases
- * @param {Object} options
+ * Matches partial string against available options for a command.
+ * Appends input with matched option or sends message with multiple matches
+ * @param {string[]} phrases - Input from user
+ * @param {Object} options - Options from command
  */
 function autoCompleteOption(phrases = [], options = {}) {
   const option = options[`${phrases[phrases.length - 2]}`];
@@ -857,7 +860,7 @@ function keyPress(event) {
 
 /**
  * Indicates that a key has been released and sets the corresponding flag
- * @param event key event from JS
+ * @param {KeyboardEvent} event - Keyboard event
  */
 function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
@@ -1554,9 +1557,14 @@ function onMapPositions(mapPositions = []) {
 }
 
 /**
- * @param {{videoPath: string}} params
+ * Video message emitted from server
+ * @param {{videoPath: string}} params - Path for the video to load from
  */
 function onVideoMessage(params = {}) {
+  if (!storage.getLoadVideo()) {
+    return;
+  }
+
   const videoPath = params.videoPath;
 
   if (videoPath) {
@@ -1573,6 +1581,7 @@ function onVideoMessage(params = {}) {
 /**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
+ * @param {Object} params - Configuration properties
  */
 function onStartup(params = { }) {
   storage.setDefaultLanguage(params.defaultLanguage);

@@ -1,3 +1,5 @@
+/** @module */
+
 const audio = new Audio();
 
 /**

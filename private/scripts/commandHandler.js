@@ -1,3 +1,5 @@
+/** @module */
+
 const storage = require('./storage');
 const messenger = require('./messenger');
 const labels = require('./labels');
@@ -5,7 +7,6 @@ const domManipulator = require('./domManipulator');
 const socketHandler = require('./socketHandler');
 
 const commandCollections = [
-  // require('./bbr'),
   require('./cmdsAdmin'),
   require('./cmdsChat'),
   require('./cmdsInfo'),
@@ -15,6 +16,7 @@ const commandCollections = [
   require('./cmdsTeam'),
   require('./cmdsUser'),
   require('./cmdsUtility'),
+  require('./cmdsBbr'),
 ];
 const commandHelper = {
   maxSteps: 0,

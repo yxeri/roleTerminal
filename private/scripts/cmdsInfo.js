@@ -1,3 +1,5 @@
+/** @module */
+
 const socketHandler = require('./socketHandler');
 const messenger = require('./messenger');
 

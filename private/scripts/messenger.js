@@ -1,3 +1,5 @@
+/** @module */
+
 const storage = require('./storage');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');

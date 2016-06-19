@@ -1,16 +1,25 @@
+/** @module */
+
 const storage = require('./storage');
 
 /**
  * Socket.IO
+ * @private
  */
 const socket = io(); // eslint-disable-line no-undef
 /**
  * Focus can sometimes trigger twice, which is used to check if a reconnection
  * is needed. This flag will be set to true while it is reconnecting to
  * block the second attempt
+ * @private
+ * @type {boolean}
  */
 let reconnecting = false;
 
+/**
+ * @static
+ * @param {string[]} events
+ */
 function startSocket(events) {
   if (socket) {
     for (const event of Object.keys(events)) {
@@ -19,6 +28,9 @@ function startSocket(events) {
   }
 }
 
+/**
+ * @static
+ */
 function reconnect() {
   const user = storage.getUser();
 
@@ -34,14 +46,23 @@ function reconnect() {
   }
 }
 
+/**
+ * @static
+ */
 function emit(event, params) {
   socket.emit(event, params);
 }
 
+/**
+ * @static
+ */
 function getSocket() {
   return socket;
 }
 
+/**
+ * @static
+ */
 function setReconnecting(isRecon) {
   reconnecting = isRecon;
 }

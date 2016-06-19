@@ -1,3 +1,5 @@
+/** @module */
+
 const storage = require('./storage');
 const labels = require('./labels');
 const socketHandler = require('./socketHandler');

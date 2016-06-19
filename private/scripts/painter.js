@@ -1,12 +1,31 @@
-'use strict';
+/** @module */
 
+/**
+ * @private
+ * @type {CanvasRenderingContext2D}
+ */
 const context = (document.getElementById('canvas')).getContext('2d');
+/**
+ * @private
+ * @type {HTMLElement}
+ */
 const paintArea = document.getElementById('central');
 
+/**
+ * @private
+ * @type {Object}
+ */
 const objects = {};
 
+/**
+ * @private
+ * @type {Number}
+ */
 const lineWidth = 2;
 
+/**
+ * @private
+ */
 function clearExisting(obj, type = '') {
   const padding = lineWidth * 2;
 
@@ -44,14 +63,23 @@ function clearExisting(obj, type = '') {
   }
 }
 
+/**
+ * @private
+ */
 function fillObject(obj) {
   context.fill(obj);
 }
 
+/**
+ * @private
+ */
 function strokeObject(obj) {
   context.stroke(obj);
 }
 
+/**
+ * @private
+ */
 function drawObject(params) {
   const obj = params.obj;
   const shouldStroke = params.shouldStroke;
@@ -66,6 +94,9 @@ function drawObject(params) {
   }
 }
 
+/**
+ * @static
+ */
 function createRect(params) {
   const x = params.x;
   const y = params.y;
@@ -92,6 +123,9 @@ function createRect(params) {
   };
 }
 
+/**
+ * @static
+ */
 function createCircle(params) {
   const x = params.x;
   const y = params.y;
@@ -115,6 +149,11 @@ function createCircle(params) {
   };
 }
 
+/**
+ * @private
+ * @param {Object} obj
+ * @returns {{x: Number, y: Number}}
+ */
 function getCenter(obj) {
   const type = obj.type;
 
@@ -145,6 +184,12 @@ function getEdgePoint(obj, target) {
   }
 }
 
+/**
+ * @private
+ * @param {Number} sentX
+ * @param {Number} sentY
+ * @returns {{x: Number, y: Number}}
+ */
 function createVector(sentX, sentY) {
   const scale = Math.sqrt((sentX * sentX) + (sentY * sentY));
   const x = sentX / scale;
@@ -153,6 +198,12 @@ function createVector(sentX, sentY) {
   return { x, y };
 }
 
+/**
+ * @private
+ * @param {Object} fromObj
+ * @param {Object} toObj
+ * @returns {{from: {x: Number, y: Number}, to: {x: Number, y: Number}}}
+ */
 function getLinePoints(fromObj, toObj) {
   const fromCenter = getCenter(fromObj);
   const toCenter = getCenter(toObj);
@@ -170,6 +221,10 @@ function getLinePoints(fromObj, toObj) {
   };
 }
 
+/**
+ * @private
+ * @param {{fromObjId: string, toObjId: string}} params
+ */
 function lineConnection(params) {
   const fromObj = objects[params.fromObjId];
   const toObj = objects[params.toObjId];
@@ -177,6 +232,10 @@ function lineConnection(params) {
   return getLinePoints(fromObj, toObj);
 }
 
+/**
+ * @static
+ * @param {{fromObjId: string, toObjId: string, objId: string, from:{x: Number, y: Number}, to:{x: Number, y: Number}}} params
+ */
 function createLine(params) {
   const fromObjId = params.fromObjId;
   const toObjId = params.toObjId;
@@ -212,6 +271,9 @@ function createLine(params) {
   };
 }
 
+/**
+ * @static
+ */
 function drawCanvas() {
   context.canvas.width = paintArea.offsetWidth;
   context.canvas.height = paintArea.offsetHeight;

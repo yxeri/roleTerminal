@@ -54,10 +54,22 @@ const morseCodes = {
 };
 const commands = {};
 
+/**
+ * Copies string to avoid the original being consumed
+ * @private
+ * @param {string} text - String to copy
+ * @returns {string} - String copy
+ */
 function copyString(text) {
   return text && text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
+/**
+ * Parses the text that will be sent as morse and returns the parsed morse text
+ * @private
+ * @param {string} text - Text to be sent as morse
+ * @returns {string} - Parsed morse text
+ */
 function parseMorse(text) {
   let morseCode;
   let morseCodeText = '';

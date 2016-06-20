@@ -3,7 +3,11 @@
 const audio = new Audio();
 
 /**
- * @param {Object} params
+ * @static
+ * @param {Object} params - Parameters
+ * @param {string} params.path - Path to the file
+ * @param {Number} params.startTime - Starting time of the audio
+ * @param {Number} params.volume - Volume for the audio
  */
 function playAudio(params) {
   if (params.path) {
@@ -21,10 +25,18 @@ function playAudio(params) {
   audio.play();
 }
 
+/**
+ * Pauses the audio
+ * @static
+ */
 function pauseAudio() {
   audio.pause();
 }
 
+/**
+ * Pauses audio and resets time and volume parameters
+ * @static
+ */
 function resetAudio() {
   audio.pause();
   audio.currentTime = 0;
@@ -32,7 +44,9 @@ function resetAudio() {
 }
 
 /**
- * @param {Number} level
+ * Sets new audio volume
+ * @static
+ * @param {Number} level - New audio volume
  */
 function changeAudioVolume(level) {
   audio.volume = level;

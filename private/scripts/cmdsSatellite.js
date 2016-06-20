@@ -3,6 +3,10 @@
 const painter = require('./painter');
 const layoutChanger = require('./layoutChanger');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.central = {

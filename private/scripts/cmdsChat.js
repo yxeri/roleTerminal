@@ -10,6 +10,7 @@ const domManipulator = require('./domManipulator');
 
 /**
  * Symbolizes space between words in morse string
+ * @private
  * @type {string}
  */
 const morseSeparator = '#';
@@ -52,6 +53,10 @@ const morseCodes = {
   0: '-----',
   '#': morseSeparator,
 };
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 /**

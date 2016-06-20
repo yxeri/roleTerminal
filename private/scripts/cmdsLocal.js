@@ -8,6 +8,10 @@ const commandHandler = require('./commandHandler');
 const textTools = require('./textTools');
 const domManipulator = require('./domManipulator');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 /**

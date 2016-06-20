@@ -8,6 +8,10 @@ const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const messenger = require('./messenger');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.whoami = {

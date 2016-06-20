@@ -3,6 +3,10 @@
 const socketHandler = require('./socketHandler');
 const messenger = require('./messenger');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.list = {

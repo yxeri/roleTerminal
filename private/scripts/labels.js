@@ -1139,9 +1139,9 @@ const all = {
 /**
  * Appends a language code to property name. Example: errors_se. No appended language code is the default
  * If no object with the property name and appended language code is found it will fall back to default
- * @param propertyName
- * @param language
- * @returns {*}
+ * @param {string} propertyName - Name of the property
+ * @param {string} language - Language code
+ * @returns {string} - Property name with appended language code
  */
 function appendLanguage(propertyName, language = defaultLanguage) {
   const languagePropertyName = language ? `${propertyName}_${language}` : propertyName;
@@ -1156,9 +1156,10 @@ function appendLanguage(propertyName, language = defaultLanguage) {
 
 /**
  * Retrieves correct property from objects in labels. Returns null if a property is not found
- * @param sentCategory
- * @param value
- * @returns {*}
+ * @param {string} sentCategory - Category name
+ * @param {string} value - Property name
+ * @param {string} language - Language code
+ * @returns {string} - Retrieved label from category_language[name]
  */
 function getLabel(sentCategory, value, language) {
   const fullCategory = all[appendLanguage(sentCategory, language)];
@@ -1172,9 +1173,10 @@ function getLabel(sentCategory, value, language) {
 
 /**
  * Returns a single string
- * @param sentCategory
- * @param value
- * @returns {string}
+ * @param {string} sentCategory - Category name
+ * @param {string} value - Property name
+ * @param {string} language - Language code
+ * @returns {string} - String
  */
 function getString(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
@@ -1184,9 +1186,10 @@ function getString(sentCategory, value, language) {
 
 /**
  * Returns an array with strings. The strings are meant to be printed in order
- * @param sentCategory
- * @param value
- * @returns {string[]}
+ * @param {string} sentCategory - Category name
+ * @param {string} value - Property name
+ * @param {string} language - Language code
+ * @returns {string[]} - Array with strings
  */
 function getText(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
@@ -1195,10 +1198,11 @@ function getText(sentCategory, value, language) {
 }
 
 /**
- * Returns a message object.
- * @param sentCategory
- * @param value
- * @returns {{text: string[]}}
+ * Returns a message
+ * @param {string} sentCategory - Category name
+ * @param {string} value - Property name
+ * @param {string} language - Language code
+ * @returns {{text: string[]}} - Message object with text array
  */
 function getMessage(sentCategory, value, language) {
   const label = getLabel(sentCategory, value, language);
@@ -1206,6 +1210,10 @@ function getMessage(sentCategory, value, language) {
   return label || { text: [''] };
 }
 
+/**
+ * Set the default language code
+ * @param {string} languageCode - New default language code
+ */
 function setLanguage(languageCode) {
   defaultLanguage = languageCode;
 }

@@ -5,6 +5,11 @@ const domManipulator = require('./domManipulator');
 let viewIsSplit = false;
 let isLandscape = window.innerWidth > window.innerHeight;
 
+/**
+ * Splits or collapses view. A div will be added (or removed) that takes up 50% of the view
+ * @param {boolean} shouldSplit - Should the view split? No means it should collapses
+ * @param {HTMLElement} secondDiv - Side div that should be added to the view
+ */
 function splitView(shouldSplit, secondDiv) {
   const mainView = domManipulator.getMainView();
   const secondView = domManipulator.getSecondView();
@@ -44,6 +49,9 @@ function splitView(shouldSplit, secondDiv) {
   domManipulator.scrollView();
 }
 
+/**
+ * Change the orientation of the view. Most likely triggered by the user changing from landscape to portrait mode or vice versa
+ */
 function changeOrientation() {
   const mainView = domManipulator.getMainView();
   const secondView = domManipulator.getSecondView();
@@ -63,10 +71,16 @@ function changeOrientation() {
   }
 }
 
+/**
+ * Toggles if view is in landscape mode
+ */
 function toggleIsLandscape() {
   isLandscape = !isLandscape;
 }
 
+/**
+ * Is view split?
+ */
 function isViewSplit() {
   return viewIsSplit;
 }

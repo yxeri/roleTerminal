@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "DEBUG=eslint:cli-engine eslint *.js",
+    "test": "DEBUG=eslint:cli-engine eslint ./",
     "nsp": "nsp check"
   },
   "repository": {

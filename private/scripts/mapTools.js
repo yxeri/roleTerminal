@@ -12,6 +12,10 @@ let mapView = '';
 let map;
 let overlay;
 
+/**
+ * Sets new map view. Affects how the map is realigned and shown
+ * @param {string} view - Type of map view (overview, me, cluster)
+ */
 function setMapView(view) {
   mapView = view;
 }

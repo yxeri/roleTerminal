@@ -60,7 +60,8 @@ let oldAndroid;
 let thisCommandItem;
 
 /**
- * @param {boolean} hide
+ * Hides (password style) user input
+ * @param {boolean} hide - Should input be hidden?
  */
 function hideInput(hide) {
   if (hide) {
@@ -71,12 +72,16 @@ function hideInput(hide) {
 }
 
 /**
- * @returns {string}
+ * Get text from input field
+ * @returns {string} - Text from input field
  */
 function getInputText() {
   return cmdInput.value;
 }
 
+/**
+ * Updates command item in menu
+ */
 function updateThisCommandItem() {
   const command = commandHandler.getCommand(getInputText().split(' ')[0]);
   const span = thisCommandItem.firstElementChild;
@@ -89,7 +94,8 @@ function updateThisCommandItem() {
 }
 
 /**
- * @param {string} text
+ * Set text in input field
+ * @param {string} text - Text to be set
  */
 function setCommandInput(text) {
   cmdInput.value = text;
@@ -97,18 +103,23 @@ function setCommandInput(text) {
 }
 
 /**
- * @returns {string}
+ * Returns text from input start
+ * @returns {string} - Text from input start
  */
 function getInputStart() {
   return inputStart.textContent;
 }
 
+/**
+ * Clear text in input field
+ */
 function clearInput() {
   setCommandInput('');
 }
 
 /**
- * @param {string} text
+ * Replaces last part of the input field with sent string
+ * @param {string} text - String to replace with
  */
 function replaceLastInputPhrase(text) {
   const phrases = getInputText().split(' ');
@@ -117,6 +128,9 @@ function replaceLastInputPhrase(text) {
   setCommandInput(phrases.join(' '));
 }
 
+/**
+ * Scrolls the list view to the bottom
+ */
 function scrollView() {
   if (!oldAndroid) {
     spacer.scrollIntoView();
@@ -127,30 +141,39 @@ function scrollView() {
 }
 
 /**
- * @param {string} text
+ * Set text in mode field (CHAT or CMD)
+ * @param {string} text - String to be set
  */
 function setModeText(text) {
   modeField.textContent = `[${text}]`;
 }
 
+/**
+ * Clears text in mode field
+ */
 function clearModeText() {
   modeField.textContent = '';
 }
 
 /**
- * @returns {string}
+ * Get text from mode field
+ * @returns {string} - Text in mode field
  */
 function getModeText() {
   return modeField.textContent;
 }
 
 /**
- * @param {string} text
+ * Set text in input start
+ * @param {string} text - String to be set
  */
 function setInputStart(text) {
   inputStart.textContent = text.replace(/\s/g, '-').toLowerCase();
 }
 
+/**
+ * Replace text in mode field (CMD or CHAT)
+ */
 function changeModeText() {
   const inputText = getInputText();
   const mode = storage.getMode();
@@ -166,48 +189,64 @@ function changeModeText() {
 }
 
 /**
- * @param {HTMLElement} view
+ * Set second view, which will be shown above/to the left of the main view
+ * @param {HTMLElement} view - Second side view
  */
 function setSecondView(view) {
   secondView = view;
 }
 
 /**
- * @returns {HTMLElement}
+ * Gets second view, which is shown above/to the left of the main view
+ * @returns {HTMLElement} - Second side view
  */
 function getSecondView() {
   return secondView;
 }
 
 /**
- * @returns {HTMLElement}
+ * Get the main view
+ * @returns {HTMLElement} - Main view
  */
 function getMainView() {
   return mainView;
 }
 
 /**
- * @returns {HTMLElement}
+ * Get the space, which is used as a point of reference when scrolling to the bottom of the main view
+ * @returns {HTMLElement} - Spacer
  */
 function getSpacer() {
   return spacer;
 }
 
+/**
+ * Set focus on the input field
+ */
 function focusInput() {
   cmdInput.focus();
 }
 
+/**
+ * Remove focus from the input field
+ */
 function blurInput() {
   cmdInput.blur();
 }
 
 /**
- * @param {HTMLElement} item
+ * Add a new item to the menu
+ * @param {HTMLElement} item - New item in the menu
  */
 function addMenuItem(item) {
   menuList.appendChild(item);
 }
 
+/**
+ * Add a sub menu
+ * @param {string} elementId - Id of the element to receive a sub menu
+ * @param {HTMLElement} item - New sub menu
+ */
 function addSubMenuItem(elementId, item) {
   const element = Array.from(menuList.children).find((elem) => elem.id === elementId);
 
@@ -217,12 +256,16 @@ function addSubMenuItem(elementId, item) {
 }
 
 /**
- * @param {HTMLElement} view
+ * Set the main view
+ * @param {HTMLElement} view - New main view
  */
 function setMainView(view) {
   mainView = view;
 }
 
+/**
+ * Clear main list
+ */
 function clearMainFeed() {
   while (mainFeed.childNodes.length > 1) {
     mainFeed.removeChild(mainFeed.lastChild);
@@ -230,20 +273,33 @@ function clearMainFeed() {
 }
 
 /**
- * @returns {HTMLElement}
+ * Get menu
+ * @returns {HTMLElement} - Menu element
  */
 function getMenu() {
   return menu;
 }
 
+/**
+ * Set command item in menu
+ * @param {HTMLElement} item - New command item
+ */
 function setThisCommandItem(item) {
   thisCommandItem = item;
 }
 
+/**
+ * Get command item from menu
+ * @returns {HTMLElement} - Command item
+ */
 function getThisCommandItem() {
   return thisCommandItem;
 }
 
+/**
+ * Append string to input field
+ * @param {string} text - New string to be appended
+ */
 function appendInputText(text) {
   const currentInputText = getInputText();
   let appendText = '';
@@ -257,6 +313,9 @@ function appendInputText(text) {
   setCommandInput(currentInputText + appendText);
 }
 
+/**
+ * Removes sub menu from item in the menu
+ */
 function removeSubMenu() {
   const commandList = menuList.lastChild;
 
@@ -265,6 +324,10 @@ function removeSubMenu() {
   }
 }
 
+/**
+ * Get div with video in it
+ * @returns {HTMLElement} - Div with video
+ */
 function getVideoHolder() {
   return videoHolder;
 }

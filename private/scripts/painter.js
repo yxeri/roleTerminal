@@ -26,42 +26,42 @@ const lineWidth = 2;
 /**
  * @private
  */
-function clearExisting(obj, type = '') {
-  const padding = lineWidth * 2;
+// function clearExisting(obj, type = '') {
+//   const padding = lineWidth * 2;
 
-  if (obj) {
-    switch (type) {
-      case 'line': {
-        // Lowest x coordinate value
-        const x = (obj.from.x < obj.to.x ? obj.from.x : obj.to.x) - lineWidth;
-        // Lowest y coordinate value
-        const y = (obj.from.y < obj.to.y ? obj.from.y : obj.to.y) - lineWidth;
-        // Difference between from and to x coordinates
-        const width = Math.abs(obj.from.x - obj.to.x) + padding;
-        // Difference between from and to y coordinates
-        const height = Math.abs(obj.from.y - obj.to.y) + padding;
+//   if (obj) {
+//     switch (type) {
+//       case 'line': {
+//         // Lowest x coordinate value
+//         const x = (obj.from.x < obj.to.x ? obj.from.x : obj.to.x) - lineWidth;
+//         // Lowest y coordinate value
+//         const y = (obj.from.y < obj.to.y ? obj.from.y : obj.to.y) - lineWidth;
+//         // Difference between from and to x coordinates
+//         const width = Math.abs(obj.from.x - obj.to.x) + padding;
+//         // Difference between from and to y coordinates
+//         const height = Math.abs(obj.from.y - obj.to.y) + padding;
 
-        // Rectangle that starts with the lowest x and y of the line and encompasses the highest x and y coordinates
-        context.clearRect(x, y, width, height);
+//         // Rectangle that starts with the lowest x and y of the line and encompasses the highest x and y coordinates
+//         context.clearRect(x, y, width, height);
 
-        break;
-      }
-      case 'circle': {
-        const radius = obj.radius;
+//         break;
+//       }
+//       case 'circle': {
+//         const radius = obj.radius;
 
-        // Arc x and y coordinates start in the middle of the circle. Calculating x, y, width and height based on that
-        context.clearRect((obj.x - radius - lineWidth), (obj.y - radius - lineWidth), ((radius * 2) + padding), ((radius * 2) + padding));
+//         // Arc x and y coordinates start in the middle of the circle. Calculating x, y, width and height based on that
+//         context.clearRect((obj.x - radius - lineWidth), (obj.y - radius - lineWidth), ((radius * 2) + padding), ((radius * 2) + padding));
 
-        break;
-      }
-      default: {
-        context.clearRect((obj.x - lineWidth), (obj.y - lineWidth), (obj.width + padding), (obj.height + padding));
+//         break;
+//       }
+//       default: {
+//         context.clearRect((obj.x - lineWidth), (obj.y - lineWidth), (obj.width + padding), (obj.height + padding));
 
-        break;
-      }
-    }
-  }
-}
+//         break;
+//       }
+//     }
+//   }
+// }
 
 /**
  * @private
@@ -170,19 +170,19 @@ function getCenter(obj) {
   }
 }
 
-function getEdgePoint(obj, target) {
-  const type = obj.type;
+// function getEdgePoint(obj, target) {
+//   const type = obj.type;
 
-  switch (type) {
-    case 'circle': {
+//   switch (type) {
+//     case 'circle': {
 
-    }
-    case 'line': {
-    }
-    default: {
-    }
-  }
-}
+//     }
+//     case 'line': {
+//     }
+//     default: {
+//     }
+//   }
+// }
 
 /**
  * @private

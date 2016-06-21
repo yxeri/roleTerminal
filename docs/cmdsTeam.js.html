@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: cmdsTeam.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: cmdsTeam.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module */
+
+const labels = require('./labels');
+const storage = require('./storage');
+const socketHandler = require('./socketHandler');
+const commandHandler = require('./commandHandler');
+const messenger = require('./messenger');
+const domManipulator = require('./domManipulator');
+
+/**
+ * @static
+ * @type {Object}
+ */
+const commands = {};
+
+commands.createteam = {
+  func: (phrases) => {
+    const commandHelper = commandHandler.commandHelper;
+    const data = { team: { teamName: '' } };
+
+    if (phrases.length > 0) {
+      data.team.teamName = phrases.join(' ');
+      commandHelper.data = data;
+      messenger.queueMessage({ text: labels.getText('info', 'cancel') });
+      domManipulator.setInputStart('owner');
+      socketHandler.emit('teamExists', commandHelper.data);
+    } else {
+      messenger.queueMessage({
+        text: ['You have to enter a name. Example: createteam My Team Name'],
+        text_se: ['Ni måste skriva in ett namn. Exempel: createteam Mitt Team'],
+      });
+      commandHandler.resetCommand(false);
+    }
+  },
+  steps: [
+    () => {
+      const commandHelper = commandHandler.commandHelper;
+
+      messenger.queueMessage({
+        text: [
+          'Are you the owner of the team? Leave it empty and press enter, if you are. Enter the name of the user that is the owner, if you are not',
+          'You can press tab or double space to see available users',
+        ],
+        text_se: [
+          'Är ni ägaren av teamet? Lämna fältet tomt och tryck på Enter-knappen om ni är det. Skriv annars in användarnamnet som är ägaren om inte ni är det',
+          'Ni kan trycka på tab-knappen eller skriva in dubbelblanksteg för att se tillgängliga användare',
+        ],
+      });
+      commandHelper.allowAutoComplete = true;
+      commandHelper.onStep++;
+    },
+    (phrases) => {
+      const commandHelper = commandHandler.commandHelper;
+
+      if (phrases[0] !== '') {
+        const owner = phrases[0];
+
+        commandHelper.data.team.owner = owner;
+        commandHelper.data.team.admins = [storage.getUser()];
+      } else {
+        commandHelper.data.team.owner = storage.getUser();
+      }
+
+      socketHandler.emit('createTeam', commandHelper.data);
+      commandHandler.resetCommand(false);
+    },
+  ],
+  accessLevel: 13,
+  category: 'basic',
+  autocomplete: { type: 'users' },
+  commandName: 'createteam',
+};
+
+commands.inviteteam = {
+  func: (phrases) => {
+    const data = { user: { userName: phrases[0] } };
+
+    if (data.user.userName) {
+      socketHandler.emit('inviteToTeam', data);
+    } else {
+      messenger.queueMessage({
+        text: ['You have to enter a user name. Example: inviteteam bob'],
+        text_se: ['Ni måste skriva in ett användarnamn. Exempel: inviteteam bob'],
+      });
+    }
+  },
+  accessLevel: 13,
+  category: 'basic',
+  commandName: 'inviteteam',
+};
+
+module.exports = commands;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audio.html">audio</a></li><li><a href="module-clickHandler.html">clickHandler</a></li><li><a href="module-cmdsAdmin.html">cmdsAdmin</a></li><li><a href="module-cmdsBbr.html">cmdsBbr</a></li><li><a href="module-cmdsChat.html">cmdsChat</a></li><li><a href="module-cmdsInfo.html">cmdsInfo</a></li><li><a href="module-cmdsLocal.html">cmdsLocal</a></li><li><a href="module-cmdsMap.html">cmdsMap</a></li><li><a href="module-cmdsSatellite.html">cmdsSatellite</a></li><li><a href="module-cmdsTeam.html">cmdsTeam</a></li><li><a href="module-cmdsUser.html">cmdsUser</a></li><li><a href="module-cmdsUtility.html">cmdsUtility</a></li><li><a href="module-commandHandler.html">commandHandler</a></li><li><a href="module-domManipulator.html">domManipulator</a></li><li><a href="module-labels.html">labels</a></li><li><a href="module-layoutChanger.html">layoutChanger</a></li><li><a href="module-mapTools.html">mapTools</a></li><li><a href="module-messenger.html">messenger</a></li><li><a href="module-painter.html">painter</a></li><li><a href="module-socketHandler.html">socketHandler</a></li><li><a href="module-storage.html">storage</a></li><li><a href="module-textTools.html">textTools</a></li><li><a href="module-videoPlayer.html">videoPlayer</a></li><li><a href="module-zalgoGenerator.html">zalgoGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#autoCompleteOption">autoCompleteOption</a></li><li><a href="global.html#commandQueue">commandQueue</a></li><li><a href="global.html#commandTime">commandTime</a></li><li><a href="global.html#goFullScreen">goFullScreen</a></li><li><a href="global.html#isScreenOff">isScreenOff</a></li><li><a href="global.html#isTouchDevice">isTouchDevice</a></li><li><a href="global.html#keyPressed">keyPressed</a></li><li><a href="global.html#keyReleased">keyReleased</a></li><li><a href="global.html#lastScreenOff">lastScreenOff</a></li><li><a href="global.html#match">match</a></li><li><a href="global.html#morseSeparator">morseSeparator</a></li><li><a href="global.html#onStartup">onStartup</a></li><li><a href="global.html#onVideoMessage">onVideoMessage</a></li><li><a href="global.html#pausePositionTime">pausePositionTime</a></li><li><a href="global.html#preparePosition">preparePosition</a></li><li><a href="global.html#refocus">refocus</a></li><li><a href="global.html#screenOffIntervalTime">screenOffIntervalTime</a></li><li><a href="global.html#setIntervals">setIntervals</a></li><li><a href="global.html#soundQueue">soundQueue</a></li><li><a href="global.html#watchPositionTime">watchPositionTime</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 21 2016 22:00:47 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

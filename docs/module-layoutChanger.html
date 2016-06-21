@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Module: layoutChanger</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: layoutChanger</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~changeOrientation"><span class="type-signature">(inner) </span>changeOrientation<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Change the orientation of the view. Most likely triggered by the user changing from landscape to portrait mode or vice versa
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="layoutChanger.js.html">layoutChanger.js</a>, <a href="layoutChanger.js.html#line55">line 55</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~isViewSplit"><span class="type-signature">(inner) </span>isViewSplit<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Is view split?
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="layoutChanger.js.html">layoutChanger.js</a>, <a href="layoutChanger.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    viewIsSplit - Is view split?
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~splitView"><span class="type-signature">(inner) </span>splitView<span class="signature">(shouldSplit, secondDiv)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Splits or collapses view. A div will be added (or removed) that takes up 50% of the view
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>shouldSplit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Should the view split? No means it should collapses</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>secondDiv</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Side div that should be added to the view</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="layoutChanger.js.html">layoutChanger.js</a>, <a href="layoutChanger.js.html#line13">line 13</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~toggleIsLandscape"><span class="type-signature">(inner) </span>toggleIsLandscape<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Toggles if view is in landscape mode
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="layoutChanger.js.html">layoutChanger.js</a>, <a href="layoutChanger.js.html#line77">line 77</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audio.html">audio</a></li><li><a href="module-clickHandler.html">clickHandler</a></li><li><a href="module-cmdsAdmin.html">cmdsAdmin</a></li><li><a href="module-cmdsBbr.html">cmdsBbr</a></li><li><a href="module-cmdsChat.html">cmdsChat</a></li><li><a href="module-cmdsInfo.html">cmdsInfo</a></li><li><a href="module-cmdsLocal.html">cmdsLocal</a></li><li><a href="module-cmdsMap.html">cmdsMap</a></li><li><a href="module-cmdsSatellite.html">cmdsSatellite</a></li><li><a href="module-cmdsTeam.html">cmdsTeam</a></li><li><a href="module-cmdsUser.html">cmdsUser</a></li><li><a href="module-cmdsUtility.html">cmdsUtility</a></li><li><a href="module-commandHandler.html">commandHandler</a></li><li><a href="module-domManipulator.html">domManipulator</a></li><li><a href="module-labels.html">labels</a></li><li><a href="module-layoutChanger.html">layoutChanger</a></li><li><a href="module-mapTools.html">mapTools</a></li><li><a href="module-messenger.html">messenger</a></li><li><a href="module-painter.html">painter</a></li><li><a href="module-socketHandler.html">socketHandler</a></li><li><a href="module-storage.html">storage</a></li><li><a href="module-textTools.html">textTools</a></li><li><a href="module-videoPlayer.html">videoPlayer</a></li><li><a href="module-zalgoGenerator.html">zalgoGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#autoCompleteOption">autoCompleteOption</a></li><li><a href="global.html#commandQueue">commandQueue</a></li><li><a href="global.html#commandTime">commandTime</a></li><li><a href="global.html#goFullScreen">goFullScreen</a></li><li><a href="global.html#isScreenOff">isScreenOff</a></li><li><a href="global.html#isTouchDevice">isTouchDevice</a></li><li><a href="global.html#keyPressed">keyPressed</a></li><li><a href="global.html#keyReleased">keyReleased</a></li><li><a href="global.html#lastScreenOff">lastScreenOff</a></li><li><a href="global.html#match">match</a></li><li><a href="global.html#morseSeparator">morseSeparator</a></li><li><a href="global.html#onStartup">onStartup</a></li><li><a href="global.html#onVideoMessage">onVideoMessage</a></li><li><a href="global.html#pausePositionTime">pausePositionTime</a></li><li><a href="global.html#preparePosition">preparePosition</a></li><li><a href="global.html#refocus">refocus</a></li><li><a href="global.html#screenOffIntervalTime">screenOffIntervalTime</a></li><li><a href="global.html#setIntervals">setIntervals</a></li><li><a href="global.html#soundQueue">soundQueue</a></li><li><a href="global.html#watchPositionTime">watchPositionTime</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 21 2016 22:00:48 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

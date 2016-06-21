@@ -89,7 +89,7 @@ commands.radio = {
         const chosenChannel = phrases[1].toLowerCase();
 
         if (channels[chosenChannel] && channels[chosenChannel].url) {
-          audio.playAudio({ path: channels[chosenChannel].url });
+          audio.playAudio({ path: channels[chosenChannel].url, type: 'radio' });
         } else {
           messenger.queueMessage({
             text: labels.getText('instructions', 'radio'),
@@ -104,7 +104,7 @@ commands.radio = {
         break;
       }
       case 'off': {
-        audio.resetAudio();
+        audio.resetAudio('radio');
 
         break;
       }

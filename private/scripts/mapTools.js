@@ -14,12 +14,18 @@ let overlay;
 
 /**
  * Sets new map view. Affects how the map is realigned and shown
+ * @static
  * @param {string} view - Type of map view (overview, me, cluster)
  */
 function setMapView(view) {
   mapView = view;
 }
 
+/**
+ * @private
+ * @param {Object[]} coordsCollection - Collection of x and y coordinates of the polygon
+ * @returns {{latitude: Number, longitude: Number}} - Long and lat center coordinates of the polygon
+ */
 function getPolygonCenter(coordsCollection) {
   const bounds = new google.maps.LatLngBounds();
 
@@ -32,6 +38,14 @@ function getPolygonCenter(coordsCollection) {
   return { latitude: center.lat(), longitude: center.lng() };
 }
 
+/**
+ * Creates a label at the location of another object
+ * The name of the position will be used as text for the label
+ * @private
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the position
+ * @param {{latitude: Number, longitude: Number}} param.position - Long and lat coordinates of the label
+ */
 function createLabel(params) {
   const positionName = params.positionName;
   const itemName = params.positionName.toLowerCase();
@@ -50,6 +64,15 @@ function createLabel(params) {
   mapLabels[itemName].setMap(map || null);
 }
 
+/**
+ * Creates a map marker, adds it to the map and calls the creation of a label (if flag is set)
+ * @private
+ * @param {Object} params - Parameters
+ * @param {string} params.markerName - Name of the map marker
+ * @param {string} params.iconUrl - Path to a custom icon image
+ * @param {{longitude: Number, latitude: Number}} params.position - Long and lat coordinates of the map marker
+ * @param {string} params.description - Description for map marker, which will be shown on click or command
+ */
 function createMarker(params) {
   const markerName = params.markerName;
   const position = params.position;
@@ -97,6 +120,17 @@ function createMarker(params) {
   });
 }
 
+/**
+ * Sets new position for a map marker
+ * Creates a new map marker if it doesn't exist
+ * @static
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the map marker
+ * @param {{latitude: Number, longitude: Number}} params.position - Lat and long coordinates for the map marker
+ * @param {boolean} params.hideLabel - Should the label be hidden?
+ * @param {string} params.iconUrl - Path to custom map marker icon
+ * @param {string} params.description - Description for map marker, which will be shown on click or command
+ */
 function setMarkerPosition(params) {
   const positionName = params.positionName;
   const markerName = params.positionName.toLowerCase();
@@ -116,6 +150,14 @@ function setMarkerPosition(params) {
   }
 }
 
+/**
+ * Creates a polygon and adds it to the map
+ * @private
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the polygon
+ * @param {Object[]} params.coordsCollection - Collection of x and y coordinates of the polygon
+ * @param {boolean} params.hideLabel - Should the label be hidden?
+ */
 function createPolygon(params) {
   const positionName = params.positionName;
   const coordsCollection = params.coordsCollection;
@@ -141,6 +183,14 @@ function createPolygon(params) {
   mapPolygons[positionName].setMap(map || null);
 }
 
+/**
+ * Sets new positions of the polygon
+ * Creates a new polygon if one with the sent name doesn't exist
+ * @static
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the polygon
+ * @param {Object[]} params.coordsCollection - Collection of x and y coordinates of the polygon
+ */
 function setPolygonPosition(params) {
   const positionName = params.positionName;
   const coordsCollection = params.coordsCollection;
@@ -155,6 +205,14 @@ function setPolygonPosition(params) {
   }
 }
 
+/**
+ * Creates a line and adds it to the map
+ * The line can have multiple points
+ * @private
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the line
+ * @param {Object[]} params.coordsCollection - Collection of Long and lat coordinates of the line
+ */
 function createLine(params) {
   const positionName = params.positionName;
 
@@ -168,6 +226,14 @@ function createLine(params) {
   mapLines[positionName].setMap(map || null);
 }
 
+/**
+ * Sets new positions for the line
+ * Creates a new line if a line with the sent name doesn't exist
+ * @static
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the line
+ * @param {Object[]} params.coordsCollection - Collection of long and lat coordinates for the line
+ */
 function setLinePosition(params) {
   const positionName = params.positionName;
   const coordsCollection = params.coordsCollection;
@@ -182,14 +248,27 @@ function setLinePosition(params) {
   }
 }
 
+/**
+ * @static
+ * @returns {string} - Returns string representing the type of map view
+ */
 function getMapView() {
   return mapView;
 }
 
+/**
+ * @static
+ * @returns {Object} - Returns map marker representing this user
+ */
 function getThisUserMarker() {
   return mapMarkers.I;
 }
 
+/**
+ * Creates the map marker representing this user
+ * @static
+ * @param {{longitude: Number, latitude:Number}} position - Long and lat coordinates of the map marker
+ */
 function createThisUserMarker(position) {
   createMarker({
     markerName: 'I',
@@ -200,6 +279,12 @@ function createThisUserMarker(position) {
   });
 }
 
+/**
+ * Sets new position to the user's map marker
+ * Creates a new map marker if it doesn't exist
+ * @static
+ * @param {{longitude: Number, latitude:Number}} position - Long and lat coordinates of the map marker
+ */
 function setUserPosition(position) {
   if (mapMarkers.I) {
     mapMarkers.I.setPosition(new google.maps.LatLng(position.latitude, position.longitude));
@@ -208,6 +293,10 @@ function setUserPosition(position) {
   }
 }
 
+/**
+ * Resets map on all labels, in case any of the connected markers are no longer on the map
+ * @static
+ */
 function toggleMapLabels() {
   for (const markerName of Object.keys(mapMarkers)) {
     if (mapLabels[markerName] && mapLabels[markerName].getMap() !== mapMarkers[markerName].getMap()) {
@@ -216,6 +305,11 @@ function toggleMapLabels() {
   }
 }
 
+/**
+ * Creates new bounds and re-centers the map based on the map view
+ * @static
+ * @param {Objects} markers - Map markers used to create bounds if map view is "cluster"
+ */
 function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();
   let centerPos = map.getCenter();
@@ -253,6 +347,11 @@ function realignMap(markers) {
   markerInfo.classList.add('hide');
 }
 
+/**
+ * Set map to current map on all objects in the collection
+ * @private
+ * @param {Object} collections - Collection of objects to be attached to the map
+ */
 function setMap(collections) {
   for (const collection of collections) {
     for (const markerName of Object.keys(collection)) {
@@ -261,6 +360,9 @@ function setMap(collections) {
   }
 }
 
+/**
+ * Add listeners to map
+ */
 function attachMapListeners() {
   google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
     const bounds = new google.maps.LatLngBounds();
@@ -282,6 +384,10 @@ function attachMapListeners() {
   });
 }
 
+/**
+ * Create map clusterer and add all map markers to it
+ * @private
+ */
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
     gridSize: 13,
@@ -299,6 +405,16 @@ function createMarkerClusterer() {
   });
 }
 
+/**
+ * Create map, sets this map on all polygons, markers, lines, creates map clusterer and attaches listeners
+ * @static
+ * @param {Object} params - Parameters
+ * @param {Object} params.centerCoordinates - Long and lat coordinates
+ * @param {Number} params.centerCoordinates.latitude - Center latitude for the map
+ * @param {Number} params.centerCoordinates.longitude - Center longitude for the map
+ * @param {Number} params.zoomLevel - Default zoom level
+ * @param {string} params.elementId - Id of map element
+ */
 function createMap(params) {
   if (!google) {
     return;
@@ -374,43 +490,74 @@ function createMap(params) {
   createMarkerClusterer();
   attachMapListeners(elementId);
 
+  /**
+   * Overlay is used to catch mouse clicks and easily retrieve x and y instead of lot and lang coordinates
+   */
   overlay = new google.maps.OverlayView();
   overlay.draw = () => {};
   overlay.setMap(map);
 }
 
+/**
+ * Reset view port, which recreates all clusters
+ * @static
+ */
 function resetClusters() {
   markerClusterer.resetViewport();
 }
 
+/**
+ * @static
+ * @returns {google.maps.Map} - Map
+ */
 function getMap() {
   return map;
 }
 
+/**
+ * @static
+ * @param {{latitude: Number, longitude: Number}} position - Long and lat coordinates for the new map center
+ */
 function setMapCenter(position) {
   if (map) {
     map.setCenter(new google.maps.LatLng(parseFloat(position.latitude), parseFloat(position.longitude)));
   }
 }
 
+/**
+ * Set corner coordinates of the bounds for the map
+ * @static
+ * @param {{longitude: Number, latitude: Number}} cornerOneCoords - Corner lat and long coordinates
+ * @param {{longitude: Number, latitude: Number}} cornerTwoCoords - Corner lat and long coordinates
+ */
 function setCornerCoords(cornerOneCoords, cornerTwoCoords) {
   cornerCoords.cornerOne = cornerOneCoords;
   cornerCoords.cornerTwo = cornerTwoCoords;
 }
 
+/**
+ * Increase the zoom level of the map by 1
+ * @static
+ */
 function increaseZoom() {
   mapView = '';
   map.setZoom(map.getZoom() + 1);
 }
 
+/**
+ * Decrease the zoom level of the map by 1
+ * @static
+ */
 function decreaseZoom() {
   mapView = '';
   map.setZoom(map.getZoom() - 1);
 }
 
 /**
- * @param {string} markerName
- * @returns {{title: string, description: string}}
+ * Get description from the map marker
+ * @static
+ * @param {string} markerName - Name of the map marker
+ * @returns {{title: string, description: string}} - Title and escription of the map marker
  */
 function getInfoText(markerName) {
   const marker = mapMarkers[markerName];

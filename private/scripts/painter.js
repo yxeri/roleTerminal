@@ -12,6 +12,7 @@ const context = (document.getElementById('canvas')).getContext('2d');
 const paintArea = document.getElementById('central');
 
 /**
+ * All objects in the scene (including out of view)
  * @private
  * @type {Object}
  */
@@ -64,21 +65,29 @@ const lineWidth = 2;
 // }
 
 /**
+ * Draw the inside of the object
  * @private
+ * @param {Path2D} obj - 2D object
  */
 function fillObject(obj) {
   context.fill(obj);
 }
 
 /**
+ * Draw the outline of the object
  * @private
+ * @param {Path2D} obj - 2D object
  */
 function strokeObject(obj) {
   context.stroke(obj);
 }
 
 /**
+ * Fills the inside and/or draws the outline of the object, depending on parameters
  * @private
+ * @param {Object} params - Parameters
+ * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
+ * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
  */
 function drawObject(params) {
   const obj = params.obj;
@@ -95,7 +104,16 @@ function drawObject(params) {
 }
 
 /**
+ * Create and draw a rectangle
  * @static
+ * @param {Object} params - Parameters
+ * @param {Number} x - X coordinate of the upper left corner
+ * @param {Number} y - Y coordiantes of the upper left corner
+ * @param {Number} width - Width of the object in pixels
+ * @param {Number} height - Height of the object in pixels
+ * @param {objId} objId - Name identifier of the object
+ * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
+ * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
  */
 function createRect(params) {
   const x = params.x;
@@ -125,6 +143,13 @@ function createRect(params) {
 
 /**
  * @static
+ * @param {Object} params - Parameters
+ * @param {Number} x - X coordinate of the center of the circle
+ * @param {Number} y - Y coordiantes of the center of the circle
+ * @param {Number} width - Radius of the circle
+ * @param {objId} objId - Name identifier of the object
+ * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
+ * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
  */
 function createCircle(params) {
   const x = params.x;
@@ -150,9 +175,12 @@ function createCircle(params) {
 }
 
 /**
+ * Returns center of the object
+ * Center is calcualted according to the type of object sent
+ * Supports circle, line and rectangular objects
  * @private
- * @param {Object} obj
- * @returns {{x: Number, y: Number}}
+ * @param {Object} obj - 2D object
+ * @returns {{x: Number, y: Number}} - x and y coordinates of the center of the object
  */
 function getCenter(obj) {
   const type = obj.type;
@@ -186,9 +214,9 @@ function getCenter(obj) {
 
 /**
  * @private
- * @param {Number} sentX
- * @param {Number} sentY
- * @returns {{x: Number, y: Number}}
+ * @param {Number} sentX - x
+ * @param {Number} sentY - y
+ * @returns {{x: Number, y: Number}} - x and y coordinates
  */
 function createVector(sentX, sentY) {
   const scale = Math.sqrt((sentX * sentX) + (sentY * sentY));
@@ -199,12 +227,15 @@ function createVector(sentX, sentY) {
 }
 
 /**
+ * Returns x and y points for both ends of a line from two object
  * @private
- * @param {Object} fromObj
- * @param {Object} toObj
- * @returns {{from: {x: Number, y: Number}, to: {x: Number, y: Number}}}
+ * @param {Object} fromObjId - Id of the object at the start of the line
+ * @param {Object} toObjId - Id of the object at the end of the line
+ * @returns {{from: {x: Number, y: Number}, to: {x: Number, y: Number}}} - X and y coordinates where the line connects from both objects
  */
-function getLinePoints(fromObj, toObj) {
+function getLinePoints(fromObjId, toObjId) {
+  const fromObj = objects[fromObjId];
+  const toObj = objects[toObjId];
   const fromCenter = getCenter(fromObj);
   const toCenter = getCenter(toObj);
   const vector = createVector(toCenter.x - fromCenter.x, toCenter.y - fromCenter.y);
@@ -222,19 +253,19 @@ function getLinePoints(fromObj, toObj) {
 }
 
 /**
- * @private
- * @param {{fromObjId: string, toObjId: string}} params
- */
-function lineConnection(params) {
-  const fromObj = objects[params.fromObjId];
-  const toObj = objects[params.toObjId];
-
-  return getLinePoints(fromObj, toObj);
-}
-
-/**
+ * Creates a line between two objects OR two points
+ * The line, if between two objects, will be drawn to the edges of the objects
  * @static
- * @param {{fromObjId: string, toObjId: string, objId: string, from:{x: Number, y: Number}, to:{x: Number, y: Number}}} params
+ * @param {Object} params - Parameters
+ * @param {string} params.fromObjId - Id of the object at the beginning of the line. Leave empty if you are drawing a line between two points
+ * @param {string} params.toObjId - Id of the object at the end of the line. Leave empty if you are drawing a line between two points
+ * @param {string} params.objId - Id of the line
+ * @param {Object} params.from - X and Y coordinates for the beginning of the line
+ * @param {Object} params.from.x - X coordinate for the beginning of the line
+ * @param {Object} params.from.y - Y coordinate for the beginning of the line
+ * @param {Object} params.to - X and Y coordinates for the end of the line
+ * @param {Object} params.to.x - X coordinate for the end of the line
+ * @param {Object} params.to.y - Y coordinate for the end of the line
  */
 function createLine(params) {
   const fromObjId = params.fromObjId;
@@ -246,10 +277,8 @@ function createLine(params) {
 
   // clearExisting(lines[objId], 'line');
 
-  console.log('params', params);
-  if (params.fromObjId && params.toObjId) {
-    const connection = lineConnection(params);
-    console.log('connection', connection);
+  if (fromObjId && toObjId) {
+    const connection = getLinePoints(fromObjId, toObjId);
     from = connection.from;
     to = connection.to;
 

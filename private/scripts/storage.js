@@ -5,35 +5,37 @@ const mapTools = require('./mapTools');
 const domManipulator = require('./domManipulator');
 
 /**
+ * Sets item to localStorage
  * @private
- * @param {string} name
- * @param {} item
+ * @param {string} name - Name of the item
+ * @param {string} item - Item to be set
  */
 function setLocalVal(name, item) {
   localStorage.setItem(name, item);
 }
 
 /**
+ * Gets item from localStorage
  * @private
- * @param {string} name
- * @returns {}
+ * @param {string} name - Name of the item to be retrieved
+ * @returns {string} - Retrieved item
  */
 function getLocalVal(name) {
   return localStorage.getItem(name);
 }
 
 /**
+ * Removes item from localStorage
  * @private
- * @param {string} name
+ * @param {string} name - Name of the item to be removed
  */
 function removeLocalVal(name) {
   localStorage.removeItem(name);
 }
 
 /**
- * Get default language
  * @static
- * @returns {string}
+ * @returns {string} - Language code
  */
 function getDefaultLanguage() {
   return getLocalVal('defaultLanguage');
@@ -41,7 +43,7 @@ function getDefaultLanguage() {
 
 /**
  * @static
- * @param {string} languageCode
+ * @param {string} languageCode - New language code
  */
 function setDefaultLanguage(languageCode) {
   setLocalVal('defaultLanguage', languageCode);
@@ -49,16 +51,18 @@ function setDefaultLanguage(languageCode) {
 }
 
 /**
+ * Used to skip some visual effects to save time
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is fast mode on?
  */
 function getFastMode() {
   return getLocalVal('fastMode') === 'true';
 }
 
 /**
+ * Used to skip some visual effects to save time
  * @static
- * @param {boolean} isOn
+ * @param {boolean} isOn - Should fast mode be on?
  */
 function setFastMode(isOn) {
   setLocalVal('fastMode', isOn);
@@ -66,7 +70,7 @@ function setFastMode(isOn) {
 
 /**
  * @static
- * @param {boolean} hide
+ * @param {boolean} hide - Should room names be hidden?
  */
 function shouldHideRoomNames(hide) {
   setLocalVal('hideRoomNames', hide);
@@ -74,7 +78,7 @@ function shouldHideRoomNames(hide) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Are room names hidden?
  */
 function getHideRoomNames() {
   return getLocalVal('hideRoomNames') === 'true';
@@ -82,7 +86,7 @@ function getHideRoomNames() {
 
 /**
  * @static
- * @param {boolean} hide
+ * @param {boolean} hide - Should time stamps be hidden?
  */
 function shouldHideTimeStamp(hide) {
   setLocalVal('hideTimeStamp', hide);
@@ -90,16 +94,17 @@ function shouldHideTimeStamp(hide) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Are time stamps hidden?
  */
 function getHideTimeStamp() {
   return getLocalVal('hideTimeStamp') === 'true';
 }
 
 /**
- * @public
+ * Aliases are user-created shortcuts to commands
+ * Stored as object
  * @static
- * @returns {Object}
+ * @returns {Object} - Command aliases
  */
 function getAliases() {
   const aliases = getLocalVal('aliases');
@@ -108,8 +113,10 @@ function getAliases() {
 }
 
 /**
+ * Aliases are user-created shortcuts to commands
+ * Stored as object
  * @static
- * @param {Object} aliases
+ * @param {Object} aliases - New aliases
  */
 function setAliases(aliases) {
   setLocalVal('aliases', JSON.stringify(aliases));
@@ -117,7 +124,7 @@ function setAliases(aliases) {
 
 /**
  * @static
- * @returns {string}
+ * @returns {string} - Device ID
  */
 function getDeviceId() {
   return getLocalVal('deviceId');
@@ -125,7 +132,7 @@ function getDeviceId() {
 
 /**
  * @static
- * @param {string} deviceId
+ * @param {string} deviceId - Device ID
  */
 function setDeviceId(deviceId) {
   setLocalVal('deviceId', deviceId);
@@ -133,7 +140,7 @@ function setDeviceId(deviceId) {
 
 /**
  * @static
- * @returns {string}
+ * @returns {string} - Room name
  */
 function getRoom() {
   return getLocalVal('room');
@@ -141,7 +148,7 @@ function getRoom() {
 
 /**
  * @static
- * @param {string} room
+ * @param {string} room - New room name
  */
 function setRoom(room) {
   setLocalVal('room', room);
@@ -156,15 +163,16 @@ function removeRoom() {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is the cursor hidden?
  */
 function isHiddenCursor() {
   return getLocalVal('hiddenCursor') === 'true';
 }
 
 /**
+ * Hides or shows the cursor in the main view
  * @static
- * @param {boolean} isHidden
+ * @param {boolean} isHidden - Should the cursor be hidden?
  */
 function shouldHideCursor(isHidden) {
   const mainView = domManipulator.getMainView();
@@ -180,15 +188,16 @@ function shouldHideCursor(isHidden) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is the menu hidden?
  */
 function isHiddenMenu() {
   return getLocalVal('hiddenMenu') === 'true';
 }
 
 /**
+ * Hides or shows the menu in the view
  * @static
- * @param {boolean} isHidden
+ * @param {boolean} isHidden - Should the menu be hidden?
  */
 function shouldHideMenu(isHidden) {
   const menu = domManipulator.getMenu();
@@ -204,15 +213,16 @@ function shouldHideMenu(isHidden) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is the command input hidden?
  */
 function isHiddenCmdInput() {
   return getLocalVal('hiddenCmdInput') === 'true';
 }
 
 /**
+ * Hides or shows the command input in the view
  * @static
- * @param {boolean} isHidden
+ * @param {boolean} isHidden - Should the command input be hidden?
  */
 function shouldHideCmdInput(isHidden) {
   const cmdContainer = document.getElementById('inputContainer');
@@ -228,15 +238,17 @@ function shouldHideCmdInput(isHidden) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is the view thin?
  */
 function isThinView() {
   return getLocalVal('thinnerView') === 'true';
 }
 
 /**
+ * Adds more padding to make the view look more thinner
+ * Used on screens that might be partially obstructed
  * @static
- * @param {boolean} isThinner
+ * @param {boolean} isThinner - Should the view be thin?
  */
 function shouldThinView(isThinner) {
   if (isThinner) {
@@ -250,7 +262,7 @@ function shouldThinView(isThinner) {
 
 /**
  * @static
- * @returns {Number}
+ * @returns {Number} - User access level
  */
 function getAccessLevel() {
   return parseInt(getLocalVal('accessLevel'), 10);
@@ -258,7 +270,7 @@ function getAccessLevel() {
 
 /**
  * @static
- * @param {Number} accessLevel
+ * @param {Number} accessLevel - User access level
  */
 function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
@@ -266,7 +278,7 @@ function setAccessLevel(accessLevel) {
 
 /**
  * @static
- * @param {boolean} forceFullscreen
+ * @param {boolean} forceFullscreen - Should fullscreen be forced?
  */
 function shouldForceFullscreen(forceFullscreen) {
   setLocalVal('forceFullscreen', forceFullscreen);
@@ -274,7 +286,7 @@ function shouldForceFullscreen(forceFullscreen) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is fullscreen forced?
  */
 function getForceFullscreen() {
   return getLocalVal('forceFullscreen') === 'true';
@@ -282,7 +294,7 @@ function getForceFullscreen() {
 
 /**
  * @static
- * @param {boolean} gpsTracking
+ * @param {boolean} gpsTracking - Should gps tracking be available?
  */
 function shouldGpsTrack(gpsTracking) {
   setLocalVal('gpsTracking', gpsTracking);
@@ -290,23 +302,25 @@ function shouldGpsTrack(gpsTracking) {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is gps tracking available?
  */
 function getGpsTracking() {
   return getLocalVal('gpsTracking') === 'true';
 }
 
 /**
+ * The msg command will still be available in chat mode
  * @static
- * @param {boolean}
+ * @param {boolean} disable - Should commands be disabled?
  */
 function shouldDisableCommands(disable) {
   setLocalVal('disableCommands', disable);
 }
 
 /**
+ * The msg command will still be available in chat mode
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Are commands disabled?
  */
 function getDisableCommands() {
   return getLocalVal('disableCommands') === 'true';
@@ -314,7 +328,7 @@ function getDisableCommands() {
 
 /**
  * @static
- * @returns {string}
+ * @returns {string} - User name
  */
 function getUser() {
   return getLocalVal('user');
@@ -322,7 +336,7 @@ function getUser() {
 
 /**
  * @static
- * @param {string} user
+ * @param {string} user - New user name
  */
 function setUser(user) {
   setLocalVal('user', user);
@@ -336,8 +350,9 @@ function removeUser() {
 }
 
 /**
+ * Stored as array
  * @static
- * @returns {string[]}
+ * @returns {string[]} - Command history
  */
 function getCommandHistory() {
   const commandHistory = getLocalVal('cmdHistory');
@@ -346,9 +361,9 @@ function getCommandHistory() {
 }
 
 /**
- * @public
+ * Stored as array
  * @static
- * @param {string[]} commandHistory
+ * @param {string[]} commandHistory - Command history
  */
 function setCommandHistory(commandHistory) {
   setLocalVal('cmdHistory', JSON.stringify(commandHistory));
@@ -363,7 +378,7 @@ function removeCommandHistory() {
 
 /**
  * @static
- * @param {string} mode
+ * @param {string} mode - New command input mode
  */
 function setMode(mode) {
   setLocalVal('mode', mode);
@@ -371,7 +386,7 @@ function setMode(mode) {
 
 /**
  * @static
- * @returns {string}
+ * @returns {string} - Command input mode
  */
 function getMode() {
   return getLocalVal('mode');
@@ -379,7 +394,7 @@ function getMode() {
 
 /**
  * @static
- * @returns {boolean}
+ * @returns {boolean} - Is the input start text static?
  */
 function getStaticInputStart() {
   return getLocalVal('staticInputStart') === 'true';
@@ -387,7 +402,7 @@ function getStaticInputStart() {
 
 /**
  * @static
- * @param {boolean} isStatic
+ * @param {boolean} isStatic - Should the input start text be static?
  */
 function shouldStaticInputStart(isStatic) {
   setLocalVal('staticInputStart', isStatic);
@@ -395,16 +410,17 @@ function shouldStaticInputStart(isStatic) {
 
 /**
  * @static
- * @param {string} value
+ * @param {string} value - New default input start text
  */
 function setDefaultInputStart(value) {
   setLocalVal('defaultInputStart', value);
 }
 
 /**
+ * Sets new center coordinates on the map
  * @static
- * @param {Number} longitude
- * @param {Number} latitude
+ * @param {Number} longitude - Longitude
+ * @param {Number} latitude - Latitude
  */
 function setCenterCoordinates(longitude, latitude) {
   setLocalVal('centerLong', longitude);
@@ -417,8 +433,9 @@ function setCenterCoordinates(longitude, latitude) {
 }
 
 /**
+ * Gets center coordinates from the map
  * @static
- * @returns {{latitude: Number, longitude: Number}}
+ * @returns {{latitude: Number, longitude: Number}} - Center coordinates
  */
 function getCenterCoordinates() {
   return {
@@ -428,9 +445,10 @@ function getCenterCoordinates() {
 }
 
 /**
+ * Used together with cornerTwo to calculate map bounds
  * @static
- * @param {Number} longitude
- * @param {Number} latitude
+ * @param {Number} longitude - Longitude
+ * @param {Number} latitude - Latitude
  */
 function setCornerOneCoordinates(longitude, latitude) {
   setLocalVal('cornerOneLong', longitude);
@@ -438,8 +456,9 @@ function setCornerOneCoordinates(longitude, latitude) {
 }
 
 /**
+ * Used together with cornerTwo to calculate map bounds
  * @static
- * @returns {{latitude: Number, longitude: Number}}
+ * @returns {{latitude: Number, longitude: Number}} - Corner coordinates
  */
 function getCornerOneCoordinates() {
   return {
@@ -449,9 +468,10 @@ function getCornerOneCoordinates() {
 }
 
 /**
+ * Used together with cornerOne to calculate map bounds
  * @static
- * @param {Number} longitude
- * @param {Number} latitude
+ * @param {Number} longitude - Longitude
+ * @param {Number} latitude - Latitude
  */
 function setCornerTwoCoordinates(longitude, latitude) {
   setLocalVal('cornerTwoLong', longitude);
@@ -459,8 +479,9 @@ function setCornerTwoCoordinates(longitude, latitude) {
 }
 
 /**
+ * Used together with cornerOne to calculate map bounds
  * @static
- * @returns {{latitude: Number, longitude: Number}}
+ * @returns {{latitude: Number, longitude: Number}} - Corner coordinates
  */
 function getCornerTwoCoordinates() {
   return {
@@ -470,16 +491,18 @@ function getCornerTwoCoordinates() {
 }
 
 /**
+ * Set default zoom level on the map
  * @static
- * @param {Number} zoomLevel
+ * @param {Number} zoomLevel - New default zoom level
  */
 function setDefaultZoomLevel(zoomLevel) {
   setLocalVal('defaultZoomLevel', zoomLevel);
 }
 
 /**
+ * Get default zoom level from the map
  * @static
- * @returns {Number}
+ * @returns {Number} - Get default zoom level
  */
 function getDefaultZoomLevel() {
   return parseInt(getLocalVal('defaultZoomLevel'), 10);
@@ -487,16 +510,18 @@ function getDefaultZoomLevel() {
 
 /**
  * Sets radio channels
+ * Stored as object
  * @static
- * @param {{name: string, url: string}} radioChannels
+ * @param {{name: string, url: string}} radioChannels - Radio channels, consisting of name and url
  */
 function setRadioChannels(radioChannels) {
   setLocalVal('radioChannels', JSON.stringify(radioChannels));
 }
 
 /**
+ * Stored as object
  * @static
- * @returns {{name: string, url: string}}
+ * @returns {{name: string, url: string}} - Radio channels, consisting of name and url
  */
 function getRadioChannels() {
   return JSON.parse(getLocalVal('radioChannels'));
@@ -504,7 +529,7 @@ function getRadioChannels() {
 
 /**
  * @static
- * @returns {string}
+ * @returns {string} - Default start input
  */
 function getDefaultInputStart() {
   return getLocalVal('defaultInputStart');

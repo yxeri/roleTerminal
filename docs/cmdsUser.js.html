@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: cmdsUser.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: cmdsUser.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module */
+
+const labels = require('./labels');
+const storage = require('./storage');
+const socketHandler = require('./socketHandler');
+const textTools = require('./textTools');
+const commandHandler = require('./commandHandler');
+const domManipulator = require('./domManipulator');
+const messenger = require('./messenger');
+
+/**
+ * @static
+ * @type {Object}
+ */
+const commands = {};
+
+commands.whoami = {
+  func: () => {
+    socketHandler.emit('whoAmI');
+  },
+  accessLevel: 13,
+  category: 'basic',
+};
+
+commands.register = {
+  func: (phrases = []) => {
+    const data = {};
+
+    if (storage.getUser() === null) {
+      const userName = phrases[0];
+
+      if (userName &amp;&amp; userName.length >= 2 &amp;&amp; userName.length &lt;= 6 &amp;&amp; textTools.isTextAllowed(userName)) {
+        const commandHelper = commandHandler.commandHelper;
+        data.user = {
+          userName,
+          registerDevice: storage.getDeviceId(),
+        };
+        commandHelper.data = data;
+        commandHelper.hideInput = true;
+        domManipulator.hideInput(true);
+        socketHandler.emit('userExists', commandHelper.data);
+      } else {
+        commandHandler.resetCommand(true);
+        messenger.queueMessage({
+          text: [
+            'Name has to be 2 to 6 characters long',
+            'The name can only contain letters and numbers (a-z, 0-9)',
+            'Don\'t use whitespace in your name!',
+            'example: register myname',
+          ],
+          text_se: [
+            'Namnet behöver vara 2 till 6 tecken långt',
+            'Namnet får endast innehålla bokstäver och nummer (a-z, 0-9)',
+            'Använd inte blanksteg i ert namn!',
+            'Exempel: register myname',
+          ],
+        });
+      }
+    } else {
+      commandHandler.resetCommand(true);
+      messenger.queueMessage({
+        text: [
+          'You have already registered a user',
+          `${storage.getUser()} is registered and logged in`,
+        ],
+        text_se: [
+          'Ni har redan registrerat en användare',
+          `${storage.getUser()} är registrerad och inloggad`,
+        ],
+      });
+    }
+  },
+  steps: [
+    () => {
+      messenger.queueMessage({
+        text: [
+          'Input a password and press enter',
+          'Your password won\'t appear on the screen as you type it',
+          'Don\'t use whitespaces in your password!',
+        ],
+        text_se: [
+          'Skriv in ert lösenord och tryck på enter-knappen',
+          'Ert lösenord kommer inte visas på skärmen',
+          'Använd inte blanksteg i ert lösenord!',
+        ],
+      });
+      messenger.queueMessage({ text: labels.getText('info', 'cancel') });
+      domManipulator.setInputStart('password');
+      commandHandler.commandHelper.onStep++;
+    },
+    (phrases = []) => {
+      const password = phrases[0];
+
+      if (phrases &amp;&amp; password.length >= 3 &amp;&amp; textTools.isTextAllowed(password)) {
+        const commandHelper = commandHandler.commandHelper;
+
+        commandHelper.data.user.password = password;
+        messenger.queueMessage({
+          text: ['Repeat your password one more time'],
+          text_se: ['Skriv in ert lösenord en gång till'],
+        });
+        commandHelper.onStep++;
+      } else {
+        messenger.queueMessage({
+          text: [
+            'Password is too short!',
+            'It has to be at least 3 characters (a-z, 0-9. Password can mix upper/lowercase)',
+            'Please, input a password and press enter',
+          ],
+          text_se: [
+            'Lösenordet är för kort!',
+            'Det måste vara minst 3 tecken långt (a-z, 0-9. Lösenordet kan ha en blandning av gemener och versaler)',
+            'Skriv in ert lösenord och tryck på enter-knappen',
+          ],
+        });
+      }
+    },
+    (phrases = []) => {
+      const commandHelper = commandHandler.commandHelper;
+      const password = phrases[0];
+
+      if (password === commandHelper.data.user.password) {
+        messenger.queueMessage({ text: labels.getText('info', 'congratulations') });
+        socketHandler.emit('register', commandHelper.data);
+        commandHandler.abortCommand(commandHelper.command);
+        commandHandler.resetCommand(false);
+      } else {
+        messenger.queueMessage({
+          text: [
+            'Passwords don\'t match. Please try again',
+            'Input a password and press enter',
+          ],
+          text_se: [
+            'Lösenorden matchar inte. Försök igen',
+            'Skriv in ert lösenord och tryck på enter-knappen',
+          ],
+        });
+        commandHelper.onStep--;
+      }
+    },
+  ],
+  abortFunc: () => {
+    domManipulator.hideInput(false);
+  },
+  accessLevel: 0,
+  category: 'login',
+  commandName: 'register',
+};
+
+commands.login = {
+  func: (phrases) => {
+    const data = { user: {} };
+
+    if (storage.getUser() !== null) {
+      messenger.queueMessage({
+        text: [
+          'You are already logged in',
+          'You have to be logged out to log in',
+        ],
+        text_se: [
+          'Ni har redan loggat in',
+          'Ni måste vara utloggade för att kunna logga in',
+        ],
+      });
+      commandHandler.resetCommand();
+    } else if (phrases.length > 0) {
+      const commandHelper = commandHandler.commandHelper;
+      data.user.userName = phrases[0].toLowerCase();
+      commandHelper.data = data;
+      commandHelper.hideInput = true;
+
+      messenger.queueMessage({
+        text: ['Input your password'],
+        text_se: ['Skriv in ert lösenord'],
+      });
+      domManipulator.setInputStart('password');
+      domManipulator.hideInput(true);
+    } else {
+      messenger.queueMessage({
+        text: [
+          'You need to input a user name',
+          'Example: login best',
+        ],
+        text_se: [
+          'Ni måste skriva in ert användarnamn',
+          'Exempel: login best',
+        ],
+      });
+      domManipulator.resetCommand();
+    }
+  },
+  steps: [
+    (phrases) => {
+      const commandHelper = commandHandler.commandHelper;
+      commandHelper.data.user.password = phrases[0];
+
+      socketHandler.emit('login', commandHelper.data);
+      commandHandler.abortCommand(commandHelper.command);
+      commandHandler.triggerCommand({ cmd: 'clear' });
+      commandHandler.resetCommand();
+    },
+  ],
+  abortFunc: () => {
+    domManipulator.hideInput(false);
+  },
+  clearAfterUse: true,
+  accessLevel: 0,
+  category: 'login',
+  commandName: 'login',
+};
+
+commands.password = {
+  func: () => {
+    commandHandler.commandHelper.hideInput = true;
+
+    domManipulator.hideInput(true);
+    domManipulator.setInputStart('Old passwd');
+    messenger.queueMessage({ text: labels.getText('info', 'cancel') });
+    messenger.queueMessage({
+      text: ['Enter your current password'],
+      text_se: ['Skriv in ert nuvarande lösenord'],
+    });
+  },
+  steps: [
+    (phrases = ['']) => {
+      const commandHelper = commandHandler.commandHelper;
+      const data = {};
+      const oldPassword = phrases[0];
+      data.oldPassword = oldPassword;
+      commandHelper.data = data;
+      commandHelper.onStep++;
+
+      domManipulator.setInputStart('New pass');
+      socketHandler.emit('checkPassword', data);
+    },
+    (phrases = []) => {
+      const commandHelper = commandHandler.commandHelper;
+      commandHelper.data.newPassword = phrases[0];
+      commandHelper.onStep++;
+
+      domManipulator.setInputStart('Repeat passwd');
+      messenger.queueMessage({
+        text: ['Repeat your new password'],
+        text_se: ['Skriv in ert nya lösenord igen'],
+      });
+    },
+    (phrases = []) => {
+      const commandHelper = commandHandler.commandHelper;
+      const repeatedPassword = phrases[0];
+
+      if (repeatedPassword === commandHelper.data.newPassword) {
+        socketHandler.emit('changePassword', commandHelper.data);
+        commandHandler.resetCommand(false);
+      } else {
+        commandHelper.onStep--;
+
+        domManipulator.setInputStart('New pass');
+        messenger.queueMessage({
+          text: [
+            'Password doesn\'t match. Please try again',
+            'Enter your new password',
+          ],
+          text_se: [
+            'Lösenorden matchar inte. Försök igen',
+            'Skriv in ert nya lösenord',
+          ],
+        });
+      }
+    },
+  ],
+  abortFunc: () => {
+    domManipulator.hideInput(false);
+  },
+  accessLevel: 13,
+  category: 'basic',
+  commandName: 'password',
+};
+
+commands.logout = {
+  func: () => {
+    socketHandler.emit('logout');
+  },
+  accessLevel: 13,
+  category: 'basic',
+  clearAfterUse: true,
+  commandName: 'logout',
+};
+
+module.exports = commands;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audio.html">audio</a></li><li><a href="module-clickHandler.html">clickHandler</a></li><li><a href="module-cmdsAdmin.html">cmdsAdmin</a></li><li><a href="module-cmdsBbr.html">cmdsBbr</a></li><li><a href="module-cmdsChat.html">cmdsChat</a></li><li><a href="module-cmdsInfo.html">cmdsInfo</a></li><li><a href="module-cmdsLocal.html">cmdsLocal</a></li><li><a href="module-cmdsMap.html">cmdsMap</a></li><li><a href="module-cmdsSatellite.html">cmdsSatellite</a></li><li><a href="module-cmdsTeam.html">cmdsTeam</a></li><li><a href="module-cmdsUser.html">cmdsUser</a></li><li><a href="module-cmdsUtility.html">cmdsUtility</a></li><li><a href="module-commandHandler.html">commandHandler</a></li><li><a href="module-domManipulator.html">domManipulator</a></li><li><a href="module-labels.html">labels</a></li><li><a href="module-layoutChanger.html">layoutChanger</a></li><li><a href="module-mapTools.html">mapTools</a></li><li><a href="module-messenger.html">messenger</a></li><li><a href="module-painter.html">painter</a></li><li><a href="module-socketHandler.html">socketHandler</a></li><li><a href="module-storage.html">storage</a></li><li><a href="module-textTools.html">textTools</a></li><li><a href="module-videoPlayer.html">videoPlayer</a></li><li><a href="module-zalgoGenerator.html">zalgoGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#autoCompleteOption">autoCompleteOption</a></li><li><a href="global.html#commandQueue">commandQueue</a></li><li><a href="global.html#commandTime">commandTime</a></li><li><a href="global.html#goFullScreen">goFullScreen</a></li><li><a href="global.html#isScreenOff">isScreenOff</a></li><li><a href="global.html#isTouchDevice">isTouchDevice</a></li><li><a href="global.html#keyPressed">keyPressed</a></li><li><a href="global.html#keyReleased">keyReleased</a></li><li><a href="global.html#lastScreenOff">lastScreenOff</a></li><li><a href="global.html#match">match</a></li><li><a href="global.html#morseSeparator">morseSeparator</a></li><li><a href="global.html#onStartup">onStartup</a></li><li><a href="global.html#onVideoMessage">onVideoMessage</a></li><li><a href="global.html#pausePositionTime">pausePositionTime</a></li><li><a href="global.html#preparePosition">preparePosition</a></li><li><a href="global.html#refocus">refocus</a></li><li><a href="global.html#screenOffIntervalTime">screenOffIntervalTime</a></li><li><a href="global.html#setIntervals">setIntervals</a></li><li><a href="global.html#soundQueue">soundQueue</a></li><li><a href="global.html#watchPositionTime">watchPositionTime</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 21 2016 22:00:47 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

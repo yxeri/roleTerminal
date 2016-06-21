@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: layoutChanger.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: layoutChanger.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module */
+
+const domManipulator = require('./domManipulator');
+
+let viewIsSplit = false;
+let isLandscape = window.innerWidth > window.innerHeight;
+
+/**
+ * Splits or collapses view. A div will be added (or removed) that takes up 50% of the view
+ * @param {boolean} shouldSplit - Should the view split? No means it should collapses
+ * @param {HTMLElement} secondDiv - Side div that should be added to the view
+ */
+function splitView(shouldSplit, secondDiv) {
+  const mainView = domManipulator.getMainView();
+  const secondView = domManipulator.getSecondView();
+
+  if (shouldSplit) {
+    secondDiv.classList.remove('hide');
+    mainView.classList.add('halfView');
+
+    if (!isLandscape) {
+      mainView.classList.add('halfHeight');
+      secondDiv.classList.add('halfHeight');
+    } else {
+      mainView.classList.add('halfWidth');
+      secondDiv.classList.add('halfWidth');
+    }
+  } else {
+    secondDiv.classList.add('hide');
+    mainView.classList.remove('halfView');
+    mainView.classList.remove('halfWidth');
+    mainView.classList.remove('halfHeight');
+    secondDiv.classList.remove('halfWidth');
+    secondDiv.classList.remove('halfHeight');
+  }
+
+  /**
+   * If the view is already split and it should split, meaning that a second view already exists
+   */
+  if (viewIsSplit &amp;&amp; secondDiv !== secondView) {
+    secondView.classList.add('hide');
+    secondView.classList.remove('halfWidth');
+    secondView.classList.remove('halfHeight');
+  }
+
+  viewIsSplit = shouldSplit;
+  domManipulator.setSecondView(secondDiv);
+
+  domManipulator.scrollView();
+}
+
+/**
+ * Change the orientation of the view. Most likely triggered by the user changing from landscape to portrait mode or vice versa
+ */
+function changeOrientation() {
+  const mainView = domManipulator.getMainView();
+  const secondView = domManipulator.getSecondView();
+
+  if (viewIsSplit) {
+    if (!isLandscape) {
+      mainView.classList.remove('halfWidth');
+      secondView.classList.remove('halfWidth');
+      mainView.classList.add('halfHeight');
+      secondView.classList.add('halfHeight');
+    } else {
+      mainView.classList.remove('halfHeight');
+      secondView.classList.remove('halfHeight');
+      mainView.classList.add('halfWidth');
+      secondView.classList.add('halfWidth');
+    }
+  }
+}
+
+/**
+ * Toggles if view is in landscape mode
+ */
+function toggleIsLandscape() {
+  isLandscape = !isLandscape;
+}
+
+/**
+ * Is view split?
+ * @returns {boolean} viewIsSplit - Is view split?
+ */
+function isViewSplit() {
+  return viewIsSplit;
+}
+
+exports.splitView = splitView;
+exports.changeOrientation = changeOrientation;
+exports.toggleIsLandscape = toggleIsLandscape;
+exports.isViewSplit = isViewSplit;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audio.html">audio</a></li><li><a href="module-clickHandler.html">clickHandler</a></li><li><a href="module-cmdsAdmin.html">cmdsAdmin</a></li><li><a href="module-cmdsBbr.html">cmdsBbr</a></li><li><a href="module-cmdsChat.html">cmdsChat</a></li><li><a href="module-cmdsInfo.html">cmdsInfo</a></li><li><a href="module-cmdsLocal.html">cmdsLocal</a></li><li><a href="module-cmdsMap.html">cmdsMap</a></li><li><a href="module-cmdsSatellite.html">cmdsSatellite</a></li><li><a href="module-cmdsTeam.html">cmdsTeam</a></li><li><a href="module-cmdsUser.html">cmdsUser</a></li><li><a href="module-cmdsUtility.html">cmdsUtility</a></li><li><a href="module-commandHandler.html">commandHandler</a></li><li><a href="module-domManipulator.html">domManipulator</a></li><li><a href="module-labels.html">labels</a></li><li><a href="module-layoutChanger.html">layoutChanger</a></li><li><a href="module-mapTools.html">mapTools</a></li><li><a href="module-messenger.html">messenger</a></li><li><a href="module-painter.html">painter</a></li><li><a href="module-socketHandler.html">socketHandler</a></li><li><a href="module-storage.html">storage</a></li><li><a href="module-textTools.html">textTools</a></li><li><a href="module-videoPlayer.html">videoPlayer</a></li><li><a href="module-zalgoGenerator.html">zalgoGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#autoCompleteOption">autoCompleteOption</a></li><li><a href="global.html#commandQueue">commandQueue</a></li><li><a href="global.html#commandTime">commandTime</a></li><li><a href="global.html#goFullScreen">goFullScreen</a></li><li><a href="global.html#isScreenOff">isScreenOff</a></li><li><a href="global.html#isTouchDevice">isTouchDevice</a></li><li><a href="global.html#keyPressed">keyPressed</a></li><li><a href="global.html#keyReleased">keyReleased</a></li><li><a href="global.html#lastScreenOff">lastScreenOff</a></li><li><a href="global.html#match">match</a></li><li><a href="global.html#morseSeparator">morseSeparator</a></li><li><a href="global.html#onStartup">onStartup</a></li><li><a href="global.html#onVideoMessage">onVideoMessage</a></li><li><a href="global.html#pausePositionTime">pausePositionTime</a></li><li><a href="global.html#preparePosition">preparePosition</a></li><li><a href="global.html#refocus">refocus</a></li><li><a href="global.html#screenOffIntervalTime">screenOffIntervalTime</a></li><li><a href="global.html#setIntervals">setIntervals</a></li><li><a href="global.html#soundQueue">soundQueue</a></li><li><a href="global.html#watchPositionTime">watchPositionTime</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 21 2016 22:00:47 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

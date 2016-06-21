@@ -1,6 +1,10 @@
-/** @module */
+/**
+ * @module
+ */
 
-const audio = new Audio();
+const audioElements = {
+  radio: new Audio(),
+};
 
 /**
  * @static
@@ -8,48 +12,68 @@ const audio = new Audio();
  * @param {string} params.path - Path to the file
  * @param {Number} params.startTime - Starting time of the audio
  * @param {Number} params.volume - Volume for the audio
+ * @param {string} params.type - Type of audio
  */
 function playAudio(params) {
-  if (params.path) {
-    audio.src = params.path;
-  }
+  const audio = audioElements[params.type];
 
-  if (params.startTime) {
-    audio.currentTime = params.startTime;
-  }
+  if (audio) {
+    if (params.path) {
+      audio.src = params.path;
+    }
 
-  if (params.volume) {
-    audio.volume = params.volume;
-  }
+    if (params.startTime) {
+      audio.currentTime = params.startTime;
+    }
 
-  audio.play();
+    if (params.volume) {
+      audio.volume = params.volume;
+    }
+
+    audio.play();
+  }
 }
 
 /**
  * Pauses the audio
  * @static
+ * @param {string} type - Type of audio
  */
-function pauseAudio() {
-  audio.pause();
+function pauseAudio(type) {
+  const audio = audioElements[type];
+
+  if (audio) {
+    audio.pause();
+  }
 }
 
 /**
  * Pauses audio and resets time and volume parameters
  * @static
+ * @param {string} type - Type of audio
  */
-function resetAudio() {
-  audio.pause();
-  audio.currentTime = 0;
-  audio.volume = 1;
+function resetAudio(type) {
+  const audio = audioElements[type];
+
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1;
+  }
 }
 
 /**
  * Sets new audio volume
  * @static
  * @param {Number} level - New audio volume
+ * @param {string} type - Type of audio
  */
-function changeAudioVolume(level) {
-  audio.volume = level;
+function changeAudioVolume(level, type) {
+  const audio = audioElements[type];
+
+  if (audio) {
+    audio.volume = level;
+  }
 }
 
 exports.playAudio = playAudio;

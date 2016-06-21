@@ -11,22 +11,26 @@ const labels = require('./labels');
 /**
  * List where all the output is printed too
  * @type {Element}
+ * @private
  */
 const mainFeed = document.getElementById('mainFeed');
 /**
  * Number of messages that will be processed and printed
  * per loop in consumeMessageQueue
  * @type {number}
+ * @private
  */
 const messagesPerQueue = 5;
 /**
  * Queue of all the message objects that will be handled and printed
  * @type {object[]}
+ * @private
  */
 const messageQueue = [];
 /**
  * Room names which should be hidden in the output
  * @type {string[]}
+ * @private
  */
 const hideRooms = [
   'broadcast',
@@ -36,6 +40,7 @@ const hideRooms = [
 /**
  * Room names which should not be clickable
  * @type {string[]}
+ * @private
  */
 const noLinkRooms = [
   'whisper',
@@ -43,27 +48,51 @@ const noLinkRooms = [
 /**
  * Timeout between print of rows (milliseconds)
  * @type {number}
+ * @private
  */
 const rowTimeout = 40;
 /**
  * Class names of animations in css
  * @type {string[]}
+ * @private
  */
 const animations = [
   'subliminal',
   'subliminalFast',
   'subliminalSlow',
 ];
-// Index of the animation to be retrieved from animations array
+/**
+ * Index of the animation to be retrieved from animations array
+ * @private
+ * @type {Number}
+ */
 let animationPosition = 0;
-// True if messages are being processed and printed right now
+/**
+ * True if messages are being processed and printed right now
+ * @private
+ * @type {boolean}
+ */
 let printing = false;
 /**
  * Shorter queue of messages that will be processed this loop. Length is
  * based on messagesPerQueue constiable
+ * @private
+ * @type {Object[]}
  */
 let shortMessageQueue = [];
 
+/**
+ * Creates and returns a span element
+ * Span can be clickable, if the flag is true
+ * @private
+ * @param {Object} params - Parameters
+ * @param {string} params.text - Text
+ * @param {boolean} params.linkable - Should the text be clickable?
+ * @param {boolean} params.keepInput - Should the text (when clicked on) be appended to existing input?
+ * @param {boolean} replacePhrase - Should the text (when clicked on) replace the last phrase in the input?
+ * @param {string} className - CSS class name
+ * @returns {HTMLSpanElement} - Generated span element
+ */
 function generateSpan(params = { text: '' }) {
   const text = params.text;
   const linkable = params.linkable;
@@ -99,6 +128,14 @@ function generateSpan(params = { text: '' }) {
 }
 
 // TODO Refactor this and if case for linkable in generateSpan()
+/**
+ * Adds a mouse click listener on the sent text that triggers sent callback
+ * @private
+ * @param {string} text - String to be clickable
+ * @param {string} className - CSS class
+ * @param {function} func - Callback on click
+ * @returns {HTMLSpanElement} - Clickable span
+ */
 function generateLink(text, className, func) {
   const spanObj = generateSpan({
     text,
@@ -116,10 +153,22 @@ function generateLink(text, className, func) {
   return spanObj;
 }
 
+/**
+ * Clicked callback
+ * Sets input field to "whisper " + user name
+ * @private
+ * @param {HTMLElement} elem - Clicked span
+ */
 function linkUser(elem) {
   domManipulator.setCommandInput(`whisper ${elem.textContent} `);
 }
 
+/**
+ * Clicked callback
+ * Triggers room command with the room named clicked as parameter
+ * @private
+ * @param {HTMLElement} elem - Clicked span
+ */
 function linkRoom(elem) {
   commandHandler.triggerCommand({
     cmd: 'room',
@@ -128,6 +177,19 @@ function linkRoom(elem) {
 }
 
 // Adds time stamp and room name to a string from a message if they are set
+/**
+ * Creates and returns a li element
+ * @private
+ * @param {Object} message - Message
+ * @param {boolean} message.extraClass - CSS class name
+ * @param {string} message.roomName - Receiving room name
+ * @param {Date} message.time - Time sent
+ * @param {Object} message.msgAnimation - Animation on print and/or interval
+ * @param {boolean} message.msgAnimation.instantAnimation - Should the animation start playing instantly?
+ * @param {boolean} message.msgAnimation.fixedAnimationSpeed - Should the animation always be the same? False will randomise the animation style
+ * @param {string} subText - Text shown during some animations
+ * @returns {HTMLLIElement} - Created li element
+ */
 function createRow(message, subText) {
   const rowObj = document.createElement('li');
   const roomName = message.roomName;
@@ -180,6 +242,13 @@ function createRow(message, subText) {
   return rowObj;
 }
 
+/**
+ * Append span to row
+ * @private
+ * @param {string} text - Text to insert into span
+ * @param {HTMLLIElement} row - Row to append to
+ * @param {Object} message - Message
+ */
 function addText(text, row, message) {
   row.appendChild(generateSpan({
     text,
@@ -189,6 +258,11 @@ function addText(text, row, message) {
   }));
 }
 
+/**
+ * Creates a row, appends it to the list and consumes next item in the message queue
+ * @private
+ * @param {Object} message - Message
+ */
 function addRow(message) {
   const defaultLanguage = storage.getDefaultLanguage();
   const columns = message.columns || 1;
@@ -249,6 +323,10 @@ function addRow(message) {
   }
 }
 
+/**
+ * Shift shortMessageQueue and add a row from the message
+ * @private
+ */
 function consumeMessageShortQueue() {
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
@@ -261,6 +339,10 @@ function consumeMessageShortQueue() {
 }
 
 // Prints messages from the queue
+/**
+ * Splice messageQueue and start consuming messages from the shorter queue
+ * @private
+ */
 function consumeMessageQueue() {
   if (!printing && messageQueue.length > 0) {
     shortMessageQueue = messageQueue.splice(0, messagesPerQueue);
@@ -269,11 +351,21 @@ function consumeMessageQueue() {
   }
 }
 
+/**
+ * Adds message to the queue and starts the queue
+ * @static
+ * @param {Object} message - Message
+ */
 function queueMessage(message) {
   messageQueue.push(message);
   consumeMessageQueue();
 }
 
+/**
+ * Prints help and instructions from the command
+ * @static
+ * @param {string} command - Command name
+ */
 function printHelpMessage(command) {
   const helpMsg = { text: [] };
   const helpText = labels.getText('help', command);

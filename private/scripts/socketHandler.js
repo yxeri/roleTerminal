@@ -17,8 +17,9 @@ const socket = io(); // eslint-disable-line no-undef
 let reconnecting = false;
 
 /**
+ * Add all listenable events to socket.io
  * @static
- * @param {string[]} events
+ * @param {string[]} events - All listenable events
  */
 function startSocket(events) {
   if (socket) {
@@ -29,6 +30,7 @@ function startSocket(events) {
 }
 
 /**
+ * Reconnect to socket.io
  * @static
  */
 function reconnect() {
@@ -47,6 +49,9 @@ function reconnect() {
 }
 
 /**
+ * Emit event through socket.io
+ * @param {Object} event - Event to emit
+ * @param {Object} params - Parameters to send in the emit
  * @static
  */
 function emit(event, params) {
@@ -54,17 +59,21 @@ function emit(event, params) {
 }
 
 /**
+ * Get socket from socket.io
  * @static
+ * @returns {Object} socket - Socket from socket.io
  */
 function getSocket() {
   return socket;
 }
 
 /**
+ * Set is reconnecting
  * @static
+ * @param {boolean} isReconecting - Is it reconnecting?
  */
-function setReconnecting(isRecon) {
-  reconnecting = isRecon;
+function setReconnecting(isReconecting) {
+  reconnecting = isReconecting;
 }
 
 exports.reconnect = reconnect;

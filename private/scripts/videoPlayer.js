@@ -3,6 +3,7 @@
 const videoPlayer = document.getElementById('videoPlayer');
 
 /**
+ * Starts playing the video
  * @static
  */
 function playVideo() {
@@ -10,6 +11,7 @@ function playVideo() {
 }
 
 /**
+ * Starts loading the video
  * @static
  */
 function loadVideo() {
@@ -17,6 +19,7 @@ function loadVideo() {
 }
 
 /**
+ * Stop playing the video, by removing the source and loading the video
  * @static
  */
 function stopVideo() {
@@ -25,14 +28,16 @@ function stopVideo() {
 }
 
 /**
+ * Sets new video file path
  * @static
- * @param {string} path
+ * @param {string} path - Path to the video file
  */
 function setVideo(path) {
   videoPlayer.firstChild.setAttribute('src', path);
 }
 
 /**
+ * Pauses the video
  * @static
  */
 function pauseVideo() {
@@ -40,16 +45,18 @@ function pauseVideo() {
 }
 
 /**
+ * Get the video ready state
  * @static
- * @returns {Number}
+ * @returns {Number} - Video ready state
  */
 function getReadyState() {
   return videoPlayer.readyState;
 }
 
 /**
+ * Get the video element
  * @static
- * @returns {HTMLMediaElement}
+ * @returns {HTMLMediaElement} - Video element
  */
 function getPlayer() {
   return videoPlayer;

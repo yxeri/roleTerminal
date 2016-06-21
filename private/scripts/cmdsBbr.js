@@ -3,6 +3,10 @@
 const textTools = require('./textTools');
 const messenger = require('./messenger');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.hackstation = {

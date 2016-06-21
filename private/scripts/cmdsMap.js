@@ -6,6 +6,10 @@ const storage = require('./storage');
 const layoutChanger = require('./layoutChanger');
 const messenger = require('./messenger');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.map = {

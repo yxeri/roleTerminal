@@ -80,6 +80,7 @@ function toggleIsLandscape() {
 
 /**
  * Is view split?
+ * @returns {boolean} viewIsSplit - Is view split?
  */
 function isViewSplit() {
   return viewIsSplit;

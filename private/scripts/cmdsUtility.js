@@ -8,6 +8,10 @@ const messenger = require('./messenger');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.invitations = {

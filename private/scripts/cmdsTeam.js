@@ -7,6 +7,10 @@ const commandHandler = require('./commandHandler');
 const messenger = require('./messenger');
 const domManipulator = require('./domManipulator');
 
+/**
+ * @static
+ * @type {Object}
+ */
 const commands = {};
 
 commands.createteam = {

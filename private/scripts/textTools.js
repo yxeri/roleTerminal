@@ -310,28 +310,6 @@ function addMessageSpecialProperties(message = {}) {
 }
 
 /**
- * Takes a string and randomly changes the cases on the characters
- * @private
- * @param {string} sentString - String to be modified
- * @returns {string} - Modified string
- */
-function mixCases(sentString) {
-  let mixed = '';
-
-  for (let i = 0; i < sentString.length; i++) {
-    const rand = Math.random();
-
-    if (rand > 0.5) {
-      mixed += sentString[i].toUpperCase();
-    } else {
-      mixed += sentString[i].toLowerCase();
-    }
-  }
-
-  return mixed;
-}
-
-/**
  * Creates array with randomised strings.
  * It will also insert substrings into the randomised strings, if requiredStrings is set
  * @static
@@ -373,7 +351,7 @@ function createMixedArray(params) {
     /**
      * Inserts required string and cuts away enough characters from the left and right of the random string to keep the length intact
      */
-    text[randomArrayIndex] = text[randomArrayIndex].slice(0, randomStringIndex) + mixCases(requiredStrings[i]) + text[randomArrayIndex].slice(randomStringIndex + stringLength);
+    text[randomArrayIndex] = text[randomArrayIndex].slice(0, randomStringIndex) + requiredStrings[i] + text[randomArrayIndex].slice(randomStringIndex + stringLength);
     requiredIndexes.push(randomArrayIndex);
   }
 

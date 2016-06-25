@@ -137,8 +137,11 @@ const mapPositionSchema = new mongoose.Schema({
 const gameUserSchema = new mongoose.Schema({
   userName: { type: String, unique: true },
   password: String,
-  passwordHint: String,
+  hints: [String],
 }, { collection: 'gameUsers' });
+const gamePasswordSchema = new mongoose.Schema({
+  password: { type: String, unique: true },
+}, { collection: 'gamePasswords' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -152,6 +155,7 @@ const Mission = mongoose.model('Mission', missionSchema);
 const InvitationList = mongoose.model('InvitationList', invitationListSchema);
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
 const GameUser = mongoose.model('GameUser', gameUserSchema);
+const GamePassword = mongoose.model('GamePassword', gamePasswordSchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName };
@@ -366,6 +370,53 @@ function getGameUser(userName, callback) {
     }
 
     callback(err, foundGameUser);
+  });
+}
+
+function getAllGameUsers(callback) {
+  GameUser.find().lean().exec((err, gameUsers) => {
+    if (err || gameUsers === null) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get game users'],
+        err,
+      });
+    }
+
+    callback(err, gameUsers);
+  });
+}
+
+function createGamePassword(gamePassword, callback) {
+  const newGamePassword = new GamePassword(gamePassword);
+  const query = { userName: gamePassword.userName };
+
+  GamePassword.findOne(query).lean().exec((err, foundGamePassword) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to check if game password already exists'],
+        err,
+      });
+    } else if (foundGamePassword === null) {
+      saveObject(newGamePassword, 'gamePassword', callback);
+    } else {
+      callback(err, null);
+    }
+  });
+}
+
+function getAllGamePasswords(callback) {
+  GamePassword.find().lean().exec((err, gamePasswords) => {
+    if (err || gamePasswords === null) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get game passwords'],
+        err,
+      });
+    }
+
+    callback(err, gamePasswords);
   });
 }
 
@@ -1746,3 +1797,6 @@ exports.getPosition = getPosition;
 exports.updateUserIsTracked = updateUserIsTracked;
 exports.createGameUser = createGameUser;
 exports.getGameUser = getGameUser;
+exports.createGamePassword = createGamePassword;
+exports.getAllGamePasswords = getAllGamePasswords;
+exports.getAllGameUsers = getAllGameUsers;

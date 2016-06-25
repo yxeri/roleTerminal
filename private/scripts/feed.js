@@ -1206,15 +1206,21 @@ function onLogin(data = {}) {
   });
 }
 
-function onCommandSuccess(data = {}) {
+/**
+ * @param {Object} params - Parameters
+ * @param {boolean} params.noStepCall - Should next step function be called?
+ * @param {boolean} params.freezeStep - Should the step stay the same after being called?
+ * @param {*} params.newData - New data to be used by next command step
+ */
+function onCommandSuccess(params = {}) {
   const commandHelper = commandHandler.commandHelper;
 
-  if (!data.noStepCall) {
-    if (!data.freezeStep) {
+  if (!params.noStepCall) {
+    if (!params.freezeStep) {
       commandHelper.onStep++;
     }
 
-    commandHandler.triggerCommandStep();
+    commandHandler.triggerCommandStep(params.newData);
   } else {
     commandHandler.resetCommand(false);
   }

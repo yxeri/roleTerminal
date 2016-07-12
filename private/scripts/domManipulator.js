@@ -94,6 +94,28 @@ function updateThisCommandItem() {
 }
 
 /**
+ * Scrolls the list view to the bottom
+ */
+function scrollView() {
+  if (!oldAndroid) {
+    spacer.scrollIntoView();
+  } else {
+    // Compatibility fix for old Android
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+}
+
+/**
+ * Sets the height of the textarea to fit all text
+ * @param {boolean} wasCleared - Was the textarea cleared?
+ */
+function resizeInput() {
+  cmdInput.style.height = 'auto';
+  cmdInput.style.height = `${cmdInput.scrollHeight}px`;
+  scrollView();
+}
+
+/**
  * Set text in input field
  * @param {string} text - Text to be set
  */
@@ -126,18 +148,6 @@ function replaceLastInputPhrase(text) {
   phrases[phrases.length - 1] = text;
 
   setCommandInput(phrases.join(' '));
-}
-
-/**
- * Scrolls the list view to the bottom
- */
-function scrollView() {
-  if (!oldAndroid) {
-    spacer.scrollIntoView();
-  } else {
-    // Compatibility fix for old Android
-    window.scrollTo(0, document.body.scrollHeight);
-  }
 }
 
 /**
@@ -360,3 +370,4 @@ exports.appendInputText = appendInputText;
 exports.updateThisCommandItem = updateThisCommandItem;
 exports.removeSubMenu = removeSubMenu;
 exports.getVideoHolder = getVideoHolder;
+exports.resizeInput = resizeInput;

@@ -892,6 +892,7 @@ function keyReleased(event) {
   }
 
   domManipulator.updateThisCommandItem();
+  domManipulator.resizeInput();
 }
 
 function attachMenuListener(menuItem, func, funcParam) {

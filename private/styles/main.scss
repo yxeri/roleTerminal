@@ -58,6 +58,11 @@ video {
   height: auto;
 }
 
+textarea {
+  margin: 0;
+  padding: 0;
+}
+
 #background {
   overflow: hidden;
   position: fixed;
@@ -93,12 +98,13 @@ video {
 #inputContainer {
   overflow: hidden;
   padding: 0 .8em 0 .8em;
-  display: table;
   width: 99%;
+  display: table;
+}
 
-  span {
-    display: table-cell;
-  }
+#inputContainer > * {
+  display: table-cell;
+  vertical-align: top;
 }
 
 #inputStart {
@@ -110,12 +116,10 @@ video {
   border: 0;
   font-size: inherit;
   font-family: inherit;
-  vertical-align: baseline;
   color: inherit;
   background-color: transparent;
-  width: 100%;
-  display: table-cell;
   padding-left: .3em;
+  width: 100%;
 }
 
 #cmdInput:focus {

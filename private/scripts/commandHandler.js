@@ -55,6 +55,7 @@ function resetCommand(aborted) {
   commandHelper.command = null;
   commandHelper.onStep = 0;
   commandHelper.maxSteps = 0;
+  commandHelper.fallbackStep = 0;
   commandHelper.keysBlocked = false;
   commandHelper.data = null;
   commandHelper.hideInput = false;

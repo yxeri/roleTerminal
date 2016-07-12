@@ -672,8 +672,7 @@ function specialKeyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-      // Tab
-      case 9: {
+      case 9: { // Tab
         const phrases = domManipulator.getInputText().split(' ');
         keyPressed = true;
 
@@ -717,62 +716,53 @@ function specialKeyPress(event) {
 
         break;
       }
-      // Enter
-      case 13: {
+      case 13: { // Enter
         enterKeyHandler();
 
         event.preventDefault();
 
         break;
       }
-      // Ctrl
-      case 17: {
+      case 17: { // Ctrl
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Alt
-      case 18: {
+      case 18: { // Alt
         triggerKeysPressed.alt = true;
 
         break;
       }
-      // Left Command key in OS X
-      case 91: {
+      case 91: { // Left Command key in OS X
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Right Command key in OS X
-      case 93: {
+      case 93: { // Right Command key in OS X
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Command key in OS X (Firefox)
-      case 224: {
+      case 224: { // Command key in OS X (Firefox)
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Page up
-      case 33: {
+      case 33: { // Page up
         domManipulator.getMainView().scrollTop -= window.innerHeight;
 
         event.preventDefault();
 
         break;
       }
-      // Page down
-      case 34: {
+      case 34: { // Page down
         domManipulator.getMainView().scrollTop += window.innerHeight;
 
         event.preventDefault();
 
         break;
       }
-      // Up arrow
-      case 38: {
+      case 38: { // Up arrow
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
@@ -787,8 +777,7 @@ function specialKeyPress(event) {
 
         break;
       }
-      // Down arrow
-      case 40: {
+      case 40: { // Down arrow
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
@@ -866,14 +855,15 @@ function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
   switch (keyCode) {
-    // Ctrl
-    case 17: {
+    case 91: // Left Command key in OS X
+    case 93: // Right Command key in OS X
+    case 224: // Command key in OS X (Firefox)
+    case 17: { // Ctrl
       triggerKeysPressed.ctrl = false;
 
       break;
     }
-    // Alt
-    case 18: {
+    case 18: { // Alt
       triggerKeysPressed.alt = false;
 
       break;

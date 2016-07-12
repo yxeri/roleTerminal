@@ -1208,7 +1208,7 @@ function onLogin(data = {}) {
 
 /**
  * @param {Object} params - Parameters
- * @param {boolean} params.noStepCall - Should next step function be called?
+ * @param {boolean} params.noStepCall - Should next step function be skipped?
  * @param {boolean} params.freezeStep - Should the step stay the same after being called?
  * @param {*} params.newData - New data to be used by next command step
  */
@@ -1233,6 +1233,16 @@ function onCommandFail() {
     commandHandler.abortCommand(commandHelper.command);
     commandHandler.resetCommand(true);
   }
+}
+
+/**
+ * Calls a specific command step which has been designated as the fallback step
+ * Example usage: failed login leads back to start of user name input
+ * @param {Object} params - Parameters for the command step
+ */
+function onCommandStep(params) {
+  commandHandler.commandHelper.onStep = commandHandler.commandHelper.fallbackStep;
+  commandHandler.triggerCommandStep(params);
 }
 
 function onReconnectSuccess(data) {
@@ -1697,4 +1707,5 @@ socketHandler.startSocket({
   startup: onStartup,
   mapPositions: onMapPositions,
   videoMessage: onVideoMessage,
+  commandStep: onCommandStep,
 });

@@ -4,6 +4,8 @@ const textTools = require('./textTools');
 const socketHandler = require('./socketHandler');
 const commandHandler = require('./commandHandler');
 const messenger = require('./messenger');
+const domManipulator = require('./domManipulator');
+const labels = require('./labels');
 
 /**
  * @static
@@ -12,6 +14,8 @@ const messenger = require('./messenger');
 const commands = {};
 
 function humanReadableHints(hints) {
+  const modifiedHints = [];
+
   function createReadable(hint) {
     const splitHint = hint.split(' ');
     let modifiedHint = hint;
@@ -31,12 +35,17 @@ function humanReadableHints(hints) {
     return modifiedHint;
   }
 
-  return hints.reduce((previous, current) => `${createReadable(previous)}${createReadable(current)}`);
+  for (const hint of hints) {
+    modifiedHints.push(createReadable(hint));
+  }
+
+  return modifiedHints;
 }
 
 commands.hackstation = {
   func: () => {
     commandHandler.commandHelper.data = {};
+    commandHandler.commandHelper.fallbackStep = 3;
 
     socketHandler.emit('getGameUsersSelection', { userAmount: 3 });
   },
@@ -48,7 +57,7 @@ commands.hackstation = {
 
       for (let i = 0; i < 2; i++) {
         codeColumns.push(textTools.createMixedArray({
-          amount: 24,
+          amount: 23,
           length: 28,
           upperCase: false,
           codeMode: true,
@@ -56,12 +65,127 @@ commands.hackstation = {
         }));
       }
 
+      domManipulator.setInputStart('ssm');
+      messenger.queueMessage({
+        text: labels.getText('info', 'hackStationIntro'),
+      });
+
       commandHandler.commandHelper.data.codeColumns = codeColumns;
+      commandHandler.commandHelper.data.users = users;
+      commandHandler.commandHelper.onStep++;
+    },
+    () => {
+      const users = commandHandler.commandHelper.data.users;
+      let userList = [];
+      commandHandler.commandHelper.onStep++;
 
-      messenger.queueMessage({ text: users.map((user) => `User: ${user.userName}. Gathered password information: ${humanReadableHints(user.hints)}`) });
+      for (const user of users) {
+        userList.push(textTools.createFullLine());
+        userList.push(`User: ${user.userName}`);
+        userList.push('Gathered password information:');
+        userList = userList.concat(humanReadableHints(user.hints));
+      }
 
-      messenger.queueMessage({ text: codeColumns[0] });
-      messenger.queueMessage({ text: codeColumns[1] });
+      commandHandler.triggerCommand({ cmd: 'clear' });
+      messenger.queueMessage({
+        text: [
+          'Users with authorization to access the station:',
+        ].concat(userList),
+      });
+      messenger.queueMessage({
+        text: [
+          textTools.createFullLine(),
+          'Press enter to continue. Prepare to receive memory dumps',
+        ],
+      });
+    },
+    () => {
+      const codeColumns = commandHandler.commandHelper.data.codeColumns;
+
+      commandHandler.triggerCommand({ cmd: 'clear' });
+      messenger.queueMessage({
+        text: [
+          'Dumping and translating memory content...',
+          textTools.createFullLine(),
+        ],
+      });
+      messenger.queueMessage({ text: codeColumns.shift() });
+
+      if (codeColumns.length === 0) {
+        commandHandler.commandHelper.onStep++;
+      }
+    },
+    (params = {}) => {
+      commandHandler.commandHelper.onStep++;
+
+      if (!params.reset) {
+        commandHandler.triggerCommand({ cmd: 'clear' });
+        messenger.queueMessage({
+          text: [
+            'Memory dump done',
+            'All traces cleared',
+            'Input authorized user:',
+          ],
+        });
+      } else {
+        messenger.queueMessage({
+          text: ['Input authorized user:'],
+        });
+      }
+
+      domManipulator.setInputStart('authUsr');
+    },
+    (phrases) => {
+      if (!phrases) {
+        domManipulator.setInputStart('authUsr');
+        messenger.queueMessage({
+          text: [
+            'Incorrect user and/or password',
+            'Lockdown will initiate with too many failed attempts',
+            'Input authorized user:',
+          ],
+        });
+      } else {
+        commandHandler.commandHelper.data.gameUser = { userName: phrases[0].toLowerCase() };
+        commandHandler.commandHelper.onStep++;
+
+        domManipulator.setInputStart('passwd');
+        messenger.queueMessage({ text: ['Input password:'] });
+      }
+    },
+    (phrases = ['']) => {
+      commandHandler.commandHelper.data.gameUser.password = phrases[0];
+      commandHandler.commandHelper.onStep++;
+
+      domManipulator.setInputStart('choice');
+      messenger.queueMessage({
+        text: [
+          'Which command do you want to trigger?',
+          'Enter the number of your choice:',
+          '[1] Boost signal to the station',
+          '[2] Block signal to the station',
+        ],
+      });
+    },
+    (phrases) => {
+      const validOptions = ['1', '2'];
+
+      if (!phrases || validOptions.indexOf(phrases[0]) === -1) {
+        messenger.queueMessage({
+          text: [
+            'Incorrect choice',
+            'Which command do you want to trigger?',
+            'Enter the number of your choice:',
+            '[1] Boost signal to the station',
+            '[2] Block signal to the station',
+          ],
+        });
+      } else {
+        commandHandler.commandHelper.data.choice = phrases[0];
+        commandHandler.commandHelper.onStep++;
+
+        socketHandler.emit('manipulateStation', commandHandler.commandHelper.data);
+      }
     },
   ],
   accessLevel: 1,

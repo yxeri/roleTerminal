@@ -26,28 +26,85 @@ function shuffleArray(array) {
 }
 
 function handle(socket) {
-  socket.on('loginGameUser', (params) => {
-    dbConnector.getGameUser(params.userName.toLowerCase(), (err, gameUser) => {
+  socket.on('manipulateStation', (params) => {
+    const sentUser = params.gameUser;
+
+    if (params.users.map((user) => user.userName).indexOf(sentUser.userName) === -1) {
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: ['User is not authorized to access the station'],
+        },
+      });
+      socket.emit('commandStep', { reset: true });
+
+      return;
+    }
+
+    dbConnector.getGameUser(sentUser.userName.toLowerCase(), (err, gameUser) => {
       if (err) {
+        socket.emit('commandFail');
+
         return;
       } else if (gameUser === null) {
         messenger.sendSelfMsg({
           socket,
           message: {
-            text: [`User ${params.userName} does not exist`],
+            text: [`User ${sentUser.userName} does not exist`],
           },
         });
+        socket.emit('commandStep', { reset: true });
 
         return;
       }
 
-      let loginSuccessful = false;
+      if (params.gameUser.password === gameUser.password) {
+        const choice = params.choice;
 
-      if (params.password === gameUser.password) {
-        loginSuccessful = true;
+        switch (choice) {
+          case '1': {
+            messenger.sendSelfMsg({
+              socket,
+              message: {
+                text: [
+                  'You have been authorized to access the station',
+                  'SSM is fully functional and running',
+                  'Boosting signal output from station',
+                ],
+              },
+            });
+            socket.emit('commandSuccess', { noStepCall: true });
+
+            break;
+          }
+          case '2': {
+            messenger.sendSelfMsg({
+              socket,
+              message: {
+                text: [
+                  'You have been authorized to access the station',
+                  'SSM is fully functional and running',
+                  'Blocking signal output from station',
+                ],
+              },
+            });
+            socket.emit('commandSuccess', { noStepCall: true });
+
+            break;
+          }
+          default: {
+            messenger.sendSelfMsg({
+              socket,
+              message: {
+                text: ['User is not authorized to access the station'],
+              },
+            });
+            socket.emit('commandStep', { reset: true });
+
+            break;
+          }
+        }
       }
-
-      socket.emit('loginGameUser', { loginSuccessful });
     });
   });
 
@@ -74,8 +131,6 @@ function handle(socket) {
           shuffleArray(shuffledPasswords.slice(0, 5).concat([correctPassword])),
           shuffleArray(shuffledPasswords.slice(5, 11).concat([correctPassword])),
         ];
-
-        // TODO Get random passwords that do not match the chosen password
 
         socket.emit('commandSuccess', {
           freezeStep: true,

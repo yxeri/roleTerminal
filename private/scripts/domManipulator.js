@@ -98,7 +98,7 @@ function updateThisCommandItem() {
  */
 function scrollView() {
   if (!oldAndroid) {
-    spacer.scrollIntoView();
+    cmdInput.scrollIntoView();
   } else {
     // Compatibility fix for old Android
     window.scrollTo(0, document.body.scrollHeight);
@@ -107,11 +107,11 @@ function scrollView() {
 
 /**
  * Sets the height of the textarea to fit all text
- * @param {boolean} wasCleared - Was the textarea cleared?
  */
 function resizeInput() {
   cmdInput.style.height = 'auto';
   cmdInput.style.height = `${cmdInput.scrollHeight}px`;
+
   scrollView();
 }
 

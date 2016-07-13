@@ -61,6 +61,7 @@ video {
 textarea {
   margin: 0;
   padding: 0;
+  resize: none;
 }
 
 #background {
@@ -175,10 +176,6 @@ textarea {
       display:inherit;
     }
   }
-}
-
-#spacer {
-  height: .4em;
 }
 
 #central {
@@ -390,10 +387,6 @@ textarea {
 }
 
 @media (max-width: 736px) {
-  #spacer {
-    height: .2em;
-  }
-
   #mainFeed li {
     padding: 0 .4em 0 .4em;
   }
@@ -416,10 +409,6 @@ textarea {
 }
 
 @media (max-width: 414px) {
-  #spacer {
-    height: .1em;
-  }
-
   #mainFeed li {
     padding: 0 .2em 0 .2em;
   }

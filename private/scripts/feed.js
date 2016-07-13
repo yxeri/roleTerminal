@@ -557,6 +557,11 @@ function goFullScreen(element) {
   }
 }
 
+/**
+ * Fix for Android.
+ * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
+ * @param {boolean} keyboardShown - Is the virtual keyboard visible?
+ */
 function fullscreenResize(keyboardShown) {
   /**
    * Used for Android when it shows/hides the keyboard
@@ -855,6 +860,17 @@ function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
   switch (keyCode) {
+    case 9: // Tab
+    case 16: // Shift
+    case 20: // Caps lock
+    case 33: // Page up
+    case 34: // Page down
+    case 37: // Left arrow
+    case 39: { // Down arrow
+      keyPressed = false;
+
+      break;
+    }
     case 91: // Left Command key in OS X
     case 93: // Right Command key in OS X
     case 224: // Command key in OS X (Firefox)
@@ -870,6 +886,7 @@ function keyReleased(event) {
     }
     default: {
       keyPressed = false;
+      domManipulator.resizeInput();
 
       break;
     }
@@ -882,7 +899,6 @@ function keyReleased(event) {
   }
 
   domManipulator.updateThisCommandItem();
-  domManipulator.resizeInput();
 }
 
 function attachMenuListener(menuItem, func, funcParam) {

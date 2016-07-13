@@ -712,9 +712,12 @@ function specialKeyPress(event) {
           }
         } else if (phrases.length >= 2) {
           const command = commandHandler.getCommand(phrases[0]);
-          const options = command.options;
 
-          autoCompleteOption(phrases, options, phrases.length);
+          if (command) {
+            const options = command.options;
+
+            autoCompleteOption(phrases, options, phrases.length);
+          }
         }
 
         event.preventDefault();

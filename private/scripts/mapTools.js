@@ -420,15 +420,11 @@ function createMarkerClusterer() {
  */
 function createMap(params) {
   // Will stop and retry to create map if external files have not finished loading
-  if (!google || !MarkerClusterer || !MapLabel) {
+  if (typeof google === 'undefined' || typeof MarkerClusterer === 'undefined' || typeof MapLabel === 'undefined') {
     setTimeout(createMap, 500, params);
-
-    console.log('will retry with map');
 
     return;
   }
-
-  console.log('creating map!');
 
   const elementId = params.elementId;
 

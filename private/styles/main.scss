@@ -58,6 +58,12 @@ video {
   height: auto;
 }
 
+textarea {
+  margin: 0;
+  padding: 0;
+  resize: none;
+}
+
 #background {
   overflow: hidden;
   position: fixed;
@@ -93,12 +99,13 @@ video {
 #inputContainer {
   overflow: hidden;
   padding: 0 .8em 0 .8em;
-  display: table;
   width: 99%;
+  display: table;
+}
 
-  span {
-    display: table-cell;
-  }
+#inputContainer > * {
+  display: table-cell;
+  vertical-align: top;
 }
 
 #inputStart {
@@ -110,12 +117,10 @@ video {
   border: 0;
   font-size: inherit;
   font-family: inherit;
-  vertical-align: baseline;
   color: inherit;
   background-color: transparent;
-  width: 100%;
-  display: table-cell;
   padding-left: .3em;
+  width: 100%;
 }
 
 #cmdInput:focus {
@@ -171,10 +176,6 @@ video {
       display:inherit;
     }
   }
-}
-
-#spacer {
-  height: .4em;
 }
 
 #central {
@@ -386,10 +387,6 @@ video {
 }
 
 @media (max-width: 736px) {
-  #spacer {
-    height: .2em;
-  }
-
   #mainFeed li {
     padding: 0 .4em 0 .4em;
   }
@@ -412,10 +409,6 @@ video {
 }
 
 @media (max-width: 414px) {
-  #spacer {
-    height: .1em;
-  }
-
   #mainFeed li {
     padding: 0 .2em 0 .2em;
   }

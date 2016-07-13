@@ -557,6 +557,11 @@ function goFullScreen(element) {
   }
 }
 
+/**
+ * Fix for Android.
+ * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
+ * @param {boolean} keyboardShown - Is the virtual keyboard visible?
+ */
 function fullscreenResize(keyboardShown) {
   /**
    * Used for Android when it shows/hides the keyboard
@@ -672,8 +677,7 @@ function specialKeyPress(event) {
 
   if (!keyPressed) {
     switch (keyCode) {
-      // Tab
-      case 9: {
+      case 9: { // Tab
         const phrases = domManipulator.getInputText().split(' ');
         keyPressed = true;
 
@@ -708,71 +712,65 @@ function specialKeyPress(event) {
           }
         } else if (phrases.length >= 2) {
           const command = commandHandler.getCommand(phrases[0]);
-          const options = command.options;
 
-          autoCompleteOption(phrases, options, phrases.length);
+          if (command) {
+            const options = command.options;
+
+            autoCompleteOption(phrases, options, phrases.length);
+          }
         }
 
         event.preventDefault();
 
         break;
       }
-      // Enter
-      case 13: {
+      case 13: { // Enter
         enterKeyHandler();
 
         event.preventDefault();
 
         break;
       }
-      // Ctrl
-      case 17: {
+      case 17: { // Ctrl
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Alt
-      case 18: {
+      case 18: { // Alt
         triggerKeysPressed.alt = true;
 
         break;
       }
-      // Left Command key in OS X
-      case 91: {
+      case 91: { // Left Command key in OS X
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Right Command key in OS X
-      case 93: {
+      case 93: { // Right Command key in OS X
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Command key in OS X (Firefox)
-      case 224: {
+      case 224: { // Command key in OS X (Firefox)
         triggerKeysPressed.ctrl = true;
 
         break;
       }
-      // Page up
-      case 33: {
+      case 33: { // Page up
         domManipulator.getMainView().scrollTop -= window.innerHeight;
 
         event.preventDefault();
 
         break;
       }
-      // Page down
-      case 34: {
+      case 34: { // Page down
         domManipulator.getMainView().scrollTop += window.innerHeight;
 
         event.preventDefault();
 
         break;
       }
-      // Up arrow
-      case 38: {
+      case 38: { // Up arrow
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
@@ -787,8 +785,7 @@ function specialKeyPress(event) {
 
         break;
       }
-      // Down arrow
-      case 40: {
+      case 40: { // Down arrow
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
@@ -866,20 +863,33 @@ function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
   switch (keyCode) {
-    // Ctrl
-    case 17: {
+    case 9: // Tab
+    case 16: // Shift
+    case 20: // Caps lock
+    case 33: // Page up
+    case 34: // Page down
+    case 37: // Left arrow
+    case 39: { // Down arrow
+      keyPressed = false;
+
+      break;
+    }
+    case 91: // Left Command key in OS X
+    case 93: // Right Command key in OS X
+    case 224: // Command key in OS X (Firefox)
+    case 17: { // Ctrl
       triggerKeysPressed.ctrl = false;
 
       break;
     }
-    // Alt
-    case 18: {
+    case 18: { // Alt
       triggerKeysPressed.alt = false;
 
       break;
     }
     default: {
       keyPressed = false;
+      domManipulator.resizeInput();
 
       break;
     }
@@ -897,6 +907,7 @@ function keyReleased(event) {
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
     menuItem.addEventListener('click', (event) => {
+      fullscreenResize();
       func([funcParam]);
       clickHandler.setClicked(true);
       event.stopPropagation();
@@ -1206,15 +1217,21 @@ function onLogin(data = {}) {
   });
 }
 
-function onCommandSuccess(data = {}) {
+/**
+ * @param {Object} params - Parameters
+ * @param {boolean} params.noStepCall - Should next step function be skipped?
+ * @param {boolean} params.freezeStep - Should the step stay the same after being called?
+ * @param {*} params.newData - New data to be used by next command step
+ */
+function onCommandSuccess(params = {}) {
   const commandHelper = commandHandler.commandHelper;
 
-  if (!data.noStepCall) {
-    if (!data.freezeStep) {
+  if (!params.noStepCall) {
+    if (!params.freezeStep) {
       commandHelper.onStep++;
     }
 
-    commandHandler.triggerCommandStep();
+    commandHandler.triggerCommandStep(params.newData);
   } else {
     commandHandler.resetCommand(false);
   }
@@ -1227,6 +1244,16 @@ function onCommandFail() {
     commandHandler.abortCommand(commandHelper.command);
     commandHandler.resetCommand(true);
   }
+}
+
+/**
+ * Calls a specific command step which has been designated as the fallback step
+ * Example usage: failed login leads back to start of user name input
+ * @param {Object} params - Parameters for the command step
+ */
+function onCommandStep(params) {
+  commandHandler.commandHelper.onStep = commandHandler.commandHelper.fallbackStep;
+  commandHandler.triggerCommandStep(params);
 }
 
 function onReconnectSuccess(data) {
@@ -1691,4 +1718,5 @@ socketHandler.startSocket({
   startup: onStartup,
   mapPositions: onMapPositions,
   videoMessage: onVideoMessage,
+  commandStep: onCommandStep,
 });

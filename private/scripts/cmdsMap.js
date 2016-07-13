@@ -1,8 +1,6 @@
 /** @module */
 
 const mapTools = require('./mapTools');
-const socketHandler = require('./socketHandler');
-const storage = require('./storage');
 const layoutChanger = require('./layoutChanger');
 const messenger = require('./messenger');
 
@@ -27,16 +25,6 @@ commands.map = {
             mapTools.setMapView(value);
           } else {
             mapTools.setMapView('area');
-          }
-
-          if (!mapTools.getMap()) {
-            mapTools.createMap({
-              centerCoordinates: storage.getCenterCoordinates(),
-              zoomLevel: storage.getDefaultZoomLevel(),
-              elementId: 'map',
-            });
-            socketHandler.emit('getMapPositions', { types: ['static', 'users'] });
-            socketHandler.emit('getGooglePositions', { types: ['world'] });
           }
 
           if (mapTools.getMap()) {

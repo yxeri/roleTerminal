@@ -1,5 +1,8 @@
 /** @module */
 
+const socketHandler = require('./socketHandler');
+const storage = require('./storage');
+
 const markerInfo = document.getElementById('markerInfo');
 const mapMarkers = {};
 const mapPolygons = {};
@@ -416,9 +419,16 @@ function createMarkerClusterer() {
  * @param {string} params.elementId - Id of map element
  */
 function createMap(params) {
-  if (!google) {
+  // Will stop and retry to create map if external files have not finished loading
+  if (!google || !MarkerClusterer || !MapLabel) {
+    setTimeout(createMap, 500, params);
+
+    console.log('will retry with map');
+
     return;
   }
+
+  console.log('creating map!');
 
   const elementId = params.elementId;
 
@@ -574,6 +584,19 @@ function getInfoText(markerName) {
   return { title: marker.addedTitle, description };
 }
 
+function startMap() {
+  if (!getMap()) {
+    createMap({
+      centerCoordinates: storage.getCenterCoordinates(),
+      zoomLevel: storage.getDefaultZoomLevel(),
+      elementId: 'map',
+    });
+  }
+
+  socketHandler.emit('getMapPositions', { types: ['static', 'users'] });
+  socketHandler.emit('getGooglePositions', { types: ['world'] });
+}
+
 exports.setMarkerPosition = setMarkerPosition;
 exports.setLinePosition = setLinePosition;
 exports.setPolygonPosition = setPolygonPosition;
@@ -591,3 +614,4 @@ exports.setCornerCoords = setCornerCoords;
 exports.increaseZoom = increaseZoom;
 exports.decreaseZoom = decreaseZoom;
 exports.getInfoText = getInfoText;
+exports.startMap = startMap;

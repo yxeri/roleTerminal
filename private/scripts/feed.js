@@ -904,6 +904,7 @@ function keyReleased(event) {
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
     menuItem.addEventListener('click', (event) => {
+      fullscreenResize();
       func([funcParam]);
       clickHandler.setClicked(true);
       event.stopPropagation();

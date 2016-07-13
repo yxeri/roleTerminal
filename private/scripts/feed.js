@@ -1215,6 +1215,7 @@ function onLogin(data = {}) {
       entered: true,
     },
   });
+  mapTools.startMap();
 }
 
 /**
@@ -1686,6 +1687,8 @@ function onStartup(params = { }) {
       firstConnection: true,
       device: { deviceId: storage.getDeviceId() },
     });
+
+    mapTools.startMap();
 
     firstConnection = false;
   }

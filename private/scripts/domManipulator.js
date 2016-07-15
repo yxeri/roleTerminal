@@ -42,6 +42,10 @@ const menuList = document.getElementById('menuList');
  */
 const videoHolder = document.getElementById('videoHolder');
 /**
+ * @type {HTMLElement}
+ */
+const statusField = document.getElementById('status');
+/**
  * Div containing mainFeed, inputContainer and spacer
  * @type {HTMLElement}
  */
@@ -343,6 +347,13 @@ function getVideoHolder() {
   return videoHolder;
 }
 
+/**
+ * @param {string} status - Current status text (online/offline)
+ */
+function setStatus(status) {
+  statusField.textContent = status;
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -372,3 +383,4 @@ exports.updateThisCommandItem = updateThisCommandItem;
 exports.removeSubMenu = removeSubMenu;
 exports.getVideoHolder = getVideoHolder;
 exports.resizeInput = resizeInput;
+exports.setStatus = setStatus;

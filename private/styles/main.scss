@@ -99,11 +99,10 @@ textarea {
 #inputContainer {
   overflow: hidden;
   padding: 0 .8em 0 .8em;
-  width: 99%;
-  display: table;
+  width: 100%;
 }
 
-#inputContainer > * {
+#inputContainer > span {
   display: table-cell;
   vertical-align: top;
 }
@@ -119,7 +118,6 @@ textarea {
   font-family: inherit;
   color: inherit;
   background-color: transparent;
-  padding-left: .3em;
   width: 100%;
 }
 

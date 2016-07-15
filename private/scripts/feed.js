@@ -1139,6 +1139,7 @@ function onImportantMsg(data = {}) {
 function onReconnect() {
   clearTimeout(serverDownTimeout);
   socketHandler.reconnect();
+  domManipulator.setStatus(labels.getString('status', 'online'));
 }
 
 function onDisconnect() {
@@ -1150,6 +1151,7 @@ function onDisconnect() {
     }
   };
 
+  domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
     text: labels.getText('info', 'lostConnection'),
   });
@@ -1292,10 +1294,7 @@ function onReconnectSuccess(data) {
     });
   } else {
     if (!data.firstConnection) {
-      messenger.queueMessage({
-        text: ['Re-established connection'],
-        text_se: ['Lyckades återansluta'],
-      });
+      messenger.queueMessage(labels.getMessage('info', 'reestablished'));
     } else {
       printStartMessage();
     }
@@ -1612,6 +1611,7 @@ function onVideoMessage(params = {}) {
  * @param {Object} params - Configuration properties
  */
 function onStartup(params = { }) {
+  domManipulator.setStatus(labels.getString('status', 'online'));
   storage.setDefaultLanguage(params.defaultLanguage);
   storage.shouldForceFullscreen(params.forceFullscreen);
   storage.shouldGpsTrack(params.gpsTracking);

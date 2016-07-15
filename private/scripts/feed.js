@@ -557,6 +557,17 @@ function goFullScreen(element) {
   }
 }
 
+function isAndroid() {
+  return navigator.userAgent.match(/Android/i);
+}
+
+function isStandalone() {
+  return window.navigator.standalone;
+}
+
+function isIos() {
+  return navigator.userAgent.match(/iP(hone|ad|od)/i);
+}
 /**
  * Fix for Android.
  * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
@@ -567,7 +578,7 @@ function fullscreenResize(keyboardShown) {
    * Used for Android when it shows/hides the keyboard
    * The soft keyboard will block part of the site without this fix
    */
-  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
+  if (isFullscreen() && isAndroid()) {
     const spacer = domManipulator.getSpacer();
 
     domManipulator.getMainView().classList.add('fullscreen');
@@ -1099,7 +1110,7 @@ function hideMessageProperties(message = { }) {
  * @returns {boolean} Returns true if userAgent contains iPhone, iPad, iPod or Android
  */
 function isTouchDevice() {
-  return ((/iP(hone|ad|od)/.test(navigator.userAgent) || /Android/.test(navigator.userAgent)));
+  return ((isIos() || isAndroid()));
 }
 
 function onMessage(data = { message: {} }) {

@@ -386,6 +386,10 @@ textarea {
   padding: 0 .4em 0 .4em;
 }
 
+.textMelt {
+  color: $back-color !important;
+}
+
 @media (max-width: 736px) {
   #mainFeed li {
     padding: 0 .4em 0 .4em;

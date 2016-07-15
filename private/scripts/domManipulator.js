@@ -60,14 +60,15 @@ let oldAndroid;
 let thisCommandItem;
 
 /**
- * Hides (password style) user input
+ * Changes color of the text to melt into the background
+ * Uglier but less complex way than replacing characters in keydown event
  * @param {boolean} hide - Should input be hidden?
  */
 function hideInput(hide) {
   if (hide) {
-    cmdInput.setAttribute('type', 'password');
+    cmdInput.classList.add('textMelt');
   } else {
-    cmdInput.setAttribute('type', 'text');
+    cmdInput.classList.remove('textMelt');
   }
 }
 

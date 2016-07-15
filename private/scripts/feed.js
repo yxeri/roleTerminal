@@ -557,6 +557,24 @@ function goFullScreen(element) {
   }
 }
 
+function isAndroid() {
+  return navigator.userAgent.match(/Android/i);
+}
+
+function isStandalone() {
+  return window.navigator.standalone;
+}
+
+function isIos() {
+  return navigator.userAgent.match(/iP(hone|ad|od)/i);
+}
+
+function padMenu() {
+  if (isIos() && isStandalone()) {
+    domManipulator.getMenu().classList.add('iosMenuPadding');
+  }
+}
+
 /**
  * Fix for Android.
  * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
@@ -567,7 +585,7 @@ function fullscreenResize(keyboardShown) {
    * Used for Android when it shows/hides the keyboard
    * The soft keyboard will block part of the site without this fix
    */
-  if (isFullscreen() && navigator.userAgent.match(/Android/i)) {
+  if (isFullscreen() && isAndroid()) {
     const spacer = domManipulator.getSpacer();
 
     domManipulator.getMainView().classList.add('fullscreen');
@@ -1099,7 +1117,7 @@ function hideMessageProperties(message = { }) {
  * @returns {boolean} Returns true if userAgent contains iPhone, iPad, iPod or Android
  */
 function isTouchDevice() {
-  return ((/iP(hone|ad|od)/.test(navigator.userAgent) || /Android/.test(navigator.userAgent)));
+  return ((isIos() || isAndroid()));
 }
 
 function onMessage(data = { message: {} }) {
@@ -1139,6 +1157,7 @@ function onImportantMsg(data = {}) {
 function onReconnect() {
   clearTimeout(serverDownTimeout);
   socketHandler.reconnect();
+  domManipulator.setStatus(labels.getString('status', 'online'));
 }
 
 function onDisconnect() {
@@ -1150,6 +1169,7 @@ function onDisconnect() {
     }
   };
 
+  domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
     text: labels.getText('info', 'lostConnection'),
   });
@@ -1292,10 +1312,7 @@ function onReconnectSuccess(data) {
     });
   } else {
     if (!data.firstConnection) {
-      messenger.queueMessage({
-        text: ['Re-established connection'],
-        text_se: ['Lyckades återansluta'],
-      });
+      messenger.queueMessage(labels.getMessage('info', 'reestablished'));
     } else {
       printStartMessage();
     }
@@ -1612,6 +1629,7 @@ function onVideoMessage(params = {}) {
  * @param {Object} params - Configuration properties
  */
 function onStartup(params = { }) {
+  domManipulator.setStatus(labels.getString('status', 'online'));
   storage.setDefaultLanguage(params.defaultLanguage);
   storage.shouldForceFullscreen(params.forceFullscreen);
   storage.shouldGpsTrack(params.gpsTracking);
@@ -1637,6 +1655,7 @@ function onStartup(params = { }) {
 
   if (firstConnection) {
     populateMenu();
+    padMenu();
 
     if (!isTouchDevice()) {
       domManipulator.focusInput();

@@ -42,6 +42,10 @@ const menuList = document.getElementById('menuList');
  */
 const videoHolder = document.getElementById('videoHolder');
 /**
+ * @type {HTMLElement}
+ */
+const statusField = document.getElementById('status');
+/**
  * Div containing mainFeed, inputContainer and spacer
  * @type {HTMLElement}
  */
@@ -60,14 +64,15 @@ let oldAndroid;
 let thisCommandItem;
 
 /**
- * Hides (password style) user input
+ * Changes color of the text to melt into the background
+ * Uglier but less complex way than replacing characters in keydown event
  * @param {boolean} hide - Should input be hidden?
  */
 function hideInput(hide) {
   if (hide) {
-    cmdInput.setAttribute('type', 'password');
+    cmdInput.classList.add('textMelt');
   } else {
-    cmdInput.setAttribute('type', 'text');
+    cmdInput.classList.remove('textMelt');
   }
 }
 
@@ -342,6 +347,13 @@ function getVideoHolder() {
   return videoHolder;
 }
 
+/**
+ * @param {string} status - Current status text (online/offline)
+ */
+function setStatus(status) {
+  statusField.textContent = status;
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -371,3 +383,4 @@ exports.updateThisCommandItem = updateThisCommandItem;
 exports.removeSubMenu = removeSubMenu;
 exports.getVideoHolder = getVideoHolder;
 exports.resizeInput = resizeInput;
+exports.setStatus = setStatus;

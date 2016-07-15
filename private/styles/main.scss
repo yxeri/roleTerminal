@@ -99,11 +99,10 @@ textarea {
 #inputContainer {
   overflow: hidden;
   padding: 0 .8em 0 .8em;
-  width: 99%;
-  display: table;
+  width: 100%;
 }
 
-#inputContainer > * {
+#inputContainer > span {
   display: table-cell;
   vertical-align: top;
 }
@@ -119,7 +118,6 @@ textarea {
   font-family: inherit;
   color: inherit;
   background-color: transparent;
-  padding-left: .3em;
   width: 100%;
 }
 
@@ -384,6 +382,14 @@ textarea {
   border-left: 2px solid;
   border-right: 2px solid;
   padding: 0 .4em 0 .4em;
+}
+
+.iosMenuPadding {
+  padding-top: .8em;
+}
+
+.textMelt {
+  color: $back-color !important;
 }
 
 @media (max-width: 736px) {

@@ -1051,6 +1051,10 @@ const all = {
     broadcast: 'allmänt meddelande',
     broadcastFrom: 'allmänt meddelande från:',
   },
+  status: {
+    online: '[ONLINE]',
+    offline: '[OFFLINE]',
+  },
   logos: {
     christmas: {
       text: [

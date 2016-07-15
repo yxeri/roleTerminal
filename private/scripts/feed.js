@@ -568,6 +568,13 @@ function isStandalone() {
 function isIos() {
   return navigator.userAgent.match(/iP(hone|ad|od)/i);
 }
+
+function padMenu() {
+  if (isIos() && isStandalone()) {
+    domManipulator.getMenu().classList.add('iosMenuPadding');
+  }
+}
+
 /**
  * Fix for Android.
  * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
@@ -1648,6 +1655,7 @@ function onStartup(params = { }) {
 
   if (firstConnection) {
     populateMenu();
+    padMenu();
 
     if (!isTouchDevice()) {
       domManipulator.focusInput();

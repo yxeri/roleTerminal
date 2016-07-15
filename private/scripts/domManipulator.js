@@ -351,7 +351,7 @@ function getVideoHolder() {
  * @param {string} status - Current status text (online/offline)
  */
 function setStatus(status) {
-  statusField.textContent = status;
+  statusField.textContent = `[${status}]`;
 }
 
 exports.setInputStart = setInputStart;

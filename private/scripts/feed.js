@@ -1,5 +1,3 @@
-'use strict';
-
 const labels = require('./labels');
 const textTools = require('./textTools');
 const mapTools = require('./mapTools');
@@ -1712,6 +1710,16 @@ function onStartup(params = { }) {
     firstConnection = false;
   }
 }
+
+window.addEventListener('error', (event) => {
+  console.log(event.error);
+  domManipulator.setStatus(labels.getString('status', 'offline'));
+  messenger.queueMessage({
+    text: ['!!!! Something bad happened and the terminal is no longer working !!!!'],
+  });
+
+  return false;
+});
 
 socketHandler.startSocket({
   message: onMessage,

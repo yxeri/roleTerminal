@@ -85,6 +85,7 @@ function createMarker(params) {
     origin: new google.maps.Point(0, 0),
     anchor: new google.maps.Point(8, 8),
   };
+  const description = params.description;
 
   mapMarkers[markerName] = new google.maps.Marker({
     position: {
@@ -94,9 +95,12 @@ function createMarker(params) {
     opacity: params.opacity || 0.9,
     icon,
   });
-  mapMarkers[markerName].addedShortDesc = params.description.length > maxShortDescLength ? `${params.description.slice(0, maxShortDescLength)}...` : `${params.description}`;
-  mapMarkers[markerName].addedExpandedDesc = params.description.length > maxShortDescLength ? `${params.description.slice(maxShortDescLength)}` : undefined;
   mapMarkers[markerName].addedTitle = params.title;
+
+  if (description) {
+    mapMarkers[markerName].addedShortDesc = description.length > maxShortDescLength ? `${description.slice(0, maxShortDescLength)}...` : `${description}`;
+    mapMarkers[markerName].addedExpandedDesc = description.length > maxShortDescLength ? `${description.slice(maxShortDescLength)}` : undefined;
+  }
 
   if (!params.hideLabel) {
     createLabel({
@@ -119,7 +123,7 @@ function createMarker(params) {
     markerInfo.classList.remove('hide');
     markerInfo.style.left = `${xy.x}px`;
     markerInfo.style.top = `${xy.y}px`;
-    markerInfo.textContent = `${marker.addedTitle}.${'\n'}${marker.addedShortDesc}`;
+    markerInfo.textContent = `${marker.addedTitle}.${'\n'}${marker.addedShortDesc || ''}`;
   });
 }
 

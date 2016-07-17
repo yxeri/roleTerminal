@@ -459,7 +459,7 @@ function autoCompleteOption(phrases = [], options = {}) {
 function autoCompleteCommand() {
   const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
   // TODO Change from Object.keys for compatibility with older Android
-  const allCommands = commandHandler.getCommands().concat(Object.keys(storage.getAliases()));
+  const allCommands = commandHandler.getCommands({ aliases: true, filtered: true });
   const matched = [];
   const sign = phrases[0].charAt(0);
   let newText = '';
@@ -990,6 +990,12 @@ function thisCommandOptions() {
   }
 }
 
+function showCommands() {
+  const commands = commandHandler.getCommands({ aliases: true, filtered: true });
+
+  domManipulator.addSubMenuItem('commands', createSubMenuItem(commands));
+}
+
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -1000,7 +1006,7 @@ function populateMenu() {
     },
     commands: {
       itemName: 'CMDS',
-      func: commandHandler.getCommand('help').func,
+      func: showCommands,
       elementId: 'commands',
     },
     thisCommand: {

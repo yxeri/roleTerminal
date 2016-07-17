@@ -126,49 +126,17 @@ commands.radio = {
 
 commands.help = {
   func: (phrases) => {
-    /**
-     * Returns names of all available commands for the user, based on the users access level and the commands visibility
-     * @private
-     * @returns {string[]} - Names of all available commands for the user
-     */
-    function getCommands() {
-      const allCommands = [];
-      // TODO Change from Object.keys for compatibility with older Android
-      const keys = commandHandler.getCommands();
-
-      for (let i = 0; i < keys.length; i++) {
-        const commandName = keys[i];
-        const commandAccessLevel = commandHandler.getCommandAccessLevel(commandName);
-        const commandVisibility = commandHandler.getCommandVisibility(commandName);
-
-        if (storage.getAccessLevel() >= commandAccessLevel && storage.getAccessLevel() >= commandVisibility) {
-          allCommands.push(commandName);
-        }
-      }
-
-      return allCommands.concat(Object.keys(storage.getAliases())).sort();
-    }
-
-    /**
-     * Sends all available commands as a message to the user
-     * @private
-     */
-    function getAll() {
-      const allCommands = getCommands();
+    if (undefined === phrases || phrases.length === 0) {
+      messenger.queueMessage({ text: textTools.createCommandStart('help').concat(labels.getText('instructions', 'helpExtra')) });
 
       if (storage.getUser() === null) {
         messenger.queueMessage({ text: labels.getText('info', 'useRegister') });
       }
 
       messenger.queueMessage({
-        text: allCommands,
+        text: commandHandler.getCommands(true),
         linkable: true,
       });
-    }
-
-    if (undefined === phrases || phrases.length === 0) {
-      messenger.queueMessage({ text: textTools.createCommandStart('help').concat(labels.getText('instructions', 'helpExtra')) });
-      getAll();
     } else if (phrases.length >= 1) {
       messenger.printHelpMessage(phrases[0]);
     }

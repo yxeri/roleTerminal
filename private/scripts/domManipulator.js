@@ -126,6 +126,7 @@ function resizeInput() {
  */
 function setCommandInput(text) {
   cmdInput.value = text;
+  cmdInput.setSelectionRange(cmdInput.value.length, cmdInput.value.length);
   updateThisCommandItem();
 }
 

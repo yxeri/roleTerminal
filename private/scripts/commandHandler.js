@@ -151,10 +151,36 @@ function isCommandChar(char) {
 
 /**
  * Get the names of all commands
+ * @param {Object} params - Parameters
+ * @param {boolean} params.aliases - Should aliases be included with the returned commands?
+ * @param {boolean} params.filtered - Should returned commands be filtered based on user's access level?
  * @returns {string[]} - Names of all commands
  */
-function getCommands() {
-  return Object.keys(commands);
+function getCommands(params) {
+  const keys = Object.keys(commands);
+  let allCommands;
+
+  if (params.filtered) {
+    allCommands = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      const commandName = keys[i];
+      const commandAccessLevel = getCommandAccessLevel(commandName);
+      const commandVisibility = getCommandVisibility(commandName);
+
+      if (storage.getAccessLevel() >= commandAccessLevel && storage.getAccessLevel() >= commandVisibility) {
+        allCommands.push(commandName);
+      }
+    }
+  } else {
+    allCommands = keys;
+  }
+
+  if (params.aliases) {
+    allCommands = allCommands.concat(Object.keys(storage.getAliases()));
+  }
+
+  return allCommands.sort();
 }
 
 /**
@@ -212,7 +238,7 @@ function updateCommand(command) {
  * Triggered by commandHandler
  */
 function addSpecialHelpOptions() {
-  for (const command of getCommands()) {
+  for (const command of getCommands({ aliases: false })) {
     commands.help.options[command] = { description: command };
   }
 }

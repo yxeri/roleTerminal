@@ -186,7 +186,7 @@ commands.login = {
           'Exempel: login best',
         ],
       });
-      domManipulator.resetCommand();
+      commandHandler.resetCommand();
     }
   },
   steps: [

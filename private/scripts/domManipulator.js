@@ -55,6 +55,10 @@ let mainView = document.getElementById('background');
  */
 let secondView = null;
 /**
+ * Function to call when the view changes size
+ */
+let viewResizeCallback;
+/**
  * @type {boolean}
  */
 let oldAndroid;
@@ -207,9 +211,11 @@ function changeModeText() {
 /**
  * Set second view, which will be shown above/to the left of the main view
  * @param {HTMLElement} view - Second side view
+ * @param {function} resizeFunc - Function to call when the view is resized
  */
-function setSecondView(view) {
+function setSecondView(view, resizeFunc) {
   secondView = view;
+  viewResizeCallback = resizeFunc;
 }
 
 /**
@@ -355,6 +361,12 @@ function setStatus(status) {
   statusField.textContent = `[${status}]`;
 }
 
+function resizeCallback() {
+  if (viewResizeCallback) {
+    viewResizeCallback();
+  }
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -385,3 +397,4 @@ exports.removeSubMenu = removeSubMenu;
 exports.getVideoHolder = getVideoHolder;
 exports.resizeInput = resizeInput;
 exports.setStatus = setStatus;
+exports.resizeCallback = resizeCallback;

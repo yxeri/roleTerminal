@@ -686,6 +686,17 @@ function enterKeyHandler() {
   domManipulator.clearModeText();
 }
 
+/**
+ * Scrolls the view (with rows) a specific amount of pixels
+ * Used to scroll the view with page up/down keys
+ * @param {number} amount - Amount of pixels to scroll the view with
+ */
+function scrollText(amount) {
+  const modifiedAmount = amount < 0 ? (amount + 100) : (amount - 100);
+
+  domManipulator.getMainView().scrollTop += modifiedAmount;
+}
+
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const commandHistory = storage.getCommandHistory();
@@ -773,14 +784,14 @@ function specialKeyPress(event) {
         break;
       }
       case 33: { // Page up
-        domManipulator.getMainView().scrollTop -= window.innerHeight;
+        scrollText(-window.innerHeight);
 
         event.preventDefault();
 
         break;
       }
       case 34: { // Page down
-        domManipulator.getMainView().scrollTop += window.innerHeight;
+        scrollText(window.innerHeight);
 
         event.preventDefault();
 
@@ -790,7 +801,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          domManipulator.getMainView().scrollTop -= window.innerHeight;
+          scrollText(-window.innerHeight);
         } else if (!commandHelper.keysBlocked && commandHelper.command === null && previousCommandPointer > 0) {
           domManipulator.clearInput();
           previousCommandPointer--;
@@ -805,7 +816,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          domManipulator.getMainView().scrollTop += window.innerHeight;
+          scrollText(window.innerHeight);
         } else {
           if (!commandHelper.keysBlocked && commandHelper.command === null) {
             if (previousCommandPointer < commandHistory.length - 1) {

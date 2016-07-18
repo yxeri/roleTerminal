@@ -773,14 +773,14 @@ function specialKeyPress(event) {
         break;
       }
       case 33: { // Page up
-        domManipulator.getMainView().scrollTop -= window.innerHeight;
+        domManipulator.getMainView().scrollTop -= (window.innerHeight - 100);
 
         event.preventDefault();
 
         break;
       }
       case 34: { // Page down
-        domManipulator.getMainView().scrollTop += window.innerHeight;
+        domManipulator.getMainView().scrollTop += (window.innerHeight - 100);
 
         event.preventDefault();
 
@@ -790,7 +790,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          domManipulator.getMainView().scrollTop -= window.innerHeight;
+          domManipulator.getMainView().scrollTop -= (window.innerHeight - 100);
         } else if (!commandHelper.keysBlocked && commandHelper.command === null && previousCommandPointer > 0) {
           domManipulator.clearInput();
           previousCommandPointer--;
@@ -805,7 +805,7 @@ function specialKeyPress(event) {
         keyPressed = true;
 
         if (triggerKeysPressed.ctrl) {
-          domManipulator.getMainView().scrollTop += window.innerHeight;
+          domManipulator.getMainView().scrollTop += (window.innerHeight - 100);
         } else {
           if (!commandHelper.keysBlocked && commandHelper.command === null) {
             if (previousCommandPointer < commandHistory.length - 1) {

@@ -145,7 +145,7 @@ function generateLink(text, className, func) {
 
   spanObj.addEventListener('click', (event) => {
     clickHandler.setClicked(true);
-    func(this);
+    func(event.target);
     domManipulator.focusInput();
     event.stopPropagation();
   });

@@ -19,7 +19,7 @@ commands.map = {
 
       switch (choice) {
         case 'on': {
-          layoutChanger.splitView(true, mapDiv);
+          layoutChanger.splitView(true, mapDiv, mapTools.realignMap);
 
           if (value) {
             mapTools.setMapView(value);

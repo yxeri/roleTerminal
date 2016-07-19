@@ -23,7 +23,7 @@ function humanReadableHints(hints) {
     if (splitHint[0] === 'end') {
       modifiedHint = `Password ends with: ${splitHint[1]}. `;
     } else if (splitHint[0] === 'middle') {
-      modifiedHint = `Position ${parseInt(splitHint[1], 10) + 1} in the password is: ${splitHint[2]}. `;
+      modifiedHint = `Position ${parseInt(splitHint[1], 10)} in the password is: ${splitHint[2]}. `;
     } else if (splitHint[0] === 'start') {
       modifiedHint = `Password starts with: ${splitHint[1]}. `;
     } else if (splitHint[0] === 'type') {

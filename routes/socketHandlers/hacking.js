@@ -96,7 +96,7 @@ function handle(socket) {
             messenger.sendSelfMsg({
               socket,
               message: {
-                text: ['User is not authorized to access the station'],
+                text: ['Incorrect choice'],
               },
             });
             socket.emit('commandStep', { reset: true });
@@ -104,6 +104,14 @@ function handle(socket) {
             break;
           }
         }
+      } else {
+        messenger.sendSelfMsg({
+          socket,
+          message: {
+            text: ['Incorrect password'],
+          },
+        });
+        socket.emit('commandStep', { reset: true });
       }
     });
   });

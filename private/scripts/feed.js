@@ -313,8 +313,33 @@ function buildMorsePlayer() {
   }
 }
 
+function isAndroid() {
+  return navigator.userAgent.match(/Android/i);
+}
+
+function isStandalone() {
+  return window.navigator.standalone;
+}
+
+function isIos() {
+  return navigator.userAgent.match(/iP(hone|ad|od)/i);
+}
+
+function padMenu() {
+  if (isIos() && isStandalone()) {
+    domManipulator.getMenu().classList.add('iosMenuPadding');
+  }
+}
+
 function triggerAutoComplete(text, textChar) {
-  if (text.charAt(text.length - 1) === ' ' && textChar === ' ') {
+  /**
+   * Older versions of Android bugs on keypress/down, thus this check
+   */
+  if (isAndroid() && text.match(/\s\s$/)) {
+    domManipulator.setCommandInput(textTools.trimSpace(text));
+
+    return true;
+  } else if (!isAndroid() && text.match(/\s$/) && textChar.match(/^\s$/)) {
     domManipulator.setCommandInput(textTools.trimSpace(text));
 
     return true;
@@ -555,24 +580,6 @@ function goFullScreen(element) {
   }
 }
 
-function isAndroid() {
-  return navigator.userAgent.match(/Android/i);
-}
-
-function isStandalone() {
-  return window.navigator.standalone;
-}
-
-function isIos() {
-  return navigator.userAgent.match(/iP(hone|ad|od)/i);
-}
-
-function padMenu() {
-  if (isIos() && isStandalone()) {
-    domManipulator.getMenu().classList.add('iosMenuPadding');
-  }
-}
-
 /**
  * Fix for Android.
  * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
@@ -697,10 +704,22 @@ function scrollText(amount) {
   domManipulator.getMainView().scrollTop += modifiedAmount;
 }
 
+function defaultKeyPress(textChar, event) {
+  if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
+    autoCompleteCommand();
+    // Prevent new whitespace to be printed
+    event.preventDefault();
+  }
+}
+
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+  const textChar = String.fromCharCode(keyCode);
   const commandHistory = storage.getCommandHistory();
   const commandHelper = commandHandler.commandHelper;
+
+  domManipulator.focusInput();
+  domManipulator.removeSubMenu();
 
   if (!keyPressed) {
     switch (keyCode) {
@@ -836,32 +855,6 @@ function specialKeyPress(event) {
 
         break;
       }
-      default: {
-        break;
-      }
-    }
-  } else {
-    event.preventDefault();
-  }
-}
-
-function defaultKeyPress(textChar, event) {
-  if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
-    autoCompleteCommand();
-    // Prevent new whitespace to be printed
-    event.preventDefault();
-  }
-}
-
-function keyPress(event) {
-  const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
-  const textChar = String.fromCharCode(keyCode);
-
-  domManipulator.focusInput();
-  domManipulator.removeSubMenu();
-
-  if (!keyPressed) {
-    switch (keyCode) {
       case 102: {
         if (triggerKeysPressed.ctrl) {
           goFullScreen(document.documentElement);
@@ -879,6 +872,8 @@ function keyPress(event) {
         break;
       }
     }
+  } else {
+    event.preventDefault();
   }
 }
 
@@ -888,6 +883,17 @@ function keyPress(event) {
  */
 function keyReleased(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+  /**
+   * Older versions of Android bugs on keydown/press and sends incorrect keycodes,
+   * thus defaultKeyPress has to be triggered on keyup
+   */
+  if (isAndroid()) {
+    const textChar = domManipulator.getInputText().charAt(domManipulator.getInputText().length - 1);
+    messenger.queueMessage({ text: [textChar] });
+
+    defaultKeyPress(textChar, event);
+  }
 
   switch (keyCode) {
     case 9: // Tab
@@ -1687,7 +1693,6 @@ function onStartup(params = { }) {
     }, 5000);
 
     attachFullscreenListener();
-    addEventListener('keypress', keyPress);
     // Needed for some special keys. They are not detected with keypress
     addEventListener('keydown', specialKeyPress);
     addEventListener('keyup', keyReleased);

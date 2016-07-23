@@ -142,6 +142,13 @@ const gameUserSchema = new mongoose.Schema({
 const gamePasswordSchema = new mongoose.Schema({
   password: { type: String, unique: true },
 }, { collection: 'gamePasswords' });
+// TODO Move event specific db calls to separate file
+const stationSchema = new mongoose.Schema({
+  stationId: { type: Number, unique: true },
+  stationName: String,
+  boostAmount: { type: Number, default: 0 },
+  isOpen: { type: Boolean, default: false },
+}, { collection: 'stations' });
 
 const User = mongoose.model('User', userSchema);
 const Room = mongoose.model('Room', roomSchema);
@@ -156,6 +163,7 @@ const InvitationList = mongoose.model('InvitationList', invitationListSchema);
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
 const GameUser = mongoose.model('GameUser', gameUserSchema);
 const GamePassword = mongoose.model('GamePassword', gamePasswordSchema);
+const Station = mongoose.model('Station', stationSchema);
 
 function updateUserValue(userName, update, callback) {
   const query = { userName };
@@ -249,6 +257,12 @@ function incrementCommandUsage(commandName) {
       });
     }
   });
+}
+
+function createStation(sentStation, callback) {
+  const newStation = new Station(sentStation);
+
+  saveObject(newStation, 'station', callback);
 }
 
 function createMission(sentMission, callback) {
@@ -1800,3 +1814,4 @@ exports.getGameUser = getGameUser;
 exports.createGamePassword = createGamePassword;
 exports.getAllGamePasswords = getAllGamePasswords;
 exports.getAllGameUsers = getAllGameUsers;
+exports.createStation = createStation;

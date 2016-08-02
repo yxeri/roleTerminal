@@ -237,7 +237,7 @@ function getAllUserPositions(sentUser, callback) {
     } else if (users !== null) {
       const userNames = users.map(user => user.userName);
 
-      location.getPositions(userNames, (mapErr, userPositions) => {
+      locationConnector.getPositions(userNames, (mapErr, userPositions) => {
         if (mapErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,

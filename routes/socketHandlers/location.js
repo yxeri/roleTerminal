@@ -174,7 +174,7 @@ function handle(socket) {
           }
           case 'users': {
             if (user.isTracked) {
-              dbLocation.getAllUserPositions(user, (err, userPositions) => {
+              dbUser.getAllUserPositions(user, (err, userPositions) => {
                 if (err) {
                   return;
                 }

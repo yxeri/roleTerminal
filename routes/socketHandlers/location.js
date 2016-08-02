@@ -1,6 +1,7 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbUser = require('../../db/connectors/user');
+const dbLocation = require('../../db/connectors/location');
 const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../utils/logger');
@@ -28,7 +29,7 @@ function handle(socket) {
 
       // Return all user locations
       if (positionName === '*') {
-        dbConnector.getAllUserPositions(user, (err, mapPositions) => {
+        dbUser.getAllUserPositions(user, (err, mapPositions) => {
           if (err || mapPositions === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -48,7 +49,7 @@ function handle(socket) {
           socket.emit('locationMsg', locationData);
         });
       } else {
-        dbConnector.getUserPosition(user, positionName, (err, mapPosition) => {
+        dbUser.getUserPosition(user, positionName, (err, mapPosition) => {
           if (err || mapPosition === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -83,7 +84,7 @@ function handle(socket) {
         return;
       }
 
-      dbConnector.updateUserIsTracked(user.userName, true, (trackingErr) => {
+      dbUser.updateUserIsTracked(user.userName, true, (trackingErr) => {
         if (trackingErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -95,7 +96,7 @@ function handle(socket) {
         }
       });
 
-      dbConnector.updatePosition({
+      dbLocation.updatePosition({
         positionName: user.userName,
         position: params.position,
         type: 'user',
@@ -110,7 +111,7 @@ function handle(socket) {
             return;
           }
 
-          dbConnector.getPosition(user.userName, (err, position) => {
+          dbLocation.getPosition(user.userName, (err, position) => {
             if (err) {
               logger.sendErrorMsg({
                 code: logger.ErrorCodes.db,
@@ -121,7 +122,7 @@ function handle(socket) {
               return;
             }
 
-            dbConnector.getAllUsers(user, (allErr, users) => {
+            dbUser.getAllUsers(user, (allErr, users) => {
               if (allErr) {
                 logger.sendErrorMsg({
                   code: logger.ErrorCodes.db,
@@ -161,7 +162,7 @@ function handle(socket) {
       function getPositions(type, positions) {
         switch (type) {
           case 'static': {
-            dbConnector.getStaticPositions((err, staticPositions) => {
+            dbLocation.getAllStaticPositions((err, staticPositions) => {
               if (err) {
                 return;
               }
@@ -173,7 +174,7 @@ function handle(socket) {
           }
           case 'users': {
             if (user.isTracked) {
-              dbConnector.getAllUserPositions(user, (err, userPositions) => {
+              dbLocation.getAllUserPositions(user, (err, userPositions) => {
                 if (err) {
                   return;
                 }

@@ -1,6 +1,6 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbCommand = require('../../db/connectors/command');
 const manager = require('../../socketHelpers/manager');
 const messenger = require('../../socketHelpers/messenger');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
@@ -13,7 +13,7 @@ function handle(socket) {
    * Emits updateCommands
    */
   socket.on('getCommands', () => {
-    dbConnector.getAllCommands((err, commands) => {
+    dbCommand.getAllCommands((err, commands) => {
       if (err || commands === null || commands.length === 0) {
         messenger.sendImportantMsg({
           message: {
@@ -75,11 +75,11 @@ function handle(socket) {
       };
       switch (field) {
         case 'visibility':
-          dbConnector.updateCommandVisibility(commandName, value, callback);
+          dbCommand.updateCommandVisibility(commandName, value, callback);
 
           break;
         case 'accesslevel':
-          dbConnector.updateCommandAccessLevel(commandName, value, callback);
+          dbCommand.updateCommandAccessLevel(commandName, value, callback);
 
           break;
         default:

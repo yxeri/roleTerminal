@@ -6,7 +6,6 @@ const path = require('path');
 const morgan = require('morgan');
 const compression = require('compression');
 const appConfig = require('./config/defaults/config').app;
-const dbConnector = require('./dbConnectors/databaseConnector');
 const databasePopulation = require('./config/defaults/config').databasePopulation;
 const app = express();
 
@@ -31,9 +30,9 @@ for (const route of appConfig.routes) {
   app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
 }
 
-dbConnector.populateDbUsers(databasePopulation.users);
-dbConnector.populateDbRooms(databasePopulation.rooms, databasePopulation.users.superuser);
-dbConnector.populateDbCommands(databasePopulation.commands);
+require('./db/connectors/user').populateDbUsers(databasePopulation.users);
+require('./db/connectors/room').populateDbRooms(databasePopulation.rooms, databasePopulation.users.superuser);
+require('./db/connectors/command').populateDbCommands(databasePopulation.commands);
 
 /*
  * Catches all exceptions and keeps the server running

@@ -40,4 +40,4 @@ Most of the configuration can also be changed through environmental variables. E
 
 ## Other contributions
 
-* A big thanks to all of those who are helping support this project through [Patreon](http://patreon.com/yxeri)
+* A big thanks to all of those who are supporting this project through [Patreon](http://patreon.com/yxeri)

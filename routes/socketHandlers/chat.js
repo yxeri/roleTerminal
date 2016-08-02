@@ -1,6 +1,9 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbConnector = require('../../db/databaseConnector');
+const dbRoom = require('../../db/connectors/room');
+const dbUser = require('../../db/connectors/user');
+const dbDevice = require('../../db/connectors/device');
 const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const appConfig = require('../../config/defaults/config').app;
@@ -168,7 +171,7 @@ function handle(socket, io) {
         room.password = '';
       }
 
-      dbConnector.authUserToRoom(user, room.roomName, room.password, (err, authRoom) => {
+      dbRoom.authUserToRoom(user, room.roomName, room.password, (err, authRoom) => {
         if (err || authRoom === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -182,7 +185,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.addRoomToUser(user.userName, room.roomName, (roomErr) => {
+        dbUser.addRoomToUser(user.userName, room.roomName, (roomErr) => {
           if (roomErr) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.db,
@@ -255,7 +258,7 @@ function handle(socket, io) {
          * That room is for private messaging between users
          */
         if (roomName !== userName) {
-          dbConnector.removeRoomFromUser(userName, roomName, (err, removedUser) => {
+          dbUser.removeRoomFromUser(userName, roomName, (err, removedUser) => {
             if (err || removedUser === null) {
               logger.sendSocketErrorMsg({
                 socket,
@@ -300,7 +303,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getAllRooms(user, (roomErr, rooms) => {
+      dbRoom.getAllRooms(user, (roomErr, rooms) => {
         if (roomErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -336,7 +339,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getAllUsers(user, (userErr, users) => {
+      dbUser.getAllUsers(user, (userErr, users) => {
         if (userErr || users === null) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -416,7 +419,7 @@ function handle(socket, io) {
         },
       });
 
-      dbConnector.getOwnedRooms(user, (err, ownedRooms) => {
+      dbRoom.getOwnedRooms(user, (err, ownedRooms) => {
         if (err || !ownedRooms || ownedRooms === null) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -521,7 +524,7 @@ function handle(socket, io) {
 
       const roomNameLower = params.room.roomName.toLowerCase();
 
-      dbConnector.removeRoom(roomNameLower, user, (err, room) => {
+      dbRoom.removeRoom(roomNameLower, user, (err, room) => {
         if (err || room === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -534,7 +537,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.removeRoomFromAllUsers(roomNameLower, (roomErr) => {
+        dbUser.removeRoomFromAllUsers(roomNameLower, (roomErr) => {
           if (roomErr) {
             logger.sendSocketErrorMsg({
               socket,
@@ -602,7 +605,7 @@ function handle(socket, io) {
       }
 
       if (params.device) {
-        dbConnector.getDevice(params.device.deviceId, (err, device) => {
+        dbDevice.getDevice(params.device.deviceId, (err, device) => {
           if (err || device === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -673,11 +676,11 @@ function handle(socket, io) {
 
       switch (field) {
         case 'visibility':
-          dbConnector.updateRoomVisibility(roomName, value, callback);
+          dbRoom.updateRoomVisibility(roomName, value, callback);
 
           break;
         case 'accesslevel':
-          dbConnector.updateRoomAccessLevel(roomName, value, callback);
+          dbRoom.updateRoomAccessLevel(roomName, value, callback);
 
           break;
         default:
@@ -739,7 +742,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.matchPartialRoom(params.partialName, user, (err, rooms) => {
+      dbRoom.matchPartialRoom(params.partialName, user, (err, rooms) => {
         if (err) {
           return;
         }
@@ -779,7 +782,7 @@ function handle(socket, io) {
       const userName = params.user.userName;
       const roomName = params.room.roomName;
 
-      dbConnector.getUser(userName, (userErr, invitedUser) => {
+      dbUser.getUser(userName, (userErr, invitedUser) => {
         if (userErr || invitedUser === null) {
           return;
         } else if (invitedUser.rooms.indexOf(roomName) > -1) {
@@ -852,7 +855,7 @@ function handle(socket, io) {
       invitation.time = new Date();
 
       if (params.accepted) {
-        dbConnector.addRoomToUser(userName, roomName, (roomErr) => {
+        dbUser.addRoomToUser(userName, roomName, (roomErr) => {
           if (roomErr) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.db,

@@ -1,6 +1,8 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbConnector = require('../../db/databaseConnector');
+const dbUser = require('../../db/connectors/user');
+const dbRoom = require('../../db/connectors/room');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const manager = require('../../socketHelpers/manager');
 const logger = require('../../utils/logger');
@@ -14,7 +16,7 @@ function updateUserTeam(params) {
   const teamName = params.teamName;
   const callback = params.callback;
 
-  dbConnector.updateUserTeam(userName, teamName, (err, user) => {
+  dbUser.updateUserTeam(userName, teamName, (err, user) => {
     if (err || user === null) {
       logger.sendSocketErrorMsg({
         socket,
@@ -46,7 +48,7 @@ function addUserTeamRoom(params) {
   const userName = params.userName;
   const io = params.io;
 
-  dbConnector.addRoomToUser(userName, roomName, (roomErr, user) => {
+  dbUser.addRoomToUser(userName, roomName, (roomErr, user) => {
     if (roomErr || user === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
@@ -182,7 +184,7 @@ function handle(socket, io) {
 
           const userName = params.user.userName;
 
-          dbConnector.getUser(userName, (userErr, invitedUser) => {
+          dbUser.getUser(userName, (userErr, invitedUser) => {
             if (userErr) {
               return;
             } else if (invitedUser.team) {
@@ -267,7 +269,7 @@ function handle(socket, io) {
       const team = params.team;
       team.verified = false;
 
-      dbConnector.getUser(owner, (userErr, user) => {
+      dbUser.getUser(owner, (userErr, user) => {
         if (userErr) {
           logger.sendSocketErrorMsg({
             socket,
@@ -308,7 +310,7 @@ function handle(socket, io) {
             visibility: databasePopulation.accessLevels.superUser,
           };
 
-          dbConnector.createRoom(teamRoom, databasePopulation.users.superuser, (errRoom, room) => {
+          dbRoom.createRoom(teamRoom, databasePopulation.users.superuser, (errRoom, room) => {
             if (errRoom || room === null) {
               return;
             }
@@ -447,7 +449,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getUnverifiedUsers((err, teams) => {
+      dbUser.getUnverifiedUsers((err, teams) => {
         if (err || teams === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -540,7 +542,7 @@ function handle(socket, io) {
               return;
             }
 
-            dbConnector.addRoomToUser(userName, roomName, (errRoom) => {
+            dbUser.addRoomToUser(userName, roomName, (errRoom) => {
               if (errRoom) {
                 return;
               }

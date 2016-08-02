@@ -1,6 +1,6 @@
 'use strict';
 
-const dbConnector = require('./../dbConnectors/databaseConnector');
+const dbChatHistory = require('./../db/connectors/chatHistory');
 const databasePopulation = require('./../config/defaults/config').databasePopulation;
 const appConfig = require('./../config/defaults/config').app;
 const logger = require('./../utils/logger');
@@ -14,7 +14,7 @@ const objectValidator = require('./../utils/objectValidator');
  * @param callback Function callback
  */
 function addMsgToHistory(roomName, message, socket, callback) {
-  dbConnector.addMsgToHistory(roomName, message, (err, history) => {
+  dbChatHistory.addMsgToHistory(roomName, message, (err, history) => {
     if (err || history === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,

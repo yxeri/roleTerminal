@@ -1,6 +1,6 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbDevice = require('../../db/connectors/device');
 const manager = require('../../socketHelpers/manager');
 const messenger = require('../../socketHelpers/messenger');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
@@ -28,7 +28,7 @@ function handle(socket) {
         return;
       }
 
-      dbConnector.getAllDevices((devErr, devices) => {
+      dbDevice.getAllDevices((devErr, devices) => {
         if (devErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -77,7 +77,7 @@ function handle(socket) {
       return;
     }
 
-    dbConnector.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, (err) => {
+    dbDevice.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, (err) => {
       if (err) {
         return;
       }
@@ -121,7 +121,7 @@ function handle(socket) {
 
       switch (field) {
         case 'alias': {
-          dbConnector.updateDeviceAlias(deviceId, value, callback);
+          dbDevice.updateDeviceAlias(deviceId, value, callback);
 
           break;
         }
@@ -150,7 +150,7 @@ function handle(socket) {
       return;
     }
 
-    dbConnector.getDevice(params.device.deviceId, (err, device) => {
+    dbDevice.getDevice(params.device.deviceId, (err, device) => {
       if (err || device === null) {
         messenger.sendSelfMsg({
           socket,
@@ -188,7 +188,7 @@ function handle(socket) {
 
     socket.join(deviceId + appConfig.deviceAppend);
 
-    dbConnector.updateDeviceSocketId(deviceId, socket.id, userName, (err, device) => {
+    dbDevice.updateDeviceSocketId(deviceId, socket.id, userName, (err, device) => {
       if (err || device === null) {
         return;
       }

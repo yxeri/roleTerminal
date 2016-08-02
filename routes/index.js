@@ -4,7 +4,8 @@ const express = require('express');
 const router = new express.Router();
 const chatHandler = require('./socketHandlers/chat');
 const userHandler = require('./socketHandlers/user');
-const dbConnector = require('../dbConnectors/databaseConnector');
+const dbConnector = require('../db/databaseConnector');
+const dbUser = require('../db/connectors/user');
 const commandHandler = require('./socketHandlers/command');
 const teamHandler = require('./socketHandlers/team');
 const hackingHandler = require('./socketHandlers/hacking');
@@ -49,7 +50,7 @@ function handle(io) {
     });
 
     socket.on('disconnect', () => {
-      dbConnector.getUserById(socket.id, (err, user) => {
+      dbUser.getUserById(socket.id, (err, user) => {
         if (err || user === null) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.general,
@@ -60,7 +61,7 @@ function handle(io) {
           return;
         }
 
-        dbConnector.updateUserSocketId(user.userName, '', (userErr, socketUser) => {
+        dbUser.updateUserSocketId(user.userName, '', (userErr, socketUser) => {
           if (userErr || socketUser === null) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.general,
@@ -71,7 +72,7 @@ function handle(io) {
             return;
           }
 
-          dbConnector.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
+          dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
             if (userOnlineErr || settedUser === null) {
               logger.sendErrorMsg({
                 code: logger.ErrorCodes.general,
@@ -82,7 +83,7 @@ function handle(io) {
               return;
             }
 
-            dbConnector.updateUserOnline(settedUser.userName, false, (onlineErr, updatedUser) => {
+            dbUser.updateUserOnline(settedUser.userName, false, (onlineErr, updatedUser) => {
               if (onlineErr || updatedUser === null) {
                 logger.sendErrorMsg({
                   code: logger.ErrorCodes.general,

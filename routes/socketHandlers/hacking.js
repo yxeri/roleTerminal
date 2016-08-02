@@ -1,6 +1,6 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbConnector = require('../../db/databaseConnector');
 const messenger = require('../../socketHelpers/messenger');
 
 /**

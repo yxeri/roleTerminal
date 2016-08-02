@@ -1,6 +1,6 @@
 'use strict';
 
-const dbConnector = require('../../dbConnectors/databaseConnector');
+const dbUser = require('../../db/connectors/user');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const manager = require('../../socketHelpers/manager');
 const logger = require('../../utils/logger');
@@ -25,7 +25,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getUser(params.user.userName, (err, foundUser) => {
+      dbUser.getUser(params.user.userName, (err, foundUser) => {
         if (err) {
           logger.sendSocketErrorMsg({
             socket,
@@ -77,7 +77,7 @@ function handle(socket, io) {
       };
 
       // TODO Refactor the inner code
-      dbConnector.createUser(userObj, (err, user) => {
+      dbUser.createUser(userObj, (err, user) => {
         if (err) {
           logger.sendSocketErrorMsg({
             socket,
@@ -210,7 +210,7 @@ function handle(socket, io) {
       const user = params.user;
       const userName = user.userName.toLowerCase();
 
-      dbConnector.authUser(userName, user.password, (err, authUser) => {
+      dbUser.authUser(userName, user.password, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -278,7 +278,7 @@ function handle(socket, io) {
           socket.emit('login', { user: authUser });
         });
 
-        dbConnector.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
+        dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
           if (userOnlineErr || settedUser === null) {
             console.log('Failed to set last online');
 
@@ -299,7 +299,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.authUser(user.userName, params.oldPassword, (err, authUser) => {
+      dbUser.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -343,7 +343,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.authUser(user.userName, params.oldPassword, (err, authUser) => {
+      dbUser.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -356,7 +356,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.updateUserPassword(authUser.userName, params.newPassword, (userErr, updatedUser) => {
+        dbUser.updateUserPassword(authUser.userName, params.newPassword, (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -389,7 +389,7 @@ function handle(socket, io) {
 
       const userName = user.userName;
 
-      dbConnector.updateUserSocketId(userName, '', (err, socketUser) => {
+      dbUser.updateUserSocketId(userName, '', (err, socketUser) => {
         if (err || socketUser === null) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.general,
@@ -400,7 +400,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.updateUserOnline(userName, false, (userErr, updatedUser) => {
+        dbUser.updateUserOnline(userName, false, (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendErrorMsg({
               code: logger.ErrorCodes.general,
@@ -445,7 +445,7 @@ function handle(socket, io) {
       const userNameLower = params.user.userName.toLowerCase();
 
       if (userNameLower !== undefined) {
-        dbConnector.verifyUser(userNameLower, (err, user) => {
+        dbUser.verifyUser(userNameLower, (err, user) => {
           if (err || user === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -476,7 +476,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getUnverifiedUsers((err, users) => {
+      dbUser.getUnverifiedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -489,7 +489,7 @@ function handle(socket, io) {
           return;
         }
 
-        dbConnector.verifyAllUsers((verifyErr) => {
+        dbUser.verifyAllUsers((verifyErr) => {
           if (verifyErr) {
             logger.sendSocketErrorMsg({
               socket,
@@ -521,7 +521,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getUnverifiedUsers((err, users) => {
+      dbUser.getUnverifiedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -567,7 +567,7 @@ function handle(socket, io) {
 
       const userNameLower = params.user.userName.toLowerCase();
 
-      dbConnector.banUser(userNameLower, (err, user) => {
+      dbUser.banUser(userNameLower, (err, user) => {
         if (err || user === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -589,7 +589,7 @@ function handle(socket, io) {
           },
         });
 
-        dbConnector.updateUserSocketId(userNameLower, '', (userErr, updatedUser) => {
+        dbUser.updateUserSocketId(userNameLower, '', (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -632,7 +632,7 @@ function handle(socket, io) {
 
       const userNameLower = params.user.userName.toLowerCase();
 
-      dbConnector.unbanUser(userNameLower, (err, user) => {
+      dbUser.unbanUser(userNameLower, (err, user) => {
         if (err || user === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -662,7 +662,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.getBannedUsers((err, users) => {
+      dbUser.getBannedUsers((err, users) => {
         if (err || users === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -737,11 +737,11 @@ function handle(socket, io) {
 
       switch (field) {
         case 'visibility':
-          dbConnector.updateUserVisibility(userName, value, callback);
+          dbUser.updateUserVisibility(userName, value, callback);
 
           break;
         case 'accesslevel':
-          dbConnector.updateUserAccessLevel(userName, value, callback);
+          dbUser.updateUserAccessLevel(userName, value, callback);
 
           break;
         case 'addgroup':
@@ -751,7 +751,7 @@ function handle(socket, io) {
 
           break;
         case 'password':
-          dbConnector.updateUserPassword(userName, value, callback);
+          dbUser.updateUserPassword(userName, value, callback);
 
           break;
         default:
@@ -787,7 +787,7 @@ function handle(socket, io) {
       const userName = user.userName;
       const value = params.mode;
 
-      dbConnector.updateUserMode(userName, value, (err) => {
+      dbUser.updateUserMode(userName, value, (err) => {
         if (err) {
           logger.sendSocketErrorMsg({
             socket,
@@ -829,7 +829,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbConnector.matchPartialUser(params.partialName, user, (err, users) => {
+      dbUser.matchPartialUser(params.partialName, user, (err, users) => {
         if (err) {
           return;
         }

@@ -1,6 +1,9 @@
 'use strict';
 
-const dbConnector = require('./../dbConnectors/databaseConnector');
+const dbUser = require('./../db/connectors/user');
+const dbCommand = require('./../db/connectors/command');
+const dbRoom = require('./../db/connectors/room');
+const dbChatHistory = require('./../db/connectors/chatHistory');
 const databasePopulation = require('./../config/defaults/config').databasePopulation;
 const logger = require('./../utils/logger.js');
 const appConfig = require('./../config/defaults/config').app;
@@ -24,7 +27,7 @@ const messageSort = (a, b) => {
  * @param callback Function callback
  */
 function getUserById(socketId, callback) {
-  dbConnector.getUserById(socketId, (err, user) => {
+  dbUser.getUserById(socketId, (err, user) => {
     callback(err, user);
   });
 }
@@ -35,7 +38,7 @@ function getUserById(socketId, callback) {
  * @param callback Function callback
  */
 function getCommand(commandName, callback) {
-  dbConnector.getCommand(commandName, (err, command) => {
+  dbCommand.getCommand(commandName, (err, command) => {
     callback(err, command);
   });
 }
@@ -65,7 +68,7 @@ function userAllowedCommand(socketId, commandName, callback) {
         }
 
         if (isAllowed) {
-          dbConnector.incrementCommandUsage(commandName);
+          dbCommand.incrementCommandUsage(commandName);
         }
 
         callback(cmdErr, isAllowed, user);
@@ -85,7 +88,7 @@ function userAllowedCommand(socketId, commandName, callback) {
  * @param callback Function callback
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
-  dbConnector.getHistoryFromRooms(rooms, (err, history) => {
+  dbChatHistory.getHistoryFromRooms(rooms, (err, history) => {
     let historyMessages = [];
 
     if (err || history === null) {
@@ -134,7 +137,7 @@ function createRoom(sentRoom, user, callback) {
   const newRoom = sentRoom;
   newRoom.roomName = sentRoom.roomName.toLowerCase();
 
-  dbConnector.createRoom(newRoom, null, (err, room) => {
+  dbRoom.createRoom(newRoom, null, (err, room) => {
     if (err || room === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
@@ -143,7 +146,7 @@ function createRoom(sentRoom, user, callback) {
       });
       callback(err);
     } else {
-      dbConnector.addRoomToUser(user.userName, room.roomName, (roomErr) => {
+      dbUser.addRoomToUser(user.userName, room.roomName, (roomErr) => {
         if (roomErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -165,7 +168,7 @@ function createRoom(sentRoom, user, callback) {
  * @param callback Function callback
  */
 function updateUserSocketId(socketId, userName, callback) {
-  dbConnector.updateUserSocketId(userName, socketId, (err, user) => {
+  dbUser.updateUserSocketId(userName, socketId, (err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,

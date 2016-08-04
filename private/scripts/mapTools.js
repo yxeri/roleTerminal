@@ -9,7 +9,7 @@ const mapPolygons = {};
 const mapLines = {};
 const mapLabels = {};
 const cornerCoords = {};
-const maxShortDescLength = 320;
+const maxShortDescLength = 200;
 let markerClusterer;
 let mapView = '';
 let map;
@@ -383,6 +383,14 @@ function attachMapListeners() {
   });
 
   google.maps.event.addListener(map, 'click', () => {
+    markerInfo.classList.add('hide');
+  });
+
+  google.maps.event.addListener(map, 'dragstart', () => {
+    markerInfo.classList.add('hide');
+  });
+
+  google.maps.event.addListener(map, 'zoom_changed', () => {
     markerInfo.classList.add('hide');
   });
 

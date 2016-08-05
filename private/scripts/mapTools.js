@@ -47,15 +47,16 @@ function getPolygonCenter(coordsCollection) {
  * @private
  * @param {Object} params - Parameters
  * @param {string} params.positionName - Name of the position
+ * @param {string} params.labelText - Text that will be printed
  * @param {{latitude: Number, longitude: Number}} param.position - Long and lat coordinates of the label
  */
 function createLabel(params) {
-  const positionName = params.positionName;
-  const itemName = params.positionName.toLowerCase();
+  const positionName = params.positionName.toLowerCase();
   const position = params.position;
+  const labelText = params.labelText;
 
-  mapLabels[itemName] = new MapLabel({
-    text: positionName,
+  mapLabels[positionName] = new MapLabel({
+    text: labelText,
     position: new google.maps.LatLng(position.latitude, position.longitude),
     align: params.align || 'right',
     fontFamily: 'monospace',
@@ -64,7 +65,7 @@ function createLabel(params) {
     fontSize: 12,
   });
 
-  mapLabels[itemName].setMap(map || null);
+  mapLabels[positionName].setMap(map || null);
 }
 
 /**
@@ -86,6 +87,8 @@ function createMarker(params) {
     anchor: new google.maps.Point(8, 8),
   };
   const description = params.description;
+  const title = params.title;
+  const markerId = Object.keys(mapMarkers).length + 1;
 
   mapMarkers[markerName] = new google.maps.Marker({
     position: {
@@ -95,16 +98,19 @@ function createMarker(params) {
     opacity: params.opacity || 0.9,
     icon,
   });
+
   mapMarkers[markerName].addedTitle = params.title;
+  mapMarkers[markerName].markerId = markerId;
 
   if (description) {
-    mapMarkers[markerName].addedShortDesc = description.length > maxShortDescLength ? `${description.slice(0, maxShortDescLength)}...` : `${description}`;
+    mapMarkers[markerName].addedShortDesc = description.length > maxShortDescLength ? `${description.slice(0, maxShortDescLength)}..` : `${description}`;
     mapMarkers[markerName].addedExpandedDesc = description.length > maxShortDescLength ? `${description.slice(maxShortDescLength)}` : undefined;
   }
 
   if (!params.hideLabel) {
     createLabel({
-      positionName: params.title,
+      positionName: title,
+      labelText: title.length > 18 ? `${title.slice(0, 18)}..[${markerId}]` : `${title}[${markerId}]`,
       position,
     });
   }
@@ -182,6 +188,7 @@ function createPolygon(params) {
     // TODO Should center the label inside the polygon
     createLabel({
       positionName,
+      labelText: positionName,
       position: getPolygonCenter(coordsCollection),
       align: 'center',
     });
@@ -405,8 +412,8 @@ function attachMapListeners() {
  */
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-    gridSize: 13,
-    maxZoom: 15,
+    gridSize: 24,
+    maxZoom: 17,
     zoomOnClick: false,
     singleSize: true,
     averageCenter: true,
@@ -571,19 +578,20 @@ function decreaseZoom() {
 /**
  * Get description from the map marker
  * @static
- * @param {string} markerName - Name of the map marker
+ * @param {Number} markerId - ID of the map marker
  * @returns {{title: string, description: string}} - Title and escription of the map marker
  */
-function getInfoText(markerName) {
-  const marker = mapMarkers[markerName];
+function getInfoText(markerId) {
+  const marker = mapMarkers.find(mapMarker => mapMarker.markerId === markerId);
+
+  if (!marker) {
+    return null;
+  }
+
   let description = marker.addedShortDesc;
 
   if (description.addedExpandedDesc) {
     description = marker.addedShortDesc.slice(0, marker.addedShortDesc.length - 3) + marker.addedExpandedDesc;
-  }
-
-  if (!marker) {
-    return null;
   }
 
   return { title: marker.addedTitle, description };

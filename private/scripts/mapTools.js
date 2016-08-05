@@ -88,6 +88,7 @@ function createMarker(params) {
   };
   const description = params.description;
   const title = params.title;
+  const snakeCaseTitle = title.replace(/\s/g, '_');
   const markerId = Object.keys(mapMarkers).length + 1;
 
   mapMarkers[markerName] = new google.maps.Marker({
@@ -110,7 +111,7 @@ function createMarker(params) {
   if (!params.hideLabel) {
     createLabel({
       positionName: title,
-      labelText: title.length > 18 ? `${title.slice(0, 18)}..[${markerId}]` : `${title}[${markerId}]`,
+      labelText: snakeCaseTitle.length > 18 ? `${markerId}:${snakeCaseTitle.slice(0, 18)}..` : `${markerId}:${snakeCaseTitle}`,
       position,
     });
   }

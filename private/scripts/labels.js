@@ -185,6 +185,7 @@ const all = {
       'info *number* - retrieves information about a specific point',
       'zoomin - zooms in',
       'zoomout - zooms out',
+      'locate *user name* - locate a user',
     ],
   },
   help_se: {
@@ -581,7 +582,7 @@ const all = {
       'map info *number*',
       'map zoomin',
       'map zoomout',
-      'map locate *number OR user name*',
+      'map locate *user name*',
       exampleLine,
       'map on me',
       'map info 5',

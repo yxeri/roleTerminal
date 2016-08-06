@@ -223,7 +223,7 @@ function handle(socket, io) {
         room.roomName = 'team';
       }
 
-      if (Object.keys(socket.rooms).indexOf(roomName) > 0) {
+      if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
         socket.emit('follow', { room: params.room });
       } else {
         messenger.sendSelfMsg({

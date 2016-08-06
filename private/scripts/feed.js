@@ -890,7 +890,6 @@ function keyReleased(event) {
    */
   if (isAndroid()) {
     const textChar = domManipulator.getInputText().charAt(domManipulator.getInputText().length - 1);
-    messenger.queueMessage({ text: [textChar] });
 
     defaultKeyPress(textChar, event);
   }

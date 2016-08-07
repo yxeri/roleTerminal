@@ -393,6 +393,11 @@ textarea {
   color: $back-color !important;
 }
 
+.flash {
+  -webkit-animation: flash .5s 1;
+  animation: flash .3s 1;
+}
+
 @media (max-width: 736px) {
   #mainFeed li {
     padding: 0 .4em 0 .4em;
@@ -493,5 +498,29 @@ textarea {
   to {
     opacity: 0;
     display: none;
+  }
+}
+
+@-webkit-keyframes flash {
+  from {
+    background-color: $back-color;
+  }
+  50% {
+    background-color: #003b2c;
+  }
+  100% {
+    background-color: $back-color;
+  }
+}
+
+@keyframes flash {
+  from {
+    background-color: $back-color;
+  }
+  50% {
+    background-color: #003b2c;
+  }
+  100% {
+    background-color: $back-color;
   }
 }

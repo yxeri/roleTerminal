@@ -1144,6 +1144,11 @@ function onMessage(data = { message: {} }) {
   const message = textTools.addMessageSpecialProperties(hideMessageProperties(data.message));
 
   messenger.queueMessage(message);
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
+    console.log(layoutChanger.isViewExpanded());
+  }
 }
 
 function onMessages(data = { messages: [] }) {
@@ -1153,6 +1158,10 @@ function onMessages(data = { messages: [] }) {
     const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
 
     messenger.queueMessage(message);
+  }
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
   }
 }
 
@@ -1168,6 +1177,10 @@ function onImportantMsg(data = {}) {
     if (message.morse) {
       commandHandler.triggerCommand({ cmd: 'morse', cmdParams: message.text.slice(0, 1) });
     }
+  }
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
   }
 }
 

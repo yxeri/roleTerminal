@@ -139,8 +139,17 @@ function isViewSplit() {
   return viewIsSplit;
 }
 
+/**
+ * Is view expanded?
+ * * @returns {boolean} viewIsExpanded - Is view expanded?
+ */
+function isViewExpanded() {
+  return viewIsExpanded;
+}
+
 exports.splitView = splitView;
 exports.changeOrientation = changeOrientation;
 exports.toggleIsLandscape = toggleIsLandscape;
 exports.isViewSplit = isViewSplit;
 exports.transformView = transformView;
+exports.isViewExpanded = isViewExpanded;

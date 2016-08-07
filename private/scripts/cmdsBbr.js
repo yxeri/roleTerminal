@@ -47,10 +47,10 @@ commands.hackstation = {
     commandHandler.commandHelper.data = {};
     commandHandler.commandHelper.fallbackStep = 3;
 
-    socketHandler.emit('getGameUsersSelection', { userAmount: 3 });
+    socketHandler.emit('getGameUsersSelection', { userAmount: 1 });
   },
   steps: [
-    (params) => {
+    (params = {}) => {
       const users = params.users;
       const passwords = params.passwords;
       const codeColumns = [];
@@ -66,38 +66,62 @@ commands.hackstation = {
       }
 
       domManipulator.setInputStart('ssm');
-      messenger.queueMessage({
-        text: labels.getText('info', 'hackStationIntro'),
-      });
+      messenger.queueMessage({ text: labels.getText('info', 'hackStationIntro') });
+      messenger.queueMessage({ text: [textTools.createFullLine()] });
+      socketHandler.emit('getStations');
 
       commandHandler.commandHelper.data.codeColumns = codeColumns;
       commandHandler.commandHelper.data.users = users;
-      commandHandler.commandHelper.onStep++;
     },
-    () => {
-      const users = commandHandler.commandHelper.data.users;
-      let userList = [];
-      commandHandler.commandHelper.onStep++;
+    (params = {}) => {
+      if (params.stations) {
+        const stationList = params.stations.map((station) => `[${station.stationId}] ${station.stationName} - Owner: ${station.owner || 'None'}`);
+        commandHandler.commandHelper.data.stations = params.stations;
 
-      for (const user of users) {
-        userList.push(textTools.createFullLine());
-        userList.push(`User: ${user.userName}`);
-        userList.push('Gathered password information:');
-        userList = userList.concat(humanReadableHints(user.hints));
+        messenger.queueMessage({ text: ['Available stations:'].concat(stationList) });
       }
 
-      commandHandler.triggerCommand({ cmd: 'clear' });
       messenger.queueMessage({
-        text: [
-          'Users with authorization to access the station:',
-        ].concat(userList),
+        text: ['Input the number of your chosen station:'],
       });
-      messenger.queueMessage({
-        text: [
-          textTools.createFullLine(),
-          'Press enter to continue. Prepare to receive memory dumps',
-        ],
-      });
+
+      commandHandler.commandHelper.onStep++;
+    },
+    (phrases = ['']) => {
+      const stationId = parseInt(phrases[0], 10);
+
+      if (isNaN(stationId) || !commandHandler.commandHelper.data.stations.find((station) => station.stationId === stationId)) {
+        messenger.queueMessage({ text: ['Incorrect choice'] });
+
+        commandHandler.commandHelper.onStep--;
+        commandHandler.triggerCommandStep();
+      } else {
+        const users = commandHandler.commandHelper.data.users;
+        let userList = [];
+        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.data.stationId = stationId;
+
+        for (const user of users) {
+          userList.push(textTools.createFullLine());
+          userList.push(`User: ${user.userName}`);
+          userList.push('Gathered password information:');
+          userList = userList.concat(humanReadableHints(user.hints));
+        }
+
+        commandHandler.triggerCommand({ cmd: 'clear' });
+        messenger.queueMessage({
+          text: [
+            `Accessing station ${stationId}...`,
+            'Users with authorization to access the station:',
+          ].concat(userList),
+        });
+        messenger.queueMessage({
+          text: [
+            textTools.createFullLine(),
+            'Press enter to continue. Prepare to receive memory dumps',
+          ],
+        });
+      }
     },
     () => {
       const codeColumns = commandHandler.commandHelper.data.codeColumns;
@@ -135,7 +159,7 @@ commands.hackstation = {
 
       domManipulator.setInputStart('authUsr');
     },
-    (phrases) => {
+    (phrases = ['']) => {
       if (!phrases) {
         domManipulator.setInputStart('authUsr');
         messenger.queueMessage({
@@ -167,7 +191,7 @@ commands.hackstation = {
         ],
       });
     },
-    (phrases) => {
+    (phrases = ['']) => {
       const validOptions = ['1', '2'];
 
       if (!phrases || validOptions.indexOf(phrases[0]) === -1) {
@@ -193,72 +217,5 @@ commands.hackstation = {
   category: 'basic',
   commandName: 'hackstation',
 };
-
-/**
- * emp + 3 numbers (emp5120, emp3310, emp0020)
- */
-
-/**
- * Random passwords need hint for:
- * word type
- */
-
-/**
- * Single character placement
- * String length
- * Multiple character placements
- * Word type (example: fruit)
- */
-
-// commands.addgameuser = {
-//   func: (phrases = []) => {
-//     if (phrases.length < 2) {
-//       commandHandler.resetCommand(true);
-
-//       return;
-//     }
-
-//     commandHandler.commandHelper.data = {
-//       gameUser: {
-//         userName: phrases[0],
-//         password: phrases[1],
-//       },
-//     };
-
-//     messenger.queueMessage({ text: labels.getText('info', 'cancel') });
-//     messenger.queueMessage({ text: [
-//       'Type a password hint and press enter',
-//       'Press enter without any input when you are done',
-//     ] });
-//     domManipulator.setInputStart('addGmUsr');
-//   },
-//   steps: [
-//     (phrases = []) => {
-//       const commandHelper = commandHandler.commandHelper;
-//       const gameUser = commandHelper.gameUser;
-
-//       if (phrases.length > 0 && phrases[0] !== '') {
-
-//       } else {
-//         messenger.queueMessage({ text:  });
-//         messenger.queueMessage({ text: labels.getText('info', 'isThisOk') });
-//       }
-//     },
-//   ],
-//   accessLevel: 1,
-//   visibility: 1,
-//   category: 'admin',
-//   commandName: 'addgameuser',
-// };
-
-// commands.addallgameusers = {
-//   func: () => {
-
-//   },
-//   accessLevel: 1,
-//   visibility: 1,
-//   category: 'admin',
-//   commandName: 'addallgameusers',
-// };
 
 module.exports = commands;

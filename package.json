@@ -20,7 +20,7 @@
   "devDependencies": {
     "eslint": "2.8.0",
     "eslint-config-airbnb": "7.0.0",
-    "eslint-plugin-react": "4.3.0",
+    "eslint-plugin-react": "4.3.0"
   },
   "dependencies": {
     "html-minifier": "2.0.0",

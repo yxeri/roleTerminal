@@ -583,7 +583,7 @@ function decreaseZoom() {
  * @returns {{title: string, description: string}} - Title and escription of the map marker
  */
 function getInfoText(markerId) {
-  const marker = mapMarkers.find(mapMarker => mapMarker.markerId === markerId);
+  const marker = mapMarkers[Object.keys(mapMarkers).find(markerName => mapMarkers[markerName].markerId === parseInt(markerId, 10))];
 
   if (!marker) {
     return null;
@@ -591,8 +591,8 @@ function getInfoText(markerId) {
 
   let description = marker.addedShortDesc;
 
-  if (description.addedExpandedDesc) {
-    description = marker.addedShortDesc.slice(0, marker.addedShortDesc.length - 3) + marker.addedExpandedDesc;
+  if (marker.addedExpandedDesc) {
+    description = marker.addedShortDesc.slice(0, marker.addedShortDesc.length - 2) + marker.addedExpandedDesc;
   }
 
   return { title: marker.addedTitle, description };

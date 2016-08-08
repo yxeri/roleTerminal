@@ -1,7 +1,12 @@
 'use strict';
 
 const dbConnector = require('../../db/databaseConnector');
+const dbStation = require('../../db/connectors/station');
 const messenger = require('../../socketHelpers/messenger');
+const objectValidator = require('../../utils/objectValidator');
+
+const maxSignal = 100;
+const signalPercentage = 0.1;
 
 /**
  * @private
@@ -25,8 +30,38 @@ function shuffleArray(array) {
   return shuffledArray;
 }
 
+function updateSignalValue(stationId, boostingSignal) {
+  dbStation.getStation(stationId, (err, station) => {
+    if (err) {
+      return;
+    }
+
+    const signalValue = station.signalValue;
+
+    function setNewValue(newSignalValue) {
+      dbStation.updateSignalValue(stationId, Math.ceil(newSignalValue), (updateErr) => {
+        if (updateErr) {
+          return;
+        }
+      });
+    }
+
+    const modifiedMaxSignal = boostingSignal ? maxSignal : -maxSignal;
+
+    if ((boostingSignal && signalValue > 0) || (!boostingSignal && signalValue < 0)) {
+      setNewValue(signalValue + ((modifiedMaxSignal - signalValue) * signalPercentage));
+    } else {
+      setNewValue(signalValue + (modifiedMaxSignal * signalPercentage));
+    }
+  });
+}
+
 function handle(socket) {
   socket.on('manipulateStation', (params) => {
+    if (!objectValidator.isValidData(params, { users: true, gameUser: true, choice: true, stationId: true })) {
+      return;
+    }
+
     const sentUser = params.gameUser;
 
     if (params.users.map((user) => user.userName).indexOf(sentUser.userName) === -1) {
@@ -74,6 +109,7 @@ function handle(socket) {
               },
             });
             socket.emit('commandSuccess', { noStepCall: true });
+            updateSignalValue(params.stationId, true);
 
             break;
           }
@@ -89,6 +125,7 @@ function handle(socket) {
               },
             });
             socket.emit('commandSuccess', { noStepCall: true });
+            updateSignalValue(params.stationId, false);
 
             break;
           }
@@ -117,6 +154,10 @@ function handle(socket) {
   });
 
   socket.on('getGameUsersSelection', (params) => {
+    if (!objectValidator.isValidData(params, { userAmount: true })) {
+      return;
+    }
+
     dbConnector.getAllGameUsers((err, gameUsers) => {
       if (err || gameUsers === null) {
         socket.emit('commandFail');
@@ -148,6 +189,16 @@ function handle(socket) {
           },
         });
       });
+    });
+  });
+
+  socket.on('getStations', () => {
+    dbStation.getAllStations((err, stations) => {
+      if (err) {
+        return;
+      }
+
+      socket.emit('commandSuccess', { newData: { stations } });
     });
   });
 }

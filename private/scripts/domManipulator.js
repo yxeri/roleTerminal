@@ -367,6 +367,11 @@ function resizeCallback() {
   }
 }
 
+function flashMenu() {
+  menu.classList.add('flash');
+  setTimeout(() => { menu.classList.remove('flash'); }, 800);
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -398,3 +403,4 @@ exports.getVideoHolder = getVideoHolder;
 exports.resizeInput = resizeInput;
 exports.setStatus = setStatus;
 exports.resizeCallback = resizeCallback;
+exports.flashMenu = flashMenu;

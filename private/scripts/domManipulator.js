@@ -361,12 +361,18 @@ function setStatus(status) {
   statusField.textContent = `[${status}]`;
 }
 
+/**
+ * Calls function assigned to viewResizeCallback, if assigned
+ */
 function resizeCallback() {
   if (viewResizeCallback) {
     viewResizeCallback();
   }
 }
 
+/**
+ * Adds the flash class to an element, which will start a flashing animation
+ */
 function flashMenu() {
   menu.classList.add('flash');
   setTimeout(() => { menu.classList.remove('flash'); }, 800);

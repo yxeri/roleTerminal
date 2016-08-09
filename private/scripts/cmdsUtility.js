@@ -101,15 +101,6 @@ commands.time = {
   commandName: 'time',
 };
 
-commands.weather = {
-  func: () => {
-    socketHandler.emit('weather');
-  },
-  accessLevel: 1,
-  category: 'basic',
-  commandName: 'weather',
-};
-
 commands.mode = {
   func: (phrases, verbose) => {
     const commandChars = commandHandler.getCommandChars();

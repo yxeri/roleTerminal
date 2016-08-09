@@ -6,6 +6,7 @@ const appConfig = require('../../config/defaults/config').app;
 const logger = require('../../utils/logger');
 const http = require('http');
 
+// FIXME SMHI API changed. Structure needs to be fixed here before usage
 /**
  * Prepare a weather report from the retrieved json object
  * @param jsonObj JSON object retrieved from external source
@@ -15,14 +16,13 @@ function createWeatherReport(jsonObj) {
   const weatherRep = {};
 
   weatherRep.time = new Date(jsonObj.validTime);
-  weatherRep.temperature = jsonObj.t;
-  weatherRep.visibility = jsonObj.vis;
-  weatherRep.windDirection = jsonObj.wd;
-  weatherRep.thunder = jsonObj.tstm;
-  weatherRep.gust = jsonObj.gust;
-  weatherRep.cloud = jsonObj.tcc;
-  weatherRep.precipitation = jsonObj.pit;
-  weatherRep.precipType = jsonObj.pcat;
+  weatherRep.temperature = jsonObj.parameters.find((group) => group.name === 't');
+  weatherRep.visibility = jsonObj.parameters.find((group) => group.name === 'vis');
+  weatherRep.windDirection = jsonObj.parameters.find((group) => group.name === 'wd');
+  weatherRep.thunder = jsonObj.parameters.find((group) => group.name === 'tstm');
+  weatherRep.gust = jsonObj.parameters.find((group) => group.name === 'gust');
+  weatherRep.cloud = jsonObj.parameters.find((group) => group.name === 'tcc_mean');
+  weatherRep.precipitation = jsonObj.parameters.find((group) => group.name === 'pcat');
 
   return weatherRep;
 }
@@ -45,24 +45,25 @@ function handle(socket) {
     });
   });
 
+  // TODO Should average values across hours
+  // FIXME SMHI API changed. Structure needs to be fixed here before usage
   /**
    * Weather command. Returns weather for coming days. Weather is retrieved from external source
    * Emits weather
    */
-   // TODO Should average values across hours
   socket.on('weather', () => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.weather.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
       }
 
-      const lat = appConfig.centerLat.toFixed(2);
-      const lon = appConfig.centerLong.toFixed(2);
+      const lat = appConfig.centerLat.toFixed(3);
+      const lon = appConfig.centerLong.toFixed(3);
       const hoursAllowed = [0, 4, 8, 12, 16, 20];
       let url = '';
 
       if (appConfig.country.toLowerCase() === 'sweden') {
-        url = `http://opendata-download-metfcst.smhi.se/api/category/pmp1.5g/version/1/geopoint/lat/${lat}/lon/${lon}/data.json`;
+        url = `http://opendata-download-metfcst.smhi.se/api/category/pmp2g/version/2/geotype/point/lon/${lon}/lat/${lat}/data.json`;
       }
 
       http.get(url, (resp) => {
@@ -74,7 +75,7 @@ function handle(socket) {
 
         resp.on('end', () => {
           const response = JSON.parse(body);
-          const times = response.timeseries;
+          const times = response.timeSeries;
           const now = new Date();
           const report = [];
 

@@ -134,7 +134,7 @@ commands.help = {
       }
 
       messenger.queueMessage({
-        text: commandHandler.getCommands(true),
+        text: commandHandler.getCommands({ filtered: true }),
         linkable: true,
       });
     } else if (phrases.length >= 1) {

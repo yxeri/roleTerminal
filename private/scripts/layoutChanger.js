@@ -22,6 +22,9 @@ const viewChangerItem = (() => {
   return item;
 })();
 
+/**
+ * Resizes the secondView to 100% or 50% width by adding classes on them, depending on viewIsExpanded flag
+ */
 function transformView() {
   const mainView = domManipulator.getMainView();
   const secondView = domManipulator.getSecondView();
@@ -141,7 +144,7 @@ function isViewSplit() {
 
 /**
  * Is view expanded?
- * * @returns {boolean} viewIsExpanded - Is view expanded?
+ * @returns {boolean} viewIsExpanded - Is view expanded?
  */
 function isViewExpanded() {
   return viewIsExpanded;

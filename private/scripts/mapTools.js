@@ -598,6 +598,10 @@ function getInfoText(markerId) {
   return { title: marker.addedTitle, description };
 }
 
+/**
+ * Creates the map and retrieves positions from server and Google maps
+ * @static
+ */
 function startMap() {
   if (!getMap()) {
     createMap({

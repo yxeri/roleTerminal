@@ -13,9 +13,21 @@ const labels = require('./labels');
  */
 const commands = {};
 
+/**
+ * Translates password hints and make them human readable
+ * @static
+ * @param {string[]} hints - Password hints
+ * @return {string[]} Human readable password hints
+ */
 function humanReadableHints(hints) {
   const modifiedHints = [];
 
+  /**
+   * Translates a password hint and makes it human readable
+   * @private
+   * @param {string} hint - Password hint
+   * @return {string[]} Human readable password hint
+   */
   function createReadable(hint) {
     const splitHint = hint.split(' ');
     let modifiedHint = hint;

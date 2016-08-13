@@ -147,51 +147,6 @@ commands.central = {
           toObjId: 'p4',
         });
 
-        // painter.createCircle({
-        //   objId: 'test1',
-        //   x: 450,
-        //   y: 450,
-        //   radius: 20,
-        //   shouldStroke: true,
-        //   shouldFill: true,
-        // });
-        // painter.createCircle({
-        //   objId: 'test1',
-        //   x: 550,
-        //   y: 550,
-        //   radius: 20,
-        //   shouldStroke: true,
-        //   shouldFill: true,
-        // });
-
-        // painter.createRect({
-        //   objId: 'test2',
-        //   x: 550,
-        //   y: 450,
-        //   width: 50,
-        //   height: 50,
-        //   shouldFill: true,
-        //   shouldStroke: true,
-        // });
-        // painter.createRect({
-        //   objId: 'test3',
-        //   x: 570,
-        //   y: 470,
-        //   width: 50,
-        //   height: 50,
-        //   shouldFill: true,
-        //   shouldStroke: true,
-        // });
-        // painter.createRect({
-        //   objId: 'test3',
-        //   x: 650,
-        //   y: 470,
-        //   width: 50,
-        //   height: 50,
-        //   shouldFill: true,
-        //   shouldStroke: true,
-        // });
-
         break;
       }
       case 'off': {

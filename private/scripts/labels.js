@@ -539,7 +539,7 @@ const all = {
     ],
     helpExtra: [
       'Instructions',
-      'Add -help after a command to get instructions on how to use it. Example: uploadkey -help',
+      'Use the help command to get instructions on how to use a command. Example: help list',
       'Shortcuts',
       'Use page up/down to scroll the view',
       'Press arrow up/down to go through your previous used commands',
@@ -789,7 +789,7 @@ const all = {
     ],
     helpExtra: [
       'Instruktioner',
-      'Lägg till -help efter ett kommando för att få instruktioner på hur det kan användas. Exempel: uploadkey -help',
+      'Använd hjälp-kommandot för att få instruktioner på hur ett kommando kan användas. Exempel: help list',
       'Genvägar',
       'Använd page up/down för att skrolla vyn',
       'Använd pil upp/ner för att gå igenom tidigare använda kommandon',
@@ -865,18 +865,18 @@ const all = {
     ],
     welcomeLoggedIn: [
       'Welcome, employee',
-      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
-      'You can also retrieve instructions if you use the tab button or type double space without any other input',
-      'Learn this valuable skill to increase your productivity!',
+      'You can retrieve instructions on how to use the terminal with the tab button or typing double space without any other input',
+      'You can also type "help" to retrieve the same instructions',
+      'Learn these valuable skills to increase your productivity!',
       'May you have a productive day',
     ],
     razorHacked: ['## This terminal has been cracked by your friendly Razor team. Enjoy! ##'],
     welcome: [
       'Welcome to the Oracle of Organica',
       'Please login to start your productive day!',
-      'Did you know that you can auto-complete commands by using the tab button or writing double spaces?',
-      'You can also retrieve instructions if you use the tab button or type double space without any other input',
-      'Learn this valuable skill to increase your productivity!',
+      'You can retrieve instructions on how to use the terminal with the tab button or typing double space without any other input',
+      'You can also type "help" to retrieve the same instructions',
+      'Learn these valuable skills to increase your productivity!',
     ],
     pressEnter: ['Press enter to continue'],
     typeLineEnter: [

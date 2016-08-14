@@ -171,7 +171,7 @@ commands.mode = {
   },
   autocomplete: { type: 'modes' },
   accessLevel: 13,
-  category: 'advanced',
+  category: 'extra',
   commandName: 'mode',
   options: {
     chat: { description: 'Chat mode' },
@@ -212,6 +212,36 @@ commands.create = {
   options: {
     room: { description: 'Create a room' },
     team: { description: 'Create a team' },
+  },
+};
+
+commands.remove = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const choice = phrases[0];
+
+      switch (choice) {
+        case 'room': {
+          commandHandler.triggerCommand({ cmd: 'removeroom', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        default: {
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+
+          break;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'remove',
+  options: {
+    room: { description: 'Remove a room' },
   },
 };
 

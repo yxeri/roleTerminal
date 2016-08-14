@@ -523,20 +523,6 @@ commands.createroom = {
   commandName: 'createroom',
 };
 
-commands.myrooms = {
-  func: () => {
-    const data = { user: {}, device: {} };
-
-    data.user.userName = storage.getUser();
-    data.device.deviceId = storage.getDeviceId();
-
-    socketHandler.emit('myRooms', data);
-  },
-  accessLevel: 13,
-  category: 'advanced',
-  commandName: 'myrooms',
-};
-
 commands.inviteroom = {
   func: (phrases) => {
     const data = {

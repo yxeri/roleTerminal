@@ -1678,6 +1678,7 @@ function onStartup(params = { }) {
   socketHandler.emit('getCommands');
   labels.setLanguage(storage.getDefaultLanguage());
   domManipulator.setMainView(document.getElementById('background'));
+  commandHandler.addSpecialHelpOptions();
 
   if (firstConnection) {
     populateMenu();

@@ -391,7 +391,7 @@ function handle(socket, io) {
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.myrooms.commandName, (allowErr, allowed, user) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
       }

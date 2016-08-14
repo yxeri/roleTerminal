@@ -16,7 +16,13 @@ const commands = {};
 
 commands.whoami = {
   func: () => {
+    const data = {
+      user: { userName: storage.getUser() },
+      device: { deviceId: storage.getDeviceId() },
+    };
+
     socketHandler.emit('whoAmI');
+    socketHandler.emit('myRooms', data);
   },
   accessLevel: 13,
   category: 'basic',

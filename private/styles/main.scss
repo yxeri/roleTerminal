@@ -369,8 +369,12 @@ textarea {
 }
 
 .thinner {
-  margin-left: 3em;
-  margin-right: 3em;
+  -webkit-transform: translateZ(0); // Fix for Chrome
+  position: fixed;
+  width: 96%;
+  height: 94%;
+  margin-left: 2%;
+  margin-top: 2%;
 }
 
 .subMenu {

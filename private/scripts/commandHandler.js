@@ -110,6 +110,11 @@ function triggerCommand(params) {
   const command = trimCommandChar(params.cmd);
 
   if (commands[command]) {
+    if (commands[command].steps) {
+      commandHelper.command = commands[command].commandName;
+      commandHelper.maxSteps = commands[command].steps.length;
+    }
+
     commands[command].func(cmdParams);
   }
 }

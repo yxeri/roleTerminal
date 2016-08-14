@@ -133,6 +133,15 @@ function getCommandVisibility(command) {
 }
 
 /**
+ * Get category from command
+ * @param {string} command - Name of command
+ * @returns {string} - Category
+ */
+function getCommandCategory(command) {
+  return commands[command] ? commands[command].category : '';
+}
+
+/**
  * Get valid command characters
  * @returns {string[]} - Valid command characters
  */
@@ -167,8 +176,10 @@ function getCommands(params) {
       const commandName = keys[i];
       const commandAccessLevel = getCommandAccessLevel(commandName);
       const commandVisibility = getCommandVisibility(commandName);
+      const commandCategory = getCommandCategory(commandName);
+      const userAccessLevel = storage.getAccessLevel();
 
-      if (storage.getAccessLevel() >= commandAccessLevel && storage.getAccessLevel() >= commandVisibility) {
+      if (userAccessLevel >= commandAccessLevel && userAccessLevel >= commandVisibility && (userAccessLevel === 0 || commandCategory !== 'login')) {
         allCommands.push(commandName);
       }
     }
@@ -264,6 +275,7 @@ exports.triggerCommand = triggerCommand;
 exports.resetCommand = resetCommand;
 exports.getCommandAccessLevel = getCommandAccessLevel;
 exports.getCommandVisibility = getCommandVisibility;
+exports.getCommandCategory = getCommandCategory;
 exports.getCommandChars = getCommandChars;
 exports.isCommandChar = isCommandChar;
 exports.getCommands = getCommands;

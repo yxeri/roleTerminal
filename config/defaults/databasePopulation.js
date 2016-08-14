@@ -28,6 +28,7 @@ modifiedDatabasePop.rooms = modifiedDatabasePop.rooms ? modifiedDatabasePop.room
 modifiedDatabasePop.commands = modifiedDatabasePop.commands ? modifiedDatabasePop.commands : {};
 
 config.accessLevels = {
+  god: 13,
   superUser: 12,
   admin: 11,
   privileged: 9,
@@ -204,7 +205,7 @@ config.commands = {
   createroom: modifiedDatabasePop.commands.createroom || {
     commandName: 'createroom',
     accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
+    visibility: config.accessLevels.god,
     category: 'advanced',
   },
   myrooms: modifiedDatabasePop.commands.myrooms || {
@@ -349,13 +350,13 @@ config.commands = {
   inviteteam: modifiedDatabasePop.commands.inviteteam || {
     commandName: 'inviteteam',
     accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
+    visibility: config.accessLevels.god,
     category: 'admin',
   },
   createteam: modifiedDatabasePop.commands.createteam || {
     commandName: 'createteam',
     accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
+    visibility: config.accessLevels.god,
     category: 'admin',
   },
   alias: modifiedDatabasePop.commands.alias || {
@@ -379,7 +380,7 @@ config.commands = {
   inviteroom: modifiedDatabasePop.commands.inviteroom || {
     commandName: 'inviteroom',
     accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
+    visibility: config.accessLevels.god,
     category: 'basic',
   },
   createmission: modifiedDatabasePop.commands.createmission || {

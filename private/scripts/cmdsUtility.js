@@ -179,4 +179,76 @@ commands.mode = {
   },
 };
 
+commands.create = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const choice = phrases[0];
+
+      switch (choice) {
+        case 'room': {
+          commandHandler.triggerCommand({ cmd: 'createroom', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        case 'team': {
+          commandHandler.triggerCommand({ cmd: 'createteam', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        default: {
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+
+          break;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'create',
+  options: {
+    room: { description: 'Create a room' },
+    team: { description: 'Create a team' },
+  },
+};
+
+commands.invite = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const choice = phrases[0];
+
+      switch (choice) {
+        case 'room': {
+          commandHandler.triggerCommand({ cmd: 'inviteroom', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        case 'team': {
+          commandHandler.triggerCommand({ cmd: 'inviteteam', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        default: {
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+
+          break;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'create',
+  options: {
+    room: { description: 'Invite a user to a room you are following' },
+    team: { description: 'Invite a user to your team' },
+  },
+};
+
 module.exports = commands;

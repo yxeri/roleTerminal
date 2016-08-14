@@ -168,6 +168,7 @@ function isCommandChar(char) {
  * @param {Object} params - Parameters
  * @param {boolean} params.aliases - Should aliases be included with the returned commands?
  * @param {boolean} params.filtered - Should returned commands be filtered based on user's access level?
+ * @param {boolean} params.extras - Should returned commands contain extra category commands?
  * @returns {string[]} - Names of all commands
  */
 function getCommands(params) {
@@ -184,7 +185,7 @@ function getCommands(params) {
       const commandCategory = getCommandCategory(commandName);
       const userAccessLevel = storage.getAccessLevel();
 
-      if (userAccessLevel >= commandAccessLevel && userAccessLevel >= commandVisibility && (userAccessLevel === 0 || commandCategory !== 'login')) {
+      if (userAccessLevel >= commandAccessLevel && userAccessLevel >= commandVisibility && (userAccessLevel === 0 || commandCategory !== 'login') && (params.extras || commandCategory !== 'extra')) {
         allCommands.push(commandName);
       }
     }
@@ -254,7 +255,7 @@ function updateCommand(command) {
  * Triggered by commandHandler
  */
 function addSpecialHelpOptions() {
-  for (const command of getCommands({ aliases: false })) {
+  for (const command of getCommands({ filtered: true, aliases: false })) {
     commands.help.options[command] = { description: command };
   }
 }
@@ -274,7 +275,6 @@ function addSpecialMapOption(positionName, type) {
 }
 
 collectCommands();
-addSpecialHelpOptions();
 
 exports.triggerCommand = triggerCommand;
 exports.resetCommand = resetCommand;
@@ -290,3 +290,4 @@ exports.getCommand = getCommand;
 exports.updateCommand = updateCommand;
 exports.commandHelper = commandHelper;
 exports.addSpecialMapOption = addSpecialMapOption;
+exports.addSpecialHelpOptions = addSpecialHelpOptions;

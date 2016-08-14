@@ -59,7 +59,7 @@ commands.alias = {
     }
   },
   accessLevel: 13,
-  category: 'basic',
+  category: 'extra',
   commandName: 'alias',
 };
 

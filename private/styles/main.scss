@@ -99,7 +99,7 @@ textarea {
 #inputContainer {
   overflow: hidden;
   padding: 0 .8em 0 .8em;
-  width: 100%;
+  width: 99%;
 }
 
 #inputContainer > span {
@@ -147,7 +147,6 @@ textarea {
 }
 
 #map {
-  top: 2em;
   overflow: hidden;
   background-color: #00865e;
 
@@ -369,8 +368,12 @@ textarea {
 }
 
 .thinner {
-  margin-left: 3em;
-  margin-right: 3em;
+  -webkit-transform: translateZ(0); // Fix for Chrome
+  position: fixed;
+  width: 96%;
+  height: 94%;
+  margin-left: 2%;
+  margin-top: 2%;
 }
 
 .subMenu {

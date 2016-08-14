@@ -56,6 +56,9 @@ const all = {
       'The password is optional',
       'The name can only contain letters and numbers (a-z, 0-9)',
     ],
+    create: [
+      'Create a chat room or a team',
+    ],
     myrooms: ['Shows a list of all rooms you are following'],
     login: [
       'Logs in as a user on this device',
@@ -153,6 +156,7 @@ const all = {
       'You have to be the team leader or an team administrator to invite new members',
     ],
     inviteroom: ['Invites another user to a room you are following'],
+    invite: ['Invite a user to a room that you are following or to your team'],
     alias: [
       'Create a new shortcut for a command and sequence',
       'The shortcut will appear among other commands when you auto-complete',
@@ -317,6 +321,7 @@ const all = {
       'Ni måste vara ledare för teamet eller en administratör för teamet för att kunna bjuda in nya medlemmar',
     ],
     inviteroom: ['Bjuder in en annan användare till ett rum ni följer'],
+    invite: ['Bjud in en användare till ett rum ni följer eller till ditt team'],
     alias: [
       'Skapa en ny genväg för ett kommando och en sekvens',
       'Genvägen kommer att synas tillsammans med andra kommandon när ni använder autoifyllning',
@@ -511,6 +516,14 @@ const all = {
       exampleLine,
       'createteam team1',
     ],
+    create: [
+      usageLine,
+      'create room *name*',
+      'create team *name*',
+      exampleLine,
+      'create room room1',
+      'create team team1',
+    ],
     invitations: [
       usageLine,
       'invitations',
@@ -530,6 +543,14 @@ const all = {
       'inviteroom *user name* *room name*',
       exampleLine,
       'inviteroom user1 room1',
+    ],
+    invite: [
+      usageLine,
+      'invite room *user name* *room name*',
+      'invite team *user name*',
+      exampleLine,
+      'invite room user1 room1',
+      'invite team user1',
     ],
     alias: [
       usageLine,

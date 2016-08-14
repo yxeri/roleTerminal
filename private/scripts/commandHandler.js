@@ -110,6 +110,11 @@ function triggerCommand(params) {
   const command = trimCommandChar(params.cmd);
 
   if (commands[command]) {
+    if (commands[command].steps) {
+      commandHelper.command = commands[command].commandName;
+      commandHelper.maxSteps = commands[command].steps.length;
+    }
+
     commands[command].func(cmdParams);
   }
 }
@@ -130,6 +135,15 @@ function getCommandAccessLevel(command) {
  */
 function getCommandVisibility(command) {
   return commands[command] ? commands[command].visibility : 1;
+}
+
+/**
+ * Get category from command
+ * @param {string} command - Name of command
+ * @returns {string} - Category
+ */
+function getCommandCategory(command) {
+  return commands[command] ? commands[command].category : '';
 }
 
 /**
@@ -167,8 +181,10 @@ function getCommands(params) {
       const commandName = keys[i];
       const commandAccessLevel = getCommandAccessLevel(commandName);
       const commandVisibility = getCommandVisibility(commandName);
+      const commandCategory = getCommandCategory(commandName);
+      const userAccessLevel = storage.getAccessLevel();
 
-      if (storage.getAccessLevel() >= commandAccessLevel && storage.getAccessLevel() >= commandVisibility) {
+      if (userAccessLevel >= commandAccessLevel && userAccessLevel >= commandVisibility && (userAccessLevel === 0 || commandCategory !== 'login')) {
         allCommands.push(commandName);
       }
     }
@@ -264,6 +280,7 @@ exports.triggerCommand = triggerCommand;
 exports.resetCommand = resetCommand;
 exports.getCommandAccessLevel = getCommandAccessLevel;
 exports.getCommandVisibility = getCommandVisibility;
+exports.getCommandCategory = getCommandCategory;
 exports.getCommandChars = getCommandChars;
 exports.isCommandChar = isCommandChar;
 exports.getCommands = getCommands;

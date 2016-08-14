@@ -66,6 +66,7 @@ commands.createteam = {
     },
   ],
   accessLevel: 13,
+  visibility: 13,
   category: 'basic',
   autocomplete: { type: 'users' },
   commandName: 'createteam',

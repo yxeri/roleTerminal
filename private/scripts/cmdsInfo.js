@@ -41,7 +41,6 @@ commands.list = {
       });
     }
   },
-  autocomplete: { type: 'lists' },
   accessLevel: 13,
   category: 'basic',
   commandName: 'list',

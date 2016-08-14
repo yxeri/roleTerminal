@@ -518,6 +518,7 @@ commands.createroom = {
     },
   ],
   accessLevel: 13,
+  visibility: 13,
   category: 'advanced',
   commandName: 'createroom',
 };

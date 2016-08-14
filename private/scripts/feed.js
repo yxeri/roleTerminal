@@ -355,7 +355,7 @@ function setCommandUsed(used) {
 function consumeCommandQueue() {
   if (commandQueue.length > 0) {
     const storedCommand = commandQueue.shift();
-    const commmand = storedCommand.command;
+    const command = storedCommand.command;
     const commandMessage = storedCommand.commandMsg;
 
     if (commandMessage) {
@@ -363,7 +363,7 @@ function consumeCommandQueue() {
     }
 
     setCommandUsed(true);
-    commmand(storedCommand.data);
+    commandHandler.triggerCommand({ cmd: command, cmdParams: storedCommand.data });
     setTimeout(consumeCommandQueue, commandTime);
   } else {
     setCommandUsed(false);
@@ -639,16 +639,11 @@ function enterKeyHandler() {
           // Store the command for usage with up/down arrows
           pushCommandHistory(phrases.join(' '));
 
-          if (command.steps) {
-            commandHelper.command = command.commandName;
-            commandHelper.maxSteps = command.steps.length;
-          }
-
           if (command.clearBeforeUse) {
             commandHandler.triggerCommand({ cmd: 'clear' });
           }
 
-          queueCommand(command.func, combineSequences(command.commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
+          queueCommand(command.commandName, combineSequences(command.commandName, phrases), printUsedCommand(command.clearAfterUse, inputText));
           startCommandQueue();
           /**
            * User is logged in and in chat mode
@@ -725,16 +720,18 @@ function specialKeyPress(event) {
     switch (keyCode) {
       case 9: { // Tab
         const phrases = domManipulator.getInputText().split(' ');
+        const command = commandHandler.getCommand(commandHelper.command || phrases[0]);
         keyPressed = true;
 
         if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
           autoCompleteCommand();
           domManipulator.changeModeText();
-        } else if (commandHelper.allowAutoComplete) {
-          const command = commandHandler.getCommand(commandHelper.command);
-          const partial = phrases[0];
+        } else if (command) {
+          if (command.autocomplete && phrases.length < 3) {
+            const partial = phrases[1];
 
-          if (command && command.autocomplete) {
+            console.log(command.autocomplete.type);
+
             switch (command.autocomplete.type) {
               case 'users': {
                 socketHandler.emit('matchPartialUser', { partialName: partial });
@@ -755,11 +752,7 @@ function specialKeyPress(event) {
                 break;
               }
             }
-          }
-        } else if (phrases.length >= 2) {
-          const command = commandHandler.getCommand(phrases[0]);
-
-          if (command) {
+          } else if (command.options && phrases.length > 1) {
             const options = command.options;
 
             autoCompleteOption(phrases, options, phrases.length);

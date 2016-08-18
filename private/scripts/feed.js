@@ -933,6 +933,7 @@ function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
     menuItem.addEventListener('click', (event) => {
       fullscreenResize();
+      domManipulator.removeAllSubMenus();
       func([funcParam]);
       clickHandler.setClicked(true);
       event.stopPropagation();
@@ -956,7 +957,7 @@ function createMenuItem(menuItem) {
   return listItem;
 }
 
-function createSubMenuItem(subItems) {
+function createSubMenuItem(subItems, replaceInput) {
   const ulElem = document.createElement('ul');
 
   for (const item of subItems) {
@@ -970,8 +971,13 @@ function createSubMenuItem(subItems) {
     ulElem.appendChild(liElem);
 
     liElem.addEventListener('click', () => {
-      domManipulator.appendInputText(span.textContent.toLowerCase());
-      domManipulator.removeSubMenu();
+      if (replaceInput) {
+        domManipulator.setCommandInput(`${span.textContent.toLowerCase()} `);
+      } else {
+        domManipulator.appendInputText(span.textContent.toLowerCase());
+      }
+
+      domManipulator.removeAllSubMenus();
     });
   }
 
@@ -1002,7 +1008,7 @@ function thisCommandOptions() {
 function showCommands() {
   const commands = commandHandler.getCommands({ aliases: true, filtered: true });
 
-  domManipulator.addSubMenuItem('commands', createSubMenuItem(commands));
+  domManipulator.addSubMenuItem('commands', createSubMenuItem(commands, true));
 }
 
 function populateMenu() {
@@ -1078,6 +1084,8 @@ function attachFullscreenListener() {
       goFullScreen(document.documentElement);
       fullscreenResize(clickHandler.isClicked());
     }
+
+    domManipulator.removeAllSubMenus();
 
     event.preventDefault();
   });

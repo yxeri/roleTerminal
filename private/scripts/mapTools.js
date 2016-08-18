@@ -413,7 +413,7 @@ function attachMapListeners() {
  */
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-    gridSize: 24,
+    gridSize: 20,
     maxZoom: 17,
     zoomOnClick: false,
     singleSize: true,
@@ -479,7 +479,7 @@ function createMap(params) {
         featureType: 'road',
         elementType: 'geometry',
         stylers: [
-          { color: '#00ffcc' },
+          { color: '#00cca3' },
         ],
       }, {
         featureType: 'road',
@@ -503,7 +503,7 @@ function createMap(params) {
         featureType: 'water',
         elementType: 'all',
         stylers: [
-          { color: '#00ffcc' },
+          { color: '#00cca3' },
         ],
       },
     ],

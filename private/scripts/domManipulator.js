@@ -272,7 +272,7 @@ function addMenuItem(item) {
 function addSubMenuItem(elementId, item) {
   const element = Array.from(menuList.children).find((elem) => elem.id === elementId);
 
-  if (element) {
+  if (element && element.lastChild.tagName !== 'UL') {
     element.appendChild(item);
   }
 }
@@ -347,6 +347,21 @@ function removeSubMenu() {
 }
 
 /**
+ * Removes all sub menus
+ */
+function removeAllSubMenus() {
+  const commandsItem = document.getElementById('commands');
+
+  if (thisCommandItem.lastChild.tagName === 'UL') {
+    thisCommandItem.removeChild(thisCommandItem.lastChild);
+  }
+
+  if (commandsItem && commandsItem.lastChild.tagName === 'UL') {
+    commandsItem.removeChild(commandsItem.lastChild);
+  }
+}
+
+/**
  * Get div with video in it
  * @returns {HTMLElement} - Div with video
  */
@@ -410,3 +425,4 @@ exports.resizeInput = resizeInput;
 exports.setStatus = setStatus;
 exports.resizeCallback = resizeCallback;
 exports.flashMenu = flashMenu;
+exports.removeAllSubMenus = removeAllSubMenus;

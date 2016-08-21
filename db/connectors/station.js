@@ -50,7 +50,7 @@ function getStation(stationId, callback) {
 
 function getAllStations(callback) {
   const query = {};
-  const sort = { stationName: 1 };
+  const sort = { stationId: 1 };
   const filter = { _id: 0 };
 
   Station.find(query, filter).sort(sort).lean().exec((err, stations) => {

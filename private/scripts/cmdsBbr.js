@@ -57,7 +57,7 @@ function humanReadableHints(hints) {
 commands.hackstation = {
   func: () => {
     commandHandler.commandHelper.data = {};
-    commandHandler.commandHelper.fallbackStep = 3;
+    commandHandler.commandHelper.fallbackStep = 4;
 
     socketHandler.emit('getGameUsersSelection', { userAmount: 2 });
   },

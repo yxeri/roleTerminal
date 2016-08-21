@@ -59,7 +59,7 @@ commands.hackstation = {
     commandHandler.commandHelper.data = {};
     commandHandler.commandHelper.fallbackStep = 3;
 
-    socketHandler.emit('getGameUsersSelection', { userAmount: 1 });
+    socketHandler.emit('getGameUsersSelection', { userAmount: 2 });
   },
   steps: [
     (params = {}) => {

@@ -730,8 +730,6 @@ function specialKeyPress(event) {
           if (command.autocomplete && phrases.length < 3) {
             const partial = phrases[1];
 
-            console.log(command.autocomplete.type);
-
             switch (command.autocomplete.type) {
               case 'users': {
                 socketHandler.emit('matchPartialUser', { partialName: partial });
@@ -1148,7 +1146,6 @@ function onMessage(data = { message: {} }) {
 
   if (layoutChanger.isViewExpanded()) {
     domManipulator.flashMenu();
-    console.log(layoutChanger.isViewExpanded());
   }
 }
 

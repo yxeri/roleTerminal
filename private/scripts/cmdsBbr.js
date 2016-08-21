@@ -79,6 +79,7 @@ commands.hackstation = {
 
       domManipulator.setInputStart('ssm');
       messenger.queueMessage({ text: labels.getText('info', 'hackStationIntro') });
+      messenger.queueMessage({ text: labels.getText('info', 'cancel') });
       messenger.queueMessage({ text: [textTools.createFullLine()] });
       socketHandler.emit('getActiveStations');
 

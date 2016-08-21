@@ -942,7 +942,9 @@ const all = {
       'Welcome, dearest user',
       'You will be shown current memory dumps from the station of your choice',
       'You must find the correct password within the dump and use it to get access to the station',
+      'The correct password is the only password printed in both memory dumps',
       'Our operatives have collected information about user passwords for you to use',
+      'Using that information will help you find the correct password faster',
       'We take no responsibility for deaths due to accidental activitation of defense systems',
     ],
     useRegister: [

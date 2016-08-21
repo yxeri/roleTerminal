@@ -50,7 +50,7 @@ function getStation(stationId, callback) {
 
 function getAllStations(callback) {
   const query = {};
-  const sort = { stationName: 1 };
+  const sort = { stationId: 1 };
   const filter = { _id: 0 };
 
   Station.find(query, filter).sort(sort).lean().exec((err, stations) => {
@@ -101,8 +101,27 @@ function updateIsActive(stationId, isActive, callback) {
   });
 }
 
+function getActiveStations(callback) {
+  const query = { isActive: true };
+  const sort = { stationId: 1 };
+  const filter = { _id: 0 };
+
+  Station.find(query, filter).sort(sort).lean().exec((err, stations) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get stations'],
+        err,
+      });
+    }
+
+    callback(err, stations);
+  });
+}
+
 exports.updateSignalValue = updateSignalValue;
 exports.getStation = getStation;
 exports.getAllStations = getAllStations;
 exports.createStation = createStation;
 exports.updateIsActive = updateIsActive;
+exports.getActiveStations = getActiveStations;

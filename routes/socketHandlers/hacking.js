@@ -192,13 +192,18 @@ function handle(socket) {
     });
   });
 
-  socket.on('getStations', () => {
-    dbStation.getAllStations((err, stations) => {
+  socket.on('getActiveStations', () => {
+    dbStation.getActiveStations((err, stations) => {
       if (err) {
         return;
       }
 
-      socket.emit('commandSuccess', { newData: { stations } });
+      if (stations && stations.length > 0) {
+        socket.emit('commandSuccess', { newData: { stations } });
+      } else {
+        messenger.sendSelfMsg({ message: { text: ['There are no active stations available'] } });
+        socket.emit('commandFail');
+      }
     });
   });
 }

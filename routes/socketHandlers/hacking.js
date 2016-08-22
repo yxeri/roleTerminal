@@ -68,7 +68,7 @@ function handle(socket) {
       messenger.sendSelfMsg({
         socket,
         message: {
-          text: ['User is not authorized to access the station'],
+          text: ['User is not authorized to access the LANTERN'],
         },
       });
       socket.emit('commandStep', { reset: true });
@@ -102,9 +102,9 @@ function handle(socket) {
               socket,
               message: {
                 text: [
-                  'You have been authorized to access the station',
-                  'SSM is fully functional and running',
-                  'Boosting signal output from station',
+                  'You have been authorized to access the LANTERN',
+                  'LSM is fully functional and running',
+                  'Amplifying signal output',
                 ],
               },
             });
@@ -118,9 +118,9 @@ function handle(socket) {
               socket,
               message: {
                 text: [
-                  'You have been authorized to access the station',
-                  'SSM is fully functional and running',
-                  'Blocking signal output from station',
+                  'You have been authorized to access the LANTERN',
+                  'LSM is fully functional and running',
+                  'Dampening signal output',
                 ],
               },
             });
@@ -201,7 +201,7 @@ function handle(socket) {
       if (stations && stations.length > 0) {
         socket.emit('commandSuccess', { newData: { stations } });
       } else {
-        messenger.sendSelfMsg({ message: { text: ['There are no active stations available'] } });
+        messenger.sendSelfMsg({ message: { text: ['There are no active LANTERNs available'] } });
         socket.emit('commandFail');
       }
     });

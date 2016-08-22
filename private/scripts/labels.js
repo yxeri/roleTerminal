@@ -922,9 +922,9 @@ const all = {
       `Connecting to relay ${randomRelay}... Connection established`,
       textTools.createFullLine(),
     ],
-    hackStationIntro: [
+    hackLanternIntro: [
       'Razor proudly presents:',
-      'Station Signal Manipulator (SSM)',
+      'LANTERN Signal Manipulator (LSM)',
       textTools.createFullLine(),
       textTools.createMixedString(28),
       textTools.createMixedString(28),
@@ -941,13 +941,13 @@ const all = {
       textTools.createFullLine(),
       'Welcome. We heard that you want to open the Ark. We can help you with that',
       'We will retrieve two memory dumps for you. Within these dumps you will find one to many passwords',
-      'You must find the true password within the dumps and use it together with a user name to get access to the station',
+      'You must find the true password within the dumps and use it together with a user name to get access to the LANTERN',
       'The true password is repeated in both memory dumps',
       'Our operatives have also gathered information about the users to help',
-      'You will be shown users with access to your chosen station',
+      'You will be shown users with access to your chosen LANTERN',
       'Each user will have information about its password attached to it, helping you figure out the true password',
       'You will have to use this information to filter out the true password in the memory dumps',
-      'Use the password and the name of the user using that password to get access to the station of your choice',
+      'Use the password and the name of the user using that password to get access to the LANTERN of your choice',
       'We take no responsibility for deaths due to accidental activitation of defense systems',
     ],
     useRegister: [

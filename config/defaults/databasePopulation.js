@@ -286,6 +286,12 @@ config.commands = {
     visibility: config.accessLevels.advanced,
     category: 'basic',
   },
+  hacklantern: modifiedDatabasePop.commands.hacklantern || {
+    commandName: 'hackroom',
+    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.basic,
+    category: 'basic',
+  },
   importantmsg: modifiedDatabasePop.commands.importantmsg || {
     commandName: 'importantmsg',
     accessLevel: config.accessLevels.admin,

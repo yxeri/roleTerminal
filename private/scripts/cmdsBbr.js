@@ -54,7 +54,7 @@ function humanReadableHints(hints) {
   return modifiedHints;
 }
 
-commands.hackstation = {
+commands.hacklantern = {
   func: () => {
     commandHandler.commandHelper.data = {};
     commandHandler.commandHelper.fallbackStep = 4;
@@ -78,7 +78,7 @@ commands.hackstation = {
       }
 
       domManipulator.setInputStart('ssm');
-      messenger.queueMessage({ text: labels.getText('info', 'hackStationIntro') });
+      messenger.queueMessage({ text: labels.getText('info', 'hackLanternIntro') });
       messenger.queueMessage({ text: labels.getText('info', 'cancel') });
       messenger.queueMessage({ text: [textTools.createFullLine()] });
       socketHandler.emit('getActiveStations');
@@ -91,11 +91,11 @@ commands.hackstation = {
         const stationList = params.stations.map((station) => `[${station.stationId}] ${station.stationName} - Owner: ${station.owner || 'None'}`);
         commandHandler.commandHelper.data.stations = params.stations;
 
-        messenger.queueMessage({ text: ['Available stations:'].concat(stationList) });
+        messenger.queueMessage({ text: ['Available LANTERNs:'].concat(stationList) });
       }
 
       messenger.queueMessage({
-        text: ['Input the number of your chosen station:'],
+        text: ['Input the number of your chosen LANTERN:'],
       });
 
       commandHandler.commandHelper.onStep++;
@@ -124,8 +124,8 @@ commands.hackstation = {
         commandHandler.triggerCommand({ cmd: 'clear' });
         messenger.queueMessage({
           text: [
-            `Accessing station ${stationId}...`,
-            'Users with authorization to access the station:',
+            `Accessing LANTERN ${stationId}...`,
+            'Users with authorization to access the LANTERN:',
           ].concat(userList),
         });
         messenger.queueMessage({
@@ -199,8 +199,8 @@ commands.hackstation = {
         text: [
           'Which command do you want to trigger?',
           'Enter the number of your choice:',
-          '[1] Boost signal to the station',
-          '[2] Block signal to the station',
+          '[1] Amplify signal',
+          '[2] Dampen signal',
         ],
       });
     },
@@ -213,8 +213,8 @@ commands.hackstation = {
             'Incorrect choice',
             'Which command do you want to trigger?',
             'Enter the number of your choice:',
-            '[1] Boost signal to the station',
-            '[2] Block signal to the station',
+            '[1] Amplify signal',
+            '[2] Dampen signal',
           ],
         });
       } else {
@@ -228,7 +228,7 @@ commands.hackstation = {
   accessLevel: 1,
   visibility: 1,
   category: 'basic',
-  commandName: 'hackstation',
+  commandName: 'hacklantern',
 };
 
 module.exports = commands;

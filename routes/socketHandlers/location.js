@@ -136,11 +136,17 @@ function handle(socket) {
 
               for (const socketUser of users) {
                 if (socketUser.socketId && socket.id !== socketUser.socketId && socketUser.isTracked) {
-                  socket.broadcast.to(socketUser.socketId).emit('mapPositions', { positions: [position] });
+                  socket.broadcast.to(socketUser.socketId).emit('mapPositions', {
+                    positions: [position],
+                    currentTime: (new Date()),
+                  });
                 }
               }
 
-              socket.broadcast.emit('mapPositions', { positions: [position] });
+              socket.broadcast.emit('mapPositions', {
+                positions: [position],
+                currentTime: (new Date()),
+              });
             });
           });
         },
@@ -199,7 +205,11 @@ function handle(socket) {
             break;
           }
           default: {
-            socket.emit('mapPositions', { team: user.team, positions });
+            socket.emit('mapPositions', {
+              positions,
+              team: user.team,
+              currentTime: (new Date()),
+            });
 
             break;
           }

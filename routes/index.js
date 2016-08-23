@@ -113,7 +113,7 @@ function handle(io) {
         }
 
         dbConnector.getInvitations(user.userName, (err, list) => {
-          if (err || list === null) {
+          if (err) {
             messenger.sendSelfMsg({
               socket,
               message: {
@@ -124,9 +124,21 @@ function handle(io) {
             socket.emit('commandFail');
 
             return;
+          } else if (list === null) {
+            messenger.sendSelfMsg({
+              socket,
+              message: {
+                text: ['No invitations founds'],
+                text_se: ['Inga inbjudan hittades'],
+              },
+            });
+
+            socket.emit('commandFail');
+
+            return;
           }
 
-          socket.emit('commandSuccess', { invitations: list.invitations, freezeStep: true });
+          socket.emit('commandSuccess', { newData: { invitations: list.invitations }, freezeStep: true });
         });
       });
     });

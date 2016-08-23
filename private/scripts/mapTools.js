@@ -32,7 +32,9 @@ function setMapView(view) {
 function getPolygonCenter(coordsCollection) {
   const bounds = new google.maps.LatLngBounds();
 
-  for (const coords of coordsCollection) {
+  for (let i = 0; i < coordsCollection.length; i++) {
+    const coords = coordsCollection[i];
+
     bounds.extend(new google.maps.LatLng(coords.lat, coords.lng));
   }
 
@@ -313,7 +315,11 @@ function setUserPosition(position) {
  * @static
  */
 function toggleMapLabels() {
-  for (const markerName of Object.keys(mapMarkers)) {
+  const markerKeys = Object.keys(mapMarkers);
+
+  for (let i = 0; i < markerKeys.length; i++) {
+    const markerName = markerKeys[i];
+
     if (mapLabels[markerName] && mapLabels[markerName].getMap() !== mapMarkers[markerName].getMap()) {
       mapLabels[markerName].setMap(mapMarkers[markerName].getMap());
     }
@@ -332,7 +338,11 @@ function realignMap(markers) {
   google.maps.event.trigger(map, 'resize');
 
   if (mapView === 'overview') {
-    for (const marker of Object.keys(mapMarkers)) {
+    const markerKeys = Object.keys(mapMarkers);
+
+    for (let i = 0; i < markerKeys.length; i++) {
+      const marker = markerKeys[i];
+
       bounds.extend(mapMarkers[marker].getPosition());
     }
 
@@ -343,7 +353,9 @@ function realignMap(markers) {
     map.setZoom(18);
   } else if (mapView === 'cluster') {
     if (markers) {
-      for (const marker of markers) {
+      for (let i = 0; i < markers.length; i++) {
+        const marker = markers[i];
+
         bounds.extend(marker.getPosition());
       }
 
@@ -368,9 +380,12 @@ function realignMap(markers) {
  * @param {Object} collections - Collection of objects to be attached to the map
  */
 function setMap(collections) {
-  for (const collection of collections) {
-    for (const markerName of Object.keys(collection)) {
-      collection[markerName].setMap(map);
+  for (let i = 0; i < collections.length; i++) {
+    const collection = collections[i];
+    const collectionKeys = Object.keys(collection);
+
+    for (let j = 0; j < collectionKeys.length; j++) {
+      collection[collectionKeys[j]].setMap(map);
     }
   }
 }
@@ -381,9 +396,10 @@ function setMap(collections) {
 function attachMapListeners() {
   google.maps.event.addListener(markerClusterer, 'clusterclick', (cluster) => {
     const bounds = new google.maps.LatLngBounds();
+    const markers = cluster.getMarkers();
 
-    for (const marker of cluster.getMarkers()) {
-      bounds.extend(marker.getPosition());
+    for (let i = 0; i < markers.length; i++) {
+      bounds.extend(markers[i].getPosition());
     }
 
     setMapView('cluster');

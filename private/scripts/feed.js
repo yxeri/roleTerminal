@@ -132,7 +132,9 @@ function playMorse(morseCode, silent) {
     soundTimeout = 0;
   }
 
-  for (const code of morseCode) {
+  for (let i = 0; i < morseCode.length; i++) {
+    const code = morseCode[i];
+
     shouldPlay = false;
     duration = 0;
 
@@ -419,9 +421,11 @@ function match(partial, items) {
   const matched = [];
   let matches = false;
 
-  for (const name of items) {
-    for (let i = 0; i < partial.length; i++) {
-      if (partial.charAt(i) === name.charAt(i)) {
+  for (let i = 0; i < items.length; i++) {
+    const name = items[i];
+
+    for (let j = 0; j < partial.length; j++) {
+      if (partial.charAt(j) === name.charAt(j)) {
         matches = true;
       } else {
         matches = false;
@@ -502,7 +506,8 @@ function autoCompleteCommand() {
       partialCommand = partialCommand.slice(1);
     }
 
-    for (const command of allCommands) {
+    for (let i = 0; i < allCommands.length; i++) {
+      const command = allCommands[i];
       matches = false;
 
       for (let j = 0; j < partialCommand.length; j++) {
@@ -958,7 +963,8 @@ function createMenuItem(menuItem) {
 function createSubMenuItem(subItems, replaceInput) {
   const ulElem = document.createElement('ul');
 
-  for (const item of subItems) {
+  for (let i = 0; i < subItems.length; i++) {
+    const item = subItems[i];
     const liElem = document.createElement('li');
     const span = document.createElement('span');
 
@@ -1028,9 +1034,10 @@ function populateMenu() {
       elementId: 'thisCommand',
     },
   };
+  const menuKeys = Object.keys(menuItems);
 
-  for (const key of Object.keys(menuItems)) {
-    const menuItem = menuItems[key];
+  for (let i = 0; i < menuKeys.length; i++) {
+    const menuItem = menuItems[menuKeys[i]];
     const listItem = createMenuItem(menuItem);
 
     if (listItem.id === 'thisCommand') {
@@ -1384,7 +1391,10 @@ function onTime(data = {}) {
 }
 
 function onLocationMsg(locationData) {
-  for (const user of Object.keys(locationData)) {
+  const locationKeys = Object.keys(locationData);
+
+  for (let i = 0; i < locationKeys.length; i++) {
+    const user = locationKeys[i];
     const position = locationData[user].position;
     const latitude = position.latitude;
     const longitude = position.longitude;
@@ -1585,7 +1595,9 @@ function onMapPositions(params) {
   const mapPositions = params.positions || [];
   const team = params.team;
 
-  for (const mapPosition of mapPositions) {
+  for (let i = 0; i < mapPositions.length; i++) {
+    const mapPosition = mapPositions[i];
+
     if (mapPosition.positionName.toLowerCase() === storage.getUser().toLowerCase()) {
       continue;
     }

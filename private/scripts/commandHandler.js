@@ -88,8 +88,13 @@ function trimCommandChar(command) {
  * Add all commands to one collection
  */
 function collectCommands() {
-  for (const cmdCollection of commandCollections) {
-    for (const command of Object.keys(cmdCollection)) {
+  for (let i = 0; i < commandCollections.length; i++) {
+    const cmdCollection = commandCollections[i];
+    const cmdKeys = Object.keys(cmdCollection);
+
+    for (let j = 0; j < cmdKeys.length; j++) {
+      const command = cmdKeys[j];
+
       if (!commands[command]) {
         commands[command] = cmdCollection[command];
       } else {
@@ -255,7 +260,11 @@ function updateCommand(command) {
  * Triggered by commandHandler
  */
 function addSpecialHelpOptions() {
-  for (const command of getCommands({ filtered: true, aliases: false })) {
+  const filteredCommands = getCommands({ filtered: true, aliases: false });
+
+  for (let i = 0; i < filteredCommands.length; i++) {
+    const command = filteredCommands[i];
+
     commands.help.options[command] = { description: command };
   }
 }

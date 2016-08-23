@@ -100,6 +100,7 @@ function handle(socket) {
         positionName: user.userName,
         position: params.position,
         type: 'user',
+        group: user.team,
         callback: (userErr) => {
           if (userErr) {
             logger.sendErrorMsg({
@@ -139,7 +140,7 @@ function handle(socket) {
                 }
               }
 
-              socket.broadcast.emit('mapPositions', [position]);
+              socket.broadcast.emit('mapPositions', { positions: [position] });
             });
           });
         },
@@ -198,7 +199,7 @@ function handle(socket) {
             break;
           }
           default: {
-            socket.emit('mapPositions', positions);
+            socket.emit('mapPositions', { team: user.team, positions });
 
             break;
           }
@@ -226,7 +227,7 @@ function handle(socket) {
           return;
         }
 
-        socket.emit('mapPositions', googlePositions);
+        socket.emit('mapPositions', { positions: googlePositions });
       });
     });
   });

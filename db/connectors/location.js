@@ -9,6 +9,7 @@ const mapPositionSchema = new mongoose.Schema({
   position: {},
   isStatic: { type: Boolean, default: false },
   type: String,
+  group: String,
 }, { collection: 'mapPositions' });
 
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
@@ -18,6 +19,7 @@ function updatePosition(params) {
   const position = params.position;
   const isStatic = params.isStatic;
   const type = params.type;
+  const group = params.group;
   const callback = params.callback;
 
   const query = { positionName };
@@ -26,6 +28,10 @@ function updatePosition(params) {
     type,
   };
   const options = { upsert: true, new: true };
+
+  if (typeof group !== 'undefined') {
+    update.group = group;
+  }
 
   if (typeof isStatic !== 'undefined') {
     update.isStatic = isStatic;

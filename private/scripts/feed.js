@@ -1581,7 +1581,10 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
   domManipulator.replaceLastInputPhrase(`${data.matchedName} `);
 }
 
-function onMapPositions(mapPositions = []) {
+function onMapPositions(params) {
+  const mapPositions = params.positions;
+  const team = params.team;
+
   for (const mapPosition of mapPositions) {
     if (mapPosition.positionName.toLowerCase() === storage.getUser().toLowerCase()) {
       continue;
@@ -1593,6 +1596,7 @@ function onMapPositions(mapPositions = []) {
     const coordsCollection = mapPosition.position.coordsCollection;
     const geometry = mapPosition.geometry;
     const type = mapPosition.type;
+    const group = mapPosition.group;
     const description = mapPosition.description;
 
     if (geometry === 'line') {
@@ -1623,7 +1627,7 @@ function onMapPositions(mapPositions = []) {
           latitude,
           longitude,
         },
-        iconUrl: 'images/mapiconuser.png',
+        iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
         hideLabel: true,
       });
     }

@@ -430,7 +430,7 @@ function attachMapListeners() {
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
     gridSize: 20,
-    maxZoom: 17,
+    maxZoom: 16,
     zoomOnClick: false,
     singleSize: true,
     averageCenter: true,

@@ -1230,12 +1230,14 @@ function onFollow(data = { room: {} }) {
 function onUnfollow(data = { room: { roomName: '' } }) {
   const room = data.room;
 
-  messenger.queueMessage({
-    text: [`Stopped following ${room.roomName}`],
-    text_se: [`Slutade följa ${room.roomName}`],
-  });
+  if (!data.silent) {
+    messenger.queueMessage({
+      text: [`Stopped following ${room.roomName}`],
+      text_se: [`Slutade följa ${room.roomName}`],
+    });
+  }
 
-  if (room.exited) {
+  if (room.roomName === storage.getRoom()) {
     socketHandler.emit('follow', {
       room: {
         roomName: 'public',
@@ -1594,11 +1596,12 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
 function onMapPositions(params) {
   const mapPositions = params.positions || [];
   const team = params.team;
+  const userName = storage.getUser() ? storage.getUser().toLowerCase() : '';
 
   for (let i = 0; i < mapPositions.length; i++) {
     const mapPosition = mapPositions[i];
 
-    if (mapPosition.positionName.toLowerCase() === storage.getUser().toLowerCase()) {
+    if (mapPosition.positionName.toLowerCase() === userName) {
       continue;
     }
 
@@ -1631,17 +1634,25 @@ function onMapPositions(params) {
         },
         description,
       });
-    } else if (type && type === 'user') {
-      commandHandler.addSpecialMapOption(positionName, 'user');
-      mapTools.setMarkerPosition({
-        positionName,
-        position: {
-          latitude,
-          longitude,
-        },
-        iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
-        hideLabel: true,
-      });
+    } else if (type && type === 'user' && mapPosition.lastUpdated) {
+      const currentTime = new Date(params.currentTime);
+      const lastUpdated = new Date(mapPosition.lastUpdated);
+
+      if (currentTime - lastUpdated < (20 * 60 * 1000)) {
+        const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
+
+        commandHandler.addSpecialMapOption(positionName, 'user');
+        mapTools.setMarkerPosition({
+          positionName,
+          position: {
+            latitude,
+            longitude,
+          },
+          iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+          hideLabel: true,
+          description: userDescription,
+        });
+      }
     }
   }
 
@@ -1668,6 +1679,10 @@ function onVideoMessage(params = {}) {
       videoPlayer.playVideo();
     });
   }
+}
+
+function onReboot() {
+  commandHandler.triggerCommand({ cmd: 'reboot' });
 }
 
 /**
@@ -1798,4 +1813,5 @@ socketHandler.startSocket({
   mapPositions: onMapPositions,
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
+  reboot: onReboot,
 });

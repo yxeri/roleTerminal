@@ -10,6 +10,7 @@ const mapPositionSchema = new mongoose.Schema({
   isStatic: { type: Boolean, default: false },
   type: String,
   group: String,
+  lastUpdated: Date,
 }, { collection: 'mapPositions' });
 
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
@@ -21,11 +22,13 @@ function updatePosition(params) {
   const type = params.type;
   const group = params.group;
   const callback = params.callback;
+  const lastUpdated = new Date();
 
   const query = { positionName };
   const update = {
     position,
     type,
+    lastUpdated,
   };
   const options = { upsert: true, new: true };
 

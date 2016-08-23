@@ -280,4 +280,40 @@ commands.invite = {
   },
 };
 
+commands.leave = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const choice = phrases[0];
+
+      switch (choice) {
+        case 'room': {
+          commandHandler.triggerCommand({ cmd: 'unfollow', cmdParams: phrases.slice(1) });
+
+          break;
+        }
+        case 'team': {
+          socketHandler.emit('leaveTeam');
+
+          break;
+        }
+        default: {
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+
+          break;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'leave',
+  options: {
+    room: { description: 'Unfollow a room' },
+    team: { description: 'Leave your current team' },
+  },
+};
+
 module.exports = commands;

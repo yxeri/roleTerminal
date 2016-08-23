@@ -70,7 +70,7 @@ function generateTimeStamp(date, full, year) {
   timeStamp = `${hours}:${mins}`;
 
   if (full) {
-    const month = beautifyNumb(newDate.getMonth());
+    const month = beautifyNumb(newDate.getMonth() + 1);
     const day = beautifyNumb(newDate.getDate());
     timeStamp = `${day}/${month} ${timeStamp}`;
   }

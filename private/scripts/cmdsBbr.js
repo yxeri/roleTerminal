@@ -47,8 +47,8 @@ function humanReadableHints(hints) {
     return modifiedHint;
   }
 
-  for (const hint of hints) {
-    modifiedHints.push(createReadable(hint));
+  for (let i = 0; i < hints.length; i++) {
+    modifiedHints.push(createReadable(hints[i]));
   }
 
   return modifiedHints;
@@ -114,7 +114,9 @@ commands.hacklantern = {
         commandHandler.commandHelper.onStep++;
         commandHandler.commandHelper.data.stationId = stationId;
 
-        for (const user of users) {
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+
           userList.push(textTools.createFullLine());
           userList.push(`User: ${user.userName}`);
           userList.push('Gathered password information:');

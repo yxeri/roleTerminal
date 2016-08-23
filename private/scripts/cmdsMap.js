@@ -30,6 +30,7 @@ commands.map = {
           if (mapTools.getMap()) {
             mapTools.resetClusters();
             mapTools.realignMap();
+            messenger.queueMessage({ text: ['Map has been loaded'] });
           } else {
             messenger.queueMessage({ text: ['Map data is still loading. Please try again in a couple of seconds'] });
           }
@@ -73,9 +74,21 @@ commands.map = {
           break;
         }
         default: {
+          layoutChanger.splitView(true, mapDiv, mapTools.realignMap);
+
+          if (mapTools.getMap()) {
+            mapTools.resetClusters();
+            mapTools.realignMap();
+            messenger.queueMessage({ text: ['Map has been loaded'] });
+          } else {
+            messenger.queueMessage({ text: ['Map data is still loading. Please try again in a couple of seconds'] });
+          }
+
           break;
         }
       }
+    } else {
+      messenger.queueMessage({ text: ['Incorrect option. Turn on the map with "map on" Turn it off with "map off"'] });
     }
   },
   accessLevel: 1,

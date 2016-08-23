@@ -20,12 +20,11 @@ commands.invitations = {
   },
   steps: [
     (data) => {
-      const commandHelper = commandHandler.commandHelper;
       const sentInvitations = data.invitations;
       const text = [];
-      commandHelper.data = data;
+      commandHandler.commandHelper.data = data;
 
-      if (sentInvitations.length > 0) {
+      if (sentInvitations && sentInvitations.length > 0) {
         for (let i = 0; i < sentInvitations.length; i++) {
           const invitation = sentInvitations[i];
           const itemNumber = i + 1;
@@ -40,7 +39,7 @@ commands.invitations = {
         });
         messenger.queueMessage({ text: labels.getText('info', 'cancel') });
         domManipulator.setInputStart('answer');
-        commandHelper.onStep++;
+        commandHandler.commandHelper.onStep++;
       } else {
         messenger.queueMessage({
           text: ['You have no invitations'],
@@ -274,7 +273,7 @@ commands.invite = {
   accessLevel: 1,
   visibility: 1,
   category: 'basic',
-  commandName: 'create',
+  commandName: 'invite',
   options: {
     room: { description: 'Invite a user to a room you are following' },
     team: { description: 'Invite a user to your team' },

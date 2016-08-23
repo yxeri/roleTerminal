@@ -23,7 +23,11 @@ let reconnecting = false;
  */
 function startSocket(events) {
   if (socket) {
-    for (const event of Object.keys(events)) {
+    const eventKeys = Object.keys(events);
+
+    for (let i = 0; i < eventKeys.length; i++) {
+      const event = eventKeys[i];
+
       socket.on(event, events[event]);
     }
   }

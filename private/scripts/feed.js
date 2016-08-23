@@ -1230,12 +1230,14 @@ function onFollow(data = { room: {} }) {
 function onUnfollow(data = { room: { roomName: '' } }) {
   const room = data.room;
 
-  messenger.queueMessage({
-    text: [`Stopped following ${room.roomName}`],
-    text_se: [`Slutade följa ${room.roomName}`],
-  });
+  if (!data.silent) {
+    messenger.queueMessage({
+      text: [`Stopped following ${room.roomName}`],
+      text_se: [`Slutade följa ${room.roomName}`],
+    });
+  }
 
-  if (room.exited) {
+  if (room.roomName === storage.getRoom()) {
     socketHandler.emit('follow', {
       room: {
         roomName: 'public',
@@ -1670,6 +1672,10 @@ function onVideoMessage(params = {}) {
   }
 }
 
+function onReboot() {
+  commandHandler.triggerCommand({ cmd: 'reboot' });
+}
+
 /**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
@@ -1798,4 +1804,5 @@ socketHandler.startSocket({
   mapPositions: onMapPositions,
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
+  reboot: onReboot,
 });

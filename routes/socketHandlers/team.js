@@ -529,6 +529,64 @@ function handle(socket, io) {
     });
   });
 
+  socket.on('leaveTeam', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.leaveteam.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      if (!user.team) {
+        messenger.sendSelfMsg({
+          socket,
+          message: {
+            text: ['You are not part of a team'],
+          },
+        });
+
+        return;
+      }
+
+      const roomName = `${user.team}-team`;
+
+      dbUser.updateUserTeam(user.userName, '', (err) => {
+        if (err) {
+          logger.sendSocketErrorMsg({
+            socket,
+            code: logger.ErrorCodes.db,
+            text: ['Failed to leave team'],
+            err,
+          });
+
+          return;
+        }
+
+        dbUser.removeRoomFromUser(user.userName, roomName, (roomErr) => {
+          if (roomErr) {
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.db,
+              text: ['Failed to unfollow room'],
+              text_se: ['Misslyckades med att följa rummet'],
+              roomErr,
+            });
+
+            return;
+          }
+
+          socket.leave(roomName);
+          socket.emit('unfollow', { room: { roomName }, silent: true });
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: ['You have left the team'],
+            },
+          });
+          socket.emit('reboot');
+        });
+      });
+    });
+  });
+
   socket.on('teamAnswer', (params) => {
     if (!objectValidator.isValidData(params, { accepted: true, invitation: { itemName: true, sender: true, invitationType: true } })) {
       return;

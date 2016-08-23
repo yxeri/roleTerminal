@@ -407,6 +407,12 @@ config.commands = {
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
+  leaveteam: modifiedDatabasePop.commands.leaveteam || {
+    commandName: 'leaveteam',
+    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.basic,
+    category: 'basic',
+  },
 };
 
 module.exports = config;

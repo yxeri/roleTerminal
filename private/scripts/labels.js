@@ -157,6 +157,7 @@ const all = {
     ],
     inviteroom: ['Invites another user to a room you are following'],
     invite: ['Invite a user to a room that you are following or to your team'],
+    leave: ['Leave your current team or unfollow a room'],
     alias: [
       'Create a new shortcut for a command and sequence',
       'The shortcut will appear among other commands when you auto-complete',
@@ -322,6 +323,7 @@ const all = {
     ],
     inviteroom: ['Bjuder in en annan användare till ett rum ni följer'],
     invite: ['Bjud in en användare till ett rum ni följer eller till ditt team'],
+    leave: ['Lämna ditt nuvarande team eller sluta följa ett rum'],
     alias: [
       'Skapa en ny genväg för ett kommando och en sekvens',
       'Genvägen kommer att synas tillsammans med andra kommandon när ni använder autoifyllning',
@@ -551,6 +553,14 @@ const all = {
       exampleLine,
       'invite room user1 room1',
       'invite team user1',
+    ],
+    leave: [
+      usageLine,
+      'leave team',
+      'leave room *room name*',
+      exampleLine,
+      'leave team',
+      'leave room room1',
     ],
     alias: [
       usageLine,

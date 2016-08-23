@@ -273,7 +273,7 @@ commands.invite = {
   accessLevel: 1,
   visibility: 1,
   category: 'basic',
-  commandName: 'create',
+  commandName: 'invite',
   options: {
     room: { description: 'Invite a user to a room you are following' },
     team: { description: 'Invite a user to your team' },

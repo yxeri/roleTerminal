@@ -14,7 +14,7 @@ let defaultLanguage;
 const all = {
   help: {
     help: ['Shows a list of available commands, helpful information or help for a specific command'],
-    whoami: ['Shows information about the current user'],
+    whoami: ['Shows information and followed rooms for the current user'],
     clear: ['Clears the terminal view'],
     msg: [
       'Sends a message to your current room',

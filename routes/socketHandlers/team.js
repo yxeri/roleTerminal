@@ -269,6 +269,18 @@ function handle(socket, io) {
       const team = params.team;
       team.verified = false;
 
+      if (teamName.toLowerCase() === 'team') {
+        messenger.sendSelfMsg({
+          socket,
+          message: {
+            text: ['Team already exists. Failed to create team'],
+            text_se: ['Teamet existerar redan. Misslyckades med att skapa teamet'],
+          },
+        });
+
+        return;
+      }
+
       dbUser.getUser(owner, (userErr, user) => {
         if (userErr) {
           logger.sendSocketErrorMsg({

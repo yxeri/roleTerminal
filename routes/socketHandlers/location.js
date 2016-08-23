@@ -136,7 +136,7 @@ function handle(socket) {
 
               for (const socketUser of users) {
                 if (socketUser.socketId && socket.id !== socketUser.socketId && socketUser.isTracked) {
-                  socket.broadcast.to(socketUser.socketId).emit('mapPositions', [position]);
+                  socket.broadcast.to(socketUser.socketId).emit('mapPositions', { positions: [position] });
                 }
               }
 

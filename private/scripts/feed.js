@@ -1582,7 +1582,7 @@ function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
 }
 
 function onMapPositions(params) {
-  const mapPositions = params.positions;
+  const mapPositions = params.positions || [];
   const team = params.team;
 
   for (const mapPosition of mapPositions) {

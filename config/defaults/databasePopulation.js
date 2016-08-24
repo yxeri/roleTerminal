@@ -407,6 +407,12 @@ config.commands = {
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
+  archives: modifiedDatabasePop.commands.archives || {
+    commandName: 'archives',
+    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.basic,
+    category: 'basic',
+  },
   leaveteam: modifiedDatabasePop.commands.leaveteam || {
     commandName: 'leaveteam',
     accessLevel: config.accessLevels.basic,

@@ -192,6 +192,10 @@ const all = {
       'zoomout - zooms out',
       'locate *user name* - locate a user',
     ],
+    archives: [
+      'Retrieve a document from the archives',
+      'You can retrieve a list of publically available documents with the list option',
+    ],
   },
   help_se: {
     help: ['Visa en lista av tillgängliga kommandon, hjälpsam information eller hjälp för ett specifikt kommando'],
@@ -346,6 +350,14 @@ const all = {
     ],
   },
   instructions: {
+    archives: [
+      usageLine,
+      'archives *ID*',
+      'archives list',
+      exampleLine,
+      'archives orgchairman1',
+      'archives list',
+    ],
     help: [
       usageLine,
       'help',

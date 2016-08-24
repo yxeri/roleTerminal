@@ -5,6 +5,9 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const appConfig = require('../../config/defaults/config').app;
 const logger = require('../../utils/logger');
 const http = require('http');
+const objectValidator = require('../../utils/objectValidator');
+const dbArchive = require('../../db/connectors/archive');
+const messenger = require('../../socketHelpers/messenger');
 
 // FIXME SMHI API changed. Structure needs to be fixed here before usage
 /**
@@ -42,6 +45,72 @@ function handle(socket) {
 
       now.setFullYear(now.getFullYear() + appConfig.yearModification);
       socket.emit('time', { time: now });
+    });
+  });
+
+  socket.on('getArchive', (params) => {
+    if (!objectValidator.isValidData(params, { archiveId: true })) {
+      return;
+    }
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.archives.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      console.log('id', params.archiveId);
+
+      dbArchive.getArchive(params.archiveId.toLowerCase(), user.accessLevel, (err, archive) => {
+        if (err) {
+          return;
+        }
+
+        if (archive) {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: ['Found document. Printing...', archive.title || archive.archiveId].concat(archive.text),
+            },
+          });
+        } else {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: [`Could not find any documents with ID ${params.archiveId}`],
+            },
+          });
+        }
+      });
+    });
+  });
+
+  socket.on('getArchivesList', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.archives.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      dbArchive.getArchivesList(user.accessLevel, (err, archives) => {
+        if (err) {
+          return;
+        }
+
+        if (archives) {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: ['Found documents:'].concat(archives.map(archive => `ID: ${archive.archiveId}. Title: ${archive.title || archive.archiveId}`)),
+            },
+          });
+        } else {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: ['Could not find any public documents'],
+            },
+          });
+        }
+      });
     });
   });
 

@@ -195,13 +195,13 @@ commands.create = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: create room r552'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: create room r552'] });
     }
   },
   accessLevel: 1,
@@ -226,13 +226,13 @@ commands.remove = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room. Example: remove room r552'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room. Example: remove room r552'] });
     }
   },
   accessLevel: 1,
@@ -261,13 +261,13 @@ commands.invite = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: invite room user1'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: invite room user1'] });
     }
   },
   accessLevel: 1,
@@ -278,6 +278,33 @@ commands.invite = {
     room: { description: 'Invite a user to a room you are following' },
     team: { description: 'Invite a user to your team' },
   },
+};
+
+commands.archives = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const option = phrases[0];
+
+      switch (option) {
+        case 'list': {
+          socketHandler.emit('getArchivesList');
+
+          return;
+        }
+        default: {
+          socketHandler.emit('getArchive', { archiveId: option });
+
+          return;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['You need to enter an ID. Example: archives 55612'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'archives',
 };
 
 commands.leave = {

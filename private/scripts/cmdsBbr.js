@@ -59,7 +59,7 @@ commands.hacklantern = {
     commandHandler.commandHelper.data = {};
     commandHandler.commandHelper.fallbackStep = 4;
 
-    socketHandler.emit('getGameUsersSelection', { userAmount: 2 });
+    socketHandler.emit('getGameUsersSelection', { userAmount: 1 });
   },
   steps: [
     (params = {}) => {

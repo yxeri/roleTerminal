@@ -4,9 +4,12 @@ const dbConnector = require('../../db/databaseConnector');
 const dbStation = require('../../db/connectors/station');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
+const http = require('http');
 
-const maxSignal = 100;
-const signalPercentage = 0.1;
+const signalThreshold = 50;
+const signalDefault = 100;
+const changePercentage = 0.2;
+const signalMaxChange = 10;
 
 /**
  * @private
@@ -30,29 +33,85 @@ function shuffleArray(array) {
   return shuffledArray;
 }
 
+function postRequest(params) {
+  const host = params.host;
+  const path = params.path;
+  const callback = params.callback;
+  const dataString = JSON.stringify(params.data);
+  const options = {
+    host,
+    path,
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': dataString.length,
+    },
+    method: 'POST',
+  };
+
+  const request = http.request(options, (response) => {
+    let responseString = '';
+
+    response.setEncoding('utf-8');
+
+    response.on('data', (data) => {
+      responseString += data;
+    });
+
+    response.on('end', () => {
+      callback(response.statusCode);
+    });
+  });
+
+  request.write(dataString);
+  request.end();
+}
+
 function updateSignalValue(stationId, boostingSignal) {
   dbStation.getStation(stationId, (err, station) => {
     if (err) {
       return;
     }
 
-    const signalValue = station.signalValue;
-
     function setNewValue(newSignalValue) {
-      dbStation.updateSignalValue(stationId, Math.ceil(newSignalValue), (updateErr) => {
+      let ceilSignalValue = Math.ceil(newSignalValue);
+      const minValue = signalDefault - signalThreshold;
+      const maxValue = signalDefault + signalThreshold;
+
+      if (ceilSignalValue > maxValue) {
+        ceilSignalValue = maxValue;
+      } else if (ceilSignalValue < minValue) {
+        ceilSignalValue = minValue;
+      }
+
+      dbStation.updateSignalValue(stationId, ceilSignalValue, (updateErr) => {
         if (updateErr) {
           return;
         }
+        postRequest({
+          host: 'wrecking.bbreloaded.se',
+          path: '/reports/set_boost',
+          data: {
+            station: stationId,
+            boost: ceilSignalValue,
+            key: 'hemligt',
+          },
+          callback: (response) => {
+            console.log(response);
+          },
+        });
       });
     }
+    const signalValue = station.signalValue;
+    const difference = Math.abs(signalValue - signalDefault);
+    let signalChange = (signalThreshold - difference) * changePercentage;
 
-    const modifiedMaxSignal = boostingSignal ? maxSignal : -maxSignal;
-
-    if ((boostingSignal && signalValue > 0) || (!boostingSignal && signalValue < 0)) {
-      setNewValue(signalValue + ((modifiedMaxSignal - signalValue) * signalPercentage));
-    } else {
-      setNewValue(signalValue + (modifiedMaxSignal * signalPercentage));
+    if (boostingSignal && signalValue < signalDefault) {
+      signalChange = signalMaxChange;
+    } else if (!boostingSignal && signalValue > signalDefault) {
+      signalChange = -Math.abs(signalMaxChange);
     }
+
+    setNewValue(signalValue + signalChange);
   });
 }
 

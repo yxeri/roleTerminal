@@ -195,13 +195,13 @@ commands.create = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: create room r552'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: create room r552'] });
     }
   },
   accessLevel: 1,
@@ -226,13 +226,13 @@ commands.remove = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room. Example: remove room r552'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room. Example: remove room r552'] });
     }
   },
   accessLevel: 1,
@@ -261,13 +261,13 @@ commands.invite = {
           break;
         }
         default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: invite room user1'] });
 
           break;
         }
       }
     } else {
-      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team'] });
+      messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: invite room user1'] });
     }
   },
   accessLevel: 1,

@@ -280,6 +280,33 @@ commands.invite = {
   },
 };
 
+commands.archives = {
+  func: (phrases = ['']) => {
+    if (phrases.length > 0) {
+      const option = phrases[0];
+
+      switch (option) {
+        case 'list': {
+          socketHandler.emit('getArchivesList');
+
+          return;
+        }
+        default: {
+          socketHandler.emit('getArchive', { archiveId: option });
+
+          return;
+        }
+      }
+    } else {
+      messenger.queueMessage({ text: ['You need to enter an ID. Example: archives 55612'] });
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'archives',
+};
+
 commands.leave = {
   func: (phrases = ['']) => {
     if (phrases.length > 0) {

@@ -20,8 +20,6 @@ function getArchive(archiveId, accessLevel, callback) {
     ],
   };
 
-  console.log(archiveId, accessLevel);
-
   Archive.findOne(query).lean().exec((err, archive) => {
     if (err) {
       logger.sendErrorMsg({

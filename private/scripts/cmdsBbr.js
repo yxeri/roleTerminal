@@ -12,7 +12,8 @@ const labels = require('./labels');
  * @type {Object}
  */
 const commands = {};
-let statsInterval = null;
+let statsTimeout = null;
+let statsTimeoutTime = 10000;
 
 /**
  * Translates password hints and make them human readable
@@ -57,6 +58,7 @@ function humanReadableHints(hints) {
 
 function getStats() {
   socketHandler.emit('getStationStats');
+  statsTimeout = setTimeout(getStats, statsTimeoutTime);
 }
 
 commands.lantern = {
@@ -67,18 +69,18 @@ commands.lantern = {
           socketHandler.emit('getStationStats');
           domManipulator.toggleStationStats(true);
 
-          if (statsInterval !== null) {
-            clearInterval(statsInterval);
+          if (statsTimeout !== null) {
+            clearInterval(statsTimeout);
           }
 
-          statsInterval = setInterval(getStats, 10000);
+          statsTimeout = setTimeout(getStats, statsTimeoutTime);
 
           break;
         }
         case 'off': {
           domManipulator.toggleStationStats(false);
-          clearInterval(statsInterval);
-          statsInterval = null;
+          clearInterval(statsTimeout);
+          statsTimeout = null;
 
           break;
         }

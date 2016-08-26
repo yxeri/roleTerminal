@@ -20,7 +20,7 @@ const commandQueue = [];
  * It will trigger a function if the response is delayed
  * @type {Number}
  */
-const screenOffIntervalTime = 1000;
+const screenOffTimeoutTime = 1000;
 /**
  * Get GPS coordinates for * amount of milliseconds
  * @type {Number}
@@ -72,7 +72,7 @@ let commmandUsed = false;
  */
 let keyPressed;
 let trackingTimeout;
-let isScreenOffInterval;
+let isScreenOffTimeout;
 let serverDownTimeout;
 
 function queueCommand(command, data, commandMsg) {
@@ -251,13 +251,15 @@ function isScreenOff() {
   if (offBy > 10000) {
     socketHandler.reconnect();
   }
+
+  isScreenOffTimeout = setTimeout(isScreenOff, screenOffTimeoutTime);
 }
 
 /**
  * Set intervals at boot and recreate them when the window is focused
  * This is to make sure that nothing has been killed in the background
  */
-function setIntervals() {
+function setTimeouts() {
   if (trackingTimeout !== null) {
     clearTimeout(trackingTimeout);
   }
@@ -272,13 +274,13 @@ function setIntervals() {
   }
 
   // Should not be recreated on focus
-  if (isScreenOffInterval === null) {
+  if (isScreenOffTimeout === null) {
     /**
      * Checks time between when JS stopped and started working again
      * This will be most frequently triggered when a user turns off the
      * screen on their phone and turns it back on
      */
-    isScreenOffInterval = setInterval(isScreenOff, screenOffIntervalTime);
+    isScreenOffTimeout = setTimeout(isScreenOff, screenOffTimeoutTime);
   }
 }
 
@@ -289,7 +291,7 @@ function refocus() {
   keyPressed = false;
   triggerKeysPressed.ctrl = false;
   triggerKeysPressed.alt = false;
-  setIntervals();
+  setTimeouts();
 }
 
 function buildMorsePlayer() {
@@ -1790,7 +1792,7 @@ function onStartup(params = { }) {
     window.addEventListener('focus', refocus);
 
     resetPreviousCommandPointer();
-    setIntervals();
+    setTimeouts();
     buildMorsePlayer();
 
     if (!storage.getAccessLevel()) {

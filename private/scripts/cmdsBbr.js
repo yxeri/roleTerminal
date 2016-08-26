@@ -55,6 +55,10 @@ function humanReadableHints(hints) {
   return modifiedHints;
 }
 
+function getStats() {
+  socketHandler.emit('getStationStats');
+}
+
 commands.lantern = {
   func: (phrases = []) => {
     if (phrases.length > 0) {
@@ -67,7 +71,7 @@ commands.lantern = {
             clearInterval(statsInterval);
           }
 
-          // statsInterval = setInterval();
+          statsInterval = setInterval(getStats, 10000);
 
           break;
         }

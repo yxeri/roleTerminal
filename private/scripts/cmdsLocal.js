@@ -229,6 +229,14 @@ commands.settings = {
       messenger.queueMessage({ text: labels.getText('errors', 'settingUsage') });
     }
   },
+  options: {
+    fastmode: { description: 'Speed up some commands' },
+    hiddencursor: { description: 'Hide mouse cursor' },
+    hiddenmenu: { description: 'Hide top menu' },
+    hiddencmdinput: { description: 'Hide command input' },
+    thinnerview: { description: 'Add margin to window' },
+    staticposition: { description: 'Add static GPS coordinates' },
+  },
   accessLevel: 1,
   visibility: 13,
   category: 'admin',

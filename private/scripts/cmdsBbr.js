@@ -86,6 +86,10 @@ commands.lantern = {
       }
     }
   },
+  options: {
+    on: { description: 'Show LANTERN status' },
+    off: { description: 'Hide LANTERN status' },
+  },
   accessLevel: 1,
   visibility: 1,
   category: 'basic',

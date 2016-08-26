@@ -49,6 +49,8 @@ const triggerKeysPressed = [];
  * @type {string}
  */
 const morseSeparator = '#';
+const teams = {};
+const stations = {};
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -69,7 +71,7 @@ let commmandUsed = false;
  * Used to block repeat of key presses
  */
 let keyPressed;
-let trackingInterval;
+let trackingTimeout;
 let isScreenOffInterval;
 let serverDownTimeout;
 
@@ -183,7 +185,7 @@ function retrievePosition() {
   const clearingWatch = () => {
     navigator.geolocation.clearWatch(watchId);
     watchId = null;
-    trackingInterval = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
+    trackingTimeout = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
   };
 
   watchId = navigator.geolocation.watchPosition((position) => {
@@ -201,7 +203,7 @@ function retrievePosition() {
   }, { enableHighAccuracy: true });
 
   if (isTracking) {
-    trackingInterval = setTimeout(clearingWatch, watchPositionTime);
+    trackingTimeout = setTimeout(clearingWatch, watchPositionTime);
   }
 }
 
@@ -256,8 +258,8 @@ function isScreenOff() {
  * This is to make sure that nothing has been killed in the background
  */
 function setIntervals() {
-  if (trackingInterval !== null) {
-    clearTimeout(trackingInterval);
+  if (trackingTimeout !== null) {
+    clearTimeout(trackingTimeout);
   }
 
   if (watchId !== null) {
@@ -337,12 +339,8 @@ function triggerAutoComplete(text, textChar) {
   /**
    * Older versions of Android bugs on keypress/down, thus this check
    */
-  if (isAndroid() && text.match(/\s\s$/)) {
-    domManipulator.setCommandInput(textTools.trimSpace(text));
-
-    return true;
-  } else if (!isAndroid() && text.match(/\s$/) && textChar.match(/^\s$/)) {
-    domManipulator.setCommandInput(textTools.trimSpace(text));
+  if ((isAndroid() && text.match(/\s\s$/)) || (!isAndroid() && text.match(/\s$/) && textChar.match(/^\s$/))) {
+    domManipulator.setCommandInput(text.slice(0, -1));
 
     return true;
   }
@@ -449,7 +447,7 @@ function match(partial, items) {
  * @param {Object} options - Options from command
  */
 function autoCompleteOption(phrases = [], options = {}) {
-  const option = options[`${phrases[phrases.length - 2]}`];
+  const option = options[phrases[1]];
   const partial = phrases[phrases.length - 1];
   /**
    * @type {string[]}
@@ -465,10 +463,6 @@ function autoCompleteOption(phrases = [], options = {}) {
     } else if (matched.length > 0) {
       messenger.queueMessage({ text: [matched.join('\t')] });
     } else if (nextKeys.length > 0) {
-      if (partial !== '') {
-        domManipulator.setCommandInput(`${domManipulator.getInputText()} `);
-      }
-
       messenger.queueMessage({ text: [nextKeys.join('\t')] });
     }
   } else if (phrases.length <= 2) {
@@ -478,6 +472,7 @@ function autoCompleteOption(phrases = [], options = {}) {
     if (matched.length === 1) {
       domManipulator.replaceLastInputPhrase(`${matched[0]} `);
     } else if (matched.length > 0) {
+      domManipulator.setCommandInput(textTools.trimSpace(domManipulator.getInputText()));
       messenger.queueMessage({ text: [matched.join('\t')] });
     } else if (partial === '') {
       messenger.queueMessage({ text: [firstLevelOptions.join('\t')] });
@@ -485,13 +480,11 @@ function autoCompleteOption(phrases = [], options = {}) {
   }
 }
 
-function autoCompleteCommand() {
-  const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
+function autoCompleteCommand(phrases) {
   // TODO Change from Object.keys for compatibility with older Android
   const allCommands = commandHandler.getCommands({ aliases: true, filtered: true });
   const matched = [];
   const sign = phrases[0].charAt(0);
-  let newText = '';
   let matches;
   let partialCommand = phrases[0];
 
@@ -531,6 +524,7 @@ function autoCompleteCommand() {
     if (matched.length === 1) {
       const commandChars = commandHandler.getCommandChars();
       const commandIndex = commandChars.indexOf(sign);
+      let newText = '';
 
       if (commandIndex >= 0) {
         newText += commandChars[commandIndex];
@@ -541,13 +535,9 @@ function autoCompleteCommand() {
       domManipulator.clearInput();
       domManipulator.setCommandInput(newText);
     } else if (matched.length > 0) {
-      domManipulator.setCommandInput(expandPartialMatch(matched, partialCommand, sign));
+      domManipulator.setCommandInput(textTools.trimSpace(`${expandPartialMatch(matched, partialCommand, sign)}`));
       messenger.queueMessage({ text: [matched.join('\t')] });
     }
-
-    // No input? Show all available commands
-  } else if (partialCommand.length === 0) {
-    commandHandler.triggerCommand({ cmd: 'help' });
   }
 }
 
@@ -704,9 +694,54 @@ function scrollText(amount) {
   domManipulator.getMainView().scrollTop += modifiedAmount;
 }
 
-function defaultKeyPress(textChar, event) {
+function autoComplete() {
+  const commandHelper = commandHandler.commandHelper;
+  const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
+  const command = commandHandler.getCommand(commandHelper.command || phrases[0]);
+
+  if (command && phrases.length === 1) {
+    phrases.push('');
+  }
+
+  if (phrases.length === 1 && phrases[0].length === 0) {
+    commandHandler.triggerCommand({ cmd: 'help' });
+  } else if (!command && !commandHelper.keysBlocked && commandHelper.command === null) {
+    autoCompleteCommand(phrases);
+    domManipulator.changeModeText();
+  } else if (command) {
+    if (command.autocomplete && phrases.length < 3) {
+      const partial = phrases[1];
+
+      switch (command.autocomplete.type) {
+        case 'users': {
+          socketHandler.emit('matchPartialUser', { partialName: partial });
+
+          break;
+        }
+        case 'rooms': {
+          socketHandler.emit('matchPartialRoom', { partialName: partial });
+
+          break;
+        }
+        case 'myRooms': {
+          socketHandler.emit('matchPartialMyRoom', { partialName: partial });
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    } else if (command.options) {
+      autoCompleteOption(phrases, command.options);
+    }
+  }
+}
+
+function defaultKeyPress(textChar) {
   if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
-    autoCompleteCommand();
+    autoComplete();
+
     // Prevent new whitespace to be printed
     event.preventDefault();
   }
@@ -724,43 +759,9 @@ function specialKeyPress(event) {
   if (!keyPressed) {
     switch (keyCode) {
       case 9: { // Tab
-        const phrases = domManipulator.getInputText().split(' ');
-        const command = commandHandler.getCommand(commandHelper.command || phrases[0]);
         keyPressed = true;
 
-        if (!commandHelper.keysBlocked && commandHelper.command === null && phrases.length === 1) {
-          autoCompleteCommand();
-          domManipulator.changeModeText();
-        } else if (command) {
-          if (command.autocomplete && phrases.length < 3) {
-            const partial = phrases[1];
-
-            switch (command.autocomplete.type) {
-              case 'users': {
-                socketHandler.emit('matchPartialUser', { partialName: partial });
-
-                break;
-              }
-              case 'rooms': {
-                socketHandler.emit('matchPartialRoom', { partialName: partial });
-
-                break;
-              }
-              case 'myRooms': {
-                socketHandler.emit('matchPartialMyRoom', { partialName: partial });
-
-                break;
-              }
-              default: {
-                break;
-              }
-            }
-          } else if (command.options && phrases.length > 1) {
-            const options = command.options;
-
-            autoCompleteOption(phrases, options, phrases.length);
-          }
-        }
+        autoComplete();
 
         event.preventDefault();
 
@@ -1015,6 +1016,18 @@ function showCommands() {
   domManipulator.addSubMenuItem('commands', createSubMenuItem(commands, true));
 }
 
+let lanternOn = false;
+
+function toggleLantern() {
+  lanternOn = !lanternOn;
+
+  if (lanternOn) {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['on'] });
+  } else {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
+  }
+}
+
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -1032,6 +1045,11 @@ function populateMenu() {
       itemName: '',
       func: thisCommandOptions,
       elementId: 'thisCommand',
+    },
+    lantern: {
+      itemName: 'LANTERN',
+      func: toggleLantern,
+      elementId: 'lantern',
     },
   };
   const menuKeys = Object.keys(menuItems);
@@ -1685,6 +1703,43 @@ function onReboot() {
   commandHandler.triggerCommand({ cmd: 'reboot' });
 }
 
+function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
+  const stationsStats = params.stations;
+  const teamsStats = params.teams;
+
+  for (let i = 0; i < stationsStats.length; i++) {
+    const station = stationsStats[i];
+    const stationId = `ID${station.id || station.stationId}`;
+
+    if (!stations[stationId]) {
+      stations[stationId] = {};
+    }
+
+    if (station.owner) {
+      stations[stationId].owner = station.owner;
+    } else if (station.owner === null) {
+      stations[stationId].owner = '-';
+    }
+
+    if (station.signalValue || station.boost) {
+      stations[stationId].signalValue = station.signalValue || station.boost;
+    }
+  }
+
+  for (let i = 0; i < teamsStats.length; i++) {
+    const team = teamsStats[i];
+    const teamName = team.name;
+
+    if (teamName === 'ownerless') {
+      continue;
+    }
+
+    teams[teamName] = team.score;
+  }
+
+  domManipulator.setStationStats(stations, teams);
+}
+
 /**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
@@ -1779,7 +1834,7 @@ window.addEventListener('error', (event) => {
   console.log(event.error);
   domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
-    text: ['!!!! Something bad happened and the terminal is no longer working !!!!'],
+    text: ['!!!! Something bad happened and the terminal is no longer working !!!!, !!!! Input "reboot" to reboot !!!!'],
   });
 
   return false;
@@ -1814,4 +1869,5 @@ socketHandler.startSocket({
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
   reboot: onReboot,
+  stationStats: onStationStats,
 });

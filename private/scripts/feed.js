@@ -71,7 +71,7 @@ let commmandUsed = false;
  * Used to block repeat of key presses
  */
 let keyPressed;
-let trackingInterval;
+let trackingTimeout;
 let isScreenOffInterval;
 let serverDownTimeout;
 
@@ -185,7 +185,7 @@ function retrievePosition() {
   const clearingWatch = () => {
     navigator.geolocation.clearWatch(watchId);
     watchId = null;
-    trackingInterval = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
+    trackingTimeout = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
   };
 
   watchId = navigator.geolocation.watchPosition((position) => {
@@ -203,7 +203,7 @@ function retrievePosition() {
   }, { enableHighAccuracy: true });
 
   if (isTracking) {
-    trackingInterval = setTimeout(clearingWatch, watchPositionTime);
+    trackingTimeout = setTimeout(clearingWatch, watchPositionTime);
   }
 }
 
@@ -258,8 +258,8 @@ function isScreenOff() {
  * This is to make sure that nothing has been killed in the background
  */
 function setIntervals() {
-  if (trackingInterval !== null) {
-    clearTimeout(trackingInterval);
+  if (trackingTimeout !== null) {
+    clearTimeout(trackingTimeout);
   }
 
   if (watchId !== null) {
@@ -1835,7 +1835,7 @@ window.addEventListener('error', (event) => {
   console.log(event.error);
   domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
-    text: ['!!!! Something bad happened and the terminal is no longer working !!!!'],
+    text: ['!!!! Something bad happened and the terminal is no longer working !!!!, !!!! Input "reboot" to reboot !!!!'],
   });
 
   return false;

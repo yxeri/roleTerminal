@@ -71,6 +71,8 @@ let oldAndroid;
  */
 let thisCommandItem;
 
+let lanternOn = false;
+
 stationStats.addEventListener('click', () => {
   commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
 });
@@ -401,10 +403,22 @@ function flashMenu() {
   setTimeout(() => { menu.classList.remove('flash'); }, 800);
 }
 
+function toggleLantern() {
+  lanternOn = !lanternOn;
+
+  if (lanternOn) {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['on'] });
+  } else {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
+  }
+}
+
 function toggleStationStats(show) {
   if (show) {
+    lanternOn = true;
     stationStats.classList.remove('hide');
   } else {
+    lanternOn = false;
     stationStats.classList.add('hide');
   }
 }
@@ -495,3 +509,4 @@ exports.flashMenu = flashMenu;
 exports.removeAllSubMenus = removeAllSubMenus;
 exports.setStationStats = setStationStats;
 exports.toggleStationStats = toggleStationStats;
+exports.toggleLantern = toggleLantern;

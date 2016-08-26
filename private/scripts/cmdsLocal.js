@@ -219,6 +219,15 @@ commands.settings = {
 
           break;
         }
+        case 'staticposition': {
+          if (value && phrases.length > 3) {
+            messenger.queueMessage({ text: labels.getText('info', 'staticPositionOn') });
+          } else {
+            messenger.queueMessage({ text: labels.getText('info', 'staticPositionOff') });
+          }
+
+          break;
+        }
         default: {
           messenger.queueMessage({ text: labels.getText('errors', 'invalidSetting') });
 
@@ -228,6 +237,14 @@ commands.settings = {
     } else {
       messenger.queueMessage({ text: labels.getText('errors', 'settingUsage') });
     }
+  },
+  options: {
+    fastmode: { description: 'Speed up some commands' },
+    hiddencursor: { description: 'Hide mouse cursor' },
+    hiddenmenu: { description: 'Hide top menu' },
+    hiddencmdinput: { description: 'Hide command input' },
+    thinnerview: { description: 'Add margin to window' },
+    staticposition: { description: 'Add static GPS coordinates' },
   },
   accessLevel: 1,
   visibility: 13,

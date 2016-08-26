@@ -194,6 +194,11 @@ commands.create = {
 
           break;
         }
+        case 'mission': {
+          commandHandler.triggerCommand({ cmd: 'createmission', cmdParams: phrases.slice(1) });
+
+          break;
+        }
         default: {
           messenger.queueMessage({ text: ['Incorrect option. Available options are: room, team. Example: create room r552'] });
 
@@ -289,12 +294,12 @@ commands.archives = {
         case 'list': {
           socketHandler.emit('getArchivesList');
 
-          return;
+          break;
         }
         default: {
           socketHandler.emit('getArchive', { archiveId: option });
 
-          return;
+          break;
         }
       }
     } else {
@@ -305,6 +310,9 @@ commands.archives = {
   visibility: 1,
   category: 'basic',
   commandName: 'archives',
+  options: {
+    list: { description: 'List public archive' },
+  },
 };
 
 commands.leave = {

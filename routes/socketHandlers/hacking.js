@@ -138,7 +138,27 @@ function handle(socket) {
     socket.join('stationStats');
 
     retrieveStationStats((stations, teams) => {
-      socket.emit('stationStats', { stations, teams });
+      dbStation.getActiveStations((err, dbStations) => {
+        if (err) {
+          return;
+        }
+
+        if (stations) {
+          for (const station of stations) {
+            const foundStation = dbStations.find(dbStation => dbStation.stationId === station.id);
+
+            if (foundStation) {
+              station.signalValue = foundStation.signalValue;
+            } else {
+              station.signalValue = station.boost;
+            }
+          }
+
+          socket.emit('stationStats', { stations, teams });
+        } else {
+          socket.emit('stationStats', { dbStations, teams });
+        }
+      });
     });
   });
 

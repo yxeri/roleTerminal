@@ -103,8 +103,7 @@ commands.map = {
     zoomin: { description: 'Increase zoom' },
     zoomout: { description: 'Decrease zoom' },
     user: { description: 'Locate user', next: {} },
-    location: { description: 'Locate location', next: {} },
-    info: { description: 'Show information for the location' },
+    info: { description: 'Show information for the location', next: {} },
   },
   commandName: 'map',
 };

@@ -33,6 +33,24 @@ function shuffleArray(array) {
   return shuffledArray;
 }
 
+function retrieveStationStats(callback) {
+  require('request').get('http://wrecking.bbreloaded.se/public.json', (err, response, body) => {
+    if (err) {
+      console.log('Error request', response, err);
+
+      return;
+    }
+
+    if (body) {
+      const stats = JSON.parse(body);
+      const stations = stats.stations;
+      const teams = stats.teams;
+
+      callback(stations, teams);
+    }
+  });
+}
+
 function postRequest(params) {
   const host = params.host;
   const path = params.path;
@@ -116,6 +134,14 @@ function updateSignalValue(stationId, boostingSignal) {
 }
 
 function handle(socket) {
+  socket.on('getStationStats', () => {
+    socket.join('stationStats');
+
+    retrieveStationStats((stations, teams) => {
+      socket.emit('stationStats', { stations, teams });
+    });
+  });
+
   socket.on('manipulateStation', (params) => {
     if (!objectValidator.isValidData(params, { users: true, gameUser: true, choice: true, stationId: true })) {
       return;

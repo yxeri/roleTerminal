@@ -12,6 +12,7 @@ const labels = require('./labels');
  * @type {Object}
  */
 const commands = {};
+let statsInterval = null;
 
 /**
  * Translates password hints and make them human readable
@@ -54,6 +55,43 @@ function humanReadableHints(hints) {
   return modifiedHints;
 }
 
+commands.lantern = {
+  func: (phrases = []) => {
+    if (phrases.length > 0) {
+      switch (phrases[0]) {
+        case 'on': {
+          socketHandler.emit('getStationStats');
+          domManipulator.toggleStationStats(true);
+
+          if (statsInterval !== null) {
+            clearInterval(statsInterval);
+          }
+
+          // statsInterval = setInterval();
+
+          break;
+        }
+        case 'off': {
+          domManipulator.toggleStationStats(false);
+          clearInterval(statsInterval);
+          statsInterval = null;
+
+          break;
+        }
+        default: {
+          messenger.queueMessage({ text: ['Incorrect option. Available options are: on, off'] });
+
+          break;
+        }
+      }
+    }
+  },
+  accessLevel: 1,
+  visibility: 1,
+  category: 'basic',
+  commandName: 'lantern',
+};
+
 commands.hacklantern = {
   func: () => {
     commandHandler.commandHelper.data = {};
@@ -77,7 +115,7 @@ commands.hacklantern = {
         }));
       }
 
-      domManipulator.setInputStart('ssm');
+      domManipulator.setInputStart('lsm');
       messenger.queueMessage({ text: labels.getText('info', 'hackLanternIntro') });
       messenger.queueMessage({ text: labels.getText('info', 'cancel') });
       messenger.queueMessage({ text: [textTools.createFullLine()] });

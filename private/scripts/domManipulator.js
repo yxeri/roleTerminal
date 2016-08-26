@@ -46,6 +46,10 @@ const videoHolder = document.getElementById('videoHolder');
  */
 const statusField = document.getElementById('status');
 /**
+ * @type {HTMLElement}
+ */
+const stationStats = document.getElementById('stationStats');
+/**
  * Div containing mainFeed, inputContainer and spacer
  * @type {HTMLElement}
  */
@@ -66,6 +70,10 @@ let oldAndroid;
  * @type {HTMLElement}
  */
 let thisCommandItem;
+
+stationStats.addEventListener('click', () => {
+  commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
+});
 
 /**
  * Changes color of the text to melt into the background
@@ -393,6 +401,65 @@ function flashMenu() {
   setTimeout(() => { menu.classList.remove('flash'); }, 800);
 }
 
+function toggleStationStats(show) {
+  if (show) {
+    stationStats.classList.remove('hide');
+  } else {
+    stationStats.classList.add('hide');
+  }
+}
+
+function createListItem(text, style) {
+  const listItem = document.createElement('LI');
+  listItem.appendChild(document.createTextNode(text));
+
+  if (style) {
+    listItem.classList.add(style);
+  }
+
+  return listItem;
+}
+
+function setStationStats(stations, teams) {
+  const stationList = document.createElement('UL');
+  const teamList = document.createElement('UL');
+  const stationKeys = Object.keys(stations);
+  const teamKeys = Object.keys(teams);
+
+  stationList.appendChild(createListItem('-LANTERNs-'));
+
+  if (stationKeys.length > 0) {
+    for (let i = 0; i < stationKeys.length; i++) {
+      const stationId = stationKeys[i];
+      const station = stations[stationId];
+
+      stationList.appendChild(createListItem(`${stationId}>>`));
+      stationList.appendChild(createListItem(`Amp: ${station.signalValue}`, 'indent'));
+      stationList.appendChild(createListItem(`Owner: ${station.owner}`, 'indent'));
+    }
+  } else {
+    stationList.appendChild(createListItem('No active LANTERNs'));
+  }
+
+  teamList.appendChild(createListItem('-Wreckers-'));
+
+  for (let i = 0; i < teamKeys.length; i++) {
+    const teamName = teamKeys[i];
+    const score = teams[teamName];
+
+    teamList.appendChild(createListItem(`${teamName}>>`));
+    teamList.appendChild(createListItem(`Signal: ${score}`, 'indent'));
+  }
+
+  if (stationStats.firstChild !== null) {
+    stationStats.removeChild(stationStats.firstChild);
+    stationStats.removeChild(stationStats.firstChild);
+  }
+
+  stationStats.appendChild(stationList);
+  stationStats.appendChild(teamList);
+}
+
 exports.setInputStart = setInputStart;
 exports.setCommandInput = setCommandInput;
 exports.getInputText = getInputText;
@@ -426,3 +493,5 @@ exports.setStatus = setStatus;
 exports.resizeCallback = resizeCallback;
 exports.flashMenu = flashMenu;
 exports.removeAllSubMenus = removeAllSubMenus;
+exports.setStationStats = setStationStats;
+exports.toggleStationStats = toggleStationStats;

@@ -49,6 +49,8 @@ const triggerKeysPressed = [];
  * @type {string}
  */
 const morseSeparator = '#';
+const teams = {};
+const stations = {};
 let audioCtx;
 let oscillator;
 let gainNode;
@@ -1015,6 +1017,18 @@ function showCommands() {
   domManipulator.addSubMenuItem('commands', createSubMenuItem(commands, true));
 }
 
+let lanternOn = false;
+
+function toggleLantern() {
+  lanternOn = !lanternOn;
+
+  if (lanternOn) {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['on'] });
+  } else {
+    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
+  }
+}
+
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -1032,6 +1046,11 @@ function populateMenu() {
       itemName: '',
       func: thisCommandOptions,
       elementId: 'thisCommand',
+    },
+    lantern: {
+      itemName: 'LANTERN',
+      func: toggleLantern,
+      elementId: 'lantern',
     },
   };
   const menuKeys = Object.keys(menuItems);
@@ -1685,6 +1704,43 @@ function onReboot() {
   commandHandler.triggerCommand({ cmd: 'reboot' });
 }
 
+function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
+  const stationsStats = params.stations;
+  const teamsStats = params.teams;
+
+  for (let i = 0; i < stationsStats.length; i++) {
+    const station = stationsStats[i];
+    const stationId = `ID${station.id || station.stationId}`;
+
+    if (!stations[stationId]) {
+      stations[stationId] = {};
+    }
+
+    if (station.owner) {
+      stations[stationId].owner = station.owner;
+    } else if (station.owner === null) {
+      stations[stationId].owner = '-';
+    }
+
+    if (station.signalValue || station.boost) {
+      stations[stationId].signalValue = station.signalValue || station.boost;
+    }
+  }
+
+  for (let i = 0; i < teamsStats.length; i++) {
+    const team = teamsStats[i];
+    const teamName = team.name;
+
+    if (teamName === 'ownerless') {
+      continue;
+    }
+
+    teams[teamName] = team.score;
+  }
+
+  domManipulator.setStationStats(stations, teams);
+}
+
 /**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
@@ -1814,4 +1870,5 @@ socketHandler.startSocket({
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
   reboot: onReboot,
+  stationStats: onStationStats,
 });

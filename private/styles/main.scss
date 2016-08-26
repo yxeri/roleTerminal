@@ -193,6 +193,24 @@ textarea {
   top: 2em;
 }
 
+#stationStats {
+  position: absolute;
+  right: 0;
+  z-index: 40;
+  text-align: left;
+
+  ul {
+    padding-top: .2em;
+    padding-bottom: .2em;
+    padding-left: .3em;
+    padding-right: .3em;
+    float: right;
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    background-color: $back-color;
+  }
+}
+
 .halfView {
   position: fixed;
   right: 0;
@@ -321,6 +339,10 @@ textarea {
   font-weight: bold;
 }
 
+.indent {
+  margin-left: 0.2em;
+}
+
 .user:after {
   content: ':';
 }
@@ -434,6 +456,10 @@ textarea {
 
   #inputContainer {
     padding: 0 .2em 0 .2em;
+  }
+
+  #stationStats ul {
+    float: none;
   }
 
   .logo {

@@ -9,7 +9,6 @@ const stationSchema = new mongoose.Schema({
   stationName: String,
   signalValue: { type: Number, default: 0 },
   isActive: { type: Boolean, default: false },
-  owner: String,
 }, { collection: 'stations' });
 
 const Station = mongoose.model('Station', stationSchema);

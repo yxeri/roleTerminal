@@ -219,6 +219,15 @@ commands.settings = {
 
           break;
         }
+        case 'staticposition': {
+          if (value && phrases.length > 3) {
+            messenger.queueMessage({ text: labels.getText('info', 'staticPositionOn') });
+          } else {
+            messenger.queueMessage({ text: labels.getText('info', 'staticPositionOff') });
+          }
+
+          break;
+        }
         default: {
           messenger.queueMessage({ text: labels.getText('errors', 'invalidSetting') });
 

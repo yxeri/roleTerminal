@@ -419,6 +419,12 @@ config.commands = {
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
+  creategameuser: modifiedDatabasePop.commands.creategameuser || {
+    commandName: 'creategameuser',
+    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.basic,
+    category: 'basic',
+  },
 };
 
 module.exports = config;

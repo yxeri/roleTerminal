@@ -461,9 +461,9 @@ function autoCompleteOption(phrases = [], options = {}) {
     if (matched.length === 1) {
       domManipulator.replaceLastInputPhrase(`${matched[0]} `);
     } else if (matched.length > 0) {
-      messenger.queueMessage({ text: [matched.join('\t')] });
+      messenger.queueMessage({ text: [matched.join(' - ')] });
     } else if (nextKeys.length > 0) {
-      messenger.queueMessage({ text: [nextKeys.join('\t')] });
+      messenger.queueMessage({ text: [nextKeys.join(' - ')] });
     }
   } else if (phrases.length <= 2) {
     const firstLevelOptions = Object.keys(options);
@@ -473,9 +473,9 @@ function autoCompleteOption(phrases = [], options = {}) {
       domManipulator.replaceLastInputPhrase(`${matched[0]} `);
     } else if (matched.length > 0) {
       domManipulator.setCommandInput(textTools.trimSpace(domManipulator.getInputText()));
-      messenger.queueMessage({ text: [matched.join('\t')] });
+      messenger.queueMessage({ text: [matched.join(' - ')] });
     } else if (partial === '') {
-      messenger.queueMessage({ text: [firstLevelOptions.join('\t')] });
+      messenger.queueMessage({ text: [firstLevelOptions.join(' - ')] });
     }
   }
 }
@@ -536,7 +536,7 @@ function autoCompleteCommand(phrases) {
       domManipulator.setCommandInput(newText);
     } else if (matched.length > 0) {
       domManipulator.setCommandInput(textTools.trimSpace(`${expandPartialMatch(matched, partialCommand, sign)}`));
-      messenger.queueMessage({ text: [matched.join('\t')] });
+      messenger.queueMessage({ text: [matched.join(' - ')] });
     }
   }
 }
@@ -1631,7 +1631,6 @@ function onMapPositions(params) {
         coordsCollection,
       });
     } else if (geometry === 'point') {
-      commandHandler.addSpecialMapOption(positionName, 'location');
       mapTools.setMarkerPosition({
         positionName,
         position: {
@@ -1639,6 +1638,7 @@ function onMapPositions(params) {
           longitude,
         },
         description,
+        markerType: 'location',
       });
     } else if (type && type === 'user' && mapPosition.lastUpdated) {
       const currentTime = new Date(params.currentTime);
@@ -1647,8 +1647,8 @@ function onMapPositions(params) {
       if (currentTime - lastUpdated < (20 * 60 * 1000)) {
         const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
 
-        commandHandler.addSpecialMapOption(positionName, 'user');
         mapTools.setMarkerPosition({
+          lastUpdated,
           positionName,
           position: {
             latitude,
@@ -1657,6 +1657,7 @@ function onMapPositions(params) {
           iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
           hideLabel: true,
           description: userDescription,
+          markerType: type,
         });
       }
     }

@@ -1016,18 +1016,6 @@ function showCommands() {
   domManipulator.addSubMenuItem('commands', createSubMenuItem(commands, true));
 }
 
-let lanternOn = false;
-
-function toggleLantern() {
-  lanternOn = !lanternOn;
-
-  if (lanternOn) {
-    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['on'] });
-  } else {
-    commandHandler.triggerCommand({ cmd: 'lantern', cmdParams: ['off'] });
-  }
-}
-
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -1048,7 +1036,7 @@ function populateMenu() {
     },
     lantern: {
       itemName: 'LANTERN',
-      func: toggleLantern,
+      func: domManipulator.toggleLantern,
       elementId: 'lantern',
     },
   };

@@ -2,6 +2,7 @@
 
 const socketHandler = require('./socketHandler');
 const storage = require('./storage');
+const commandHandler = require('./commandHandler');
 
 const markerInfo = document.getElementById('markerInfo');
 const mapMarkers = {};
@@ -92,6 +93,7 @@ function createMarker(params) {
   const title = params.title;
   const snakeCaseTitle = title.replace(/\s/g, '_');
   const markerId = Object.keys(mapMarkers).length + 1;
+  const markerType = params.markerType;
 
   mapMarkers[markerName] = new google.maps.Marker({
     position: {
@@ -104,6 +106,7 @@ function createMarker(params) {
 
   mapMarkers[markerName].addedTitle = params.title;
   mapMarkers[markerName].markerId = markerId;
+  mapMarkers[markerName].markerType = markerType;
 
   if (description) {
     mapMarkers[markerName].addedShortDesc = description.length > maxShortDescLength ? `${description.slice(0, maxShortDescLength)}..` : `${description}`;
@@ -151,19 +154,27 @@ function setMarkerPosition(params) {
   const positionName = params.positionName;
   const markerName = params.positionName.toLowerCase();
   const position = params.position;
+  const lastUpdated = params.lastUpdated;
+  const marker = mapMarkers[markerName];
+  const markerType = params.markerType;
 
-  if (mapMarkers[markerName]) {
-    mapMarkers[markerName].setPosition(new google.maps.LatLng(position.latitude, position.longitude));
+  if (marker) {
+    marker.setPosition(new google.maps.LatLng(position.latitude, position.longitude));
+    marker.lastUpdated = lastUpdated;
   } else {
     createMarker({
+      lastUpdated,
       position,
       markerName,
       title: positionName,
       hideLabel: params.hideLabel,
       iconUrl: params.iconUrl,
       description: params.description,
+      markerType: params.markerType,
     });
   }
+
+  commandHandler.addSpecialMapOption(positionName, markerType, mapMarkers[markerName].markerId);
 }
 
 /**

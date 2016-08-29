@@ -4,6 +4,8 @@ const dbConnector = require('../../db/databaseConnector');
 const dbStation = require('../../db/connectors/station');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const http = require('http');
 
 const signalThreshold = 50;
@@ -134,6 +136,71 @@ function updateSignalValue(stationId, boostingSignal) {
 }
 
 function handle(socket) {
+  socket.on('createGameUser', (params) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    if (!objectValidator.isValidData(params, { userName: true, password: true })) {
+      return;
+    }
+
+    const gameUser = {
+      userName: params.userName,
+      password: params.password,
+    };
+
+    dbConnector.createGameUser(gameUser, (err) => {
+      if (err) {
+        return;
+      }
+    });
+  });
+
+  socket.on('getAllGameUsers', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    dbConnector.getAllGameUsers((err, gameUsers) => {
+      if (err) {
+        return;
+      }
+
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: gameUsers.map((gameUser) => `Name: ${gameUser.userName}. Pass: ${gameUser.password}`),
+        },
+      });
+    });
+  });
+
+  socket.on('getAllGamePasswords', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    dbConnector.getAllGamePasswords((passErr, gamePasswords) => {
+      if (passErr) {
+        return;
+      }
+
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: gamePasswords.map(gamePassword => `${gamePassword.password}`),
+        },
+      });
+    });
+  });
+
   socket.on('getStationStats', () => {
     socket.join('stationStats');
 
@@ -145,7 +212,7 @@ function handle(socket) {
 
         if (stations) {
           for (const station of stations) {
-            const foundStation = dbStations.find(dbStation => dbStation.stationId === station.id);
+            const foundStation = dbStations.find(dbs => dbs.stationId === station.id);
 
             if (foundStation) {
               station.signalValue = foundStation.signalValue;

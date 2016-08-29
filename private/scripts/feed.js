@@ -256,8 +256,7 @@ function isScreenOff() {
 }
 
 /**
- * Set intervals at boot and recreate them when the window is focused
- * This is to make sure that nothing has been killed in the background
+ * NOTE! NOTE! Intervals are unreliable in Chrome. Don't use them
  */
 function setTimeouts() {
   if (trackingTimeout !== null) {

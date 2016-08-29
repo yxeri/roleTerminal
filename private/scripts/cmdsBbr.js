@@ -12,8 +12,8 @@ const labels = require('./labels');
  * @type {Object}
  */
 const commands = {};
+const statsTimeoutTime = 10000;
 let statsTimeout = null;
-let statsTimeoutTime = 10000;
 
 /**
  * Translates password hints and make them human readable
@@ -60,6 +60,29 @@ function getStats() {
   socketHandler.emit('getStationStats');
   statsTimeout = setTimeout(getStats, statsTimeoutTime);
 }
+
+commands.creategameuser = {
+  func: (phrases) => {
+    if (phrases.length > 1) {
+      switch (phrases[0]) {
+        case 'list': {
+          socketHandler.emit('getAllGameUsers');
+
+          break;
+        }
+        default: {
+          socketHandler.emit('createGameUser', { userName: phrases[0], password: phrases[1] });
+
+          break;
+        }
+      }
+    }
+  },
+  visibility: 11,
+  accessLevel: 11,
+  category: 'admin',
+  commandName: 'creategameuser',
+};
 
 commands.lantern = {
   func: (phrases = []) => {

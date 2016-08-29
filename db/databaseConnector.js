@@ -53,7 +53,6 @@ const invitationListSchema = new mongoose.Schema({
 const gameUserSchema = new mongoose.Schema({
   userName: { type: String, unique: true },
   password: String,
-  hints: [String],
 }, { collection: 'gameUsers' });
 const gamePasswordSchema = new mongoose.Schema({
   password: { type: String, unique: true },

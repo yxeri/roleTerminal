@@ -421,8 +421,8 @@ config.commands = {
   },
   creategameuser: modifiedDatabasePop.commands.creategameuser || {
     commandName: 'creategameuser',
-    accessLevel: config.accessLevels.basic,
-    visibility: config.accessLevels.basic,
+    accessLevel: config.accessLevels.admin,
+    visibility: config.accessLevels.admin,
     category: 'basic',
   },
 };

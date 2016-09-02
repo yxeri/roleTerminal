@@ -1824,8 +1824,9 @@ window.addEventListener('error', (event) => {
   console.log(event.error);
   domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
-    text: ['!!!! Something bad happened and the terminal is no longer working !!!!, !!!! Input "reboot" to reboot !!!!'],
+    text: ['!!!! Something bad happened and the terminal is no longer working !!!!', 'Rebooting in 3 seconds'],
   });
+  setTimeout(window.location.reload, 3000);
 
   return false;
 });

@@ -309,14 +309,14 @@ function addRow(message) {
     }
 
     mainFeed.appendChild(row);
-    domManipulator.scrollView();
+    domManipulator.scrollView(mainFeed.lastChild.getBoundingClientRect().height);
     setTimeout(addRow, timeout, message);
   } else {
     if (message.morseCode) {
       const row = createRow(message.morseCode, { time: message.time });
 
       mainFeed.appendChild(row);
-      domManipulator.scrollView();
+      domManipulator.scrollView(mainFeed.lastChild.getBoundingClientRect().height);
     }
 
     consumeMessageShortQueue(); // eslint-disable-line no-use-before-define

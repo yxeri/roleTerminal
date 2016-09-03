@@ -7,6 +7,7 @@ const objectValidator = require('../../utils/objectValidator');
 const manager = require('../../socketHelpers/manager');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const http = require('http');
+const gameUserManager = require('../../utils/gameUserManager');
 
 const signalThreshold = 50;
 const signalDefault = 100;
@@ -352,6 +353,10 @@ function handle(socket) {
           shuffleArray(shuffledPasswords.slice(0, 5).concat([correctPassword])),
           shuffleArray(shuffledPasswords.slice(5, 11).concat([correctPassword])),
         ];
+
+        for (const user of users) {
+          user.hints = shuffleArray(gameUserManager.createHints(user.password)).slice(0, 2);
+        }
 
         socket.emit('commandSuccess', {
           freezeStep: true,

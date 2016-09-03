@@ -241,8 +241,6 @@ function handle(socket) {
           }
 
           socket.emit('stationStats', { stations, teams });
-        } else {
-          socket.emit('stationStats', { dbStations, teams });
         }
       });
     });

@@ -1717,6 +1717,10 @@ function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
     if (station.signalValue || station.boost) {
       stations[stationId].signalValue = station.signalValue || station.boost;
     }
+
+    if (typeof station.active === 'boolean') {
+      stations[stationId].active = station.active;
+    }
   }
 
   for (let i = 0; i < teamsStats.length; i++) {

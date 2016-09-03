@@ -211,7 +211,7 @@ commands.hacklantern = {
     },
     (params = {}) => {
       if (params.stations) {
-        const stationList = params.stations.map((station) => `[${station.stationId}] ${station.stationName} - Owner: ${station.owner || 'None'}`);
+        const stationList = params.stations.map((station) => `[${station.id}] #${station.id} ${station.location} - Owner: ${station.owner || 'None'}`);
         commandHandler.commandHelper.data.stations = params.stations;
 
         messenger.queueMessage({ text: ['Available LANTERNs:'].concat(stationList) });

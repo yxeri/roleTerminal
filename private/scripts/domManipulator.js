@@ -112,15 +112,33 @@ function updateThisCommandItem() {
   }
 }
 
+function isCloseToScreen(element, newElementHeight) {
+  const elementTop = element.getBoundingClientRect().top;
+
+  return elementTop <= window.innerHeight + 100 + (newElementHeight || 0);
+}
+
+/**
+ * Adds the flash class to an element, which will start a flashing animation
+ */
+function flashMenu() {
+  menu.classList.add('flash');
+  setTimeout(() => { menu.classList.remove('flash'); }, 800);
+}
+
 /**
  * Scrolls the list view to the bottom
  */
-function scrollView() {
-  if (!oldAndroid) {
-    cmdInput.scrollIntoView();
+function scrollView(newElementHeight) {
+  if (isCloseToScreen(cmdInput, newElementHeight)) {
+    if (!oldAndroid) {
+      cmdInput.scrollIntoView();
+    } else {
+      // Compatibility fix for old Android
+      window.scrollTo(0, document.body.scrollHeight);
+    }
   } else {
-    // Compatibility fix for old Android
-    window.scrollTo(0, document.body.scrollHeight);
+    flashMenu();
   }
 }
 
@@ -393,14 +411,6 @@ function resizeCallback() {
   if (viewResizeCallback) {
     viewResizeCallback();
   }
-}
-
-/**
- * Adds the flash class to an element, which will start a flashing animation
- */
-function flashMenu() {
-  menu.classList.add('flash');
-  setTimeout(() => { menu.classList.remove('flash'); }, 800);
 }
 
 function toggleLantern() {

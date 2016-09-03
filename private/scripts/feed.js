@@ -690,9 +690,7 @@ function enterKeyHandler() {
  * @param {number} amount - Amount of pixels to scroll the view with
  */
 function scrollText(amount) {
-  const modifiedAmount = amount < 0 ? (amount + 100) : (amount - 100);
-
-  domManipulator.getMainView().scrollTop += modifiedAmount;
+  domManipulator.getMainView().scrollTop += amount;
 }
 
 function autoComplete() {
@@ -801,14 +799,14 @@ function specialKeyPress(event) {
         break;
       }
       case 33: { // Page up
-        scrollText(-window.innerHeight);
+        scrollText(-window.innerHeight * 0.5);
 
         event.preventDefault();
 
         break;
       }
       case 34: { // Page down
-        scrollText(window.innerHeight);
+        scrollText(window.innerHeight * 0.5);
 
         event.preventDefault();
 

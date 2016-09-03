@@ -99,7 +99,7 @@ function handle(socket) {
           messenger.sendSelfMsg({
             socket,
             message: {
-              text: ['Found documents:'].concat(archives.map(archive => `ID: ${archive.archiveId}. Title: ${archive.title || archive.archiveId}`)),
+              text: ['Found documents:'].concat(archives.map(archive => `ID: ${archive.archiveId.toUpperCase()}. Title: ${archive.title || archive.archiveId.toUpperCase()}`)),
             },
           });
         } else {

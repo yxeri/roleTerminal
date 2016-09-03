@@ -425,6 +425,12 @@ config.commands = {
     visibility: config.accessLevels.admin,
     category: 'basic',
   },
+  creategameword: modifiedDatabasePop.commands.creategameword || {
+    commandName: 'creategameword',
+    accessLevel: config.accessLevels.admin,
+    visibility: config.accessLevels.admin,
+    category: 'basic',
+  },
 };
 
 module.exports = config;

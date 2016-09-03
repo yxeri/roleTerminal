@@ -160,6 +160,45 @@ function handle(socket) {
     });
   });
 
+  socket.on('createGamePassword', (params) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    if (!objectValidator.isValidData(params, { password: true })) {
+      return;
+    }
+
+    dbConnector.createGamePassword(params, (err) => {
+      if (err) {
+        return;
+      }
+    });
+  });
+
+  socket.on('getAllGamePasswords', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    dbConnector.getAllGamePasswords((err, gamePasswords) => {
+      if (err) {
+        return;
+      }
+
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: [gamePasswords.map(gamePassword => `${gamePassword.password}`).join(' - ')],
+        },
+      });
+    });
+  });
+
   socket.on('getAllGameUsers', () => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
@@ -172,6 +211,8 @@ function handle(socket) {
         return;
       }
 
+      console.log('Get all game users');
+
       messenger.sendSelfMsg({
         socket,
         message: {
@@ -181,30 +222,7 @@ function handle(socket) {
     });
   });
 
-  socket.on('getAllGamePasswords', () => {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed) {
-        return;
-      }
-    });
-
-    dbConnector.getAllGamePasswords((passErr, gamePasswords) => {
-      if (passErr) {
-        return;
-      }
-
-      messenger.sendSelfMsg({
-        socket,
-        message: {
-          text: gamePasswords.map(gamePassword => `${gamePassword.password}`),
-        },
-      });
-    });
-  });
-
   socket.on('getStationStats', () => {
-    socket.join('stationStats');
-
     retrieveStationStats((stations, teams) => {
       dbStation.getActiveStations((err, dbStations) => {
         if (err) {
@@ -349,9 +367,12 @@ function handle(socket) {
         const users = shuffleArray(gameUsers).slice(0, userAmount);
         const correctPassword = users[Math.floor(Math.random() * userAmount)].password;
         const shuffledPasswords = shuffleArray(gamePasswords.map((password) => password.password));
+        const halfPasswordLength = shuffledPasswords.length > 12 ? 6 : shuffledPasswords.length / 2;
+        const passwordMaxLength = shuffledPasswords.length > 12 ? 12 : shuffledPasswords.length;
+
         const passwords = [
-          shuffleArray(shuffledPasswords.slice(0, 5).concat([correctPassword])),
-          shuffleArray(shuffledPasswords.slice(5, 11).concat([correctPassword])),
+          shuffleArray(shuffledPasswords.slice(0, halfPasswordLength).concat([correctPassword])),
+          shuffleArray(shuffledPasswords.slice(halfPasswordLength, passwordMaxLength).concat([correctPassword])),
         ];
 
         for (const user of users) {
@@ -370,15 +391,23 @@ function handle(socket) {
   });
 
   socket.on('getActiveStations', () => {
-    dbStation.getActiveStations((err, stations) => {
-      if (err) {
-        return;
-      }
-
-      if (stations && stations.length > 0) {
+    retrieveStationStats((stations) => {
+      if (stations && stations.length > 0 && stations.find(station => station.active === true)) {
         socket.emit('commandSuccess', { newData: { stations } });
       } else {
-        messenger.sendSelfMsg({ message: { text: ['There are no active LANTERNs available'] } });
+        messenger.sendSelfMsg({
+          socket,
+          message: {
+            text: [
+              '----------------',
+              'LANTERN INACTIVE',
+              '----------------',
+              'There are no active LANTERNs available',
+              'Unable to proceed',
+              'Please wait for the next connection window',
+            ],
+          },
+        });
         socket.emit('commandFail');
       }
     });

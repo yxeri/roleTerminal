@@ -62,8 +62,20 @@ function getStats() {
 }
 
 commands.creategameuser = {
-  func: (phrases) => {
-    if (phrases.length > 1) {
+  func: () => {
+    messenger.queueMessage({
+      text: [
+        'Input user name + password to create a new game user',
+        'Input "list" to list all existing game users',
+        'Input "exit" when you are done',
+        'Example: user1 banana',
+        'Example: list',
+        'Example: exit',
+      ],
+    });
+  },
+  steps: [(phrases = []) => {
+    if (phrases.length > 0) {
       switch (phrases[0]) {
         case 'list': {
           socketHandler.emit('getAllGameUsers');
@@ -71,17 +83,57 @@ commands.creategameuser = {
           break;
         }
         default: {
-          socketHandler.emit('createGameUser', { userName: phrases[0], password: phrases[1] });
+          if (phrases.length > 1) {
+            socketHandler.emit('createGameUser', { userName: phrases[0], password: phrases[1] });
+          } else {
+            messenger.queueMessage({ text: ['You need to input a name and password. Example: creategameuser user1 banana'] });
+          }
 
           break;
         }
       }
     }
-  },
+  }],
   visibility: 11,
   accessLevel: 11,
   category: 'admin',
   commandName: 'creategameuser',
+};
+
+commands.creategameword = {
+  func: () => {
+    messenger.queueMessage({
+      text: [
+        'Input word to create a new game word, which will be used to fill out the hacklantern mini-game',
+        'Don\'t use words that are passwords for game users!',
+        'Input "list" to list all existing words',
+        'Input "exit" when you are done',
+        'Example: banana',
+        'Example: list',
+        'Example: exit',
+      ],
+    });
+  },
+  steps: [(phrases = []) => {
+    if (phrases.length > 0) {
+      switch (phrases[0]) {
+        case 'list': {
+          socketHandler.emit('getAllGamePasswords');
+
+          break;
+        }
+        default: {
+          socketHandler.emit('createGamePassword', { password: phrases[0] });
+
+          break;
+        }
+      }
+    }
+  }],
+  visibility: 11,
+  accessLevel: 11,
+  category: 'admin',
+  commandName: 'creategameword',
 };
 
 commands.lantern = {

@@ -186,7 +186,7 @@ function getAllGameUsers(callback) {
 
 function createGamePassword(gamePassword, callback) {
   const newGamePassword = new GamePassword(gamePassword);
-  const query = { userName: gamePassword.userName };
+  const query = { password: gamePassword.password };
 
   GamePassword.findOne(query).lean().exec((err, foundGamePassword) => {
     if (err) {

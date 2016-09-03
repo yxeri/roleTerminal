@@ -4,7 +4,10 @@ const dbConnector = require('../../db/databaseConnector');
 const dbStation = require('../../db/connectors/station');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
+const manager = require('../../socketHelpers/manager');
+const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const http = require('http');
+const gameUserManager = require('../../utils/gameUserManager');
 
 const signalThreshold = 50;
 const signalDefault = 100;
@@ -134,9 +137,92 @@ function updateSignalValue(stationId, boostingSignal) {
 }
 
 function handle(socket) {
-  socket.on('getStationStats', () => {
-    socket.join('stationStats');
+  socket.on('createGameUser', (params) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
 
+    if (!objectValidator.isValidData(params, { userName: true, password: true })) {
+      return;
+    }
+
+    const gameUser = {
+      userName: params.userName,
+      password: params.password,
+    };
+
+    dbConnector.createGameUser(gameUser, (err) => {
+      if (err) {
+        return;
+      }
+    });
+  });
+
+  socket.on('createGamePassword', (params) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    if (!objectValidator.isValidData(params, { password: true })) {
+      return;
+    }
+
+    dbConnector.createGamePassword(params, (err) => {
+      if (err) {
+        return;
+      }
+    });
+  });
+
+  socket.on('getAllGamePasswords', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    dbConnector.getAllGamePasswords((err, gamePasswords) => {
+      if (err) {
+        return;
+      }
+
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: [gamePasswords.map(gamePassword => `${gamePassword.password}`).join(' - ')],
+        },
+      });
+    });
+  });
+
+  socket.on('getAllGameUsers', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+    });
+
+    dbConnector.getAllGameUsers((err, gameUsers) => {
+      if (err) {
+        return;
+      }
+
+      console.log('Get all game users');
+
+      messenger.sendSelfMsg({
+        socket,
+        message: {
+          text: gameUsers.map((gameUser) => `Name: ${gameUser.userName}. Pass: ${gameUser.password}`),
+        },
+      });
+    });
+  });
+
+  socket.on('getStationStats', () => {
     retrieveStationStats((stations, teams) => {
       dbStation.getActiveStations((err, dbStations) => {
         if (err) {
@@ -145,7 +231,7 @@ function handle(socket) {
 
         if (stations) {
           for (const station of stations) {
-            const foundStation = dbStations.find(dbStation => dbStation.stationId === station.id);
+            const foundStation = dbStations.find(dbs => dbs.stationId === station.id);
 
             if (foundStation) {
               station.signalValue = foundStation.signalValue;
@@ -281,10 +367,17 @@ function handle(socket) {
         const users = shuffleArray(gameUsers).slice(0, userAmount);
         const correctPassword = users[Math.floor(Math.random() * userAmount)].password;
         const shuffledPasswords = shuffleArray(gamePasswords.map((password) => password.password));
+        const halfPasswordLength = shuffledPasswords.length > 12 ? 6 : shuffledPasswords.length / 2;
+        const passwordMaxLength = shuffledPasswords.length > 12 ? 12 : shuffledPasswords.length;
+
         const passwords = [
-          shuffleArray(shuffledPasswords.slice(0, 5).concat([correctPassword])),
-          shuffleArray(shuffledPasswords.slice(5, 11).concat([correctPassword])),
+          shuffleArray(shuffledPasswords.slice(0, halfPasswordLength).concat([correctPassword])),
+          shuffleArray(shuffledPasswords.slice(halfPasswordLength, passwordMaxLength).concat([correctPassword])),
         ];
+
+        for (const user of users) {
+          user.hints = shuffleArray(gameUserManager.createHints(user.password)).slice(0, 2);
+        }
 
         socket.emit('commandSuccess', {
           freezeStep: true,
@@ -298,15 +391,23 @@ function handle(socket) {
   });
 
   socket.on('getActiveStations', () => {
-    dbStation.getActiveStations((err, stations) => {
-      if (err) {
-        return;
-      }
-
-      if (stations && stations.length > 0) {
+    retrieveStationStats((stations) => {
+      if (stations && stations.length > 0 && stations.find(station => station.active === true)) {
         socket.emit('commandSuccess', { newData: { stations } });
       } else {
-        messenger.sendSelfMsg({ message: { text: ['There are no active LANTERNs available'] } });
+        messenger.sendSelfMsg({
+          socket,
+          message: {
+            text: [
+              '----------------',
+              'LANTERN INACTIVE',
+              '----------------',
+              'There are no active LANTERNs available',
+              'Unable to proceed',
+              'Please wait for the next connection window',
+            ],
+          },
+        });
         socket.emit('commandFail');
       }
     });

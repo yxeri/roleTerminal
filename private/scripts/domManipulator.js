@@ -448,8 +448,13 @@ function setStationStats(stations, teams) {
       const station = stations[stationId];
 
       stationList.appendChild(createListItem(`${stationId}>>`));
-      stationList.appendChild(createListItem(`Amp: ${station.signalValue}`, 'indent'));
-      stationList.appendChild(createListItem(`Owner: ${station.owner}`, 'indent'));
+
+      if (station.active) {
+        stationList.appendChild(createListItem(`Output: ${station.signalValue}`, 'indent'));
+        stationList.appendChild(createListItem(`Owner: ${station.owner}`, 'indent'));
+      } else {
+        stationList.appendChild(createListItem('INACTIVE', 'indent'));
+      }
     }
   } else {
     stationList.appendChild(createListItem('No active LANTERNs'));

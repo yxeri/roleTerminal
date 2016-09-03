@@ -53,7 +53,6 @@ const invitationListSchema = new mongoose.Schema({
 const gameUserSchema = new mongoose.Schema({
   userName: { type: String, unique: true },
   password: String,
-  hints: [String],
 }, { collection: 'gameUsers' });
 const gamePasswordSchema = new mongoose.Schema({
   password: { type: String, unique: true },
@@ -187,7 +186,7 @@ function getAllGameUsers(callback) {
 
 function createGamePassword(gamePassword, callback) {
   const newGamePassword = new GamePassword(gamePassword);
-  const query = { userName: gamePassword.userName };
+  const query = { password: gamePassword.password };
 
   GamePassword.findOne(query).lean().exec((err, foundGamePassword) => {
     if (err) {

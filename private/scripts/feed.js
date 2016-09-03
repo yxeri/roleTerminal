@@ -256,8 +256,7 @@ function isScreenOff() {
 }
 
 /**
- * Set intervals at boot and recreate them when the window is focused
- * This is to make sure that nothing has been killed in the background
+ * NOTE! NOTE! Intervals are unreliable in Chrome. Don't use them
  */
 function setTimeouts() {
   if (trackingTimeout !== null) {
@@ -1700,14 +1699,17 @@ function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
 
   for (let i = 0; i < stationsStats.length; i++) {
     const station = stationsStats[i];
-    const stationId = `ID${station.id || station.stationId}`;
+    const stationId = `#${station.id || station.stationId}`;
+    const stationTeam = teamsStats.find(team => station.owner === team.name);
 
     if (!stations[stationId]) {
       stations[stationId] = {};
     }
 
-    if (station.owner) {
-      stations[stationId].owner = station.owner;
+    if (station.owner && stationTeam && stationTeam.short_name) {
+      stations[stationId].owner = stationTeam.short_name;
+    } else if (stationTeam && !stationTeam.short_name) {
+      stations[stationId].owner = '?';
     } else if (station.owner === null) {
       stations[stationId].owner = '-';
     }
@@ -1822,11 +1824,16 @@ function onStartup(params = { }) {
 }
 
 window.addEventListener('error', (event) => {
+  function restart() {
+    window.location.reload();
+  }
+
   console.log(event.error);
   domManipulator.setStatus(labels.getString('status', 'offline'));
   messenger.queueMessage({
-    text: ['!!!! Something bad happened and the terminal is no longer working !!!!, !!!! Input "reboot" to reboot !!!!'],
+    text: ['!!!! Something bad happened and the terminal is no longer working !!!!', 'Rebooting in 3 seconds'],
   });
+  setTimeout(restart, 3000);
 
   return false;
 });

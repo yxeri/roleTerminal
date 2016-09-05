@@ -1697,7 +1697,7 @@ function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
 
   for (let i = 0; i < stationsStats.length; i++) {
     const station = stationsStats[i];
-    const stationId = `#${station.id || station.stationId}`;
+    const stationId = `${station.id || station.stationId}`;
     const stationTeam = teamsStats.find(team => station.owner === team.name);
 
     if (!stations[stationId]) {

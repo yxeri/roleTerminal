@@ -226,7 +226,7 @@ commands.hacklantern = {
     (phrases = ['']) => {
       const stationId = parseInt(phrases[0], 10);
 
-      if (isNaN(stationId) || !commandHandler.commandHelper.data.stations.find((station) => station.stationId === stationId)) {
+      if (isNaN(stationId) || !commandHandler.commandHelper.data.stations.find((station) => station.id === stationId)) {
         messenger.queueMessage({ text: ['Incorrect choice'] });
 
         commandHandler.commandHelper.onStep--;

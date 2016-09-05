@@ -457,7 +457,7 @@ function setStationStats(stations, teams) {
       const stationId = stationKeys[i];
       const station = stations[stationId];
 
-      stationList.appendChild(createListItem(`${stationId}>>`));
+      stationList.appendChild(createListItem(`#${stationId}>>`));
 
       if (station.active) {
         stationList.appendChild(createListItem(`Output: ${station.signalValue}`, 'indent'));

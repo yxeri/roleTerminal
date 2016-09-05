@@ -180,7 +180,7 @@ const all = {
       'Available options:',
       'list - lists all available channels',
       'off - turn off the radio',
-      'on *channel* - tunes the radio to that channel',
+      'on *channel ID* - tunes the radio to that channel. The channel ID is printed within []',
     ],
     map: [
       'Shows your current location, other connected users location and other stationary points of interests',
@@ -612,7 +612,7 @@ const all = {
       'radio on *channel*',
       exampleLine,
       'radio list',
-      'radio on metal',
+      'radio on ra1',
       'radio off',
     ],
     map: [
@@ -860,7 +860,7 @@ const all = {
       'radio on *kanal*',
       exampleLine_se,
       'radio list',
-      'radio on metal',
+      'radio on ra1',
       'radio off',
     ],
   },

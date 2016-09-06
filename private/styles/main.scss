@@ -1,3 +1,8 @@
+@font-face {
+  font-family: GlassTTYVT220;
+  src: local("Glass TTY VT220 Medium"), url(/scripts/vt220.ttf) format("truetype");
+}
+
 $text-color: #00ffcc;
 $shadow-color: #008766;
 $back-color: #001e15;
@@ -15,7 +20,7 @@ html {
   -moz-user-select: none;
   -ms-user-select: none;
   background-color: $back-color;
-  -webkit-font-smoothing: antialiased;
+  // -webkit-font-smoothing: antialiased;
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -26,10 +31,10 @@ body {
   margin: 0;
   background-color: $back-color;
   color: $text-color;
-  text-shadow: 1px 1px 2px $shadow-color;
-  font-family: monospace;
-  font-size: 1.2em;
-  letter-spacing: .05em;
+  // text-shadow: 1px 1px 2px $shadow-color;
+  font-family: GlassTTYVT220;
+  font-size: 1.3em;
+  // letter-spacing: .05em;
   -webkit-text-size-adjust: 100%;
   height: 100%;
   width: 100%;
@@ -250,7 +255,7 @@ textarea {
   width: 100%;
   background-color: $sub-back-color;
   color: $sub-text-color;
-  text-shadow: 1px 1px 4px $sub-shadow-color;
+  // text-shadow: 1px 1px 4px $sub-shadow-color;
   opacity: 0;
 }
 
@@ -299,7 +304,7 @@ textarea {
 
 .importantMsg {
   color: $imp-text-color;
-  text-shadow: none;
+  // text-shadow: none;
   background-color: $imp-back-color;
   font-size: 1.2em;
   text-transform: uppercase;

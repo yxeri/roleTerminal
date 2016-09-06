@@ -256,4 +256,6 @@ config.staticInputStart = staticInputStartEnv !== undefined ? staticInputStartEn
  */
 config.defaultInputStart = process.env.DEFAULTINPUTSTART || modifiedConfig.defaultInputStart || 'RAZCMD';
 
+config.signalResetInterval = process.env.SIGNALRESETINTERVAL || modifiedConfig.signalResetInterval || 0;
+
 module.exports = config;

@@ -5,6 +5,7 @@ const dbStation = require('../../db/connectors/station');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
 const manager = require('../../socketHelpers/manager');
+const appConfig = require('../../config/defaults/config').app;
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const http = require('http');
 const gameUserManager = require('../../utils/gameUserManager');
@@ -13,6 +14,46 @@ const signalThreshold = 50;
 const signalDefault = 100;
 const changePercentage = 0.2;
 const signalMaxChange = 10;
+let resetInterval = null;
+
+function setResetInterval() {
+  function resetStations() {
+    dbStation.getAllStations((err, stations) => {
+      if (err) {
+        return;
+      }
+
+      for (const station of stations) {
+        const signalValue = station.signalValue;
+        const stationId = station.stationId;
+        let newSignalValue = signalValue;
+
+        if (signalValue !== signalDefault) {
+          if (signalValue > signalDefault) {
+            newSignalValue -= 1;
+          } else {
+            newSignalValue += 1;
+          }
+
+          dbStation.updateSignalValue(stationId, newSignalValue, (signErr) => {
+            if (signErr) {
+              return;
+            }
+          });
+        }
+      }
+    });
+  }
+
+  if (appConfig.signalResetInterval !== 0) {
+    if (resetInterval === null) {
+      resetInterval = setInterval(resetStations, appConfig.signalResetInterval);
+    } else {
+      clearInterval(resetInterval);
+      resetInterval = setInterval(resetStations, appConfig.signalResetInterval);
+    }
+  }
+}
 
 /**
  * @private
@@ -411,5 +452,7 @@ function handle(socket) {
     });
   });
 }
+
+setResetInterval();
 
 exports.handle = handle;

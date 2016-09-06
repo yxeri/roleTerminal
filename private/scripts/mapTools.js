@@ -62,7 +62,7 @@ function createLabel(params) {
     text: labelText,
     position: new google.maps.LatLng(position.latitude, position.longitude),
     align: params.align || 'right',
-    fontFamily: 'monospace',
+    fontFamily: 'GlassTTYVT220',
     fontColor: '#00ffcc',
     strokeColor: '#001e15',
     fontSize: 12,

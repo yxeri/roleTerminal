@@ -12,7 +12,7 @@ const labels = require('./labels');
  * @type {Object}
  */
 const commands = {};
-const statsTimeoutTime = 10000;
+const statsTimeoutTime = 5000;
 let statsTimeout = null;
 
 /**

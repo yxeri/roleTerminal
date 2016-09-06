@@ -209,7 +209,6 @@ commands.login = {
   abortFunc: () => {
     domManipulator.hideInput(false);
   },
-  clearAfterUse: true,
   accessLevel: 0,
   category: 'login',
   commandName: 'login',

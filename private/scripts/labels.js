@@ -65,12 +65,6 @@ const all = {
       'You have to be logged out to login as another user',
     ],
     time: ['Shows the current time'],
-    locate: [
-      'Shows the last known location of the user',
-      '* is a shortcut for all users. Example: locate *',
-      'Just writing the command without a user name will show your current location. Example: locate',
-      'You need to be connected to the satellites to access this command',
-    ],
     history: [
       'Clears the screen and retrieves chat messages from server',
       'The amount you send with the command is the amount of messages that will be returned from each room you follow',
@@ -190,7 +184,7 @@ const all = {
       'info *number* - retrieves information about a specific point',
       'zoomin - zooms in',
       'zoomout - zooms out',
-      'locate *user name* - locate a user',
+      'user *user name* - locate a user',
     ],
     archives: [
       'Retrieve a document from the archives',
@@ -235,12 +229,6 @@ const all = {
       'Ni måste vara utloggade för att kunna logga in som en annan användare',
     ],
     time: ['Visar nuvarande tiden'],
-    locate: [
-      'Visar senaste identifierade position för användaren',
-      '* är en genväg för alla användare. Exempel: locate *',
-      'Om ni bara skriver kommandot utan ett användarnamn så kommer det visa er nuvarande position. Exempel: locate',
-      'Ni måste vara uppkopplade mot satelliterna för att ha tillgång till detta kommando',
-    ],
     history: [
       'Rensar skärmen och hämtar chatmeddelanden från servern',
       'Om ni skriver med ett värde så kommer servern skicka tillbaka så många meddelanden från varje rum ni följer',
@@ -418,14 +406,6 @@ const all = {
       'login *user name*',
       exampleLine,
       'login user11',
-    ],
-    locate: [
-      usageLine,
-      'locate *optional user name OR "*"*',
-      exampleLine,
-      'locate user1',
-      'locate *',
-      'locate',
     ],
     history: [
       usageLine,
@@ -625,11 +605,11 @@ const all = {
       'map info *number*',
       'map zoomin',
       'map zoomout',
-      'map locate *user name*',
+      'map user *user name*',
       exampleLine,
       'map on me',
       'map info 5',
-      'map locate user1',
+      'map user user1',
     ],
   },
   instructions_se: {
@@ -694,14 +674,6 @@ const all = {
       'login *användarnamn*',
       exampleLine_se,
       'login user11',
-    ],
-    locate: [
-      usageLine_se,
-      'locate *frivilligt användarnamn ELLER "*"*',
-      exampleLine_se,
-      'locate user1',
-      'locate *',
-      'locate',
     ],
     history: [
       usageLine_se,

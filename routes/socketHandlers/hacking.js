@@ -16,6 +16,39 @@ const changePercentage = 0.2;
 const signalMaxChange = 10;
 let resetInterval = null;
 
+function postRequest(params) {
+  const host = params.host;
+  const path = params.path;
+  const callback = params.callback;
+  const dataString = JSON.stringify(params.data);
+  const options = {
+    host,
+    path,
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': dataString.length,
+    },
+    method: 'POST',
+  };
+
+  const request = http.request(options, (response) => {
+    let responseString = '';
+
+    response.setEncoding('utf-8');
+
+    response.on('data', (data) => {
+      responseString += data;
+    });
+
+    response.on('end', () => {
+      callback(response.statusCode);
+    });
+  });
+
+  request.write(dataString);
+  request.end();
+}
+
 function setResetInterval() {
   function resetStations() {
     dbStation.getAllStations((err, stations) => {
@@ -106,39 +139,6 @@ function retrieveStationStats(callback) {
       callback(stations, teams);
     }
   });
-}
-
-function postRequest(params) {
-  const host = params.host;
-  const path = params.path;
-  const callback = params.callback;
-  const dataString = JSON.stringify(params.data);
-  const options = {
-    host,
-    path,
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': dataString.length,
-    },
-    method: 'POST',
-  };
-
-  const request = http.request(options, (response) => {
-    let responseString = '';
-
-    response.setEncoding('utf-8');
-
-    response.on('data', (data) => {
-      responseString += data;
-    });
-
-    response.on('end', () => {
-      callback(response.statusCode);
-    });
-  });
-
-  request.write(dataString);
-  request.end();
 }
 
 function updateSignalValue(stationId, boostingSignal) {

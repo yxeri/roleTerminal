@@ -4,7 +4,8 @@
  * @private
  * @type {CanvasRenderingContext2D}
  */
-const context = (document.getElementById('canvas')).getContext('2d');
+const context = null;
+// const context = (document.getElementById('canvas')).getContext('2d');
 /**
  * @private
  * @type {HTMLElement}

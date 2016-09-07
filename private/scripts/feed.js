@@ -1773,6 +1773,7 @@ function onStartup(params = { }) {
     if (!isTouchDevice()) {
       domManipulator.focusInput();
     } else {
+      document.body.classList.add('bold');
       domManipulator.getMainView().classList.add('fullscreen');
     }
 

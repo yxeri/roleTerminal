@@ -161,18 +161,14 @@ textarea {
   }
 
   > div {
-    display: none
-  }
-
-  > div:first-child {
-    display: inherit;
-
     > div {
-      display: none;
-    }
+      > div:first-child {
+        display: inherit;
+      }
 
-    div:first-child {
-      display:inherit;
+      > div {
+        display: none;
+      }
     }
   }
 }

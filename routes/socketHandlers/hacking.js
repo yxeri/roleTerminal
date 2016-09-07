@@ -39,6 +39,19 @@ function setResetInterval() {
             if (signErr) {
               return;
             }
+
+            postRequest({
+              host: 'wrecking.bbreloaded.se',
+              path: '/reports/set_boost',
+              data: {
+                station: stationId,
+                boost: newSignalValue,
+                key: 'hemligt',
+              },
+              callback: (response) => {
+                console.log(response);
+              },
+            });
           });
         }
       }

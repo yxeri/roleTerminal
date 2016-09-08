@@ -134,8 +134,10 @@ function retrieveStationStats(callback) {
       const stats = JSON.parse(body);
       const stations = stats.stations;
       const teams = stats.teams;
+      const currentRound = stats.active_round;
+      const futureRounds = stats.coming_rounds;
 
-      callback(stations, teams);
+      callback(stations, teams, currentRound, futureRounds);
     }
   });
 }
@@ -276,7 +278,7 @@ function handle(socket) {
   });
 
   socket.on('getStationStats', () => {
-    retrieveStationStats((stations, teams) => {
+    retrieveStationStats((stations, teams, currentRound, futureRounds) => {
       dbStation.getActiveStations((err, dbStations) => {
         if (err) {
           return;
@@ -293,7 +295,7 @@ function handle(socket) {
             }
           }
 
-          socket.emit('stationStats', { stations, teams });
+          socket.emit('stationStats', { stations, teams, currentRound, futureRounds, now: new Date() });
         }
       });
     });

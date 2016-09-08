@@ -1694,6 +1694,9 @@ function onReboot() {
 function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
   const stationsStats = params.stations;
   const teamsStats = params.teams;
+  const currentRound = params.currentRound;
+  const futureRounds = params.futureRounds;
+  const now = params.now;
 
   for (let i = 0; i < stationsStats.length; i++) {
     const station = stationsStats[i];
@@ -1732,7 +1735,7 @@ function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
     teams[teamName] = team.score;
   }
 
-  domManipulator.setStationStats(stations, teams);
+  domManipulator.setStationStats(stations, teams, currentRound, futureRounds, now);
 }
 
 /**

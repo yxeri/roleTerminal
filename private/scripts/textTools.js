@@ -51,11 +51,16 @@ function beautifyNumb(number) {
  * @param {Date} date - Non-humanreadable date
  * @param {boolean} full - Should the month and day be added?
  * @param {boolean} year - Should year be added?
+ * @param {Number} offset - Should hours be added/removed from the final time?
  * @returns {string} - Human-readable time and date
  */
-function generateTimeStamp(date, full, year) {
+function generateTimeStamp(date, full, year, offset) {
   let newDate = new Date(date);
   let timeStamp;
+
+  if (offset) {
+    newDate.setHours(newDate.getHours() + offset);
+  }
 
   /**
    * Splitting of date is a fix for NaN on Android 2.*

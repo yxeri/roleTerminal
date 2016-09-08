@@ -450,8 +450,10 @@ function handle(socket) {
 
   socket.on('getActiveStations', () => {
     retrieveStationStats((stations) => {
-      if (stations && stations.length > 0 && stations.find(station => station.active === true)) {
-        socket.emit('commandSuccess', { newData: { stations } });
+      const activeStations = stations ? stations.map(station => station.active === true) : [];
+
+      if (activeStations.length > 0) {
+        socket.emit('commandSuccess', { newData: { activeStations } });
       } else {
         messenger.sendSelfMsg({
           socket,

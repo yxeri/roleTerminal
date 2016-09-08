@@ -379,6 +379,11 @@ function realignMap(markers) {
 
     map.fitBounds(bounds);
     centerPos = bounds.getCenter();
+  } else if (mapMarkers[mapView]) {
+    bounds.extend(mapMarkers[mapView].getPosition());
+
+    map.fitBounds(bounds);
+    centerPos = bounds.getCenter();
   }
 
   map.setCenter(centerPos);

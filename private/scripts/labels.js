@@ -184,7 +184,7 @@ const all = {
       'info *number* - retrieves information about a specific point',
       'zoomin - zooms in',
       'zoomout - zooms out',
-      'user *user name* - locate a user',
+      'locate *user name* - locate a user',
     ],
     archives: [
       'Retrieve a document from the archives',
@@ -605,11 +605,11 @@ const all = {
       'map info *number*',
       'map zoomin',
       'map zoomout',
-      'map user *user name*',
+      'map locate *user name*',
       exampleLine,
       'map on me',
       'map info 5',
-      'map user user1',
+      'map locate user1',
     ],
   },
   instructions_se: {

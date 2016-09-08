@@ -69,7 +69,10 @@ commands.map = {
           break;
         }
         case 'locate': {
-          // TODO
+          if (mapTools.getMap() && phrases.length > 1) {
+            mapTools.setMapView(value);
+            mapTools.realignMap();
+          }
 
           break;
         }
@@ -102,7 +105,7 @@ commands.map = {
     off: { description: 'Turn off map' },
     zoomin: { description: 'Increase zoom' },
     zoomout: { description: 'Decrease zoom' },
-    user: { description: 'Locate user', next: {} },
+    locate: { description: 'Locate user', next: {} },
     info: { description: 'Show information for the location', next: {} },
   },
   commandName: 'map',

@@ -278,7 +278,7 @@ function addSpecialHelpOptions() {
  */
 function addSpecialMapOption(positionName, type, markerId) {
   if (type === 'user') {
-    commands.map.options.user.next[positionName] = { description: `User: ${positionName}` };
+    commands.map.options.locate.next[positionName] = { description: `User: ${positionName}` };
   } else if (type === 'location') {
     commands.map.options.info.next[`[${markerId}] ${positionName}`] = { description: `Location: ${positionName}` };
   }

@@ -629,7 +629,7 @@ function enterKeyHandler() {
       phrases = textTools.trimSpace(inputText).split(' ');
 
       if (phrases[0].length > 0) {
-        const command = commandHandler.getCommand(phrases[0]);
+        const command = commandHandler.getCommand(phrases[0].toLowerCase());
 
         if (!storage.getDisableCommands() && (command && (isNaN(command.accessLevel) || storage.getAccessLevel() >= command.accessLevel))) {
           // Store the command for usage with up/down arrows
@@ -696,7 +696,7 @@ function scrollText(amount) {
 function autoComplete() {
   const commandHelper = commandHandler.commandHelper;
   const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
-  const command = commandHandler.getCommand(commandHelper.command || phrases[0]);
+  const command = commandHandler.getCommand((commandHelper.command || phrases[0]).toLowerCase());
 
   if (command && phrases.length === 1) {
     phrases.push('');

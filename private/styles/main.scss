@@ -157,19 +157,19 @@ textarea {
   background-color: #00865e;
 
   a {
-    display: none;
+    display: none !important;
   }
 
-  > div {
-    > div {
-      > div:first-child {
-        display: inherit;
-      }
+  .gmnoprint {
+    display: none !important;
+  }
 
-      > div {
-        display: none;
-      }
-    }
+  .gmnoscreen {
+    display: none !important;
+  }
+
+  .gm-style-cc {
+    display: none !important;
   }
 }
 

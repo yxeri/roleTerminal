@@ -453,9 +453,11 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
   stationList.appendChild(createListItem('-LANTERNs-'));
 
   if (stationKeys.length > 0) {
-    const time = textTools.generateTimeStamp(new Date(currentRound.endtime) - new Date(now), false, false, -1);
+    if (currentRound) {
+      const time = textTools.generateTimeStamp(new Date(currentRound.endtime) - new Date(now), false, false, -1);
 
-    stationList.appendChild(createListItem(`Time left: ${time}`));
+      stationList.appendChild(createListItem(`Time left: ${time}`));
+    }
 
     for (let i = 0; i < stationKeys.length; i++) {
       const stationId = stationKeys[i];

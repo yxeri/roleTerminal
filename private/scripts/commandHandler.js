@@ -16,7 +16,7 @@ const commandCollections = [
   require('./cmdsInfo'),
   require('./cmdsLocal'),
   require('./cmdsMap'),
-  require('./cmdsSatellite'),
+  // require('./cmdsSatellite'),
   require('./cmdsTeam'),
   require('./cmdsUser'),
   require('./cmdsUtility'),

@@ -156,6 +156,12 @@ function updateSignalValue(stationId, boostingSignal) {
         ceilSignalValue = maxValue;
       } else if (ceilSignalValue < minValue) {
         ceilSignalValue = minValue;
+      } else if (ceilSignalValue === signalDefault) {
+        if (boostingSignal) {
+          ceilSignalValue = maxValue;
+        } else {
+          ceilSignalValue = minValue;
+        }
       }
 
       dbStation.updateSignalValue(stationId, ceilSignalValue, (updateErr) => {

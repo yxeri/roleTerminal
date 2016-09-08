@@ -287,7 +287,7 @@ config.commands = {
     category: 'basic',
   },
   hacklantern: modifiedDatabasePop.commands.hacklantern || {
-    commandName: 'hackroom',
+    commandName: 'hacklantern',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',

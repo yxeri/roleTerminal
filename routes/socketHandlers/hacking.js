@@ -302,34 +302,22 @@ function handle(socket) {
   });
 
   socket.on('manipulateStation', (params) => {
-    if (!objectValidator.isValidData(params, { users: true, gameUser: true, choice: true, stationId: true })) {
-      return;
-    }
-
-    const sentUser = params.gameUser;
-
-    if (params.users.map((user) => user.userName).indexOf(sentUser.userName) === -1) {
-      messenger.sendSelfMsg({
-        socket,
-        message: {
-          text: ['User is not authorized to access the LANTERN'],
-        },
-      });
-      socket.emit('commandStep', { reset: true });
-
-      return;
-    }
-
-    dbConnector.getGameUser(sentUser.userName.toLowerCase(), (err, gameUser) => {
-      if (err) {
-        socket.emit('commandFail');
-
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.hacklantern.commandName, (allowErr, allowed, allowedUser) => {
+      if (allowErr || !allowed) {
         return;
-      } else if (gameUser === null) {
+      }
+
+      if (!objectValidator.isValidData(params, { users: true, gameUser: true, choice: true, stationId: true })) {
+        return;
+      }
+
+      const sentUser = params.gameUser;
+
+      if (params.users.map((user) => user.userName).indexOf(sentUser.userName) === -1) {
         messenger.sendSelfMsg({
           socket,
           message: {
-            text: [`User ${sentUser.userName} does not exist`],
+            text: ['User is not authorized to access the LANTERN'],
           },
         });
         socket.emit('commandStep', { reset: true });
@@ -337,63 +325,97 @@ function handle(socket) {
         return;
       }
 
-      if (params.gameUser.password === gameUser.password) {
-        const choice = params.choice;
+      dbConnector.getGameUser(sentUser.userName.toLowerCase(), (err, gameUser) => {
+        if (err) {
+          socket.emit('commandFail');
 
-        switch (choice) {
-          case '1': {
-            messenger.sendSelfMsg({
-              socket,
-              message: {
-                text: [
-                  'You have been authorized to access the LANTERN',
-                  'LSM is fully functional and running',
-                  'Amplifying signal output',
-                ],
-              },
-            });
-            socket.emit('commandSuccess', { noStepCall: true });
-            updateSignalValue(params.stationId, true);
+          return;
+        } else if (gameUser === null) {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: [`User ${sentUser.userName} does not exist`],
+            },
+          });
+          socket.emit('commandStep', { reset: true });
 
-            break;
-          }
-          case '2': {
-            messenger.sendSelfMsg({
-              socket,
-              message: {
-                text: [
-                  'You have been authorized to access the LANTERN',
-                  'LSM is fully functional and running',
-                  'Dampening signal output',
-                ],
-              },
-            });
-            socket.emit('commandSuccess', { noStepCall: true });
-            updateSignalValue(params.stationId, false);
-
-            break;
-          }
-          default: {
-            messenger.sendSelfMsg({
-              socket,
-              message: {
-                text: ['Incorrect choice'],
-              },
-            });
-            socket.emit('commandStep', { reset: true });
-
-            break;
-          }
+          return;
         }
-      } else {
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Incorrect password'],
-          },
-        });
-        socket.emit('commandStep', { reset: true });
-      }
+
+        if (params.gameUser.password === gameUser.password) {
+          const choice = params.choice;
+
+          switch (choice) {
+            case '1': {
+              messenger.sendSelfMsg({
+                socket,
+                message: {
+                  text: [
+                    'You have been authorized to access the LANTERN',
+                    'LSM is fully functional and running',
+                    'Amplifying signal output',
+                  ],
+                },
+              });
+              socket.emit('commandSuccess', { noStepCall: true });
+              updateSignalValue(params.stationId, true);
+              messenger.sendMsg({
+                socket,
+                message: {
+                  text: [`LANTERN ${params.stationId}> User ${allowedUser.userName} has amplified the signal of the station. User is part of team: ${allowedUser.team || '-'}`],
+                  userName: 'SYSTEM',
+                },
+                sendTo: `lantern${params.stationId}`,
+              });
+
+              break;
+            }
+            case '2': {
+              messenger.sendSelfMsg({
+                socket,
+                message: {
+                  text: [
+                    'You have been authorized to access the LANTERN',
+                    'LSM is fully functional and running',
+                    'Dampening signal output',
+                  ],
+                },
+              });
+              socket.emit('commandSuccess', { noStepCall: true });
+              updateSignalValue(params.stationId, false);
+              messenger.sendMsg({
+                socket,
+                message: {
+                  text: [`LANTERN ${params.stationId}> WARNING! User ${allowedUser.userName} has dampened the signal of the station. User is part of team: ${allowedUser.team || '-'}`],
+                  userName: 'SYSTEM',
+                },
+                sendTo: `lantern${params.stationId}`,
+              });
+
+              break;
+            }
+            default: {
+              messenger.sendSelfMsg({
+                socket,
+                message: {
+                  text: ['Incorrect choice'],
+                },
+              });
+              socket.emit('commandStep', { reset: true });
+
+              break;
+            }
+          }
+        } else {
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: ['Incorrect password'],
+            },
+          });
+          socket.emit('commandStep', { reset: true });
+        }
+      });
     });
   });
 

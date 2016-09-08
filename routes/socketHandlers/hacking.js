@@ -81,8 +81,7 @@ function setResetInterval() {
                 boost: newSignalValue,
                 key: 'hemligt',
               },
-              callback: (response) => {
-                console.log(response);
+              callback: () => {
               },
             });
           });
@@ -156,12 +155,6 @@ function updateSignalValue(stationId, boostingSignal) {
         ceilSignalValue = maxValue;
       } else if (ceilSignalValue < minValue) {
         ceilSignalValue = minValue;
-      } else if (ceilSignalValue === signalDefault) {
-        if (boostingSignal) {
-          ceilSignalValue = maxValue;
-        } else {
-          ceilSignalValue = minValue;
-        }
       }
 
       dbStation.updateSignalValue(stationId, ceilSignalValue, (updateErr) => {
@@ -189,10 +182,10 @@ function updateSignalValue(stationId, boostingSignal) {
     if (boostingSignal && signalValue < signalDefault) {
       signalChange = signalMaxChange;
     } else if (!boostingSignal && signalValue > signalDefault) {
-      signalChange = -Math.abs(signalMaxChange);
+      signalChange = signalMaxChange;
     }
 
-    setNewValue(signalValue + signalChange);
+    setNewValue(signalValue + (boostingSignal ? signalChange : -Math.abs(signalChange)));
   });
 }
 
@@ -450,10 +443,10 @@ function handle(socket) {
 
   socket.on('getActiveStations', () => {
     retrieveStationStats((stations) => {
-      const activeStations = stations ? stations.map(station => station.active === true) : [];
+      const activeStations = stations ? stations.filter(station => station.active === true) : [];
 
       if (activeStations.length > 0) {
-        socket.emit('commandSuccess', { newData: { activeStations } });
+        socket.emit('commandSuccess', { newData: { stations: activeStations } });
       } else {
         messenger.sendSelfMsg({
           socket,

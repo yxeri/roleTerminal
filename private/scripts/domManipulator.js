@@ -444,7 +444,7 @@ function createListItem(text, style) {
   return listItem;
 }
 
-function setStationStats(stations, teams) {
+function setStationStats(stations, teams, currentRound, futureRounds, now) {
   const stationList = document.createElement('UL');
   const teamList = document.createElement('UL');
   const stationKeys = Object.keys(stations);
@@ -453,6 +453,10 @@ function setStationStats(stations, teams) {
   stationList.appendChild(createListItem('-LANTERNs-'));
 
   if (stationKeys.length > 0) {
+    const time = textTools.generateTimeStamp(new Date(currentRound.endtime) - new Date(now), false, false, -1);
+
+    stationList.appendChild(createListItem(`Time left: ${time}`));
+
     for (let i = 0; i < stationKeys.length; i++) {
       const stationId = stationKeys[i];
       const station = stations[stationId];
@@ -467,6 +471,12 @@ function setStationStats(stations, teams) {
       }
     }
   } else {
+    if (futureRounds && futureRounds[0]) {
+      const time = textTools.generateTimeStamp(new Date(futureRounds[0].endtime) - new Date(now), false, false, -1);
+
+      stationList.appendChild(createListItem(`Next com-win in: ${time}`));
+    }
+
     stationList.appendChild(createListItem('No active LANTERNs'));
   }
 
@@ -476,8 +486,7 @@ function setStationStats(stations, teams) {
     const teamName = teamKeys[i];
     const score = teams[teamName];
 
-    teamList.appendChild(createListItem(`${teamName}>>`));
-    teamList.appendChild(createListItem(`Signal: ${score}`, 'indent'));
+    teamList.appendChild(createListItem(`${teamName}>> ${score}`));
   }
 
   if (stationStats.firstChild !== null) {

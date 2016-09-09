@@ -535,22 +535,4 @@ commands.updatedevice = {
   commandName: 'updatedevice',
 };
 
-commands.creategameuser = {
-  func: (phrases) => {
-    if (phrases.length > 1) {
-      const userName = phrases[0];
-      const password = phrases[1];
-
-      socketHandler.emit('createGameUser', { userName, password });
-    } else {
-      messenger.queueMessage({
-        text: ['Incorrect usager. You have to input user name and password. Example: creategameuser user1 banana'],
-      });
-    }
-  },
-  accessLevel: 13,
-  category: 'admin',
-  commandName: 'creategameuser',
-};
-
 module.exports = commands;

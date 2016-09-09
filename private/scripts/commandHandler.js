@@ -11,7 +11,6 @@ const socketHandler = require('./socketHandler');
  * @type {Object[]}
  */
 const commandCollections = [
-  require('./cmdsAdmin'),
   require('./cmdsChat'),
   require('./cmdsInfo'),
   require('./cmdsLocal'),

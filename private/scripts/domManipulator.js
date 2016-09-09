@@ -453,10 +453,14 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
   stationList.appendChild(createListItem('-LANTERNs-'));
 
   if (stationKeys.length > 0) {
-    if (currentRound) {
+    if (currentRound && currentRound.endtime) {
       const time = textTools.generateTimeStamp(new Date(currentRound.endtime) - new Date(now), false, false, -1);
 
       stationList.appendChild(createListItem(`Time left: ${time}`));
+    } else if (futureRounds && futureRounds[0] && futureRounds[0].endtime) {
+      const time = textTools.generateTimeStamp(new Date(futureRounds[0].endtime) - new Date(now), false, false, -1);
+
+      stationList.appendChild(createListItem(`Next com-win in: ${time}`));
     }
 
     for (let i = 0; i < stationKeys.length; i++) {
@@ -472,14 +476,6 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
         stationList.appendChild(createListItem('INACTIVE', 'indent'));
       }
     }
-  } else {
-    if (futureRounds && futureRounds[0]) {
-      const time = textTools.generateTimeStamp(new Date(futureRounds[0].endtime) - new Date(now), false, false, -1);
-
-      stationList.appendChild(createListItem(`Next com-win in: ${time}`));
-    }
-
-    stationList.appendChild(createListItem('No active LANTERNs'));
   }
 
   teamList.appendChild(createListItem('-Wreckers-'));

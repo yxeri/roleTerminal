@@ -461,21 +461,30 @@ function handle(socket, io) {
       return;
     }
 
+
     manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
-      } else if (params.room && Object.keys(socket.rooms).indexOf(params.room.roomName) < 0) {
+      }
+
+      const sentRoom = params.room;
+
+      if (sentRoom && user.team && sentRoom.roomName === 'team') {
+        sentRoom.roomName = user.team + appConfig.teamAppend;
+      }
+
+      if (sentRoom && Object.keys(socket.rooms).indexOf(sentRoom.roomName) < 0) {
         logger.sendSocketErrorMsg({
           socket,
           code: logger.ErrorCodes.general,
-          text: [`${user.userName} is not following room ${params.room.roomName}. Unable to retrieve history`],
-          text_se: [`${user.userName} följer inte rummet ${params.room.roomName}. Misslyckades med hämtningen av historik`],
+          text: [`${user.userName} is not following room ${sentRoom.roomName}. Unable to retrieve history`],
+          text_se: [`${user.userName} följer inte rummet ${sentRoom.roomName}. Misslyckades med hämtningen av historik`],
         });
 
         return;
       }
 
-      const allRooms = params.room ? [params.room.roomName] : Object.keys(socket.rooms);
+      const allRooms = sentRoom ? [sentRoom.roomName] : Object.keys(socket.rooms);
       const startDate = params.startDate || new Date();
 
       manager.getHistory(allRooms, params.lines, false, startDate, (histErr, historyMessages) => {

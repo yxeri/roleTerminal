@@ -457,8 +457,8 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
       const time = textTools.generateTimeStamp(new Date(currentRound.endtime) - new Date(now), false, false, -1);
 
       stationList.appendChild(createListItem(`Time left: ${time}`));
-    } else if (futureRounds && futureRounds[0] && futureRounds[0].endtime) {
-      const time = textTools.generateTimeStamp(new Date(futureRounds[0].endtime) - new Date(now), false, false, -1);
+    } else if (futureRounds && futureRounds[0] && futureRounds[0].starttime) {
+      const time = textTools.generateTimeStamp(new Date(futureRounds[0].starttime) - new Date(now), false, false, -1);
 
       stationList.appendChild(createListItem(`Next com-win in: ${time}`));
     }

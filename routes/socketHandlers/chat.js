@@ -321,11 +321,10 @@ function handle(socket, io) {
             roomNames.push(rooms[i].roomName);
           }
 
-          messenger.sendList({
+          messenger.sendSelfMsg({
             socket,
-            itemList: {
-              listTitle: 'List rooms',
-              itemList: roomNames,
+            message: {
+              text: ['Rooms:', roomNames.join(' - ')],
             },
           });
         }
@@ -366,18 +365,22 @@ function handle(socket, io) {
             }
           }
 
-          messenger.sendList({
+          messenger.sendSelfMsg({
             socket,
-            itemList: {
-              listTitle: 'Online users',
-              itemList: onlineUsers,
+            message: {
+              text: [
+                'Online users:',
+                onlineUsers.join(' - '),
+              ],
             },
           });
-          messenger.sendList({
+          messenger.sendSelfMsg({
             socket,
-            itemList: {
-              listTitle: 'Other users',
-              itemList: offlineUsers,
+            message: {
+              text: [
+                'Other users:',
+                offlineUsers.join(' - '),
+              ],
             },
           });
         }
@@ -411,11 +414,13 @@ function handle(socket, io) {
         }
       }
 
-      messenger.sendList({
+      messenger.sendSelfMsg({
         socket,
-        itemList: {
-          listTitle: 'My rooms',
-          itemList: rooms,
+        message: {
+          text: [
+            'My rooms:',
+            rooms.join(' - '),
+          ],
         },
       });
 
@@ -437,11 +442,13 @@ function handle(socket, io) {
             roomNames.push(ownedRooms[i].roomName);
           }
 
-          messenger.sendList({
+          messenger.sendSelfMsg({
             socket,
-            itemList: {
-              listTitle: 'You are owner of the rooms:',
-              itemList: roomNames,
+            message: {
+              text: [
+                'You are the owner of:',
+                roomNames.join(' - '),
+              ],
             },
           });
         }

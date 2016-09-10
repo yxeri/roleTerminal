@@ -193,7 +193,7 @@ commands.hacklantern = {
       for (let i = 0; i < 2; i++) {
         codeColumns.push(textTools.createMixedArray({
           amount: 23,
-          length: 28,
+          length: 27,
           upperCase: false,
           codeMode: true,
           requiredStrings: passwords[i],

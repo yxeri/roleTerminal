@@ -258,4 +258,6 @@ config.defaultInputStart = process.env.DEFAULTINPUTSTART || modifiedConfig.defau
 
 config.signalResetInterval = process.env.SIGNALRESETINTERVAL || modifiedConfig.signalResetInterval || 0;
 
+config.welcomeMessage = process.env.WELCOMEMESSAGE || modifiedConfig.welcomeMessage;
+
 module.exports = config;

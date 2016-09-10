@@ -162,6 +162,7 @@ function handle(socket, io) {
       socket.emit('reconnectSuccess', {
         anonUser: true,
         firstConnection: params.firstConnection,
+        welcomeMessage: appConfig.welcomeMessage,
       });
     } else {
       manager.updateUserSocketId(socket.id, params.user.userName, (idErr, user) => {
@@ -180,6 +181,7 @@ function handle(socket, io) {
         socket.emit('reconnectSuccess', {
           firstConnection: params.firstConnection,
           user,
+          welcomeMessage: appConfig.welcomeMessage,
         });
         manager.getHistory(allRooms, Infinity, true, user.lastOnline, (histErr, missedMessages) => {
           if (histErr) {

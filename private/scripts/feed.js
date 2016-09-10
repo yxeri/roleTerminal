@@ -1322,7 +1322,7 @@ function onCommandStep(params) {
   commandHandler.triggerCommandStep(params);
 }
 
-function onReconnectSuccess(data) {
+function onReconnectSuccess(data = {}) {
   if (!data.anonUser) {
     const mode = data.user.mode || 'cmd';
     const room = storage.getRoom();
@@ -1364,6 +1364,12 @@ function onReconnectSuccess(data) {
   }
 
   socketHandler.setReconnecting(false);
+
+  if (data.welcomeMessage) {
+    messenger.queueMessage({
+      text: ['!!!!!', data.welcomeMessage, '!!!!!'],
+    });
+  }
 }
 
 function onDisconnectUser() {

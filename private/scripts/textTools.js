@@ -33,7 +33,7 @@ const binary = '01';
  * @private
  * @type {Number}
  */
-const lineLength = 28;
+const lineLength = 27;
 
 /**
  * Beautifies number by adding a 0 before the number if it is lower than 10

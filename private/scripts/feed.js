@@ -30,7 +30,7 @@ const watchPositionTime = 15000;
  * Get GPS coordinates every * milliseconds
  * @type {Number}
  */
-const pausePositionTime = 40000;
+const pausePositionTime = 20000;
 /**
  * Queue of all sounds to be consumed and played
  * @type {Object[]}

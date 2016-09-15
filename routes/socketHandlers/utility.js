@@ -173,6 +173,16 @@ function handle(socket) {
       });
     });
   });
+
+  socket.on('rebootAll', () => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.rebootall.commandName, (allowErr, allowed) => {
+      if (allowErr || !allowed) {
+        return;
+      }
+
+      socket.broadcast.emit('reboot');
+    });
+  });
 }
 
 exports.handle = handle;

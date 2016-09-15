@@ -506,6 +506,15 @@ commands.updateroom = {
   commandName: 'updateroom',
 };
 
+commands.rebootall = {
+  func: () => {
+    socketHandler.emit('rebootAll');
+  },
+  accessLevel: 13,
+  category: 'admin',
+  commandName: 'rebootall',
+}
+
 commands.updatedevice = {
   func: (phrases) => {
     const data = { device: {} };

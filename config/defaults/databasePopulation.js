@@ -431,6 +431,12 @@ config.commands = {
     visibility: config.accessLevels.admin,
     category: 'basic',
   },
+  rebootall: modifiedDatabasePop.commands.rebootall || {
+    commandName: 'rebootall',
+    accessLevel: config.accessLevels.admin,
+    visibility: config.accessLevels.admin,
+    category: 'admin',
+  },
 };
 
 module.exports = config;

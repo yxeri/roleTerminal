@@ -138,32 +138,30 @@ commands.creategameword = {
 
 commands.lantern = {
   func: (phrases = []) => {
-    if (phrases.length > 0) {
-      switch (phrases[0]) {
-        case 'on': {
-          socketHandler.emit('getStationStats');
-          domManipulator.toggleStationStats(true);
+    switch (phrases[0]) {
+      case 'on': {
+        socketHandler.emit('getStationStats');
+        domManipulator.toggleStationStats(true);
 
-          if (statsTimeout !== null) {
-            clearInterval(statsTimeout);
-          }
-
-          statsTimeout = setTimeout(getStats, statsTimeoutTime);
-
-          break;
-        }
-        case 'off': {
-          domManipulator.toggleStationStats(false);
+        if (statsTimeout !== null) {
           clearInterval(statsTimeout);
-          statsTimeout = null;
-
-          break;
         }
-        default: {
-          messenger.queueMessage({ text: ['Incorrect option. Available options are: on, off'] });
 
-          break;
-        }
+        statsTimeout = setTimeout(getStats, statsTimeoutTime);
+
+        break;
+      }
+      case 'off': {
+        domManipulator.toggleStationStats(false);
+        clearInterval(statsTimeout);
+        statsTimeout = null;
+
+        break;
+      }
+      default: {
+        messenger.queueMessage({ text: ['Incorrect option. Available options are: on, off'] });
+
+        break;
       }
     }
   },

@@ -82,6 +82,7 @@ const all = {
       'verifyuser without any additional input will show a list of all unverified users. Exempel: verifyuser',
       'Use "*" to verify all users',
     ],
+    lantern: ['Shows latest LANTERN status'],
     banuser: [
       'Bans a user and disconnects it from the system',
       'The user will not be able to log on again',
@@ -338,6 +339,13 @@ const all = {
     ],
   },
   instructions: {
+    lantern: [
+      usageLine,
+      'lantern *option*',
+      exampleLine,
+      'lantern on',
+      'lantern off',
+    ],
     archives: [
       usageLine,
       'archives *ID*',

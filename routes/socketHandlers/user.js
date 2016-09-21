@@ -841,11 +841,10 @@ function handle(socket, io) {
         if (itemList.length === 1) {
           socket.emit('matchFound', { matchedName: itemList[0] });
         } else {
-          socket.emit('list', {
-            itemList: {
-              itemList,
-              keepInput: false,
-              replacePhrase: true,
+          messenger.sendSelfMsg({
+            socket,
+            message: {
+              text: [itemList.join(' - ')],
             },
           });
         }

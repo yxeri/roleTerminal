@@ -276,6 +276,23 @@ function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
 }
 
+function getStaticPosition() {
+  return {
+    longitude: parseFloat(getLocalVal('staticLong')),
+    latitude: parseFloat(getLocalVal('staticLat')),
+  };
+}
+
+function setStaticPosition(lat, long) {
+  setLocalVal('staticLong', long);
+  setLocalVal('staticLat', lat);
+}
+
+function removeStaticPosition() {
+  localStorage.removeItem('staticLong');
+  localStorage.removeItem('staticLat');
+}
+
 /**
  * @static
  * @param {boolean} forceFullscreen - Should fullscreen be forced?
@@ -606,3 +623,6 @@ exports.getDefaultZoomLevel = getDefaultZoomLevel;
 exports.setRadioChannels = setRadioChannels;
 exports.getRadioChannels = getRadioChannels;
 exports.getDefaultInputStart = getDefaultInputStart;
+exports.getStaticPosition = getStaticPosition;
+exports.setStaticPosition = setStaticPosition;
+exports.removeStaticPosition = removeStaticPosition;

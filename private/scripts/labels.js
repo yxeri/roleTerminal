@@ -165,10 +165,9 @@ const all = {
     ],
     settings: [
       'Local settings for the terminal',
-      'This should only be used on off-game terminals',
       'It might change behaviour and looks that will make the terminal look more off-game',
       'Available settings:',
-      'fastmode - removes flavour text and speeds up print',
+      'staticposition - Sets a static position. Usage: settings staticposition *latitude* *longitude* Example: settings staticposition 59.005 18.004',
     ],
     radio: [
       'Listen in on a radio transmission',
@@ -973,6 +972,8 @@ const all = {
     hiddenCursorOff: ['Mouse cursor is now visible'],
     hiddenMenuOn: ['Menu is now hidden'],
     hiddenMenuOff: ['Menu is now visible'],
+    staticPositionOn: ['Static position has been set'],
+    staticPositionOff: ['Static position has been removed'],
     youHaveBeenBanned: [
       'You have been banned from the system',
       'Contact your nearest Organica IT Support Center for re-education',

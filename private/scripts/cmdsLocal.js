@@ -220,10 +220,13 @@ commands.settings = {
           break;
         }
         case 'staticposition': {
-          if (value && phrases.length > 3) {
+          if (phrases.length > 2) {
+            storage.setStaticPosition(phrases[1], phrases[2]);
             messenger.queueMessage({ text: labels.getText('info', 'staticPositionOn') });
           } else {
+            storage.removeStaticPosition();
             messenger.queueMessage({ text: labels.getText('info', 'staticPositionOff') });
+            commandHandler.triggerCommand({ cmd: 'reboot' });
           }
 
           break;
@@ -244,7 +247,7 @@ commands.settings = {
     hiddenmenu: { description: 'Hide top menu' },
     hiddencmdinput: { description: 'Hide command input' },
     thinnerview: { description: 'Add margin to window' },
-    staticposition: { description: 'Add static GPS coordinates' },
+    staticposition: { description: 'Add static GPS coordinates (lat, long)' },
   },
   accessLevel: 1,
   visibility: 13,

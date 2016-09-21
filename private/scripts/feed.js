@@ -147,7 +147,7 @@ function playMorse(morseCode, silent) {
       duration = 150;
       shouldPlay = true;
     } else if (morseSeparator === code) {
-      duration = 50;
+      duration = 200;
     } else {
       duration = 75;
     }

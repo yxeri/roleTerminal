@@ -1,6 +1,6 @@
 /** @module */
 
-const messenger = require('./messenger');
+require('./messenger');
 
 /**
  * @static

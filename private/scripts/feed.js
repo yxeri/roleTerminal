@@ -188,19 +188,38 @@ function retrievePosition() {
     trackingTimeout = setTimeout(sendLocation, pausePositionTime); // eslint-disable-line no-use-before-define
   };
 
-  watchId = navigator.geolocation.watchPosition((position) => {
-    if (position !== undefined) {
-      isTracking = true;
-      positions.push(position);
+  const staticPosition = storage.getStaticPosition();
 
-      mapTools.setUserPosition({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    }
-  }, (err) => {
-    console.log(err);
-  }, { enableHighAccuracy: true });
+  if (staticPosition && staticPosition.latitude && staticPosition.longitude) {
+    isTracking = true;
+
+    positions.push({
+      coords: {
+        latitude: staticPosition.latitude,
+        longitude: staticPosition.longitude,
+        accuracy: 100,
+      },
+      timestamp: new Date(),
+    });
+    mapTools.setUserPosition({
+      latitude: staticPosition.latitude,
+      longitude: staticPosition.longitude,
+    });
+  } else {
+    watchId = navigator.geolocation.watchPosition((position) => {
+      if (position !== undefined) {
+        isTracking = true;
+        positions.push(position);
+
+        mapTools.setUserPosition({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      }
+    }, (err) => {
+      console.log(err);
+    }, { enableHighAccuracy: true });
+  }
 
   if (isTracking) {
     trackingTimeout = setTimeout(clearingWatch, watchPositionTime);

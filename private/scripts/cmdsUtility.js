@@ -513,7 +513,7 @@ commands.rebootall = {
   accessLevel: 13,
   category: 'admin',
   commandName: 'rebootall',
-}
+};
 
 commands.updatedevice = {
   func: (phrases) => {

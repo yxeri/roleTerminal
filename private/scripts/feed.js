@@ -870,11 +870,22 @@ function specialKeyPress(event) {
 
         break;
       }
-      case 102: {
+      case 68: { // d
+        if (triggerKeysPressed.ctrl) {
+          commandHandler.triggerCommand({ cmd: 'logout' });
+          event.preventDefault();
+        } else {
+          defaultKeyPress(textChar, event);
+        }
+
+        break;
+      }
+      case 85: { // u
         if (triggerKeysPressed.ctrl) {
           goFullScreen(document.documentElement);
           fullscreenResize(false);
           event.preventDefault();
+          domManipulator.scrollView();
         } else {
           defaultKeyPress(textChar, event);
         }

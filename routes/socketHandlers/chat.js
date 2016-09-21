@@ -469,19 +469,23 @@ function handle(socket, io) {
 
       const sentRoom = params.room;
 
-      if (sentRoom && user.team && sentRoom.roomName === 'team') {
-        sentRoom.roomName = user.team + appConfig.teamAppend;
-      }
+      if (sentRoom) {
+        if (user.team && sentRoom.roomName === 'team') {
+          sentRoom.roomName = user.team + appConfig.teamAppend;
+        } else if (sentRoom.roomName === 'whisper') {
+          sentRoom.roomName = user.userName + appConfig.whisperAppend;
+        }
 
-      if (sentRoom && Object.keys(socket.rooms).indexOf(sentRoom.roomName) < 0) {
-        logger.sendSocketErrorMsg({
-          socket,
-          code: logger.ErrorCodes.general,
-          text: [`${user.userName} is not following room ${sentRoom.roomName}. Unable to retrieve history`],
-          text_se: [`${user.userName} följer inte rummet ${sentRoom.roomName}. Misslyckades med hämtningen av historik`],
-        });
+        if (Object.keys(socket.rooms).indexOf(sentRoom.roomName) < 0) {
+          logger.sendSocketErrorMsg({
+            socket,
+            code: logger.ErrorCodes.general,
+            text: [`${user.userName} is not following room ${sentRoom.roomName}. Unable to retrieve history`],
+            text_se: [`${user.userName} följer inte rummet ${sentRoom.roomName}. Misslyckades med hämtningen av historik`],
+          });
 
-        return;
+          return;
+        }
       }
 
       const allRooms = sentRoom ? [sentRoom.roomName] : Object.keys(socket.rooms);

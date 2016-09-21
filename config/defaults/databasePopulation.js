@@ -102,6 +102,17 @@ config.rooms = {
     accessLevel: config.accessLevels.superUser,
     password: generatePass(),
   },
+
+  /**
+   * Blocking name for users
+   * Not used as an ordinary chat room
+   */
+  whisper: {
+    roomName: 'whisper',
+    visibility: config.accessLevels.superUser,
+    accessLevel: config.accessLevels.superUser,
+    password: generatePass(),
+  },
 };
 
 /**

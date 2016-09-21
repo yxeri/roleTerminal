@@ -9,51 +9,6 @@ const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 
 /**
- * Symbolizes space between words in morse string
- * @private
- * @type {string}
- */
-const morseSeparator = '#';
-const morseCodes = {
-  a: '.-',
-  b: '-...',
-  c: '-.-.',
-  d: '-..',
-  e: '.',
-  f: '..-.',
-  g: '--.',
-  h: '....',
-  i: '..',
-  j: '.---',
-  k: '-.-',
-  l: '.-..',
-  m: '--',
-  n: '-.',
-  o: '---',
-  p: '.--.',
-  q: '--.-',
-  r: '.-.',
-  s: '...',
-  t: '-',
-  u: '..-',
-  v: '...-',
-  w: '.--',
-  x: '-..-',
-  y: '-.--',
-  z: '--..',
-  1: '.----',
-  2: '..---',
-  3: '...--',
-  4: '....-',
-  5: '.....',
-  6: '-....',
-  7: '--...',
-  8: '---..',
-  9: '----.',
-  0: '-----',
-  '#': morseSeparator,
-};
-/**
  * @static
  * @type {Object}
  */
@@ -67,35 +22,6 @@ const commands = {};
  */
 function copyString(text) {
   return text && text !== null ? JSON.parse(JSON.stringify(text)) : '';
-}
-
-/**
- * Parses the text that will be sent as morse and returns the parsed morse text
- * @private
- * @param {string} text - Text to be sent as morse
- * @returns {string} - Parsed morse text
- */
-function parseMorse(text) {
-  let morseCode;
-  let morseCodeText = '';
-  let filteredText = text.toLowerCase();
-
-  filteredText = filteredText.replace(/[åä]/g, 'a');
-  filteredText = filteredText.replace(/[ö]/g, 'o');
-  filteredText = filteredText.replace(/\s/g, '#');
-  filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
-
-  for (let i = 0; i < filteredText.length; i++) {
-    morseCode = morseCodes[filteredText.charAt(i)];
-
-    for (let j = 0; j < morseCode.length; j++) {
-      morseCodeText += `${morseCode[j]} `;
-    }
-
-    morseCodeText += '   ';
-  }
-
-  return morseCodeText;
 }
 
 commands.history = {
@@ -138,7 +64,7 @@ commands.morse = {
         }
       }
 
-      const morseCodeText = parseMorse(morsePhrases.join(' ').toLowerCase());
+      const morseCodeText = morsePhrases.join(' ').toLowerCase();
 
       if (morseCodeText.length > 0) {
         data.morseCode = morseCodeText;
@@ -350,7 +276,7 @@ commands.importantmsg = {
 
         if (phrases[0].toLowerCase() === 'yes') {
           commandHelper.data.morse = {
-            morseCode: parseMorse(commandHelper.data.message.text[0]),
+            morseCode: commandHelper.data.message.text[0],
             local: true,
           };
         }

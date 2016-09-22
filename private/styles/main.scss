@@ -33,7 +33,7 @@ body {
   background-color: $back-color;
   color: $text-color;
   // text-shadow: 1px 1px 2px $shadow-color;
-  font-family: GlassTTYVT220;
+  font-family: GlassTTYVT220 monospace;
   font-size: 1.3em;
   // letter-spacing: .05em;
   -webkit-text-size-adjust: 100%;
@@ -204,10 +204,7 @@ textarea {
   text-align: left;
 
   ul {
-    padding-top: .2em;
-    padding-bottom: .2em;
-    padding-left: .3em;
-    padding-right: .3em;
+    padding: .2em .3em;
     float: right;
     border-bottom: 2px solid;
     border-left: 2px solid;

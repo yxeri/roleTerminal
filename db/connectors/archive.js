@@ -12,6 +12,12 @@ const archiveSchema = new mongoose.Schema({
 
 const Archive = mongoose.model('Archive', archiveSchema);
 
+/**
+ * Get archive by archive ID and user access level
+ * @param {string} archiveId - ID of archive
+ * @param {number} accessLevel - User access level
+ * @param {Function} callback - Callback
+ */
 function getArchive(archiveId, accessLevel, callback) {
   const query = {
     $and: [
@@ -33,6 +39,11 @@ function getArchive(archiveId, accessLevel, callback) {
   });
 }
 
+/**
+ * Get all archives based on user access level
+ * @param {number} accessLevel - User access level
+ * @param {Function} callback - Callback
+ */
 function getArchives(accessLevel, callback) {
   const query = { accessLevel: { $lte: accessLevel } };
 
@@ -49,6 +60,11 @@ function getArchives(accessLevel, callback) {
   });
 }
 
+/**
+ * Get list of archives, based on user access level and if archive is public
+ * @param {number} accessLevel - User access level
+ * @param {Function} callback - Callback
+ */
 function getArchivesList(accessLevel, callback) {
   const query = {
     $and: [

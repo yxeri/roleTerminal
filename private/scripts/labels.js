@@ -1237,7 +1237,7 @@ function getLabel(sentCategory, value, language) {
  * Returns a single string
  * @param {string} sentCategory - Category name
  * @param {string} value - Property name
- * @param {string} language - Language code
+ * @param {string} [language] - Language code
  * @returns {string} - String
  */
 function getString(sentCategory, value, language) {
@@ -1250,7 +1250,7 @@ function getString(sentCategory, value, language) {
  * Returns an array with strings. The strings are meant to be printed in order
  * @param {string} sentCategory - Category name
  * @param {string} value - Property name
- * @param {string} language - Language code
+ * @param {string} [language] - Language code
  * @returns {string[]} - Array with strings
  */
 function getText(sentCategory, value, language) {
@@ -1263,7 +1263,7 @@ function getText(sentCategory, value, language) {
  * Returns a message
  * @param {string} sentCategory - Category name
  * @param {string} value - Property name
- * @param {string} language - Language code
+ * @param {string} [language] - Language code
  * @returns {{text: string[]}} - Message object with text array
  */
 function getMessage(sentCategory, value, language) {

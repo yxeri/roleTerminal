@@ -276,6 +276,11 @@ function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
 }
 
+/**
+ * Returns longitude and latitude
+ * @static
+ * @returns {Object} Object with longitude and latitude
+ */
 function getStaticPosition() {
   return {
     longitude: parseFloat(getLocalVal('staticLong')),
@@ -283,11 +288,20 @@ function getStaticPosition() {
   };
 }
 
+/**
+ * Set longitude and latitude
+ * @static
+ * @param {number} lat - Latitude
+ * @param {number} long - Longitude
+ */
 function setStaticPosition(lat, long) {
   setLocalVal('staticLong', long);
   setLocalVal('staticLat', lat);
 }
 
+/**
+ * Remove longitude and latitude from localStorage
+ */
 function removeStaticPosition() {
   localStorage.removeItem('staticLong');
   localStorage.removeItem('staticLat');

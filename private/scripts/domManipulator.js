@@ -112,6 +112,13 @@ function updateThisCommandItem() {
   }
 }
 
+/**
+ * Is the element inside the view or close to the end of the view?
+ * @static
+ * @param {HTMLElement} element - The element that will be checked
+ * @param {number} [newElementHeight] - Value will be added to check if an element is close to the edge
+ * @returns {boolean} - Is the element in view or close to the edge?
+ */
 function isCloseToScreen(element, newElementHeight) {
   const elementTop = element.getBoundingClientRect().top;
 
@@ -128,6 +135,8 @@ function flashMenu() {
 
 /**
  * Scrolls the list view to the bottom
+ * @static
+ * @param {number} [newElementHeight] - Height of the new element
  */
 function scrollView(newElementHeight) {
   if (isCloseToScreen(cmdInput, newElementHeight)) {
@@ -413,6 +422,9 @@ function resizeCallback() {
   }
 }
 
+/**
+ * @static
+ */
 function toggleLantern() {
   lanternOn = !lanternOn;
 
@@ -423,6 +435,11 @@ function toggleLantern() {
   }
 }
 
+/**
+ * Reveal or hide the stats container
+ * @static
+ * @param {boolean} show - Should the stats container be shown?
+ */
 function toggleStationStats(show) {
   if (show) {
     lanternOn = true;
@@ -433,6 +450,12 @@ function toggleStationStats(show) {
   }
 }
 
+/**
+ * Returns a list item containing a text node and with an optional class
+ * @param {string} text - Text to be added to the list item
+ * @param {string} [style] - Class name to be added to the list item
+ * @returns {HTMLElement} List item containing a text node and with an optional class
+ */
 function createListItem(text, style) {
   const listItem = document.createElement('LI');
   listItem.appendChild(document.createTextNode(text));
@@ -444,6 +467,14 @@ function createListItem(text, style) {
   return listItem;
 }
 
+/**
+ * Creates lists for station and team stats
+ * @param {Object} stations - Station IDs and current status
+ * @param {Object} teams - Team names and total score
+ * @param {Object} currentRound - Start and end time for current round
+ * @param {Object} futureRounds - Start times for future rounds, if any
+ * @param {Date} now - Current time
+ */
 function setStationStats(stations, teams, currentRound, futureRounds, now) {
   const stationList = document.createElement('UL');
   const teamList = document.createElement('UL');

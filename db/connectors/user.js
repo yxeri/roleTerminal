@@ -202,7 +202,9 @@ function verifyAllUsers(callback) {
 }
 
 /**
- * @param {Object} sentUser
+ * Gets all user
+ * @param {Object} sentUser - User that is checking for all users
+ * @param {Function} callback - Function to be called on completion
  */
 function getAllUsers(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };

@@ -60,7 +60,7 @@ function transformView() {
  * Splits or collapses view. A div will be added (or removed) that takes up 50% of the view
  * @param {boolean} shouldSplit - Should the view split? No means it should collapses
  * @param {HTMLElement} secondDiv - Side div that should be added to the view
- * @param {function} resizeCallback - Function to call when the view changes size
+ * @param {Function} resizeCallback - Function to call when the view changes size
  */
 function splitView(shouldSplit, secondDiv, resizeCallback) {
   const mainView = domManipulator.getMainView();

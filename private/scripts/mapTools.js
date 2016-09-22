@@ -145,10 +145,12 @@ function createMarker(params) {
  * @static
  * @param {Object} params - Parameters
  * @param {string} params.positionName - Name of the map marker
- * @param {{latitude: Number, longitude: Number}} params.position - Lat and long coordinates for the map marker
- * @param {boolean} params.hideLabel - Should the label be hidden?
- * @param {string} params.iconUrl - Path to custom map marker icon
+ * @param {{latitude: Number, longitude: Number}} params.position - Latitude and longitude coordinates for the map marker
  * @param {string} params.description - Description for map marker, which will be shown on click or command
+ * @param {string} params.markerType - Type of marker
+ * @param {Date} [params.lastUpdated] - Time of last update
+ * @param {boolean} [params.hideLabel] - Should the label be hidden?
+ * @param {string} [params.iconUrl] - Path to custom map marker icon
  */
 function setMarkerPosition(params) {
   const positionName = params.positionName;

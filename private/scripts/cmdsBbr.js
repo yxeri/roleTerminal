@@ -56,6 +56,10 @@ function humanReadableHints(hints) {
   return modifiedHints;
 }
 
+/**
+ * Emits getStationStats to retrieve gameplay stats and sets a timeout to repeat the emit
+ * @static
+ */
 function getStats() {
   socketHandler.emit('getStationStats');
   statsTimeout = setTimeout(getStats, statsTimeoutTime);

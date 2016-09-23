@@ -3,10 +3,18 @@
 const appConfig = require('./appConfig');
 const databasePop = require('./databasePopulation');
 
+/**
+ * Sets configuration
+ * @param {Object} config - Configuration
+ */
 function setConfig(config) {
   require('./../modified/config').setConfig(config);
 }
 
+/**
+ * Sets database defaults
+ * @param {Object} databasePopulation - Database defaults
+ */
 function setDatabasePopulation(databasePopulation) {
   require('./../modified/databasePopulation').setDatabasePopulation(databasePopulation);
 }

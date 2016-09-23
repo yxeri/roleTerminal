@@ -18,12 +18,6 @@ mongoose.connect(dbPath, (err) => {
   }
 });
 
-const scheduledEventSchema = new mongoose.Schema({
-  receiverName: String,
-  func: {},
-  createdAt: Date,
-  endAt: Date,
-}, { collection: 'events' });
 const teamSchema = new mongoose.Schema({
   teamName: String,
   owner: String,
@@ -58,13 +52,18 @@ const gamePasswordSchema = new mongoose.Schema({
   password: { type: String, unique: true },
 }, { collection: 'gamePasswords' });
 
-const ScheduledEvent = mongoose.model('ScheduledEvent', scheduledEventSchema);
 const Team = mongoose.model('Team', teamSchema);
 const Weather = mongoose.model('Weather', weatherSchema);
 const InvitationList = mongoose.model('InvitationList', invitationListSchema);
 const GameUser = mongoose.model('GameUser', gameUserSchema);
 const GamePassword = mongoose.model('GamePassword', gamePasswordSchema);
 
+/**
+ * Saves object to database
+ * @param {Object} object - Object to save
+ * @param {string} objectName - Object type name
+ * @param {Function} callback - Callback
+ */
 function saveObject(object, objectName, callback) {
   object.save((saveErr, savedObj) => {
     if (saveErr) {
@@ -79,6 +78,13 @@ function saveObject(object, objectName, callback) {
   });
 }
 
+/**
+ * Verifies object
+ * @param {Object} query - Search query
+ * @param {Object} object - Type of object that will be modified
+ * @param {string} objectName - Object type name
+ * @param {Function} callback - Callback
+ */
 function verifyObject(query, object, objectName, callback) {
   const update = { $set: { verified: true } };
 
@@ -95,6 +101,13 @@ function verifyObject(query, object, objectName, callback) {
   });
 }
 
+/**
+ * Verifies all object
+ * @param {Object} query - Search query
+ * @param {Object} object - Type of object that will be modified
+ * @param {string} objectName - Object type name
+ * @param {Function} callback - Callback
+ */
 function verifyAllObjects(query, object, objectName, callback) {
   const update = { $set: { verified: true } };
   const options = { multi: true };
@@ -112,12 +125,22 @@ function verifyAllObjects(query, object, objectName, callback) {
   });
 }
 
+/**
+ * Creates and saves weather report to db
+ * @param {Object} sentWeather - Weather report
+ * @param {Function} callback - Callback
+ */
 function createWeather(sentWeather, callback) {
   const newWeather = new Weather(sentWeather);
 
   saveObject(newWeather, 'weather', callback);
 }
 
+/**
+ * Get weather report based on time
+ * @param {Date} sentTime - Time to retrieve reports from (equal to or greater than)
+ * @param {Function} callback - Callback
+ */
 function getWeather(sentTime, callback) {
   const query = { time: { $gte: sentTime } };
   const filter = { _id: 0 };
@@ -135,6 +158,11 @@ function getWeather(sentTime, callback) {
   });
 }
 
+/**
+ * Create and save game user
+ * @param {Object} gameUser - Game user
+ * @param {Function} callback - Callback
+ */
 function createGameUser(gameUser, callback) {
   const newGameUser = new GameUser(gameUser);
   const query = { userName: gameUser.userName };
@@ -154,6 +182,11 @@ function createGameUser(gameUser, callback) {
   });
 }
 
+/**
+ * Get game user
+ * @param {string} userName - Game user name to retrieve
+ * @param {Function} callback - Callback
+ */
 function getGameUser(userName, callback) {
   const query = { userName };
 
@@ -170,6 +203,10 @@ function getGameUser(userName, callback) {
   });
 }
 
+/**
+ * Get all game users
+ * @param {Function} callback - Callback
+ */
 function getAllGameUsers(callback) {
   GameUser.find().lean().exec((err, gameUsers) => {
     if (err || gameUsers === null) {
@@ -184,6 +221,11 @@ function getAllGameUsers(callback) {
   });
 }
 
+/**
+ * Create and save game password
+ * @param {Object} gamePassword - Game password
+ * @param {Function} callback - Callback
+ */
 function createGamePassword(gamePassword, callback) {
   const newGamePassword = new GamePassword(gamePassword);
   const query = { password: gamePassword.password };
@@ -203,6 +245,10 @@ function createGamePassword(gamePassword, callback) {
   });
 }
 
+/**
+ * Get all game passwords
+ * @param {Function} callback - Callback
+ */
 function getAllGamePasswords(callback) {
   GamePassword.find().lean().exec((err, gamePasswords) => {
     if (err || gamePasswords === null) {
@@ -217,6 +263,11 @@ function getAllGamePasswords(callback) {
   });
 }
 
+/**
+ * Create and save team
+ * @param {Object} team - Team
+ * @param {Function} callback - Callback
+ */
 function createTeam(team, callback) {
   const newTeam = new Team(team);
   const query = { teamName: team.teamName };
@@ -236,6 +287,11 @@ function createTeam(team, callback) {
   });
 }
 
+/**
+ * Get team
+ * @param {string} teamName - Name of team to retrieve
+ * @param {Function} callback - Callback
+ */
 function getTeam(teamName, callback) {
   const query = { teamName };
   const filter = { _id: 0 };
@@ -253,17 +309,31 @@ function getTeam(teamName, callback) {
   });
 }
 
+/**
+ * Verify team
+ * @param {string} teamName - Name of the team that will be verified
+ * @param {Function} callback - Callback
+ */
 function verifyTeam(teamName, callback) {
   const query = { teamName };
   verifyObject(query, Team, 'team', callback);
 }
 
+/**
+ * Verify all teams
+ * @param {Function} callback - Callback
+ */
 function verifyAllTeams(callback) {
   const query = { verified: false };
 
   verifyAllObjects(query, Team, 'teams', callback);
 }
 
+/**
+ * Get invitation list
+ * @param {string} userName - Name of the owner of the list
+ * @param {Function} callback - Callback
+ */
 function getInvitations(userName, callback) {
   const query = { userName };
 
@@ -280,6 +350,12 @@ function getInvitations(userName, callback) {
   });
 }
 
+/**
+ * Add invitation
+ * @param {string} userName - Name of owner
+ * @param {Object} invitation - Invitation
+ * @param {Function} callback - Callback
+ */
 function addInvitationToList(userName, invitation, callback) {
   const query = {
     $and: [
@@ -319,6 +395,13 @@ function addInvitationToList(userName, invitation, callback) {
   });
 }
 
+/**
+ * Remove invitation
+ * @param {string} userName - Name of owner
+ * @param {string} itemName - Name of invitation
+ * @param {string} invitationType - Type of invitation
+ * @param {Function} callback - Callback
+ */
 function removeInvitationFromList(userName, itemName, invitationType, callback) {
   const query = { userName };
   const update = { $pull: { invitations: { itemName, invitationType } } };
@@ -336,6 +419,12 @@ function removeInvitationFromList(userName, itemName, invitationType, callback) 
   });
 }
 
+/**
+ * Remove all invitations of a type
+ * @param {string} userName - Name of owner
+ * @param {string} invitationType - Type of invitation
+ * @param {Function} callback - Callback
+ */
 function removeInvitationTypeFromList(userName, invitationType, callback) {
   const query = { userName };
   const update = { $pull: { invitations: { invitationType } } };
@@ -354,6 +443,10 @@ function removeInvitationTypeFromList(userName, invitationType, callback) {
   });
 }
 
+/**
+ * Get all unverified teams
+ * @param {Function} callback - Callback
+ */
 function getUnverifiedTeams(callback) {
   const query = { verified: false };
   const filter = { _id: 0 };
@@ -372,36 +465,13 @@ function getUnverifiedTeams(callback) {
   });
 }
 
-function createEvent(sentReceiverName, sentEndAt, callback) {
-  const now = new Date();
-  const query = {
-    receiverName: sentReceiverName,
-    createdAt: now,
-    endAt: sentEndAt,
-  };
-  const newEvent = new ScheduledEvent(query);
-
-  saveObject(newEvent, 'event', callback);
-}
-
-function getPassedEvents(callback) {
-  const now = new Date();
-  const query = { endAt: { $lte: now } };
-  const filter = { _id: 0 };
-
-  ScheduledEvent.find(query, filter).lean().exec((err, events) => {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['Failed to trigger events'],
-        err,
-      });
-    }
-
-    callback(err, events);
-  });
-}
-
+/**
+ * Match partial name
+ * @param {Object} params - Parameters
+ * @param {Function} params.callback - Callback
+ * @param {string} params.partialName - Partial name
+ * @param {Function} params.callback - Callback
+ */
 function matchPartial(params) {
   if (!objectValidator.isValidData(params, { filter: true, sort: true, user: true, queryType: true, callback: true })) {
     if (params.callback) {
@@ -437,8 +507,6 @@ function matchPartial(params) {
   });
 }
 
-exports.createEvent = createEvent;
-exports.getPassedEvents = getPassedEvents;
 exports.createTeam = createTeam;
 exports.getTeam = getTeam;
 exports.createWeather = createWeather;
@@ -457,3 +525,5 @@ exports.getAllGamePasswords = getAllGamePasswords;
 exports.getAllGameUsers = getAllGameUsers;
 exports.matchPartial = matchPartial;
 exports.saveObject = saveObject;
+exports.verifyObject = verifyObject;
+exports.verifyAllObjects = verifyAllObjects;

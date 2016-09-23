@@ -16,9 +16,15 @@ const chatHistorySchema = new mongoose.Schema({
 
 const ChatHistory = mongoose.model('ChatHistory', chatHistorySchema);
 
-function addMsgToHistory(sentRoomName, sentMessage, callback) {
-  const query = { roomName: sentRoomName };
-  const update = { $push: { messages: sentMessage } };
+/**
+ * Add message to room history
+ * @param {string} roomName - Name of the room
+ * @param {object} message - Message to add
+ * @param {Function} callback - Callback
+ */
+function addMsgToHistory(roomName, message, callback) {
+  const query = { roomName };
+  const update = { $push: { messages: message } };
   const options = { upsert: true, new: true };
 
   ChatHistory.findOneAndUpdate(query, update, options).lean().exec((err, history) => {
@@ -34,6 +40,11 @@ function addMsgToHistory(sentRoomName, sentMessage, callback) {
   });
 }
 
+/**
+ * Get room history
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
 function getHistoryFromRoom(roomName, callback) {
   const query = { roomName };
   const filter = { 'messages._id': 0, _id: 0 };
@@ -51,6 +62,11 @@ function getHistoryFromRoom(roomName, callback) {
   });
 }
 
+/**
+ * Get room history from multiple rooms
+ * @param {string[]} rooms - Name of the rooms
+ * @param {Function} callback - Callback
+ */
 function getHistoryFromRooms(rooms, callback) {
   const query = { roomName: { $in: rooms } };
   const filter = { 'messages._id': 0, _id: 0 };
@@ -68,6 +84,11 @@ function getHistoryFromRooms(rooms, callback) {
   });
 }
 
+/**
+ * Create and save room history
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
 function createHistory(roomName, callback) {
   const query = { roomName };
 
@@ -98,8 +119,13 @@ function createHistory(roomName, callback) {
   });
 }
 
-function removeHistory(sentRoomName, callback) {
-  ChatHistory.findOneAndRemove({ roomName: sentRoomName }).lean().exec(callback);
+/**
+ * Remove room history
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function removeHistory(roomName, callback) {
+  ChatHistory.findOneAndRemove({ roomName }).lean().exec(callback);
 }
 
 exports.addMsgToHistory = addMsgToHistory;

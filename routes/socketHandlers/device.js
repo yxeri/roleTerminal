@@ -8,6 +8,9 @@ const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 const appConfig = require('../../config/defaults/config').app;
 
+/**
+ * @param {Object} socket Socket.IO socket
+ */
 function handle(socket) {
   /**
    * Returns all devices from database, if the user has high enough access level
@@ -77,10 +80,7 @@ function handle(socket) {
       return;
     }
 
-    dbDevice.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, (err) => {
-      if (err) {
-        return;
-      }
+    dbDevice.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, () => {
     });
   });
 
@@ -114,8 +114,6 @@ function handle(socket) {
             err,
             code: logger.ErrorCodes.general,
           });
-
-          return;
         }
       };
 
@@ -188,10 +186,7 @@ function handle(socket) {
 
     socket.join(deviceId + appConfig.deviceAppend);
 
-    dbDevice.updateDeviceSocketId(deviceId, socket.id, userName, (err, device) => {
-      if (err || device === null) {
-        return;
-      }
+    dbDevice.updateDeviceSocketId(deviceId, socket.id, userName, () => {
     });
   });
 }

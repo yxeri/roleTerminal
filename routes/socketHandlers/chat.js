@@ -16,6 +16,7 @@ const objectValidator = require('../../utils/objectValidator');
  * @param {Object} params - Parameters
  * @param {Object} params.socket - Socket.IO socket
  * @param {Object} params.newRoom - New room to follow
+ * @param {string} params.userName - Name of the new user following the room
  */
 function followRoom(params) {
   const socket = params.socket;
@@ -27,7 +28,7 @@ function followRoom(params) {
       socket,
       message: {
         text: [`${params.userName} is following ${newRoomName}`],
-        text_se: [`${params.username} följer ${newRoomName}`],
+        text_se: [`${params.userName} följer ${newRoomName}`],
         roomName: newRoomName,
       },
       sendTo: newRoomName,
@@ -473,6 +474,11 @@ function handle(socket, io) {
     });
   });
 
+  /**
+   * Get history for one to many rooms
+   * @param {Object} params - Parameters
+   * @param {Date} [params.startDate] - Start date of retrieval
+   */
   socket.on('history', (params) => {
     if (!objectValidator.isValidData(params, {})) {
       return;

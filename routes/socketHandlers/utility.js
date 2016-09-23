@@ -12,24 +12,27 @@ const messenger = require('../../socketHelpers/messenger');
 // FIXME SMHI API changed. Structure needs to be fixed here before usage
 /**
  * Prepare a weather report from the retrieved json object
- * @param jsonObj JSON object retrieved from external source
- * @returns {} Returns weather report
+ * @param {Object} jsonObj - JSON object retrieved from external source
+ * @returns {Object} Weather report
  */
 function createWeatherReport(jsonObj) {
-  const weatherRep = {};
+  const weatherRep = jsonObj;
 
-  weatherRep.time = new Date(jsonObj.validTime);
-  weatherRep.temperature = jsonObj.parameters.find((group) => group.name === 't');
-  weatherRep.visibility = jsonObj.parameters.find((group) => group.name === 'vis');
-  weatherRep.windDirection = jsonObj.parameters.find((group) => group.name === 'wd');
-  weatherRep.thunder = jsonObj.parameters.find((group) => group.name === 'tstm');
-  weatherRep.gust = jsonObj.parameters.find((group) => group.name === 'gust');
-  weatherRep.cloud = jsonObj.parameters.find((group) => group.name === 'tcc_mean');
-  weatherRep.precipitation = jsonObj.parameters.find((group) => group.name === 'pcat');
+  // weatherRep.time = new Date(jsonObj.validTime);
+  // weatherRep.temperature = jsonObj.parameters.find((group) => group.name === 't');
+  // weatherRep.visibility = jsonObj.parameters.find((group) => group.name === 'vis');
+  // weatherRep.windDirection = jsonObj.parameters.find((group) => group.name === 'wd');
+  // weatherRep.thunder = jsonObj.parameters.find((group) => group.name === 'tstm');
+  // weatherRep.gust = jsonObj.parameters.find((group) => group.name === 'gust');
+  // weatherRep.cloud = jsonObj.parameters.find((group) => group.name === 'tcc_mean');
+  // weatherRep.precipitation = jsonObj.parameters.find((group) => group.name === 'pcat');
 
   return weatherRep;
 }
 
+/**
+ * @param {Object} socket - Socket.IO socket
+ */
 function handle(socket) {
   /**
    * Time command. Returns current date
@@ -143,7 +146,13 @@ function handle(socket) {
         });
 
         resp.on('end', () => {
+          /**
+           * @type {{ timeSeries: Object[] }}
+           */
           const response = JSON.parse(body);
+          /**
+           * @type { { validTime: Date }[] }
+           */
           const times = response.timeSeries;
           const now = new Date();
           const report = [];

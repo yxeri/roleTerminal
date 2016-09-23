@@ -16,6 +16,14 @@ const changePercentage = 0.2;
 const signalMaxChange = 10;
 let resetInterval = null;
 
+/**
+ * Post request to external server
+ * @param {Object} params - Parameters
+ * @param {string} params.host - Host name
+ * @param {string} params.path - Path
+ * @param {Function} params.callback - Path
+ * @param {*} params.data - Data to send
+ */
 function postRequest(params) {
   const host = params.host;
   const path = params.path;
@@ -34,8 +42,6 @@ function postRequest(params) {
   const request = http.request(options, (response) => {
     let responseString = '';
 
-    response.setEncoding('utf-8');
-
     response.on('data', (data) => {
       responseString += data;
     });
@@ -49,7 +55,14 @@ function postRequest(params) {
   request.end();
 }
 
+/**
+ * Create signal value reset interval
+ */
 function setResetInterval() {
+  /**
+   * Lower/increase signal value on all stations towards default value
+   * @private
+   */
   function resetStations() {
     dbStation.getAllStations((err, stations) => {
       if (err) {
@@ -102,8 +115,8 @@ function setResetInterval() {
 
 /**
  * @private
- * @param {string[]} - Array to be shuffled
- * @returns {string[]} - Shuffled array
+ * @param {string[]} array - Array to be shuffled
+ * @returns {string[]} Shuffled array
  */
 function shuffleArray(array) {
   const shuffledArray = array;
@@ -122,6 +135,10 @@ function shuffleArray(array) {
   return shuffledArray;
 }
 
+/**
+ * Fetch station status from external server
+ * @param {Function} callback - Callback
+ */
 function retrieveStationStats(callback) {
   require('request').get('http://wrecking.bbreloaded.se/public.json', (err, response, body) => {
     if (err) {
@@ -131,6 +148,9 @@ function retrieveStationStats(callback) {
     }
 
     if (body) {
+      /**
+       * @type {{ stations: Object[], teams: Object[], active_round: Object, coming_rounds: Object[] }}
+       */
       const stats = JSON.parse(body);
       const stations = stats.stations;
       const teams = stats.teams;
@@ -142,12 +162,22 @@ function retrieveStationStats(callback) {
   });
 }
 
+/**
+ * Update signal value on a station
+ * @param {number} stationId - Station ID
+ * @param {boolean} boostingSignal - Should the signal be increased?
+ */
 function updateSignalValue(stationId, boostingSignal) {
   dbStation.getStation(stationId, (err, station) => {
     if (err) {
       return;
     }
 
+    /**
+     * Set new signalvalue
+     * @private
+     * @param {number} newSignalValue - New value
+     */
     function setNewValue(newSignalValue) {
       let ceilSignalValue = Math.ceil(newSignalValue);
       const minValue = signalDefault - signalThreshold;
@@ -191,12 +221,12 @@ function updateSignalValue(stationId, boostingSignal) {
   });
 }
 
+/**
+ * @param {Object} socket - Socket.IO socket
+ */
 function handle(socket) {
   socket.on('createGameUser', (params) => {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed) {
-        return;
-      }
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, () => {
     });
 
     if (!objectValidator.isValidData(params, { userName: true, password: true })) {
@@ -208,36 +238,24 @@ function handle(socket) {
       password: params.password,
     };
 
-    dbConnector.createGameUser(gameUser, (err) => {
-      if (err) {
-        return;
-      }
+    dbConnector.createGameUser(gameUser, () => {
     });
   });
 
   socket.on('createGamePassword', (params) => {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed) {
-        return;
-      }
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, () => {
     });
 
     if (!objectValidator.isValidData(params, { password: true })) {
       return;
     }
 
-    dbConnector.createGamePassword(params, (err) => {
-      if (err) {
-        return;
-      }
+    dbConnector.createGamePassword(params, () => {
     });
   });
 
   socket.on('getAllGamePasswords', () => {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed) {
-        return;
-      }
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameword.commandName, () => {
     });
 
     dbConnector.getAllGamePasswords((err, gamePasswords) => {
@@ -255,10 +273,7 @@ function handle(socket) {
   });
 
   socket.on('getAllGameUsers', () => {
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed) {
-        return;
-      }
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.creategameuser.commandName, () => {
     });
 
     dbConnector.getAllGameUsers((err, gameUsers) => {

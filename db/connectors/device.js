@@ -14,6 +14,13 @@ const deviceSchema = new mongoose.Schema({
 
 const Device = mongoose.model('Device', deviceSchema);
 
+/**
+ * Update socket.IO ID and user connected to device
+ * @param {string} deviceId - ID of the device
+ * @param {string} socketId - socket.IO ID
+ * @param {string} user - User name of the user that was latest active on this device
+ * @param {Function} callback - Callback
+ */
 function updateDeviceSocketId(deviceId, socketId, user, callback) {
   const query = { deviceId };
   const update = {
@@ -49,6 +56,12 @@ function updateDeviceSocketId(deviceId, socketId, user, callback) {
   );
 }
 
+/**
+ * Update last alive (last seen) for device
+ * @param {string} deviceId - ID of device
+ * @param {Date} value - Date when last seen
+ * @param {Function} callback - Callback
+ */
 function updateDeviceLastAlive(deviceId, value, callback) {
   const query = { deviceId };
   const update = { $set: { lastAlive: value } };
@@ -69,6 +82,12 @@ function updateDeviceLastAlive(deviceId, value, callback) {
   );
 }
 
+/**
+ * Update alias of device
+ * @param {string} deviceId - ID of device
+ * @param {string} value - New alias
+ * @param {Function} callback - Callback
+ */
 function updateDeviceAlias(deviceId, value, callback) {
   const query = { deviceId };
   const update = { $set: { deviceAlias: value } };
@@ -89,6 +108,11 @@ function updateDeviceAlias(deviceId, value, callback) {
   );
 }
 
+/**
+ * Get device based on device ID or alias
+ * @param {string} deviceCode - Device ID OR device alias
+ * @param {Function} callback - Callback
+ */
 function getDevice(deviceCode, callback) {
   const query = { $or: [{ deviceId: deviceCode }, { deviceAlias: deviceCode }] };
 
@@ -105,6 +129,10 @@ function getDevice(deviceCode, callback) {
   });
 }
 
+/**
+ * Get all devices
+ * @param {Function} callback - Callback
+ */
 function getAllDevices(callback) {
   const query = {};
   const filter = { _id: 0 };

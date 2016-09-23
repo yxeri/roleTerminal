@@ -9,6 +9,9 @@ const objectValidator = require('../../utils/objectValidator');
 const mapCreator = require('../../utils/mapCreator');
 const messenger = require('../../socketHelpers/messenger');
 
+/**
+ * @param {Object} socket - Socket.IO socket
+ */
 function handle(socket) {
   /**
    * Locate command. Returns location for one or more users
@@ -91,8 +94,6 @@ function handle(socket) {
             text: ['Failed to update user isTracking'],
             err: trackingErr,
           });
-
-          return;
         }
       });
 
@@ -166,6 +167,12 @@ function handle(socket) {
 
       const types = params.types;
 
+      /**
+       * Get and send positions
+       * @private
+       * @param {string} type - Position type
+       * @param {Object[]} positions - All positions
+       */
       function getPositions(type, positions) {
         switch (type) {
           case 'static': {

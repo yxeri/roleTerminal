@@ -18,6 +18,10 @@ const logger = require('../utils/logger');
 const messenger = require('../socketHelpers/messenger');
 const deviceHandler = require('./socketHandlers/device');
 
+/**
+ * @param {Object} io - Socket.IO
+ * @returns {Object} Router
+ */
 function handle(io) {
   router.get('/', (req, res) => {
     res.render('index', {

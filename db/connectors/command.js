@@ -14,6 +14,10 @@ const commandSchema = new mongoose.Schema({
 
 const Command = mongoose.model('Command', commandSchema);
 
+/**
+ * Increment command usage
+ * @param {string} commandName - Name of the command
+ */
 function incrementCommandUsage(commandName) {
   const query = { commandName };
   const update = { $inc: { timesUsed: 1 } };
@@ -29,6 +33,12 @@ function incrementCommandUsage(commandName) {
   });
 }
 
+/**
+ * Update command visibility
+ * @param {string} cmdName - Name of the command
+ * @param {number} value - New visibility value
+ * @param {Function} callback - Callback
+ */
 function updateCommandVisibility(cmdName, value, callback) {
   const query = { commandName: cmdName };
   const update = { $set: { visibility: value } };
@@ -49,6 +59,12 @@ function updateCommandVisibility(cmdName, value, callback) {
   );
 }
 
+/**
+ * Update command access level
+ * @param {string} cmdName - Name of the command
+ * @param {number} value - New access level value
+ * @param {Function} callback - Callback
+ */
 function updateCommandAccessLevel(cmdName, value, callback) {
   const query = { commandName: cmdName };
   const update = { $set: { accessLevel: value } };
@@ -69,6 +85,10 @@ function updateCommandAccessLevel(cmdName, value, callback) {
   );
 }
 
+/**
+ * Get all commands
+ * @param {Function} callback - Callback
+ */
 function getAllCommands(callback) {
   const filter = { _id: 0 };
 
@@ -85,6 +105,10 @@ function getAllCommands(callback) {
   });
 }
 
+/**
+ * Updates all commands. Creates new ones if they don't already exist
+ * @param {Object} sentCommands - New commands
+ */
 function populateDbCommands(sentCommands) {
   const cmdKeys = Object.keys(sentCommands);
   const callback = (err) => {
@@ -106,6 +130,11 @@ function populateDbCommands(sentCommands) {
   }
 }
 
+/**
+ * Get command
+ * @param {string} commandName - Name of the command
+ * @param {Function} callback - Callback
+ */
 function getCommand(commandName, callback) {
   const query = { commandName };
 

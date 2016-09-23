@@ -15,6 +15,16 @@ const mapPositionSchema = new mongoose.Schema({
 
 const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
 
+/**
+ * Update position
+ * @param {Object} params - Parameters
+ * @param {string} params.positionName - Name of the position
+ * @param {Object} params.position - Position
+ * @param {boolean} params.isStatic - Is the position static? (most commonly used on everything non-user)
+ * @param {string} params.type - Type of position
+ * @param {string} [params.group] - Name of the grop that the position belongs to (most commonly used by user)
+ * @param {Function} params.callback - Callback
+ */
 function updatePosition(params) {
   const positionName = params.positionName;
   const position = params.position;
@@ -53,6 +63,11 @@ function updatePosition(params) {
   });
 }
 
+/**
+ * Get position
+ * @param {string} positionName - Name of the position
+ * @param {Function} callback - Callback
+ */
 function getPosition(positionName, callback) {
   const query = { positionName };
 
@@ -69,6 +84,11 @@ function getPosition(positionName, callback) {
   });
 }
 
+/**
+ * Get multiple positions
+ * @param {string[]} positionNames - Name of the positions
+ * @param {Function} callback - Callback
+ */
 function getPositions(positionNames, callback) {
   const query = { positionName: { $in: positionNames } };
 
@@ -85,6 +105,10 @@ function getPositions(positionNames, callback) {
   });
 }
 
+/**
+ * Get all static positions
+ * @param {Function} callback - Callback
+ */
 function getAllStaticPositions(callback) {
   const query = { isStatic: true };
 

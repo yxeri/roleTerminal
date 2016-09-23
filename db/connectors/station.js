@@ -13,6 +13,12 @@ const stationSchema = new mongoose.Schema({
 
 const Station = mongoose.model('Station', stationSchema);
 
+/**
+ * Update signal value on station
+ * @param {number} stationId - Station ID
+ * @param {number} signalValue - New signal value
+ * @param {Function} callback - Callback
+ */
 function updateSignalValue(stationId, signalValue, callback) {
   const query = { stationId };
   const update = { $set: { signalValue } };
@@ -30,6 +36,11 @@ function updateSignalValue(stationId, signalValue, callback) {
   });
 }
 
+/**
+ * Get station
+ * @param {number} stationId - Station ID
+ * @param {Function} callback - Callback
+ */
 function getStation(stationId, callback) {
   const query = { stationId };
   const filter = { _id: 0 };
@@ -47,6 +58,10 @@ function getStation(stationId, callback) {
   });
 }
 
+/**
+ * Get all stations. Sorted on station ID
+ * @param {Function} callback - Callback
+ */
 function getAllStations(callback) {
   const query = {};
   const sort = { stationId: 1 };
@@ -65,6 +80,11 @@ function getAllStations(callback) {
   });
 }
 
+/**
+ * Create and save station
+ * @param {Object} station - New station
+ * @param {Function} callback - Callback
+ */
 function createStation(station, callback) {
   const newStation = new Station(station);
 
@@ -83,6 +103,12 @@ function createStation(station, callback) {
   });
 }
 
+/**
+ * Set new isActive on station
+ * @param {number} stationId - ID of station
+ * @param {boolean} isActive - Is the station active?
+ * @param {Function} callback - Callback
+ */
 function updateIsActive(stationId, isActive, callback) {
   const query = { stationId };
   const update = { $set: { isActive } };
@@ -100,6 +126,10 @@ function updateIsActive(stationId, isActive, callback) {
   });
 }
 
+/**
+ * Get active stations
+ * @param {Function} callback - Callback
+ */
 function getActiveStations(callback) {
   const query = { isActive: true };
   const sort = { stationId: 1 };

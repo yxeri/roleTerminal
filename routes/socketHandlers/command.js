@@ -7,6 +7,9 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 
+/**
+ * @param {Object} socket - Socket.IO socket
+ */
 function handle(socket) {
   /**
    * Gets all commands available to the user

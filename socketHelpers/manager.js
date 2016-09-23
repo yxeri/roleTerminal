@@ -23,8 +23,8 @@ const messageSort = (a, b) => {
 
 /**
  * Gets user by sent socket ID from socket.io
- * @param socketId Users ID in the socket from socket.io
- * @param callback Function callback
+ * @param {string} socketId - Users ID in the socket from socket.io
+ * @param {Function} callback - callback
  */
 function getUserById(socketId, callback) {
   dbUser.getUserById(socketId, (err, user) => {
@@ -34,8 +34,8 @@ function getUserById(socketId, callback) {
 
 /**
  * Gets a command
- * @param commandName String Name of the command to retrieve
- * @param callback Function callback
+ * @param {string} commandName - Name of the command to retrieve
+ * @param {Function} callback - callback
  */
 function getCommand(commandName, callback) {
   dbCommand.getCommand(commandName, (err, command) => {
@@ -45,9 +45,9 @@ function getCommand(commandName, callback) {
 
 /**
  * Checks if the user is allowed to use the command
- * @param socketId The users socket ID from socket.io
- * @param commandName Name of the command
- * @param callback Function callback
+ * @param {string} socketId - The users socket ID from socket.io
+ * @param {string} commandName - Name of the command
+ * @param {Function} callback - callback
  */
 function userAllowedCommand(socketId, commandName, callback) {
   let isAllowed = false;
@@ -81,11 +81,11 @@ function userAllowedCommand(socketId, commandName, callback) {
 
 /**
  * Gets history (messages) from one or more rooms
- * @param rooms The rooms to retrieve the history from
- * @param lines How many message to retrieve
- * @param missedMsgs Set to true if only the messages since the users last connection should be returned
- * @param lastOnline Date of the last time the user was online
- * @param callback Function callback
+ * @param {string[]} rooms - The rooms to retrieve the history from
+ * @param {number} lines - How many message to retrieve
+ * @param {boolean} missedMsgs - Set to true if only the messages since the users last connection should be returned
+ * @param {Date} lastOnline - Date of the last time the user was online
+ * @param {Function} callback - callback
  */
 function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
   dbChatHistory.getHistoryFromRooms(rooms, (err, history) => {
@@ -129,9 +129,9 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
 
 /**
  * Creates a new chat room and adds the user who created it to it
- * @param sentRoom Object of the new room
- * @param user Object of the user
- * @param callback Function callback
+ * @param {Object} sentRoom - New room
+ * @param {Object} user User who is creating the new room
+ * @param {Function} callback - callback
  */
 function createRoom(sentRoom, user, callback) {
   const newRoom = sentRoom;
@@ -163,9 +163,9 @@ function createRoom(sentRoom, user, callback) {
 
 /**
  * Updates user's socket ID in the database
- * @param socketId User's socket ID for socket.io
- * @param userName User's name
- * @param callback Function callback
+ * @param {string} socketId - User's socket ID for socket.io
+ * @param {string} userName - User's name
+ * @param {Function} callback - callback
  */
 function updateUserSocketId(socketId, userName, callback) {
   dbUser.updateUserSocketId(userName, socketId, (err, user) => {
@@ -183,9 +183,9 @@ function updateUserSocketId(socketId, userName, callback) {
 
 /**
  * Joins the user's socket to all sent rooms and added standard rooms
- * @param rooms Rooms for the user to join
- * @param socket socket.io socket
- * @param device DeviceID of the user
+ * @param {string[]} rooms - Rooms for the user to join
+ * @param {Object} socket - socket.io socket
+ * @param {string} device - DeviceID of the user
  */
 function joinRooms(rooms, socket, device) {
   const allRooms = rooms;

@@ -49,9 +49,9 @@ function beautifyNumb(number) {
  * Takes date and returns shorter human-readable time
  * @static
  * @param {Date} date - Non-humanreadable date
- * @param {boolean} full - Should the month and day be added?
- * @param {boolean} year - Should year be added?
- * @param {Number} offset - Should hours be added/removed from the final time?
+ * @param {boolean} [full] - Should the month and day be added?
+ * @param {boolean} [year] - Should year be added?
+ * @param {Number} [offset] - Should hours be added/removed from the final time?
  * @returns {string} - Human-readable time and date
  */
 function generateTimeStamp(date, full, year, offset) {

@@ -11,6 +11,13 @@ const logger = require('../../utils/logger');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
 
+/**
+ * Follow a new room on the socket
+ * @param {Object} params - Parameters
+ * @param {Object} params.socket - Socket.IO socket
+ * @param {Object} params.newRoom - New room to follow
+ * @param {string} params.userName - Name of the new user following the room
+ */
 function followRoom(params) {
   const socket = params.socket;
   const newRoom = params.newRoom;
@@ -21,7 +28,7 @@ function followRoom(params) {
       socket,
       message: {
         text: [`${params.userName} is following ${newRoomName}`],
-        text_se: [`${params.username} följer ${newRoomName}`],
+        text_se: [`${params.userName} följer ${newRoomName}`],
         roomName: newRoomName,
       },
       sendTo: newRoomName,
@@ -33,6 +40,13 @@ function followRoom(params) {
   socket.emit('commandSuccess', { noStepCall: true });
 }
 
+/**
+ * Should the room be hidden?
+ * @static
+ * @param {string} room - Room name
+ * @param {string} socketId - ID of the socket
+ * @returns {boolean} Should the room be hidden?
+ */
 function shouldBeHidden(room, socketId) {
   const hiddenRooms = [
     socketId,
@@ -44,6 +58,10 @@ function shouldBeHidden(room, socketId) {
   return hiddenRooms.indexOf(room) >= 0 || room.indexOf(appConfig.whisperAppend) >= 0 || room.indexOf(appConfig.deviceAppend) >= 0 || room.indexOf(appConfig.teamAppend) >= 0;
 }
 
+/**
+ * @param {object} socket - Socket.IO socket
+ * @param {object} io - Socket.IO
+ */
 function handle(socket, io) {
   socket.on('chatMsg', (params) => {
     if (!objectValidator.isValidData(params, { message: { text: true, roomName: true } })) {
@@ -456,6 +474,11 @@ function handle(socket, io) {
     });
   });
 
+  /**
+   * Get history for one to many rooms
+   * @param {Object} params - Parameters
+   * @param {Date} [params.startDate] - Start date of retrieval
+   */
   socket.on('history', (params) => {
     if (!objectValidator.isValidData(params, {})) {
       return;
@@ -889,10 +912,7 @@ function handle(socket, io) {
             userName,
             newRoom: { roomName },
           });
-          dbConnector.removeInvitationFromList(userName, roomName, invitation.invitationType, (remErr) => {
-            if (remErr) {
-              return;
-            }
+          dbConnector.removeInvitationFromList(userName, roomName, invitation.invitationType, () => {
           });
         });
       } else {

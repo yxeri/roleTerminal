@@ -4,8 +4,8 @@ const defaultLanguage = require('./../config/defaults/config').app.defaultLangua
 
 /**
  * Appends property name with the set default language in the configuration
- * @param propertyName Name of the property
- * @returns String Returns property name with the set default language in the configuration
+ * @param {string} propertyName Name of the property
+ * @returns {String} Property name with the set default language in the configuration
  */
 function appendLanguageCode(propertyName) {
   if (defaultLanguage !== '') {

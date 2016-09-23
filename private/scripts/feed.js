@@ -75,6 +75,13 @@ let trackingTimeout;
 let isScreenOffTimeout;
 let serverDownTimeout;
 
+/**
+ * Push command to queue
+ * @static
+ * @param {string} command - Name of the command
+ * @param {string[]} data - Values, options to be used with the command
+ * @param {string} [commandMsg] - String to be printed after command usage
+ */
 function queueCommand(command, data, commandMsg) {
   commandQueue.push({
     command,
@@ -83,6 +90,10 @@ function queueCommand(command, data, commandMsg) {
   });
 }
 
+/**
+ * Push used command to history
+ * @param {string} command - Command with options
+ */
 function pushCommandHistory(command) {
   const commandHistory = storage.getCommandHistory();
 
@@ -90,6 +101,10 @@ function pushCommandHistory(command) {
   storage.setCommandHistory(commandHistory);
 }
 
+/**
+ * Sets room as the new default room
+ * @param {string} roomName - Name of the new room
+ */
 function enterRoom(roomName) {
   storage.setRoom(roomName);
 
@@ -103,17 +118,33 @@ function enterRoom(roomName) {
   });
 }
 
+/**
+ *
+ */
 function resetPreviousCommandPointer() {
   const commandHistory = storage.getCommandHistory();
 
   previousCommandPointer = commandHistory ? commandHistory.length : 0;
 }
 
+/**
+ * Set new gain value
+ * @param {number} value - New gain value
+ */
 function setGain(value) {
   gainNode.gain.value = value;
 }
 
+/**
+ * Play and print morse code
+ * @param {string} morseCode - Morse code to be played and printed
+ * @param {boolean} silent - Should the morse code text be surpressed?
+ */
 function playMorse(morseCode, silent) {
+  /**
+   * Finish sound queue by clearing it and send morse code as text
+   * @param {number} timeouts - Morse code array length
+   */
   function finishSoundQueue(timeouts) {
     const cleanMorse = morseCode.replace(/#/g, '');
 
@@ -166,8 +197,8 @@ function playMorse(morseCode, silent) {
 /**
  * Geolocation object is empty when sent through Socket.IO
  * This is a fix for that
- * @param {object} position . -
- * @returns {object} Returns position
+ * @param {object} position - Position
+ * @returns {object} Position
  */
 function preparePosition(position) {
   const preparedPosition = {};
@@ -181,6 +212,9 @@ function preparePosition(position) {
   return preparedPosition; // geolocation
 }
 
+/**
+ * Checks client position, stores them and later sends the best one to the server
+ */
 function retrievePosition() {
   const clearingWatch = () => {
     navigator.geolocation.clearWatch(watchId);
@@ -226,6 +260,9 @@ function retrievePosition() {
   }
 }
 
+/**
+ * Send client position to server
+ */
 function sendLocation() {
   let mostAccuratePos;
 
@@ -253,6 +290,7 @@ function sendLocation() {
 }
 
 /**
+ * Checks if the screen has been unresponsive for some time.
  * Some devices disable Javascript when screen is off (iOS)
  * They also fail to notice that they have been disconnected
  * We check the time between heartbeats and if the time i
@@ -275,6 +313,7 @@ function isScreenOff() {
 }
 
 /**
+ * Sets timeouts.
  * NOTE! NOTE! Intervals are unreliable in Chrome. Don't use them
  */
 function setTimeouts() {
@@ -312,6 +351,9 @@ function refocus() {
   setTimeouts();
 }
 
+/**
+ * Create AudioContext needed for morse
+ */
 function buildMorsePlayer() {
   // Not supported in Spartan nor IE11 or lower
   if (window.AudioContext || window.webkitAudioContext) {
@@ -337,24 +379,46 @@ function buildMorsePlayer() {
   }
 }
 
+/**
+ * Does the user agent contain Android?
+ * @returns {boolean} Does the user agent contain Android?
+ */
 function isAndroid() {
-  return navigator.userAgent.match(/Android/i);
+  return navigator.userAgent.match(/Android/i) !== null;
 }
 
+/**
+ * Is the site visited in standalone mode? (iOS, site started from home screen)
+ * @returns {boolean} Is the site visited in standalone mode?
+ */
 function isStandalone() {
   return window.navigator.standalone;
 }
 
+/**
+ * Does the user agent contain iPhone, iPad or iPad?
+ * @returns {boolean} Does the user agent contain iPhone, iPad or iPad?
+ */
 function isIos() {
-  return navigator.userAgent.match(/iP(hone|ad|od)/i);
+  return navigator.userAgent.match(/iP(hone|ad|od)/i) !== null;
 }
 
+/**
+ * Adds padding to top, if iOS and in stand alone mode
+ * Needed due to top menu row in iOS
+ */
 function padMenu() {
   if (isIos() && isStandalone()) {
     domManipulator.getMenu().classList.add('iosMenuPadding');
   }
 }
 
+/**
+ * Should auto-completion trigger?
+ * @param {string} text - Previous text in input
+ * @param {string} textChar - Latest text char
+ * @returns {boolean} Should auto-completion trigger?
+ */
 function triggerAutoComplete(text, textChar) {
   /**
    * Older versions of Android bugs on keypress/down, thus this check
@@ -368,10 +432,17 @@ function triggerAutoComplete(text, textChar) {
   return false;
 }
 
+/**
+ * Set command used
+ * @param {boolean} used - Has command been used?
+ */
 function setCommandUsed(used) {
   commmandUsed = used;
 }
 
+/**
+ * Consume command queue. Runs the commands stored until empty
+ */
 function consumeCommandQueue() {
   if (commandQueue.length > 0) {
     const storedCommand = commandQueue.shift();
@@ -390,18 +461,33 @@ function consumeCommandQueue() {
   }
 }
 
+/**
+ * Start consumption of command queue
+ */
 function startCommandQueue() {
   if (!commmandUsed) {
     consumeCommandQueue();
   }
 }
 
+/**
+ * @param {string} commandName - Command name
+ * @param {string[]} phrases - Command input
+ * @returns {string[]} Combined input
+ */
 function combineSequences(commandName, phrases) {
   const aliases = storage.getAliases();
 
   return aliases[commandName] ? aliases[commandName].concat(phrases.slice(1)) : phrases.slice(1);
 }
 
+/**
+ * Expands sent partial string to a matched command, if any
+ * @param {string[]} matchedCommands - Matched command names
+ * @param {string} partialMatch - Partial string
+ * @param {string} sign - Command character
+ * @returns {string} Expanded match
+ */
 function expandPartialMatch(matchedCommands, partialMatch, sign) {
   const firstCommand = matchedCommands[0];
   let expanded = '';
@@ -500,8 +586,11 @@ function autoCompleteOption(phrases = [], options = {}) {
   }
 }
 
+/**
+ * Auto-completes command
+ * @param {string[]} phrases - Full input
+ */
 function autoCompleteCommand(phrases) {
-  // TODO Change from Object.keys for compatibility with older Android
   const allCommands = commandHandler.getCommands({ aliases: true, filtered: true });
   const matched = [];
   const sign = phrases[0].charAt(0);
@@ -561,6 +650,12 @@ function autoCompleteCommand(phrases) {
   }
 }
 
+/**
+ * Prints the command input used, unless clearAfterUse is true
+ * @param {boolean} clearAfterUse - Should command usage be cleared after usage?
+ * @param {string} inputText - The command input that will be printed
+ * @returns {{text: string[]}} Full command row, with added visuals
+ */
 function printUsedCommand(clearAfterUse, inputText) {
   if (clearAfterUse) {
     return null;
@@ -575,6 +670,10 @@ function printUsedCommand(clearAfterUse, inputText) {
   };
 }
 
+/**
+ * Is the view in full screen?
+ * @returns {boolean} Is the view in full screen?
+ */
 function isFullscreen() {
   return (!window.screenTop && !window.screenY);
 }
@@ -598,7 +697,7 @@ function goFullScreen(element) {
 /**
  * Fix for Android.
  * Expands the spacer so that the virtual keyboard doesn't block the rest of the site
- * @param {boolean} keyboardShown - Is the virtual keyboard visible?
+ * @param {boolean} [keyboardShown] - Is the virtual keyboard visible?
  */
 function fullscreenResize(keyboardShown) {
   /**
@@ -622,6 +721,9 @@ function fullscreenResize(keyboardShown) {
   }
 }
 
+/**
+ * Triggers on enter press. Runs command based on input
+ */
 function enterKeyHandler() {
   const commandHelper = commandHandler.commandHelper;
   const user = storage.getUser();
@@ -712,6 +814,9 @@ function scrollText(amount) {
   domManipulator.getMainView().scrollTop += amount;
 }
 
+/**
+ * Auto-completes depending on current input
+ */
 function autoComplete() {
   const commandHelper = commandHandler.commandHelper;
   const phrases = textTools.trimSpace(domManipulator.getInputText().toLowerCase()).split(' ');
@@ -756,6 +861,10 @@ function autoComplete() {
   }
 }
 
+/**
+ * All key presses that weren't caught in specialKeypress
+ * @param {string} textChar - Character pressed on the keyboard
+ */
 function defaultKeyPress(textChar) {
   if (triggerAutoComplete(domManipulator.getInputText(), textChar) && commandHandler.commandHelper.command === null) {
     autoComplete();
@@ -765,6 +874,10 @@ function defaultKeyPress(textChar) {
   }
 }
 
+/**
+ * Checks key event against a list of keys
+ * @param {Object} event - Key event
+ */
 function specialKeyPress(event) {
   const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
   const textChar = String.fromCharCode(keyCode);
@@ -875,7 +988,7 @@ function specialKeyPress(event) {
           commandHandler.triggerCommand({ cmd: 'logout' });
           event.preventDefault();
         } else {
-          defaultKeyPress(textChar, event);
+          defaultKeyPress(textChar);
         }
 
         break;
@@ -887,13 +1000,13 @@ function specialKeyPress(event) {
           event.preventDefault();
           domManipulator.scrollView();
         } else {
-          defaultKeyPress(textChar, event);
+          defaultKeyPress(textChar);
         }
 
         break;
       }
       default: {
-        defaultKeyPress(textChar, event);
+        defaultKeyPress(textChar);
 
         break;
       }
@@ -917,7 +1030,7 @@ function keyReleased(event) {
   if (isAndroid()) {
     const textChar = domManipulator.getInputText().charAt(domManipulator.getInputText().length - 1);
 
-    defaultKeyPress(textChar, event);
+    defaultKeyPress(textChar);
   }
 
   switch (keyCode) {
@@ -962,6 +1075,12 @@ function keyReleased(event) {
   domManipulator.updateThisCommandItem();
 }
 
+/**
+ * Attach click listener to menu item
+ * @param {Element} menuItem - Menu item that will get a click handler
+ * @param {Function} func - Function on click
+ * @param {string} funcParam - Function parameters
+ */
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
     menuItem.addEventListener('click', (event) => {
@@ -974,6 +1093,11 @@ function attachMenuListener(menuItem, func, funcParam) {
   }
 }
 
+/**
+ * Create menu item
+ * @param {Object} menuItem - Menu item to be added
+ * @returns {Element} List item
+ */
 function createMenuItem(menuItem) {
   const listItem = document.createElement('li');
   const span = document.createElement('span');
@@ -990,6 +1114,12 @@ function createMenuItem(menuItem) {
   return listItem;
 }
 
+/**
+ * Creates sub-menu list
+ * @param {string[]} subItems - Items that will be added to the list
+ * @param {boolean} replaceInput - Should a click on the item replace current input?
+ * @returns {Element} List item
+ */
 function createSubMenuItem(subItems, replaceInput) {
   const ulElem = document.createElement('ul');
 
@@ -1018,6 +1148,9 @@ function createSubMenuItem(subItems, replaceInput) {
   return ulElem;
 }
 
+/**
+ * Shows available options for command in sub-menu
+ */
 function thisCommandOptions() {
   const command = commandHandler.getCommand(domManipulator.getThisCommandItem().children[0].textContent.toLowerCase());
   const options = command.options;
@@ -1039,12 +1172,18 @@ function thisCommandOptions() {
   }
 }
 
+/**
+ * Shows available commands in sub-menu
+ */
 function showCommands() {
   const commands = commandHandler.getCommands({ aliases: true, filtered: true });
 
   domManipulator.addSubMenuItem('commands', createSubMenuItem(commands, true));
 }
 
+/**
+ * Populate top menu with items
+ */
 function populateMenu() {
   const menuItems = {
     runCommand: {
@@ -1084,6 +1223,9 @@ function populateMenu() {
   }
 }
 
+/**
+ * Print welcome messages
+ */
 function printWelcomeMessage() {
   if (!storage.getFastMode()) {
     const mainLogo = labels.getMessage('logos', 'mainLogo');
@@ -1096,6 +1238,9 @@ function printWelcomeMessage() {
   }
 }
 
+/**
+ * Print starting messages
+ */
 function printStartMessage() {
   if (!storage.getFastMode()) {
     const mainLogo = labels.getMessage('logos', 'mainLogo');
@@ -1109,6 +1254,9 @@ function printStartMessage() {
   }
 }
 
+/**
+ * Add listener that sets view to full screen on click
+ */
 function attachFullscreenListener() {
   domManipulator.getMainView().addEventListener('click', (event) => {
     clickHandler.toggleClicked();
@@ -1131,6 +1279,9 @@ function attachFullscreenListener() {
   });
 }
 
+/**
+ * Resets local storage
+ */
 function resetAllLocalVals() {
   storage.removeCommandHistory();
   storage.removeRoom();
@@ -1140,7 +1291,12 @@ function resetAllLocalVals() {
   previousCommandPointer = 0;
 }
 
-function hideMessageProperties(message = { }) {
+/**
+ * Modifies message following special rules depending on what the message contains
+ * @param {Object} message - Message to be modified
+ * @returns {Object} Returns modified message
+ */
+function hideMessageProperties(message = {}) {
   const modifiedMessage = message;
   const roomName = message.roomName;
 
@@ -1175,14 +1331,20 @@ function hideMessageProperties(message = { }) {
 
 // TODO Not all Android devices have touch screens
 /**
+ * Checks if device is iOS or Android
  * @returns {boolean} Returns true if userAgent contains iPhone, iPad, iPod or Android
  */
 function isTouchDevice() {
   return ((isIos() || isAndroid()));
 }
 
-function onMessage(data = { message: {} }) {
-  const message = textTools.addMessageSpecialProperties(hideMessageProperties(data.message));
+/**
+ * Called on message emit. Prints text
+ * @param {Object} params - Parameters
+ * @param {Object} params.message - Message
+ */
+function onMessage(params = { message: {} }) {
+  const message = textTools.addMessageSpecialProperties(hideMessageProperties(params.message));
 
   messenger.queueMessage(message);
 
@@ -1191,8 +1353,13 @@ function onMessage(data = { message: {} }) {
   }
 }
 
-function onMessages(data = { messages: [] }) {
-  const messages = data.messages;
+/**
+ * Called on messages emit. Prints multiple texts
+ * @param {Object} params - Parameters
+ * @param {Object[]} params.messages - Messages
+ */
+function onMessages(params = { messages: [] }) {
+  const messages = params.messages;
 
   for (let i = 0; i < messages.length; i++) {
     const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
@@ -1205,8 +1372,13 @@ function onMessages(data = { messages: [] }) {
   }
 }
 
-function onImportantMsg(data = {}) {
-  const message = data.message;
+/**
+ * Called on importantMsg emit. Prints text
+ * @param {Object} params - Parameters
+ * @param {Object} params.message - Message
+ */
+function onImportantMsg(params = {}) {
+  const message = params.message;
 
   if (message) {
     message.extraClass = 'importantMsg';
@@ -1224,8 +1396,8 @@ function onImportantMsg(data = {}) {
   }
 }
 
-/*
- * Triggers when the connection is lost and then re-established
+/**
+ * Called on reconnect emit. Triggers when the connection is lost and then re-established
  */
 function onReconnect() {
   clearTimeout(serverDownTimeout);
@@ -1233,6 +1405,9 @@ function onReconnect() {
   domManipulator.setStatus(labels.getString('status', 'online'));
 }
 
+/**
+ * Called on disconnect emit
+ */
 function onDisconnect() {
   const serverDown = () => {
     if (storage.getUser()) {
@@ -1249,8 +1424,13 @@ function onDisconnect() {
   serverDownTimeout = setTimeout(serverDown, 300000);
 }
 
-function onFollow(data = { room: {} }) {
-  const room = data.room;
+/**
+ * Called on follow emit
+ * @param {Object} params - Parameters
+ * @param {Object} params.room - Room
+ */
+function onFollow(params = { room: {} }) {
+  const room = params.room;
 
   if (room.entered) {
     enterRoom(room.roomName);
@@ -1262,10 +1442,16 @@ function onFollow(data = { room: {} }) {
   }
 }
 
-function onUnfollow(data = { room: { roomName: '' } }) {
-  const room = data.room;
+/**
+ * Called on unfollow emit
+ * @param {Object} params - Parameters
+ * @param {Object} params.room - Room
+ * @param {string} params.room.roomName - Name of the room that was unfollowed
+ */
+function onUnfollow(params = { room: { roomName: '' } }) {
+  const room = params.room;
 
-  if (!data.silent) {
+  if (!params.silent) {
     messenger.queueMessage({
       text: [`Stopped following ${room.roomName}`],
       text_se: [`Slutade följa ${room.roomName}`],
@@ -1282,8 +1468,13 @@ function onUnfollow(data = { room: { roomName: '' } }) {
   }
 }
 
-function onLogin(data = {}) {
-  const user = data.user;
+/**
+ * Called on login emit. Sets users info and starts map
+ * @param {Object} params - Parameters
+ * @param {Object} params.user - User information
+ */
+function onLogin(params = {}) {
+  const user = params.user;
   const mode = user.mode || 'cmd';
 
   commandHandler.triggerCommand({ cmd: 'clear' });
@@ -1333,6 +1524,9 @@ function onCommandSuccess(params = {}) {
   }
 }
 
+/**
+ * Called on commandFail emit
+ */
 function onCommandFail() {
   const commandHelper = commandHandler.commandHelper;
 
@@ -1345,22 +1539,27 @@ function onCommandFail() {
 /**
  * Calls a specific command step which has been designated as the fallback step
  * Example usage: failed login leads back to start of user name input
- * @param {Object} params - Parameters for the command step
+ * @param {string[]} cmdParams - Parameters for the command step
  */
-function onCommandStep(params) {
+function onCommandStep(cmdParams) {
   commandHandler.commandHelper.onStep = commandHandler.commandHelper.fallbackStep;
-  commandHandler.triggerCommandStep(params);
+  commandHandler.triggerCommandStep(cmdParams);
 }
 
-function onReconnectSuccess(data = {}) {
-  if (!data.anonUser) {
-    const mode = data.user.mode || 'cmd';
+/**
+ * Called on reconnectSuccess emit
+ * @param {Object} params - Parameters
+ *
+ */
+function onReconnectSuccess(params = {}) {
+  if (!params.anonUser) {
+    const mode = params.user.mode || 'cmd';
     const room = storage.getRoom();
 
     commandHandler.triggerCommand({ cmd: 'mode', cmdParams: [mode] });
-    storage.setAccessLevel(data.user.accessLevel);
+    storage.setAccessLevel(params.user.accessLevel);
 
-    if (!data.firstConnection) {
+    if (!params.firstConnection) {
       messenger.queueMessage({
         text: labels.getText('info', 'reestablished'),
       });
@@ -1386,7 +1585,7 @@ function onReconnectSuccess(data = {}) {
       },
     });
   } else {
-    if (!data.firstConnection) {
+    if (!params.firstConnection) {
       messenger.queueMessage(labels.getMessage('info', 'reestablished'));
     } else {
       printStartMessage();
@@ -1395,13 +1594,16 @@ function onReconnectSuccess(data = {}) {
 
   socketHandler.setReconnecting(false);
 
-  if (data.welcomeMessage) {
+  if (params.welcomeMessage) {
     messenger.queueMessage({
-      text: ['!!!!!', data.welcomeMessage, '!!!!!'],
+      text: ['!!!!!', params.welcomeMessage, '!!!!!'],
     });
   }
 }
 
+/**
+ * Called on disconnectUser emit
+ */
 function onDisconnectUser() {
   const currentUser = storage.getUser();
 
@@ -1422,42 +1624,31 @@ function onDisconnectUser() {
   resetAllLocalVals();
 }
 
-function onMorse(data = {}) {
-  playMorse(data.morseCode, data.silent);
+/**
+ * Called on morse emit. Plays and prints morse
+ * @param {Object} params - Parameters
+ * @param {string} params.morseCode - Morse code to be played and printed
+ * @param {boolean} params.silent - Should the morse code be printed as text?
+ */
+function onMorse(params = {}) {
+  playMorse(params.morseCode, params.silent);
 }
 
-function onTime(data = {}) {
+/**
+ * Called on time emit. Prints time from server
+ * @param {Object} params - Parameters
+ * @param {Date} params.time - Current time
+ */
+function onTime(params = {}) {
   messenger.queueMessage({
-    text: [`Time: ${textTools.generateTimeStamp(data.time, true, true)}`],
-    text_en: [`Tid: ${textTools.generateTimeStamp(data.time, true, true)}`],
+    text: [`Time: ${textTools.generateTimeStamp(params.time, true, true)}`],
+    text_en: [`Tid: ${textTools.generateTimeStamp(params.time, true, true)}`],
   });
 }
 
-function onLocationMsg(locationData) {
-  const locationKeys = Object.keys(locationData);
-
-  for (let i = 0; i < locationKeys.length; i++) {
-    const user = locationKeys[i];
-    const position = locationData[user].position;
-    const latitude = position.latitude;
-    const longitude = position.longitude;
-    const heading = !isNaN(position.heading) && position.heading !== null ? Math.round(position.heading) : null;
-    const accuracy = position.accuracy < 1000 ? Math.ceil(position.accuracy) : 'BAD';
-    let text = '';
-
-    text += `User: ${user}${'\t'}`;
-    text += `Time: ${textTools.generateTimeStamp(position.timestamp, true)}${'\t'}`;
-    text += `Accuracy: ${accuracy} ${accuracy !== 'BAD' ? 'meters' : ''}${'\t'}`;
-    text += `Coordinates: ${latitude}, ${longitude}${'\t'}`;
-
-    if (heading !== null) {
-      text += `Heading: ${heading} deg.`;
-    }
-
-    messenger.queueMessage({ text: [text] });
-  }
-}
-
+/**
+ * Called on ban emit
+ */
 function onBan() {
   messenger.queueMessage({
     text: labels.getText('info', 'youHaveBeenBanned'),
@@ -1466,6 +1657,9 @@ function onBan() {
   resetAllLocalVals();
 }
 
+/**
+ * Called on logout emit. Clears local data
+ */
 function onLogout() {
   commandHandler.triggerCommand({ cmd: 'clear' });
   resetAllLocalVals();
@@ -1474,14 +1668,22 @@ function onLogout() {
   printStartMessage();
 }
 
-function onUpdateCommands(data = { commands: [] }) {
-  const newCommands = data.commands;
+/**
+ * Called on updateCommands emit
+ * @param {Object} params - Parameters
+ */
+function onUpdateCommands(params = { commands: [] }) {
+  const newCommands = params.commands;
 
   for (let i = 0; i < newCommands.length; i++) {
     commandHandler.updateCommand(newCommands[i]);
   }
 }
 
+/**
+ * Called on weather emit.
+ * @param {Object[]} report - Weather information
+ */
 function onWeather(report) {
   const weather = [];
   let weatherString = '';
@@ -1591,49 +1793,79 @@ function onWeather(report) {
   messenger.queueMessage({ text: weather });
 }
 
+/**
+ * Called on updateDeviceId emit. Sets new device ID
+ * @param {string} newId - New device ID
+ */
 function onUpdateDeviceId(newId) {
   storage.setDeviceId(newId);
 }
 
-function onWhoami(data) {
-  const team = data.user.team || '';
+/**
+ * Called on whoami emit
+ * @param {Object} params - Parameters
+ * @param {Object} params.user - User information
+ */
+function onWhoami(params) {
+  const team = params.user.team || '';
   const userMarker = mapTools.getThisUserMarker();
   const text = textTools.createCommandStart('whoami').concat([
-    `User: ${data.user.userName}`,
-    `Access level: ${data.user.accessLevel}`,
+    `User: ${params.user.userName}`,
+    `Access level: ${params.user.accessLevel}`,
     `Team: ${team}`,
     `Device ID: ${storage.getDeviceId()}`,
     `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
-    textTools.createCommandEnd('whoami'),
+    textTools.createCommandEnd(),
   ]);
 
   messenger.queueMessage({ text });
 }
 
-function onList(data = { itemList: [] }) {
-  const itemList = data.itemList.itemList;
-  const title = data.itemList.listTitle;
+/**
+ * Called on list emit. Receives a list to print
+ * @param {Object} params - Parameters
+ * @param {number} params.columns - Number of columns to print items to
+ * @param {Object[]} params.itemList - List to be printed
+ * @param {string} params.itemList[].listTitle - Title of the list
+ */
+function onList(params = {}) {
+  if (params.itemList) {
+    const itemList = params.itemList.itemList;
+    const title = params.itemList.listTitle;
 
-  if (title) {
-    onMessage({ message: { text: textTools.createCommandStart(title) } });
+    if (title) {
+      onMessage({ message: { text: textTools.createCommandStart(title) } });
+    }
+
+    onMessage({
+      message: {
+        text: itemList,
+        linkable: params.itemList.linkable || true,
+        keepInput: params.itemList.keepInput || true,
+        replacePhrase: params.itemList.replacePhrase || false,
+        columns: params.columns,
+        extraClass: 'columns',
+      },
+    });
   }
-
-  onMessage({
-    message: {
-      text: itemList,
-      linkable: data.itemList.linkable || true,
-      keepInput: data.itemList.keepInput || true,
-      replacePhrase: data.itemList.replacePhrase || false,
-      columns: data.columns,
-      extraClass: 'columns',
-    },
-  });
 }
 
-function onMatchFound(data = { matchedName: '', defaultLanguage: '' }) {
-  domManipulator.replaceLastInputPhrase(`${data.matchedName} `);
+/**
+ * Called on matchFound emit
+ * @param {Object} params - Parameters
+ * @param {string} params.matchedName - Found match
+ */
+function onMatchFound(params = { matchedName: '' }) {
+  domManipulator.replaceLastInputPhrase(`${params.matchedName} `);
 }
 
+/**
+ * Called on mapPositions emit. Adds new map positions
+ * @param {Object} params - Parameters
+ * @param {Object[]} params.positions - New map positions
+ * @param {string} [params.team] - Name of the team that the user in the position belongs to. Valid for user positions
+ * @param {Date} [params.currentTime] - Time of update of the positions
+ */
 function onMapPositions(params) {
   const mapPositions = params.positions || [];
   const team = params.team;
@@ -1717,17 +1949,30 @@ function onVideoMessage(params = {}) {
     videoPlayer.loadVideo();
 
     videoPlayer.getPlayer().addEventListener('canplaythrough', () => {
-      layoutChanger.splitView(true, domManipulator.getVideoHolder());
+      // layoutChanger.splitView(true, domManipulator.getVideoHolder());
       videoPlayer.playVideo();
     });
   }
 }
 
+/**
+ * Called on reboot emit. Calls reboot command
+ */
 function onReboot() {
   commandHandler.triggerCommand({ cmd: 'reboot' });
 }
 
-function onStationStats(params = { teamsStats: [], stationsStats: [] }) {
+/**
+ * Called on stationStats emit
+ * @param {Object} params - Parameters
+ * @param {Object[]} params.teams - Team names, scores
+ * @param {string} params.teams[].short_name - Name of the team
+ * @param {Object[]} params.stations - Station IDs, status
+ * @param {Object} params.currentRound - Times for current round
+ * @param {Object} params.futureRounds - Times for future rounds
+ * @param {Date} params.now - Current time
+ */
+function onStationStats(params) {
   const stationsStats = params.stations;
   const teamsStats = params.teams;
   const currentRound = params.currentRound;
@@ -1866,6 +2111,10 @@ function onStartup(params = { }) {
 }
 
 window.addEventListener('error', (event) => {
+  /**
+   * Reloads page
+   * @private
+   */
   function restart() {
     window.location.reload();
   }
@@ -1895,7 +2144,6 @@ socketHandler.startSocket({
   disconnectUser: onDisconnectUser,
   morse: onMorse,
   time: onTime,
-  locationMsg: onLocationMsg,
   ban: onBan,
   logout: onLogout,
   updateCommands: onUpdateCommands,

@@ -19,7 +19,7 @@ let reconnecting = false;
 /**
  * Add all listenable events to socket.io
  * @static
- * @param {string[]} events - All listenable events
+ * @param {Object} events - All listenable events
  */
 function startSocket(events) {
   if (socket) {
@@ -55,7 +55,7 @@ function reconnect() {
 /**
  * Emit event through socket.io
  * @param {Object} event - Event to emit
- * @param {Object} params - Parameters to send in the emit
+ * @param {Object} [params] - Parameters to send in the emit
  * @static
  */
 function emit(event, params) {

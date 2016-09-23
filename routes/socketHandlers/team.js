@@ -10,6 +10,14 @@ const objectValidator = require('../../utils/objectValidator');
 const messenger = require('../../socketHelpers/messenger');
 const appConfig = require('../../config/defaults/config').app;
 
+/**
+ * Update user's team
+ * @param {Object} params - Parameters
+ * @param {Object} params.socket - Socket.IO socket
+ * @param {string} params.userName - Name of the user
+ * @param {string} params.teamName - Name of the team
+ * @param {Function} params.callback - Callback
+ */
 function updateUserTeam(params) {
   const socket = params.socket;
   const userName = params.userName;
@@ -43,6 +51,13 @@ function updateUserTeam(params) {
   });
 }
 
+/**
+ * Add user to team's room
+ * @param {Object} params - Parameters
+ * @param {string} params.userName - Name of the user
+ * @param {string} params.roomName - Name of the room
+ * @param {Object} params.io - Socket.IO
+ */
 function addUserTeamRoom(params) {
   const roomName = params.roomName;
   const userName = params.userName;
@@ -69,6 +84,13 @@ function addUserTeamRoom(params) {
   });
 }
 
+/**
+ * Get team
+ * @param {Object} params - Parameters
+ * @param {Object} params.socket - Socket.IO socket
+ * @param {Object} params.user - User
+ * @param {Function} params.callback - Callback
+ */
 function getTeam(params) {
   const socket = params.socket;
   const user = params.user;
@@ -91,6 +113,10 @@ function getTeam(params) {
   });
 }
 
+/**
+ * @param {object} socket - Socket.IO socket
+ * @param {object} io - Socket.IO
+ */
 function handle(socket, io) {
   socket.on('getTeam', () => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteteam.commandName, (allowErr, allowed, user) => {
@@ -101,10 +127,7 @@ function handle(socket, io) {
       getTeam({
         socket,
         user,
-        callback: (err) => {
-          if (err) {
-            return;
-          }
+        callback: () => {
         },
       });
     });
@@ -243,6 +266,13 @@ function handle(socket, io) {
     });
   });
 
+  /**
+   * Create a team
+   * @param {Object} params - Parameters
+   * @param {Object} params.team - Team
+   * @param {string} params.team.owner - Owner of the team
+   * @param {string} params.team.admins - Admins of the team
+   */
   socket.on('createTeam', (params) => {
     if (!objectValidator.isValidData(params, { team: { teamName: true, owner: true } })) {
       return;
@@ -633,8 +663,6 @@ function handle(socket, io) {
                     text_se: [`Misslyckades med att ta bort alla inbjudan av typen ${invitation.invitationType}`],
                     err: teamErr,
                   });
-
-                  return;
                 }
               });
 

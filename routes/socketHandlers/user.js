@@ -8,10 +8,19 @@ const appConfig = require('../../config/defaults/config').app;
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
 
+/**
+ * Does string contain valid characters?
+ * @param {string} text - String to check
+ * @returns {boolean} Does string contain valid characters?
+ */
 function isTextAllowed(text) {
   return /^[a-zA-Z0-9]+$/g.test(text);
 }
 
+/**
+ * @param {object} socket - Socket.IO socket
+ * @param {object} io - Socket.IO
+ */
 function handle(socket, io) {
   socket.on('userExists', (params) => {
     if (!objectValidator.isValidData(params, { user: { userName: true } })) {
@@ -107,10 +116,7 @@ function handle(socket, io) {
           accessLevel: 12,
         };
 
-        manager.createRoom(newRoom, user, (createErr) => {
-          if (createErr) {
-            return;
-          }
+        manager.createRoom(newRoom, user, () => {
         });
 
         messenger.sendSelfMsg({
@@ -283,8 +289,6 @@ function handle(socket, io) {
         dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
           if (userOnlineErr || settedUser === null) {
             console.log('Failed to set last online');
-
-            return;
           }
         });
       });
@@ -798,8 +802,6 @@ function handle(socket, io) {
             text_se: ['Misslyckades med att lagra nya användarläget'],
             err,
           });
-
-          return;
         }
       });
     });

@@ -27,9 +27,9 @@ const ErrorCodes = {
 
 /**
  * Prints error message to server log
- * @param code Error code
- * @param text Array Text to be printed
- * @param err Thrown error
+ * @param {Object} code - Error code
+ * @param {string} text - Text to be printed
+ * @param {Object} err - Thrown error
  */
 function printErrorMsg(code, text, err) {
   console.log('[ERROR]', code.text, text, '- Error:', err || '');
@@ -37,33 +37,40 @@ function printErrorMsg(code, text, err) {
 
 /**
  * Prepares the error message and prints it
- * @param data Contains error code and array with text to be printed
+ * @param {Object} params - Parameters
+ * @param {Object} params.code - Error code
+ * @param {string} params.text - Error text
+ * @param {Object} [params.err] - Thrown error
  */
-function sendErrorMsg(data) {
-  if (!objectValidator.isValidData(data, { code: true, text: true })) {
+function sendErrorMsg(params) {
+  if (!objectValidator.isValidData(params, { code: true, text: true })) {
     return;
   }
 
-  const code = data.code;
-  const text = data.text;
-  const err = data.err;
+  const code = params.code;
+  const text = params.text;
+  const err = params.err;
 
   printErrorMsg(code, text, err);
 }
 
 /**
  * Prepares the errmor message and prints it both server log and to client
- * @param data Contains socket from socket.io, error code and array with text to be printed
+ * @param {Object} params - Parameters
+ * @param {Object} params.code - Error code
+ * @param {string} params.text - Error text
+ * @param {Object} params.socket - Socket.IO socket
+ * @param {Object} [params.err] - Thrown error
  */
-function sendSocketErrorMsg(data) {
-  if (!objectValidator.isValidData(data, { socket: true, code: true, text: true })) {
+function sendSocketErrorMsg(params) {
+  if (!objectValidator.isValidData(params, { socket: true, code: true, text: true })) {
     return;
   }
 
-  const socket = data.socket;
-  const code = data.code;
-  const text = data.text;
-  const err = data.err;
+  const socket = params.socket;
+  const code = params.code;
+  const text = params.text;
+  const err = params.err;
   text[0] = `[${code.num}] ${text[0]}`;
 
   messenger.sendSelfMsg({
@@ -77,7 +84,7 @@ function sendSocketErrorMsg(data) {
 
 /**
  * Prints info message to server log
- * @param text Array Text to be printed
+ * @param {string} text - Text to be printed
  */
 function sendInfoMsg(text) {
   console.log('[INFO]', text);

@@ -23,12 +23,19 @@ const roomSchema = new mongoose.Schema({
 
 const Room = mongoose.model('Room', roomSchema);
 
-function authUserToRoom(sentUser, sentRoomName, sentPassword, callback) {
+/**
+ * Authorize the user to the room, by checking if the password is correct and the user has high enough access level
+ * @param {Object} user - User to authorize
+ * @param {string} roomName - Name of the room
+ * @param {string} password - Password of the room
+ * @param {Function} callback - Callback
+ */
+function authUserToRoom(user, roomName, password, callback) {
   const query = {
     $and: [
-      { accessLevel: { $lte: sentUser.accessLevel } },
-      { roomName: sentRoomName },
-      { password: sentPassword },
+      { accessLevel: { $lte: user.accessLevel } },
+      { roomName },
+      { password },
     ],
   };
 
@@ -45,11 +52,17 @@ function authUserToRoom(sentUser, sentRoomName, sentPassword, callback) {
   });
 }
 
-// TODO Move findOne for user to outside of the database function
+/**
+ * Create and save room
+ * @param {Object} sentRoom - New room
+ * @param {Object} sentUser - User that created the room
+ * @param {Function} callback - Callback
+ */
 function createRoom(sentRoom, sentUser, callback) {
   const newRoom = new Room(sentRoom);
   let query;
 
+  // TODO Remove user check. All users should be able to create multiple rooms
   if (sentUser && sentUser.accessLevel < 11) {
     query = {
       $or: [
@@ -98,15 +111,20 @@ function createRoom(sentRoom, sentUser, callback) {
   });
 }
 
-function getRoom(sentRoomName, callback) {
-  const query = { roomName: sentRoomName };
+/**
+ * Get room
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function getRoom(roomName, callback) {
+  const query = { roomName };
   const filter = { _id: 0 };
 
   Room.findOne(query, filter).lean().exec((err, room) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: [`Failed to get room ${sentRoomName}`],
+        text: [`Failed to get room ${roomName}`],
         err,
       });
     }
@@ -115,8 +133,13 @@ function getRoom(sentRoomName, callback) {
   });
 }
 
-function getOwnedRooms(sentUser, callback) {
-  const query = { owner: sentUser.userName };
+/**
+ * Get rooms owned by user
+ * @param {Object} user - Owner
+ * @param {Function} callback - Callback
+ */
+function getOwnedRooms(user, callback) {
+  const query = { owner: user.userName };
   const sort = { roomName: 1 };
   const filter = { _id: 0 };
 
@@ -133,8 +156,13 @@ function getOwnedRooms(sentUser, callback) {
   });
 }
 
-function getAllRooms(sentUser, callback) {
-  const query = { visibility: { $lte: sentUser.accessLevel } };
+/**
+ * Get all rooms, based on user's access level
+ * @param {Object} user - User
+ * @param {Function} callback - Callback
+ */
+function getAllRooms(user, callback) {
+  const query = { visibility: { $lte: user.accessLevel } };
   const sort = { roomName: 1 };
   const filter = { _id: 0 };
 
@@ -151,15 +179,21 @@ function getAllRooms(sentUser, callback) {
   });
 }
 
-function banUserFromRoom(sentUserName, sentRoomName, callback) {
-  const query = { roomName: sentRoomName };
-  const update = { $addToSet: { bannedUsers: sentUserName } };
+/**
+ * Ban user from room
+ * @param {string} userName - Name of the user
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function banUserFromRoom(userName, roomName, callback) {
+  const query = { roomName };
+  const update = { $addToSet: { bannedUsers: userName } };
 
   Room.findOneAndUpdate(query, update).lean().exec((err, room) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: [`Failed to ban user ${sentUserName} from room ${sentRoomName}`],
+        text: [`Failed to ban user ${userName} from room ${roomName}`],
         err,
       });
     }
@@ -168,15 +202,21 @@ function banUserFromRoom(sentUserName, sentRoomName, callback) {
   });
 }
 
-function unbanUserFromRoom(sentUserName, sentRoomName, callback) {
-  const query = { roomName: sentRoomName };
-  const update = { $pull: { bannedUsers: sentUserName } };
+/**
+ * Unban user from room
+ * @param {string} userName - Name of the user
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function unbanUserFromRoom(userName, roomName, callback) {
+  const query = { roomName };
+  const update = { $pull: { bannedUsers: userName } };
 
   Room.findOneAndUpdate(query, update).lean().exec((err, room) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: [`Failed to unban user ${sentUserName} from room ${sentRoomName}`],
+        text: [`Failed to unban user ${userName} from room ${roomName}`],
         err,
       });
     }
@@ -185,16 +225,22 @@ function unbanUserFromRoom(sentUserName, sentRoomName, callback) {
   });
 }
 
-function removeRoom(sentRoomName, sentUser, callback) {
+/**
+ * Remove room
+ * @param {string} roomName - Name of the room
+ * @param {Object} user - User who is trying to remove the room
+ * @param {Function} callback - Callback
+ */
+function removeRoom(roomName, user, callback) {
   let query;
 
-  if (sentUser.accessLevel >= 11) {
-    query = { roomName: sentRoomName };
+  if (user.accessLevel >= 11) {
+    query = { roomName };
   } else {
     query = {
       $and: [
-        { owner: sentUser.userName },
-        { roomName: sentRoomName },
+        { owner: user.userName },
+        { roomName },
       ],
     };
   }
@@ -207,7 +253,7 @@ function removeRoom(sentRoomName, sentUser, callback) {
         err,
       });
     } else if (room !== null) {
-      chatHistoryConnector.removeHistory(sentRoomName, (histErr, history) => {
+      chatHistoryConnector.removeHistory(roomName, (histErr, history) => {
         if (histErr) {
           logger.sendErrorMsg({
             code: logger.ErrorCodes.db,
@@ -226,6 +272,12 @@ function removeRoom(sentRoomName, sentUser, callback) {
   });
 }
 
+/**
+ * Match partial room name
+ * @param {string} partialName - Partial room name
+ * @param {Object} user - User
+ * @param {Function} callback - Callback
+ */
 function matchPartialRoom(partialName, user, callback) {
   const filter = { _id: 0, roomName: 1 };
   const sort = { roomName: 1 };
@@ -240,7 +292,12 @@ function matchPartialRoom(partialName, user, callback) {
   });
 }
 
-function populateDbRooms(sentRooms, user) {
+/**
+ * Add rooms to db
+ * @param {Object} rooms - Rooms to be added
+ * @param {Object} user - User that will be the owner
+ */
+function populateDbRooms(rooms, user) {
   const roomCallback = (err, room) => {
     if (err) {
       logger.sendErrorMsg({
@@ -253,12 +310,12 @@ function populateDbRooms(sentRooms, user) {
     }
   };
 
-  const roomKeys = Object.keys(sentRooms);
+  const roomKeys = Object.keys(rooms);
 
   logger.sendInfoMsg('PopulateDb: Creating rooms from defaults, if needed');
 
   for (let i = 0; i < roomKeys.length; i++) {
-    const room = sentRooms[roomKeys[i]];
+    const room = rooms[roomKeys[i]];
 
     createRoom(room, user, roomCallback);
   }

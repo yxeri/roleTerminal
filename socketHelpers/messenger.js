@@ -83,10 +83,10 @@ function parseMorse(text) {
 
 /**
  * Add a sent message to a room's history in the database
- * @param roomName Name of the room
- * @param message Message to be added
- * @param socket Socket.io socket
- * @param callback Function callback
+ * @param {string} roomName - Name of the room
+ * @param {Object} message - Message to be added
+ * @param {Object} socket - Socket.io socket
+ * @param {Function} callback - callback
  */
 function addMsgToHistory(roomName, message, socket, callback) {
   dbChatHistory.addMsgToHistory(roomName, message, (err, history) => {
@@ -112,7 +112,7 @@ function addMsgToHistory(roomName, message, socket, callback) {
 
 /**
  * Send a message to the user's socket
- * @param {{socket: Object, message: {text: string[]}}} params
+ * @param {{socket: Object, message: {text: string[]}}} params - Parameters
  */
 function sendSelfMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true } })) {
@@ -126,7 +126,7 @@ function sendSelfMsg(params) {
 
 /**
  * Sends multiple message to the user's socket
- * @param {{socket: Object, messages: Object[]}} params
+ * @param {{socket: Object, messages: Object[]}} params - Parameters
  */
 function sendSelfMsgs(params) {
   if (!objectValidator.isValidData(params, { socket: true, messages: true })) {
@@ -140,9 +140,9 @@ function sendSelfMsgs(params) {
 
 /**
  * Checks if the socket is following a room
- * @param socket Socket.io socket
- * @param roomName Name of the room
- * @returns {boolean} Returns true if the socket is following the room
+ * @param {Object} socket - Socket.io socket
+ * @param {string} roomName - Name of the room
+ * @returns {boolean} Is the socket following the room?
  */
 function isSocketFollowingRoom(socket, roomName) {
   if (Object.keys(socket.rooms).indexOf(roomName) === -1) {
@@ -163,7 +163,7 @@ function isSocketFollowingRoom(socket, roomName) {
 /**
  * Sends a message to a room. The message will not be stored in history
  * Emits message
- * @param params Contains socket (socket.io socket), message (required: text, userName) and sendTo (room name)
+ * @param {{sendTo: string, socket: Object, message: {text: string[], userName: string}}} params - Parameters
  */
 function sendMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true }, sendTo: true })) {
@@ -183,7 +183,7 @@ function sendMsg(params) {
  * Sends a message with the importantMsg class. It can be sent to all connected sockets or one specific device (if toOneDevice is set)
  * It is stored in a separate histories collection for important messages
  * Emits importantMsg
- * @param params Contains socket (socket.io socket), message (required: text, userName) and optional toOneDevice (boolean. True will send it to specific device)
+ * @param {{toOneDevice: boolean, socket: Object, message: {text: string[], userName: string}}} params - Parameters
  */
 function sendImportantMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
@@ -221,7 +221,7 @@ function sendImportantMsg(params) {
 /**
  * Sends a message to a room and stores it in history
  * Emits message
- * @param params Contains socket (socket.io), message (required: text, roomName, userName)
+ * @param {{socket: Object, message: {text: string[], roomName: string, userName: string}}} params - Parameters
  */
 function sendChatMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
@@ -249,7 +249,7 @@ function sendChatMsg(params) {
 /**
  * Sends a message to a whisper room (*user name*-whisper), which is followed by a single user, and stores it in history
  * Emits message
- * @param params Contains socket (socket.io), message (required: text, roomName, userName)
+ * @param {{socket: Object, message: {text: string[], roomName: string, userName: string}}} params - Parameters
  */
 function sendWhisperMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
@@ -286,7 +286,7 @@ function sendWhisperMsg(params) {
  * Sends a message with broadcastMsg class to all connected sockets
  * It is stored in a separate broadcast history
  * Emits message
- * @param params Contains socket (socket.io), message (required: text, user name)
+ * @param {{socket: Object, message: {text: string[], userName: string}}} params - Parameters
  */
 function sendBroadcastMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
@@ -314,7 +314,7 @@ function sendBroadcastMsg(params) {
 /**
  * Send an array of strings with an optional title
  * Emits list
- * @param params Contains socket (socket.io), itemList (required: itemList, listTitle) and optional columns
+ * @param {{socket: Object, itemList: { itemList: Object[], listTitle: string}, columns: number}} params - Parameters
  */
 function sendList(params) {
   if (!objectValidator.isValidData(params, { socket: true, itemList: { itemList: true, listTitle: true } })) {
@@ -332,7 +332,12 @@ function sendList(params) {
 
 /**
  * Send morse code to all sockets and store in history
- * @param params Contains socket (socket.io), message (required: morseCode)
+ * @param {Object} params - Parameters
+ * @param {Object} params.socket - Socket.IO socket
+ * @param {Object} params.message - Message
+ * @param {string} [params.message.room] - Room name
+ * @param {boolean} [params.silent] - Should the morse code text be surpressed?
+ * @param {boolean} [params.local] - Should morse be played on the client that sent it?
  */
 function sendMorse(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { morseCode: true } })) {
@@ -361,10 +366,7 @@ function sendMorse(params) {
       roomName,
     };
 
-    addMsgToHistory(roomName, morseMessage, socket, (err) => {
-      if (err) {
-        return;
-      }
+    addMsgToHistory(roomName, morseMessage, socket, () => {
     });
   }
 }

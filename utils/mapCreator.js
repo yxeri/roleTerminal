@@ -4,14 +4,29 @@ const appConfig = require('../config/defaults/config').app;
 const request = require('request');
 const xml2json = require('xml2json');
 
+/**
+ * Convert xml to json
+ * @param {Object} xml - XML data
+ * @returns {Object} JSON
+ */
 function convertToJson(xml) {
   return JSON.parse(xml2json.toJson(xml));
 }
 
-function parseCoords(string) {
+/**
+ * Parse and clean up coordinates from Google Maps
+ * @param {string} string - Coordinate string
+ * @returns {string[]} Coordinates
+ */
+function parseGoogleCoords(string) {
   return string.replace(/0\.0 |0\.0/g, '').replace(/,$/g, '').split(',');
 }
 
+/**
+ * Creates a collection of all Google coordinates
+ * @param {number[]} coords - Coordinates from Google maps
+ * @returns {{lat: number, lng: number}[]} Collection with positions (latitudes and longitudes)
+ */
 function createCoordsCollection(coords) {
   const coordsCollection = [];
 
@@ -39,18 +54,25 @@ function createCoordsCollection(coords) {
 }
 
 /**
- * @param {Object} placemark
- * @returns {{positionName: string, position: {latitude: Number, longitude: Number}, isStatic: boolean, type: string, geometry: string, description: string}}
+ * Create and return a position with a position from Google Maps as base
+ * @param {Object} placemark - Google Maps position
+ * @param {Object} placemark.name - Google Maps position name
+ * @param {Object} [placemark.description] - Google Maps position description
+ * @param {Object} [placemark.Polygon] - Google Maps position polygon
+ * @param {Object} placemark.Polygon.outerBoundaryIs.LinearRing.coordinates - Google Maps polygon coordinates
+ * @param {Object} [placemark.LineString] - Google Maps position line
+ * @param {Object} [placemark.Point] - Google Maps position point
+ * @returns {{positionName: string, position: {latitude: Number, longitude: Number}, isStatic: boolean, type: string, geometry: string, description: string}} New position
  */
 function createPosition(placemark) {
   const position = {};
   let geometry = '';
 
   if (placemark.Polygon) {
-    position.coordsCollection = createCoordsCollection(parseCoords(placemark.Polygon.outerBoundaryIs.LinearRing.coordinates));
+    position.coordsCollection = createCoordsCollection(parseGoogleCoords(placemark.Polygon.outerBoundaryIs.LinearRing.coordinates));
     geometry = 'polygon';
   } else if (placemark.LineString) {
-    position.coordsCollection = createCoordsCollection(parseCoords(placemark.LineString.coordinates));
+    position.coordsCollection = createCoordsCollection(parseGoogleCoords(placemark.LineString.coordinates));
     geometry = 'line';
   } else if (placemark.Point) {
     position.latitude = placemark.Point.coordinates.split(',')[1];
@@ -68,6 +90,10 @@ function createPosition(placemark) {
   };
 }
 
+/**
+ * Get Google Maps positions
+ * @param {Function} callback - Callback
+ */
 function getGooglePositions(callback) {
   request.get(appConfig.mapLayersPath, (err, response, body) => {
     if (err || response.statusCode !== 200) {
@@ -77,9 +103,15 @@ function getGooglePositions(callback) {
     }
 
     const positions = [];
+    /**
+     * @type {{ kml: Object, Document: Object, Folder: Object }}
+     */
     const layers = convertToJson(body).kml.Document.Folder;
 
     for (const layerKey of Object.keys(layers)) {
+      /**
+       * @type {{ Placemark: Object }}
+       */
       const layer = layers[layerKey];
 
       // Placemark can be either an object or an array with objects

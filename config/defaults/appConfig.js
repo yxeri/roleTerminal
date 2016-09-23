@@ -8,6 +8,11 @@ try {
   console.log('Did not find modified appConfig. Using defaults');
 }
 
+/**
+ * Converts string to boolean
+ * @param {string} envar - Value
+ * @returns {boolean} Converted boolean
+ */
 function convertToBoolean(envar) {
   if (envar === 'true') {
     return true;

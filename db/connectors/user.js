@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+/**
+ * Update user field
+ * @param {string} userName - Name of the user
+ * @param {Object} update - Update
+ * @param {Function} callback - Callback
+ */
 function updateUserValue(userName, update, callback) {
   const query = { userName };
 
@@ -45,18 +51,36 @@ function updateUserValue(userName, update, callback) {
   });
 }
 
+/**
+ * Update if user is tracked
+ * @param {string} userName - Name of the user
+ * @param {boolean} value - Is the user being tracked?
+ * @param {Function} callback - Callback
+ */
 function updateUserIsTracked(userName, value, callback) {
   const update = { $set: { isTracked: value } };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Update user's team
+ * @param {string} userName - Name of the user
+ * @param {string} value - Name of the team
+ * @param {Function} callback - Callback
+ */
 function updateUserTeam(userName, value, callback) {
   const update = { $set: { team: value } };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Set new group to user
+ * @param {string} userName - Name of the user
+ * @param {string} group - Name of the group
+ * @param {Function} callback - Callback
+ */
 function addGroupToUser(userName, group, callback) {
   const query = { userName };
   const update = { $push: { group } };
@@ -74,6 +98,11 @@ function addGroupToUser(userName, group, callback) {
   });
 }
 
+/**
+ * Get user by device ID or device alias
+ * @param {string} deviceCode - Device ID OR device alias
+ * @param {Function} callback - Callback
+ */
 function getUserByDevice(deviceCode, callback) {
   deviceConnector.getDevice(deviceCode, (err, device) => {
     if (err || device === null) {
@@ -101,6 +130,11 @@ function getUserByDevice(deviceCode, callback) {
   });
 }
 
+/**
+ * Get user by socket ID
+ * @param {string} sentSocketId - Socket ID
+ * @param {Function} callback - Callback
+ */
 function getUserById(sentSocketId, callback) {
   const query = { socketId: sentSocketId };
   const filter = { _id: 0 };
@@ -118,9 +152,15 @@ function getUserById(sentSocketId, callback) {
   });
 }
 
-function authUser(sentUserName, sentPassword, callback) {
+/**
+ * Authorize user
+ * @param {string} userName - Name of the user
+ * @param {string} password - Password of the user
+ * @param {Function} callback - Callback
+ */
+function authUser(userName, password, callback) {
   const query = {
-    $and: [{ userName: sentUserName }, { password: sentPassword }],
+    $and: [{ userName }, { password }],
   };
 
   User.findOne(query).lean().exec((err, user) => {
@@ -136,6 +176,11 @@ function authUser(sentUserName, sentPassword, callback) {
   });
 }
 
+/**
+ * Get user
+ * @param {string} userName - User name
+ * @param {Function} callback - Callback
+ */
 function getUser(userName, callback) {
   const query = { userName };
   const filter = { _id: 0, password: 0 };
@@ -153,6 +198,11 @@ function getUser(userName, callback) {
   });
 }
 
+/**
+ * Create and save user
+ * @param {Object} user - New user
+ * @param {Function} callback - Callback
+ */
 function createUser(user, callback) {
   const newUser = new User(user);
 
@@ -171,30 +221,57 @@ function createUser(user, callback) {
   });
 }
 
+/**
+ * Update user's socket ID
+ * @param {string} userName - Name of the user
+ * @param {string} value - New socket ID
+ * @param {Function} callback - Callback
+ */
 function updateUserSocketId(userName, value, callback) {
   const update = { socketId: value, online: true };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Set user online
+ * @param {string} userName - Name of the user
+ * @param {boolean} value Is the user online?
+ * @param {Function} callback - Callback
+ */
 function updateUserOnline(userName, value, callback) {
   const update = { online: value };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Update user's mode
+ * @param {string} userName - Name of the user
+ * @param {string} mode - New input mode
+ * @param {Function} callback - Callback
+ */
 function updateUserMode(userName, mode, callback) {
   const update = { mode };
 
   updateUserValue(userName, update, callback);
 }
 
-function verifyUser(sentUserName, callback) {
-  const query = { userName: sentUserName };
+/**
+ * Verify user
+ * @param {string} userName - Name of the user
+ * @param {Function} callback - Callback
+ */
+function verifyUser(userName, callback) {
+  const query = { userName };
 
   databaseConnector.verifyObject(query, User, 'user', callback);
 }
 
+/**
+ * Verify all users
+ * @param {Function} callback - Callback
+ */
 function verifyAllUsers(callback) {
   const query = { verified: false };
 
@@ -202,7 +279,9 @@ function verifyAllUsers(callback) {
 }
 
 /**
- * @param {Object} sentUser
+ * Gets all user
+ * @param {Object} sentUser - User that is checking for all users
+ * @param {Function} callback - Function to be called on completion
  */
 function getAllUsers(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
@@ -222,6 +301,11 @@ function getAllUsers(sentUser, callback) {
   });
 }
 
+/**
+ * Get positions for all users, based on user's access level
+ * @param {Object} sentUser - User who is retrieving positions
+ * @param {Function} callback - Callback
+ */
 function getAllUserPositions(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
   const sort = { userName: 1 };
@@ -254,6 +338,12 @@ function getAllUserPositions(sentUser, callback) {
   });
 }
 
+/**
+ * Get positions for a user, based on the access level of the user retrieving the positions
+ * @param {Object} sentUser - User retrieving the positions
+ * @param {string} sentUserName - Name of the user
+ * @param {Function} callback - Callback
+ */
 function getUserPositions(sentUser, sentUserName, callback) {
   const query = {
     $and: [
@@ -288,6 +378,11 @@ function getUserPositions(sentUser, sentUserName, callback) {
   });
 }
 
+/**
+ * Get all users following a room
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
 function getUsersFollowingRoom(roomName, callback) {
   const query = { rooms: { $in: [roomName] } };
   const filter = { rooms: 1, socketId: 1 };
@@ -305,9 +400,15 @@ function getUsersFollowingRoom(roomName, callback) {
   });
 }
 
-function addRoomToUser(sentUserName, sentRoomName, callback) {
-  const query = { userName: sentUserName };
-  const update = { $addToSet: { rooms: sentRoomName } };
+/**
+ * Add room to user
+ * @param {string} userName - Name of the user
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function addRoomToUser(userName, roomName, callback) {
+  const query = { userName };
+  const update = { $addToSet: { rooms: roomName } };
 
   User.findOneAndUpdate(query, update).lean().exec((err, user) => {
     if (err || user === null) {
@@ -322,15 +423,21 @@ function addRoomToUser(sentUserName, sentRoomName, callback) {
   });
 }
 
-function removeRoomFromUser(sentUserName, sentRoomName, callback) {
-  const query = { userName: sentUserName };
-  const update = { $pull: { rooms: sentRoomName } };
+/**
+ * Remove room from user
+ * @param {string} userName - Name of the user
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
+function removeRoomFromUser(userName, roomName, callback) {
+  const query = { userName };
+  const update = { $pull: { rooms: roomName } };
 
   User.findOneAndUpdate(query, update).lean().exec((err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: [`Failed to remove room ${sentRoomName} from user`],
+        text: [`Failed to remove room ${roomName} from user`],
         err,
       });
     }
@@ -339,6 +446,11 @@ function removeRoomFromUser(sentUserName, sentRoomName, callback) {
   });
 }
 
+/**
+ * Remove room from all users following it
+ * @param {string} roomName - Name of the room
+ * @param {Function} callback - Callback
+ */
 function removeRoomFromAllUsers(roomName, callback) {
   const query = { rooms: { $in: [roomName] } };
   const update = { $pull: { rooms: roomName } };
@@ -357,15 +469,21 @@ function removeRoomFromAllUsers(roomName, callback) {
   });
 }
 
-function setUserLastOnline(sentUserName, sentDate, callback) {
-  const query = { userName: sentUserName };
-  const update = { lastOnline: sentDate };
+/**
+ * Set user last seen
+ * @param {string} userName - Name of the user
+ * @param {Date} date - Last seen
+ * @param {Function} callback - Callback
+ */
+function setUserLastOnline(userName, date, callback) {
+  const query = { userName };
+  const update = { lastOnline: date };
 
   User.findOneAndUpdate(query, update).lean().exec((err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
-        text: [`Failed to update last online on ${sentUserName}`],
+        text: [`Failed to update last online on ${userName}`],
         err,
       });
     }
@@ -374,6 +492,10 @@ function setUserLastOnline(sentUserName, sentDate, callback) {
   });
 }
 
+/**
+ * Get all unverified users
+ * @param {Function} callback - Callback
+ */
 function getUnverifiedUsers(callback) {
   const query = { verified: false };
   const filter = { _id: 0 };
@@ -392,8 +514,13 @@ function getUnverifiedUsers(callback) {
   });
 }
 
-function banUser(sentUserName, callback) {
-  const query = { userName: sentUserName };
+/**
+ * Ban user
+ * @param {string} userName - Name of the user
+ * @param {Function} callback - Callback
+ */
+function banUser(userName, callback) {
+  const query = { userName };
   const update = { banned: true, socketId: '' };
 
   User.findOneAndUpdate(query, update).lean().exec((err, user) => {
@@ -409,8 +536,13 @@ function banUser(sentUserName, callback) {
   });
 }
 
-function unbanUser(sentUserName, callback) {
-  const query = { userName: sentUserName };
+/**
+ * Unban user
+ * @param {string} userName - Name of the user
+ * @param {Function} callback - Callback
+ */
+function unbanUser(userName, callback) {
+  const query = { userName };
   const update = { banned: false };
 
   User.findOneAndUpdate(query, update).lean().exec((err, user) => {
@@ -426,6 +558,10 @@ function unbanUser(sentUserName, callback) {
   });
 }
 
+/**
+ * Get all banned users
+ * @param {Function} callback - Callback
+ */
 function getBannedUsers(callback) {
   const query = { banned: true };
   const filter = { userName: 1, _id: 0 };
@@ -444,7 +580,11 @@ function getBannedUsers(callback) {
   });
 }
 
-function populateDbUsers(sentUsers) {
+/**
+ * Add users to the db
+ * @param {Object} users - New users
+ */
+function populateDbUsers(users) {
   User.count({}).exec((err, userCount) => {
     if (err) {
       logger.sendErrorMsg({
@@ -453,7 +593,7 @@ function populateDbUsers(sentUsers) {
         err,
       });
     } else if (userCount < 1) {
-      const userKeys = Object.keys(sentUsers);
+      const userKeys = Object.keys(users);
       const callback = (userErr, user) => {
         if (userErr || user === null) {
           logger.sendErrorMsg({
@@ -473,7 +613,7 @@ function populateDbUsers(sentUsers) {
       logger.sendInfoMsg('PopulateDb: Creating users from defaults');
 
       for (let i = 0; i < userKeys.length; i++) {
-        const user = sentUsers[userKeys[i]];
+        const user = users[userKeys[i]];
 
         createUser(user, callback);
       }
@@ -483,12 +623,24 @@ function populateDbUsers(sentUsers) {
   });
 }
 
+/**
+ * Set new user visibility
+ * @param {string} userName - Name of the user
+ * @param {number} value - New visibility
+ * @param {Function} callback - Callback
+ */
 function updateUserVisibility(userName, value, callback) {
   const update = { visibility: value };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Set new user access level
+ * @param {string} userName - Name of the user
+ * @param {number} value - New access level
+ * @param {Function} callback - Callback
+ */
 function updateUserAccessLevel(userName, value, callback) {
   const query = { userName };
   const update = { accessLevel: value };
@@ -506,6 +658,12 @@ function updateUserAccessLevel(userName, value, callback) {
   });
 }
 
+/**
+ * Set new room visibiity
+ * @param {string} roomName - Name of the room
+ * @param {number} value - New visibility
+ * @param {Function} callback - Callback
+ */
 function updateRoomVisibility(roomName, value, callback) {
   const query = { roomName };
   const update = { visibility: value };
@@ -523,6 +681,12 @@ function updateRoomVisibility(roomName, value, callback) {
   });
 }
 
+/**
+ * Set new room access level
+ * @param {string} roomName - Name of the room
+ * @param {number} value - New access level
+ * @param {Function} callback - Callback
+ */
 function updateRoomAccessLevel(roomName, value, callback) {
   const query = { roomName };
   const update = { accessLevel: value };
@@ -540,12 +704,24 @@ function updateRoomAccessLevel(roomName, value, callback) {
   });
 }
 
+/**
+ * Set new password for user
+ * @param {string} userName - Name of the user
+ * @param {string} value - New password
+ * @param {Function} callback - Callback
+ */
 function updateUserPassword(userName, value, callback) {
   const update = { password: value };
 
   updateUserValue(userName, update, callback);
 }
 
+/**
+ * Match partial use rname
+ * @param {string} partialName - Partial user name
+ * @param {Object} user - User doing the matching
+ * @param {Function} callback - Callback
+ */
 function matchPartialUser(partialName, user, callback) {
   const filter = { _id: 0, userName: 1 };
   const sort = { userName: 1 };

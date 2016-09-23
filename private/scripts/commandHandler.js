@@ -107,7 +107,7 @@ function collectCommands() {
  * Run command
  * @param {Object} params - Parameters
  * @param {string} params.cmd - Name of the command to be triggered
- * @param {string[]} params.cmdParams - Command parameters sent to the commands
+ * @param {string[]} [params.cmdParams] - Command parameters sent to the commands
  */
 function triggerCommand(params) {
   const cmdParams = params.cmdParams;
@@ -169,10 +169,10 @@ function isCommandChar(char) {
 
 /**
  * Get the names of all commands
- * @param {Object} params - Parameters
- * @param {boolean} params.aliases - Should aliases be included with the returned commands?
- * @param {boolean} params.filtered - Should returned commands be filtered based on user's access level?
- * @param {boolean} params.extras - Should returned commands contain extra category commands?
+ * @param {Object} [params] - Parameters
+ * @param {boolean} [params.aliases] - Should aliases be included with the returned commands?
+ * @param {boolean} [params.filtered] - Should returned commands be filtered based on user's access level?
+ * @param {boolean} [params.extras] - Should returned commands contain extra category commands?
  * @returns {string[]} - Names of all commands
  */
 function getCommands(params) {

@@ -447,8 +447,8 @@ function attachMapListeners() {
  */
 function createMarkerClusterer() {
   markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
-    gridSize: 20,
-    maxZoom: 16,
+    gridSize: 24,
+    maxZoom: 17,
     zoomOnClick: false,
     singleSize: true,
     averageCenter: true,
@@ -501,7 +501,7 @@ function createMap(params) {
     streetViewControl: false,
     backgroundColor: '#001e15',
     minZoom: 3,
-    maxZoom: 18,
+    maxZoom: 19,
     styles: [
       {
         featureType: 'all',

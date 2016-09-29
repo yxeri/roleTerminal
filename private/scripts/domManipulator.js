@@ -28,10 +28,6 @@ const menu = document.getElementById('menu');
  * @type {HTMLElement}
  */
 const mainFeed = document.getElementById('mainFeed');
-/**
- * User input field
- * @type {HTMLElement}
- */
 const cmdInput = document.getElementById('cmdInput');
 /**
  * The span infront of the input field
@@ -487,7 +483,7 @@ function createListItem(text, style) {
  * Creates lists for station and team stats
  * @param {Object} stations - Station IDs and current status
  * @param {Object} teams - Team names and total score
- * @param {Object} currentRound - Start and end time for current round
+ * @param {{endtime: Date, starttime: Date}} currentRound - Start and end time for current round
  * @param {Object} futureRounds - Start times for future rounds, if any
  * @param {Date} now - Current time
  */

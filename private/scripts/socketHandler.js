@@ -70,7 +70,7 @@ function reconnect() {
 
 /**
  * Emit event through socket.io
- * @param {Object} event - Event to emit
+ * @param {string} event - Event to emit
  * @param {Object} [params] - Parameters to send in the emit
  * @static
  */

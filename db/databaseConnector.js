@@ -486,6 +486,9 @@ function getUnverifiedTeams(callback) {
  * @param {Object} params - Parameters
  * @param {Function} params.callback - Callback
  * @param {string} params.partialName - Partial name
+ * @param {Object} params.queryType - Database query
+ * @param {Object} params.filter - Result filter
+ * @param {Object} params.sort - Result sorting
  * @param {Function} params.callback - Callback
  */
 function matchPartial(params) {

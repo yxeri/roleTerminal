@@ -67,8 +67,14 @@ const triggerKeysPressed = [];
 const morseSeparator = '#';
 const teams = {};
 const stations = {};
+/**
+ * @type {AudioContext}
+ */
 let audioCtx;
 let oscillator;
+/**
+ * @type {AudioNode}
+ */
 let gainNode;
 let soundTimeout = 0;
 let previousCommandPointer;
@@ -388,8 +394,6 @@ function buildMorsePlayer() {
     gainNode.gain.value = 0;
     oscillator.type = 'sine';
     oscillator.frequency.value = '440';
-    // oscillator.type = 'square';
-    // oscillator.frequency.value = '300';
 
     oscillator.start(0);
   }
@@ -1095,7 +1099,7 @@ function keyReleased(event) {
  * Attach click listener to menu item
  * @param {Element} menuItem - Menu item that will get a click handler
  * @param {Function} func - Function on click
- * @param {string} funcParam - Function parameters
+ * @param {string} [funcParam] - Function parameters
  */
 function attachMenuListener(menuItem, func, funcParam) {
   if (func) {
@@ -1133,7 +1137,7 @@ function createMenuItem(menuItem) {
 /**
  * Creates sub-menu list
  * @param {string[]} subItems - Items that will be added to the list
- * @param {boolean} replaceInput - Should a click on the item replace current input?
+ * @param {boolean} [replaceInput] - Should a click on the item replace current input?
  * @returns {Element} List item
  */
 function createSubMenuItem(subItems, replaceInput) {
@@ -1234,7 +1238,7 @@ function populateMenu() {
       domManipulator.setThisCommandItem(listItem);
     }
 
-    attachMenuListener(listItem, menuItem.func, menuItem.funcParam);
+    attachMenuListener(listItem, menuItem.func);
     domManipulator.addMenuItem(listItem);
   }
 }
@@ -1463,6 +1467,7 @@ function onFollow(params = { room: {} }) {
  * @param {Object} params - Parameters
  * @param {Object} params.room - Room
  * @param {string} params.room.roomName - Name of the room that was unfollowed
+ * @param {boolean} [params.silent] - Should the room notification be surpressed?
  */
 function onUnfollow(params = { room: { roomName: '' } }) {
   const room = params.room;
@@ -1694,119 +1699,6 @@ function onUpdateCommands(params = { commands: [] }) {
   for (let i = 0; i < newCommands.length; i++) {
     commandHandler.updateCommand(newCommands[i]);
   }
-}
-
-/**
- * Called on weather emit.
- * @param {Object[]} report - Weather information
- */
-function onWeather(report) {
-  const weather = [];
-  let weatherString = '';
-
-  for (let i = 0; i < report.length; i++) {
-    const weatherInstance = report[i];
-    const time = new Date(weatherInstance.time);
-    const hours = textTools.beautifyNumb(time.getHours());
-    const day = textTools.beautifyNumb(time.getDate());
-    const month = textTools.beautifyNumb(time.getMonth() + 1);
-    const temperature = Math.round(weatherInstance.temperature);
-    const windSpeed = Math.round(weatherInstance.gust);
-    const precipitation = weatherInstance.precipitation === 0 ? 'Light ' : `${weatherInstance.precipitation}mm`;
-    let coverage;
-    let precipType;
-    weatherString = '';
-
-    switch (weatherInstance.precipType) {
-      // None
-      case 0: {
-        break;
-      }
-      // Snow
-      case 1: {
-        precipType = labels.getString('weather', 'snow');
-
-        break;
-      }
-      // Snow + rain
-      case 2: {
-        precipType = labels.getString('weather', 'snowRain');
-
-        break;
-      }
-      // Rain
-      case 3: {
-        precipType = labels.getString('weather', 'rain');
-
-        break;
-      }
-      // Drizzle
-      case 4: {
-        precipType = labels.getString('weather', 'drizzle');
-
-        break;
-      }
-      // Freezing rain
-      case 5: {
-        precipType = labels.getString('weather', 'freezeRain');
-
-        break;
-      }
-      // Freezing drizzle
-      case 6: {
-        precipType = labels.getString('weather', 'freezeDrizzle');
-
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    switch (weatherInstance.cloud) {
-      case 0:
-      case 1:
-      case 2:
-      case 3: {
-        coverage = labels.getString('weather', 'light');
-
-        break;
-      }
-      case 4:
-      case 5:
-      case 6: {
-        coverage = labels.getString('weather', 'moderate');
-
-        break;
-      }
-      case 7:
-      case 8:
-      case 9: {
-        coverage = labels.getString('weather', 'high');
-
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
-    weatherString += `${day}/${month} ${hours}:00: `;
-    weatherString += `${labels.getString('weather', 'temperature')}: ${temperature}${'\xB0C'} `;
-    weatherString += `${labels.getString('weather', 'visibility')}: ${weatherInstance.visibility}km `;
-    weatherString += `${labels.getString('weather', 'direction')}: ${weatherInstance.windDirection}${'\xB0'} `;
-    weatherString += `${labels.getString('weather', 'speed')}: ${windSpeed}m/s `;
-    weatherString += `${labels.getString('weather', 'pollution')}: ${coverage} `;
-
-    if (precipType) {
-      weatherString += precipitation;
-      weatherString += precipType;
-    }
-
-    weather.push(weatherString);
-  }
-
-  messenger.queueMessage({ text: weather });
 }
 
 /**
@@ -2163,7 +2055,6 @@ socketHandler.startSocket({
   ban: onBan,
   logout: onLogout,
   updateCommands: onUpdateCommands,
-  weather: onWeather,
   updateDeviceId: onUpdateDeviceId,
   whoAmI: onWhoami,
   list: onList,

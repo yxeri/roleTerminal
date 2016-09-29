@@ -64,26 +64,18 @@ function beautifyNumb(number) {
 /**
  * Takes date and returns shorter human-readable time
  * @static
- * @param {Date} date - Non-humanreadable date
+ * @param {Date} date - Date
  * @param {boolean} [full] - Should the month and day be added?
  * @param {boolean} [year] - Should year be added?
  * @param {Number} [offset] - Should hours be added/removed from the final time?
  * @returns {string} - Human-readable time and date
  */
 function generateTimeStamp(date, full, year, offset) {
-  let newDate = new Date(date);
+  const newDate = new Date(date);
   let timeStamp;
 
   if (offset) {
     newDate.setHours(newDate.getHours() + offset);
-  }
-
-  /**
-   * Splitting of date is a fix for NaN on Android 2.*
-   */
-  if (isNaN(newDate.getMinutes())) {
-    const splitDate = date.split(/[-T:\.]+/);
-    newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
 
   const mins = beautifyNumb(newDate.getMinutes());

@@ -120,6 +120,7 @@ config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
  *   sitePath : '*',
  *   filePath : './routes/index.js'
  * }
+ * @type {{sitePath:string, filePath:string}[]}
  */
 config.routes = modifiedConfig.routes || [
   {

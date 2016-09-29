@@ -67,7 +67,8 @@ function getPolygonCenter(coordsCollection) {
  * @param {Object} params - Parameters
  * @param {string} params.positionName - Name of the position
  * @param {string} params.labelText - Text that will be printed
- * @param {{latitude: Number, longitude: Number}} param.position - Long and lat coordinates of the label
+ * @param {string} params.align - Text alignment (left|right)
+ * @param {{latitude: Number, longitude: Number}} params.position - Long and lat coordinates of the label
  */
 function createLabel(params) {
   const positionName = params.positionName.toLowerCase();
@@ -92,6 +93,11 @@ function createLabel(params) {
  * @private
  * @param {Object} params - Parameters
  * @param {string} params.markerName - Name of the map marker
+ * @param {string} params.title - Title of the marker description
+ * @param {string} params.markerType - Type of the marker
+ * @param {number} params.opacity - Opacity of the marker in the view
+ * @param {boolean} params.hideLabel - Should the label be hidden in the view?
+ * @param {boolean} params.ignoreCluster - Should the marker be excluded from clusters?
  * @param {string} params.iconUrl - Path to a custom icon image
  * @param {{longitude: Number, latitude: Number}} params.position - Long and lat coordinates of the map marker
  * @param {string} params.description - Description for map marker, which will be shown on click or command
@@ -201,7 +207,7 @@ function setMarkerPosition(params) {
  * @param {Object} params - Parameters
  * @param {string} params.positionName - Name of the polygon
  * @param {Object[]} params.coordsCollection - Collection of x and y coordinates of the polygon
- * @param {boolean} params.hideLabel - Should the label be hidden?
+ * @param {boolean} [params.hideLabel] - Should the label be hidden?
  */
 function createPolygon(params) {
   const positionName = params.positionName;
@@ -358,7 +364,7 @@ function toggleMapLabels() {
 /**
  * Creates new bounds and re-centers the map based on the map view
  * @static
- * @param {Objects} markers - Map markers used to create bounds if map view is "cluster"
+ * @param {Object[]} markers - Map markers used to create bounds if map view is "cluster"
  */
 function realignMap(markers) {
   const bounds = new google.maps.LatLngBounds();

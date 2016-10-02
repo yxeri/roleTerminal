@@ -628,7 +628,7 @@ function populateDbUsers(users) {
       });
       logger.sendInfoMsg('PopulateDb: Creating users from defaults');
 
-      for (let i = 0; i < userKeys.length; i++) {
+      for (let i = 0; i < userKeys.length; i += 1) {
         const user = users[userKeys[i]];
 
         createUser(user, callback);

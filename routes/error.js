@@ -17,8 +17,9 @@
 'use strict';
 
 const express = require('express');
-const router = new express.Router();
 const appConfig = require('../config/defaults/config').app;
+
+const router = new express.Router();
 
 /**
  * @returns {Object} Router

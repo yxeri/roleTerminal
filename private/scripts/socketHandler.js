@@ -41,7 +41,7 @@ function startSocket(events) {
   if (socket) {
     const eventKeys = Object.keys(events);
 
-    for (let i = 0; i < eventKeys.length; i++) {
+    for (let i = 0; i < eventKeys.length; i += 1) {
       const event = eventKeys[i];
 
       socket.on(event, events[event]);

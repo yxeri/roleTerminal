@@ -330,7 +330,7 @@ function populateDbRooms(rooms, user) {
 
   logger.sendInfoMsg('PopulateDb: Creating rooms from defaults, if needed');
 
-  for (let i = 0; i < roomKeys.length; i++) {
+  for (let i = 0; i < roomKeys.length; i += 1) {
     const room = rooms[roomKeys[i]];
 
     createRoom(room, user, roomCallback);

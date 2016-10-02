@@ -20,6 +20,7 @@ const mongoose = require('mongoose');
 const appConfig = require('./../config/defaults/config').app;
 const logger = require('./../utils/logger');
 const objectValidator = require('./../utils/objectValidator');
+
 const dbPath = `mongodb://${appConfig.dbHost}:${appConfig.dbPort}/${appConfig.dbName}`;
 
 mongoose.connect(dbPath, (err) => {

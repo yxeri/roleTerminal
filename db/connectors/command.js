@@ -137,7 +137,7 @@ function populateDbCommands(sentCommands) {
     }
   };
 
-  for (let i = 0; i < cmdKeys.length; i++) {
+  for (let i = 0; i < cmdKeys.length; i += 1) {
     const command = sentCommands[cmdKeys[i]];
     const query = { commandName: command.commandName };
     const options = { upsert: true };

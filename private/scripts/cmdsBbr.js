@@ -65,7 +65,7 @@ function humanReadableHints(hints) {
     return modifiedHint;
   }
 
-  for (let i = 0; i < hints.length; i++) {
+  for (let i = 0; i < hints.length; i += 1) {
     modifiedHints.push(createReadable(hints[i]));
   }
 
@@ -208,7 +208,7 @@ commands.hacklantern = {
       const passwords = params.passwords;
       const codeColumns = [];
 
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 2; i += 1) {
         codeColumns.push(textTools.createMixedArray({
           amount: 23,
           length: 27,
@@ -229,7 +229,7 @@ commands.hacklantern = {
     },
     (params = {}) => {
       if (params.stations) {
-        const stationList = params.stations.map((station) => `[${station.id}] #${station.id} ${station.location} - Owner: ${station.owner || 'None'}`);
+        const stationList = params.stations.map(station => `[${station.id}] #${station.id} ${station.location} - Owner: ${station.owner || 'None'}`);
         commandHandler.commandHelper.data.stations = params.stations;
 
         messenger.queueMessage({ text: ['Available LANTERNs:'].concat(stationList) });
@@ -239,23 +239,23 @@ commands.hacklantern = {
         text: ['Input the number of your chosen LANTERN:'],
       });
 
-      commandHandler.commandHelper.onStep++;
+      commandHandler.commandHelper.onStep += 1;
     },
     (phrases = ['']) => {
       const stationId = parseInt(phrases[0], 10);
 
-      if (isNaN(stationId) || !commandHandler.commandHelper.data.stations.find((station) => station.id === stationId)) {
+      if (isNaN(stationId) || !commandHandler.commandHelper.data.stations.find(station => station.id === stationId)) {
         messenger.queueMessage({ text: ['Incorrect choice'] });
 
-        commandHandler.commandHelper.onStep--;
+        commandHandler.commandHelper.onStep -= 1;
         commandHandler.triggerCommandStep();
       } else {
         const users = commandHandler.commandHelper.data.users;
         let userList = [];
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
         commandHandler.commandHelper.data.stationId = stationId;
 
-        for (let i = 0; i < users.length; i++) {
+        for (let i = 0; i < users.length; i += 1) {
           const user = users[i];
 
           userList.push(textTools.createFullLine());
@@ -292,11 +292,11 @@ commands.hacklantern = {
       messenger.queueMessage({ text: codeColumns.shift() });
 
       if (codeColumns.length === 0) {
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
       }
     },
     (params = {}) => {
-      commandHandler.commandHelper.onStep++;
+      commandHandler.commandHelper.onStep += 1;
 
       if (!params.reset) {
         commandHandler.triggerCommand({ cmd: 'clear' });
@@ -327,7 +327,7 @@ commands.hacklantern = {
         });
       } else {
         commandHandler.commandHelper.data.gameUser = { userName: phrases[0].toLowerCase() };
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
 
         domManipulator.setInputStart('passwd');
         messenger.queueMessage({ text: ['Input password:'] });
@@ -335,7 +335,7 @@ commands.hacklantern = {
     },
     (phrases = ['']) => {
       commandHandler.commandHelper.data.gameUser.password = phrases[0];
-      commandHandler.commandHelper.onStep++;
+      commandHandler.commandHelper.onStep += 1;
 
       domManipulator.setInputStart('choice');
       messenger.queueMessage({
@@ -362,7 +362,7 @@ commands.hacklantern = {
         });
       } else {
         commandHandler.commandHelper.data.choice = phrases[0];
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
 
         socketHandler.emit('manipulateStation', commandHandler.commandHelper.data);
       }

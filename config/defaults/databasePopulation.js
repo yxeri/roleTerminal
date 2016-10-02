@@ -20,7 +20,7 @@ const config = {};
 let modifiedDatabasePop = {};
 
 try {
-  modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation;
+  modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation; // eslint-disable-line import/no-unresolved, global-require
 } catch (err) {
   console.log('Did not find modified databasePopulation. Using defaults');
 }
@@ -30,7 +30,7 @@ const generatePass = function generatePass() {
   const randomLength = randomString.length;
   let code = '';
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 10; i += 1) {
     const randomVal = Math.random() * (randomLength - 1);
 
     code += randomString[Math.round(randomVal)];

@@ -115,7 +115,7 @@ commands.radio = {
         break;
       }
       case 'list': {
-        messenger.queueMessage({ text: Object.keys(channels).map((channel) => channels[channel].name) });
+        messenger.queueMessage({ text: Object.keys(channels).map(channel => channels[channel].name) });
 
         break;
       }

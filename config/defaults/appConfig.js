@@ -19,7 +19,7 @@
 let modifiedConfig = {};
 
 try {
-  modifiedConfig = require('../modified/appConfig').config;
+  modifiedConfig = require('../modified/appConfig').config; // eslint-disable-line import/no-unresolved, global-require
 } catch (err) {
   console.log('Did not find modified appConfig. Using defaults');
 }

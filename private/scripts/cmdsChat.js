@@ -73,7 +73,7 @@ commands.morse = {
       };
       const morsePhrases = phrases;
 
-      for (let i = 0; i < phrases.length; i++) {
+      for (let i = 0; i < phrases.length; i += 1) {
         if (phrases[i] === '-s' || phrases[i] === '-silent') {
           morsePhrases.splice(i, 1);
           data.silent = true;
@@ -138,12 +138,11 @@ commands.broadcast = {
   steps: [
     (phrases) => {
       if (phrases.length > 0 && phrases[0] !== '') {
-        const phrase = phrases.join(' ');
-        commandHandler.commandHelper.data.message.customSender = phrase;
+        commandHandler.commandHelper.data.message.customSender = phrases.join(' ');
       }
 
       messenger.queueMessage({ text: labels.getText('info', 'typeLineEnter') });
-      commandHandler.commandHelper.onStep++;
+      commandHandler.commandHelper.onStep += 1;
     },
     (phrases) => {
       const message = commandHandler.commandHelper.data.message;
@@ -155,7 +154,7 @@ commands.broadcast = {
         message.text.push(phrase);
       } else {
         dataText = copyString(message.text);
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
 
         messenger.queueMessage({ text: labels.getText('info', 'preview') });
         messenger.queueMessage({ text: textTools.prependBroadcastMessage({ sender: message.customSender }).concat(dataText, textTools.createFullLine()) });
@@ -205,14 +204,13 @@ commands.whisper = {
 
 commands.importantmsg = {
   func: () => {
-    const data = {
+    commandHandler.commandHelper.data = {
       message: {
         text: [],
         userName: storage.getUser(),
         hideName: true,
       },
     };
-    commandHandler.commandHelper.data = data;
 
     messenger.queueMessage({ text: labels.getText('info', 'cancel') });
     messenger.queueMessage({
@@ -243,7 +241,7 @@ commands.importantmsg = {
           });
           socketHandler.emit('verifyDevice', commandHelper.data);
         } else {
-          commandHelper.onStep++;
+          commandHelper.onStep += 1;
           commandHandler.triggerCommandStep();
         }
       }
@@ -251,7 +249,7 @@ commands.importantmsg = {
     () => {
       const commandHelper = commandHandler.commandHelper;
 
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
       messenger.queueMessage({ text: labels.getText('info', 'typeLineEnter') });
       messenger.queueMessage({ text: labels.getText('info', 'keepShortMorse') });
     },
@@ -265,7 +263,7 @@ commands.importantmsg = {
         message.text.push(phrase);
       } else {
         const dataText = copyString(message.text);
-        commandHelper.onStep++;
+        commandHelper.onStep += 1;
 
         messenger.queueMessage({ text: labels.getText('info', 'preview') });
         messenger.queueMessage({
@@ -278,7 +276,7 @@ commands.importantmsg = {
     (phrases) => {
       if (phrases.length > 0) {
         if (phrases[0].toLowerCase() === 'yes') {
-          commandHandler.commandHelper.onStep++;
+          commandHandler.commandHelper.onStep += 1;
 
           messenger.queueMessage({ text: labels.getText('info', 'sendMorse') });
         } else {
@@ -417,7 +415,7 @@ commands.createroom = {
     (phrases = ['']) => {
       const commandHelper = commandHandler.commandHelper;
       const password = phrases[0];
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
 
       if (password.length > 0) {
         commandHelper.data.room.password = password;
@@ -428,7 +426,7 @@ commands.createroom = {
           text_se: ['Skriv in lösenordet igen'],
         });
       } else {
-        commandHelper.onStep++;
+        commandHelper.onStep += 1;
         socketHandler.emit('createRoom', commandHelper.data);
         commandHandler.resetCommand(false);
       }
@@ -441,7 +439,7 @@ commands.createroom = {
         socketHandler.emit('createRoom', commandHelper.data);
         commandHandler.resetCommand(false);
       } else {
-        commandHelper.onStep--;
+        commandHelper.onStep -= 1;
 
         messenger.queueMessage({
           text: [

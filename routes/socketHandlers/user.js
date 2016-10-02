@@ -559,7 +559,7 @@ function handle(socket, io) {
         // TODO Should send a list, not a string
         let usersString = '';
 
-        for (let i = 0; i < users.length; i++) {
+        for (let i = 0; i < users.length; i += 1) {
           usersString += users[i].userName;
 
           if (i !== users.length - 1) {
@@ -700,7 +700,7 @@ function handle(socket, io) {
         // TODO Should send a list, not a string
         let usersString = '';
 
-        for (let i = 0; i < users.length; i++) {
+        for (let i = 0; i < users.length; i += 1) {
           usersString += users[i].userName;
 
           if (i !== users.length - 1) {

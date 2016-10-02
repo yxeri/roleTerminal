@@ -317,7 +317,7 @@ function addRow(message) {
       timeout = rowTimeout;
     }
 
-    for (let i = 0; i < columns; i++) {
+    for (let i = 0; i < columns; i += 1) {
       const text = currentText.shift();
 
       addText(text, row, message);

@@ -41,7 +41,7 @@ commands.invitations = {
       commandHandler.commandHelper.data = data;
 
       if (sentInvitations && sentInvitations.length > 0) {
-        for (let i = 0; i < sentInvitations.length; i++) {
+        for (let i = 0; i < sentInvitations.length; i += 1) {
           const invitation = sentInvitations[i];
           const itemNumber = i + 1;
 
@@ -55,7 +55,7 @@ commands.invitations = {
         });
         messenger.queueMessage({ text: labels.getText('info', 'cancel') });
         domManipulator.setInputStart('answer');
-        commandHandler.commandHelper.onStep++;
+        commandHandler.commandHelper.onStep += 1;
       } else {
         messenger.queueMessage({
           text: ['You have no invitations'],

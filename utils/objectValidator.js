@@ -27,7 +27,7 @@ const logger = require('./logger');
 function checkKeys(data, expected) {
   const expectedKeys = Object.keys(expected);
 
-  for (let i = 0; i < expectedKeys.length; i++) {
+  for (let i = 0; i < expectedKeys.length; i += 1) {
     const expectedKey = expectedKeys[i];
 
     if ((!data[expectedKey] || data[expectedKey] === null) && typeof data[expectedKey] !== 'boolean') {

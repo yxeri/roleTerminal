@@ -173,7 +173,7 @@ function handle(socket) {
           const now = new Date();
           const report = [];
 
-          for (let i = 0; i < times.length; i++) {
+          for (let i = 0; i < times.length; i += 1) {
             const weatherRep = createWeatherReport(times[i]);
 
             if (weatherRep.time > now && hoursAllowed.indexOf(weatherRep.time.getHours()) > -1) {

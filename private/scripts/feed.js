@@ -187,7 +187,7 @@ function playMorse(morseCode, silent) {
     soundTimeout = 0;
   }
 
-  for (let i = 0; i < morseCode.length; i++) {
+  for (let i = 0; i < morseCode.length; i += 1) {
     const code = morseCode[i];
 
     shouldPlay = false;
@@ -291,7 +291,7 @@ function sendLocation() {
   if (storage.getUser() !== null && positions.length > 0) {
     mostAccuratePos = positions[positions.length - 1];
 
-    for (let i = positions.length - 2; i >= 0; i--) {
+    for (let i = positions.length - 2; i >= 0; i -= 1) {
       const position = positions[i];
       const accuracy = positions[i].coords.accuracy;
 
@@ -513,10 +513,10 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
   let expanded = '';
   let matched = true;
 
-  for (let i = partialMatch.length; i < firstCommand.length; i++) {
+  for (let i = partialMatch.length; i < firstCommand.length; i += 1) {
     const commandChar = firstCommand.charAt(i);
 
-    for (let j = 0; j < matchedCommands.length; j++) {
+    for (let j = 0; j < matchedCommands.length; j += 1) {
       if (matchedCommands[j].charAt(i) !== commandChar) {
         matched = false;
 
@@ -545,10 +545,10 @@ function match(partial, items) {
   const matched = [];
   let matches = false;
 
-  for (let i = 0; i < items.length; i++) {
+  for (let i = 0; i < items.length; i += 1) {
     const name = items[i];
 
-    for (let j = 0; j < partial.length; j++) {
+    for (let j = 0; j < partial.length; j += 1) {
       if (partial.charAt(j) === name.charAt(j)) {
         matches = true;
       } else {
@@ -628,11 +628,11 @@ function autoCompleteCommand(phrases) {
       partialCommand = partialCommand.slice(1);
     }
 
-    for (let i = 0; i < allCommands.length; i++) {
+    for (let i = 0; i < allCommands.length; i += 1) {
       const command = allCommands[i];
       matches = false;
 
-      for (let j = 0; j < partialCommand.length; j++) {
+      for (let j = 0; j < partialCommand.length; j += 1) {
         const commandAccesssLevel = commandHandler.getCommandAccessLevel(command);
         const commandVisibility = commandHandler.getCommandVisibility(command);
 
@@ -971,7 +971,7 @@ function specialKeyPress(event) {
           scrollText(-window.innerHeight);
         } else if (!commandHelper.keysBlocked && commandHelper.command === null && previousCommandPointer > 0) {
           domManipulator.clearInput();
-          previousCommandPointer--;
+          previousCommandPointer -= 1;
           domManipulator.setCommandInput(commandHistory[previousCommandPointer]);
         }
 
@@ -984,18 +984,16 @@ function specialKeyPress(event) {
 
         if (triggerKeysPressed.ctrl) {
           scrollText(window.innerHeight);
-        } else {
-          if (!commandHelper.keysBlocked && commandHelper.command === null) {
-            if (previousCommandPointer < commandHistory.length - 1) {
-              domManipulator.clearInput();
-              previousCommandPointer++;
-              domManipulator.setCommandInput(commandHistory[previousCommandPointer]);
-            } else if (previousCommandPointer === commandHistory.length - 1) {
-              domManipulator.clearInput();
-              previousCommandPointer++;
-            } else {
-              domManipulator.clearInput();
-            }
+        } else if (!commandHelper.keysBlocked && commandHelper.command === null) {
+          if (previousCommandPointer < commandHistory.length - 1) {
+            domManipulator.clearInput();
+            previousCommandPointer += 1;
+            domManipulator.setCommandInput(commandHistory[previousCommandPointer]);
+          } else if (previousCommandPointer === commandHistory.length - 1) {
+            domManipulator.clearInput();
+            previousCommandPointer += 1;
+          } else {
+            domManipulator.clearInput();
           }
         }
 
@@ -1143,7 +1141,7 @@ function createMenuItem(menuItem) {
 function createSubMenuItem(subItems, replaceInput) {
   const ulElem = document.createElement('ul');
 
-  for (let i = 0; i < subItems.length; i++) {
+  for (let i = 0; i < subItems.length; i += 1) {
     const item = subItems[i];
     const liElem = document.createElement('li');
     const span = document.createElement('span');
@@ -1230,7 +1228,7 @@ function populateMenu() {
   };
   const menuKeys = Object.keys(menuItems);
 
-  for (let i = 0; i < menuKeys.length; i++) {
+  for (let i = 0; i < menuKeys.length; i += 1) {
     const menuItem = menuItems[menuKeys[i]];
     const listItem = createMenuItem(menuItem);
 
@@ -1381,7 +1379,7 @@ function onMessage(params = { message: {} }) {
 function onMessages(params = { messages: [] }) {
   const messages = params.messages;
 
-  for (let i = 0; i < messages.length; i++) {
+  for (let i = 0; i < messages.length; i += 1) {
     const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
 
     messenger.queueMessage(message);
@@ -1536,7 +1534,7 @@ function onCommandSuccess(params = {}) {
 
   if (!params.noStepCall) {
     if (!params.freezeStep) {
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
     }
 
     commandHandler.triggerCommandStep(params.newData);
@@ -1605,12 +1603,10 @@ function onReconnectSuccess(params = {}) {
         userName: storage.getUser(),
       },
     });
+  } else if (!params.firstConnection) {
+    messenger.queueMessage(labels.getMessage('info', 'reestablished'));
   } else {
-    if (!params.firstConnection) {
-      messenger.queueMessage(labels.getMessage('info', 'reestablished'));
-    } else {
-      printStartMessage();
-    }
+    printStartMessage();
   }
 
   socketHandler.setReconnecting(false);
@@ -1696,7 +1692,7 @@ function onLogout() {
 function onUpdateCommands(params = { commands: [] }) {
   const newCommands = params.commands;
 
-  for (let i = 0; i < newCommands.length; i++) {
+  for (let i = 0; i < newCommands.length; i += 1) {
     commandHandler.updateCommand(newCommands[i]);
   }
 }
@@ -1779,61 +1775,59 @@ function onMapPositions(params) {
   const team = params.team;
   const userName = storage.getUser() ? storage.getUser().toLowerCase() : '';
 
-  for (let i = 0; i < mapPositions.length; i++) {
+  for (let i = 0; i < mapPositions.length; i += 1) {
     const mapPosition = mapPositions[i];
 
-    if (mapPosition.positionName.toLowerCase() === userName) {
-      continue;
-    }
+    if (mapPosition.positionName.toLowerCase() !== userName) {
+      const positionName = mapPosition.positionName;
+      const latitude = parseFloat(mapPosition.position.latitude);
+      const longitude = parseFloat(mapPosition.position.longitude);
+      const coordsCollection = mapPosition.position.coordsCollection;
+      const geometry = mapPosition.geometry;
+      const type = mapPosition.type;
+      const group = mapPosition.group;
+      const description = mapPosition.description;
 
-    const positionName = mapPosition.positionName;
-    const latitude = parseFloat(mapPosition.position.latitude);
-    const longitude = parseFloat(mapPosition.position.longitude);
-    const coordsCollection = mapPosition.position.coordsCollection;
-    const geometry = mapPosition.geometry;
-    const type = mapPosition.type;
-    const group = mapPosition.group;
-    const description = mapPosition.description;
-
-    if (geometry === 'line') {
-      mapTools.setLinePosition({
-        coordsCollection,
-        positionName,
-      });
-    } else if (geometry === 'polygon') {
-      mapTools.setPolygonPosition({
-        positionName,
-        coordsCollection,
-      });
-    } else if (geometry === 'point') {
-      mapTools.setMarkerPosition({
-        positionName,
-        position: {
-          latitude,
-          longitude,
-        },
-        description,
-        markerType: 'location',
-      });
-    } else if (type && type === 'user' && mapPosition.lastUpdated) {
-      const currentTime = new Date(params.currentTime);
-      const lastUpdated = new Date(mapPosition.lastUpdated);
-
-      if (currentTime - lastUpdated < (20 * 60 * 1000)) {
-        const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
-
+      if (geometry === 'line') {
+        mapTools.setLinePosition({
+          coordsCollection,
+          positionName,
+        });
+      } else if (geometry === 'polygon') {
+        mapTools.setPolygonPosition({
+          positionName,
+          coordsCollection,
+        });
+      } else if (geometry === 'point') {
         mapTools.setMarkerPosition({
-          lastUpdated,
           positionName,
           position: {
             latitude,
             longitude,
           },
-          iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
-          hideLabel: true,
-          description: userDescription,
-          markerType: type,
+          description,
+          markerType: 'location',
         });
+      } else if (type && type === 'user' && mapPosition.lastUpdated) {
+        const currentTime = new Date(params.currentTime);
+        const lastUpdated = new Date(mapPosition.lastUpdated);
+
+        if (currentTime - lastUpdated < (20 * 60 * 1000)) {
+          const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
+
+          mapTools.setMarkerPosition({
+            lastUpdated,
+            positionName,
+            position: {
+              latitude,
+              longitude,
+            },
+            iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+            hideLabel: true,
+            description: userDescription,
+            markerType: type,
+          });
+        }
       }
     }
   }
@@ -1887,7 +1881,7 @@ function onStationStats(params) {
   const futureRounds = params.futureRounds;
   const now = params.now;
 
-  for (let i = 0; i < stationsStats.length; i++) {
+  for (let i = 0; i < stationsStats.length; i += 1) {
     const station = stationsStats[i];
     const stationId = `${station.id || station.stationId}`;
     const stationTeam = teamsStats.find(team => station.owner === team.name);
@@ -1913,15 +1907,13 @@ function onStationStats(params) {
     }
   }
 
-  for (let i = 0; i < teamsStats.length; i++) {
+  for (let i = 0; i < teamsStats.length; i += 1) {
     const team = teamsStats[i];
     const teamName = team.name;
 
-    if (teamName === 'ownerless') {
-      continue;
+    if (teamName !== 'ownerless') {
+      teams[teamName] = team.score;
     }
-
-    teams[teamName] = team.score;
   }
 
   domManipulator.setStationStats(stations, teams, currentRound, futureRounds, now);

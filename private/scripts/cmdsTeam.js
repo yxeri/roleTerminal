@@ -63,18 +63,17 @@ commands.createteam = {
         ],
       });
       commandHelper.allowAutoComplete = true;
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
     },
     (phrases) => {
       const commandHelper = commandHandler.commandHelper;
+      const user = storage.getUser();
 
       if (phrases[0] !== '') {
-        const owner = phrases[0];
-
-        commandHelper.data.team.owner = owner;
-        commandHelper.data.team.admins = [storage.getUser()];
+        commandHelper.data.team.owner = phrases[0];
+        commandHelper.data.team.admins = [user];
       } else {
-        commandHelper.data.team.owner = storage.getUser();
+        commandHelper.data.team.owner = user;
       }
 
       socketHandler.emit('createTeam', commandHelper.data);

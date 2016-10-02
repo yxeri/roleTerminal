@@ -58,7 +58,7 @@ function handle(socket) {
           return;
         }
 
-        const allDevices = devices.map(device => {
+        const allDevices = devices.map((device) => {
           let deviceString = '';
 
           deviceString += `DeviceID: ${device.deviceId}${'\t'}`;

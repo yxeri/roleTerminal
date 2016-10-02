@@ -319,7 +319,7 @@ function addMenuItem(item) {
  * @param {HTMLElement} item - New sub menu
  */
 function addSubMenuItem(elementId, item) {
-  const element = Array.from(menuList.children).find((elem) => elem.id === elementId);
+  const element = Array.from(menuList.children).find(elem => elem.id === elementId);
 
   if (element && element.lastChild.tagName !== 'UL') {
     element.appendChild(item);
@@ -506,7 +506,7 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
       stationList.appendChild(createListItem(`Next com-win in: ${time}`));
     }
 
-    for (let i = 0; i < stationKeys.length; i++) {
+    for (let i = 0; i < stationKeys.length; i += 1) {
       const stationId = stationKeys[i];
       const station = stations[stationId];
 
@@ -523,7 +523,7 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
 
   teamList.appendChild(createListItem('-Wreckers-'));
 
-  for (let i = 0; i < teamKeys.length; i++) {
+  for (let i = 0; i < teamKeys.length; i += 1) {
     const teamName = teamKeys[i];
     const score = teams[teamName];
 

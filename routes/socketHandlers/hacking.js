@@ -24,6 +24,7 @@ const manager = require('../../socketHelpers/manager');
 const appConfig = require('../../config/defaults/config').app;
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const http = require('http');
+const request = require('request');
 const gameUserManager = require('../../utils/gameUserManager');
 
 const signalThreshold = 50;
@@ -55,20 +56,14 @@ function postRequest(params) {
     method: 'POST',
   };
 
-  const request = http.request(options, (response) => {
-    let responseString = '';
-
-    response.on('data', (data) => {
-      responseString += data;
-    });
-
+  const req = http.request(options, (response) => {
     response.on('end', () => {
       callback(response.statusCode);
     });
   });
 
-  request.write(dataString);
-  request.end();
+  req.write(dataString);
+  req.end();
 }
 
 /**
@@ -156,7 +151,7 @@ function shuffleArray(array) {
  * @param {Function} callback - Callback
  */
 function retrieveStationStats(callback) {
-  require('request').get('http://wrecking.bbreloaded.se/public.json', (err, response, body) => {
+  request.get('http://wrecking.bbreloaded.se/public.json', (err, response, body) => {
     if (err) {
       console.log('Error request', response, err);
 
@@ -302,7 +297,7 @@ function handle(socket) {
       messenger.sendSelfMsg({
         socket,
         message: {
-          text: gameUsers.map((gameUser) => `Name: ${gameUser.userName}. Pass: ${gameUser.password}`),
+          text: gameUsers.map(gameUser => `Name: ${gameUser.userName}. Pass: ${gameUser.password}`),
         },
       });
     });
@@ -344,7 +339,7 @@ function handle(socket) {
 
       const sentUser = params.gameUser;
 
-      if (params.users.map((user) => user.userName).indexOf(sentUser.userName) === -1) {
+      if (params.users.map(user => user.userName).indexOf(sentUser.userName) === -1) {
         messenger.sendSelfMsg({
           socket,
           message: {
@@ -472,7 +467,7 @@ function handle(socket) {
         const userAmount = params.userAmount;
         const users = shuffleArray(gameUsers).slice(0, userAmount);
         const correctPassword = users[Math.floor(Math.random() * userAmount)].password;
-        const shuffledPasswords = shuffleArray(gamePasswords.map((password) => password.password));
+        const shuffledPasswords = shuffleArray(gamePasswords.map(password => password.password));
         const halfPasswordLength = shuffledPasswords.length > 12 ? 6 : shuffledPasswords.length / 2;
         const passwordMaxLength = shuffledPasswords.length > 12 ? 12 : shuffledPasswords.length;
 

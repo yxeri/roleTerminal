@@ -108,7 +108,7 @@ commands.register = {
       });
       messenger.queueMessage({ text: labels.getText('info', 'cancel') });
       domManipulator.setInputStart('password');
-      commandHandler.commandHelper.onStep++;
+      commandHandler.commandHelper.onStep += 1;
     },
     (phrases = []) => {
       const password = phrases[0];
@@ -121,7 +121,7 @@ commands.register = {
           text: ['Repeat your password one more time'],
           text_se: ['Skriv in ert lösenord en gång till'],
         });
-        commandHelper.onStep++;
+        commandHelper.onStep += 1;
       } else {
         messenger.queueMessage({
           text: [
@@ -157,7 +157,7 @@ commands.register = {
             'Skriv in ert lösenord och tryck på enter-knappen',
           ],
         });
-        commandHelper.onStep--;
+        commandHelper.onStep -= 1;
       }
     },
   ],
@@ -249,7 +249,7 @@ commands.password = {
       const oldPassword = phrases[0];
       data.oldPassword = oldPassword;
       commandHelper.data = data;
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
 
       domManipulator.setInputStart('New pass');
       socketHandler.emit('checkPassword', data);
@@ -257,7 +257,7 @@ commands.password = {
     (phrases = []) => {
       const commandHelper = commandHandler.commandHelper;
       commandHelper.data.newPassword = phrases[0];
-      commandHelper.onStep++;
+      commandHelper.onStep += 1;
 
       domManipulator.setInputStart('Repeat passwd');
       messenger.queueMessage({
@@ -273,7 +273,7 @@ commands.password = {
         socketHandler.emit('changePassword', commandHelper.data);
         commandHandler.resetCommand(false);
       } else {
-        commandHelper.onStep--;
+        commandHelper.onStep -= 1;
 
         domManipulator.setInputStart('New pass');
         messenger.queueMessage({

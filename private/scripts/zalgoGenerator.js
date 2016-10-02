@@ -156,7 +156,7 @@ const lowerZalgo = [
  * @returns {Number} - Random number between min and max
  */
 function randomNumber(max, min) {
-  return Math.floor(Math.random() * (max - min) + min);
+  return Math.floor((Math.random() * (max - min)) + min);
 }
 
 /**
@@ -169,7 +169,7 @@ function randomNumber(max, min) {
 function retrieveChars(array, amount) {
   let zalgoString = '';
 
-  for (let i = 0; i < amount; i++) {
+  for (let i = 0; i < amount; i += 1) {
     zalgoString += array[randomNumber(array.length, 0)];
   }
 
@@ -188,7 +188,7 @@ function retrieveChars(array, amount) {
 function createZalgoPhrase(phrase, maxUpper, maxMiddle, maxLower) {
   let zalgoString = '';
 
-  for (let i = 0; i < phrase.length; i++) {
+  for (let i = 0; i < phrase.length; i += 1) {
     let charString = phrase[i];
 
     charString += retrieveChars(upperZalgo, maxUpper || randomNumber(6, 0));
@@ -219,7 +219,7 @@ function randomMultiZalgoPhrase(params = {}) {
   const percentage = params.percentage;
   const words = phrase.split(' ');
 
-  for (let i = 0; i < words.length; i++) {
+  for (let i = 0; i < words.length; i += 1) {
     if (Math.random() < (percentage || 0.3)) {
       words[i] = createZalgoPhrase(words[i], maxUpper, maxMiddle, maxLower);
     }

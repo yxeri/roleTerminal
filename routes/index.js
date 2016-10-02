@@ -17,7 +17,6 @@
 'use strict';
 
 const express = require('express');
-const router = new express.Router();
 const chatHandler = require('./socketHandlers/chat');
 const userHandler = require('./socketHandlers/user');
 const dbConnector = require('../db/databaseConnector');
@@ -33,6 +32,8 @@ const databasePopulation = require('../config/defaults/config').databasePopulati
 const logger = require('../utils/logger');
 const messenger = require('../socketHelpers/messenger');
 const deviceHandler = require('./socketHandlers/device');
+
+const router = new express.Router();
 
 /**
  * @param {Object} io - Socket.IO

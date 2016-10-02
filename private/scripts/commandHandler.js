@@ -22,6 +22,7 @@ const labels = require('./labels');
 const domManipulator = require('./domManipulator');
 const socketHandler = require('./socketHandler');
 
+/* eslint-disable global-require */
 /**
  * @private
  * @type {Object[]}
@@ -37,6 +38,7 @@ const commandCollections = [
   require('./cmdsUtility'),
   require('./cmdsBbr'),
 ];
+/* eslint-enable global-require */
 /**
  * @private
  * @type {Object}
@@ -63,7 +65,7 @@ const commands = {};
 
 /**
  * Resets commandHelper and everything else changed when a command with multipe steps has been used
- * @param {boolean} aborted - Has command be prematurely aborted?
+ * @param {boolean} [aborted] - Has command be prematurely aborted?
  */
 function resetCommand(aborted) {
   const room = storage.getStaticInputStart() ? storage.getDefaultInputStart() : (storage.getRoom() || storage.getDefaultInputStart());
@@ -103,11 +105,11 @@ function trimCommandChar(command) {
  * Add all commands to one collection
  */
 function collectCommands() {
-  for (let i = 0; i < commandCollections.length; i++) {
+  for (let i = 0; i < commandCollections.length; i += 1) {
     const cmdCollection = commandCollections[i];
     const cmdKeys = Object.keys(cmdCollection);
 
-    for (let j = 0; j < cmdKeys.length; j++) {
+    for (let j = 0; j < cmdKeys.length; j += 1) {
       const command = cmdKeys[j];
 
       if (!commands[command]) {
@@ -198,7 +200,7 @@ function getCommands(params) {
   if (params.filtered) {
     allCommands = [];
 
-    for (let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i += 1) {
       const commandName = keys[i];
       const commandAccessLevel = getCommandAccessLevel(commandName);
       const commandVisibility = getCommandVisibility(commandName);
@@ -243,7 +245,7 @@ function abortCommand(command) {
 
 /**
  * Run function in command steps
- * @param {string[]} cmdParams - Parameters for the function in command steps
+ * @param {string[]} [cmdParams] - Parameters for the function in command steps
  */
 function triggerCommandStep(cmdParams) {
   commands[commandHelper.command].steps[commandHelper.onStep](cmdParams, socketHandler.getSocket());
@@ -277,7 +279,7 @@ function updateCommand(command) {
 function addSpecialHelpOptions() {
   const filteredCommands = getCommands({ filtered: true, aliases: false });
 
-  for (let i = 0; i < filteredCommands.length; i++) {
+  for (let i = 0; i < filteredCommands.length; i += 1) {
     const command = filteredCommands[i];
 
     commands.help.options[command] = { description: command };

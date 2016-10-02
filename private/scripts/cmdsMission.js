@@ -47,9 +47,11 @@ commands.mission = {
   commandName: 'mission',
   options: {
     complete: { description: 'Mark a misison as done. You can only mark missions that you have created as done' },
-    list: { description: 'Show all active missions', next: {
-      all: { description: 'Show all missions, including completed ones' },
-    } },
+    list: { description: 'Show all active missions',
+      next: {
+        all: { description: 'Show all missions, including completed ones' },
+      },
+    },
   },
 };
 

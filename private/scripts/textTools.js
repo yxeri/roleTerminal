@@ -64,26 +64,18 @@ function beautifyNumb(number) {
 /**
  * Takes date and returns shorter human-readable time
  * @static
- * @param {Date} date - Non-humanreadable date
+ * @param {Date|number} date - Date
  * @param {boolean} [full] - Should the month and day be added?
  * @param {boolean} [year] - Should year be added?
  * @param {Number} [offset] - Should hours be added/removed from the final time?
  * @returns {string} - Human-readable time and date
  */
 function generateTimeStamp(date, full, year, offset) {
-  let newDate = new Date(date);
+  const newDate = new Date(date);
   let timeStamp;
 
   if (offset) {
     newDate.setHours(newDate.getHours() + offset);
-  }
-
-  /**
-   * Splitting of date is a fix for NaN on Android 2.*
-   */
-  if (isNaN(newDate.getMinutes())) {
-    const splitDate = date.split(/[-T:\.]+/);
-    newDate = new Date(Date.UTC(splitDate[0], splitDate[1], splitDate[2], splitDate[3], splitDate[4], splitDate[5]));
   }
 
   const mins = beautifyNumb(newDate.getMinutes());
@@ -155,7 +147,7 @@ function createRandString(params) {
   const randomLength = selection.length;
   let result = '';
 
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < length; i += 1) {
     const randomVal = Math.round(Math.random() * (randomLength - 1));
     let val = Math.random() > 0.5 ? selection[randomVal].toUpperCase() : selection[randomVal];
 
@@ -252,7 +244,7 @@ function createMixedString(length, upperCase, codeMode) {
 function createLine(length) {
   let line = '';
 
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < length; i += 1) {
     line += '-';
   }
 
@@ -351,11 +343,11 @@ function createMixedArray(params) {
   const text = [];
   const requiredIndexes = [];
 
-  for (let i = 0; i < amount; i++) {
+  for (let i = 0; i < amount; i += 1) {
     text.push(createMixedString(length, upperCase, codeMode));
   }
 
-  for (let i = 0; i < requiredStrings.length; i++) {
+  for (let i = 0; i < requiredStrings.length; i += 1) {
     const stringLength = requiredStrings[i].length;
     const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
     let randomArrayIndex = Math.floor(Math.random() * (amount - 2));
@@ -365,7 +357,7 @@ function createMixedArray(params) {
      * Stores the indexes of the ones who already had a substring added to them
      * This rule will be ignored and multiple substrings can appear in a randomised string if the amount of required string is higher than the amount of strings to be generated
      */
-    while (requiredIndexes.length < amount && requiredIndexes.indexOf(randomArrayIndex) > - 1) {
+    while (requiredIndexes.length < amount && requiredIndexes.indexOf(randomArrayIndex) > -1) {
       randomArrayIndex = Math.floor(Math.random() * (amount - 2));
     }
 

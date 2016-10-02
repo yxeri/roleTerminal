@@ -19,7 +19,7 @@
 let modifiedConfig = {};
 
 try {
-  modifiedConfig = require('../modified/appConfig').config;
+  modifiedConfig = require('../modified/appConfig').config; // eslint-disable-line import/no-unresolved, global-require
 } catch (err) {
   console.log('Did not find modified appConfig. Using defaults');
 }
@@ -120,6 +120,7 @@ config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
  *   sitePath : '*',
  *   filePath : './routes/index.js'
  * }
+ * @type {{sitePath:string, filePath:string}[]}
  */
 config.routes = modifiedConfig.routes || [
   {

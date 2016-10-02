@@ -41,7 +41,7 @@ function startSocket(events) {
   if (socket) {
     const eventKeys = Object.keys(events);
 
-    for (let i = 0; i < eventKeys.length; i++) {
+    for (let i = 0; i < eventKeys.length; i += 1) {
       const event = eventKeys[i];
 
       socket.on(event, events[event]);
@@ -70,7 +70,7 @@ function reconnect() {
 
 /**
  * Emit event through socket.io
- * @param {Object} event - Event to emit
+ * @param {string} event - Event to emit
  * @param {Object} [params] - Parameters to send in the emit
  * @static
  */

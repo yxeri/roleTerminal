@@ -127,7 +127,7 @@ function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
       }
 
       if (missedMsgs) {
-        for (let i = historyMessages.length - 1; i > 0; i--) {
+        for (let i = historyMessages.length - 1; i > 0; i -= 1) {
           const message = historyMessages[i];
 
           if (lastOnline > message.time) {

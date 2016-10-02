@@ -351,7 +351,7 @@ function handle(socket, io) {
         if (rooms.length > 0) {
           const roomNames = [];
 
-          for (let i = 0; i < rooms.length; i++) {
+          for (let i = 0; i < rooms.length; i += 1) {
             roomNames.push(rooms[i].roomName);
           }
 
@@ -387,7 +387,7 @@ function handle(socket, io) {
           const offlineUsers = [];
           const onlineUsers = [];
 
-          for (let i = 0; i < users.length; i++) {
+          for (let i = 0; i < users.length; i += 1) {
             const currentUser = users[i];
 
             if ((!appConfig.userVerify || currentUser.verified) && !currentUser.banned) {
@@ -440,7 +440,7 @@ function handle(socket, io) {
         rooms.push('team');
       }
 
-      for (let i = 0; i < socketRooms.length; i++) {
+      for (let i = 0; i < socketRooms.length; i += 1) {
         const room = socketRooms[i];
 
         if (!shouldBeHidden(room, socket.id)) {
@@ -472,7 +472,7 @@ function handle(socket, io) {
         if (ownedRooms.length > 0) {
           const roomNames = [];
 
-          for (let i = 0; i < ownedRooms.length; i++) {
+          for (let i = 0; i < ownedRooms.length; i += 1) {
             roomNames.push(ownedRooms[i].roomName);
           }
 
@@ -610,7 +610,7 @@ function handle(socket, io) {
           const connectedIds = io.sockets.adapter.rooms[roomNameLower].sockets;
           const allSockets = io.sockets.connected;
 
-          for (let i = 0; i < connectedIds.length; i++) {
+          for (let i = 0; i < connectedIds.length; i += 1) {
             const userSocket = allSockets[connectedIds[i]];
 
             userSocket.leave(roomNameLower);
@@ -771,7 +771,7 @@ function handle(socket, io) {
         rooms.push('team');
       }
 
-      for (let i = 0; i < rooms.length; i++) {
+      for (let i = 0; i < rooms.length; i += 1) {
         const room = rooms[i];
 
         if (!shouldBeHidden(room, socket.id) && (!params.partialName || room.indexOf(partialName) === 0)) {
@@ -808,7 +808,7 @@ function handle(socket, io) {
         const itemList = [];
         const roomKeys = Object.keys(rooms);
 
-        for (let i = 0; i < roomKeys.length; i++) {
+        for (let i = 0; i < roomKeys.length; i += 1) {
           itemList.push(rooms[roomKeys[i]].roomName);
         }
 
@@ -863,7 +863,7 @@ function handle(socket, io) {
 
         dbConnector.addInvitationToList(userName, invitation, (invErr, list) => {
           if (invErr || list !== null) {
-            if (list || invErr && invErr.code === 11000) {
+            if (list || (invErr && invErr.code === 11000)) {
               messenger.sendSelfMsg({
                 socket,
                 message: {

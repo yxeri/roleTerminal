@@ -103,11 +103,11 @@ let shortMessageQueue = [];
  * @private
  * @param {Object} params - Parameters
  * @param {string} params.text - Text
- * @param {boolean} params.linkable - Should the text be clickable?
- * @param {boolean} params.keepInput - Should the text (when clicked on) be appended to existing input?
- * @param {boolean} replacePhrase - Should the text (when clicked on) replace the last phrase in the input?
- * @param {string} className - CSS class name
- * @returns {HTMLSpanElement} - Generated span element
+ * @param {boolean} [params.replacePhrase] - Should the text (when clicked on) replace the last phrase in the input?
+ * @param {string} [params.className] - CSS class name
+ * @param {boolean} [params.linkable] - Should the text be clickable?
+ * @param {boolean} [params.keepInput] - Should the text (when clicked on) be appended to existing input?
+ * @returns {HTMLElement} - Generated span element
  */
 function generateSpan(params = { text: '' }) {
   const text = params.text;
@@ -150,7 +150,7 @@ function generateSpan(params = { text: '' }) {
  * @param {string} text - String to be clickable
  * @param {string} className - CSS class
  * @param {function} func - Callback on click
- * @returns {HTMLSpanElement} - Clickable span
+ * @returns {HTMLElement} - Clickable span
  */
 function generateLink(text, className, func) {
   const spanObj = generateSpan({
@@ -200,11 +200,12 @@ function linkRoom(elem) {
  * @param {boolean} message.extraClass - CSS class name
  * @param {string} message.roomName - Receiving room name
  * @param {Date} message.time - Time sent
+ * @param {boolean} message.hideName - Should the name of the sender be hidden?
  * @param {Object} message.msgAnimation - Animation on print and/or interval
  * @param {boolean} message.msgAnimation.instantAnimation - Should the animation start playing instantly?
  * @param {boolean} message.msgAnimation.fixedAnimationSpeed - Should the animation always be the same? False will randomise the animation style
  * @param {string} subText - Text shown during some animations
- * @returns {HTMLLIElement} - Created li element
+ * @returns {HTMLElement} - Created li element
  */
 function createRow(message, subText) {
   const rowObj = document.createElement('li');
@@ -262,7 +263,7 @@ function createRow(message, subText) {
  * Append span to row
  * @private
  * @param {string} text - Text to insert into span
- * @param {HTMLLIElement} row - Row to append to
+ * @param {HTMLElement} row - Row to append to
  * @param {Object} message - Message
  */
 function addText(text, row, message) {
@@ -278,6 +279,8 @@ function addText(text, row, message) {
  * Creates a row, appends it to the list and consumes next item in the message queue
  * @private
  * @param {Object} message - Message
+ * @param {string} message.subText - Sub text
+ * @param {number} message.timeout - Waiting time until the row is printed
  */
 function addRow(message) {
   const defaultLanguage = storage.getDefaultLanguage();
@@ -314,7 +317,7 @@ function addRow(message) {
       timeout = rowTimeout;
     }
 
-    for (let i = 0; i < columns; i++) {
+    for (let i = 0; i < columns; i += 1) {
       const text = currentText.shift();
 
       addText(text, row, message);
@@ -347,7 +350,7 @@ function consumeMessageShortQueue() {
   if (shortMessageQueue.length > 0) {
     const message = shortMessageQueue.shift();
 
-    addRow(message, consumeMessageShortQueue);
+    addRow(message);
   } else {
     printing = false;
     consumeMessageQueue(); // eslint-disable-line no-use-before-define

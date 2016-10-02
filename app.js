@@ -23,6 +23,7 @@ const morgan = require('morgan');
 const compression = require('compression');
 const appConfig = require('./config/defaults/config').app;
 const databasePopulation = require('./config/defaults/config').databasePopulation;
+
 const app = express();
 
 app.io = socketIo();
@@ -30,7 +31,7 @@ app.io = socketIo();
 // view engine setup
 app.set('views', path.join(__dirname, appConfig.publicBase, appConfig.viewsPath));
 app.set('view engine', 'html');
-app.engine('html', require('hbs').__express);
+app.engine('html', require('hbs').__express); // eslint-disable-line no-underscore-dangle, import/newline-after-import
 app.use(compression());
 
 // Logging
@@ -43,7 +44,7 @@ app.use(express.static(path.join(__dirname, appConfig.publicBase)));
  * Add all request paths and corresponding file paths to Express
  */
 for (const route of appConfig.routes) {
-  app.use(route.sitePath, require(path.resolve(route.filePath))(app.io));
+  app.use(route.sitePath, require(path.resolve(route.filePath))(app.io)); // eslint-disable-line import/no-dynamic-require, global-require
 }
 
 require('./db/connectors/user').populateDbUsers(databasePopulation.users);

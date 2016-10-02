@@ -133,7 +133,7 @@ function getGooglePositions(callback) {
       // Placemark can be either an object or an array with objects
       if (layer.Placemark) {
         if (layer.Placemark.length > 0) {
-          for (let i = 0; i < layer.Placemark.length; i++) {
+          for (let i = 0; i < layer.Placemark.length; i += 1) {
             positions.push(createPosition(layer.Placemark[i]));
           }
         } else {

@@ -38,7 +38,7 @@ function createHints(password) {
   hints.push(`end ${password.substr((password.length - 1) - endAmount)}`);
 
   if (password.length > 5) {
-    const position = Math.floor(Math.random() * ((password.length - 3) - 2) + 2);
+    const position = Math.floor((Math.random() * ((password.length - 3) - 2)) + 2);
 
     /**
      * middle *position* *characters*

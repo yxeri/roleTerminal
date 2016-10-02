@@ -24,7 +24,7 @@ const databasePop = require('./databasePopulation');
  * @param {Object} config - Configuration
  */
 function setConfig(config) {
-  require('./../modified/config').setConfig(config);
+  require('./../modified/config').setConfig(config); // eslint-disable-line import/no-unresolved, global-require
 }
 
 /**
@@ -32,7 +32,7 @@ function setConfig(config) {
  * @param {Object} databasePopulation - Database defaults
  */
 function setDatabasePopulation(databasePopulation) {
-  require('./../modified/databasePopulation').setDatabasePopulation(databasePopulation);
+  require('./../modified/databasePopulation').setDatabasePopulation(databasePopulation); // eslint-disable-line import/no-unresolved, global-require
 }
 
 exports.app = appConfig;

@@ -84,10 +84,10 @@ function parseMorse(text) {
   filteredText = filteredText.replace(/\s/g, '#');
   filteredText = filteredText.replace(/[^a-z0-9#]/g, '');
 
-  for (let i = 0; i < filteredText.length; i++) {
+  for (let i = 0; i < filteredText.length; i += 1) {
     morseCode = morseCodes[filteredText.charAt(i)];
 
-    for (let j = 0; j < morseCode.length; j++) {
+    for (let j = 0; j < morseCode.length; j += 1) {
       morseCodeText += `${morseCode[j]}${j === morseCode.length - 1 ? '' : ' '}`;
     }
 
@@ -128,30 +128,30 @@ function addMsgToHistory(roomName, message, socket, callback) {
 
 /**
  * Send a message to the user's socket
- * @param {{socket: Object, message: {text: string[]}}} params - Parameters
+ * @param {Objec} params - Parameters
+ * @param {{text: string[]}} messag - Message to send
+ * @param {Object} socket - Socket.io socket
  */
-function sendSelfMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { text: true } })) {
+function sendSelfMsg({ message, socket }) {
+  if (!objectValidator.isValidData({ message, socket }, { socket: true, message: { text: true } })) {
     return;
   }
 
-  const message = params.message;
-
-  params.socket.emit('message', { message });
+  socket.emit('message', { message });
 }
 
 /**
  * Sends multiple message to the user's socket
- * @param {{socket: Object, messages: Object[]}} params - Parameters
+ * @param {Object} params - Parameters
+ * @param {{text: string[]}[]} messages - Messages to send
+ * @param {Object} socket - Socket.io socket
  */
-function sendSelfMsgs(params) {
-  if (!objectValidator.isValidData(params, { socket: true, messages: true })) {
+function sendSelfMsgs({ messages, socket }) {
+  if (!objectValidator.isValidData({ messages, socket }, { socket: true, messages: true })) {
     return;
   }
 
-  const messages = params.messages;
-
-  params.socket.emit('messages', { messages });
+  socket.emit('messages', { messages });
 }
 
 /**

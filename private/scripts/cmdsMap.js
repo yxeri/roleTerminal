@@ -114,10 +114,12 @@ commands.map = {
   visibility: 1,
   category: 'advanced',
   options: {
-    on: { description: 'Show map', next: {
-      overview: { description: 'World map' },
-      me: { description: 'Your location' },
-    } },
+    on: { description: 'Show map',
+      next: {
+        overview: { description: 'World map' },
+        me: { description: 'Your location' },
+      },
+    },
     off: { description: 'Turn off map' },
     zoomin: { description: 'Increase zoom' },
     zoomout: { description: 'Decrease zoom' },

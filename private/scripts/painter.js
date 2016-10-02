@@ -63,6 +63,7 @@ function strokeObject(obj) {
  * Fills the inside and/or draws the outline of the object, depending on parameters
  * @private
  * @param {Object} params - Parameters
+ * @param {Object} params.obj - Object to draw
  * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
  * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
  */
@@ -84,11 +85,11 @@ function drawObject(params) {
  * Create and draw a rectangle
  * @static
  * @param {Object} params - Parameters
- * @param {Number} x - X coordinate of the upper left corner
- * @param {Number} y - Y coordiantes of the upper left corner
- * @param {Number} width - Width of the object in pixels
- * @param {Number} height - Height of the object in pixels
- * @param {objId} objId - Name identifier of the object
+ * @param {Number} params.x - X coordinate of the upper left corner
+ * @param {Number} params.y - Y coordiantes of the upper left corner
+ * @param {Number} params.width - Width of the object in pixels
+ * @param {Number} params.height - Height of the object in pixels
+ * @param {objId} params.objId - Name identifier of the object
  * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
  * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
  */
@@ -121,12 +122,13 @@ function createRect(params) {
 /**
  * @static
  * @param {Object} params - Parameters
- * @param {Number} x - X coordinate of the center of the circle
- * @param {Number} y - Y coordiantes of the center of the circle
- * @param {Number} width - Radius of the circle
- * @param {objId} objId - Name identifier of the object
+ * @param {Number} params.x - X coordinate of the center of the circle
+ * @param {Number} params.y - Y coordiantes of the center of the circle
+ * @param {Number} params.width - Radius of the circle
+ * @param {objId} params.objId - Name identifier of the object
  * @param {boolean} params.shouldStroke - Should the outline of the object be drawn?
  * @param {boolean} params.shouldFill - Should the inside of the object be drawn?
+ * @param {number} params.radius - Radius of the circle
  */
 function createCircle(params) {
   const x = params.x;

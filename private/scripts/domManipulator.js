@@ -28,10 +28,6 @@ const menu = document.getElementById('menu');
  * @type {HTMLElement}
  */
 const mainFeed = document.getElementById('mainFeed');
-/**
- * User input field
- * @type {HTMLElement}
- */
 const cmdInput = document.getElementById('cmdInput');
 /**
  * The span infront of the input field
@@ -323,7 +319,7 @@ function addMenuItem(item) {
  * @param {HTMLElement} item - New sub menu
  */
 function addSubMenuItem(elementId, item) {
-  const element = Array.from(menuList.children).find((elem) => elem.id === elementId);
+  const element = Array.from(menuList.children).find(elem => elem.id === elementId);
 
   if (element && element.lastChild.tagName !== 'UL') {
     element.appendChild(item);
@@ -487,7 +483,7 @@ function createListItem(text, style) {
  * Creates lists for station and team stats
  * @param {Object} stations - Station IDs and current status
  * @param {Object} teams - Team names and total score
- * @param {Object} currentRound - Start and end time for current round
+ * @param {{endtime: Date, starttime: Date}} currentRound - Start and end time for current round
  * @param {Object} futureRounds - Start times for future rounds, if any
  * @param {Date} now - Current time
  */
@@ -510,7 +506,7 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
       stationList.appendChild(createListItem(`Next com-win in: ${time}`));
     }
 
-    for (let i = 0; i < stationKeys.length; i++) {
+    for (let i = 0; i < stationKeys.length; i += 1) {
       const stationId = stationKeys[i];
       const station = stations[stationId];
 
@@ -527,7 +523,7 @@ function setStationStats(stations, teams, currentRound, futureRounds, now) {
 
   teamList.appendChild(createListItem('-Wreckers-'));
 
-  for (let i = 0; i < teamKeys.length; i++) {
+  for (let i = 0; i < teamKeys.length; i += 1) {
     const teamName = teamKeys[i];
     const score = teams[teamName];
 

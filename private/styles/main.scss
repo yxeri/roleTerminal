@@ -27,6 +27,8 @@ $sub-shadow-color: #870016;
 $sub-back-color: #1e0100;
 $imp-text-color: #002d25;
 $imp-back-color: #00ffcc;
+$horizontal-padding: .4em;
+$menu-height: 1.6em;
 
 html {
   margin: 0;
@@ -97,6 +99,7 @@ textarea {
 
 #menu {
   width: 100%;
+  height: $menu-height;
   position: fixed;
   z-index: 30;
   top: 0;
@@ -115,12 +118,12 @@ textarea {
 }
 
 #menuList {
-  padding: 0 .2em 0 .8em;
+  padding: 0 .2em 0 $horizontal-padding;
 }
 
 #inputContainer {
   overflow: hidden;
-  padding: 0 .8em 0 .8em;
+  padding: 0 $horizontal-padding 0 $horizontal-padding;
   width: 99%;
 }
 
@@ -154,10 +157,10 @@ textarea {
 
 #mainFeed {
   overflow: hidden;
-  padding-top: 2em;
+  padding-top: $menu-height;
 
   li {
-    padding: 0 .8em 0 .8em;
+    padding: 0 $horizontal-padding 0 $horizontal-padding;
   }
 
   li span {
@@ -190,11 +193,6 @@ textarea {
   }
 }
 
-#central {
-  position: fixed;
-  top: 2em;
-}
-
 #markerInfo {
   font-size: .8em;
   font-weight: bold;
@@ -205,11 +203,6 @@ textarea {
   background-color: $back-color;
   z-index: 10;
   max-width: 15em;
-}
-
-#videoHolder {
-  position: fixed;
-  top: 2em;
 }
 
 #stationStats {
@@ -226,6 +219,11 @@ textarea {
     border-left: 2px solid;
     background-color: $back-color;
   }
+}
+
+.view {
+  position: fixed;
+  top: $menu-height;
 }
 
 .halfView {
@@ -262,7 +260,7 @@ textarea {
   content: attr(subMsg);
   position: absolute;
   left: 0;
-  padding-left: .8em;
+  padding-left: $horizontal-padding;
   width: 100%;
   background-color: $sub-back-color;
   color: $sub-text-color;

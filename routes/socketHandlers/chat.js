@@ -510,8 +510,9 @@ function handle(socket, io) {
 
       const allRooms = sentRoom ? [sentRoom.roomName] : Object.keys(socket.rooms);
       const startDate = params.startDate || new Date();
+      const historyLines = params.lines > appConfig.maxHistoryLines ? appConfig.maxHistoryLines : params.lines;
 
-      manager.getHistory(allRooms, params.lines, false, startDate, (histErr, historyMessages) => {
+      manager.getHistory(allRooms, historyLines, false, startDate, (histErr, historyMessages) => {
         if (histErr) {
           logger.sendSocketErrorMsg({
             socket,

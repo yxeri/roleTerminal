@@ -158,6 +158,12 @@ config.defaultZoomLevel = parseInt(process.env.DEFAULTZOOMLEVEL || modifiedConfi
 // Amount of messages retrieved with the history command
 config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;
 
+/**
+ * Max amount of history that will be retrieved
+ * @type {number}
+ */
+config.maxHistoryLines = process.env.MAXHISTORYLINES || modifiedConfig.maxHistoryLines || 200;
+
 // Amount of messages sent at a time to client
 config.chunkLength = process.env.MAXCHUNK || modifiedConfig.chunkLength || 10;
 
@@ -278,8 +284,15 @@ config.staticInputStart = staticInputStartEnv !== undefined ? staticInputStartEn
  */
 config.defaultInputStart = process.env.DEFAULTINPUTSTART || modifiedConfig.defaultInputStart || 'RAZCMD';
 
+/**
+ * Amount of milliseconds between each increment/decrement of signal value (BBR game feature)
+ * @type {number}
+ */
 config.signalResetInterval = process.env.SIGNALRESETINTERVAL || modifiedConfig.signalResetInterval || 0;
 
+/**
+ * Message that will be sent to client and can be printed
+ */
 config.welcomeMessage = process.env.WELCOMEMESSAGE || modifiedConfig.welcomeMessage;
 
 module.exports = config;

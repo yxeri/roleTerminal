@@ -77,7 +77,59 @@ function humanReadableHints(hints) {
  * @static
  */
 function getStats() {
-  socketHandler.emit('getStationStats');
+  /**
+   * @param {Object} params - Parameters
+   * @param {Object[]} params.teams - Team names, scores
+   * @param {string} params.teams[].short_name - Name of the team
+   * @param {Object[]} params.stations - Station IDs, status
+   * @param {Object} params.currentRound - Times for current round
+   * @param {Object} params.futureRounds - Times for future rounds
+   * @param {Date} params.now - Current time
+   */
+  socketHandler.emit('getStationStats', '', ({ stations, teams, currentRound, futureRounds, now }) => {
+    const stationsStats = {};
+    const teamsStats = {};
+
+    for (let i = 0; i < stations.length; i += 1) {
+      const station = stations[i];
+      const stationId = `${station.id || station.stationId}`;
+      const stationTeam = teams.find(team => station.owner === team.name);
+
+      if (!stations[stationId]) {
+        stationsStats[stationId] = {};
+      }
+
+      if (station.owner && stationTeam && stationTeam.short_name) {
+        stationsStats[stationId].owner = stationTeam.short_name;
+      } else if (stationTeam && !stationTeam.short_name) {
+        stationsStats[stationId].owner = '?';
+      } else if (station.owner === null) {
+        stationsStats[stationId].owner = '-';
+      }
+
+      if (station.signalValue || station.boost) {
+        stationsStats[stationId].signalValue = station.signalValue || station.boost;
+      }
+
+      if (typeof station.active === 'boolean') {
+        stationsStats[stationId].active = station.active;
+      }
+    }
+
+    for (let i = 0; i < teams.length; i += 1) {
+      /**
+       * @type {{score: number, name: string}}
+       */
+      const team = teams[i];
+      const teamName = team.name;
+
+      if (teamName !== 'ownerless') {
+        teamsStats[teamName] = team.score;
+      }
+    }
+
+    domManipulator.setStationStats(stations, teams, currentRound, futureRounds, now);
+  });
   statsTimeout = setTimeout(getStats, statsTimeoutTime);
 }
 
@@ -160,14 +212,8 @@ commands.lantern = {
   func: (phrases = []) => {
     switch (phrases[0]) {
       case 'on': {
-        socketHandler.emit('getStationStats');
+        getStats();
         domManipulator.toggleStationStats(true);
-
-        if (statsTimeout !== null) {
-          clearInterval(statsTimeout);
-        }
-
-        statsTimeout = setTimeout(getStats, statsTimeoutTime);
 
         break;
       }

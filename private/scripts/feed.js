@@ -65,8 +65,6 @@ const triggerKeysPressed = [];
  * @type {string}
  */
 const morseSeparator = '#';
-const teams = {};
-const stations = {};
 /**
  * @type {AudioContext}
  */
@@ -695,14 +693,13 @@ function printUsedCommand(clearAfterUse, inputText) {
  * @returns {boolean} Is the view in full screen?
  */
 function isFullscreen() {
-  return (!window.screenTop && !window.screenY);
+  return !window.screenTop && !window.screenY;
 }
 
 /**
  * Goes into full screen with sent element
  * This is not supported in iOS Safari
- * @param {object} element - The element which should be maximized to full screen
- * @returns {undefined} Returns nothing
+ * @param {Element} element - The element which should be maximized to full screen
  */
 function goFullScreen(element) {
   if (element.requestFullscreen) {
@@ -1309,44 +1306,6 @@ function resetAllLocalVals() {
   previousCommandPointer = 0;
 }
 
-/**
- * Modifies message following special rules depending on what the message contains
- * @param {Object} message - Message to be modified
- * @returns {Object} Returns modified message
- */
-function hideMessageProperties(message = {}) {
-  const modifiedMessage = message;
-  const roomName = message.roomName;
-
-  // TODO Change blank user and room to booleans instead of string removal
-  if (message.extraClass === 'importantMsg') {
-    modifiedMessage.roomName = '';
-    modifiedMessage.userName = '';
-    modifiedMessage.skipTime = true;
-  } else if (message.extraClass === 'broadcastMsg') {
-    modifiedMessage.roomName = '';
-    modifiedMessage.userName = '';
-  }
-
-  if (roomName && roomName !== null) {
-    const whisperIndex = roomName.indexOf('-whisper');
-
-    if (whisperIndex >= 0) {
-      if (message.userName === storage.getUser()) {
-        modifiedMessage.roomName = roomName.substring(0, whisperIndex);
-      } else {
-        modifiedMessage.roomName = 'whisper';
-      }
-    } else if (roomName.indexOf('-device') >= 0) {
-      modifiedMessage.roomName = 'device';
-    } else if (roomName.indexOf('team') >= 0) {
-      modifiedMessage.roomName = 'team';
-    }
-  }
-
-  return modifiedMessage;
-}
-
 // TODO Not all Android devices have touch screens
 /**
  * Checks if device is iOS or Android
@@ -1354,40 +1313,6 @@ function hideMessageProperties(message = {}) {
  */
 function isTouchDevice() {
   return ((isIos() || isAndroid()));
-}
-
-/**
- * Called on message emit. Prints text
- * @param {Object} params - Parameters
- * @param {Object} params.message - Message
- */
-function onMessage(params = { message: {} }) {
-  const message = textTools.addMessageSpecialProperties(hideMessageProperties(params.message));
-
-  messenger.queueMessage(message);
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
-}
-
-/**
- * Called on messages emit. Prints multiple texts
- * @param {Object} params - Parameters
- * @param {Object[]} params.messages - Messages
- */
-function onMessages(params = { messages: [] }) {
-  const messages = params.messages;
-
-  for (let i = 0; i < messages.length; i += 1) {
-    const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
-
-    messenger.queueMessage(message);
-  }
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
 }
 
 /**
@@ -1718,10 +1643,10 @@ function onList(params = {}) {
     const title = params.itemList.listTitle;
 
     if (title) {
-      onMessage({ message: { text: textTools.createCommandStart(title) } });
+      messenger.onMessage({ message: { text: textTools.createCommandStart(title) } });
     }
 
-    onMessage({
+    messenger.onMessage({
       message: {
         text: itemList,
         linkable: params.itemList.linkable || true,
@@ -1845,61 +1770,6 @@ function onReboot() {
 }
 
 /**
- * Called on stationStats emit
- * @param {Object} params - Parameters
- * @param {Object[]} params.teams - Team names, scores
- * @param {string} params.teams[].short_name - Name of the team
- * @param {Object[]} params.stations - Station IDs, status
- * @param {Object} params.currentRound - Times for current round
- * @param {Object} params.futureRounds - Times for future rounds
- * @param {Date} params.now - Current time
- */
-function onStationStats(params) {
-  const stationsStats = params.stations;
-  const teamsStats = params.teams;
-  const currentRound = params.currentRound;
-  const futureRounds = params.futureRounds;
-  const now = params.now;
-
-  for (let i = 0; i < stationsStats.length; i += 1) {
-    const station = stationsStats[i];
-    const stationId = `${station.id || station.stationId}`;
-    const stationTeam = teamsStats.find(team => station.owner === team.name);
-
-    if (!stations[stationId]) {
-      stations[stationId] = {};
-    }
-
-    if (station.owner && stationTeam && stationTeam.short_name) {
-      stations[stationId].owner = stationTeam.short_name;
-    } else if (stationTeam && !stationTeam.short_name) {
-      stations[stationId].owner = '?';
-    } else if (station.owner === null) {
-      stations[stationId].owner = '-';
-    }
-
-    if (station.signalValue || station.boost) {
-      stations[stationId].signalValue = station.signalValue || station.boost;
-    }
-
-    if (typeof station.active === 'boolean') {
-      stations[stationId].active = station.active;
-    }
-  }
-
-  for (let i = 0; i < teamsStats.length; i += 1) {
-    const team = teamsStats[i];
-    const teamName = team.name;
-
-    if (teamName !== 'ownerless') {
-      teams[teamName] = team.score;
-    }
-  }
-
-  domManipulator.setStationStats(stations, teams, currentRound, futureRounds, now);
-}
-
-/**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
  * @param {Object} params - Configuration properties
@@ -2010,8 +1880,8 @@ window.addEventListener('error', (event) => {
 });
 
 socketHandler.startSocket({
-  message: onMessage,
-  messages: onMessages,
+  message: messenger.onMessage,
+  messages: messenger.onMessages,
   importantMsg: onImportantMsg,
   reconnect: onReconnect,
   disconnect: onDisconnect,
@@ -2035,5 +1905,4 @@ socketHandler.startSocket({
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
   reboot: onReboot,
-  stationStats: onStationStats,
 });

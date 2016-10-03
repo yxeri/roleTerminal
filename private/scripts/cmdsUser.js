@@ -23,6 +23,7 @@ const textTools = require('./textTools');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const messenger = require('./messenger');
+const mapTools = require('./mapTools');
 
 /**
  * @static
@@ -37,8 +38,37 @@ commands.whoami = {
       device: { deviceId: storage.getDeviceId() },
     };
 
-    socketHandler.emit('whoAmI');
-    socketHandler.emit('myRooms', data);
+    socketHandler.emit('whoAmI', '', (params) => {
+      const team = params.user.team || '';
+      const userMarker = mapTools.getThisUserMarker();
+      const text = textTools.createCommandStart('whoami').concat([
+        `User: ${params.user.userName}`,
+        `Access level: ${params.user.accessLevel}`,
+        `Team: ${team}`,
+        `Device ID: ${storage.getDeviceId()}`,
+        `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
+        textTools.createCommandEnd(),
+      ]);
+
+      messenger.queueMessage({ text });
+    });
+    socketHandler.emit('myRooms', data, ({ rooms, ownedRooms }) => {
+      const roomList = [
+        'My rooms:',
+        rooms.join(' - '),
+      ];
+
+      if (ownedRooms.length > 0) {
+        roomList.concat([
+          'You are the owner of:',
+          ownedRooms.join(' - '),
+        ]);
+      }
+
+      messenger.queueMessage({
+        text: roomList,
+      });
+    });
   },
   accessLevel: 13,
   category: 'basic',

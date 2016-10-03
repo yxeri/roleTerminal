@@ -314,7 +314,7 @@ function sendBroadcastMsg(params) {
     message: params.message,
   };
   data.message.extraClass = 'broadcastMsg';
-  data.message.roomName = databasePopulation.rooms.broadcast.roomName;
+  data.message.roomName = databasePopulation.rooms.bcast.roomName;
   data.message.time = new Date();
 
   addMsgToHistory(data.message.roomName, data.message, socket, (err) => {

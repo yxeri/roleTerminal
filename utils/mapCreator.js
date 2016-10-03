@@ -40,7 +40,7 @@ function parseGoogleCoords(string) {
 
 /**
  * Creates a collection of all Google coordinates
- * @param {number[]} coords - Coordinates from Google maps
+ * @param {string[]} coords - Coordinates from Google maps
  * @returns {{lat: number, lng: number}[]} Collection with positions (latitudes and longitudes)
  */
 function createCoordsCollection(coords) {
@@ -54,9 +54,9 @@ function createCoordsCollection(coords) {
      * Google Maps bugs out and will sometimes send large integer instead of double (64.5565 becomes 645565)
      * This adds a dot where needed
      */
-    if (!isNaN(coords[i].substr(0, 2)) && coords[i].charAt(2) !== '.') {
+    if (!isNaN(parseInt(longitude.substr(0, 2), 10)) && coords[i].charAt(2) !== '.') {
       longitude = `${coords[i].substr(0, 2)}.${coords[i].substr(2)}`;
-    } else if (!isNaN(coords[i + 1].substr(0, 2)) && coords[i + 1].charAt(2) !== '.') {
+    } else if (!isNaN(parseInt(latitude.substr(0, 2), 10)) && coords[i + 1].charAt(2) !== '.') {
       latitude = `${coords[i + 1].substr(0, 2)}.${coords[i + 1].substr(2)}`;
     }
 
@@ -72,13 +72,14 @@ function createCoordsCollection(coords) {
 /**
  * Create and return a position with a position from Google Maps as base
  * @param {Object} placemark - Google Maps position
- * @param {Object} placemark.name - Google Maps position name
- * @param {Object} [placemark.description] - Google Maps position description
+ * @param {string} placemark.name - Google Maps position name
+ * @param {string} [placemark.description] - Google Maps position description
  * @param {Object} [placemark.Polygon] - Google Maps position polygon
- * @param {Object} placemark.Polygon.outerBoundaryIs.LinearRing.coordinates - Google Maps polygon coordinates
+ * @param {string} placemark.Polygon.outerBoundaryIs.LinearRing.coordinates - Google Maps polygon coordinates
  * @param {Object} [placemark.LineString] - Google Maps position line
+ * @param {string} placemark.LineString.coordinates - Google Maps line coordinates
  * @param {Object} [placemark.Point] - Google Maps position point
- * @returns {{positionName: string, position: {latitude: Number, longitude: Number}, isStatic: boolean, type: string, geometry: string, description: string}} New position
+ * @returns {{positionName: string, position: Object, isStatic: boolean, type: string, geometry: string, description: string}} New position
  */
 function createPosition(placemark) {
   const position = {};

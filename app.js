@@ -26,12 +26,14 @@ const databasePopulation = require('./config/defaults/config').databasePopulatio
 
 const app = express();
 
+// noinspection JSCheckFunctionSignatures
 app.io = socketIo();
 
 // view engine setup
 app.set('views', path.join(__dirname, appConfig.publicBase, appConfig.viewsPath));
 app.set('view engine', 'html');
 app.engine('html', require('hbs').__express); // eslint-disable-line no-underscore-dangle, import/newline-after-import
+// noinspection JSCheckFunctionSignatures
 app.use(compression());
 
 // Logging

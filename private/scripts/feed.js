@@ -1706,26 +1706,6 @@ function onUpdateDeviceId(newId) {
 }
 
 /**
- * Called on whoami emit
- * @param {Object} params - Parameters
- * @param {Object} params.user - User information
- */
-function onWhoami(params) {
-  const team = params.user.team || '';
-  const userMarker = mapTools.getThisUserMarker();
-  const text = textTools.createCommandStart('whoami').concat([
-    `User: ${params.user.userName}`,
-    `Access level: ${params.user.accessLevel}`,
-    `Team: ${team}`,
-    `Device ID: ${storage.getDeviceId()}`,
-    `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
-    textTools.createCommandEnd(),
-  ]);
-
-  messenger.queueMessage({ text });
-}
-
-/**
  * Called on list emit. Receives a list to print
  * @param {Object} params - Parameters
  * @param {number} params.columns - Number of columns to print items to
@@ -2048,7 +2028,6 @@ socketHandler.startSocket({
   logout: onLogout,
   updateCommands: onUpdateCommands,
   updateDeviceId: onUpdateDeviceId,
-  whoAmI: onWhoami,
   list: onList,
   matchFound: onMatchFound,
   startup: onStartup,

@@ -67,7 +67,7 @@ function shouldBeHidden(room, socketId) {
   const hiddenRooms = [
     socketId,
     databasePopulation.rooms.important.roomName,
-    databasePopulation.rooms.broadcast.roomName,
+    databasePopulation.rooms.bcast.roomName,
     databasePopulation.rooms.morse.roomName,
   ];
 
@@ -422,8 +422,7 @@ function handle(socket, io) {
     });
   });
 
-  // TODO Data structure. data.user.userName?
-  socket.on('myRooms', (params) => {
+  socket.on('myRooms', (params, callback) => {
     if (!objectValidator.isValidData(params, { user: { userName: true }, device: { deviceId: true } })) {
       return;
     }
@@ -448,16 +447,6 @@ function handle(socket, io) {
         }
       }
 
-      messenger.sendSelfMsg({
-        socket,
-        message: {
-          text: [
-            'My rooms:',
-            rooms.join(' - '),
-          ],
-        },
-      });
-
       dbRoom.getOwnedRooms(user, (err, ownedRooms) => {
         if (err || !ownedRooms || ownedRooms === null) {
           logger.sendErrorMsg({
@@ -469,23 +458,15 @@ function handle(socket, io) {
           return;
         }
 
-        if (ownedRooms.length > 0) {
-          const roomNames = [];
+        const roomNames = [];
 
+        if (ownedRooms.length > 0) {
           for (let i = 0; i < ownedRooms.length; i += 1) {
             roomNames.push(ownedRooms[i].roomName);
           }
-
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [
-                'You are the owner of:',
-                roomNames.join(' - '),
-              ],
-            },
-          });
         }
+
+        callback({ rooms, ownedRooms: roomNames });
       });
     });
   });

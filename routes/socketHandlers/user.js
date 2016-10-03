@@ -221,8 +221,8 @@ function handle(socket, io) {
     }
   });
 
-  socket.on('login', (params) => {
-    if (!objectValidator.isValidData(params, { user: { userName: true, password: true } })) {
+  socket.on('login', ({ loginUser }) => {
+    if (!objectValidator.isValidData({ loginUser }, { user: { userName: true, password: true } })) {
       return;
     }
 
@@ -231,10 +231,9 @@ function handle(socket, io) {
         return;
       }
 
-      const user = params.user;
-      const userName = user.userName.toLowerCase();
+      const userName = loginUser.userName.toLowerCase();
 
-      dbUser.authUser(userName, user.password, (err, authUser) => {
+      dbUser.authUser(userName, loginUser.password, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -302,7 +301,7 @@ function handle(socket, io) {
           socket.emit('login', { user: authUser });
         });
 
-        dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
+        dbUser.setUserLastOnline(userName, new Date(), (userOnlineErr, settedUser) => {
           if (userOnlineErr || settedUser === null) {
             console.log('Failed to set last online');
           }
@@ -796,8 +795,8 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('updateMode', (params) => {
-    if (!objectValidator.isValidData(params, { user: { userName: true }, mode: true })) {
+  socket.on('updateMode', ({ mode }) => {
+    if (!objectValidator.isValidData({ mode }, { mode: true })) {
       return;
     }
 
@@ -807,9 +806,8 @@ function handle(socket, io) {
       }
 
       const userName = user.userName;
-      const value = params.mode;
 
-      dbUser.updateUserMode(userName, value, (err) => {
+      dbUser.updateUserMode(userName, mode, (err) => {
         if (err) {
           logger.sendSocketErrorMsg({
             socket,
@@ -823,21 +821,21 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('whoAmI', () => {
+  socket.on('whoAmI', (params, callback) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         return;
       }
 
-      const params = {
+      callback({
         user: {
           userName: user.userName,
           accessLevel: user.accessLevel,
           team: user.team,
         },
-      };
+      });
 
-      socket.emit('whoAmI', params);
+      // socket.emit('whoAmI', params);
     });
   });
 

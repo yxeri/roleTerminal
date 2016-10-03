@@ -193,7 +193,6 @@ textarea {
 #markerInfo {
   font-size: .8em;
   font-weight: bold;
-  text-shadow: none;
   position: absolute;
   border: solid 1px;
   padding: 0.1em;
@@ -261,7 +260,6 @@ textarea {
   width: 100%;
   background-color: $sub-back-color;
   color: $sub-text-color;
-  // text-shadow: 1px 1px 4px $sub-shadow-color;
   opacity: 0;
 }
 
@@ -310,7 +308,6 @@ textarea {
 
 .importantMsg {
   color: $imp-text-color;
-  // text-shadow: none;
   background-color: $imp-back-color;
   font-size: 1.2em;
   text-transform: uppercase;

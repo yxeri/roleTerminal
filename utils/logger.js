@@ -44,28 +44,24 @@ const ErrorCodes = {
 /**
  * Prints error message to server log
  * @param {Object} code - Error code
- * @param {string} text - Text to be printed
+ * @param {string[]} text - Text to be printed
  * @param {Object} err - Thrown error
  */
 function printErrorMsg(code, text, err) {
-  console.log('[ERROR]', code.text, text, '- Error:', err || '');
+  console.log('[ERROR]', code.text, text.join('\n'), '- Error:', err || '');
 }
 
 /**
  * Prepares the error message and prints it
  * @param {Object} params - Parameters
  * @param {Object} params.code - Error code
- * @param {string} params.text - Error text
+ * @param {string[]} params.text - Error text
  * @param {Object} [params.err] - Thrown error
  */
-function sendErrorMsg(params) {
-  if (!objectValidator.isValidData(params, { code: true, text: true })) {
+function sendErrorMsg({ code, text, err }) {
+  if (!objectValidator.isValidData({ code, text, err }, { code: true, text: true })) {
     return;
   }
-
-  const code = params.code;
-  const text = params.text;
-  const err = params.err;
 
   printErrorMsg(code, text, err);
 }
@@ -74,28 +70,26 @@ function sendErrorMsg(params) {
  * Prepares the errmor message and prints it both server log and to client
  * @param {Object} params - Parameters
  * @param {Object} params.code - Error code
- * @param {string} params.text - Error text
+ * @param {string[]} params.text - Error text
+ * @param {string[]} [params.text_se] - Error text (Swedish)
  * @param {Object} params.socket - Socket.IO socket
  * @param {Object} [params.err] - Thrown error
  */
-function sendSocketErrorMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, code: true, text: true })) {
+function sendSocketErrorMsg({ socket, code, text, err }) {
+  if (!objectValidator.isValidData({ socket, code, text, err }, { socket: true, code: true, text: true })) {
     return;
   }
 
-  const socket = params.socket;
-  const code = params.code;
-  const text = params.text;
-  const err = params.err;
-  text[0] = `[${code.num}] ${text[0]}`;
+  const modifiedText = text;
+  modifiedText[0] = `[${code.num}] ${text[0]}`;
 
   messenger.sendSelfMsg({
     socket,
     message: {
-      text,
+      modifiedText,
     },
   });
-  printErrorMsg(code, text, err);
+  printErrorMsg(code, modifiedText, err);
 }
 
 /**

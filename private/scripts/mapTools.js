@@ -420,11 +420,11 @@ function realignMap(markers) {
  * @param {Object} collections - Collection of objects to be attached to the map
  */
 function setMap(collections) {
-  for (let i = 0; i < collections.length; i++) {
+  for (let i = 0; i < collections.length; i += 1) {
     const collection = collections[i];
     const collectionKeys = Object.keys(collection);
 
-    for (let j = 0; j < collectionKeys.length; j++) {
+    for (let j = 0; j < collectionKeys.length; j += 1) {
       collection[collectionKeys[j]].setMap(map);
     }
   }
@@ -438,7 +438,7 @@ function attachMapListeners() {
     const bounds = new google.maps.LatLngBounds();
     const markers = cluster.getMarkers();
 
-    for (let i = 0; i < markers.length; i++) {
+    for (let i = 0; i < markers.length; i += 1) {
       bounds.extend(markers[i].getPosition());
     }
 
@@ -468,7 +468,7 @@ function attachMapListeners() {
  * @private
  */
 function createMarkerClusterer() {
-  markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map((key) => mapMarkers[key]), {
+  markerClusterer = new MarkerClusterer(map, Object.keys(mapMarkers).map(key => mapMarkers[key]), {
     gridSize: 24,
     maxZoom: 17,
     zoomOnClick: false,

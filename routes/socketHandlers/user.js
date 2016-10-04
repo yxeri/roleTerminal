@@ -210,19 +210,17 @@ function handle(socket, io) {
             return;
           }
 
-          while (missedMessages.length) {
-            messenger.sendSelfMsgs({
-              socket,
-              messages: missedMessages.splice(0, appConfig.chunkLength),
-            });
-          }
+          messenger.sendSelfMsgs({
+            socket,
+            messages: missedMessages,
+          });
         });
       });
     }
   });
 
-  socket.on('login', ({ loginUser }) => {
-    if (!objectValidator.isValidData({ loginUser }, { user: { userName: true, password: true } })) {
+  socket.on('login', ({ user }) => {
+    if (!objectValidator.isValidData({ user }, { user: { userName: true, password: true } })) {
       return;
     }
 
@@ -231,9 +229,9 @@ function handle(socket, io) {
         return;
       }
 
-      const userName = loginUser.userName.toLowerCase();
+      const userName = user.userName.toLowerCase();
 
-      dbUser.authUser(userName, loginUser.password, (err, authUser) => {
+      dbUser.authUser(userName, user.password, (err, authUser) => {
         if (err || authUser === null) {
           logger.sendSocketErrorMsg({
             socket,

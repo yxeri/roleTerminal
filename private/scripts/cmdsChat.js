@@ -56,7 +56,9 @@ commands.history = {
       }
     }
 
-    socketHandler.emit('history', data);
+    socketHandler.emit('history', data, ({ messages }) => {
+      messenger.onMessages({ messages });
+    });
   },
   clearAfterUse: true,
   clearBeforeUse: true,
@@ -107,6 +109,8 @@ commands.msg = {
           userName: storage.getUser(),
           roomName: storage.getRoom(),
         },
+      }, ({ message }) => {
+        messenger.onMessage({ message });
       });
     } else {
       messenger.queueMessage({
@@ -177,7 +181,7 @@ commands.broadcast = {
 };
 
 commands.whisper = {
-  func: (phrases) => {
+  func: (phrases = []) => {
     const data = {};
 
     if (phrases.length > 1) {
@@ -187,7 +191,9 @@ commands.whisper = {
       data.message.userName = storage.getUser();
       data.message.whisper = true;
 
-      socketHandler.emit('whisperMsg', data);
+      socketHandler.emit('whisperMsg', data, ({ message }) => {
+        messenger.onMessage({ message });
+      });
     } else {
       messenger.queueMessage({
         text: ['You forgot to type the message!'],

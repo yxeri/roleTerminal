@@ -179,7 +179,11 @@ function isSocketFollowingRoom(socket, roomName) {
 /**
  * Sends a message to a room. The message will not be stored in history
  * Emits message
- * @param {{sendTo: string, socket: Object, message: {text: string[], userName: string}}} params - Parameters
+ * @param {{sendTo: string, socket: Object}} params - Parameters
+ * @param {Object} params.message - Message to send
+ * @param {string} params.message.userName - Name of sender
+ * @param {string[]} params.message.text - Text in message
+ * @param {string[]} [params.message.text_se] - Text in message
  */
 function sendMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true }, sendTo: true })) {
@@ -199,7 +203,10 @@ function sendMsg(params) {
  * Sends a message with the importantMsg class. It can be sent to all connected sockets or one specific device (if toOneDevice is set)
  * It is stored in a separate histories collection for important messages
  * Emits importantMsg
- * @param {{toOneDevice: boolean, socket: Object, message: {text: string[], userName: string}}} params - Parameters
+ * @param {Object} params - Parameters
+ * @param {Object} params.socket - Socket.io socket
+ * @param {{text: string[], userName: string}} params.message - Message to send
+ * @param {boolean} [params.toOneDevice] - Should the message be sent to only one device?
  */
 function sendImportantMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
@@ -237,7 +244,7 @@ function sendImportantMsg(params) {
 /**
  * Sends a message to a room and stores it in history
  * Emits message
- * @param {{socket: Object, message: {text: string[], roomName: string, userName: string}}} params - Parameters
+ * @param {{socket: Object, message: {text: string[], roomName: string, userName: string, callback: Function}}} params - Parameters
  */
 function sendChatMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
@@ -258,14 +265,14 @@ function sendChatMsg(params) {
     }
 
     socket.broadcast.to(data.message.roomName).emit('message', data);
-    socket.emit('message', data);
+    params.callback(data);
   });
 }
 
 /**
  * Sends a message to a whisper room (*user name*-whisper), which is followed by a single user, and stores it in history
  * Emits message
- * @param {{socket: Object, message: {text: string[], roomName: string, userName: string}}} params - Parameters
+ * @param {{socket: Object, message: {text: string[], roomName: string, userName: string, callback: Function}}} params - Parameters
  */
 function sendWhisperMsg(params) {
   if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
@@ -293,7 +300,7 @@ function sendWhisperMsg(params) {
       }
 
       socket.broadcast.to(data.message.roomName).emit('message', data);
-      socket.emit('message', data);
+      params.callback(data);
     });
   });
 }

@@ -602,7 +602,7 @@ function handle(socket, io) {
             });
           }
 
-          const connectedIds = io.sockets.adapter.rooms[roomNameLower].sockets;
+          const connectedIds = Object.keys(io.sockets.adapter.rooms[roomNameLower].sockets);
           const allSockets = io.sockets.connected;
 
           for (let i = 0; i < connectedIds.length; i += 1) {

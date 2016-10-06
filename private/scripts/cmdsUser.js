@@ -53,21 +53,21 @@ commands.whoami = {
       messenger.queueMessage({ text });
     });
     socketHandler.emit('myRooms', data, ({ rooms, ownedRooms }) => {
-      const roomList = [
-        'My rooms:',
-        rooms.join(' - '),
-      ];
+      messenger.queueMessage({
+        text: [
+          'You are following rooms:',
+          rooms.join(' - '),
+        ],
+      });
 
       if (ownedRooms.length > 0) {
-        roomList.concat([
-          'You are the owner of:',
-          ownedRooms.join(' - '),
-        ]);
+        messenger.queueMessage({
+          text: [
+            'You are the owner of rooms:',
+            ownedRooms.join(' - '),
+          ],
+        });
       }
-
-      messenger.queueMessage({
-        text: roomList,
-      });
     });
   },
   accessLevel: 13,

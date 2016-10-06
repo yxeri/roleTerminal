@@ -412,7 +412,16 @@ commands.removeroom = {
   steps: [
     (phrases) => {
       if (phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('removeRoom', commandHandler.commandHelper.data);
+        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error }) => {
+          if (error) {
+            return;
+          }
+
+          messenger.queueMessage({
+            text: ['Removed the room'],
+            text_se: ['Rummet borttaget'],
+          });
+        });
       }
 
       commandHandler.resetCommand();

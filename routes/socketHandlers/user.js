@@ -832,8 +832,6 @@ function handle(socket, io) {
           team: user.team,
         },
       });
-
-      // socket.emit('whoAmI', params);
     });
   });
 

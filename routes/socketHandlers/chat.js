@@ -566,20 +566,22 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('removeRoom', (params) => {
-    if (!objectValidator.isValidData(params, { room: { roomName: true } })) {
+  socket.on('removeRoom', ({ room }, callback) => {
+    if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.removeroom.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
-      const roomNameLower = params.room.roomName.toLowerCase();
+      const roomNameLower = room.roomName.toLowerCase();
 
-      dbRoom.removeRoom(roomNameLower, user, (err, room) => {
-        if (err || room === null) {
+      dbRoom.removeRoom(roomNameLower, user, (err, removedRoom) => {
+        if (err || removedRoom === null) {
           logger.sendSocketErrorMsg({
             socket,
             code: logger.ErrorCodes.db,
@@ -587,6 +589,7 @@ function handle(socket, io) {
             text_se: ['Misslyckades med att ta bort rummet'],
             err,
           });
+          callback({ error: {} });
 
           return;
         }
@@ -611,24 +614,19 @@ function handle(socket, io) {
             userSocket.leave(roomNameLower);
           }
 
-          socket.broadcast.to(roomNameLower).emit('unfollow', { room: params.room });
+          socket.broadcast.to(roomNameLower).emit('unfollow', { room });
         });
 
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Removed the room'],
-            text_se: ['Rummet borttaget'],
-          },
-        });
         messenger.sendMsg({
           socket,
           message: {
+            userName: 'SYSTEM',
             text: [`Room ${roomNameLower} has been removed by the room administrator`],
             text_se: [`Rummet ${roomNameLower} har blivit borttaget av en administratör för rummet`],
           },
           sendTo: roomNameLower,
         });
+        callback({});
       });
     });
   });

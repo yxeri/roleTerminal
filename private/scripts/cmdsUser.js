@@ -38,13 +38,12 @@ commands.whoami = {
       device: { deviceId: storage.getDeviceId() },
     };
 
-    socketHandler.emit('whoAmI', '', (params) => {
-      const team = params.user.team || '';
+    socketHandler.emit('whoAmI', '', ({ user }) => {
       const userMarker = mapTools.getThisUserMarker();
       const text = textTools.createCommandStart('whoami').concat([
-        `User: ${params.user.userName}`,
-        `Access level: ${params.user.accessLevel}`,
-        `Team: ${team}`,
+        `User: ${user.userName}`,
+        `Access level: ${user.accessLevel}`,
+        `Team: ${user.team || 'Not part of a team'}`,
         `Device ID: ${storage.getDeviceId()}`,
         `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
         textTools.createCommandEnd(),
@@ -276,8 +275,7 @@ commands.password = {
     (phrases = ['']) => {
       const commandHelper = commandHandler.commandHelper;
       const data = {};
-      const oldPassword = phrases[0];
-      data.oldPassword = oldPassword;
+      data.oldPassword = phrases[0];
       commandHelper.data = data;
       commandHelper.onStep += 1;
 

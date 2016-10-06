@@ -23,7 +23,6 @@ const logger = require('../../utils/logger');
 const http = require('http');
 const objectValidator = require('../../utils/objectValidator');
 const dbArchive = require('../../db/connectors/archive');
-const messenger = require('../../socketHelpers/messenger');
 
 // FIXME SMHI API changed. Structure needs to be fixed here before usage
 /**
@@ -82,7 +81,7 @@ function handle(socket) {
           return;
         }
 
-        callback({ archive} );
+        callback({ archive });
       });
     });
   });

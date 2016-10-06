@@ -91,7 +91,10 @@ commands.morse = {
       if (morseCodeText.length > 0) {
         data.morseCode = morseCodeText;
 
-        socketHandler.emit('morse', data, ({ }) => {
+        socketHandler.emit('morse', data, ({ error }) => {
+          if (error) {
+            return;
+          }
         });
       }
     }
@@ -358,7 +361,10 @@ commands.room = {
          */
         data.room.entered = true;
 
-        socketHandler.emit('switchRoom', data, ({}) => {
+        socketHandler.emit('switchRoom', data, ({ error }) => {
+          if (error) {
+            return;
+          }
         });
       }
     } else {

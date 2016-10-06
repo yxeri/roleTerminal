@@ -81,11 +81,15 @@ function shouldBeHidden(room, socketId) {
 function handle(socket, io) {
   socket.on('chatMsg', ({ message }, callback) => {
     if (!objectValidator.isValidData({ message }, { message: { text: true, roomName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.msg.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -102,11 +106,15 @@ function handle(socket, io) {
 
   socket.on('whisperMsg', ({ message }, callback) => {
     if (!objectValidator.isValidData({ message }, { message: { text: true, roomName: true, whisper: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whisper.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -117,21 +125,24 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('broadcastMsg', (params) => {
+  socket.on('broadcastMsg', (params, callback) => {
     if (!objectValidator.isValidData(params, { message: { text: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.broadcast.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const message = params.message;
-
       message.userName = user.userName;
 
-      messenger.sendBroadcastMsg({ socket, message });
+      messenger.sendBroadcastMsg({ socket, message, callback });
     });
   });
 
@@ -236,26 +247,28 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('switchRoom', (params) => {
-    if (!objectValidator.isValidData(params, { room: { roomName: true } })) {
+  socket.on('switchRoom', ({ room }, callback) => {
+    if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.switchroom.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
-      const room = params.room;
-      let roomName = params.room.roomName.toLowerCase();
+      let roomName = room.roomName.toLowerCase();
 
       if (user.team && roomName === 'team') {
         roomName = user.team + appConfig.teamAppend;
-        room.roomName = 'team';
       }
 
       if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
-        socket.emit('follow', { room: params.room });
+        socket.emit('follow', { room });
       } else {
         messenger.sendSelfMsg({
           socket,
@@ -478,6 +491,8 @@ function handle(socket, io) {
   socket.on('history', ({ room, startDate, lines }, callback) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -497,6 +512,7 @@ function handle(socket, io) {
             text: [`${user.userName} is not following room ${modifiedRoom.roomName}. Unable to retrieve history`],
             text_se: [`${user.userName} följer inte rummet ${modifiedRoom.roomName}. Misslyckades med hämtningen av historik`],
           });
+          callback({ error: {} });
 
           return;
         }
@@ -514,6 +530,7 @@ function handle(socket, io) {
             text_se: ['Misslyckades med hämtningen av historik'],
             err: histErr,
           });
+          callback({ error: {} });
 
           return;
         }
@@ -523,13 +540,17 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('morse', ({ local, morseCode, silent }) => {
+  socket.on('morse', ({ local, morseCode, silent }, callback) => {
     if (!objectValidator.isValidData({ local, morseCode, silent }, { morseCode: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.morse.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -540,6 +561,7 @@ function handle(socket, io) {
           morseCode,
         },
         silent,
+        callback,
       });
     });
   });
@@ -611,33 +633,32 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('importantMsg', (params) => {
-    if (!objectValidator.isValidData(params, { message: { text: true } })) {
+  socket.on('importantMsg', ({ message, morse, device }, callback) => {
+    if (!objectValidator.isValidData({ message, morse, device }, { message: { text: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.importantmsg.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const morseToSend = {};
 
-      const importantMsg = {
-        socket,
-        message: params.message,
-      };
-
-      if (params.morse) {
+      if (morse) {
         morseToSend.socket = socket;
-        morseToSend.local = params.morse.local;
+        morseToSend.local = morse.local;
         morseToSend.message = {
-          morseCode: params.morse.morseCode,
+          morseCode: morse.morseCode,
         };
       }
 
-      if (params.device) {
-        dbDevice.getDevice(params.device.deviceId, (err, device) => {
+      if (device) {
+        dbDevice.getDevice(device.deviceId, (err, retrievedDevice) => {
           if (err || device === null) {
             logger.sendSocketErrorMsg({
               socket,
@@ -646,22 +667,21 @@ function handle(socket, io) {
               text_se: ['Misslyckades med att skicka meddelande till enheten'],
               err,
             });
+            callback({ error: {} });
 
             return;
           }
 
-          importantMsg.toOneDevice = true;
-
-          if (params.morse) {
-            morseToSend.message.roomName = device.deviceId + appConfig.deviceAppend;
+          if (morse) {
+            morseToSend.message.roomName = retrievedDevice.deviceId + appConfig.deviceAppend;
           }
         });
       }
 
-      messenger.sendImportantMsg(importantMsg);
+      messenger.sendImportantMsg({ socket, callback, message, device });
 
-      if (params.morse) {
-        messenger.sendMorse(morseToSend);
+      if (morse) {
+        messenger.sendMorse({ message: morseToSend });
       }
     });
   });

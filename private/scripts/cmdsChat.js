@@ -56,7 +56,11 @@ commands.history = {
       }
     }
 
-    socketHandler.emit('history', data, ({ messages }) => {
+    socketHandler.emit('history', data, ({ error, messages }) => {
+      if (error) {
+        return;
+      }
+
       messenger.onMessages({ messages });
     });
   },
@@ -87,7 +91,8 @@ commands.morse = {
       if (morseCodeText.length > 0) {
         data.morseCode = morseCodeText;
 
-        socketHandler.emit('morse', data);
+        socketHandler.emit('morse', data, ({ }) => {
+        });
       }
     }
   },
@@ -109,7 +114,11 @@ commands.msg = {
           userName: storage.getUser(),
           roomName: storage.getRoom(),
         },
-      }, ({ message }) => {
+      }, ({ error, message }) => {
+        if (error) {
+          return;
+        }
+
         messenger.onMessage({ message });
       });
     } else {
@@ -167,7 +176,13 @@ commands.broadcast = {
     },
     (phrases) => {
       if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('broadcastMsg', commandHandler.commandHelper.data);
+        socketHandler.emit('broadcastMsg', commandHandler.commandHelper.data, ({ error, message }) => {
+          if (error) {
+            return;
+          }
+
+          messenger.onMessage({ message });
+        });
         commandHandler.resetCommand();
       } else {
         commandHandler.resetCommand(true);
@@ -191,7 +206,11 @@ commands.whisper = {
       data.message.userName = storage.getUser();
       data.message.whisper = true;
 
-      socketHandler.emit('whisperMsg', data, ({ message }) => {
+      socketHandler.emit('whisperMsg', data, ({ error, message }) => {
+        if (error) {
+          return;
+        }
+
         messenger.onMessage({ message });
       });
     } else {
@@ -301,7 +320,20 @@ commands.importantmsg = {
           };
         }
 
-        socketHandler.emit('importantMsg', commandHelper.data);
+        socketHandler.emit('importantMsg', commandHelper.data, ({ error, message, device }) => {
+          if (error) {
+            return;
+          }
+
+          if (device) {
+            messenger.queueMessage({
+              text: ['Sent important message to device'],
+              text_se: ['Skickade viktigt meddelande till enheten'],
+            });
+          } else {
+            messenger.onImportantMsg({ message });
+          }
+        });
         commandHandler.resetCommand();
       }
     },
@@ -326,7 +358,8 @@ commands.room = {
          */
         data.room.entered = true;
 
-        socketHandler.emit('switchRoom', data);
+        socketHandler.emit('switchRoom', data, ({}) => {
+        });
       }
     } else {
       messenger.queueMessage({

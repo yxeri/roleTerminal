@@ -160,7 +160,7 @@ function setGain(value) {
  * @param {string} morseCode - Morse code to be played and printed
  * @param {boolean} silent - Should the morse code text be surpressed?
  */
-function playMorse(morseCode, silent) {
+function playMorse({ morseCode, silent }) {
   /**
    * Finish sound queue by clearing it and send morse code as text
    * @param {number} timeouts - Morse code array length
@@ -1316,30 +1316,6 @@ function isTouchDevice() {
 }
 
 /**
- * Called on importantMsg emit. Prints text
- * @param {Object} params - Parameters
- * @param {Object} params.message - Message
- */
-function onImportantMsg(params = {}) {
-  const message = params.message;
-
-  if (message) {
-    message.extraClass = 'importantMsg';
-    message.skipTime = true;
-
-    messenger.queueMessage(message);
-
-    if (message.morse) {
-      commandHandler.triggerCommand({ cmd: 'morse', cmdParams: message.text.slice(0, 1) });
-    }
-  }
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
-}
-
-/**
  * Called on reconnect emit. Triggers when the connection is lost and then re-established
  */
 function onReconnect() {
@@ -1564,28 +1540,6 @@ function onDisconnectUser() {
   }
 
   resetAllLocalVals();
-}
-
-/**
- * Called on morse emit. Plays and prints morse
- * @param {Object} params - Parameters
- * @param {string} params.morseCode - Morse code to be played and printed
- * @param {boolean} params.silent - Should the morse code be printed as text?
- */
-function onMorse(params = {}) {
-  playMorse(params.morseCode, params.silent);
-}
-
-/**
- * Called on time emit. Prints time from server
- * @param {Object} params - Parameters
- * @param {Date} params.time - Current time
- */
-function onTime(params = {}) {
-  messenger.queueMessage({
-    text: [`Time: ${textTools.generateTimeStamp(params.time, true, true)}`],
-    text_en: [`Tid: ${textTools.generateTimeStamp(params.time, true, true)}`],
-  });
 }
 
 /**
@@ -1882,7 +1836,7 @@ window.addEventListener('error', (event) => {
 socketHandler.startSocket({
   message: messenger.onMessage,
   messages: messenger.onMessages,
-  importantMsg: onImportantMsg,
+  importantMsg: messenger.onImportantMsg,
   reconnect: onReconnect,
   disconnect: onDisconnect,
   follow: onFollow,
@@ -1892,8 +1846,7 @@ socketHandler.startSocket({
   commandFail: onCommandFail,
   reconnectSuccess: onReconnectSuccess,
   disconnectUser: onDisconnectUser,
-  morse: onMorse,
-  time: onTime,
+  morse: playMorse,
   ban: onBan,
   logout: onLogout,
   updateCommands: onUpdateCommands,

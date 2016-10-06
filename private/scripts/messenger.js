@@ -432,7 +432,7 @@ function hideMessageProperties(message = {}) {
       } else {
         modifiedMessage.roomName = 'whisper';
       }
-    } else if (roomName.indexOf('-device') >= 0) {
+    } else if (message.extraClass !== 'importantMsg' && roomName.indexOf('-device') >= 0) {
       modifiedMessage.roomName = 'device';
     } else if (roomName.indexOf('team') >= 0) {
       modifiedMessage.roomName = 'team';
@@ -476,7 +476,32 @@ function onMessages(params = { messages: [] }) {
   }
 }
 
+/**
+ * Called on importantMsg emit. Prints text
+ * @param {Object} params - Parameters
+ * @param {Object} params.message - Message
+ */
+function onImportantMsg(params = {}) {
+  const message = params.message;
+
+  if (message) {
+    message.extraClass = 'importantMsg';
+    message.skipTime = true;
+
+    queueMessage(message);
+
+    if (message.morse) {
+      commandHandler.triggerCommand({ cmd: 'morse', cmdParams: message.text.slice(0, 1) });
+    }
+  }
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
+  }
+}
+
 exports.queueMessage = queueMessage;
 exports.printHelpMessage = printHelpMessage;
 exports.onMessage = onMessage;
 exports.onMessages = onMessages;
+exports.onImportantMsg = onImportantMsg;

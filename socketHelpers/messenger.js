@@ -128,8 +128,7 @@ function addMsgToHistory(roomName, message, socket, callback) {
 
 /**
  * Send a message to the user's socket
- * @param {Objec} params - Parameters
- * @param {{text: string[]}} messag - Message to send
+ * @param {{text: string[]}} message - Message to send
  * @param {Object} socket - Socket.io socket
  */
 function sendSelfMsg({ message, socket }) {
@@ -142,7 +141,6 @@ function sendSelfMsg({ message, socket }) {
 
 /**
  * Sends multiple message to the user's socket
- * @param {Object} params - Parameters
  * @param {{text: string[]}[]} messages - Messages to send
  * @param {Object} socket - Socket.io socket
  */
@@ -203,85 +201,94 @@ function sendMsg(params) {
  * Sends a message with the importantMsg class. It can be sent to all connected sockets or one specific device (if toOneDevice is set)
  * It is stored in a separate histories collection for important messages
  * Emits importantMsg
- * @param {Object} params - Parameters
- * @param {Object} params.socket - Socket.io socket
- * @param {{text: string[], userName: string}} params.message - Message to send
- * @param {boolean} [params.toOneDevice] - Should the message be sent to only one device?
+ * @param {Object} socket - Socket.io socket
+ * @param {{text: string[], userName: string}} message - Message to send
+ * @param {boolean} [device] - Device that will receive message. Empty if message should be sent to all clients
+ * @param {Function} callback - Client callback
  */
-function sendImportantMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
+function sendImportantMsg({ socket, message, device, callback }) {
+  if (!objectValidator.isValidData({ socket, message, device }, { socket: true, message: { text: true, userName: true } })) {
+    callback({ error: {} });
+
     return;
   }
 
-  const socket = params.socket;
   const data = {
-    message: params.message,
+    message,
+    device,
   };
-  data.message.roomName = data.message.roomName || databasePopulation.rooms.important.roomName;
+  data.message.roomName = device ? device.deviceId + appConfig.deviceAppend : (data.message.roomName || databasePopulation.rooms.important.roomName);
   data.message.extraClass = 'importantMsg';
   data.message.time = new Date();
 
   addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
+      callback({ error: {} });
+
       return;
     }
 
-    if (params.toOneDevice) {
+    if (device) {
       socket.to(data.message.roomName).emit('importantMsg', data);
-      sendSelfMsg({
-        message: {
-          text: ['Sent important message to device'],
-          text_se: ['Skickade viktigt meddelande till enheten'],
-        },
-      });
     } else {
       socket.broadcast.emit('importantMsg', data);
-      socket.emit('importantMsg', data);
     }
+
+    callback(data);
   });
 }
 
 /**
  * Sends a message to a room and stores it in history
  * Emits message
- * @param {{socket: Object, message: {text: string[], roomName: string, userName: string, callback: Function}}} params - Parameters
+ * @param {Object} message - Message to be sent
+ * @param {Object} socket - Socket.io socket
+ * @param {Function} callback - Client callback
  */
-function sendChatMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+function sendChatMsg({ message, socket, callback }) {
+  if (!objectValidator.isValidData({ message, socket, callback }, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+    callback({ error: {} });
+
     return;
-  } else if (params.message && !isSocketFollowingRoom(params.socket, params.message.roomName)) {
+  } else if (message && !isSocketFollowingRoom(socket, message.roomName)) {
+    callback({ error: {} });
+
     return;
   }
 
-  const socket = params.socket;
   const data = {
-    message: params.message,
+    message,
   };
   data.message.time = new Date();
 
   addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
+      callback({ error: {} });
+
       return;
     }
 
     socket.broadcast.to(data.message.roomName).emit('message', data);
-    params.callback(data);
+    callback(data);
   });
 }
 
 /**
  * Sends a message to a whisper room (*user name*-whisper), which is followed by a single user, and stores it in history
  * Emits message
- * @param {{socket: Object, message: {text: string[], roomName: string, userName: string, callback: Function}}} params - Parameters
+ * @param {Object} message - Message to be sent
+ * @param {Object} socket - Socket.io socket
+ * @param {Function} callback - Client callback
  */
-function sendWhisperMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+function sendWhisperMsg({ message, socket, callback }) {
+  if (!objectValidator.isValidData({ message, socket, callback }, { socket: true, message: { text: true, roomName: true, userName: true } })) {
+    callback({ error: {} });
+
     return;
   }
 
-  const socket = params.socket;
   const data = {
-    message: params.message,
+    message,
   };
   data.message.roomName += appConfig.whisperAppend;
   data.message.extraClass = 'whisperMsg';
@@ -289,6 +296,8 @@ function sendWhisperMsg(params) {
 
   addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
+      callback({ error: {} });
+
       return;
     }
 
@@ -296,11 +305,13 @@ function sendWhisperMsg(params) {
 
     addMsgToHistory(senderRoomName, data.message, socket, (senderErr) => {
       if (senderErr) {
+        callback({ error: {} });
+
         return;
       }
 
       socket.broadcast.to(data.message.roomName).emit('message', data);
-      params.callback(data);
+      callback(data);
     });
   });
 }
@@ -309,16 +320,19 @@ function sendWhisperMsg(params) {
  * Sends a message with broadcastMsg class to all connected sockets
  * It is stored in a separate broadcast history
  * Emits message
- * @param {{socket: Object, message: {text: string[], userName: string}}} params - Parameters
+ * @param {Object} message - Message to be sent
+ * @param {Object} socket - Socket.io socket
+ * @param {Function} callback - Client callback
  */
-function sendBroadcastMsg(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { text: true, userName: true } })) {
+function sendBroadcastMsg({ message, socket, callback }) {
+  if (!objectValidator.isValidData({ message, socket, callback }, { socket: true, message: { text: true, userName: true } })) {
+    callback({ error: {} });
+
     return;
   }
 
-  const socket = params.socket;
   const data = {
-    message: params.message,
+    message,
   };
   data.message.extraClass = 'broadcastMsg';
   data.message.roomName = databasePopulation.rooms.bcast.roomName;
@@ -326,11 +340,13 @@ function sendBroadcastMsg(params) {
 
   addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
     if (err) {
+      callback({ error: {} });
+
       return;
     }
 
     socket.broadcast.emit('message', data);
-    socket.emit('message', data);
+    callback(data);
   });
 }
 
@@ -355,28 +371,28 @@ function sendList(params) {
 
 /**
  * Send morse code to all sockets and store in history
- * @param {Object} params - Parameters
- * @param {Object} params.socket - Socket.IO socket
- * @param {Object} params.message - Message
- * @param {string} [params.message.room] - Room name
- * @param {boolean} [params.silent] - Should the morse code text be surpressed?
- * @param {boolean} [params.local] - Should morse be played on the client that sent it?
+ * @param {Object} socket - Socket.IO socket
+ * @param {Object} message - Message
+ * @param {string} [message.room] - Room name
+ * @param {boolean} [silent] - Should the morse code text be surpressed?
+ * @param {boolean} [local] - Should morse be played on the client that sent it?
+ * @param {Function} [callback] - Callback
  */
-function sendMorse(params) {
-  if (!objectValidator.isValidData(params, { socket: true, message: { morseCode: true } })) {
+function sendMorse({ socket, message, silent, local, callback = () => {} }) {
+  if (!objectValidator.isValidData({ socket, message, silent, local, callback }, { socket: true, message: { morseCode: true } })) {
+    callback({ error: {} });
+
     return;
   }
 
-  const roomName = params.message.roomName || databasePopulation.rooms.morse.roomName;
-  const morseCode = parseMorse(params.message.morseCode);
-  const socket = params.socket;
-  const silent = params.silent;
+  const roomName = message.roomName || databasePopulation.rooms.morse.roomName;
+  const morseCode = parseMorse(message.morseCode);
   const morseObj = {
     morseCode,
     silent,
   };
 
-  if (!params.local) {
+  if (!local) {
     socket.broadcast.emit('morse', morseObj);
   }
 

@@ -40,6 +40,29 @@ function copyString(text) {
   return text && text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
+/**
+ * Callback sent to server on createRoom emit
+ * @param {Object} error - Will be set if something went wrong
+ * @param {Object} room - Will be set if successful. Undefined means that it failed to create the room, due to it already existing
+ */
+function createRoomCallback({ error, room }) {
+  if (error) {
+    return;
+  }
+
+  if (room) {
+    messenger.queueMessage({
+      text: ['Room has been created'],
+      text_se: ['Rummet har skapats'],
+    });
+  } else {
+    messenger.queueMessage({
+      text: ['Failed to create room. A room with that name already exists'],
+      text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
+    });
+  }
+}
+
 commands.history = {
   func: (phrases) => {
     const data = {};
@@ -481,7 +504,7 @@ commands.createroom = {
         });
       } else {
         commandHelper.onStep += 1;
-        socketHandler.emit('createRoom', commandHelper.data);
+        socketHandler.emit('createRoom', commandHelper.data, createRoomCallback);
         commandHandler.resetCommand(false);
       }
     },
@@ -490,7 +513,7 @@ commands.createroom = {
       const password = phrases[0];
 
       if (password === commandHelper.data.room.password) {
-        socketHandler.emit('createRoom', commandHelper.data);
+        socketHandler.emit('createRoom', commandHelper.data, createRoomCallback);
         commandHandler.resetCommand(false);
       } else {
         commandHelper.onStep -= 1;
@@ -525,7 +548,30 @@ commands.inviteroom = {
     };
 
     if (data.user.userName && data.room.roomName) {
-      socketHandler.emit('inviteToRoom', data);
+      socketHandler.emit('inviteToRoom', data, ({ error, user }) => {
+        if (error) {
+          if (error.code && error.code === 11000) {
+            messenger.queueMessage({
+              text: ['You have already sent an invite to the user'],
+              text_se: ['Ni har redan skickat en inbjudan till användaren'],
+            });
+          }
+
+          return;
+        }
+
+        if (user) {
+          messenger.queueMessage({
+            text: ['Sent an invitation to the user'],
+            text_se: ['Skickade en inbjudan till användaren'],
+          });
+        } else {
+          messenger.queueMessage({
+            text: ['The user is already following the room'],
+            text_se: ['Användaren följer redan rummet'],
+          });
+        }
+      });
     } else {
       messenger.queueMessage({
         text: ['You have to enter a user name and a room name. Example: inviteroom bob room1'],

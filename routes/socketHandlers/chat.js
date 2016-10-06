@@ -145,13 +145,17 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('createRoom', (params) => {
+  socket.on('createRoom', (params, callback) => {
     if (!objectValidator.isValidData(params, { room: { roomName: true, owner: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.createroom.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -164,16 +168,11 @@ function handle(socket, io) {
             text_se: ['Lyckades inte skapa rummet'],
             err: createErr,
           });
+          callback({ error: {} });
 
           return;
         } else if (!roomName) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Failed to create room. A room with that name already exists'],
-              text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
-            },
-          });
+          callback({});
 
           return;
         }
@@ -181,13 +180,7 @@ function handle(socket, io) {
         const room = {};
         room.roomName = roomName;
 
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Room has been created'],
-            text_se: ['Rummet har skapats'],
-          },
-        });
+        callback({ room });
         followRoom({ socket, userName: user.userName, newRoom: room });
       });
     });
@@ -816,30 +809,30 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('inviteToRoom', (params) => {
-    if (!objectValidator.isValidData(params, { user: { userName: true }, room: { roomName: true } })) {
+  socket.on('inviteToRoom', ({ user, room }, callback) => {
+    if (!objectValidator.isValidData({ user, room }, { user: { userName: true }, room: { roomName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteroom.commandName, (allowErr, allowed, user) => {
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.inviteroom.commandName, (allowErr, allowed, allowedUser) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
-      const userName = params.user.userName;
-      const roomName = params.room.roomName;
+      const userName = user.userName;
+      const roomName = room.roomName;
 
       dbUser.getUser(userName, (userErr, invitedUser) => {
         if (userErr || invitedUser === null) {
+          callback({ error: {} });
+
           return;
         } else if (invitedUser.rooms.indexOf(roomName) > -1) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['The user is already following the room'],
-              text_se: ['Användaren följer redan rummet'],
-            },
-          });
+          callback({ error: {} });
 
           return;
         }
@@ -848,19 +841,13 @@ function handle(socket, io) {
           itemName: roomName,
           time: new Date(),
           invitationType: 'room',
-          sender: user.userName,
+          sender: allowedUser.userName,
         };
 
         dbConnector.addInvitationToList(userName, invitation, (invErr, list) => {
           if (invErr || list !== null) {
             if (list || (invErr && invErr.code === 11000)) {
-              messenger.sendSelfMsg({
-                socket,
-                message: {
-                  text: ['You have already sent an invite to the user'],
-                  text_se: ['Ni har redan skickat en inbjudan till användaren'],
-                },
-              });
+              callback({ error: { code: 11000 } });
             } else if (invErr) {
               logger.sendSocketErrorMsg({
                 socket,
@@ -869,18 +856,13 @@ function handle(socket, io) {
                 text_se: ['Misslyckades med att skicka inbjudan'],
                 err: invErr,
               });
+              callback({ error: {} });
             }
 
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Sent an invitation to the user'],
-              text_se: ['Skickade en inbjudan till användaren'],
-            },
-          });
+          callback({ user: invitedUser });
         });
       });
     });

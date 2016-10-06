@@ -34,17 +34,16 @@ const objectValidator = require('../../utils/objectValidator');
  * @param {Object} params.newRoom - New room to follow
  * @param {string} params.userName - Name of the new user following the room
  */
-function followRoom(params) {
-  const socket = params.socket;
-  const newRoom = params.newRoom;
+function followRoom({ socket, newRoom, userName }) {
   const newRoomName = newRoom.roomName;
 
   if (Object.keys(socket.rooms).indexOf(newRoomName) < 0) {
     messenger.sendMsg({
       socket,
       message: {
-        text: [`${params.userName} is following ${newRoomName}`],
-        text_se: [`${params.userName} följer ${newRoomName}`],
+        userName: 'SYSTEM',
+        text: [`${userName} started following ${newRoomName}`],
+        text_se: [`${userName} började följa ${newRoomName}`],
         roomName: newRoomName,
       },
       sendTo: newRoomName,

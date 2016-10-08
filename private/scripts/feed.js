@@ -1345,12 +1345,9 @@ function onDisconnect() {
 
 /**
  * Called on follow emit
- * @param {Object} params - Parameters
- * @param {Object} params.room - Room
+ * @param {Object} room - Room
  */
-function onFollow(params = { room: {} }) {
-  const room = params.room;
-
+function onFollow({ room = {} }) {
   if (room.entered) {
     enterRoom(room.roomName);
   } else {
@@ -1363,15 +1360,12 @@ function onFollow(params = { room: {} }) {
 
 /**
  * Called on unfollow emit
- * @param {Object} params - Parameters
- * @param {Object} params.room - Room
- * @param {string} params.room.roomName - Name of the room that was unfollowed
- * @param {boolean} [params.silent] - Should the room notification be surpressed?
+ * @param {Object} room - Room
+ * @param {string} room.roomName - Name of the room that was unfollowed
+ * @param {boolean} [silent] - Should the room notification be surpressed?
  */
-function onUnfollow(params = { room: { roomName: '' } }) {
-  const room = params.room;
-
-  if (!params.silent) {
+function onUnfollow({ room = { roomName: '' }, silent }) {
+  if (!silent) {
     messenger.queueMessage({
       text: [`Stopped following ${room.roomName}`],
       text_se: [`Slutade följa ${room.roomName}`],

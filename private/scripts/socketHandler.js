@@ -72,10 +72,15 @@ function reconnect() {
  * Emit event through socket.io
  * @param {string} event - Event to emit
  * @param {Object} [params] - Parameters to send in the emit
+ * @param {Function} [callback] - Callback
  * @static
  */
-function emit(event, params) {
-  socket.emit(event, params);
+function emit(event, params, callback) {
+  if (!callback) {
+    socket.emit(event, params);
+  } else {
+    socket.emit(event, params, callback);
+  }
 }
 
 /**

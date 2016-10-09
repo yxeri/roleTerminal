@@ -303,7 +303,7 @@ function handle(socket) {
     });
   });
 
-  socket.on('getStationStats', () => {
+  socket.on('getStationStats', (params, callback) => {
     retrieveStationStats((stations, teams, currentRound, futureRounds) => {
       dbStation.getActiveStations((err, dbStations) => {
         if (err) {
@@ -321,7 +321,7 @@ function handle(socket) {
             }
           }
 
-          socket.emit('stationStats', { stations, teams, currentRound, futureRounds, now: new Date() });
+          callback({ stations, teams, currentRound, futureRounds, now: new Date() });
         }
       });
     });

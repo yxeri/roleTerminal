@@ -23,7 +23,6 @@ const logger = require('../../utils/logger');
 const http = require('http');
 const objectValidator = require('../../utils/objectValidator');
 const dbArchive = require('../../db/connectors/archive');
-const messenger = require('../../socketHelpers/messenger');
 
 // FIXME SMHI API changed. Structure needs to be fixed here before usage
 /**
@@ -54,7 +53,7 @@ function handle(socket) {
    * Time command. Returns current date
    * Emits time
    */
-  socket.on('time', () => {
+  socket.on('time', (params, callback) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.time.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
@@ -63,11 +62,11 @@ function handle(socket) {
       const now = new Date();
 
       now.setFullYear(now.getFullYear() + appConfig.yearModification);
-      socket.emit('time', { time: now });
+      callback({ time: now });
     });
   });
 
-  socket.on('getArchive', (params) => {
+  socket.on('getArchive', (params, callback) => {
     if (!objectValidator.isValidData(params, { archiveId: true })) {
       return;
     }
@@ -77,33 +76,17 @@ function handle(socket) {
         return;
       }
 
-      console.log('id', params.archiveId);
-
       dbArchive.getArchive(params.archiveId.toLowerCase(), user.accessLevel, (err, archive) => {
         if (err) {
           return;
         }
 
-        if (archive) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Found document. Printing...', archive.title || archive.archiveId].concat(archive.text),
-            },
-          });
-        } else {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [`Could not find any documents with ID ${params.archiveId}`],
-            },
-          });
-        }
+        callback({ archive });
       });
     });
   });
 
-  socket.on('getArchivesList', () => {
+  socket.on('getArchivesList', (params, callback) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.archives.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;
@@ -114,21 +97,7 @@ function handle(socket) {
           return;
         }
 
-        if (archives) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Found documents:'].concat(archives.map(archive => `ID: ${archive.archiveId.toUpperCase()}. Title: ${archive.title || archive.archiveId.toUpperCase()}`)),
-            },
-          });
-        } else {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Could not find any public documents'],
-            },
-          });
-        }
+        callback({ archives });
       });
     });
   });

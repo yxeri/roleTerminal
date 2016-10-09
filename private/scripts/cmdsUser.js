@@ -23,6 +23,7 @@ const textTools = require('./textTools');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const messenger = require('./messenger');
+const mapTools = require('./mapTools');
 
 /**
  * @static
@@ -37,8 +38,36 @@ commands.whoami = {
       device: { deviceId: storage.getDeviceId() },
     };
 
-    socketHandler.emit('whoAmI');
-    socketHandler.emit('myRooms', data);
+    socketHandler.emit('whoAmI', '', ({ user }) => {
+      const userMarker = mapTools.getThisUserMarker();
+      const text = textTools.createCommandStart('whoami').concat([
+        `User: ${user.userName}`,
+        `Access level: ${user.accessLevel}`,
+        `Team: ${user.team || 'Not part of a team'}`,
+        `Device ID: ${storage.getDeviceId()}`,
+        `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
+        textTools.createCommandEnd(),
+      ]);
+
+      messenger.queueMessage({ text });
+    });
+    socketHandler.emit('myRooms', data, ({ rooms, ownedRooms }) => {
+      messenger.queueMessage({
+        text: [
+          'You are following rooms:',
+          rooms.join(' - '),
+        ],
+      });
+
+      if (ownedRooms.length > 0) {
+        messenger.queueMessage({
+          text: [
+            'You are the owner of rooms:',
+            ownedRooms.join(' - '),
+          ],
+        });
+      }
+    });
   },
   accessLevel: 13,
   category: 'basic',
@@ -246,8 +275,7 @@ commands.password = {
     (phrases = ['']) => {
       const commandHelper = commandHandler.commandHelper;
       const data = {};
-      const oldPassword = phrases[0];
-      data.oldPassword = oldPassword;
+      data.oldPassword = phrases[0];
       commandHelper.data = data;
       commandHelper.onStep += 1;
 

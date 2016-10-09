@@ -201,13 +201,13 @@ function updateUserSocketId(socketId, userName, callback) {
  * Joins the user's socket to all sent rooms and added standard rooms
  * @param {string[]} rooms - Rooms for the user to join
  * @param {Object} socket - socket.io socket
- * @param {string} device - DeviceID of the user
+ * @param {string} [device] - DeviceID of the user
  */
 function joinRooms(rooms, socket, device) {
   const allRooms = rooms;
 
   allRooms.push(databasePopulation.rooms.important.roomName);
-  allRooms.push(databasePopulation.rooms.broadcast.roomName);
+  allRooms.push(databasePopulation.rooms.bcast.roomName);
   allRooms.push(databasePopulation.rooms.morse.roomName);
 
   if (device) {

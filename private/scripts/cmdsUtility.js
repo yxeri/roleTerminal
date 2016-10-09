@@ -109,7 +109,12 @@ commands.invitations = {
 
 commands.time = {
   func: () => {
-    socketHandler.emit('time');
+    socketHandler.emit('time', '', ({ time }) => {
+      messenger.queueMessage({
+        text: [`Time: ${textTools.generateTimeStamp(time, true, true)}`],
+        text_en: [`Tid: ${textTools.generateTimeStamp(time, true, true)}`],
+      });
+    });
   },
   accessLevel: 13,
   category: 'basic',
@@ -308,12 +313,30 @@ commands.archives = {
 
       switch (option) {
         case 'list': {
-          socketHandler.emit('getArchivesList');
+          socketHandler.emit('getArchivesList', '', ({ archives = [] }) => {
+            if (archives.length > 0) {
+              messenger.queueMessage({
+                text: ['Found documents:'].concat(archives.map(archive => `ID: ${archive.archiveId.toUpperCase()}. Title: ${archive.title || archive.archiveId.toUpperCase()}`)),
+              });
+            } else {
+              messenger.queueMessage({ text: ['Could not find any public documents'] });
+            }
+          });
 
           break;
         }
         default: {
-          socketHandler.emit('getArchive', { archiveId: option });
+          socketHandler.emit('getArchive', { archiveId: option }, ({ archive }) => {
+            if (archive) {
+              messenger.queueMessage({
+                text: ['Found document. Printing...', archive.title || archive.archiveId].concat(archive.text),
+              });
+            } else {
+              messenger.queueMessage({
+                text: [`Could not find any documents with ID ${option}`],
+              });
+            }
+          });
 
           break;
         }

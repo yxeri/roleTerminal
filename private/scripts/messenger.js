@@ -22,6 +22,7 @@ const domManipulator = require('./domManipulator');
 const textTools = require('./textTools');
 const clickHandler = require('./clickHandler');
 const labels = require('./labels');
+const layoutChanger = require('./layoutChanger');
 
 // TODO mainFeed should be moved out of here
 /**
@@ -403,5 +404,104 @@ function printHelpMessage(command) {
   }
 }
 
+/**
+ * Modifies message following special rules depending on what the message contains
+ * @param {Object} message - Message to be modified
+ * @returns {Object} Returns modified message
+ */
+function hideMessageProperties(message = {}) {
+  const modifiedMessage = message;
+  const roomName = message.roomName;
+
+  // TODO Change blank user and room to booleans instead of string removal
+  if (message.extraClass === 'importantMsg') {
+    modifiedMessage.roomName = '';
+    modifiedMessage.userName = '';
+    modifiedMessage.skipTime = true;
+  } else if (message.extraClass === 'broadcastMsg') {
+    modifiedMessage.roomName = '';
+    modifiedMessage.userName = '';
+  }
+
+  if (roomName && roomName !== null) {
+    const whisperIndex = roomName.indexOf('-whisper');
+
+    if (whisperIndex >= 0) {
+      if (message.userName === storage.getUser()) {
+        modifiedMessage.roomName = roomName.substring(0, whisperIndex);
+      } else {
+        modifiedMessage.roomName = 'whisper';
+      }
+    } else if (message.extraClass !== 'importantMsg' && roomName.indexOf('-device') >= 0) {
+      modifiedMessage.roomName = 'device';
+    } else if (roomName.indexOf('team') >= 0) {
+      modifiedMessage.roomName = 'team';
+    }
+  }
+
+  return modifiedMessage;
+}
+
+/**
+ * Called on message emit. Prints text
+ * @param {Object} params - Parameters
+ * @param {Object} params.message - Message
+ */
+function onMessage(params = { message: {} }) {
+  const message = textTools.addMessageSpecialProperties(hideMessageProperties(params.message));
+
+  queueMessage(message);
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
+  }
+}
+
+/**
+ * Called on messages emit. Prints multiple texts
+ * @param {Object} params - Parameters
+ * @param {Object[]} params.messages - Messages
+ */
+function onMessages(params = { messages: [] }) {
+  const messages = params.messages;
+
+  for (let i = 0; i < messages.length; i += 1) {
+    const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
+
+    queueMessage(message);
+  }
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
+  }
+}
+
+/**
+ * Called on importantMsg emit. Prints text
+ * @param {Object} params - Parameters
+ * @param {Object} params.message - Message
+ */
+function onImportantMsg(params = {}) {
+  const message = params.message;
+
+  if (message) {
+    message.extraClass = 'importantMsg';
+    message.skipTime = true;
+
+    queueMessage(message);
+
+    if (message.morse) {
+      commandHandler.triggerCommand({ cmd: 'morse', cmdParams: message.text.slice(0, 1) });
+    }
+  }
+
+  if (layoutChanger.isViewExpanded()) {
+    domManipulator.flashMenu();
+  }
+}
+
 exports.queueMessage = queueMessage;
 exports.printHelpMessage = printHelpMessage;
+exports.onMessage = onMessage;
+exports.onMessages = onMessages;
+exports.onImportantMsg = onImportantMsg;

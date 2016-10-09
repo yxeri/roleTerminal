@@ -40,6 +40,29 @@ function copyString(text) {
   return text && text !== null ? JSON.parse(JSON.stringify(text)) : '';
 }
 
+/**
+ * Callback sent to server on createRoom emit
+ * @param {Object} error - Will be set if something went wrong
+ * @param {Object} room - Will be set if successful. Undefined means that it failed to create the room, due to it already existing
+ */
+function createRoomCallback({ error, room }) {
+  if (error) {
+    return;
+  }
+
+  if (room) {
+    messenger.queueMessage({
+      text: ['Room has been created'],
+      text_se: ['Rummet har skapats'],
+    });
+  } else {
+    messenger.queueMessage({
+      text: ['Failed to create room. A room with that name already exists'],
+      text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
+    });
+  }
+}
+
 commands.history = {
   func: (phrases) => {
     const data = {};
@@ -56,7 +79,13 @@ commands.history = {
       }
     }
 
-    socketHandler.emit('history', data);
+    socketHandler.emit('history', data, ({ error, messages }) => {
+      if (error) {
+        return;
+      }
+
+      messenger.onMessages({ messages });
+    });
   },
   clearAfterUse: true,
   clearBeforeUse: true,
@@ -85,7 +114,11 @@ commands.morse = {
       if (morseCodeText.length > 0) {
         data.morseCode = morseCodeText;
 
-        socketHandler.emit('morse', data);
+        socketHandler.emit('morse', data, ({ error }) => {
+          if (error) {
+            return;
+          }
+        });
       }
     }
   },
@@ -107,6 +140,12 @@ commands.msg = {
           userName: storage.getUser(),
           roomName: storage.getRoom(),
         },
+      }, ({ error, message }) => {
+        if (error) {
+          return;
+        }
+
+        messenger.onMessage({ message });
       });
     } else {
       messenger.queueMessage({
@@ -163,7 +202,13 @@ commands.broadcast = {
     },
     (phrases) => {
       if (phrases.length > 0 && phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('broadcastMsg', commandHandler.commandHelper.data);
+        socketHandler.emit('broadcastMsg', commandHandler.commandHelper.data, ({ error, message }) => {
+          if (error) {
+            return;
+          }
+
+          messenger.onMessage({ message });
+        });
         commandHandler.resetCommand();
       } else {
         commandHandler.resetCommand(true);
@@ -177,7 +222,7 @@ commands.broadcast = {
 };
 
 commands.whisper = {
-  func: (phrases) => {
+  func: (phrases = []) => {
     const data = {};
 
     if (phrases.length > 1) {
@@ -187,7 +232,13 @@ commands.whisper = {
       data.message.userName = storage.getUser();
       data.message.whisper = true;
 
-      socketHandler.emit('whisperMsg', data);
+      socketHandler.emit('whisperMsg', data, ({ error, message }) => {
+        if (error) {
+          return;
+        }
+
+        messenger.onMessage({ message });
+      });
     } else {
       messenger.queueMessage({
         text: ['You forgot to type the message!'],
@@ -295,7 +346,20 @@ commands.importantmsg = {
           };
         }
 
-        socketHandler.emit('importantMsg', commandHelper.data);
+        socketHandler.emit('importantMsg', commandHelper.data, ({ error, message, device }) => {
+          if (error) {
+            return;
+          }
+
+          if (device) {
+            messenger.queueMessage({
+              text: ['Sent important message to device'],
+              text_se: ['Skickade viktigt meddelande till enheten'],
+            });
+          } else {
+            messenger.onImportantMsg({ message });
+          }
+        });
         commandHandler.resetCommand();
       }
     },
@@ -320,7 +384,11 @@ commands.room = {
          */
         data.room.entered = true;
 
-        socketHandler.emit('switchRoom', data);
+        socketHandler.emit('switchRoom', data, ({ error }) => {
+          if (error) {
+            return;
+          }
+        });
       }
     } else {
       messenger.queueMessage({
@@ -367,7 +435,16 @@ commands.removeroom = {
   steps: [
     (phrases) => {
       if (phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('removeRoom', commandHandler.commandHelper.data);
+        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error }) => {
+          if (error) {
+            return;
+          }
+
+          messenger.queueMessage({
+            text: ['Removed the room'],
+            text_se: ['Rummet borttaget'],
+          });
+        });
       }
 
       commandHandler.resetCommand();
@@ -427,7 +504,7 @@ commands.createroom = {
         });
       } else {
         commandHelper.onStep += 1;
-        socketHandler.emit('createRoom', commandHelper.data);
+        socketHandler.emit('createRoom', commandHelper.data, createRoomCallback);
         commandHandler.resetCommand(false);
       }
     },
@@ -436,7 +513,7 @@ commands.createroom = {
       const password = phrases[0];
 
       if (password === commandHelper.data.room.password) {
-        socketHandler.emit('createRoom', commandHelper.data);
+        socketHandler.emit('createRoom', commandHelper.data, createRoomCallback);
         commandHandler.resetCommand(false);
       } else {
         commandHelper.onStep -= 1;
@@ -471,7 +548,30 @@ commands.inviteroom = {
     };
 
     if (data.user.userName && data.room.roomName) {
-      socketHandler.emit('inviteToRoom', data);
+      socketHandler.emit('inviteToRoom', data, ({ error, user }) => {
+        if (error) {
+          if (error.code && error.code === 11000) {
+            messenger.queueMessage({
+              text: ['You have already sent an invite to the user'],
+              text_se: ['Ni har redan skickat en inbjudan till användaren'],
+            });
+          }
+
+          return;
+        }
+
+        if (user) {
+          messenger.queueMessage({
+            text: ['Sent an invitation to the user'],
+            text_se: ['Skickade en inbjudan till användaren'],
+          });
+        } else {
+          messenger.queueMessage({
+            text: ['The user is already following the room'],
+            text_se: ['Användaren följer redan rummet'],
+          });
+        }
+      });
     } else {
       messenger.queueMessage({
         text: ['You have to enter a user name and a room name. Example: inviteroom bob room1'],

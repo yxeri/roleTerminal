@@ -80,7 +80,7 @@ config.rooms = {
    * Used to store messages labeled as broadcast.
    * Not used as an ordinary chat room
    */
-  broadcast: modifiedDatabasePop.rooms.broadcast || {
+  bcast: modifiedDatabasePop.rooms.bcast || {
     roomName: 'broadcast',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,

@@ -65,8 +65,6 @@ const triggerKeysPressed = [];
  * @type {string}
  */
 const morseSeparator = '#';
-const teams = {};
-const stations = {};
 /**
  * @type {AudioContext}
  */
@@ -162,7 +160,7 @@ function setGain(value) {
  * @param {string} morseCode - Morse code to be played and printed
  * @param {boolean} silent - Should the morse code text be surpressed?
  */
-function playMorse(morseCode, silent) {
+function playMorse({ morseCode, silent }) {
   /**
    * Finish sound queue by clearing it and send morse code as text
    * @param {number} timeouts - Morse code array length
@@ -695,14 +693,13 @@ function printUsedCommand(clearAfterUse, inputText) {
  * @returns {boolean} Is the view in full screen?
  */
 function isFullscreen() {
-  return (!window.screenTop && !window.screenY);
+  return !window.screenTop && !window.screenY;
 }
 
 /**
  * Goes into full screen with sent element
  * This is not supported in iOS Safari
- * @param {object} element - The element which should be maximized to full screen
- * @returns {undefined} Returns nothing
+ * @param {Element} element - The element which should be maximized to full screen
  */
 function goFullScreen(element) {
   if (element.requestFullscreen) {
@@ -1309,44 +1306,6 @@ function resetAllLocalVals() {
   previousCommandPointer = 0;
 }
 
-/**
- * Modifies message following special rules depending on what the message contains
- * @param {Object} message - Message to be modified
- * @returns {Object} Returns modified message
- */
-function hideMessageProperties(message = {}) {
-  const modifiedMessage = message;
-  const roomName = message.roomName;
-
-  // TODO Change blank user and room to booleans instead of string removal
-  if (message.extraClass === 'importantMsg') {
-    modifiedMessage.roomName = '';
-    modifiedMessage.userName = '';
-    modifiedMessage.skipTime = true;
-  } else if (message.extraClass === 'broadcastMsg') {
-    modifiedMessage.roomName = '';
-    modifiedMessage.userName = '';
-  }
-
-  if (roomName && roomName !== null) {
-    const whisperIndex = roomName.indexOf('-whisper');
-
-    if (whisperIndex >= 0) {
-      if (message.userName === storage.getUser()) {
-        modifiedMessage.roomName = roomName.substring(0, whisperIndex);
-      } else {
-        modifiedMessage.roomName = 'whisper';
-      }
-    } else if (roomName.indexOf('-device') >= 0) {
-      modifiedMessage.roomName = 'device';
-    } else if (roomName.indexOf('team') >= 0) {
-      modifiedMessage.roomName = 'team';
-    }
-  }
-
-  return modifiedMessage;
-}
-
 // TODO Not all Android devices have touch screens
 /**
  * Checks if device is iOS or Android
@@ -1354,64 +1313,6 @@ function hideMessageProperties(message = {}) {
  */
 function isTouchDevice() {
   return ((isIos() || isAndroid()));
-}
-
-/**
- * Called on message emit. Prints text
- * @param {Object} params - Parameters
- * @param {Object} params.message - Message
- */
-function onMessage(params = { message: {} }) {
-  const message = textTools.addMessageSpecialProperties(hideMessageProperties(params.message));
-
-  messenger.queueMessage(message);
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
-}
-
-/**
- * Called on messages emit. Prints multiple texts
- * @param {Object} params - Parameters
- * @param {Object[]} params.messages - Messages
- */
-function onMessages(params = { messages: [] }) {
-  const messages = params.messages;
-
-  for (let i = 0; i < messages.length; i += 1) {
-    const message = textTools.addMessageSpecialProperties(hideMessageProperties(messages[i]));
-
-    messenger.queueMessage(message);
-  }
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
-}
-
-/**
- * Called on importantMsg emit. Prints text
- * @param {Object} params - Parameters
- * @param {Object} params.message - Message
- */
-function onImportantMsg(params = {}) {
-  const message = params.message;
-
-  if (message) {
-    message.extraClass = 'importantMsg';
-    message.skipTime = true;
-
-    messenger.queueMessage(message);
-
-    if (message.morse) {
-      commandHandler.triggerCommand({ cmd: 'morse', cmdParams: message.text.slice(0, 1) });
-    }
-  }
-
-  if (layoutChanger.isViewExpanded()) {
-    domManipulator.flashMenu();
-  }
 }
 
 /**
@@ -1444,12 +1345,9 @@ function onDisconnect() {
 
 /**
  * Called on follow emit
- * @param {Object} params - Parameters
- * @param {Object} params.room - Room
+ * @param {Object} room - Room
  */
-function onFollow(params = { room: {} }) {
-  const room = params.room;
-
+function onFollow({ room = {} }) {
   if (room.entered) {
     enterRoom(room.roomName);
   } else {
@@ -1462,15 +1360,12 @@ function onFollow(params = { room: {} }) {
 
 /**
  * Called on unfollow emit
- * @param {Object} params - Parameters
- * @param {Object} params.room - Room
- * @param {string} params.room.roomName - Name of the room that was unfollowed
- * @param {boolean} [params.silent] - Should the room notification be surpressed?
+ * @param {Object} room - Room
+ * @param {string} room.roomName - Name of the room that was unfollowed
+ * @param {boolean} [silent] - Should the room notification be surpressed?
  */
-function onUnfollow(params = { room: { roomName: '' } }) {
-  const room = params.room;
-
-  if (!params.silent) {
+function onUnfollow({ room = { roomName: '' }, silent }) {
+  if (!silent) {
     messenger.queueMessage({
       text: [`Stopped following ${room.roomName}`],
       text_se: [`Slutade följa ${room.roomName}`],
@@ -1642,28 +1537,6 @@ function onDisconnectUser() {
 }
 
 /**
- * Called on morse emit. Plays and prints morse
- * @param {Object} params - Parameters
- * @param {string} params.morseCode - Morse code to be played and printed
- * @param {boolean} params.silent - Should the morse code be printed as text?
- */
-function onMorse(params = {}) {
-  playMorse(params.morseCode, params.silent);
-}
-
-/**
- * Called on time emit. Prints time from server
- * @param {Object} params - Parameters
- * @param {Date} params.time - Current time
- */
-function onTime(params = {}) {
-  messenger.queueMessage({
-    text: [`Time: ${textTools.generateTimeStamp(params.time, true, true)}`],
-    text_en: [`Tid: ${textTools.generateTimeStamp(params.time, true, true)}`],
-  });
-}
-
-/**
  * Called on ban emit
  */
 function onBan() {
@@ -1706,26 +1579,6 @@ function onUpdateDeviceId(newId) {
 }
 
 /**
- * Called on whoami emit
- * @param {Object} params - Parameters
- * @param {Object} params.user - User information
- */
-function onWhoami(params) {
-  const team = params.user.team || '';
-  const userMarker = mapTools.getThisUserMarker();
-  const text = textTools.createCommandStart('whoami').concat([
-    `User: ${params.user.userName}`,
-    `Access level: ${params.user.accessLevel}`,
-    `Team: ${team}`,
-    `Device ID: ${storage.getDeviceId()}`,
-    `Location: ${userMarker ? userMarker.getPosition() : 'Unknown'}`,
-    textTools.createCommandEnd(),
-  ]);
-
-  messenger.queueMessage({ text });
-}
-
-/**
  * Called on list emit. Receives a list to print
  * @param {Object} params - Parameters
  * @param {number} params.columns - Number of columns to print items to
@@ -1738,10 +1591,10 @@ function onList(params = {}) {
     const title = params.itemList.listTitle;
 
     if (title) {
-      onMessage({ message: { text: textTools.createCommandStart(title) } });
+      messenger.onMessage({ message: { text: textTools.createCommandStart(title) } });
     }
 
-    onMessage({
+    messenger.onMessage({
       message: {
         text: itemList,
         linkable: params.itemList.linkable || true,
@@ -1865,61 +1718,6 @@ function onReboot() {
 }
 
 /**
- * Called on stationStats emit
- * @param {Object} params - Parameters
- * @param {Object[]} params.teams - Team names, scores
- * @param {string} params.teams[].short_name - Name of the team
- * @param {Object[]} params.stations - Station IDs, status
- * @param {Object} params.currentRound - Times for current round
- * @param {Object} params.futureRounds - Times for future rounds
- * @param {Date} params.now - Current time
- */
-function onStationStats(params) {
-  const stationsStats = params.stations;
-  const teamsStats = params.teams;
-  const currentRound = params.currentRound;
-  const futureRounds = params.futureRounds;
-  const now = params.now;
-
-  for (let i = 0; i < stationsStats.length; i += 1) {
-    const station = stationsStats[i];
-    const stationId = `${station.id || station.stationId}`;
-    const stationTeam = teamsStats.find(team => station.owner === team.name);
-
-    if (!stations[stationId]) {
-      stations[stationId] = {};
-    }
-
-    if (station.owner && stationTeam && stationTeam.short_name) {
-      stations[stationId].owner = stationTeam.short_name;
-    } else if (stationTeam && !stationTeam.short_name) {
-      stations[stationId].owner = '?';
-    } else if (station.owner === null) {
-      stations[stationId].owner = '-';
-    }
-
-    if (station.signalValue || station.boost) {
-      stations[stationId].signalValue = station.signalValue || station.boost;
-    }
-
-    if (typeof station.active === 'boolean') {
-      stations[stationId].active = station.active;
-    }
-  }
-
-  for (let i = 0; i < teamsStats.length; i += 1) {
-    const team = teamsStats[i];
-    const teamName = team.name;
-
-    if (teamName !== 'ownerless') {
-      teams[teamName] = team.score;
-    }
-  }
-
-  domManipulator.setStationStats(stations, teams, currentRound, futureRounds, now);
-}
-
-/**
  * Called from server on client connection
  * Sets configuration properties from server and starts the rest of the app
  * @param {Object} params - Configuration properties
@@ -2030,9 +1828,9 @@ window.addEventListener('error', (event) => {
 });
 
 socketHandler.startSocket({
-  message: onMessage,
-  messages: onMessages,
-  importantMsg: onImportantMsg,
+  message: messenger.onMessage,
+  messages: messenger.onMessages,
+  importantMsg: messenger.onImportantMsg,
   reconnect: onReconnect,
   disconnect: onDisconnect,
   follow: onFollow,
@@ -2042,13 +1840,11 @@ socketHandler.startSocket({
   commandFail: onCommandFail,
   reconnectSuccess: onReconnectSuccess,
   disconnectUser: onDisconnectUser,
-  morse: onMorse,
-  time: onTime,
+  morse: playMorse,
   ban: onBan,
   logout: onLogout,
   updateCommands: onUpdateCommands,
   updateDeviceId: onUpdateDeviceId,
-  whoAmI: onWhoami,
   list: onList,
   matchFound: onMatchFound,
   startup: onStartup,
@@ -2056,5 +1852,4 @@ socketHandler.startSocket({
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
   reboot: onReboot,
-  stationStats: onStationStats,
 });

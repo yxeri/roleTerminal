@@ -166,12 +166,12 @@ function handle(io) {
 
     userHandler.handle(socket, io);
     chatHandler.handle(socket, io);
-    commandHandler.handle(socket, io);
-    deviceHandler.handle(socket, io);
+    commandHandler.handle(socket);
+    deviceHandler.handle(socket);
     teamHandler.handle(socket, io);
-    hackingHandler.handle(socket, io);
-    utilityHandler.handle(socket, io);
-    locationHandler.handle(socket, io);
+    hackingHandler.handle(socket);
+    utilityHandler.handle(socket);
+    locationHandler.handle(socket);
   });
 
   return router;

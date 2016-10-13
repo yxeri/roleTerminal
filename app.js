@@ -29,6 +29,8 @@ const app = express();
 // noinspection JSCheckFunctionSignatures
 app.io = socketIo();
 
+app.disable('x-powered-by');
+
 // view engine setup
 app.set('views', path.join(__dirname, appConfig.publicBase, appConfig.viewsPath));
 app.set('view engine', 'html');

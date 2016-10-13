@@ -513,21 +513,27 @@ function handle(socket, io) {
       const allRooms = modifiedRoom ? [modifiedRoom.roomName] : Object.keys(socket.rooms);
       const historyLines = lines > appConfig.maxHistoryLines ? appConfig.maxHistoryLines : lines;
 
-      manager.getHistory(allRooms, historyLines, false, startDate || new Date(), (histErr, historyMessages) => {
-        if (histErr) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['Unable to retrieve history'],
-            text_se: ['Misslyckades med hämtningen av historik'],
-            err: histErr,
-          });
-          callback({ error: {} });
+      manager.getHistory({
+        rooms: allRooms,
+        lines: historyLines,
+        missedMsgs: false,
+        lastOnline: startDate || new Date(),
+        callback: (histErr, historyMessages) => {
+          if (histErr) {
+            logger.sendSocketErrorMsg({
+              socket,
+              code: logger.ErrorCodes.general,
+              text: ['Unable to retrieve history'],
+              text_se: ['Misslyckades med hämtningen av historik'],
+              err: histErr,
+            });
+            callback({ error: {} });
 
-          return;
-        }
+            return;
+          }
 
-        callback({ messages: historyMessages });
+          callback({ messages: historyMessages });
+        },
       });
     });
   });

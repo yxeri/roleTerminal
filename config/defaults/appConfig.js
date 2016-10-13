@@ -123,13 +123,11 @@ config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
  * @type {{sitePath:string, filePath:string}[]}
  */
 config.routes = modifiedConfig.routes || [
-  {
-    sitePath: '/',
-    filePath: './routes/index.js',
-  }, {
-    sitePath: '*',
-    filePath: './routes/error.js',
-  },
+  { sitePath: '/', filePath: './routes/index.js' },
+  { sitePath: '/api/authenticate', filePath: './routes/rest/authenticate.js' },
+  { sitePath: '/api/rooms', filePath: './routes/rest/rooms.js' },
+  { sitePath: '/api/histories', filePath: './routes/rest/histories.js' },
+  { sitePath: '*', filePath: './routes/error.js' },
 ];
 
 /**
@@ -294,5 +292,10 @@ config.signalResetInterval = process.env.SIGNALRESETINTERVAL || modifiedConfig.s
  * Message that will be sent to client and can be printed
  */
 config.welcomeMessage = process.env.WELCOMEMESSAGE || modifiedConfig.welcomeMessage;
+
+/**
+ * Secret key used with JSON Web Token
+ */
+config.jsonKey = process.env.JSONKEY;
 
 module.exports = config;

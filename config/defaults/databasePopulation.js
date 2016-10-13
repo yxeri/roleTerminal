@@ -25,7 +25,11 @@ try {
   console.log('Did not find modified databasePopulation. Using defaults');
 }
 
-const generatePass = function generatePass() {
+/**
+ * Return random string
+ * @returns {string} Random string
+ */
+function generatePass() {
   const randomString = '023456789abcdefghijkmnopqrstuvwxyz';
   const randomLength = randomString.length;
   let code = '';
@@ -37,7 +41,7 @@ const generatePass = function generatePass() {
   }
 
   return code;
-};
+}
 
 // To avoid undefined if rooms and commands haven't been changed
 modifiedDatabasePop.rooms = modifiedDatabasePop.rooms ? modifiedDatabasePop.rooms : {};
@@ -61,8 +65,9 @@ config.rooms = {
   // General chat room, available for every user
   public: modifiedDatabasePop.rooms.public || {
     roomName: 'public',
-    visibility: config.accessLevels.basic,
-    accessLevel: config.accessLevels.basic,
+    visibility: config.accessLevels.anonymous,
+    accessLevel: config.accessLevels.anonymous,
+    writeLevel: config.accessLevels.basic,
   },
 
   /**
@@ -73,7 +78,6 @@ config.rooms = {
     roomName: 'important',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
-    password: generatePass(),
   },
 
   /**
@@ -84,7 +88,6 @@ config.rooms = {
     roomName: 'broadcast',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
-    password: generatePass(),
   },
 
   /**
@@ -95,7 +98,6 @@ config.rooms = {
     roomName: 'morse',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
-    password: generatePass(),
   },
 
   /**
@@ -116,7 +118,6 @@ config.rooms = {
     roomName: 'team',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
-    password: generatePass(),
   },
 
   /**
@@ -127,7 +128,6 @@ config.rooms = {
     roomName: 'whisper',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
-    password: generatePass(),
   },
 };
 
@@ -142,25 +142,25 @@ config.users = modifiedDatabasePop.users || {
     password: generatePass(),
     verified: true,
     accessLevel: config.accessLevels.superUser,
-    visibility: config.accessLevels.superUser,
+    visibility: config.accessLevels.god,
     rooms: [config.rooms.public.roomName],
   },
   // Blocking name for users
   root: {
     userName: 'root',
     password: generatePass(),
-    verified: true,
+    verified: false,
     accessLevel: config.accessLevels.anonymous,
-    visibility: config.accessLevels.superUser,
+    visibility: config.accessLevels.god,
     rooms: [],
   },
   // Blocking name for users
   admin: {
     userName: 'admin',
     password: generatePass(),
-    verified: true,
+    verified: false,
     accessLevel: config.accessLevels.anonymous,
-    visibility: config.accessLevels.superUser,
+    visibility: config.accessLevels.god,
     rooms: [],
   },
 };

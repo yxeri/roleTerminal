@@ -19,6 +19,7 @@
 const express = require('express');
 const socketIo = require('socket.io');
 const path = require('path');
+const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const compression = require('compression');
 const appConfig = require('./config/defaults/config').app;
@@ -29,16 +30,17 @@ const app = express();
 // noinspection JSCheckFunctionSignatures
 app.io = socketIo();
 
+app.disable('x-powered-by');
+
 // view engine setup
 app.set('views', path.join(__dirname, appConfig.publicBase, appConfig.viewsPath));
 app.set('view engine', 'html');
 app.engine('html', require('hbs').__express); // eslint-disable-line no-underscore-dangle, import/newline-after-import
+app.use(bodyParser.json());
 // noinspection JSCheckFunctionSignatures
 app.use(compression());
-
 // Logging
 app.use(morgan(appConfig.logLevel));
-
 // Serve files from public path
 app.use(express.static(path.join(__dirname, appConfig.publicBase)));
 

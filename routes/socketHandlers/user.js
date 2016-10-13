@@ -205,15 +205,21 @@ function handle(socket, io) {
           user,
           welcomeMessage: appConfig.welcomeMessage,
         });
-        manager.getHistory(allRooms, Infinity, true, user.lastOnline, (histErr, missedMessages) => {
-          if (histErr) {
-            return;
-          }
+        manager.getHistory({
+          rooms: allRooms,
+          lines: Infinity,
+          missedMsgs: true,
+          lastOnline: user.lastOnline,
+          callback: (histErr, missedMessages) => {
+            if (histErr) {
+              return;
+            }
 
-          messenger.sendSelfMsgs({
-            socket,
-            messages: missedMessages,
-          });
+            messenger.sendSelfMsgs({
+              socket,
+              messages: missedMessages,
+            });
+          },
         });
       });
     }

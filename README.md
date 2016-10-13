@@ -16,8 +16,11 @@ There's a container available at [Docker hub](https://hub.docker.com/r/yxeri/rol
 
 ## Configuration
 
-Default configuration can be either overriden by adding the new values to a file in config/modified with the same name as the one in config/defaults.
-Most of the configuration can also be changed through environmental variables. Environmental variables have higher priority than changes made in config/modified.
+Default configuration can be either overriden by adding the new values to a file in /config/modified with the same name as the one in /config/defaults.
+Most of the configuration can also be changed through environmental variables. Environmental variables have higher priority than changes made in /config/modified.
+You should set these environmental variable before deploying the app:
+* JSONKEY is used for JSON Web Tokens. Remember to set it when deploying the app!
+* GMAPSKEY is used for the Google Maps API
 
 ## User usage
 

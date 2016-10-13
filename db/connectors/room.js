@@ -26,6 +26,7 @@ const roomSchema = new mongoose.Schema({
   password: { type: String, default: '' },
   accessLevel: { type: Number, default: 1 },
   visibility: { type: Number, default: 1 },
+  writeLevel: Number,
   commands: [{
     commandName: String,
     accessLevel: Number,
@@ -130,11 +131,12 @@ function createRoom(sentRoom, sentUser, callback) {
 /**
  * Get room
  * @param {string} roomName - Name of the room
+ * @param {Object} user - User retrieving the room
  * @param {Function} callback - Callback
  */
-function getRoom(roomName, callback) {
-  const query = { roomName };
-  const filter = { _id: 0 };
+function getRoom(roomName, user, callback) {
+  const query = { roomName, accessLevel: { $lte: user.accessLevel } };
+  const filter = { password: 0 };
 
   Room.findOne(query, filter).lean().exec((err, room) => {
     if (err) {

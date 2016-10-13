@@ -178,8 +178,9 @@ function authUser(userName, password, callback) {
   const query = {
     $and: [{ userName }, { password }],
   };
+  const filter = { _id: 1, userName: 1, accessLevel: 1, visibility: 1, verified: 1, banned: 1 };
 
-  User.findOne(query).lean().exec((err, user) => {
+  User.findOne(query, filter).lean().exec((err, user) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,

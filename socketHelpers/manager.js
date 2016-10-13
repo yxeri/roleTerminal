@@ -98,12 +98,12 @@ function userAllowedCommand(socketId, commandName, callback) {
 /**
  * Gets history (messages) from one or more rooms
  * @param {string[]} rooms - The rooms to retrieve the history from
- * @param {number} lines - How many message to retrieve
- * @param {boolean} missedMsgs - Set to true if only the messages since the users last connection should be returned
- * @param {Date} lastOnline - Date of the last time the user was online
+ * @param {number} [lines] - How many message to retrieve
+ * @param {boolean} [missedMsgs] - Set to true if only the messages since the users last connection should be returned
+ * @param {Date} [lastOnline] - Date of the last time the user was online
  * @param {Function} callback - callback
  */
-function getHistory(rooms, lines, missedMsgs, lastOnline, callback) {
+function getHistory({ lastOnline = new Date(), rooms, lines, missedMsgs, callback }) {
   dbChatHistory.getHistoryFromRooms(rooms, (err, history) => {
     let historyMessages = [];
 

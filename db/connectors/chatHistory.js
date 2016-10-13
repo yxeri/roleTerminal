@@ -101,28 +101,6 @@ function getHistoryFromRooms(rooms, callback) {
 }
 
 /**
- * Get room history from all rooms available to the user
- * @param {string[]} rooms - Name of the rooms
- * @param {Function} callback - Callback
- */
-function getHistoryFromAllRooms(rooms, callback) {
-  const query = {  };
-  const filter = { 'messages._id': 0, _id: 0 };
-
-  ChatHistory.find(query, filter).lean().exec((err, history) => {
-    if (err) {
-      logger.sendErrorMsg({
-        code: logger.ErrorCodes.db,
-        text: ['Failed to retrieve all history from rooms'],
-        err,
-      });
-    }
-
-    callback(err, history);
-  });
-}
-
-/**
  * Create and save room history
  * @param {string} roomName - Name of the room
  * @param {Function} callback - Callback
@@ -169,6 +147,5 @@ function removeHistory(roomName, callback) {
 exports.addMsgToHistory = addMsgToHistory;
 exports.getHistoryFromRoom = getHistoryFromRoom;
 exports.getHistoryFromRooms = getHistoryFromRooms;
-exports.getHistoryFromAllRooms = getHistoryFromAllRooms;
 exports.createHistory = createHistory;
 exports.removeHistory = removeHistory;

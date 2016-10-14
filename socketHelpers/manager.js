@@ -20,7 +20,6 @@ const dbUser = require('./../db/connectors/user');
 const dbCommand = require('./../db/connectors/command');
 const dbRoom = require('./../db/connectors/room');
 const dbChatHistory = require('./../db/connectors/chatHistory');
-const databasePopulation = require('./../config/defaults/config').databasePopulation;
 const logger = require('./../utils/logger.js');
 const appConfig = require('./../config/defaults/config').app;
 
@@ -104,7 +103,7 @@ function userAllowedCommand(socketId, commandName, callback) {
  * @param {Function} callback - callback
  */
 function getHistory({ lastOnline = new Date(), rooms, lines, missedMsgs, callback }) {
-  dbChatHistory.getHistoryFromRooms(rooms, user, (err, history) => {
+  dbChatHistory.getHistoryFromRooms(rooms, (err, history) => {
     let historyMessages = [];
 
     if (err || history === null) {

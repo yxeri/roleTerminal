@@ -23,11 +23,6 @@ const dbUser = require('../../db/connectors/user');
 const jwt = require('jsonwebtoken');
 
 const router = new express.Router();
-const historyErrors = [{
-  status: 400,
-  title: 'Unable to retrieve history',
-  detail: 'Unable to retrieve history',
-}];
 
 /**
  * @returns {Object} Router

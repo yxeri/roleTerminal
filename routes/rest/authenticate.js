@@ -30,7 +30,7 @@ const router = new express.Router();
 function handle() {
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { user: { userName: true, password: true } } })) {
-      res.json({
+      res.status(400).json({
         errors: [{
           status: 400,
           title: 'Missing data',
@@ -41,10 +41,18 @@ function handle() {
       const { userName, password } = req.body.data.user;
 
       dbUser.authUser(userName, password, (err, authUser) => {
-        if (err || authUser === null) {
-          res.json({
+        if (err) {
+          res.status(500).json({
             errors: [{
-              status: 400,
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+        } else if (authUser === null) {
+          res.status(401).json({
+            errors: [{
+              status: 401,
               title: 'Unauthorized user',
               detail: 'Incorrect user name and/or password',
             }],

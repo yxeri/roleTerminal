@@ -524,12 +524,10 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
 
     if (matched) {
       expanded += commandChar;
-    } else {
-      return commandHandler.isCommandChar(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
     }
   }
 
-  return '';
+  return commandHandler.isCommandChar(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
 }
 
 // TODO autoCompleteCommand should use this

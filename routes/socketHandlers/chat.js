@@ -159,7 +159,7 @@ function handle(socket, io) {
         return;
       }
 
-      manager.createRoom(params.room, user, (createErr, roomName) => {
+      manager.createRoom(params.room, user, (createErr, room) => {
         if (createErr) {
           logger.sendSocketErrorMsg({
             socket,
@@ -171,14 +171,11 @@ function handle(socket, io) {
           callback({ error: {} });
 
           return;
-        } else if (!roomName) {
+        } else if (!room) {
           callback({});
 
           return;
         }
-
-        const room = {};
-        room.roomName = roomName;
 
         callback({ room });
         followRoom({ socket, userName: user.userName, newRoom: room });

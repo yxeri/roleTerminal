@@ -19,7 +19,7 @@
 const express = require('express');
 const manager = require('../../socketHelpers/manager');
 const appConfig = require('../../config/defaults/config').app;
-const dbRoom = require('../../db/connectors/room');
+const dbUser = require('../../db/connectors/user');
 const jwt = require('jsonwebtoken');
 
 const router = new express.Router();
@@ -37,7 +37,7 @@ function handle() {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if (jwtErr || !decoded) {
-        res.json({
+        res.status(400).json({
           errors: [{
             status: 400,
             title: 'Unauthorized',
@@ -45,15 +45,15 @@ function handle() {
           }],
         });
       } else {
-        dbRoom.getAllRooms(decoded.data, (roomErr, rooms) => {
-          if (roomErr) {
-            res.json({ errors: historyErrors });
+        dbUser.getUser(decoded.data.userName, (userErr, user) => {
+          if (userErr) {
+            res.status(400).json({ errors: historyErrors });
           } else {
             manager.getHistory({
-              rooms: rooms.map(room => room.roomName),
+              rooms: user.rooms,
               callback: (historyErr, messages) => {
                 if (historyErr) {
-                  res.json({ errors: historyErrors });
+                  res.status(400).json({ errors: historyErrors });
                 } else {
                   res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
                 }
@@ -67,9 +67,9 @@ function handle() {
 
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
-    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decodedUser) => {
-      if (jwtErr || !decodedUser) {
-        res.json({
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr || !decoded) {
+        res.status(400).json({
           errors: [{
             status: 400,
             title: 'Unauthorized',
@@ -77,18 +77,34 @@ function handle() {
           }],
         });
       } else {
-        manager.getHistory({
-          rooms: [req.params.id],
-          lines: appConfig.historyLines,
-          missedMsgs: false,
-          lastOnline: new Date(),
-          callback: (histErr, messages = []) => {
-            if (histErr) {
-              res.json({ errors: historyErrors });
-            } else {
-              res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
-            }
-          },
+        const roomName = req.params.id;
+
+        dbUser.getUser(decoded.data.userName, (userErr, user) => {
+          if (userErr) {
+            res.status(400).json({ errors: historyErrors });
+          } else if (user.rooms.indexOf(roomName) === -1) {
+            res.status(400).json({
+              errors: [{
+                status: 400,
+                title: 'User is not following room',
+                detail: 'The user has to follow the room to be able to retrieve history from it',
+              }],
+            });
+          } else {
+            manager.getHistory({
+              rooms: [roomName],
+              lines: appConfig.historyLines,
+              missedMsgs: false,
+              lastOnline: new Date(),
+              callback: (histErr, messages = []) => {
+                if (histErr) {
+                  res.status(400).json({ errors: historyErrors });
+                } else {
+                  res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
+                }
+              },
+            });
+          }
         });
       }
     });

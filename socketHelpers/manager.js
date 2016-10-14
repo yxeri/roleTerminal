@@ -104,7 +104,7 @@ function userAllowedCommand(socketId, commandName, callback) {
  * @param {Function} callback - callback
  */
 function getHistory({ lastOnline = new Date(), rooms, lines, missedMsgs, callback }) {
-  dbChatHistory.getHistoryFromRooms(rooms, (err, history) => {
+  dbChatHistory.getHistoryFromRooms(rooms, user, (err, history) => {
     let historyMessages = [];
 
     if (err || history === null) {
@@ -171,7 +171,7 @@ function createRoom(sentRoom, user, callback) {
           });
         }
 
-        callback(roomErr, room.roomName);
+        callback(roomErr, room);
       });
     }
   });

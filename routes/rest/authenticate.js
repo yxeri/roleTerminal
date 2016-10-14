@@ -20,6 +20,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const dbUser = require('../../db/connectors/user');
 const appConfig = require('../../config/defaults/config').app;
+const objectValidator = require('../../utils/objectValidator');
 
 const router = new express.Router();
 
@@ -28,7 +29,7 @@ const router = new express.Router();
  */
 function handle() {
   router.post('/', (req, res) => {
-    if (!req.body || !req.body.data) {
+    if (!objectValidator.isValidData(req.body, { data: { user: { userName: true, password: true } } })) {
       res.json({
         errors: [{
           status: 400,
@@ -37,7 +38,7 @@ function handle() {
         }],
       });
     } else {
-      const { userName, password } = req.body.data;
+      const { userName, password } = req.body.data.user;
 
       dbUser.authUser(userName, password, (err, authUser) => {
         if (err || authUser === null) {
@@ -49,8 +50,16 @@ function handle() {
             }],
           });
         } else {
+          const jwtUser = {
+            _id: authUser._id, // eslint-disable-line no-underscore-dangle
+            userName: authUser.userName,
+            accessLevel: authUser.accessLevel,
+            visibility: authUser.visibility,
+            verified: authUser.verified,
+            banned: authUser.banned,
+          };
           res.json({
-            data: { token: jwt.sign({ data: authUser }, appConfig.jsonKey, { expiresIn: '7d' }) },
+            data: { token: jwt.sign({ data: jwtUser }, appConfig.jsonKey, { expiresIn: '7d' }) },
           });
         }
       });

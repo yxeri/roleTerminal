@@ -20,6 +20,8 @@ const express = require('express');
 const dbRoom = require('../../db/connectors/room');
 const appConfig = require('../../config/defaults/config').app;
 const jwt = require('jsonwebtoken');
+const manager = require('../../socketHelpers/manager');
+const objectValidator = require('../../utils/objectValidator');
 
 const router = new express.Router();
 const roomErrors = [{
@@ -38,7 +40,7 @@ function handle() {
 
     jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if ((jwtErr || !decoded) && auth) {
-        res.json({
+        res.status(400).json({
           errors: [{
             status: 400,
             title: 'Unauthorized',
@@ -50,7 +52,7 @@ function handle() {
 
         dbRoom.getAllRooms(user, (roomErr, rooms) => {
           if (roomErr) {
-            res.json({ errors: roomErrors });
+            res.status(400).json({ errors: roomErrors });
           } else {
             res.json({ rooms: rooms.map(room => room.roomName) });
           }
@@ -65,7 +67,7 @@ function handle() {
 
     jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if ((jwtErr || !decoded) && auth) {
-        res.json({
+        res.status(400).json({
           errors: [{
             status: 400,
             title: 'Unauthorized',
@@ -77,12 +79,59 @@ function handle() {
 
         dbRoom.getRoom(req.params.id, user, (roomErr, room) => {
           if (roomErr) {
-            res.json({ errors: roomErrors });
+            res.status(400).json({ errors: roomErrors });
           } else {
             res.json({ data: { rooms: [room] } });
           }
         });
       }
+    });
+  });
+
+  router.post('/', (req, res) => {
+    if (!objectValidator.isValidData(req.body, { data: { room: { roomName: true } } })) {
+      res.status(400).json({
+        errors: [{
+          status: 400,
+          title: 'Missing data',
+          detail: 'Unable to parse data',
+        }],
+      });
+    } else {
+      // noinspection JSUnresolvedVariable
+      jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+        if (jwtErr || !decoded) {
+          res.status(400).json({
+            errors: [{
+              status: 400,
+              title: 'Unauthorized',
+              detail: 'Invalid token',
+            }],
+          });
+        } else {
+          const newRoom = req.body.data.room;
+          newRoom.roomName = newRoom.toLowerCase();
+          newRoom.owner = decoded.data.userName.toLowerCase();
+
+          manager.createRoom(newRoom, decoded.data, (errRoom, room) => {
+            if (errRoom || room === null) {
+              res.status(400).json({
+                errors: [{
+                  status: 400,
+                  title: 'Failed to create room',
+                  detail: 'Failed to create room',
+                }],
+              });
+            } else {
+              res.json({ data: { room } });
+            }
+          });
+        }
+      });
+    }
+
+    router.post('/:id', (req, res) => {
+      // Follow room
     });
   });
 

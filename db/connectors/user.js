@@ -178,7 +178,7 @@ function authUser(userName, password, callback) {
   const query = {
     $and: [{ userName }, { password }],
   };
-  const filter = { _id: 1, userName: 1, accessLevel: 1, visibility: 1, verified: 1, banned: 1 };
+  const filter = { password: 0 };
 
   User.findOne(query, filter).lean().exec((err, user) => {
     if (err) {
@@ -297,13 +297,13 @@ function verifyAllUsers(callback) {
 
 /**
  * Gets all user
- * @param {Object} sentUser - User that is checking for all users
+ * @param {Object} sentUser - User that is retrieving all users
  * @param {Function} callback - Function to be called on completion
  */
 function getAllUsers(sentUser, callback) {
   const query = { visibility: { $lte: sentUser.accessLevel } };
   const sort = { userName: 1 };
-  const filter = { _id: 0 };
+  const filter = { _id: 0, password: 0 };
 
   User.find(query, filter).sort(sort).lean().exec((err, users) => {
     if (err) {

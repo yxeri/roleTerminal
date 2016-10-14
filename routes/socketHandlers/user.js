@@ -98,10 +98,13 @@ function handle(socket, io) {
         registerDevice: params.user.registerDevice,
         mode: appConfig.defaultMode,
         verified: false,
-        rooms: [databasePopulation.rooms.public.roomName],
+        rooms: [
+          databasePopulation.rooms.public.roomName,
+          databasePopulation.rooms.important.roomName,
+          databasePopulation.rooms.bcast.roomName,
+          databasePopulation.rooms.morse.roomName,
+        ],
       };
-
-      // TODO Refactor the inner code
       dbUser.createUser(userObj, (err, user) => {
         if (err) {
           logger.sendSocketErrorMsg({

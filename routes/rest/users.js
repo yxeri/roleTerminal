@@ -33,10 +33,18 @@ function handle() {
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
-      if (jwtErr || !decoded) {
-        res.status(400).json({
+      if (jwtErr) {
+        res.status(500).json({
           errors: [{
-            status: 400,
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
             title: 'Unauthorized',
             detail: 'Invalid token',
           }],
@@ -44,11 +52,11 @@ function handle() {
       } else {
         dbUser.getAllUsers(decoded.data, (userErr, users) => {
           if (userErr || users === null) {
-            res.status(400).json({
+            res.status(500).json({
               errors: [{
-                status: 400,
-                title: 'Failed to retrieve users',
-                detail: 'Unable to retrieve users',
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
               }],
             });
           } else {
@@ -58,6 +66,7 @@ function handle() {
                   const userObj = {
                     userName: user.userName,
                     team: user.team,
+                    online: user.online,
                   };
 
                   return userObj;
@@ -82,10 +91,18 @@ function handle() {
     } else {
       // noinspection JSUnresolvedVariable
       jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
-        if (jwtErr || !decoded) {
-          res.status(400).json({
+        if (jwtErr) {
+          res.status(500).json({
             errors: [{
-              status: 400,
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+        } else if (!decoded) {
+          res.status(401).json({
+            errors: [{
+              status: 401,
               title: 'Unauthorized',
               detail: 'Invalid token',
             }],
@@ -108,17 +125,17 @@ function handle() {
 
           dbUser.createUser(newUser, (userErr, user) => {
             if (userErr) {
-              res.status(400).json({
+              res.status(500).json({
                 errors: [{
-                  status: 400,
-                  title: 'Failed to create user',
-                  detail: 'Unable to create user',
+                  status: 500,
+                  title: 'Internal Server Error',
+                  detail: 'Internal Server Error',
                 }],
               });
             } else if (user === null) {
-              res.status(400).json({
+              res.status(402).json({
                 errors: [{
-                  status: 400,
+                  status: 402,
                   title: 'User already exists',
                   detail: `User with user name ${newUser.userName} already exists`,
                 }],
@@ -141,6 +158,53 @@ function handle() {
         }
       });
     }
+  });
+
+  router.get('/:id', (req, res) => {
+    // noinspection JSUnresolvedVariable
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr) {
+        res.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
+            title: 'Unauthorized',
+            detail: 'Invalid token',
+          }],
+        });
+      } else {
+        dbUser.getUser(req.params.id, (userErr, user) => {
+          if (userErr) {
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
+          } else if (user === null || user.userName !== decoded.data.userName) {
+            res.status(402).json({
+              errors: [{
+                status: 402,
+                title: 'Failed to retrieve user',
+                detail: 'Unable to retrieve user, due it it not existing or your user not having high enough access level',
+              }],
+            });
+          } else {
+            res.json({
+              data: { users: [user] },
+            });
+          }
+        });
+      }
+    });
   });
 
   return router;

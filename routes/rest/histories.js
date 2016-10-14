@@ -36,10 +36,18 @@ function handle() {
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
-      if (jwtErr || !decoded) {
-        res.status(400).json({
+      if (jwtErr) {
+        res.status(500).json({
           errors: [{
-            status: 400,
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
             title: 'Unauthorized',
             detail: 'Invalid token',
           }],
@@ -47,13 +55,25 @@ function handle() {
       } else {
         dbUser.getUser(decoded.data.userName, (userErr, user) => {
           if (userErr) {
-            res.status(400).json({ errors: historyErrors });
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
           } else {
             manager.getHistory({
               rooms: user.rooms,
               callback: (historyErr, messages) => {
                 if (historyErr) {
-                  res.status(400).json({ errors: historyErrors });
+                  res.status(500).json({
+                    errors: [{
+                      status: 500,
+                      title: 'Internal Server Error',
+                      detail: 'Internal Server Error',
+                    }],
+                  });
                 } else {
                   res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
                 }
@@ -68,10 +88,18 @@ function handle() {
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
-      if (jwtErr || !decoded) {
-        res.status(400).json({
+      if (jwtErr) {
+        res.status(500).json({
           errors: [{
-            status: 400,
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
             title: 'Unauthorized',
             detail: 'Invalid token',
           }],
@@ -81,7 +109,13 @@ function handle() {
 
         dbUser.getUser(decoded.data.userName, (userErr, user) => {
           if (userErr) {
-            res.status(400).json({ errors: historyErrors });
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
           } else if (user.rooms.indexOf(roomName) === -1) {
             res.status(400).json({
               errors: [{
@@ -98,7 +132,13 @@ function handle() {
               lastOnline: new Date(),
               callback: (histErr, messages = []) => {
                 if (histErr) {
-                  res.status(400).json({ errors: historyErrors });
+                  res.status(500).json({
+                    errors: [{
+                      status: 500,
+                      title: 'Internal Server Error',
+                      detail: 'Internal Server Error',
+                    }],
+                  });
                 } else {
                   res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
                 }

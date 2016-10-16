@@ -37,41 +37,48 @@ function handle() {
           detail: 'Unable to parse data',
         }],
       });
-    } else {
-      const { userName, password } = req.body.data.user;
 
-      dbUser.authUser(userName, password, (err, authUser) => {
-        if (err) {
-          res.status(500).json({
-            errors: [{
-              status: 500,
-              title: 'Internal Server Error',
-              detail: 'Internal Server Error',
-            }],
-          });
-        } else if (authUser === null) {
-          res.status(401).json({
-            errors: [{
-              status: 401,
-              title: 'Unauthorized user',
-              detail: 'Incorrect user name and/or password',
-            }],
-          });
-        } else {
-          const jwtUser = {
-            _id: authUser._id, // eslint-disable-line no-underscore-dangle
-            userName: authUser.userName,
-            accessLevel: authUser.accessLevel,
-            visibility: authUser.visibility,
-            verified: authUser.verified,
-            banned: authUser.banned,
-          };
-          res.json({
-            data: { token: jwt.sign({ data: jwtUser }, appConfig.jsonKey, { expiresIn: '7d' }) },
-          });
-        }
-      });
+      return;
     }
+
+    const { userName, password } = req.body.data.user;
+
+    dbUser.authUser(userName, password, (err, authUser) => {
+      if (err) {
+        res.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+
+        return;
+      } else if (authUser === null) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
+            title: 'Unauthorized user',
+            detail: 'Incorrect user name and/or password',
+          }],
+        });
+
+        return;
+      }
+
+      const jwtUser = {
+        _id: authUser._id, // eslint-disable-line no-underscore-dangle
+        userName: authUser.userName,
+        accessLevel: authUser.accessLevel,
+        visibility: authUser.visibility,
+        verified: authUser.verified,
+        banned: authUser.banned,
+      };
+
+      res.json({
+        data: { token: jwt.sign({ data: jwtUser }, appConfig.jsonKey, { expiresIn: '7d' }) },
+      });
+    });
   });
 
   return router;

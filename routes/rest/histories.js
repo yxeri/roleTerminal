@@ -39,6 +39,8 @@ function handle() {
             detail: 'Internal Server Error',
           }],
         });
+
+        return;
       } else if (!decoded) {
         res.status(401).json({
           errors: [{
@@ -47,36 +49,42 @@ function handle() {
             detail: 'Invalid token',
           }],
         });
-      } else {
-        dbUser.getUser(decoded.data.userName, (userErr, user) => {
-          if (userErr) {
-            res.status(500).json({
-              errors: [{
-                status: 500,
-                title: 'Internal Server Error',
-                detail: 'Internal Server Error',
-              }],
-            });
-          } else {
-            manager.getHistory({
-              rooms: user.rooms,
-              callback: (historyErr, messages) => {
-                if (historyErr) {
-                  res.status(500).json({
-                    errors: [{
-                      status: 500,
-                      title: 'Internal Server Error',
-                      detail: 'Internal Server Error',
-                    }],
-                  });
-                } else {
-                  res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
-                }
-              },
-            });
-          }
-        });
+
+        return;
       }
+
+      dbUser.getUser(decoded.data.userName, (userErr, user) => {
+        if (userErr) {
+          res.status(500).json({
+            errors: [{
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+
+          return;
+        }
+
+        manager.getHistory({
+          rooms: user.rooms,
+          callback: (historyErr, messages) => {
+            if (historyErr) {
+              res.status(500).json({
+                errors: [{
+                  status: 500,
+                  title: 'Internal Server Error',
+                  detail: 'Internal Server Error',
+                }],
+              });
+
+              return;
+            }
+
+            res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
+          },
+        });
+      });
     });
   });
 
@@ -91,6 +99,8 @@ function handle() {
             detail: 'Internal Server Error',
           }],
         });
+
+        return;
       } else if (!decoded) {
         res.status(401).json({
           errors: [{
@@ -99,49 +109,57 @@ function handle() {
             detail: 'Invalid token',
           }],
         });
-      } else {
-        const roomName = req.params.id;
 
-        dbUser.getUser(decoded.data.userName, (userErr, user) => {
-          if (userErr) {
-            res.status(500).json({
-              errors: [{
-                status: 500,
-                title: 'Internal Server Error',
-                detail: 'Internal Server Error',
-              }],
-            });
-          } else if (user.rooms.indexOf(roomName) === -1) {
-            res.status(400).json({
-              errors: [{
-                status: 400,
-                title: 'User is not following room',
-                detail: 'The user has to follow the room to be able to retrieve history from it',
-              }],
-            });
-          } else {
-            manager.getHistory({
-              rooms: [roomName],
-              lines: appConfig.historyLines,
-              missedMsgs: false,
-              lastOnline: new Date(),
-              callback: (histErr, messages = []) => {
-                if (histErr) {
-                  res.status(500).json({
-                    errors: [{
-                      status: 500,
-                      title: 'Internal Server Error',
-                      detail: 'Internal Server Error',
-                    }],
-                  });
-                } else {
-                  res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
-                }
-              },
-            });
-          }
-        });
+        return;
       }
+
+      const roomName = req.params.id;
+
+      dbUser.getUser(decoded.data.userName, (userErr, user) => {
+        if (userErr) {
+          res.status(500).json({
+            errors: [{
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+
+          return;
+        } else if (user.rooms.indexOf(roomName) === -1) {
+          res.status(400).json({
+            errors: [{
+              status: 400,
+              title: 'User is not following room',
+              detail: 'The user has to follow the room to be able to retrieve history from it',
+            }],
+          });
+
+          return;
+        }
+
+        manager.getHistory({
+          rooms: [roomName],
+          lines: appConfig.historyLines,
+          missedMsgs: false,
+          lastOnline: new Date(),
+          callback: (histErr, messages = []) => {
+            if (histErr) {
+              res.status(500).json({
+                errors: [{
+                  status: 500,
+                  title: 'Internal Server Error',
+                  detail: 'Internal Server Error',
+                }],
+              });
+
+              return;
+            }
+
+            res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
+          },
+        });
+      });
     });
   });
 

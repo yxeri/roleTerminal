@@ -27,9 +27,10 @@ const dbUser = require('../../db/connectors/user');
 const router = new express.Router();
 
 /**
+ * @param {object} io - Socket.IO
  * @returns {Object} Router
  */
-function handle() {
+function handle(io) {
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     const auth = req.headers.authorization;
@@ -43,6 +44,8 @@ function handle() {
             detail: 'Internal Server Error',
           }],
         });
+
+        return;
       } else if (!decoded && auth) {
         res.status(401).json({
           errors: [{
@@ -51,23 +54,27 @@ function handle() {
             detail: 'Invalid token',
           }],
         });
-      } else {
-        const user = auth ? decoded.data : { accessLevel: 0 };
 
-        dbRoom.getAllRooms(user, (roomErr, rooms) => {
-          if (roomErr) {
-            res.status(500).json({
-              errors: [{
-                status: 500,
-                title: 'Internal Server Error',
-                detail: 'Internal Server Error',
-              }],
-            });
-          } else {
-            res.json({ rooms: rooms.map(room => room.roomName) });
-          }
-        });
+        return;
       }
+
+      const user = auth ? decoded.data : { accessLevel: 0 };
+
+      dbRoom.getAllRooms(user, (roomErr, rooms) => {
+        if (roomErr) {
+          res.status(500).json({
+            errors: [{
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+
+          return;
+        }
+
+        res.json({ rooms: rooms.map(room => room.roomName) });
+      });
     });
   });
 
@@ -84,6 +91,8 @@ function handle() {
             detail: 'Internal Server Error',
           }],
         });
+
+        return;
       } else if (!decoded && auth) {
         res.status(401).json({
           errors: [{
@@ -92,23 +101,27 @@ function handle() {
             detail: 'Invalid token',
           }],
         });
-      } else {
-        const user = auth ? decoded.data : { accessLevel: 0 };
 
-        dbRoom.getRoom(req.params.id, user, (roomErr, room) => {
-          if (roomErr) {
-            res.status(500).json({
-              errors: [{
-                status: 500,
-                title: 'Internal Server Error',
-                detail: 'Internal Server Error',
-              }],
-            });
-          } else {
-            res.json({ data: { rooms: [room] } });
-          }
-        });
+        return;
       }
+
+      const user = auth ? decoded.data : { accessLevel: 0 };
+
+      dbRoom.getRoom(req.params.id, user, (roomErr, room) => {
+        if (roomErr) {
+          res.status(500).json({
+            errors: [{
+              status: 500,
+              title: 'Internal Server Error',
+              detail: 'Internal Server Error',
+            }],
+          });
+
+          return;
+        }
+
+        res.json({ data: { rooms: [room] } });
+      });
     });
   });
 
@@ -121,10 +134,40 @@ function handle() {
           detail: 'Unable to parse data',
         }],
       });
-    } else {
-      // noinspection JSUnresolvedVariable
-      jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
-        if (jwtErr) {
+
+      return;
+    }
+
+    // noinspection JSUnresolvedVariable
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr) {
+        res.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+
+        return;
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
+            title: 'Unauthorized',
+            detail: 'Invalid token',
+          }],
+        });
+
+        return;
+      }
+
+      const newRoom = req.body.data.room;
+      newRoom.roomName = newRoom.toLowerCase();
+      newRoom.owner = decoded.data.userName.toLowerCase();
+
+      manager.createRoom(newRoom, decoded.data, (errRoom, room) => {
+        if (errRoom || room === null) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -132,35 +175,13 @@ function handle() {
               detail: 'Internal Server Error',
             }],
           });
-        } else if (!decoded) {
-          res.status(401).json({
-            errors: [{
-              status: 401,
-              title: 'Unauthorized',
-              detail: 'Invalid token',
-            }],
-          });
-        } else {
-          const newRoom = req.body.data.room;
-          newRoom.roomName = newRoom.toLowerCase();
-          newRoom.owner = decoded.data.userName.toLowerCase();
 
-          manager.createRoom(newRoom, decoded.data, (errRoom, room) => {
-            if (errRoom || room === null) {
-              res.status(500).json({
-                errors: [{
-                  status: 500,
-                  title: 'Internal Server Error',
-                  detail: 'Internal Server Error',
-                }],
-              });
-            } else {
-              res.json({ data: { room } });
-            }
-          });
+          return;
         }
+
+        res.json({ data: { room } });
       });
-    }
+    });
   });
 
   router.post('/follow', (req, res) => {
@@ -172,12 +193,40 @@ function handle() {
           detail: 'Unable to parse data',
         }],
       });
-    } else {
-      // noinspection JSUnresolvedVariable
-      const auth = req.headers.authorization;
 
-      jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
-        if (jwtErr) {
+      return;
+    }
+
+    // noinspection JSUnresolvedVariable
+    const auth = req.headers.authorization;
+
+    jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr) {
+        res.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+
+        return;
+      } else if (!decoded && auth) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
+            title: 'Unauthorized',
+            detail: 'Invalid token',
+          }],
+        });
+
+        return;
+      }
+
+      const { roomName, password = '' } = req.body.data.room;
+
+      dbRoom.authUserToRoom(decoded.data, roomName, password, (errRoom, room) => {
+        if (errRoom) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -185,54 +234,41 @@ function handle() {
               detail: 'Internal Server Error',
             }],
           });
-        } else if (!decoded && auth) {
+
+          return;
+        } else if (room === null) {
           res.status(401).json({
             errors: [{
               status: 401,
-              title: 'Unauthorized',
-              detail: 'Invalid token',
+              title: 'Not authorized to follow room',
+              detail: 'Your user is not allowed to follow the room',
             }],
           });
-        } else {
-          const { roomName, password = '' } = req.body.data.room;
 
-          dbRoom.authUserToRoom(decoded.data, roomName, password, (errRoom, room) => {
-            if (errRoom) {
-              res.status(500).json({
-                errors: [{
-                  status: 500,
-                  title: 'Internal Server Error',
-                  detail: 'Internal Server Error',
-                }],
-              });
-            } else if (room === null) {
-              res.status(401).json({
-                errors: [{
-                  status: 401,
-                  title: 'Not authorized to follow room',
-                  detail: 'Your user is not allowed to follow the room',
-                }],
-              });
-            } else {
-              dbUser.addRoomToUser(decoded.data.userName, room.roomName, (roomErr) => {
-                if (roomErr) {
-                  res.status(500).json({
-                    errors: [{
-                      status: 500,
-                      title: 'Internal Server Error',
-                      detail: 'Internal Server Error',
-                    }],
-                  });
-                } else {
-                  res.json({ data: { room: { roomName } } });
-                  // TODO Add room to socket
-                }
-              });
-            }
-          });
+          return;
         }
+
+        dbUser.addRoomToUser(decoded.data.userName, room.roomName, (roomErr, user = {}) => {
+          if (roomErr) {
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
+
+            return;
+          }
+
+          if (user.socketId) {
+            io.to(user.socketId).emit('follow', { room });
+          }
+
+          res.json({ data: { room: { roomName } } });
+        });
       });
-    }
+    });
   });
 
   return router;

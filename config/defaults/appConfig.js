@@ -128,6 +128,7 @@ config.routes = modifiedConfig.routes || [
   { sitePath: '/api/rooms', filePath: './routes/rest/rooms.js' },
   { sitePath: '/api/histories', filePath: './routes/rest/histories.js' },
   { sitePath: '/api/positions', filePath: './routes/rest/positions.js' },
+  { sitePath: '/api/archives', filePath: './routes/rest/archives.js' },
   { sitePath: '/api/users', filePath: './routes/rest/users.js' },
   { sitePath: '*', filePath: './routes/error.js' },
 ];

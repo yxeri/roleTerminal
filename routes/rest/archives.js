@@ -17,7 +17,6 @@
 'use strict';
 
 const express = require('express');
-const manager = require('../../socketHelpers/manager');
 const objectValidator = require('../../utils/objectValidator');
 const appConfig = require('../../config/defaults/config').app;
 const dbArchive = require('../../db/connectors/archive');

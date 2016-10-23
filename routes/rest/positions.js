@@ -17,18 +17,20 @@
 'use strict';
 
 const express = require('express');
-const manager = require('../../socketHelpers/manager');
+const objectValidator = require('../../utils/objectValidator');
 const appConfig = require('../../config/defaults/config').app;
 const dbUser = require('../../db/connectors/user');
 const jwt = require('jsonwebtoken');
+const dbLocation = require('../../db/connectors/location');
 
 const router = new express.Router();
 
 /**
+ * @param {object} io - Socket.IO
  * @returns {Object} Router
  */
-function handle() {
-  router.get('/', (req, res) => {
+function handle(io) {
+  router.get('/users', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if (jwtErr) {
@@ -53,8 +55,8 @@ function handle() {
         return;
       }
 
-      dbUser.getUser(decoded.data.userName, (userErr, user) => {
-        if (userErr) {
+      dbUser.getAllUserPositions(decoded.data, (posErr, positions) => {
+        if (posErr) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -66,29 +68,12 @@ function handle() {
           return;
         }
 
-        manager.getHistory({
-          rooms: user.rooms,
-          callback: (historyErr, messages) => {
-            if (historyErr) {
-              res.status(500).json({
-                errors: [{
-                  status: 500,
-                  title: 'Internal Server Error',
-                  detail: 'Internal Server Error',
-                }],
-              });
-
-              return;
-            }
-
-            res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
-          },
-        });
+        res.json({ data: { positions } });
       });
     });
   });
 
-  router.get('/:id', (req, res) => {
+  router.get('/users/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if (jwtErr) {
@@ -113,10 +98,8 @@ function handle() {
         return;
       }
 
-      const roomName = req.params.id;
-
-      dbUser.getUser(decoded.data.userName, (userErr, user) => {
-        if (userErr) {
+      dbUser.getUserPosition(decoded.data, req.params.id, (posErr, position) => {
+        if (posErr) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -126,39 +109,76 @@ function handle() {
           });
 
           return;
-        } else if (user.rooms.indexOf(roomName) === -1) {
-          res.status(400).json({
-            errors: [{
-              status: 400,
-              title: 'User is not following room',
-              detail: 'The user has to follow the room to be able to retrieve history from it',
-            }],
-          });
-
-          return;
         }
 
-        manager.getHistory({
-          rooms: [roomName],
-          lines: appConfig.historyLines,
-          missedMsgs: false,
-          lastOnline: new Date(),
-          callback: (histErr, messages = []) => {
-            if (histErr) {
-              res.status(500).json({
-                errors: [{
-                  status: 500,
-                  title: 'Internal Server Error',
-                  detail: 'Internal Server Error',
-                }],
-              });
+        res.json({ data: { positions: [position] } });
+      });
+    });
+  });
 
-              return;
-            }
+  router.post('/users', (req, res) => {
+    if (!objectValidator.isValidData(req.body, { data: { position: { position: { longitude: true, latitude: true } } } })) {
+      res.status(400).json({
+        errors: [{
+          status: 400,
+          title: 'Missing data',
+          detail: 'Unable to parse data',
+        }],
+      });
 
-            res.json({ data: { timeZoneOffset: new Date().getTimezoneOffset(), messages } });
-          },
+      return;
+    }
+
+    // noinspection JSUnresolvedVariable
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr) {
+        res.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
         });
+
+        return;
+      } else if (!decoded) {
+        res.status(401).json({
+          errors: [{
+            status: 401,
+            title: 'Unauthorized',
+            detail: 'Invalid token',
+          }],
+        });
+
+        return;
+      }
+
+      dbLocation.updatePosition({
+        positionName: decoded.data.userName,
+        position: req.body.data.position.position,
+        type: 'user',
+        // TODO group: user.team
+        callback: (posErr, position) => {
+          if (posErr) {
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
+
+            return;
+          }
+
+          // TODO Only to users that have tracking on?
+          io.emit('mapPositions', {
+            positions: [position],
+            currentTime: (new Date()),
+          });
+
+          res.json({ data: { position } });
+        },
       });
     });
   });

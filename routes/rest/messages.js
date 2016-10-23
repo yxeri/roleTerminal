@@ -17,19 +17,20 @@
 'use strict';
 
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const dbUser = require('../../db/connectors/user');
 const appConfig = require('../../config/defaults/config').app;
+const jwt = require('jsonwebtoken');
+const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
 
 const router = new express.Router();
 
 /**
+ * @param {object} io - Socket.IO
  * @returns {Object} Router
  */
-function handle() {
+function handle(io) {
   router.post('/', (req, res) => {
-    if (!objectValidator.isValidData(req.body, { data: { user: { userName: true, password: true } } })) {
+    if (!objectValidator.isValidData(req.body, { data: { message: { roomName: true, text: true } } })) {
       res.status(400).json({
         errors: [{
           status: 400,
@@ -41,10 +42,9 @@ function handle() {
       return;
     }
 
-    const { userName, password } = req.body.data.user;
-
-    dbUser.authUser(userName, password, (err, authUser) => {
-      if (err) {
+    // noinspection JSUnresolvedVariable
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
+      if (jwtErr) {
         res.status(500).json({
           errors: [{
             status: 500,
@@ -54,32 +54,44 @@ function handle() {
         });
 
         return;
-      } else if (authUser === null) {
+      } else if (!decoded) {
         res.status(401).json({
           errors: [{
             status: 401,
-            title: 'Unauthorized user',
-            detail: 'Incorrect user name and/or password',
+            title: 'Unauthorized',
+            detail: 'Invalid token',
           }],
         });
 
         return;
       }
 
-      const jwtUser = {
-        _id: authUser._id, // eslint-disable-line no-underscore-dangle
-        userName: authUser.userName,
-        accessLevel: authUser.accessLevel,
-        visibility: authUser.visibility,
-        verified: authUser.verified,
-        banned: authUser.banned,
-      };
+      const message = req.body.data.message;
+      message.userName = decoded.data.userName;
 
-      res.json({
-        data: { token: jwt.sign({ data: jwtUser }, appConfig.jsonKey, { expiresIn: '7d' }) },
+      messenger.sendChatMsg({
+        message,
+        io,
+        user: decoded.data,
+        callback: ({ error, data }) => {
+          if (error) {
+            res.status(500).json({
+              errors: [{
+                status: 500,
+                title: 'Internal Server Error',
+                detail: 'Internal Server Error',
+              }],
+            });
+
+            return;
+          }
+
+          res.json({ data: { message: data.message } });
+        },
       });
     });
   });
+
 
   return router;
 }

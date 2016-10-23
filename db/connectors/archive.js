@@ -16,6 +16,7 @@
 
 const mongoose = require('mongoose');
 const logger = require('../../utils/logger');
+const databaseConnector = require('../databaseConnector');
 
 const archiveSchema = new mongoose.Schema({
   visibility: { type: Number, default: 0 },
@@ -27,6 +28,31 @@ const archiveSchema = new mongoose.Schema({
 }, { collection: 'archives' });
 
 const Archive = mongoose.model('Archive', archiveSchema);
+
+/**
+ * Create and save archive
+ * @param {Object} archive - New archive
+ * @param {Function} callback - Callback
+ */
+function createArchive(archive, callback) {
+  const query = { archiveId: archive.archiveId };
+
+  Archive.findOne(query).lean().exec((err, foundArchive) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to check if user exists'],
+        err,
+      });
+    } else if (foundArchive === null) {
+      const newArchive = new Archive(archive);
+
+      databaseConnector.saveObject(newArchive, 'archive', callback);
+    } else {
+      callback(err, null);
+    }
+  });
+}
 
 /**
  * Get archive by archive ID and user access level
@@ -102,6 +128,7 @@ function getArchivesList(accessLevel, callback) {
   });
 }
 
+exports.createArchive = createArchive;
 exports.getArchive = getArchive;
 exports.getArchives = getArchives;
 exports.getArchivesList = getArchivesList;

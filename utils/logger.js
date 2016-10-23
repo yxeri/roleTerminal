@@ -86,7 +86,7 @@ function sendSocketErrorMsg({ socket, code, text, err }) {
   messenger.sendSelfMsg({
     socket,
     message: {
-      modifiedText,
+      text: modifiedText,
     },
   });
   printErrorMsg(code, modifiedText, err);

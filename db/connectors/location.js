@@ -36,8 +36,8 @@ const MapPosition = mongoose.model('MapPosition', mapPositionSchema);
  * @param {Object} params - Parameters
  * @param {string} params.positionName - Name of the position
  * @param {Object} params.position - Position
- * @param {boolean} params.isStatic - Is the position static? (most commonly used on everything non-user)
  * @param {string} params.type - Type of position
+ * @param {boolean} [params.isStatic] - Is the position static? (most commonly used on everything non-user)
  * @param {string} [params.group] - Name of the grop that the position belongs to (most commonly used by user)
  * @param {Function} params.callback - Callback
  */

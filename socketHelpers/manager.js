@@ -20,7 +20,6 @@ const dbUser = require('./../db/connectors/user');
 const dbCommand = require('./../db/connectors/command');
 const dbRoom = require('./../db/connectors/room');
 const dbChatHistory = require('./../db/connectors/chatHistory');
-const databasePopulation = require('./../config/defaults/config').databasePopulation;
 const logger = require('./../utils/logger.js');
 const appConfig = require('./../config/defaults/config').app;
 
@@ -171,7 +170,7 @@ function createRoom(sentRoom, user, callback) {
           });
         }
 
-        callback(roomErr, room.roomName);
+        callback(roomErr, room);
       });
     }
   });
@@ -205,10 +204,6 @@ function updateUserSocketId(socketId, userName, callback) {
  */
 function joinRooms(rooms, socket, device) {
   const allRooms = rooms;
-
-  allRooms.push(databasePopulation.rooms.important.roomName);
-  allRooms.push(databasePopulation.rooms.bcast.roomName);
-  allRooms.push(databasePopulation.rooms.morse.roomName);
 
   if (device) {
     allRooms.push(device + appConfig.deviceAppend);

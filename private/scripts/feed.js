@@ -244,35 +244,37 @@ function retrievePosition() {
 
   const staticPosition = storage.getStaticPosition();
 
-  if (staticPosition && staticPosition.latitude && staticPosition.longitude) {
-    isTracking = true;
+  if (mapTools.getMap()) {
+    if (staticPosition && staticPosition.latitude && staticPosition.longitude) {
+      isTracking = true;
 
-    positions.push({
-      coords: {
+      positions.push({
+        coords: {
+          latitude: staticPosition.latitude,
+          longitude: staticPosition.longitude,
+          accuracy: 100,
+        },
+        timestamp: new Date(),
+      });
+      mapTools.setUserPosition({
         latitude: staticPosition.latitude,
         longitude: staticPosition.longitude,
-        accuracy: 100,
-      },
-      timestamp: new Date(),
-    });
-    mapTools.setUserPosition({
-      latitude: staticPosition.latitude,
-      longitude: staticPosition.longitude,
-    });
-  } else {
-    watchId = navigator.geolocation.watchPosition((position) => {
-      if (position !== undefined) {
-        isTracking = true;
-        positions.push(position);
+      });
+    } else {
+      watchId = navigator.geolocation.watchPosition((position) => {
+        if (position !== undefined) {
+          isTracking = true;
+          positions.push(position);
 
-        mapTools.setUserPosition({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      }
-    }, (err) => {
-      console.log(err);
-    }, { enableHighAccuracy: true });
+          mapTools.setUserPosition({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        }
+      }, (err) => {
+        console.log(err);
+      }, { enableHighAccuracy: true });
+    }
   }
 
   if (isTracking) {
@@ -524,12 +526,10 @@ function expandPartialMatch(matchedCommands, partialMatch, sign) {
 
     if (matched) {
       expanded += commandChar;
-    } else {
-      return commandHandler.isCommandChar(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
     }
   }
 
-  return '';
+  return commandHandler.isCommandChar(sign) ? sign + partialMatch + expanded : partialMatch + expanded;
 }
 
 // TODO autoCompleteCommand should use this

@@ -495,13 +495,6 @@ function createMarkerClusterer() {
  * @param {string} params.elementId - Id of map element
  */
 function createMap(params) {
-  // Will stop and retry to create map if external files have not finished loading
-  if (typeof google === 'undefined' || typeof MarkerClusterer === 'undefined' || typeof MapLabel === 'undefined') {
-    setTimeout(createMap, 500, params);
-
-    return;
-  }
-
   const elementId = params.elementId;
 
   map = new google.maps.Map(document.getElementById(elementId), {
@@ -659,6 +652,13 @@ function getInfoText(markerId) {
  * @static
  */
 function startMap() {
+  // Will stop and retry to create map if external files have not finished loading
+  if (typeof google === 'undefined' || typeof MarkerClusterer === 'undefined' || typeof MapLabel === 'undefined') {
+    setTimeout(startMap, 1000);
+
+    return;
+  }
+
   if (!getMap()) {
     createMap({
       centerCoordinates: storage.getCenterCoordinates(),

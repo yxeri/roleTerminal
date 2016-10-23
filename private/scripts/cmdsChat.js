@@ -140,12 +140,10 @@ commands.msg = {
           userName: storage.getUser(),
           roomName: storage.getRoom(),
         },
-      }, ({ error, message }) => {
+      }, ({ error }) => {
         if (error) {
           return;
         }
-
-        messenger.onMessage({ message });
       });
     } else {
       messenger.queueMessage({

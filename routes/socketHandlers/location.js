@@ -160,6 +160,7 @@ function handle(socket) {
                 }
               }
 
+              // FIXME Should this be here?
               socket.broadcast.emit('mapPositions', {
                 positions: [position],
                 currentTime: (new Date()),

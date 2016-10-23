@@ -73,12 +73,6 @@ function handle(io) {
     socket.on('disconnect', () => {
       dbUser.getUserById(socket.id, (err, user) => {
         if (err || user === null) {
-          logger.sendErrorMsg({
-            code: logger.ErrorCodes.general,
-            text: ['User has disconnected. Couldn\'t retrieve user name'],
-            err,
-          });
-
           return;
         }
 
@@ -89,31 +83,27 @@ function handle(io) {
               text: ['Failed to reset user socket ID'],
               err: userErr,
             });
-
-            return;
           }
+        });
 
-          dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
-            if (userOnlineErr || settedUser === null) {
-              logger.sendErrorMsg({
-                code: logger.ErrorCodes.general,
-                text: ['Failed to set last online'],
-                err: userErr,
-              });
-
-              return;
-            }
-
-            dbUser.updateUserOnline(settedUser.userName, false, (onlineErr, updatedUser) => {
-              if (onlineErr || updatedUser === null) {
-                logger.sendErrorMsg({
-                  code: logger.ErrorCodes.general,
-                  text: ['Failed to update online'],
-                  err: userErr,
-                });
-              }
+        dbUser.setUserLastOnline(user.userName, new Date(), (userOnlineErr, settedUser) => {
+          if (userOnlineErr || settedUser === null) {
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.general,
+              text: ['Failed to set last online'],
+              err: userOnlineErr,
             });
-          });
+          }
+        });
+
+        dbUser.updateUserOnline(user.userName, false, (onlineErr, updatedUser) => {
+          if (onlineErr || updatedUser === null) {
+            logger.sendErrorMsg({
+              code: logger.ErrorCodes.general,
+              text: ['Failed to update online'],
+              err: onlineErr,
+            });
+          }
         });
 
         logger.sendInfoMsg(`${socket.id} ${user.userName} has disconnected`);

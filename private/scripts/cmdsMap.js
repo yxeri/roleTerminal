@@ -35,20 +35,20 @@ commands.map = {
 
       switch (choice) {
         case 'on': {
-          layoutChanger.splitView(true, mapDiv, mapTools.realignMap);
-
-          if (value) {
-            mapTools.setMapView(value);
-          } else {
-            mapTools.setMapView('area');
-          }
-
           if (mapTools.getMap()) {
+            layoutChanger.splitView(true, mapDiv, mapTools.realignMap);
+
+            if (value) {
+              mapTools.setMapView(value);
+            } else {
+              mapTools.setMapView('area');
+            }
+
             mapTools.resetClusters();
             mapTools.realignMap();
             messenger.queueMessage({ text: ['Map has been loaded'] });
           } else {
-            messenger.queueMessage({ text: ['Map data is still loading. Please try again in a couple of seconds'] });
+            messenger.queueMessage({ text: ['Map data is still loading. Please try again later'] });
           }
 
           break;

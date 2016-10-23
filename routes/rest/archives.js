@@ -17,25 +17,20 @@
 'use strict';
 
 const express = require('express');
-const dbRoom = require('../../db/connectors/room');
-const appConfig = require('../../config/defaults/config').app;
-const jwt = require('jsonwebtoken');
-const manager = require('../../socketHelpers/manager');
 const objectValidator = require('../../utils/objectValidator');
-const dbUser = require('../../db/connectors/user');
+const appConfig = require('../../config/defaults/config').app;
+const dbArchive = require('../../db/connectors/archive');
+const jwt = require('jsonwebtoken');
 
 const router = new express.Router();
 
 /**
- * @param {object} io - Socket.IO
  * @returns {Object} Router
  */
-function handle(io) {
+function handle() {
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
-    const auth = req.headers.authorization;
-
-    jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if (jwtErr) {
         res.status(500).json({
           errors: [{
@@ -46,7 +41,7 @@ function handle(io) {
         });
 
         return;
-      } else if (!decoded && auth) {
+      } else if (!decoded) {
         res.status(401).json({
           errors: [{
             status: 401,
@@ -58,10 +53,8 @@ function handle(io) {
         return;
       }
 
-      const user = auth ? decoded.data : { accessLevel: 0 };
-
-      dbRoom.getAllRooms(user, (roomErr, rooms) => {
-        if (roomErr) {
+      dbArchive.getArchivesList(decoded.data.accessLevel, (archiveErr, archives) => {
+        if (archiveErr) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -73,16 +66,14 @@ function handle(io) {
           return;
         }
 
-        res.json({ rooms: rooms.map(room => room.roomName) });
+        res.json({ data: { archives } });
       });
     });
   });
 
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
-    const auth = req.headers.authorization;
-
-    jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
+    jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
       if (jwtErr) {
         res.status(500).json({
           errors: [{
@@ -93,7 +84,7 @@ function handle(io) {
         });
 
         return;
-      } else if (!decoded && auth) {
+      } else if (!decoded) {
         res.status(401).json({
           errors: [{
             status: 401,
@@ -105,10 +96,8 @@ function handle(io) {
         return;
       }
 
-      const user = auth ? decoded.data : { accessLevel: 0 };
-
-      dbRoom.getRoom(req.params.id, user, (roomErr, room) => {
-        if (roomErr) {
+      dbArchive.getArchive(req.params.id, decoded.data.accessLevel, (archiveErr, archive) => {
+        if (archiveErr) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -120,13 +109,13 @@ function handle(io) {
           return;
         }
 
-        res.json({ data: { rooms: [room] } });
+        res.json({ data: { archives: [archive] } });
       });
     });
   });
 
   router.post('/', (req, res) => {
-    if (!objectValidator.isValidData(req.body, { data: { room: { roomName: true } } })) {
+    if (!objectValidator.isValidData(req.body, { data: { archive: { archiveId: true, text: true, title: true } } })) {
       res.status(400).json({
         errors: [{
           status: 400,
@@ -162,12 +151,12 @@ function handle(io) {
         return;
       }
 
-      const newRoom = req.body.data.room;
-      newRoom.roomName = newRoom.toLowerCase();
-      newRoom.owner = decoded.data.userName.toLowerCase();
+      const newArchive = req.body.data.archive;
+      newArchive.creator = decoded.data.userName;
+      newArchive.archiveId = newArchive.archiveId.toLowerCase();
 
-      manager.createRoom(newRoom, decoded.data, (errRoom, room) => {
-        if (errRoom || room === null) {
+      dbArchive.createArchive(newArchive, (archiveErr, archive) => {
+        if (archiveErr) {
           res.status(500).json({
             errors: [{
               status: 500,
@@ -177,96 +166,19 @@ function handle(io) {
           });
 
           return;
-        }
-
-        res.json({ data: { room } });
-      });
-    });
-  });
-
-  router.post('/follow', (req, res) => {
-    if (!objectValidator.isValidData(req.body, { data: { room: { roomName: true } } })) {
-      res.status(400).json({
-        errors: [{
-          status: 400,
-          title: 'Missing data',
-          detail: 'Unable to parse data',
-        }],
-      });
-
-      return;
-    }
-
-    // noinspection JSUnresolvedVariable
-    const auth = req.headers.authorization;
-
-    jwt.verify(auth || '', appConfig.jsonKey, (jwtErr, decoded) => {
-      if (jwtErr) {
-        res.status(500).json({
-          errors: [{
-            status: 500,
-            title: 'Internal Server Error',
-            detail: 'Internal Server Error',
-          }],
-        });
-
-        return;
-      } else if (!decoded && auth) {
-        res.status(401).json({
-          errors: [{
-            status: 401,
-            title: 'Unauthorized',
-            detail: 'Invalid token',
-          }],
-        });
-
-        return;
-      }
-
-      const { roomName, password = '' } = req.body.data.room;
-
-      dbRoom.authUserToRoom(decoded.data, roomName, password, (errRoom, room) => {
-        if (errRoom) {
-          res.status(500).json({
+        } else if (archive === null) {
+          res.status(402).json({
             errors: [{
-              status: 500,
-              title: 'Internal Server Error',
-              detail: 'Internal Server Error',
-            }],
-          });
-
-          return;
-        } else if (room === null) {
-          res.status(401).json({
-            errors: [{
-              status: 401,
-              title: 'Not authorized to follow room',
-              detail: 'Your user is not allowed to follow the room',
+              status: 402,
+              title: 'Archive already exists',
+              detail: `Archive with ID ${newArchive.archiveId} already exists`,
             }],
           });
 
           return;
         }
 
-        dbUser.addRoomToUser(decoded.data.userName, room.roomName, (roomErr, user = {}) => {
-          if (roomErr) {
-            res.status(500).json({
-              errors: [{
-                status: 500,
-                title: 'Internal Server Error',
-                detail: 'Internal Server Error',
-              }],
-            });
-
-            return;
-          }
-
-          if (user.socketId) {
-            io.to(user.socketId).emit('follow', { room });
-          }
-
-          res.json({ data: { room: { roomName } } });
-        });
+        res.json({ data: { archives: [archive] } });
       });
     });
   });

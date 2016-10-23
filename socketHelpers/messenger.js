@@ -17,6 +17,7 @@
 'use strict';
 
 const dbChatHistory = require('./../db/connectors/chatHistory');
+const dbUser = require('./../db/connectors/user');
 const databasePopulation = require('./../config/defaults/config').databasePopulation;
 const appConfig = require('./../config/defaults/config').app;
 const logger = require('./../utils/logger');
@@ -101,22 +102,14 @@ function parseMorse(text) {
  * Add a sent message to a room's history in the database
  * @param {string} roomName - Name of the room
  * @param {Object} message - Message to be added
- * @param {Object} socket - Socket.io socket
  * @param {Function} callback - callback
  */
-function addMsgToHistory(roomName, message, socket, callback) {
+function addMsgToHistory(roomName, message, callback) {
   dbChatHistory.addMsgToHistory(roomName, message, (err, history) => {
     if (err || history === null) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
         text: ['Failed to add message to history'],
-        err,
-      });
-      logger.sendSocketErrorMsg({
-        socket,
-        code: logger.ErrorCodes.db,
-        text: ['Failed to send the message'],
-        text_se: ['Misslyckades med att skicka meddelandet'],
         err,
       });
       callback(err || {});
@@ -153,15 +146,15 @@ function sendSelfMsgs({ messages, socket }) {
 }
 
 /**
- * Checks if the socket is following a room
- * @param {Object} socket - Socket.io socket
+ * Checks if the user is following a room
+ * @param {Object} user - User to check
  * @param {string} roomName - Name of the room
  * @returns {boolean} Is the socket following the room?
  */
-function isSocketFollowingRoom(socket, roomName) {
-  if (Object.keys(socket.rooms).indexOf(roomName) === -1) {
+function isUserFollowingRoom(user, roomName) {
+  if (user.rooms.indexOf(roomName) === -1) {
     sendSelfMsg({
-      socket,
+      user,
       message: {
         text: [`You are not following room ${roomName}`],
         text_se: [`Ni följer inte rummet ${roomName}`],
@@ -221,7 +214,7 @@ function sendImportantMsg({ socket, message, device, callback }) {
   data.message.extraClass = 'importantMsg';
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
+  addMsgToHistory(data.message.roomName, data.message, (err) => {
     if (err) {
       callback({ error: {} });
 
@@ -242,34 +235,38 @@ function sendImportantMsg({ socket, message, device, callback }) {
  * Sends a message to a room and stores it in history
  * Emits message
  * @param {Object} message - Message to be sent
- * @param {Object} socket - Socket.io socket
+ * @param {Object} user - User sending the message
  * @param {Function} callback - Client callback
  */
-function sendChatMsg({ message, socket, callback }) {
-  if (!objectValidator.isValidData({ message, socket, callback }, { socket: true, message: { text: true, roomName: true, userName: true } })) {
-    callback({ error: {} });
-
-    return;
-  } else if (message && !isSocketFollowingRoom(socket, message.roomName)) {
+function sendChatMsg({ message, user, callback, io }) {
+  if (!objectValidator.isValidData({ message, user, callback, io }, { user: { userName: true }, message: { text: true, roomName: true, userName: true }, io: true })) {
     callback({ error: {} });
 
     return;
   }
 
-  const data = {
-    message,
-  };
-  data.message.time = new Date();
-
-  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
-    if (err) {
+  dbUser.getUser(user.userName, (userErr, foundUser) => {
+    if (userErr || foundUser === null || !isUserFollowingRoom(foundUser, message.roomName)) {
       callback({ error: {} });
 
       return;
     }
 
-    socket.broadcast.to(data.message.roomName).emit('message', data);
-    callback(data);
+    const data = {
+      message,
+    };
+    data.message.time = new Date();
+
+    addMsgToHistory(data.message.roomName, data.message, (err) => {
+      if (err) {
+        callback({ error: {} });
+
+        return;
+      }
+
+      io.to(data.message.roomName).emit('message', data);
+      callback(data);
+    });
   });
 }
 
@@ -294,7 +291,7 @@ function sendWhisperMsg({ message, socket, callback }) {
   data.message.extraClass = 'whisperMsg';
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
+  addMsgToHistory(data.message.roomName, data.message, (err) => {
     if (err) {
       callback({ error: {} });
 
@@ -303,7 +300,7 @@ function sendWhisperMsg({ message, socket, callback }) {
 
     const senderRoomName = data.message.userName + appConfig.whisperAppend;
 
-    addMsgToHistory(senderRoomName, data.message, socket, (senderErr) => {
+    addMsgToHistory(senderRoomName, data.message, (senderErr) => {
       if (senderErr) {
         callback({ error: {} });
 
@@ -338,7 +335,7 @@ function sendBroadcastMsg({ message, socket, callback }) {
   data.message.roomName = databasePopulation.rooms.bcast.roomName;
   data.message.time = new Date();
 
-  addMsgToHistory(data.message.roomName, data.message, socket, (err) => {
+  addMsgToHistory(data.message.roomName, data.message, (err) => {
     if (err) {
       callback({ error: {} });
 
@@ -373,6 +370,7 @@ function sendList(params) {
  * Send morse code to all sockets and store in history
  * @param {Object} socket - Socket.IO socket
  * @param {Object} message - Message
+ * @param {string} message.morseCode - Morse code
  * @param {string} [message.room] - Room name
  * @param {boolean} [silent] - Should the morse code text be surpressed?
  * @param {boolean} [local] - Should morse be played on the client that sent it?
@@ -405,7 +403,7 @@ function sendMorse({ socket, message, silent, local, callback = () => {} }) {
       roomName,
     };
 
-    addMsgToHistory(roomName, morseMessage, socket, () => {
+    addMsgToHistory(roomName, morseMessage, () => {
     });
   }
 }

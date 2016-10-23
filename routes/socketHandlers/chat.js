@@ -99,7 +99,7 @@ function handle(socket, io) {
         modifiedMessage.roomName = user.team + appConfig.teamAppend;
       }
 
-      messenger.sendChatMsg({ socket, callback, message: modifiedMessage });
+      messenger.sendChatMsg({ user, callback, message: modifiedMessage, io });
     });
   });
 

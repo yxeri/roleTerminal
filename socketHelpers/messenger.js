@@ -265,7 +265,7 @@ function sendChatMsg({ message, user, callback, io }) {
       }
 
       io.to(data.message.roomName).emit('message', data);
-      callback(data);
+      callback({ data });
     });
   });
 }

@@ -52,6 +52,7 @@ function followRoom({ socket, newRoom, userName, callback }) {
   }
 
   socket.join(newRoomName);
+  // TODO Follow emit should just be handled by callback on client
   socket.emit('follow', { room: newRoom });
   callback({ room: newRoom });
 }

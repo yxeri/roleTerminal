@@ -28,6 +28,42 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle() {
+  /**
+   * @api {get} /histories Retrieve history from all rooms
+   * @apiName GetHistories
+   * @apiGroup Histories
+   *
+   * @apiHeader {String} [Authorization] JSON Web Token. Will retrieve chat history from public rooms if not set
+   *
+   * @apiDescription Retrieves history from all the rooms that the user is following. The messages will be sorted by date of creation
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.messages Found messages from all rooms
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "timeZoneOffset": 0,
+   *      "messages": [
+   *        {
+   *          "time": "2016-10-14T09:54:18.694Z",
+   *          "roomName": "public",
+   *          "userName": "rez",
+   *          "text": [
+   *            "Hello world!"
+   *          ]
+   *        },
+   *        {
+   *          "time": "2016-10-14T11:13:03.555Z",
+   *          "roomName": "bb1",
+   *          "userName": "rez",
+   *          "text": [
+   *            "..."
+   *          ]
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -88,6 +124,36 @@ function handle() {
     });
   });
 
+  /**
+   * @api {get} /histories/:id Retrieve history from specific room
+   * @apiName GetHistory
+   * @apiGroup Histories
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve history from a specific room, based on the sent room name
+   *
+   * @apiParam {String} id Name of the room
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.messages Found messages from specific room
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "timeZoneOffset": 0,
+   *      "messages": [
+   *        {
+   *          "time": "2016-10-14T11:13:03.555Z",
+   *          "roomName": "bb1",
+   *          "userName": "rez",
+   *          "text": [
+   *            "..."
+   *          ]
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {

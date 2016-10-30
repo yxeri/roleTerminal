@@ -55,8 +55,9 @@ function authUserToRoom(user, roomName, password, callback) {
       { password },
     ],
   };
+  const filter = { password: 0 };
 
-  Room.findOne(query).lean().exec((err, room) => {
+  Room.findOne(query, filter).lean().exec((err, room) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
@@ -109,17 +110,7 @@ function createRoom(sentRoom, sentUser, callback) {
             err: saveErr,
           });
         } else {
-          newRoom.save((roomSaveErr, saveRoom) => {
-            if (roomSaveErr) {
-              logger.sendErrorMsg({
-                code: logger.ErrorCodes.db,
-                text: ['Failed to save room'],
-                err: roomSaveErr,
-              });
-            }
-
-            callback(roomSaveErr, saveRoom);
-          });
+          databaseConnector.saveObject(newRoom, 'room', callback);
         }
       });
     } else {
@@ -159,7 +150,7 @@ function getRoom(roomName, user, callback) {
 function getOwnedRooms(user, callback) {
   const query = { owner: user.userName };
   const sort = { roomName: 1 };
-  const filter = { _id: 0 };
+  const filter = { password: 0 };
 
   Room.find(query, filter).sort(sort).lean().exec((err, rooms) => {
     if (err) {
@@ -182,7 +173,7 @@ function getOwnedRooms(user, callback) {
 function getAllRooms(user, callback) {
   const query = { visibility: { $lte: user.accessLevel } };
   const sort = { roomName: 1 };
-  const filter = { _id: 0 };
+  const filter = { password: 0 };
 
   Room.find(query, filter).sort(sort).lean().exec((err, rooms) => {
     if (err) {

@@ -33,8 +33,9 @@ const objectValidator = require('../../utils/objectValidator');
  * @param {Object} params.socket - Socket.IO socket
  * @param {Object} params.newRoom - New room to follow
  * @param {string} params.userName - Name of the new user following the room
+ * @param {Function} params.callback - Callback
  */
-function followRoom({ socket, newRoom, userName }) {
+function followRoom({ socket, newRoom, userName, callback }) {
   const newRoomName = newRoom.roomName;
 
   if (Object.keys(socket.rooms).indexOf(newRoomName) < 0) {
@@ -51,8 +52,9 @@ function followRoom({ socket, newRoom, userName }) {
   }
 
   socket.join(newRoomName);
+  // TODO Follow emit should just be handled by callback on client
   socket.emit('follow', { room: newRoom });
-  socket.emit('commandSuccess', { noStepCall: true });
+  callback({ room: newRoom });
 }
 
 /**
@@ -145,8 +147,8 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('createRoom', (params, callback) => {
-    if (!objectValidator.isValidData(params, { room: { roomName: true, owner: true } })) {
+  socket.on('createRoom', ({ room }, callback) => {
+    if (!objectValidator.isValidData({ room }, { room: { roomName: true, owner: true } })) {
       callback({ error: {} });
 
       return;
@@ -159,7 +161,7 @@ function handle(socket, io) {
         return;
       }
 
-      manager.createRoom(params.room, user, (createErr, room) => {
+      manager.createRoom(room, user, (createErr, createdRoom) => {
         if (createErr) {
           logger.sendSocketErrorMsg({
             socket,
@@ -171,20 +173,20 @@ function handle(socket, io) {
           callback({ error: {} });
 
           return;
-        } else if (!room) {
+        } else if (!createdRoom) {
           callback({});
 
           return;
         }
 
-        callback({ room });
-        followRoom({ socket, userName: user.userName, newRoom: room });
+        followRoom({ socket, userName: user.userName, newRoom: createdRoom, callback });
       });
     });
   });
 
-  socket.on('follow', ({ room }) => {
+  socket.on('follow', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
+      callback({ error: {} });
       socket.emit('commandFail');
 
       return;
@@ -192,6 +194,7 @@ function handle(socket, io) {
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.follow.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
         socket.emit('commandFail');
 
         return;
@@ -206,12 +209,12 @@ function handle(socket, io) {
 
       dbRoom.authUserToRoom(user, modifiedRoom.roomName, modifiedRoom.password, (err, authRoom) => {
         if (err || authRoom === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: [`You are not authorized to join ${modifiedRoom.roomName}`],
-            text_se: [`Ni har inte tillåtelse att gå in i rummet ${modifiedRoom.roomName}`],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.db,
+              text: [`You are not authorized to join ${modifiedRoom.roomName}`],
+              text_se: [`Ni har inte tillåtelse att gå in i rummet ${modifiedRoom.roomName}`],
+            },
           });
           socket.emit('commandFail');
 
@@ -220,6 +223,12 @@ function handle(socket, io) {
 
         dbUser.addRoomToUser(user.userName, modifiedRoom.roomName, (roomErr) => {
           if (roomErr) {
+            callback({
+              error: {
+                code: logger.ErrorCodes.db,
+                text: [`Failed to follow ${modifiedRoom.roomName}`],
+              },
+            });
             logger.sendErrorMsg({
               code: logger.ErrorCodes.db,
               text: [`Failed to follow ${modifiedRoom.roomName}`],
@@ -230,7 +239,7 @@ function handle(socket, io) {
             return;
           }
 
-          followRoom({ socket, userName: user.userName, newRoom: modifiedRoom });
+          followRoom({ socket, userName: user.userName, newRoom: modifiedRoom, callback });
         });
       });
     });
@@ -610,6 +619,7 @@ function handle(socket, io) {
           }
 
           socket.broadcast.to(roomNameLower).emit('unfollow', { room });
+          socket.emit('unfollow', { room });
         });
 
         messenger.sendMsg({
@@ -871,13 +881,17 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('roomAnswer', ({ invitation, accepted }) => {
+  socket.on('roomAnswer', ({ invitation, accepted }, callback) => {
     if (!objectValidator.isValidData({ invitation, accepted }, { accepted: true, invitation: { itemName: true, sender: true, invitationType: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.invitations.commandName, (allowErr, allowed, allowedUser) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -889,6 +903,7 @@ function handle(socket, io) {
       if (accepted) {
         dbUser.addRoomToUser(userName, roomName, (roomErr) => {
           if (roomErr) {
+            callback({ error: {} });
             logger.sendErrorMsg({
               code: logger.ErrorCodes.db,
               text: [`Failed to follow ${roomName}`],
@@ -902,6 +917,7 @@ function handle(socket, io) {
             socket,
             userName,
             newRoom: { roomName },
+            callback,
           });
           dbConnector.removeInvitationFromList(userName, roomName, modifiedInvitation.invitationType, () => {
           });
@@ -909,9 +925,8 @@ function handle(socket, io) {
       } else {
         dbConnector.removeInvitationFromList(userName, modifiedInvitation.itemName, modifiedInvitation.invitationType, (err, list) => {
           if (err || list === null) {
-            messenger.sendSelfMsg({
-              socket,
-              message: {
+            callback({
+              error: {
                 text: ['Failed to decline invitation'],
                 text_se: ['Misslyckades med att avböja inbjudan'],
               },
@@ -920,8 +935,7 @@ function handle(socket, io) {
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket,
+          callback({
             message: {
               text: ['Successfully declined invitation'],
               text_se: ['Lyckades avböja inbjudan'],

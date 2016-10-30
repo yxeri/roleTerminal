@@ -47,6 +47,16 @@ function copyString(text) {
  */
 function createRoomCallback({ error, room }) {
   if (error) {
+    commandHandler.resetCommand(true);
+
+    return;
+  } else if (room === null) {
+    messenger.queueMessage({
+      text: ['Failed to create room. A room with that name already exists'],
+      text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
+    });
+    commandHandler.resetCommand(true);
+
     return;
   }
 
@@ -55,11 +65,7 @@ function createRoomCallback({ error, room }) {
       text: ['Room has been created'],
       text_se: ['Rummet har skapats'],
     });
-  } else {
-    messenger.queueMessage({
-      text: ['Failed to create room. A room with that name already exists'],
-      text_se: ['Lyckades inte skapa rummet. Ett rum med det namnet existerar redan'],
-    });
+    commandHandler.resetCommand(false);
   }
 }
 
@@ -615,7 +621,15 @@ commands.follow = {
         commandHelper.data.room.password = phrases[0];
       }
 
-      socketHandler.emit('follow', { room: commandHelper.data.room });
+      socketHandler.emit('follow', { room: commandHelper.data.room }, ({ error }) => {
+        if (error) {
+          commandHandler.resetCommand(true);
+
+          return;
+        }
+
+        commandHandler.resetCommand(false);
+      });
     },
   ],
   autocomplete: { type: 'rooms' },

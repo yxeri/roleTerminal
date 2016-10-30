@@ -28,6 +28,37 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle() {
+  /**
+   * @api {get} /archives Retrieve all public archives
+   * @apiName GetPublicArchives
+   * @apiGroup Archives
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve all public archives
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.archives All public archives. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "archives": [
+   *        {
+   *          "_id": "58093459d3b44c3400858273",
+   *          "title": "Hello",
+   *          "archiveId": "hello",
+   *          "creator": "rez5",
+   *          "text": [
+   *            "Hello world!",
+   *            "This is great"
+   *          ],
+   *          "public": true,
+   *          "visibility": "0"
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -71,6 +102,39 @@ function handle() {
     });
   });
 
+  /**
+   * @api {get} /archives/:id Retrieve specific archive
+   * @apiName GetArchive
+   * @apiGroup Archives
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve a specific archive based on the sent archive ID
+   *
+   * @apiParam {String} id The archive ID.
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.archives Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "archives": [
+   *        {
+   *          "_id": "58093459d3b44c3400858273",
+   *          "title": "Hello",
+   *          "archiveId": "hello",
+   *          "creator": "rez5",
+   *          "text": [
+   *            "Hello world!",
+   *            "This is great"
+   *          ],
+   *          "public": true,
+   *          "visibility": "0"
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -114,6 +178,60 @@ function handle() {
     });
   });
 
+  /**
+   * @api {post} /archives Create an archive
+   * @apiName CreateArchive
+   * @apiGroup Archives
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create an archive
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.archive Archive
+   * @apiParam {String} data.archive.title Title for the archive
+   * @apiParam {String} data.archive.archiveId ID of the archive. Will be used to retrieve this specific archive
+   * @apiParam {String[]} data.archive.text Content of the archive
+   * @apiParam {Boolean} data.archive.public Should the archive be public? Non-public archives can only be retrieved with its archive ID
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "archives": [
+   *        {
+   *          "title": "Hello",
+   *          "archiveId": "hello",
+   *          "text": [
+   *            "Hello world!",
+   *            "This is great"
+   *          ],
+   *          "public": true
+   *        }
+   *      ]
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.archives Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "archives": [
+   *        {
+   *          "_id": "58093459d3b44c3400858273",
+   *          "title": "Hello",
+   *          "archiveId": "hello",
+   *          "creator": "rez5",
+   *          "text": [
+   *            "Hello world!",
+   *            "This is great"
+   *          ],
+   *          "public": true,
+   *          "visibility": "0"
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { archive: { archiveId: true, text: true, title: true } } })) {
       res.status(400).json({

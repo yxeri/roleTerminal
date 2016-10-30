@@ -91,7 +91,10 @@ function saveObject(object, objectName, callback) {
       });
     }
 
-    callback(saveErr, savedObj);
+    const filteredObject = savedObj;
+    filteredObject.password = savedObj.password && savedObj.password !== '';
+
+    callback(saveErr, filteredObject);
   });
 }
 
@@ -490,6 +493,7 @@ function getUnverifiedTeams(callback) {
  * @param {Object} params.queryType - Database query
  * @param {Object} params.filter - Result filter
  * @param {Object} params.sort - Result sorting
+ * @param {Object} params.user - User
  * @param {Function} params.callback - Callback
  */
 function matchPartial(params) {

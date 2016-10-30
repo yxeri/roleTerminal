@@ -30,6 +30,39 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle(io) {
+  /**
+   * @api {get} /positions/users Retrieve all user positions
+   * @apiName GetUserPositions
+   * @apiGroup Positions
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve the positions from all users
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.positions Found user positions
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "positions": [
+   *        {
+   *          "_id": "580cd329720ed46986af64f9",
+   *          "positionName": "rez",
+   *          "lastUpdated": "2016-10-25T16:55:34.309Z",
+   *          "type": "user",
+   *          "position": {
+   *            "latitude": "42.3625069",
+   *            "longitude": "22.0114096",
+   *            "speed": null,
+   *            "accuracy": "1889",
+   *            "heading": null,
+   *            "timestamp": "1477414497796"
+   *          }
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/users', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -73,6 +106,41 @@ function handle(io) {
     });
   });
 
+  /**
+   * @api {get} /positions/users Retrieve specific user position
+   * @apiName GetUserPosition
+   * @apiGroup Positions
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve the position for a specific user
+   *
+   * @apiParam {String} id Name of the user
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.positions Found user position
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "positions": [
+   *        {
+   *          "_id": "580cd329720ed46986af64f9",
+   *          "positionName": "rez",
+   *          "lastUpdated": "2016-10-25T16:55:34.309Z",
+   *          "type": "user",
+   *          "position": {
+   *            "latitude": "42.3625069",
+   *            "longitude": "22.0114096",
+   *            "speed": null,
+   *            "accuracy": "1889",
+   *            "heading": null,
+   *            "timestamp": "1477414497796"
+   *          }
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/users/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -116,6 +184,43 @@ function handle(io) {
     });
   });
 
+  /**
+   * @api {post} /positions/users Set position
+   * @apiName SetPosition
+   * @apiGroup Positions
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Set a new position for the user, based on the authorization token
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.position
+   * @apiParam {Object} data.position.position
+   * @apiParam {Number} data.position.position.longitude
+   * @apiParam {Number} data.position.position.latitude
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "position": {
+   *        "position": {
+   *          "longitude": 55.401,
+   *          "latitude": 12.0041
+   *        }
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.positions New position for the user
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "positions": [
+   *        {}
+   *      ]
+   *    }
+   *  }
+   */
   router.post('/users', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { position: { position: { longitude: true, latitude: true } } } })) {
       res.status(400).json({
@@ -177,7 +282,7 @@ function handle(io) {
             currentTime: (new Date()),
           });
 
-          res.json({ data: { position } });
+          res.json({ data: { positions: [position] } });
         },
       });
     });

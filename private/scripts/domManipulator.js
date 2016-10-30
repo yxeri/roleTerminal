@@ -314,6 +314,18 @@ function addMenuItem(item) {
 }
 
 /**
+ * Remove element from the menu
+ * @param {string} elementId - ID of the element to be removed
+ */
+function removeMenuItem(elementId) {
+  const element = document.getElementById(elementId);
+
+  if (element) {
+    menuList.removeChild(element);
+  }
+}
+
+/**
  * Add a sub menu
  * @param {string} elementId - Id of the element to receive a sub menu
  * @param {HTMLElement} item - New sub menu
@@ -575,3 +587,4 @@ exports.removeAllSubMenus = removeAllSubMenus;
 exports.setStationStats = setStationStats;
 exports.toggleStationStats = toggleStationStats;
 exports.toggleLantern = toggleLantern;
+exports.removeMenuItem = removeMenuItem;

@@ -28,6 +28,36 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle() {
+  /**
+   * @api {post} /authenticate Create a JSON Web Token
+   * @apiName Authenticate
+   * @apiGroup Authenticate
+   *
+   * @apiDescription Create a JSON Web Token based on the sent user. This token is needed to access most of the API. The token should be set in the Authorization header
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.user User
+   * @apiParam {String} data.user.userName User name
+   * @apiParam {String} data.user.password Password
+   * @apiParamExample {json} Request-Example:
+   *  {
+   *    "data": {
+   *      "user": {
+   *        "userName": "rez",
+   *        "password": "1234"
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {String} data.token JSON Web Token. To be used in the Authorization header
+   * @apiSuccessExample {json} Success-Response:
+   *  {
+   *    "data": {
+   *      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+   *    }
+   *  }
+   */
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { user: { userName: true, password: true } } })) {
       res.status(400).json({

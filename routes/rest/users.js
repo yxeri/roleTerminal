@@ -30,6 +30,34 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle() {
+  /**
+   * @api {get} /users Retrieve all users
+   * @apiName GetUsers
+   * @apiGroup Users
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve all users
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.message Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "users": [
+   *        {
+   *          "userName": "rez",
+   *          "team": "n4",
+   *          "online": true
+   *        },
+   *        {
+   *          "userName": "raz",
+   *          "online": false
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {
@@ -85,6 +113,57 @@ function handle() {
     });
   });
 
+  /**
+   * @api {post} /users Create a user
+   * @apiName CreateUser
+   * @apiGroup Users
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create a user
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.user User
+   * @apiParam {String} data.user.userName - Name of the user
+   * @apiParam {String} data.user.password - Password of the user
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "user": {
+   *        "userName": "rez",
+   *        "password": "password"
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object[]} data.users User created
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "users": [
+   *        {
+   *          "userName": "bb6",
+   *          "registerDevice": "RESTAPI",
+   *          "mode": "cmd",
+   *          "_id": "5815d6df93a4fb3300e14a4f",
+   *          "authGroups": [],
+   *          "online": false,
+   *          "banned": false,
+   *          "verified": false,
+   *          "rooms": [
+   *            "public",
+   *            "important",
+   *            "broadcast",
+   *            "morse"
+   *          ],
+   *          "visibility": "1",
+   *          "accessLevel": "1"
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { user: { userName: true, password: true } } })) {
       res.status(400).json({
@@ -176,6 +255,26 @@ function handle() {
     });
   });
 
+  /**
+   * @api {get} /users/:id Retrieve a specific user
+   * @apiName GetUser
+   * @apiGroup Users
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve a specific user
+   *
+   * @apiParam {String} id
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.user Found user. Empty if no user was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "users": []
+   *    }
+   *  }
+   */
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     jwt.verify(req.headers.authorization || '', appConfig.jsonKey, (jwtErr, decoded) => {

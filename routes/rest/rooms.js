@@ -31,6 +31,27 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle(io) {
+  /**
+   * @api {get} /rooms Retrieve all rooms
+   * @apiName GetRooms
+   * @apiGroup Rooms
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve all rooms available to your user
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.rooms Found rooms
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "rooms": [
+   *        "public",
+   *        "bb1"
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/', (req, res) => {
     // noinspection JSUnresolvedVariable
     const auth = req.headers.authorization;
@@ -78,6 +99,41 @@ function handle(io) {
     });
   });
 
+  /**
+   * @api {get} /rooms/:id Retrieve specific room
+   * @apiName GetRoom
+   * @apiGroup Rooms
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Retrieve a specific room, based on sent room name
+   *
+   * @apiParam {String} id Name of the room to retrieve
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.rooms Found room. Empty if no room was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "rooms": [
+   *        {
+   *          "_id": "5800ab3023e8ae3300b1548a",
+   *          "roomName": "bb1",
+   *          "owner": "rez",
+   *          "bannedUsers": [
+   *            "a1",
+   *          ],
+   *          "admins": [
+   *            "rez2"
+   *          ],
+   *          "commands": [],
+   *          "visibility": 1,
+   *          "accessLevel": 1
+   *        }
+   *      ]
+   *    }
+   *  }
+   */
   router.get('/:id', (req, res) => {
     // noinspection JSUnresolvedVariable
     const auth = req.headers.authorization;
@@ -125,6 +181,49 @@ function handle(io) {
     });
   });
 
+  /**
+   * @api {post} /rooms Create a room
+   * @apiName CreateRoom
+   * @apiGroup Rooms
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create a room
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.room Room
+   * @apiParam {String} data.room.roomName Name of the room to create
+   * @apiParam {String} [data.room.password] Password for the room. Leave unset if you don't want to password-protect the room
+   * @apiParam {Number} [data.room.visibility] Minimum access level required to see the room. 0 = anonymous. 1 = registered user. Default is 1.
+   * @apiParam {Number} [data.room.accessLevel] Minimum access level required to follow the room. 0 = anonymous. 1 = registered user. Default is 1.
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "room": {
+   *        "roomName": "bb1",
+   *        "accessLevel": 0
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.message Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "room": {
+   *        "roomName": "bb1",
+   *        "owner": "rez",
+   *        "bannedUsers": [],
+   *        "admins": [],
+   *        "commands": [],
+   *        "visibility": 1,
+   *        "accessLevel": 0,
+   *        password: false
+   *      }
+   *    }
+   *  }
+   */
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { room: { roomName: true } } })) {
       res.status(400).json({
@@ -163,7 +262,7 @@ function handle(io) {
       }
 
       const newRoom = req.body.data.room;
-      newRoom.roomName = newRoom.toLowerCase();
+      newRoom.roomName = newRoom.roomName.toLowerCase();
       newRoom.owner = decoded.data.userName.toLowerCase();
 
       manager.createRoom(newRoom, decoded.data, (errRoom, room) => {
@@ -184,6 +283,41 @@ function handle(io) {
     });
   });
 
+  /**
+   * @api {post} /rooms/follow Follow a room
+   * @apiName FollowRoom
+   * @apiGroup Rooms
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create and send a message to a room
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.room Room
+   * @apiParam {String} data.room.roomName Name of the room to follow
+   * @apiParam {String} [data.room.password] Password of the room to follow
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "room": {
+   *        "roomName": "bb1",
+   *        "password": "password"
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.room Room
+   * @apiSuccess {String} data.room.roomName Name of the room that is followed
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "room": {
+   *        "roomName": "bb1"
+   *      }
+   *    }
+   *  }
+   */
   router.post('/follow', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { room: { roomName: true } } })) {
       res.status(400).json({

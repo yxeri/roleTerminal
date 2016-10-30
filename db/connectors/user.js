@@ -200,7 +200,7 @@ function authUser(userName, password, callback) {
  */
 function getUser(userName, callback) {
   const query = { userName };
-  const filter = { _id: 0, password: 0 };
+  const filter = { password: 0 };
 
   User.findOne(query, filter).lean().exec((err, foundUser) => {
     if (err) {

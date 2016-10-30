@@ -29,6 +29,47 @@ const router = new express.Router();
  * @returns {Object} Router
  */
 function handle(io) {
+  /**
+   * @api {post} /messages Create and send a message
+   * @apiName CreateMessage
+   * @apiGroup Messages
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create and send a message to a room
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.message Message
+   * @apiParam {String} data.message.roomName Name of the room to send the message to
+   * @apiParam {String[]} data.message.text Content of the message
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "text": [
+   *          "Hello world!"
+   *        ]
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.message Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "text": [
+   *          "Hello world!"
+   *        ],
+   *        "userName": "rez",
+   *        "time": "2016-10-28T22:42:06.262Z"
+   *      }
+   *    }
+   *  }
+   */
   router.post('/', (req, res) => {
     if (!objectValidator.isValidData(req.body, { data: { message: { roomName: true, text: true } } })) {
       res.status(400).json({

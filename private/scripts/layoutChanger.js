@@ -102,6 +102,7 @@ function splitView(shouldSplit, secondDiv, resizeCallback) {
     mainView.classList.remove('halfHeight');
     secondDiv.classList.remove('halfWidth');
     secondDiv.classList.remove('halfHeight');
+    domManipulator.removeMenuItem('viewChanger');
   }
 
   /**

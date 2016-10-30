@@ -64,41 +64,57 @@ commands.invitations = {
         commandHandler.resetCommand(false);
       }
     },
-    (phrases) => {
-      if (phrases.length > 1) {
-        const itemNumber = phrases[0] - 1;
-        const answer = phrases[1].toLowerCase();
-        const invitation = commandHandler.commandHelper.data.invitations[itemNumber];
-
-        if (['accept', 'a', 'decline', 'd'].indexOf(answer) > -1) {
-          const accepted = ['accept', 'a'].indexOf(answer) > -1;
-          const data = { accepted, invitation };
-
-          switch (invitation.invitationType) {
-            case 'team': {
-              socketHandler.emit('teamAnswer', data);
-
-              break;
-            }
-            case 'room': {
-              socketHandler.emit('roomAnswer', data);
-
-              break;
-            }
-            default: {
-              break;
-            }
-          }
-
-          commandHandler.resetCommand(false);
-        } else {
-          messenger.queueMessage({
-            text: ['You have to either accept or decline the invitation'],
-            text_se: ['Ni måste antingen acceptera eller avböja inbjudan'],
-          });
-        }
-      } else {
+    (phrases = []) => {
+      if (phrases.length <= 1) {
         commandHandler.resetCommand(true);
+
+        return;
+      }
+
+      const allowed = ['accept', 'a', 'decline', 'd'];
+      const answer = phrases[1].toLowerCase();
+
+      if (allowed.indexOf(answer) === -1) {
+        messenger.queueMessage({
+          text: ['You have to either accept or decline the invitation'],
+          text_se: ['Ni måste antingen acceptera eller avböja inbjudan'],
+        });
+
+        return;
+      }
+
+      const itemNumber = phrases[0] - 1;
+      const invitation = commandHandler.commandHelper.data.invitations[itemNumber];
+      const data = {
+        invitation,
+        accepted: allowed.slice(0, 2).indexOf(answer) > -1,
+      };
+
+      switch (invitation.invitationType) {
+        case 'team': {
+          socketHandler.emit('teamAnswer', data);
+          commandHandler.resetCommand(false);
+
+          break;
+        }
+        case 'room': {
+          socketHandler.emit('roomAnswer', data, ({ error }) => {
+            if (error) {
+              commandHandler.resetCommand(true);
+
+              return;
+            }
+
+            commandHandler.resetCommand(false);
+          });
+
+          break;
+        }
+        default: {
+          commandHandler.resetCommand(true);
+
+          break;
+        }
       }
     },
   ],

@@ -23,6 +23,7 @@ const textTools = require('./textTools');
 const messenger = require('./messenger');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
+const roomhandler = require('./roomHandler');
 
 /**
  * @static
@@ -98,11 +99,17 @@ commands.invitations = {
           break;
         }
         case 'room': {
-          socketHandler.emit('roomAnswer', data, ({ error }) => {
+          socketHandler.emit('roomAnswer', data, ({ error, room, message }) => {
             if (error) {
               commandHandler.resetCommand(true);
 
               return;
+            }
+
+            if (room) {
+              roomhandler.onFollow(room);
+            } else if (message) {
+              messenger.queueMessage(message);
             }
 
             commandHandler.resetCommand(false);

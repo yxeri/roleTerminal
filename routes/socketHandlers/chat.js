@@ -31,30 +31,29 @@ const objectValidator = require('../../utils/objectValidator');
  * Follow a new room on the socket
  * @param {Object} params - Parameters
  * @param {Object} params.socket - Socket.IO socket
- * @param {Object} params.newRoom - New room to follow
+ * @param {Object} params.room - New room to follow
  * @param {string} params.userName - Name of the new user following the room
  * @param {Function} params.callback - Callback
  */
-function followRoom({ socket, newRoom, userName, callback }) {
-  const newRoomName = newRoom.roomName;
+function followRoom({ socket, room, userName, callback }) {
+  const roomName = room.roomName;
 
-  if (Object.keys(socket.rooms).indexOf(newRoomName) < 0) {
+  if (Object.keys(socket.rooms).indexOf(roomName) < 0) {
     messenger.sendMsg({
       socket,
       message: {
         userName: 'SYSTEM',
-        text: [`${userName} started following ${newRoomName}`],
-        text_se: [`${userName} började följa ${newRoomName}`],
-        roomName: newRoomName,
+        text: [`${userName} started following ${roomName}`],
+        text_se: [`${userName} började följa ${roomName}`],
+        roomName,
       },
-      sendTo: newRoomName,
+      sendTo: roomName,
     });
   }
 
-  socket.join(newRoomName);
-  // TODO Follow emit should just be handled by callback on client
-  socket.emit('follow', { room: newRoom });
-  callback({ room: newRoom });
+  socket.join(roomName);
+  console.log(room);
+  callback({ room });
 }
 
 /**
@@ -179,7 +178,7 @@ function handle(socket, io) {
           return;
         }
 
-        followRoom({ socket, userName: user.userName, newRoom: createdRoom, callback });
+        followRoom({ socket, userName: user.userName, room: createdRoom, callback });
       });
     });
   });
@@ -187,7 +186,6 @@ function handle(socket, io) {
   socket.on('follow', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
-      socket.emit('commandFail');
 
       return;
     }
@@ -195,7 +193,6 @@ function handle(socket, io) {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.follow.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         callback({ error: {} });
-        socket.emit('commandFail');
 
         return;
       }
@@ -216,7 +213,6 @@ function handle(socket, io) {
               text_se: [`Ni har inte tillåtelse att gå in i rummet ${modifiedRoom.roomName}`],
             },
           });
-          socket.emit('commandFail');
 
           return;
         }
@@ -234,12 +230,11 @@ function handle(socket, io) {
               text: [`Failed to follow ${modifiedRoom.roomName}`],
               err: roomErr,
             });
-            socket.emit('commandFail');
 
             return;
           }
 
-          followRoom({ socket, userName: user.userName, newRoom: modifiedRoom, callback });
+          followRoom({ socket, userName: user.userName, room: modifiedRoom, callback });
         });
       });
     });
@@ -266,10 +261,9 @@ function handle(socket, io) {
       }
 
       if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
-        socket.emit('follow', { room });
+        callback({ room });
       } else {
-        messenger.sendSelfMsg({
-          socket,
+        callback({
           message: {
             text: [`You are not following room ${roomName}`],
             text_se: [`Ni följer inte rummet ${roomName}`],
@@ -279,13 +273,17 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('unfollow', (params) => {
+  socket.on('unfollow', (params, callback) => {
     if (!objectValidator.isValidData(params, { room: { roomName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.unfollow.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -302,13 +300,7 @@ function handle(socket, io) {
         if (roomName !== userName) {
           dbUser.removeRoomFromUser(userName, roomName, (err, removedUser) => {
             if (err || removedUser === null) {
-              logger.sendSocketErrorMsg({
-                socket,
-                code: logger.ErrorCodes.db,
-                text: ['Failed to unfollow room'],
-                text_se: ['Misslyckades med att följa rummet'],
-                err,
-              });
+              callback({ error: {} });
 
               return;
             }
@@ -323,12 +315,11 @@ function handle(socket, io) {
               sendTo: roomName,
             });
             socket.leave(roomName);
-            socket.emit('unfollow', { room: params.room });
+            callback({ room: params.room });
           });
         }
       } else {
-        messenger.sendSelfMsg({
-          socket,
+        callback({
           message: {
             text: [`You are not following ${roomName}`],
             text_se: [`Ni följer inte ${roomName}`],
@@ -572,6 +563,8 @@ function handle(socket, io) {
 
   socket.on('removeRoom', ({ room }, callback) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
@@ -586,13 +579,6 @@ function handle(socket, io) {
 
       dbRoom.removeRoom(roomNameLower, user, (err, removedRoom) => {
         if (err || removedRoom === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: ['Failed to remove the room'],
-            text_se: ['Misslyckades med att ta bort rummet'],
-            err,
-          });
           callback({ error: {} });
 
           return;
@@ -600,13 +586,9 @@ function handle(socket, io) {
 
         dbUser.removeRoomFromAllUsers(roomNameLower, (roomErr) => {
           if (roomErr) {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.db,
-              text: ['Failed to remove room from all users'],
-              text_se: ['Misslyckades med att ta bort rummet från alla användare'],
-              err: roomErr,
-            });
+            callback({ error: {} });
+
+            return;
           }
 
           const connectedIds = Object.keys(io.sockets.adapter.rooms[roomNameLower].sockets);
@@ -619,7 +601,6 @@ function handle(socket, io) {
           }
 
           socket.broadcast.to(roomNameLower).emit('unfollow', { room });
-          socket.emit('unfollow', { room });
         });
 
         messenger.sendMsg({
@@ -631,7 +612,7 @@ function handle(socket, io) {
           },
           sendTo: roomNameLower,
         });
-        callback({});
+        callback({ room });
       });
     });
   });
@@ -751,11 +732,13 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialMyRoom', (params) => {
+  socket.on('matchPartialMyRoom', (params, callback) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -775,29 +758,24 @@ function handle(socket, io) {
         }
       }
 
-      if (itemList.length === 1) {
-        socket.emit('matchFound', { matchedName: itemList[0] });
-      } else {
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: [itemList.join(' - ')],
-          },
-        });
-      }
+      callback({ matched: itemList });
     });
   });
 
-  socket.on('matchPartialRoom', (params) => {
+  socket.on('matchPartialRoom', (params, callback) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       dbRoom.matchPartialRoom(params.partialName, user, (err, rooms) => {
         if (err) {
+          callback({ error: {} });
+
           return;
         }
 
@@ -808,16 +786,7 @@ function handle(socket, io) {
           itemList.push(rooms[roomKeys[i]].roomName);
         }
 
-        if (itemList.length === 1) {
-          socket.emit('matchFound', { matchedName: itemList[0] });
-        } else {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [itemList.join(' - ')],
-            },
-          });
-        }
+        callback({ matched: itemList });
       });
     });
   });
@@ -916,7 +885,7 @@ function handle(socket, io) {
           followRoom({
             socket,
             userName,
-            newRoom: { roomName },
+            room: { roomName },
             callback,
           });
           dbConnector.removeInvitationFromList(userName, roomName, modifiedInvitation.invitationType, () => {

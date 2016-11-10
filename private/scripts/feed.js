@@ -25,6 +25,7 @@ const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
 const clickHandler = require('./clickHandler');
 const videoPlayer = require('./videoPlayer');
+const roomHandler = require('./roomHandler');
 
 /**
  * Queue of all the commands used by the user that will be handled and printed
@@ -119,23 +120,6 @@ function pushCommandHistory(command) {
 
   commandHistory.push(command);
   storage.setCommandHistory(commandHistory);
-}
-
-/**
- * Sets room as the new default room
- * @param {string} roomName - Name of the new room
- */
-function enterRoom(roomName) {
-  storage.setRoom(roomName);
-
-  if (!storage.getStaticInputStart()) {
-    domManipulator.setInputStart(roomName);
-  }
-
-  messenger.queueMessage({
-    text: [`Entered ${roomName}`],
-    text_se: [`Gick in i ${roomName}`],
-  });
 }
 
 /**
@@ -832,6 +816,26 @@ function scrollText(amount) {
 }
 
 /**
+ * Match found callback
+ * @param {Object} error - Error. Will be set if something went wrong
+ * @param {Object} params - Parameters
+ * @param {string[]} params.matched - Found match/matches
+ */
+function matchFound({ error, matched = [''] }) {
+  if (error) {
+    return;
+  }
+
+  if (matched.length > 1) {
+    messenger.queueMessage({
+      text: [matched.join(' - ')],
+    });
+  } else {
+    domManipulator.replaceLastInputPhrase(`${matched[0]} `);
+  }
+}
+
+/**
  * Auto-completes depending on current input
  */
 function autoComplete() {
@@ -854,17 +858,17 @@ function autoComplete() {
 
       switch (command.autocomplete.type) {
         case 'users': {
-          socketHandler.emit('matchPartialUser', { partialName: partial });
+          socketHandler.emit('matchPartialUser', { partialName: partial }, matchFound);
 
           break;
         }
         case 'rooms': {
-          socketHandler.emit('matchPartialRoom', { partialName: partial });
+          socketHandler.emit('matchPartialRoom', { partialName: partial }, matchFound);
 
           break;
         }
         case 'myRooms': {
-          socketHandler.emit('matchPartialMyRoom', { partialName: partial });
+          socketHandler.emit('matchPartialMyRoom', { partialName: partial }, matchFound);
 
           break;
         }
@@ -1344,45 +1348,6 @@ function onDisconnect() {
 }
 
 /**
- * Called on follow emit
- * @param {Object} room - Room
- */
-function onFollow({ room = {} }) {
-  if (room.entered) {
-    enterRoom(room.roomName);
-  } else {
-    messenger.queueMessage({
-      text: [`Following ${room.roomName}`],
-      text_se: [`Följer ${room.roomName}`],
-    });
-  }
-}
-
-/**
- * Called on unfollow emit
- * @param {Object} room - Room
- * @param {string} room.roomName - Name of the room that was unfollowed
- * @param {boolean} [silent] - Should the room notification be surpressed?
- */
-function onUnfollow({ room = { roomName: '' }, silent }) {
-  if (!silent) {
-    messenger.queueMessage({
-      text: [`Stopped following ${room.roomName}`],
-      text_se: [`Slutade följa ${room.roomName}`],
-    });
-  }
-
-  if (room.roomName === storage.getRoom()) {
-    socketHandler.emit('follow', {
-      room: {
-        roomName: 'public',
-        entered: true,
-      },
-    });
-  }
-}
-
-/**
  * Called on login emit. Sets users info and starts map
  * @param {Object} params - Parameters
  * @param {Object} params.user - User information
@@ -1608,15 +1573,6 @@ function onList(params = {}) {
 }
 
 /**
- * Called on matchFound emit
- * @param {Object} params - Parameters
- * @param {string} params.matchedName - Found match
- */
-function onMatchFound(params = { matchedName: '' }) {
-  domManipulator.replaceLastInputPhrase(`${params.matchedName} `);
-}
-
-/**
  * Called on mapPositions emit. Adds new map positions
  * @param {Object} params - Parameters
  * @param {Object[]} params.positions - New map positions
@@ -1833,8 +1789,8 @@ socketHandler.startSocket({
   importantMsg: messenger.onImportantMsg,
   reconnect: onReconnect,
   disconnect: onDisconnect,
-  follow: onFollow,
-  unfollow: onUnfollow,
+  follow: roomHandler.onFollow,
+  unfollow: roomHandler.onUnfollow,
   login: onLogin,
   commandSuccess: onCommandSuccess,
   commandFail: onCommandFail,
@@ -1846,7 +1802,6 @@ socketHandler.startSocket({
   updateCommands: onUpdateCommands,
   updateDeviceId: onUpdateDeviceId,
   list: onList,
-  matchFound: onMatchFound,
   startup: onStartup,
   mapPositions: onMapPositions,
   videoMessage: onVideoMessage,

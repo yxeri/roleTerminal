@@ -114,8 +114,6 @@ function collectCommands() {
 
       if (!commands[command]) {
         commands[command] = cmdCollection[command];
-      } else {
-        // console.log(`Command ${command} already exists in a collection outside ${cmdCollection}`);
       }
     }
   }

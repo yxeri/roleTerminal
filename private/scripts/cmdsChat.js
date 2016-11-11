@@ -632,13 +632,14 @@ commands.follow = {
         commandHelper.data.room.password = phrases[0];
       }
 
-      socketHandler.emit('follow', { room: commandHelper.data.room }, ({ error }) => {
+      socketHandler.emit('follow', { room: commandHelper.data.room }, ({ error, room }) => {
         if (error) {
           commandHandler.resetCommand(true);
 
           return;
         }
 
+        messenger.queueMessage({ text: [`You started following ${room.roomName}`] });
         commandHandler.resetCommand(false);
       });
     },
@@ -652,21 +653,21 @@ commands.follow = {
 commands.unfollow = {
   func: (phrases) => {
     if (phrases.length > 0) {
-      const room = {
+      const unfollowedRoom = {
         roomName: phrases[0].toLowerCase(),
       };
 
-      if (room.roomName === storage.getRoom()) {
-        room.exited = true;
+      if (unfollowedRoom.roomName === storage.getRoom()) {
+        unfollowedRoom.exited = true;
       }
 
-      socketHandler.emit('unfollow', { room }, ({ error, unfollowedRoom, message }) => {
+      socketHandler.emit('unfollow', { room: unfollowedRoom }, ({ error, room, message }) => {
         if (error) {
           return;
         }
 
-        if (unfollowedRoom) {
-          roomhandler.onUnfollow({ room: unfollowedRoom });
+        if (room) {
+          roomhandler.onUnfollow({ room });
         } else if (message) {
           messenger.queueMessage(message);
         }

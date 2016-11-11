@@ -272,8 +272,8 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('unfollow', (params, callback) => {
-    if (!objectValidator.isValidData(params, { room: { roomName: true } })) {
+  socket.on('unfollow', ({ room }, callback) => {
+    if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
 
       return;
@@ -287,7 +287,7 @@ function handle(socket, io) {
       }
 
       // TODO Move toLowerCase to class
-      const roomName = params.room.roomName.toLowerCase();
+      const roomName = room.roomName.toLowerCase();
 
       if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
         const userName = user.userName;
@@ -314,7 +314,7 @@ function handle(socket, io) {
               sendTo: roomName,
             });
             socket.leave(roomName);
-            callback({ room: params.room });
+            callback({ room });
           });
         }
       } else {

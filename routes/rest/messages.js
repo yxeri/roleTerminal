@@ -21,14 +21,89 @@ const appConfig = require('../../config/defaults/config').app;
 const jwt = require('jsonwebtoken');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
+const dbUser = require('../../db/connectors/user');
 
 const router = new express.Router();
+
+/**
+ * Send chat message
+ * @param {Object} params.message - Message to send
+ * @param {Object} params.io - Socket.IO
+ * @param {Object} params.user - User sending the message
+ * @param {Object} params.response - Response object
+ */
+function sendMsg({ message, io, user, response }) {
+  messenger.sendChatMsg({
+    message,
+    io,
+    user,
+    callback: ({ error, data }) => {
+      if (error) {
+        response.status(500).json({
+          errors: [{
+            status: 500,
+            title: 'Internal Server Error',
+            detail: 'Internal Server Error',
+          }],
+        });
+
+        return;
+      }
+
+      response.json({ data: { message: data.message } });
+    },
+  });
+}
 
 /**
  * @param {object} io - Socket.IO
  * @returns {Object} Router
  */
 function handle(io) {
+  /**
+   * @api {post} /messages Create and send a message
+   * @apiVersion 5.0.2
+   * @apiName CreateMessage
+   * @apiGroup Messages
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create and send a message to a room
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.message Message
+   * @apiParam {String} data.message.roomName Name of the room to send the message to
+   * @apiParam {String} [data.message.userName] Name of the sender. Default is your user name. You can instead set it to one of your user's aliases
+   * @apiParam {String[]} data.message.text Content of the message
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "userName": "rez",
+   *        "text": [
+   *          "Hello world!"
+   *        ]
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.message Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "text": [
+   *          "Hello world!"
+   *        ],
+   *        "userName": "rez",
+   *        "time": "2016-10-28T22:42:06.262Z"
+   *      }
+   *    }
+   *  }
+   */
   /**
    * @api {post} /messages Create and send a message
    * @apiVersion 5.0.1
@@ -109,14 +184,10 @@ function handle(io) {
       }
 
       const message = req.body.data.message;
-      message.userName = decoded.data.userName;
 
-      messenger.sendChatMsg({
-        message,
-        io,
-        user: decoded.data,
-        callback: ({ error, data }) => {
-          if (error) {
+      if (message.userName) {
+        dbUser.getUserByAlias(message.userName, (err, user) => {
+          if (err) {
             res.status(500).json({
               errors: [{
                 status: 500,
@@ -126,11 +197,25 @@ function handle(io) {
             });
 
             return;
+          } else if (user === null || user.userName !== decoded.data.userName) {
+            res.status(401).json({
+              errors: [{
+                status: 401,
+                title: 'Invalid user alias',
+                detail: 'Your user does not own the sent user alias',
+              }],
+            });
+
+            return;
           }
 
-          res.json({ data: { message: data.message } });
-        },
-      });
+          sendMsg({ io, response: res, message, user: decoded.data });
+        });
+      } else {
+        message.userName = decoded.data.userName;
+
+        sendMsg({ io, response: res, message, user: decoded.data });
+      }
     });
   });
 

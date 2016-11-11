@@ -844,31 +844,26 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialUser', (params) => {
+  socket.on('matchPartialUser', (params, callback) => {
     // params.partialName is not checked if it set, to allow the retrieval of all users on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
       dbUser.matchPartialUser(params.partialName, user, (err, users) => {
         if (err) {
+          callback({ error: {} });
+
           return;
         }
 
         const itemList = Object.keys(users).map(userKey => users[userKey].userName);
 
-        if (itemList.length === 1) {
-          socket.emit('matchFound', { matchedName: itemList[0] });
-        } else {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [itemList.join(' - ')],
-            },
-          });
-        }
+        callback({ matched: itemList });
       });
     });
   });

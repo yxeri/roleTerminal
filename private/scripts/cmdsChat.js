@@ -23,6 +23,7 @@ const socketHandler = require('./socketHandler');
 const messenger = require('./messenger');
 const commandHandler = require('./commandHandler');
 const domManipulator = require('./domManipulator');
+const roomhandler = require('./roomHandler');
 
 /**
  * @static
@@ -65,6 +66,7 @@ function createRoomCallback({ error, room }) {
       text: ['Room has been created'],
       text_se: ['Rummet har skapats'],
     });
+    roomhandler.onFollow({ room });
     commandHandler.resetCommand(false);
   }
 }
@@ -388,9 +390,15 @@ commands.room = {
          */
         data.room.entered = true;
 
-        socketHandler.emit('switchRoom', data, ({ error }) => {
+        socketHandler.emit('switchRoom', data, ({ error, room, message }) => {
           if (error) {
             return;
+          }
+
+          if (room) {
+            roomhandler.onFollow({ room });
+          } else if (message) {
+            messenger.queueMessage(message);
           }
         });
       }
@@ -439,15 +447,18 @@ commands.removeroom = {
   steps: [
     (phrases) => {
       if (phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error }) => {
+        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error, room }) => {
           if (error) {
             return;
           }
 
-          messenger.queueMessage({
-            text: ['Removed the room'],
-            text_se: ['Rummet borttaget'],
-          });
+          if (room) {
+            roomhandler.onUnfollow({ room });
+            messenger.queueMessage({
+              text: ['Removed the room'],
+              text_se: ['Rummet borttaget'],
+            });
+          }
         });
       }
 
@@ -649,7 +660,17 @@ commands.unfollow = {
         room.exited = true;
       }
 
-      socketHandler.emit('unfollow', { room });
+      socketHandler.emit('unfollow', { room }, ({ error, unfollowedRoom, message }) => {
+        if (error) {
+          return;
+        }
+
+        if (unfollowedRoom) {
+          roomhandler.onUnfollow({ room: unfollowedRoom });
+        } else if (message) {
+          messenger.queueMessage(message);
+        }
+      });
     } else {
       messenger.queueMessage({
         text: ['You have to specify which room to unfollow'],

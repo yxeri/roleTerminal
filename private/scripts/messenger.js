@@ -198,14 +198,14 @@ function linkRoom(elem) {
  * Creates and returns a li element
  * @private
  * @param {Object} message - Message
- * @param {boolean} message.extraClass - CSS class name
- * @param {string} message.roomName - Receiving room name
- * @param {Date} message.time - Time sent
- * @param {boolean} message.hideName - Should the name of the sender be hidden?
- * @param {Object} message.msgAnimation - Animation on print and/or interval
- * @param {boolean} message.msgAnimation.instantAnimation - Should the animation start playing instantly?
- * @param {boolean} message.msgAnimation.fixedAnimationSpeed - Should the animation always be the same? False will randomise the animation style
- * @param {string} subText - Text shown during some animations
+ * @param {boolean} [message.extraClass] - CSS class name
+ * @param {string} [message.roomName] - Receiving room name
+ * @param {Date} [message.time] - Time sent
+ * @param {boolean} [message.hideName] - Should the name of the sender be hidden?
+ * @param {Object} [message.msgAnimation] - Animation on print and/or interval
+ * @param {boolean} [message.msgAnimation.instantAnimation] - Should the animation start playing instantly?
+ * @param {boolean} [message.msgAnimation.fixedAnimationSpeed] - Should the animation always be the same? False will randomise the animation style
+ * @param {string} [subText] - Text shown during some animations
  * @returns {HTMLElement} - Created li element
  */
 function createRow(message, subText) {

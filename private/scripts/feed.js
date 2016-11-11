@@ -1750,6 +1750,8 @@ function onStartup(params = { }) {
           userName: 'NO_USER_LOGGED_IN',
         },
       });
+    } else {
+      domManipulator.setUserName(storage.getUser());
     }
 
     socketHandler.emit('updateId', {

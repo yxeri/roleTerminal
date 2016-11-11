@@ -32,6 +32,7 @@ const router = new express.Router();
 function handle() {
   /**
    * @api {get} /users Retrieve all users
+   * @apiVersion 5.0.1
    * @apiName GetUsers
    * @apiGroup Users
    *
@@ -115,6 +116,7 @@ function handle() {
 
   /**
    * @api {post} /users Create a user
+   * @apiVersion 5.0.1
    * @apiName CreateUser
    * @apiGroup Users
    *
@@ -257,6 +259,7 @@ function handle() {
 
   /**
    * @api {get} /users/:id Retrieve a specific user
+   * @apiVersion 5.0.1
    * @apiName GetUser
    * @apiGroup Users
    *

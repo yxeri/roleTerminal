@@ -33,6 +33,7 @@ const router = new express.Router();
 function handle(io) {
   /**
    * @api {get} /rooms Retrieve all rooms
+   * @apiVersion 5.0.1
    * @apiName GetRooms
    * @apiGroup Rooms
    *
@@ -101,6 +102,7 @@ function handle(io) {
 
   /**
    * @api {get} /rooms/:id Retrieve specific room
+   * @apiVersion 5.0.1
    * @apiName GetRoom
    * @apiGroup Rooms
    *
@@ -183,6 +185,7 @@ function handle(io) {
 
   /**
    * @api {post} /rooms Create a room
+   * @apiVersion 5.0.1
    * @apiName CreateRoom
    * @apiGroup Rooms
    *
@@ -285,6 +288,7 @@ function handle(io) {
 
   /**
    * @api {post} /rooms/follow Follow a room
+   * @apiVersion 5.0.1
    * @apiName FollowRoom
    * @apiGroup Rooms
    *

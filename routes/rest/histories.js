@@ -30,6 +30,7 @@ const router = new express.Router();
 function handle() {
   /**
    * @api {get} /histories Retrieve history from all rooms
+   * @apiVersion 5.0.1
    * @apiName GetHistories
    * @apiGroup Histories
    *
@@ -126,6 +127,7 @@ function handle() {
 
   /**
    * @api {get} /histories/:id Retrieve history from specific room
+   * @apiVersion 5.0.1
    * @apiName GetHistory
    * @apiGroup Histories
    *

@@ -31,6 +31,7 @@ const router = new express.Router();
 function handle(io) {
   /**
    * @api {post} /messages Create and send a message
+   * @apiVersion 5.0.1
    * @apiName CreateMessage
    * @apiGroup Messages
    *

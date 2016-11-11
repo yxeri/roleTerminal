@@ -830,7 +830,7 @@ function matchFound({ error, matched = [''] }) {
     messenger.queueMessage({
       text: [matched.join(' - ')],
     });
-  } else {
+  } else if (matched[0]) {
     domManipulator.replaceLastInputPhrase(`${matched[0]} `);
   }
 }

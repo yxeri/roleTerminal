@@ -732,7 +732,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialMyRoom', (params, callback) => {
+  socket.on('matchPartialMyRoom', ({ partialName }, callback) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
@@ -744,7 +744,6 @@ function handle(socket, io) {
 
       const itemList = [];
       const rooms = user.rooms;
-      const partialName = params.partialName;
 
       if (user.team) {
         rooms.push('team');
@@ -753,7 +752,7 @@ function handle(socket, io) {
       for (let i = 0; i < rooms.length; i += 1) {
         const room = rooms[i];
 
-        if (!shouldBeHidden(room, socket.id) && (!params.partialName || room.indexOf(partialName) === 0)) {
+        if (!shouldBeHidden(room, socket.id) && (!partialName || room.indexOf(partialName) === 0)) {
           itemList.push(room);
         }
       }
@@ -762,7 +761,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialRoom', (params, callback) => {
+  socket.on('matchPartialRoom', ({ partialName }, callback) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
@@ -772,7 +771,7 @@ function handle(socket, io) {
         return;
       }
 
-      dbRoom.matchPartialRoom(params.partialName, user, (err, rooms) => {
+      dbRoom.matchPartialRoom(partialName, user, (err, rooms) => {
         if (err) {
           callback({ error: {} });
 

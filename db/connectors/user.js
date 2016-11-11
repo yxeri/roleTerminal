@@ -750,6 +750,9 @@ function matchPartialUser(partialName, user, callback) {
     user,
     queryType: User,
     callback,
+    type: 'userName',
+  });
+}
   });
 }
 

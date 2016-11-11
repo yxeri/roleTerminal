@@ -298,6 +298,7 @@ function matchPartialRoom(partialName, user, callback) {
     user,
     queryType: Room,
     callback,
+    type: 'roomName',
   });
 }
 

@@ -41,8 +41,6 @@ function enterRoom(roomName) {
  * @param {Object} room - Room
  */
 function onFollow({ room = {} }) {
-  console.log('onFollow', room);
-
   if (room.entered) {
     enterRoom(room.roomName);
   } else {

@@ -52,7 +52,6 @@ function followRoom({ socket, room, userName, callback }) {
   }
 
   socket.join(roomName);
-  console.log(room);
   callback({ room });
 }
 

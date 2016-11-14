@@ -232,11 +232,11 @@ function sendImportantMsg({ socket, message, device, callback }) {
 }
 
 /**
- *
- * @param user
- * @param callback
- * @param message
- * @param io
+ * Store message in history and send to connected clients
+ * @param {Object} params.user - User sending the message
+ * @param {Function} params.callback - Callback
+ * @param {Object} params.message - Message to send
+ * @param {Object} params.io - Socket.io
  */
 function sendAndStoreMsg({ user, callback, message, io }) {
   dbUser.getUser(user.userName, (userErr, foundUser) => {

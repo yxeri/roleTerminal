@@ -761,7 +761,12 @@ function matchPartialUser(partialName, user, callback) {
  * @param {Function} callback - Callback
  */
 function getUserByAlias(alias, callback) {
-  const query = { aliases: { $in: [alias] } };
+  const query = {
+    $or: [
+      { userName: alias },
+      { aliases: { $in: [alias] } },
+    ],
+  };
   const filter = { _id: 0, password: 0 };
 
   User.findOne(query, filter).lean().exec((err, user) => {

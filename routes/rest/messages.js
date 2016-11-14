@@ -21,39 +21,9 @@ const appConfig = require('../../config/defaults/config').app;
 const jwt = require('jsonwebtoken');
 const messenger = require('../../socketHelpers/messenger');
 const objectValidator = require('../../utils/objectValidator');
-const dbUser = require('../../db/connectors/user');
 
 const router = new express.Router();
 
-/**
- * Send chat message
- * @param {Object} params.message - Message to send
- * @param {Object} params.io - Socket.IO
- * @param {Object} params.user - User sending the message
- * @param {Object} params.response - Response object
- */
-function sendMsg({ message, io, user, response }) {
-  messenger.sendChatMsg({
-    message,
-    io,
-    user,
-    callback: ({ error, data }) => {
-      if (error) {
-        response.status(500).json({
-          errors: [{
-            status: 500,
-            title: 'Internal Server Error',
-            detail: 'Internal Server Error',
-          }],
-        });
-
-        return;
-      }
-
-      response.json({ data: { message: data.message } });
-    },
-  });
-}
 
 /**
  * @param {object} io - Socket.IO
@@ -185,9 +155,12 @@ function handle(io) {
 
       const message = req.body.data.message;
 
-      if (message.userName) {
-        dbUser.getUserByAlias(message.userName, (err, user) => {
-          if (err) {
+      messenger.sendChatMsg({
+        io,
+        message,
+        user: decoded.data,
+        callback: ({ error, data }) => {
+          if (error) {
             res.status(500).json({
               errors: [{
                 status: 500,
@@ -197,25 +170,11 @@ function handle(io) {
             });
 
             return;
-          } else if (user === null || user.userName !== decoded.data.userName) {
-            res.status(401).json({
-              errors: [{
-                status: 401,
-                title: 'Invalid user alias',
-                detail: 'Your user does not own the sent user alias',
-              }],
-            });
-
-            return;
           }
 
-          sendMsg({ io, response: res, message, user: decoded.data });
-        });
-      } else {
-        message.userName = decoded.data.userName;
-
-        sendMsg({ io, response: res, message, user: decoded.data });
-      }
+          res.json({ data: { message: data.message } });
+        },
+      });
     });
   });
 

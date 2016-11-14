@@ -92,14 +92,7 @@ function handle(socket, io) {
         return;
       }
 
-      const modifiedMessage = message;
-      modifiedMessage.userName = user.userName;
-
-      if (modifiedMessage.roomName === 'team') {
-        modifiedMessage.roomName = user.team + appConfig.teamAppend;
-      }
-
-      messenger.sendChatMsg({ user, callback, message: modifiedMessage, io });
+      messenger.sendChatMsg({ user, callback, message, io });
     });
   });
 
@@ -307,9 +300,10 @@ function handle(socket, io) {
             messenger.sendMsg({
               socket,
               message: {
+                roomName,
                 text: [`${userName} left ${roomName}`],
                 text_se: [`${userName} lämnade ${roomName}`],
-                roomName,
+                userName: 'SYSTEM',
               },
               sendTo: roomName,
             });

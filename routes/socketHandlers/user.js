@@ -867,6 +867,38 @@ function handle(socket, io) {
       });
     });
   });
+
+  socket.on('matchPartialAlias', ({ partialName }, callback) => {
+    // params.partialAlias is not checked if it set, to allow the retrieval of all aliases on no input
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        callback({ error: {} });
+
+        return;
+      }
+
+      console.log(user);
+
+      let matched = [];
+
+      if (user.aliases) {
+        if (!partialName) {
+          matched = user.aliases;
+        } else {
+          for (const alias of user.aliases) {
+            const aliasRegex = new RegExp(`^${partialName}.*`);
+
+            if (alias.match(aliasRegex)) {
+              matched.push(alias);
+            }
+          }
+        }
+      }
+
+      callback({ matched });
+    });
+  });
 }
 
 exports.handle = handle;

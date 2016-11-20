@@ -872,6 +872,11 @@ function autoComplete() {
 
           break;
         }
+        case 'myAliases': {
+          socketHandler.emit('matchPartialAlias', { partialName: partial }, matchFound);
+
+          break;
+        }
         default: {
           break;
         }

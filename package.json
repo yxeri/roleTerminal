@@ -35,10 +35,9 @@
     "mongodb": "2.1.16",
     "mongoose": "4.4.12",
     "morgan": "1.7.0",
-    "node-sass": "3.10.1",
+    "node-sass": "3.13.0",
     "request": "2.75.0",
     "socket.io": "1.4.5",
-    "uglify-js": "2.7.3",
-    "xml2json": "0.10.0"
+    "uglify-js": "2.7.3"
   }
 }

@@ -1,12 +1,10 @@
-FROM node:7.0.0
+FROM node:7.1.0
 EXPOSE 8888
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # wget is used to retrieve config file in prestart
 RUN apt-get update && apt-get -y install wget && rm -rf /var/lib/apt/lists/*
-COPY package.json /usr/src/app/
-RUN npm install
 
 # Creates directories for scripts, views and styles in public
 RUN mkdir -p /usr/src/app/public/scripts /usr/src/app/public/views /usr/src/app/public/styles
@@ -19,6 +17,8 @@ COPY private/required/ /usr/src/app/public/scripts/
 COPY private/images/ /usr/src/app/public/images/
 
 COPY . /usr/src/app
+
+RUN npm prune && npm install
 
 # Transpiles code to es5 and outputs it to public
 RUN ./node_modules/browserify/bin/cmd.js private/scripts/* -t [ babelify --presets [ es2015 ] --compact='false' ] -o /usr/src/app/public/scripts/bundle.js

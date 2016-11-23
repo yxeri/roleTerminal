@@ -1,5 +1,7 @@
-build:
-	docker build --force-rm -t roleterminal .
+build: node_modules
+	docker build --pull -t roleterminal .
+node_modules:
+	docker run --rm -v "$(PWD):/usr/src/app" -w "/usr/src/app" node:7.1.0 npm install
 rmi:
 	docker rmi roleterminal
 compose:
@@ -11,4 +13,4 @@ logs:
 clean:
 	docker-compose rm --all
 
-.PHONY: build rmi compose open logs
+.PHONY: build node_modules rmi compose open logs

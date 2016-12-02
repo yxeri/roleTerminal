@@ -299,6 +299,15 @@ function addSpecialMapOption(positionName, type, markerId) {
   }
 }
 
+/**
+ * Called on updateCommands emit
+ */
+function onUpdateCommands({ commands: sentCommands = [] }) {
+  for (let i = 0; i < sentCommands.length; i += 1) {
+    updateCommand(sentCommands[i]);
+  }
+}
+
 collectCommands();
 
 exports.triggerCommand = triggerCommand;
@@ -316,3 +325,4 @@ exports.updateCommand = updateCommand;
 exports.commandHelper = commandHelper;
 exports.addSpecialMapOption = addSpecialMapOption;
 exports.addSpecialHelpOptions = addSpecialHelpOptions;
+exports.onUpdateCommands = onUpdateCommands;

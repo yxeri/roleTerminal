@@ -18,7 +18,7 @@
 
 const appConfig = require('../config/defaults/config').app;
 const request = require('request');
-// const xml2json = require('xml2json');
+const xml2json = require('xml2json');
 
 /**
  * Convert xml to json
@@ -26,8 +26,7 @@ const request = require('request');
  * @returns {Object} JSON
  */
 function convertToJson(xml) {
-  // return JSON.parse(xml2json.toJson(xml));
-  return {};
+  return JSON.parse(xml2json.toJson(xml));
 }
 
 /**

@@ -31,11 +31,73 @@ commands.list = {
       const listOption = phrases[0].toLowerCase();
 
       if (listOption === 'rooms') {
-        socketHandler.emit('listRooms');
+        socketHandler.emit('listRooms', ({ error, data: { rooms } }) => {
+          if (error) {
+            return;
+          }
+
+          if (rooms.length > 0) {
+            messenger.queueMessage({
+              text: [rooms.join(' - ')],
+            });
+          } else {
+            messenger.queueMessage({
+              text: ['There are no available rooms'],
+            });
+          }
+        });
       } else if (listOption === 'users') {
-        socketHandler.emit('listUsers');
+        socketHandler.emit('listUsers', ({ error, data: { offlineUsers, onlineUsers } }) => {
+          if (error) {
+            return;
+          }
+
+          if (onlineUsers.length > 0) {
+            messenger.queueMessage({
+              text: [
+                'Online users: ',
+                onlineUsers.join(' - '),
+              ],
+            });
+          }
+
+          if (offlineUsers.length > 0) {
+            messenger.queueMessage({
+              text: [
+                'Other users: ',
+                offlineUsers.join(' - '),
+              ],
+            });
+          }
+        });
       } else if (listOption === 'devices') {
-        socketHandler.emit('listDevices');
+        socketHandler.emit('listDevices', '', ({ error, data: { devices } }) => {
+          if (error) {
+            return;
+          }
+
+          const allDevices = devices.map((device) => {
+            let deviceString = '';
+
+            deviceString += `DeviceID: ${device.deviceId}${'\t'}`;
+
+            if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
+              deviceString += `Alias: ${device.deviceAlias}${'\t'}`;
+            }
+
+            if (device.lastUser && device.lastUser !== null) {
+              deviceString += `Last user: ${device.lastUser}${'\t'}`;
+            }
+
+            if (device.lastAlive && device.lastAlive !== null) {
+              deviceString += `Last alive: ${device.lastAlive}`;
+            }
+
+            return deviceString;
+          });
+
+          messenger.queueMessage({ text: [allDevices] });
+        });
       } else {
         messenger.queueMessage({
           text: [`${listOption} is not a valid type`],

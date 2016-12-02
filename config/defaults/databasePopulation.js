@@ -16,11 +16,12 @@
 
 'use strict';
 
-const config = {};
-let modifiedDatabasePop = {};
+const path = require('path');
+
+let config = {};
 
 try {
-  modifiedDatabasePop = require('../modified/databasePopulation').databasePopulation; // eslint-disable-line import/no-unresolved, global-require
+  config = require(path.join(__dirname, 'config', 'databasePopulation')).config; // eslint-disable-line import/no-unresolved, global-require, import/no-dynamic-require
 } catch (err) {
   console.log('Did not find modified databasePopulation. Using defaults');
 }
@@ -44,10 +45,11 @@ function generatePass() {
 }
 
 // To avoid undefined if rooms and commands haven't been changed
-modifiedDatabasePop.rooms = modifiedDatabasePop.rooms ? modifiedDatabasePop.rooms : {};
-modifiedDatabasePop.commands = modifiedDatabasePop.commands ? modifiedDatabasePop.commands : {};
+config.rooms = config.rooms || {};
+config.commands = config.commands || {};
+config.users = config.users || {};
 
-config.accessLevels = {
+config.accessLevels = config.accessLevels || {
   god: 13,
   superUser: 12,
   admin: 11,
@@ -63,7 +65,7 @@ config.accessLevels = {
  */
 config.rooms = {
   // General chat room, available for every user
-  public: modifiedDatabasePop.rooms.public || {
+  public: config.rooms.public || {
     roomName: 'public',
     visibility: config.accessLevels.anonymous,
     accessLevel: config.accessLevels.anonymous,
@@ -74,7 +76,7 @@ config.rooms = {
    * Used to store messages labeled as important.
    * Not used as an ordinary chat room
    */
-  important: modifiedDatabasePop.rooms.important || {
+  important: config.rooms.important || {
     roomName: 'important',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
@@ -84,7 +86,7 @@ config.rooms = {
    * Used to store messages labeled as broadcast.
    * Not used as an ordinary chat room
    */
-  bcast: modifiedDatabasePop.rooms.bcast || {
+  bcast: config.rooms.bcast || {
     roomName: 'broadcast',
     visibility: config.accessLevels.superUser,
     accessLevel: config.accessLevels.superUser,
@@ -104,7 +106,7 @@ config.rooms = {
    * Admin related messages will be sent here
    * E.g. when a user needs verification
    */
-  admin: modifiedDatabasePop.rooms.admin || {
+  admin: config.rooms.admin || {
     roomName: 'hqroom',
     visibility: config.accessLevels.admin,
     accessLevel: config.accessLevels.admin,
@@ -135,9 +137,9 @@ config.rooms = {
  * Users to be created on first run
  * superuser should always be created. The rest are optional
  */
-config.users = modifiedDatabasePop.users || {
+config.users = {
   // Admin users to be used to create the first rooms and verify first users
-  superuser: {
+  superuser: config.users.superuser || {
     userName: 'superuser',
     password: generatePass(),
     verified: true,
@@ -146,7 +148,7 @@ config.users = modifiedDatabasePop.users || {
     rooms: [config.rooms.public.roomName],
   },
   // Blocking name for users
-  root: {
+  root: config.users.root || {
     userName: 'root',
     password: generatePass(),
     verified: false,
@@ -155,7 +157,7 @@ config.users = modifiedDatabasePop.users || {
     rooms: [],
   },
   // Blocking name for users
-  admin: {
+  admin: config.users.admin || {
     userName: 'admin',
     password: generatePass(),
     verified: false,
@@ -169,296 +171,296 @@ config.users = modifiedDatabasePop.users || {
  *
  */
 config.commands = {
-  help: modifiedDatabasePop.commands.help || {
+  help: config.commands.help || {
     commandName: 'help',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'basic',
   },
-  clear: modifiedDatabasePop.commands.clear || {
+  clear: config.commands.clear || {
     commandName: 'clear',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  whoami: modifiedDatabasePop.commands.whoami || {
+  whoami: config.commands.whoami || {
     commandName: 'whoami',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  msg: modifiedDatabasePop.commands.msg || {
+  msg: config.commands.msg || {
     commandName: 'msg',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'messaging',
   },
-  broadcast: modifiedDatabasePop.commands.broadcast || {
+  broadcast: config.commands.broadcast || {
     commandName: 'broadcast',
     accessLevel: config.accessLevels.privileged,
     visibility: config.accessLevels.privileged,
     category: 'messaging',
   },
-  follow: modifiedDatabasePop.commands.follow || {
+  follow: config.commands.follow || {
     commandName: 'follow',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  unfollow: modifiedDatabasePop.commands.unfollow || {
+  unfollow: config.commands.unfollow || {
     commandName: 'unfollow',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  list: modifiedDatabasePop.commands.list || {
+  list: config.commands.list || {
     commandName: 'list',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  mode: modifiedDatabasePop.commands.mode || {
+  mode: config.commands.mode || {
     commandName: 'mode',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'extra',
   },
-  register: modifiedDatabasePop.commands.register || {
+  register: config.commands.register || {
     commandName: 'register',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'login',
   },
-  createroom: modifiedDatabasePop.commands.createroom || {
+  createroom: config.commands.createroom || {
     commandName: 'createroom',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.god,
     category: 'basic',
   },
-  login: modifiedDatabasePop.commands.login || {
+  login: config.commands.login || {
     commandName: 'login',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'login',
   },
-  time: modifiedDatabasePop.commands.time || {
+  time: config.commands.time || {
     commandName: 'time',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'basic',
   },
-  locate: modifiedDatabasePop.commands.locate || {
+  locate: config.commands.locate || {
     commandName: 'locate',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  history: modifiedDatabasePop.commands.history || {
+  history: config.commands.history || {
     commandName: 'history',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'messaging',
   },
-  morse: modifiedDatabasePop.commands.morse || {
+  morse: config.commands.morse || {
     commandName: 'morse',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'messaging',
   },
-  password: modifiedDatabasePop.commands.password || {
+  password: config.commands.password || {
     commandName: 'password',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  logout: modifiedDatabasePop.commands.logout || {
+  logout: config.commands.logout || {
     commandName: 'logout',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  reboot: modifiedDatabasePop.commands.reboot || {
+  reboot: config.commands.reboot || {
     commandName: 'reboot',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'basic',
   },
-  verifyuser: modifiedDatabasePop.commands.verifyuser || {
+  verifyuser: config.commands.verifyuser || {
     commandName: 'verifyuser',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  banuser: modifiedDatabasePop.commands.banuser || {
+  banuser: config.commands.banuser || {
     commandName: 'banuser',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  unbanuser: modifiedDatabasePop.commands.unbanuser || {
+  unbanuser: config.commands.unbanuser || {
     commandName: 'unbanuser',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  whisper: modifiedDatabasePop.commands.whisper || {
+  whisper: config.commands.whisper || {
     commandName: 'whisper',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'messaging',
   },
-  hackroom: modifiedDatabasePop.commands.hackroom || {
+  hackroom: config.commands.hackroom || {
     commandName: 'hackroom',
     accessLevel: config.accessLevels.advanced,
     visibility: config.accessLevels.advanced,
     category: 'basic',
   },
-  hacklantern: modifiedDatabasePop.commands.hacklantern || {
+  hacklantern: config.commands.hacklantern || {
     commandName: 'hacklantern',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  importantmsg: modifiedDatabasePop.commands.importantmsg || {
+  importantmsg: config.commands.importantmsg || {
     commandName: 'importantmsg',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'messaging',
   },
-  chipper: modifiedDatabasePop.commands.chipper || {
+  chipper: config.commands.chipper || {
     commandName: 'chipper',
     accessLevel: config.accessLevels.advanced,
     visibility: config.accessLevels.advanced,
     category: 'basic',
     authGroup: 'hackers',
   },
-  switchroom: modifiedDatabasePop.commands.switchroom || {
+  switchroom: config.commands.switchroom || {
     commandName: 'room',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  removeroom: modifiedDatabasePop.commands.removeroom || {
+  removeroom: config.commands.removeroom || {
     commandName: 'removeroom',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.god,
     category: 'basic',
   },
-  updateuser: modifiedDatabasePop.commands.updateuser || {
+  updateuser: config.commands.updateuser || {
     commandName: 'updateuser',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  updatecommand: modifiedDatabasePop.commands.updatecommand || {
+  updatecommand: config.commands.updatecommand || {
     commandName: 'updatecommand',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  weather: modifiedDatabasePop.commands.weather || {
+  weather: config.commands.weather || {
     commandName: 'weather',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'basic',
   },
-  updatedevice: modifiedDatabasePop.commands.updatedevice || {
+  updatedevice: config.commands.updatedevice || {
     commandName: 'updatedevice',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  updateroom: modifiedDatabasePop.commands.updateroom || {
+  updateroom: config.commands.updateroom || {
     commandName: 'updateroom',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  inviteteam: modifiedDatabasePop.commands.inviteteam || {
+  inviteteam: config.commands.inviteteam || {
     commandName: 'inviteteam',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.god,
     category: 'admin',
   },
-  createteam: modifiedDatabasePop.commands.createteam || {
+  createteam: config.commands.createteam || {
     commandName: 'createteam',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.god,
     category: 'basic',
   },
-  alias: modifiedDatabasePop.commands.alias || {
+  alias: config.commands.alias || {
     commandName: 'alias',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'extra',
   },
-  central: modifiedDatabasePop.commands.central || {
+  central: config.commands.central || {
     commandName: 'central',
     accessLevel: config.accessLevels.god,
     visibility: config.accessLevels.god,
     category: 'basic',
   },
-  jobs: modifiedDatabasePop.commands.jobs || {
+  jobs: config.commands.jobs || {
     commandName: 'jobs',
     accessLevel: config.accessLevels.anonymous,
     visibility: config.accessLevels.anonymous,
     category: 'basic',
   },
-  invitations: modifiedDatabasePop.commands.invitations || {
+  invitations: config.commands.invitations || {
     commandName: 'invitations',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  inviteroom: modifiedDatabasePop.commands.inviteroom || {
+  inviteroom: config.commands.inviteroom || {
     commandName: 'inviteroom',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.god,
     category: 'basic',
   },
-  createmission: modifiedDatabasePop.commands.createmission || {
+  createmission: config.commands.createmission || {
     commandName: 'createmission',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  verifyteam: modifiedDatabasePop.commands.verifyteam || {
+  verifyteam: config.commands.verifyteam || {
     commandName: 'verifyteam',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'admin',
   },
-  map: modifiedDatabasePop.commands.map || {
+  map: config.commands.map || {
     commandName: 'map',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  archives: modifiedDatabasePop.commands.archives || {
+  archives: config.commands.archives || {
     commandName: 'archives',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  leaveteam: modifiedDatabasePop.commands.leaveteam || {
+  leaveteam: config.commands.leaveteam || {
     commandName: 'leaveteam',
     accessLevel: config.accessLevels.basic,
     visibility: config.accessLevels.basic,
     category: 'basic',
   },
-  creategameuser: modifiedDatabasePop.commands.creategameuser || {
+  creategameuser: config.commands.creategameuser || {
     commandName: 'creategameuser',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'basic',
   },
-  creategameword: modifiedDatabasePop.commands.creategameword || {
+  creategameword: config.commands.creategameword || {
     commandName: 'creategameword',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,
     category: 'basic',
   },
-  rebootall: modifiedDatabasePop.commands.rebootall || {
+  rebootall: config.commands.rebootall || {
     commandName: 'rebootall',
     accessLevel: config.accessLevels.admin,
     visibility: config.accessLevels.admin,

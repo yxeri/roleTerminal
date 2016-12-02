@@ -5,14 +5,21 @@
 const app = require('./../app');
 const appConfig = require('../config/defaults/config').app;
 
-// Sets server port
-app.set('port', appConfig.port);
+/**
+ * Start server
+ */
+function run() {
+  // Sets server port
+  app.set('port', appConfig.port);
 
 // Starts Express server
-const server = app.listen(app.get('port'), () => {
-});
+  const server = app.listen(app.get('port'), () => {
+  });
 
 // SocketIO
-const io = app.io;
+  const io = app.io;
 
-io.attach(server);
+  io.attach(server);
+}
+
+run();

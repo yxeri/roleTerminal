@@ -18,7 +18,6 @@
 
 const dbCommand = require('../../db/connectors/command');
 const manager = require('../../socketHelpers/manager');
-const messenger = require('../../socketHelpers/messenger');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
@@ -31,11 +30,11 @@ function handle(socket) {
    * Gets all commands available to the user
    * Emits updateCommands
    */
-  socket.on('getCommands', () => {
+  socket.on('getCommands', (params, callback = () => {}) => {
     dbCommand.getAllCommands((err, commands) => {
       if (err || commands === null || commands.length === 0) {
-        messenger.sendImportantMsg({
-          message: {
+        callback({
+          error: {
             text: [
               'Failure to retrieve commands',
               'Please try rebooting with the command "reboot"',
@@ -45,13 +44,12 @@ function handle(socket) {
               'Försök att starta om med kommandot "reboot"',
             ],
           },
-          socket,
         });
 
         return;
       }
 
-      socket.emit('updateCommands', { commands });
+      callback({ data: { commands } });
     });
   });
 
@@ -59,46 +57,52 @@ function handle(socket) {
    * Updates a command's field in the database and emits the change to all sockets
    * Emits updateCommands
    */
-  socket.on('updateCommand', (params) => {
+  socket.on('updateCommand', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { command: { commandName: true }, field: true, value: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updatecommand.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const commandName = params.command.commandName;
       const field = params.field;
       const value = params.value;
-      const callback = (err, command) => {
+      const updateCommandCallback = (err, command) => {
         if (err || command === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: ['Failed to update command'],
-            text_se: ['Misslyckades med att uppdatera kommandot'],
-          });
-        } else {
-          messenger.sendSelfMsg({
-            message: {
-              text: ['Command has been updated'],
-              text_se: ['Kommandot har uppdaterats'],
+          callback({
+            error: {
+              code: logger.ErrorCodes.db,
+              text: ['Failed to update command'],
+              text_se: ['Misslyckades med att uppdatera kommandot'],
             },
-            socket,
           });
-          socket.emit('updateCommands', { commands: [command] });
-          socket.broadcast.emit('updateCommands', { commands: [command] });
+
+          return;
         }
+
+        callback({
+          data: { commands: [command] },
+          message: {
+            text: ['Command has been updated'],
+            text_se: ['Kommandot har uppdaterats'],
+          },
+        });
+        socket.broadcast.emit('updateCommands', { commands: [command] });
       };
       switch (field) {
         case 'visibility':
-          dbCommand.updateCommandVisibility(commandName, value, callback);
+          dbCommand.updateCommandVisibility(commandName, value, updateCommandCallback);
 
           break;
         case 'accesslevel':
-          dbCommand.updateCommandAccessLevel(commandName, value, callback);
+          dbCommand.updateCommandAccessLevel(commandName, value, updateCommandCallback);
 
           break;
         default:

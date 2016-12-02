@@ -52,7 +52,7 @@ function followRoom({ socket, room, userName, callback }) {
   }
 
   socket.join(roomName);
-  callback({ room });
+  callback({ data: { room } });
 }
 
 /**
@@ -78,7 +78,7 @@ function shouldBeHidden(room, socketId) {
  * @param {object} io - Socket.IO
  */
 function handle(socket, io) {
-  socket.on('chatMsg', ({ message }, callback) => {
+  socket.on('chatMsg', ({ message }, callback = () => {}) => {
     if (!objectValidator.isValidData({ message }, { message: { text: true, roomName: true } })) {
       callback({ error: {} });
 
@@ -96,7 +96,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('whisperMsg', ({ message }, callback) => {
+  socket.on('whisperMsg', ({ message }, callback = () => {}) => {
     if (!objectValidator.isValidData({ message }, { message: { text: true, roomName: true, whisper: true } })) {
       callback({ error: {} });
 
@@ -117,7 +117,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('broadcastMsg', (params, callback) => {
+  socket.on('broadcastMsg', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { message: { text: true } })) {
       callback({ error: {} });
 
@@ -138,7 +138,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('createRoom', ({ room }, callback) => {
+  socket.on('createRoom', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true, owner: true } })) {
       callback({ error: {} });
 
@@ -175,6 +175,7 @@ function handle(socket, io) {
     });
   });
 
+  // TODO Duplicate code in rest api
   socket.on('follow', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
@@ -232,7 +233,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('switchRoom', ({ room }, callback) => {
+  socket.on('switchRoom', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
 
@@ -253,8 +254,9 @@ function handle(socket, io) {
       }
 
       if (Object.keys(socket.rooms).indexOf(roomName) > -1) {
-        callback({ room });
+        callback({ data: { room } });
       } else {
+        // TODO Should send error
         callback({
           message: {
             text: [`You are not following room ${roomName}`],
@@ -265,7 +267,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('unfollow', ({ room }, callback) => {
+  socket.on('unfollow', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
 
@@ -308,10 +310,11 @@ function handle(socket, io) {
               sendTo: roomName,
             });
             socket.leave(roomName);
-            callback({ room });
+            callback({ data: { room } });
           });
         }
       } else {
+        // TODO Should send error object
         callback({
           message: {
             text: [`You are not following ${roomName}`],
@@ -323,9 +326,11 @@ function handle(socket, io) {
   });
 
   // Shows all available rooms
-  socket.on('listRooms', () => {
+  socket.on('listRooms', (callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -337,30 +342,27 @@ function handle(socket, io) {
             err: roomErr,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
-        if (rooms.length > 0) {
-          const roomNames = [];
+        const roomNames = [];
 
-          for (let i = 0; i < rooms.length; i += 1) {
-            roomNames.push(rooms[i].roomName);
-          }
-
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['Rooms:', roomNames.join(' - ')],
-            },
-          });
+        for (let i = 0; i < rooms.length; i += 1) {
+          roomNames.push(rooms[i].roomName);
         }
+
+        callback({ data: { rooms: roomNames } });
       });
     });
   });
 
-  socket.on('listUsers', () => {
+  socket.on('listUsers', (callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -372,55 +374,42 @@ function handle(socket, io) {
             err: userErr,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
-        if (users.length > 0) {
-          const offlineUsers = [];
-          const onlineUsers = [];
+        const offlineUsers = [];
+        const onlineUsers = [];
 
-          for (let i = 0; i < users.length; i += 1) {
-            const currentUser = users[i];
+        for (let i = 0; i < users.length; i += 1) {
+          const currentUser = users[i];
 
-            if ((!appConfig.userVerify || currentUser.verified) && !currentUser.banned) {
-              if (currentUser.online) {
-                onlineUsers.push(currentUser.userName);
-              } else {
-                offlineUsers.push(currentUser.userName);
-              }
+          if ((!appConfig.userVerify || currentUser.verified) && !currentUser.banned) {
+            if (currentUser.online) {
+              onlineUsers.push(currentUser.userName);
+            } else {
+              offlineUsers.push(currentUser.userName);
             }
           }
-
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [
-                'Online users:',
-                onlineUsers.join(' - '),
-              ],
-            },
-          });
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: [
-                'Other users:',
-                offlineUsers.join(' - '),
-              ],
-            },
-          });
         }
+
+        callback({ data: { onlineUsers, offlineUsers } });
       });
     });
   });
 
-  socket.on('myRooms', (params, callback) => {
+  socket.on('myRooms', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { user: { userName: true }, device: { deviceId: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -447,6 +436,8 @@ function handle(socket, io) {
             err,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
@@ -458,7 +449,7 @@ function handle(socket, io) {
           }
         }
 
-        callback({ rooms, ownedRooms: roomNames });
+        callback({ data: { rooms, ownedRooms: roomNames } });
       });
     });
   });
@@ -470,7 +461,7 @@ function handle(socket, io) {
    * @param {Date} [params.startDate] - Start date of retrieval
    * @param {number} [params.lines] - Number of lines to retrieve
    */
-  socket.on('history', ({ room, startDate, lines }, callback) => {
+  socket.on('history', ({ room, startDate, lines }, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.history.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         callback({ error: {} });
@@ -522,13 +513,13 @@ function handle(socket, io) {
             return;
           }
 
-          callback({ messages: historyMessages });
+          callback({ data: { messages: historyMessages } });
         },
       });
     });
   });
 
-  socket.on('morse', ({ local, morseCode, silent }, callback) => {
+  socket.on('morse', ({ local, morseCode, silent }, callback = () => {}) => {
     if (!objectValidator.isValidData({ local, morseCode, silent }, { morseCode: true })) {
       callback({ error: {} });
 
@@ -554,7 +545,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('removeRoom', ({ room }, callback) => {
+  socket.on('removeRoom', ({ room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ room }, { room: { roomName: true } })) {
       callback({ error: {} });
 
@@ -605,12 +596,12 @@ function handle(socket, io) {
           },
           sendTo: roomNameLower,
         });
-        callback({ room });
+        callback({ data: { room } });
       });
     });
   });
 
-  socket.on('importantMsg', ({ message, morse, device }, callback) => {
+  socket.on('importantMsg', ({ message, morse, device }, callback = () => {}) => {
     if (!objectValidator.isValidData({ message, morse, device }, { message: { text: true } })) {
       callback({ error: {} });
 
@@ -668,20 +659,24 @@ function handle(socket, io) {
     socket.join(databasePopulation.rooms.public.roomName);
   });
 
-  socket.on('updateRoom', (params) => {
+  socket.on('updateRoom', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { room: { roomName: true }, field: true, value: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updateroom.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const roomName = params.room.roomName;
       const field = params.field;
       const value = params.value;
-      const callback = (err, room) => {
+      const updateRoomCallback = (err, room) => {
         if (err || room === null) {
           logger.sendSocketErrorMsg({
             socket,
@@ -691,33 +686,37 @@ function handle(socket, io) {
             err,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: ['Room has been updated'],
-            text_se: ['Rummet har uppdaterats'],
+        callback({
+          data: {
+            message: {
+              text: ['Room has been updated'],
+              text_se: ['Rummet har uppdaterats'],
+            },
           },
         });
       };
 
       switch (field) {
         case 'visibility':
-          dbRoom.updateRoomVisibility(roomName, value, callback);
+          dbRoom.updateRoomVisibility(roomName, value, updateRoomCallback);
 
           break;
         case 'accesslevel':
-          dbRoom.updateRoomAccessLevel(roomName, value, callback);
+          dbRoom.updateRoomAccessLevel(roomName, value, updateRoomCallback);
 
           break;
         default:
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: [`Invalid field. Room doesn't have ${field}`],
-            text_se: [`Felaktigt fält. Rum har inte fältet ${field}`],
+          callback({
+            error: {
+              code: logger.ErrorCodes.db,
+              text: [`Invalid field. Room doesn't have ${field}`],
+              text_se: [`Felaktigt fält. Rum har inte fältet ${field}`],
+            },
           });
 
           break;
@@ -725,7 +724,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialMyRoom', ({ partialName }, callback) => {
+  socket.on('matchPartialMyRoom', ({ partialName }, callback = () => {}) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
@@ -750,11 +749,11 @@ function handle(socket, io) {
         }
       }
 
-      callback({ matched: itemList });
+      callback({ data: { matched: itemList } });
     });
   });
 
-  socket.on('matchPartialRoom', ({ partialName }, callback) => {
+  socket.on('matchPartialRoom', ({ partialName }, callback = () => {}) => {
     // params.partialName is not checked if it set, to allow the retrieval of all rooms on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
@@ -778,12 +777,12 @@ function handle(socket, io) {
           itemList.push(rooms[roomKeys[i]].roomName);
         }
 
-        callback({ matched: itemList });
+        callback({ data: { matched: itemList } });
       });
     });
   });
 
-  socket.on('inviteToRoom', ({ user, room }, callback) => {
+  socket.on('inviteToRoom', ({ user, room }, callback = () => {}) => {
     if (!objectValidator.isValidData({ user, room }, { user: { userName: true }, room: { roomName: true } })) {
       callback({ error: {} });
 
@@ -836,13 +835,13 @@ function handle(socket, io) {
             return;
           }
 
-          callback({ user: invitedUser });
+          callback({ data: { user: invitedUser } });
         });
       });
     });
   });
 
-  socket.on('roomAnswer', ({ invitation, accepted }, callback) => {
+  socket.on('roomAnswer', ({ invitation, accepted }, callback = () => {}) => {
     if (!objectValidator.isValidData({ invitation, accepted }, { accepted: true, invitation: { itemName: true, sender: true, invitationType: true } })) {
       callback({ error: {} });
 

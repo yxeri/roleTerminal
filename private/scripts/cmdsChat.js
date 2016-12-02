@@ -43,10 +43,11 @@ function copyString(text) {
 
 /**
  * Callback sent to server on createRoom emit
- * @param {Object} error - Will be set if something went wrong
- * @param {Object} room - Will be set if successful. Undefined means that it failed to create the room, due to it already existing
+ * @param {Object} params.error - Will be set if something went wrong
+ * @param {Object} params.data - Will be set if successful.
+ * @param {Object} params.data.room - Undefined means that it failed to create the room, due to it already existing
  */
-function createRoomCallback({ error, room }) {
+function createRoomCallback({ error, data: { room } }) {
   if (error) {
     commandHandler.resetCommand(true);
 
@@ -87,7 +88,7 @@ commands.history = {
       }
     }
 
-    socketHandler.emit('history', data, ({ error, messages }) => {
+    socketHandler.emit('history', data, ({ error, data: { messages } }) => {
       if (error) {
         return;
       }
@@ -296,7 +297,15 @@ commands.importantmsg = {
             text: ['Searching for device...'],
             text_se: ['Letar efter enheten...'],
           });
-          socketHandler.emit('verifyDevice', commandHelper.data);
+          socketHandler.emit('verifyDevice', commandHelper.data, ({ error, message }) => {
+            if (error) {
+              messenger.queueMessage({ text: error.text });
+
+              return;
+            }
+
+            messenger.queueMessage(message);
+          });
         } else {
           commandHelper.onStep += 1;
           commandHandler.triggerCommandStep();
@@ -377,20 +386,20 @@ commands.importantmsg = {
 
 commands.room = {
   func: (phrases) => {
-    const data = { room: {} };
+    const sendData = { room: {} };
 
     if (phrases.length > 0) {
       const roomName = phrases[0].toLowerCase();
 
       if (roomName) {
-        data.room.roomName = roomName;
+        sendData.room.roomName = roomName;
         /**
          * Flag that will be used in .on function locally to
          * show user they have entered
          */
-        data.room.entered = true;
+        sendData.room.entered = true;
 
-        socketHandler.emit('switchRoom', data, ({ error, room, message }) => {
+        socketHandler.emit('switchRoom', sendData, ({ error, data: { room }, message }) => {
           if (error) {
             return;
           }
@@ -447,7 +456,7 @@ commands.removeroom = {
   steps: [
     (phrases) => {
       if (phrases[0].toLowerCase() === 'yes') {
-        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error, room }) => {
+        socketHandler.emit('removeRoom', commandHandler.commandHelper.data, ({ error, data: { room } }) => {
           if (error) {
             return;
           }
@@ -563,7 +572,7 @@ commands.inviteroom = {
     };
 
     if (data.user.userName && data.room.roomName) {
-      socketHandler.emit('inviteToRoom', data, ({ error, user }) => {
+      socketHandler.emit('inviteToRoom', data, ({ error, data: { user } }) => {
         if (error) {
           if (error.code && error.code === 11000) {
             messenger.queueMessage({
@@ -632,7 +641,7 @@ commands.follow = {
         commandHelper.data.room.password = phrases[0];
       }
 
-      socketHandler.emit('follow', { room: commandHelper.data.room }, ({ error, room }) => {
+      socketHandler.emit('follow', { room: commandHelper.data.room }, ({ error, data: { room } }) => {
         if (error) {
           commandHandler.resetCommand(true);
 
@@ -661,7 +670,7 @@ commands.unfollow = {
         unfollowedRoom.exited = true;
       }
 
-      socketHandler.emit('unfollow', { room: unfollowedRoom }, ({ error, room, message }) => {
+      socketHandler.emit('unfollow', { room: unfollowedRoom }, ({ error, data: { room }, message }) => {
         if (error) {
           return;
         }

@@ -23,83 +23,22 @@ const databasePopulation = require('../../config/defaults/config').databasePopul
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
 const mapCreator = require('../../utils/mapCreator');
-const messenger = require('../../socketHelpers/messenger');
 
 /**
  * @param {Object} socket - Socket.IO socket
  */
 function handle(socket) {
-  /**
-   * Locate command. Returns location for one or more users
-   * Emits locationMsg
-   */
-  socket.on('locate', (params) => {
-    if (!objectValidator.isValidData(params, { mapPosition: { positionName: true } })) {
-      return;
-    }
-
-    manager.userAllowedCommand(socket.id, databasePopulation.commands.locate.commandName, (allowErr, allowed, user) => {
-      if (allowErr || !allowed) {
-        return;
-      }
-
-      const positionName = params.mapPosition.positionName;
-      const locationData = {};
-
-      // Return all user locations
-      if (positionName === '*') {
-        dbUser.getAllUserPositions(user, (err, mapPositions) => {
-          if (err || mapPositions === null) {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.db,
-              text: ['Failed to get user location'],
-              err,
-            });
-
-            return;
-          }
-
-          for (const userLocation of mapPositions) {
-            const userName = userLocation.positionName;
-            locationData[userName] = userLocation;
-          }
-
-          socket.emit('locationMsg', locationData);
-        });
-      } else {
-        dbUser.getUserPosition(user, positionName, (err, mapPosition) => {
-          if (err || mapPosition === null) {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.db,
-              text: ['Failed to get user location'],
-              err,
-            });
-          } else if (mapPosition !== null) {
-            const userName = mapPosition.positionName;
-            locationData[userName] = mapPosition;
-
-            socket.emit('locationMsg', locationData);
-          } else {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.notFound,
-              text: [`Unable to locate ${positionName}`],
-            });
-          }
-        });
-      }
-    });
-  });
-
-  socket.on('updateLocation', (params) => {
+  socket.on('updateLocation', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { position: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -110,6 +49,8 @@ function handle(socket) {
             text: ['Failed to update user isTracking'],
             err: trackingErr,
           });
+
+          callback({ error: {} });
         }
       });
 
@@ -126,6 +67,8 @@ function handle(socket) {
               err: userErr,
             });
 
+            callback({ error: {} });
+
             return;
           }
 
@@ -136,6 +79,8 @@ function handle(socket) {
                 text: ['Failed to broadcast new user position'],
                 err: userErr,
               });
+
+              callback({ error: {} });
 
               return;
             }
@@ -148,23 +93,20 @@ function handle(socket) {
                   err: userErr,
                 });
 
+                callback({ error: {} });
+
                 return;
               }
 
               for (const socketUser of users) {
                 if (socketUser.socketId && socket.id !== socketUser.socketId && socketUser.isTracked) {
+                  console.log('position updated');
                   socket.broadcast.to(socketUser.socketId).emit('mapPositions', {
                     positions: [position],
                     currentTime: (new Date()),
                   });
                 }
               }
-
-              // FIXME Should this be here?
-              socket.broadcast.emit('mapPositions', {
-                positions: [position],
-                currentTime: (new Date()),
-              });
             });
           });
         },
@@ -172,17 +114,22 @@ function handle(socket) {
     });
   });
 
-  socket.on('getMapPositions', (params) => {
+  socket.on('getMapPositions', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { types: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const types = params.types;
+      const message = {};
 
       /**
        * Get and send positions
@@ -195,6 +142,8 @@ function handle(socket) {
           case 'static': {
             dbLocation.getAllStaticPositions((err, staticPositions) => {
               if (err) {
+                callback({ error: {} });
+
                 return;
               }
 
@@ -207,33 +156,42 @@ function handle(socket) {
             if (user.isTracked) {
               dbUser.getAllUserPositions(user, (err, userPositions) => {
                 if (err) {
+                  callback({ error: {} });
+
                   return;
                 }
 
                 getPositions(types.shift(), positions.concat(userPositions));
               });
             } else {
-              messenger.sendSelfMsg({
-                socket,
-                message: {
-                  text: [
-                    'DETECTED: TRACKING DISABLED',
-                    'UNABLE TO RETRIEVE USER LOCATIONS',
-                    'DISABLING TRACKING IS A MAJOR OFFENSE',
-                    'REPORT IN FOR IMMEDIATE RE-EDUCATION SESSION',
-                  ],
-                },
-              });
+              message.text = [
+                'DETECTED: TRACKING DISABLED',
+                'UNABLE TO RETRIEVE USER LOCATIONS',
+                'DISABLING TRACKING IS A MAJOR OFFENSE',
+                'REPORT IN FOR IMMEDIATE RE-EDUCATION SESSION',
+              ];
+
+              getPositions(types.shift(), positions);
             }
 
             break;
           }
           default: {
-            socket.emit('mapPositions', {
-              positions,
-              team: user.team,
-              currentTime: (new Date()),
-            });
+            const payload = {
+              data: {
+                positions,
+                team: user.team,
+                currentTime: (new Date()),
+              },
+            };
+
+            if (message.text) {
+              payload.message = message;
+            }
+
+            console.log('payload', payload);
+
+            callback(payload);
 
             break;
           }
@@ -244,9 +202,11 @@ function handle(socket) {
     });
   });
 
-  socket.on('getGooglePositions', () => {
+  socket.on('getGooglePositions', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.map.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -258,10 +218,12 @@ function handle(socket) {
             err,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
-        socket.emit('mapPositions', { positions: googlePositions });
+        callback({ data: { positions: googlePositions } });
       });
     });
   });

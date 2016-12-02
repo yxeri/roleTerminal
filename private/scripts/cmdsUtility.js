@@ -99,7 +99,7 @@ commands.invitations = {
           break;
         }
         case 'room': {
-          socketHandler.emit('roomAnswer', data, ({ error, room, message }) => {
+          socketHandler.emit('roomAnswer', data, ({ error, data: { room }, message }) => {
             if (error) {
               commandHandler.resetCommand(true);
 
@@ -241,6 +241,9 @@ commands.create = {
         case 'mission': {
           commandHandler.triggerCommand({ cmd: 'createmission', cmdParams: phrases.slice(1) });
 
+          break;
+        }
+        case 'nick': {
           break;
         }
         default: {
@@ -514,14 +517,21 @@ commands.updateuser = {
 };
 commands.updatecommand = {
   func: (phrases) => {
-    const data = {};
+    const sendData = {};
 
     if (phrases.length > 2) {
-      data.command = { commandName: phrases[0] };
-      data.field = phrases[1];
-      data.value = phrases[2];
+      sendData.command = { commandName: phrases[0] };
+      sendData.field = phrases[1];
+      sendData.value = phrases[2];
 
-      socketHandler.emit('updateCommand', data);
+      socketHandler.emit('updateCommand', sendData, ({ error, data, message }) => {
+        if (error) {
+          return;
+        }
+
+        commandHandler.onUpdateCommands({ commands: data.commands });
+        messenger.queueMessage(message);
+      });
     } else {
       messenger.queueMessage({
         text: [
@@ -586,7 +596,11 @@ commands.updatedevice = {
       data.field = phrases[1];
       data.value = phrases[2];
 
-      socketHandler.emit('updateDevice', data);
+      socketHandler.emit('updateDevice', data, ({ error }) => {
+        if (error) {
+          messenger.queueMessage({ text: error.text });
+        }
+      });
     } else {
       messenger.queueMessage({
         text: [

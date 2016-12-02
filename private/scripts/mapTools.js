@@ -19,6 +19,8 @@
 const socketHandler = require('./socketHandler');
 const storage = require('./storage');
 const commandHandler = require('./commandHandler');
+const textTools = require('./textTools');
+const messenger = require('./messenger');
 
 const markerInfo = document.getElementById('markerInfo');
 const mapMarkers = {};
@@ -648,6 +650,79 @@ function getInfoText(markerId) {
 }
 
 /**
+ * Called on mapPositions emit. Adds new map positions
+ * @param {Object} params - Parameters
+ * @param {Object[]} params.positions - New map positions
+ * @param {string} [params.team] - Name of the team that the user in the position belongs to. Valid for user positions
+ * @param {Date} [params.currentTime] - Time of update of the positions
+ */
+function onMapPositions(params) {
+  console.log('mappos', params);
+  const mapPositions = params.positions || [];
+  const team = params.team;
+  const userName = storage.getUser() ? storage.getUser().toLowerCase() : '';
+
+  for (let i = 0; i < mapPositions.length; i += 1) {
+    const mapPosition = mapPositions[i];
+
+    if (mapPosition.positionName.toLowerCase() !== userName) {
+      const positionName = mapPosition.positionName;
+      const latitude = parseFloat(mapPosition.position.latitude);
+      const longitude = parseFloat(mapPosition.position.longitude);
+      const coordsCollection = mapPosition.position.coordsCollection;
+      const geometry = mapPosition.geometry;
+      const type = mapPosition.type;
+      const group = mapPosition.group;
+      const description = mapPosition.description;
+
+      if (geometry === 'line') {
+        setLinePosition({
+          coordsCollection,
+          positionName,
+        });
+      } else if (geometry === 'polygon') {
+        setPolygonPosition({
+          positionName,
+          coordsCollection,
+        });
+      } else if (geometry === 'point') {
+        setMarkerPosition({
+          positionName,
+          position: {
+            latitude,
+            longitude,
+          },
+          description,
+          markerType: 'location',
+        });
+      } else if (type && type === 'user' && mapPosition.lastUpdated) {
+        const currentTime = new Date(params.currentTime);
+        const lastUpdated = new Date(mapPosition.lastUpdated);
+
+        if (currentTime - lastUpdated < (20 * 60 * 1000)) {
+          const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
+
+          setMarkerPosition({
+            lastUpdated,
+            positionName,
+            position: {
+              latitude,
+              longitude,
+            },
+            iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+            hideLabel: true,
+            description: userDescription,
+            markerType: type,
+          });
+        }
+      }
+    }
+  }
+
+  toggleMapLabels();
+}
+
+/**
  * Creates the map and retrieves positions from server and Google maps
  * @static
  */
@@ -667,8 +742,24 @@ function startMap() {
     });
   }
 
-  socketHandler.emit('getMapPositions', { types: ['static', 'users'] });
-  socketHandler.emit('getGooglePositions', { types: ['world'] });
+  socketHandler.emit('getMapPositions', { types: ['static', 'users'] }, ({ error, data, message }) => {
+    if (error) {
+      return;
+    }
+
+    if (message) {
+      messenger.queueMessage(message);
+    }
+
+    onMapPositions(data);
+  });
+  socketHandler.emit('getGooglePositions', { types: ['world'] }, ({ error, data }) => {
+    if (error) {
+      return;
+    }
+
+    onMapPositions(data);
+  });
 }
 
 exports.setMarkerPosition = setMarkerPosition;
@@ -689,3 +780,4 @@ exports.increaseZoom = increaseZoom;
 exports.decreaseZoom = decreaseZoom;
 exports.getInfoText = getInfoText;
 exports.startMap = startMap;
+exports.onMapPositions = onMapPositions;

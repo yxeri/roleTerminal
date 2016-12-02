@@ -53,7 +53,7 @@ function handle(socket) {
    * Time command. Returns current date
    * Emits time
    */
-  socket.on('time', (params, callback) => {
+  socket.on('time', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.time.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
         return;
@@ -66,7 +66,7 @@ function handle(socket) {
     });
   });
 
-  socket.on('getArchive', (params, callback) => {
+  socket.on('getArchive', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { archiveId: true })) {
       return;
     }
@@ -86,7 +86,7 @@ function handle(socket) {
     });
   });
 
-  socket.on('getArchivesList', (params, callback) => {
+  socket.on('getArchivesList', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.archives.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
         return;

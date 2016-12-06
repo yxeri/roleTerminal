@@ -30,6 +30,7 @@ const router = new express.Router();
 function handle() {
   /**
    * @api {post} /authenticate Create a JSON Web Token
+   * @apiVersion 5.0.1
    * @apiName Authenticate
    * @apiGroup Authenticate
    *

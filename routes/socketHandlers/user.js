@@ -38,13 +38,16 @@ function isTextAllowed(text) {
  * @param {object} io - Socket.IO
  */
 function handle(socket, io) {
-  socket.on('userExists', (params) => {
+  socket.on('userExists', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { user: { userName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed || !params || !params.user || !isTextAllowed(params.user.userName)) {
+        callback({ error: {} });
         socket.emit('commandFail');
 
         return;
@@ -52,20 +55,19 @@ function handle(socket, io) {
 
       dbUser.getUser(params.user.userName, (err, foundUser) => {
         if (err) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: ['Failed to check if user exists'],
-            text_se: ['Misslyckades med att försöka hitta användaren'],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.db,
+              text: ['Failed to check if user exists'],
+              text_se: ['Misslyckades med att försöka hitta användaren'],
+            },
           });
           socket.emit('commandFail');
 
           return;
         } else if (foundUser !== null) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
+          callback({
+            error: {
               text: ['User with that name already exists'],
               text_se: ['En användare med det namnet existerar redan'],
             },
@@ -80,22 +82,26 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('register', (params) => {
-    if (!objectValidator.isValidData(params, { user: { userName: true, password: true, registerDevice: true } })) {
+  socket.on('register', ({ user }, callback = () => {}) => {
+    if (!objectValidator.isValidData({ user }, { user: { userName: true, password: true, registerDevice: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.register.commandName, (allowErr, allowed) => {
-      if (allowErr || !allowed || !params || !params.user || !isTextAllowed(params.user.userName)) {
+      if (allowErr || !allowed || !user || !isTextAllowed(user.userName)) {
+        callback({ error: {} });
+
         return;
       }
 
-      const userName = params.user.userName.toLowerCase();
+      const userName = user.userName.toLowerCase();
       const userObj = {
         userName,
         socketId: '',
-        password: params.user.password,
-        registerDevice: params.user.registerDevice,
+        password: user.password,
+        registerDevice: user.registerDevice,
         mode: appConfig.defaultMode,
         verified: false,
         rooms: [
@@ -105,21 +111,20 @@ function handle(socket, io) {
           databasePopulation.rooms.morse.roomName,
         ],
       };
-      dbUser.createUser(userObj, (err, user) => {
+      dbUser.createUser(userObj, (err, createdUser) => {
         if (err) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.db,
-            text: ['Failed to register user'],
-            text_se: ['Misslyckades med att registrera användare'],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.db,
+              text: ['Failed to register user'],
+              text_se: ['Misslyckades med att registrera användare'],
+            },
           });
 
           return;
-        } else if (user === null) {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
+        } else if (createdUser === null) {
+          callback({
+            error: {
               text: [`${userName} already exists`],
               text_se: [`${userName} existerar redan`],
             },
@@ -130,21 +135,18 @@ function handle(socket, io) {
 
 
         const newRoom = {
-          roomName: user.userName + appConfig.whisperAppend,
+          roomName: createdUser.userName + appConfig.whisperAppend,
           visibility: 12,
           accessLevel: 12,
         };
 
-        manager.createRoom(newRoom, user, () => {
+        manager.createRoom(newRoom, createdUser, () => {
         });
 
-        messenger.sendSelfMsg({
-          socket,
-          message: {
-            text: [`${user.userName} has been registered`],
-            text_se: [`${user.userName} har blivit registerad`],
-          },
-        });
+        const registeredMessage = {
+          text: [`${createdUser.userName} has been registered`],
+          text_se: [`${createdUser.userName} har blivit registerad`],
+        };
 
         if (appConfig.userVerify) {
           const message = {
@@ -156,63 +158,63 @@ function handle(socket, io) {
             socket,
             message: {
               userName: 'SYSTEM',
-              text: [`User ${user.userName} needs to be verified`],
-              text_se: [`Användaren ${user.userName} måste bli verifierad`],
+              text: [`User ${createdUser.userName} needs to be verified`],
+              text_se: [`Användaren ${createdUser.userName} måste bli verifierad`],
             },
             sendTo: message.roomName,
           });
 
-          messenger.sendSelfMsg({
-            socket,
-            message: {
-              text: ['You will need to be verified before you can login'],
-              text_se: ['Ni måste bli verifierad innan ni kan logga in'],
-            },
-          });
+          registeredMessage.text.push('You will need to be verified before you can login');
+          registeredMessage.text_se.push('Ni måste bli verifierad innan ni kan logga in');
         }
+
+        callback({ message: registeredMessage });
       });
     });
   });
 
-  // TODO Rename to reflect the function
-  socket.on('updateId', (params) => {
-    if (!objectValidator.isValidData(params, { user: true })) {
+  socket.on('updateId', ({ user, device, firstConnection }, callback = () => {}) => {
+    if (!objectValidator.isValidData({ user }, { user: true })) {
+      callback({ error: {} });
+
       return;
     }
 
-    if (params.user.userName === null) {
+    if (user.userName === null) {
       const publicRoom = databasePopulation.rooms.public.roomName;
 
       socket.join(publicRoom);
       socket.emit('reconnectSuccess', {
+        firstConnection,
         anonUser: true,
-        firstConnection: params.firstConnection,
         welcomeMessage: appConfig.welcomeMessage,
       });
     } else {
-      manager.updateUserSocketId(socket.id, params.user.userName, (idErr, user) => {
+      manager.updateUserSocketId(socket.id, user.userName, (idErr, updatedUser) => {
         if (idErr) {
+          callback({ error: {} });
+
           return;
-        } else if (user === null) {
+        } else if (updatedUser === null) {
           socket.emit('disconnectUser');
           socket.join(databasePopulation.rooms.public.roomName);
 
           return;
         }
 
-        const allRooms = user.rooms;
+        const allRooms = updatedUser.rooms;
 
-        manager.joinRooms(allRooms, socket, params.device.deviceId);
+        manager.joinRooms(allRooms, socket, device.deviceId);
         socket.emit('reconnectSuccess', {
-          firstConnection: params.firstConnection,
-          user,
+          firstConnection,
+          user: updatedUser,
           welcomeMessage: appConfig.welcomeMessage,
         });
         manager.getHistory({
           rooms: allRooms,
           lines: Infinity,
           missedMsgs: true,
-          lastOnline: user.lastOnline,
+          lastOnline: updatedUser.lastOnline,
           callback: (histErr, missedMessages) => {
             if (histErr) {
               return;
@@ -228,13 +230,17 @@ function handle(socket, io) {
     }
   });
 
-  socket.on('login', ({ user }) => {
+  socket.on('login', ({ user }, callback = () => {}) => {
     if (!objectValidator.isValidData({ user }, { user: { userName: true, password: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.login.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -242,30 +248,32 @@ function handle(socket, io) {
 
       dbUser.authUser(userName, user.password, (err, authUser) => {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['Failed to login'],
-            text_se: ['Misslyckades med att logga in'],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.general,
+              text: ['Failed to login'],
+              text_se: ['Misslyckades med att logga in'],
+            },
           });
 
           return;
         } else if (appConfig.userVerify && !authUser.verified) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['The user has not yet been verified. Failed to login'],
-            text_se: ['Användaren har ännu inte blivit verifierad. Inloggningen misslyckades'],
+          callback({
+            error: {
+              code: logger.ErrorCodes.general,
+              text: ['The user has not yet been verified. Failed to login'],
+              text_se: ['Användaren har ännu inte blivit verifierad. Inloggningen misslyckades'],
+            },
           });
 
           return;
         } else if (authUser.banned) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['The user has been banned. Failed to login'],
-            text_se: ['Användaren är bannad. Inloggningen misslyckades'],
+          callback({
+            error: {
+              code: logger.ErrorCodes.general,
+              text: ['The user has been banned. Failed to login'],
+              text_se: ['Användaren är bannad. Inloggningen misslyckades'],
+            },
           });
 
           return;
@@ -273,6 +281,8 @@ function handle(socket, io) {
 
         manager.updateUserSocketId(socket.id, userName, (idErr) => {
           if (idErr) {
+            callback({ error: {} });
+
             return;
           }
 
@@ -305,7 +315,7 @@ function handle(socket, io) {
           }
 
           manager.joinRooms(rooms, socket);
-          socket.emit('login', { user: authUser });
+          callback({ data: { user: authUser } });
         });
 
         dbUser.setUserLastOnline(userName, new Date(), (userOnlineErr, settedUser) => {
@@ -317,32 +327,35 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('checkPassword', (params) => {
+  socket.on('checkPassword', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { oldPassword: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       dbUser.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['Incorrect password'],
-            text_se: ['Felaktigt lösenord'],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.general,
+              text: ['Incorrect password'],
+              text_se: ['Felaktigt lösenord'],
+            },
           });
           socket.emit('commandFail');
 
           return;
         }
 
-        messenger.sendSelfMsg({
-          socket,
+        callback({
           message: {
             text: ['Enter your new password'],
             text_se: ['Skriv in ert nya lösenord'],
@@ -352,20 +365,25 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('changePassword', (params) => {
+  socket.on('changePassword', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { oldPassword: true, newPassword: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.password.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       } else if (!params.newPassword) {
-        logger.sendSocketErrorMsg({
-          socket,
-          code: logger.ErrorCodes.general,
-          text: ['Failed to update password. No new password sent'],
-          text_se: ['Misslyckades med att uppdatera lösenordet. Inget nytt lösenord skickades'],
+        callback({
+          error: {
+            code: logger.ErrorCodes.general,
+            text: ['Failed to update password. No new password sent'],
+            text_se: ['Misslyckades med att uppdatera lösenordet. Inget nytt lösenord skickades'],
+          },
         });
 
         return;
@@ -373,12 +391,12 @@ function handle(socket, io) {
 
       dbUser.authUser(user.userName, params.oldPassword, (err, authUser) => {
         if (err || authUser === null) {
-          logger.sendSocketErrorMsg({
-            socket,
-            code: logger.ErrorCodes.general,
-            text: ['Failed to update password'],
-            text_se: ['Misslyckades med att uppdatera lösenordet'],
-            err,
+          callback({
+            error: {
+              code: logger.ErrorCodes.general,
+              text: ['Failed to update password'],
+              text_se: ['Misslyckades med att uppdatera lösenordet'],
+            },
           });
 
           return;
@@ -386,19 +404,18 @@ function handle(socket, io) {
 
         dbUser.updateUserPassword(authUser.userName, params.newPassword, (userErr, updatedUser) => {
           if (userErr || updatedUser === null) {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.general,
-              text: ['Failed to update password'],
-              text_se: ['Misslyckades med att uppdatera lösenordet'],
-              err: userErr,
+            callback({
+              error: {
+                code: logger.ErrorCodes.general,
+                text: ['Failed to update password'],
+                text_se: ['Misslyckades med att uppdatera lösenordet'],
+              },
             });
 
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket,
+          callback({
             message: {
               text: ['Password has been successfully changed!'],
               text_se: ['Lösenordet har ändrats!'],
@@ -409,9 +426,11 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('logout', () => {
+  socket.on('logout', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.logout.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
+        callback({ error: {} });
+
         return;
       }
 
@@ -424,6 +443,7 @@ function handle(socket, io) {
             text: ['Failed to reset user socket ID'],
             err,
           });
+          callback({ error: {} });
 
           return;
         }
@@ -435,6 +455,7 @@ function handle(socket, io) {
               text: ['Failed to reset socket id'],
               err: userErr,
             });
+            callback({ error: {} });
 
             return;
           }
@@ -447,21 +468,22 @@ function handle(socket, io) {
             }
           }
 
-          socket.emit('logout');
-          messenger.sendSelfMsg({
-            socket,
+          callback({
             message: {
               text: ['You have been logged out'],
               text_se: ['Ni har blivit urloggade'],
             },
           });
+          socket.emit('logout');
         });
       });
     });
   });
 
-  socket.on('verifyUser', (params) => {
+  socket.on('verifyUser', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { user: { userName: true } })) {
+      callback({ error: {} });
+
       return;
     }
 
@@ -475,19 +497,18 @@ function handle(socket, io) {
       if (userNameLower !== undefined) {
         dbUser.verifyUser(userNameLower, (err, user) => {
           if (err || user === null) {
-            logger.sendSocketErrorMsg({
-              socket,
-              code: logger.ErrorCodes.general,
-              text: ['Failed to verify user'],
-              text_se: ['Misslyckades med att verifiera användaren'],
-              err,
+            callback({
+              error: {
+                code: logger.ErrorCodes.general,
+                text: ['Failed to verify user'],
+                text_se: ['Misslyckades med att verifiera användaren'],
+              },
             });
 
             return;
           }
 
-          messenger.sendSelfMsg({
-            socket,
+          callback({
             message: {
               text: [`User ${user.userName} has been verified`],
               text_se: [`Användaren ${user.userName} har blivit verifierad`],
@@ -828,7 +849,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('whoAmI', (params, callback) => {
+  socket.on('whoAmI', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.whoami.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed || !user) {
         return;
@@ -844,7 +865,7 @@ function handle(socket, io) {
     });
   });
 
-  socket.on('matchPartialUser', (params, callback) => {
+  socket.on('matchPartialUser', (params, callback = () => {}) => {
     // params.partialName is not checked if it set, to allow the retrieval of all users on no input
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
@@ -865,6 +886,38 @@ function handle(socket, io) {
 
         callback({ matched: itemList });
       });
+    });
+  });
+
+  socket.on('matchPartialAlias', ({ partialName }, callback = () => {}) => {
+    // params.partialAlias is not checked if it set, to allow the retrieval of all aliases on no input
+
+    manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
+      if (allowErr || !allowed) {
+        callback({ error: {} });
+
+        return;
+      }
+
+      console.log(user);
+
+      let matched = [];
+
+      if (user.aliases) {
+        if (!partialName) {
+          matched = user.aliases;
+        } else {
+          for (const alias of user.aliases) {
+            const aliasRegex = new RegExp(`^${partialName}.*`);
+
+            if (alias.match(aliasRegex)) {
+              matched.push(alias);
+            }
+          }
+        }
+      }
+
+      callback({ matched });
     });
   });
 }

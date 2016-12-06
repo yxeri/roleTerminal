@@ -34,12 +34,7 @@ const appConfig = require('../../config/defaults/config').app;
  * @param {string} params.teamName - Name of the team
  * @param {Function} params.callback - Callback
  */
-function updateUserTeam(params) {
-  const socket = params.socket;
-  const userName = params.userName;
-  const teamName = params.teamName;
-  const callback = params.callback;
-
+function updateUserTeam({ socket, userName, teamName, callback }) {
   dbUser.updateUserTeam(userName, teamName, (err, user) => {
     if (err || user === null) {
       logger.sendSocketErrorMsg({
@@ -74,11 +69,7 @@ function updateUserTeam(params) {
  * @param {string} params.roomName - Name of the room
  * @param {Object} params.io - Socket.IO
  */
-function addUserTeamRoom(params) {
-  const roomName = params.roomName;
-  const userName = params.userName;
-  const io = params.io;
-
+function addUserTeamRoom({ roomName, userName, io }) {
   dbUser.addRoomToUser(userName, roomName, (roomErr, user) => {
     if (roomErr || user === null) {
       logger.sendErrorMsg({
@@ -107,11 +98,7 @@ function addUserTeamRoom(params) {
  * @param {Object} params.user - User
  * @param {Function} params.callback - Callback
  */
-function getTeam(params) {
-  const socket = params.socket;
-  const user = params.user;
-  const callback = params.callback;
-
+function getTeam({ socket, user, callback }) {
   dbConnector.getTeam(user.team, (err, team) => {
     let newErr;
 

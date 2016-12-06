@@ -24,6 +24,7 @@ const objectValidator = require('../../utils/objectValidator');
 
 const router = new express.Router();
 
+
 /**
  * @param {object} io - Socket.IO
  * @returns {Object} Router
@@ -31,6 +32,51 @@ const router = new express.Router();
 function handle(io) {
   /**
    * @api {post} /messages Create and send a message
+   * @apiVersion 5.0.2
+   * @apiName CreateMessage
+   * @apiGroup Messages
+   *
+   * @apiHeader {String} Authorization Your JSON Web Token
+   *
+   * @apiDescription Create and send a message to a room
+   *
+   * @apiParam {Object} data
+   * @apiParam {Object} data.message Message
+   * @apiParam {String} data.message.roomName Name of the room to send the message to
+   * @apiParam {String} [data.message.userName] Name of the sender. Default is your user name. You can instead set it to one of your user's aliases
+   * @apiParam {String[]} data.message.text Content of the message
+   * @apiParamExample {json} Request-Example:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "userName": "rez",
+   *        "text": [
+   *          "Hello world!"
+   *        ]
+   *      }
+   *    }
+   *  }
+   *
+   * @apiSuccess {Object} data
+   * @apiSuccess {Object} data.message Found archive with sent archive ID. Empty if no match was found
+   * @apiSuccessExample {json} Success-Response:
+   *   {
+   *    "data": {
+   *      "message": {
+   *        "roomName": "bb1",
+   *        "text": [
+   *          "Hello world!"
+   *        ],
+   *        "userName": "rez",
+   *        "time": "2016-10-28T22:42:06.262Z"
+   *      }
+   *    }
+   *  }
+   */
+  /**
+   * @api {post} /messages Create and send a message
+   * @apiVersion 5.0.1
    * @apiName CreateMessage
    * @apiGroup Messages
    *
@@ -108,11 +154,10 @@ function handle(io) {
       }
 
       const message = req.body.data.message;
-      message.userName = decoded.data.userName;
 
       messenger.sendChatMsg({
-        message,
         io,
+        message,
         user: decoded.data,
         callback: ({ error, data }) => {
           if (error) {

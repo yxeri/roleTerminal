@@ -30,6 +30,7 @@ const router = new express.Router();
 function handle() {
   /**
    * @api {get} /archives Retrieve all public archives
+   * @apiVersion 5.0.1
    * @apiName GetPublicArchives
    * @apiGroup Archives
    *
@@ -104,6 +105,7 @@ function handle() {
 
   /**
    * @api {get} /archives/:id Retrieve specific archive
+   * @apiVersion 5.0.1
    * @apiName GetArchive
    * @apiGroup Archives
    *
@@ -180,6 +182,7 @@ function handle() {
 
   /**
    * @api {post} /archives Create an archive
+   * @apiVersion 5.0.1
    * @apiName CreateArchive
    * @apiGroup Archives
    *

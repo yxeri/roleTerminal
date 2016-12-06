@@ -18,7 +18,6 @@
 
 const dbDevice = require('../../db/connectors/device');
 const manager = require('../../socketHelpers/manager');
-const messenger = require('../../socketHelpers/messenger');
 const databasePopulation = require('../../config/defaults/config').databasePopulation;
 const logger = require('../../utils/logger');
 const objectValidator = require('../../utils/objectValidator');
@@ -32,16 +31,19 @@ function handle(socket) {
    * Returns all devices from database, if the user has high enough access level
    * Emits list
    */
-  socket.on('listDevices', () => {
+  socket.on('listDevices', (params, callback = () => {}) => {
     manager.userAllowedCommand(socket.id, databasePopulation.commands.list.commandName, (allowErr, allowed, user) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       } else if (user.accessLevel < 11) {
-        logger.sendSocketErrorMsg({
-          socket,
-          code: logger.ErrorCodes.unauth,
-          text: ['You are not allowed to list devices'],
-          text_se: ['Ni har inte tillåtelse att lista enheter'],
+        callback({
+          error: {
+            code: logger.ErrorCodes.unauth,
+            text: ['You are not allowed to list devices'],
+            text_se: ['Ni har inte tillåtelse att lista enheter'],
+          },
         });
 
         return;
@@ -55,38 +57,12 @@ function handle(socket) {
             err: devErr,
           });
 
+          callback({ error: {} });
+
           return;
         }
 
-        const allDevices = devices.map((device) => {
-          let deviceString = '';
-
-          deviceString += `DeviceID: ${device.deviceId}${'\t'}`;
-
-          if (device.deviceAlias && device.deviceAlias !== null && device.deviceAlias !== device.deviceId) {
-            deviceString += `Alias: ${device.deviceAlias}${'\t'}`;
-          }
-
-          if (device.lastUser && device.lastUser !== null) {
-            deviceString += `Last user: ${device.lastUser}${'\t'}`;
-          }
-
-          if (device.lastAlive && device.lastAlive !== null) {
-            deviceString += `Last alive: ${device.lastAlive}`;
-          }
-
-          return deviceString;
-        });
-
-        if (allDevices.length > 0) {
-          messenger.sendList({
-            socket,
-            itemList: {
-              listTitle: 'Devices',
-              itemList: allDevices,
-            },
-          });
-        }
+        callback({ data: { devices } });
       });
     });
   });
@@ -96,27 +72,30 @@ function handle(socket) {
       return;
     }
 
-    dbDevice.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, () => {
-    });
+    dbDevice.updateDeviceLastAlive(params.device.deviceId, params.device.lastAlive, () => {});
   });
 
   /**
    * Updates a field on a device in the database
    */
-  socket.on('updateDevice', (params) => {
+  socket.on('updateDevice', (params, callback = () => {}) => {
     if (!objectValidator.isValidData(params, { device: { deviceId: true }, field: true, value: true })) {
+      callback({ error: {} });
+
       return;
     }
 
     manager.userAllowedCommand(socket.id, databasePopulation.commands.updatedevice.commandName, (allowErr, allowed) => {
       if (allowErr || !allowed) {
+        callback({ error: {} });
+
         return;
       }
 
       const deviceId = params.device.deviceId;
       const field = params.field;
       const value = params.value;
-      const callback = (err, device) => {
+      const updateCallback = (err, device) => {
         if (err || device === null) {
           let errMsg = 'Failed to update device';
 
@@ -124,27 +103,35 @@ function handle(socket) {
             errMsg += '. Alias already exists';
           }
 
-          logger.sendSocketErrorMsg({
-            socket,
-            text: [errMsg],
-            err,
-            code: logger.ErrorCodes.general,
+          callback({
+            error: {
+              text: [errMsg],
+              code: logger.ErrorCodes.general,
+            },
           });
+
+          return;
         }
+
+        callback({
+          message: {
+            text: [`${device.deviceId} has been updated`],
+          },
+        });
       };
 
       switch (field) {
         case 'alias': {
-          dbDevice.updateDeviceAlias(deviceId, value, callback);
+          dbDevice.updateDeviceAlias(deviceId, value, updateCallback);
 
           break;
         }
         default: {
-          messenger.sendSelfMsg({
-            socket,
-            message: {
+          callback({
+            error: {
               text: [`Invalid field. Device doesn't have ${field}`],
               text_se: [`Inkorrekt fält. Enheter har inte fältet ${field}`],
+              code: logger.ErrorCodes.general,
             },
           });
 
@@ -158,7 +145,7 @@ function handle(socket) {
    * Checks if the device is in the database
    * Emits commandFail or commandSuccess if the device was found
    */
-  socket.on('verifyDevice', (params) => {
+  socket.on('verifyDevice', (params, callback = () => {}) => {
     // TODO Check if either device.alias or device.deviceId is set
     if (!objectValidator.isValidData(params, { device: { deviceId: true } })) {
       return;
@@ -166,8 +153,7 @@ function handle(socket) {
 
     dbDevice.getDevice(params.device.deviceId, (err, device) => {
       if (err || device === null) {
-        messenger.sendSelfMsg({
-          socket,
+        callback({
           message: {
             text: ['Device is not in the database'],
             text_se: ['Enheten finns inte i databasen'],
@@ -178,8 +164,7 @@ function handle(socket) {
         return;
       }
 
-      messenger.sendSelfMsg({
-        socket,
+      callback({
         message: {
           text: ['Device found in the database'],
           text_se: ['Enheten funnen i databasen'],

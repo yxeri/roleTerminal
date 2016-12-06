@@ -16,10 +16,12 @@
 
 'use strict';
 
-let modifiedConfig = {};
+const path = require('path');
+
+let config = {};
 
 try {
-  modifiedConfig = require('../modified/appConfig').config; // eslint-disable-line import/no-unresolved, global-require
+  config = require(path.join(__dirname, 'config', 'appConfig')).config; // eslint-disable-line import/no-unresolved, global-require, import/no-dynamic-require
 } catch (err) {
   console.log('Did not find modified appConfig. Using defaults');
 }
@@ -43,7 +45,6 @@ function convertToBoolean(envar) {
  * All app specific configuration
  */
 
-const config = {};
 const userVerifyEnv = convertToBoolean(process.env.REQUIREVERIFY);
 const revealFailedHackEnv = convertToBoolean(process.env.REVEALFAILEDHACK);
 const forceFullscreenEnv = convertToBoolean(process.env.FORCEFULLSCREEN);
@@ -55,7 +56,7 @@ const hideTimeStampEnv = convertToBoolean(process.env.HIDETIMESTAMP);
 const staticInputStartEnv = convertToBoolean(process.env.STATICINPUTSTART);
 
 // Title of the site
-config.title = process.env.TITLE || modifiedConfig.title || 'roleHaven';
+config.title = process.env.TITLE || config.title || 'roleHaven';
 
 /**
  * Default language for clients connecting.
@@ -63,51 +64,51 @@ config.title = process.env.TITLE || modifiedConfig.title || 'roleHaven';
  * Don't set this var if you want English to be the default language.
  * Valid options: se
  */
-config.defaultLanguage = process.env.DEFAULTLANGUAGE || modifiedConfig.defaultLanguage || '';
+config.defaultLanguage = process.env.DEFAULTLANGUAGE || config.defaultLanguage || '';
 
 /*
  * Base directory for public and private files
  */
-config.publicBase = process.env.PUBLICBASE || modifiedConfig.publicBase || 'public';
-config.privateBase = process.env.PRIVATEBASE || modifiedConfig.privateBase || 'private';
+config.publicBase = process.env.PUBLICBASE || config.publicBase || 'public';
+config.privateBase = process.env.PRIVATEBASE || config.privateBase || 'private';
 
 /*
  * Sub directories for public and private files
  * Will be appended to the base directories
  */
-config.viewsPath = process.env.VIEWSPATH || modifiedConfig.viewsPath || 'views';
-config.stylesPath = process.env.STYLESPATH || modifiedConfig.stylesPath || 'styles';
-config.scriptsPath = process.env.SCRIPTSPATH || modifiedConfig.scriptsPath || 'scripts';
-config.requiredPath = process.env.REQUIREDPATH || modifiedConfig.requiredPath || 'required';
-config.faviconPath = process.env.FAVICONPATH || modifiedConfig.faviconPath || 'images/favicon.ico';
+config.viewsPath = process.env.VIEWSPATH || config.viewsPath || 'views';
+config.stylesPath = process.env.STYLESPATH || config.stylesPath || 'styles';
+config.scriptsPath = process.env.SCRIPTSPATH || config.scriptsPath || 'scripts';
+config.requiredPath = process.env.REQUIREDPATH || config.requiredPath || 'required';
+config.faviconPath = process.env.FAVICONPATH || config.faviconPath || 'images/favicon.ico';
 
 // Morgan log level
-config.logLevel = process.env.LOGLEVEL || modifiedConfig.logLevel || 'tiny';
+config.logLevel = process.env.LOGLEVEL || config.logLevel || 'tiny';
 
 // Database host name
-config.dbHost = process.env.DBHOST || modifiedConfig.dbHost || 'localhost';
+config.dbHost = process.env.DBHOST || config.dbHost || 'localhost';
 
 // Database port
-config.dbPort = process.env.DBPORT || modifiedConfig.dbPort || 27017;
+config.dbPort = process.env.DBPORT || config.dbPort || 27017;
 
 // Database database name
-config.dbName = process.env.DBNAME || modifiedConfig.dbName || 'roleHaven';
+config.dbName = process.env.DBNAME || config.dbName || 'roleHaven';
 
 // Node server port number
-config.port = process.env.PORT || modifiedConfig.port || 8888;
+config.port = process.env.PORT || config.port || 8888;
 
 /*
  * Retrieve socket.io from local server or cdn
  * Note! Android 2.2 fails when using cdn
  */
-config.socketPath = (process.env.SOCKETPATH === 'cdn' || modifiedConfig.socketPath === 'cdn') ?
-  'https://cdn.socket.io/socket.io-1.4.5.js' : (process.env.SOCKETPATH || modifiedConfig.socketPath || '/scripts/socket.io-1.4.5.js');
+config.socketPath = (process.env.SOCKETPATH === 'cdn' || config.socketPath === 'cdn') ?
+  'https://cdn.socket.io/socket.io-1.4.5.js' : (process.env.SOCKETPATH || config.socketPath || '/scripts/socket.io-1.4.5.js');
 
 /**
  * Server mode. Options:
  * prod, dev
  */
-config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
+config.mode = process.env.MODE || config.mode || 'prod';
 
 /**
  * Array of route paths
@@ -122,7 +123,7 @@ config.mode = process.env.MODE || modifiedConfig.mode || 'prod';
  * }
  * @type {{sitePath:string, filePath:string}[]}
  */
-config.routes = modifiedConfig.routes || [
+config.routes = config.routes || [
   { sitePath: '/', filePath: './routes/index.js' },
   { sitePath: '/api/authenticate', filePath: './routes/rest/authenticate.js' },
   { sitePath: '/api/rooms', filePath: './routes/rest/rooms.js' },
@@ -134,50 +135,45 @@ config.routes = modifiedConfig.routes || [
   { sitePath: '*', filePath: './routes/error.js' },
 ];
 
-/**
- * Custom set of flags to be used on the client
- */
-config.customFlags = modifiedConfig.customFlags;
-
 //
 // Instance specific
 //
 
-config.radioChannels = modifiedConfig.radioChannels || {};
+config.radioChannels = config.radioChannels || {};
 
-config.gMapsKey = process.env.GMAPSKEY || modifiedConfig.gMapsKey;
-config.mapLayersPath = process.env.MAPLAYERSPATH || modifiedConfig.mapLayersPath || 'https://www.google.com/maps/d/kml?hl=en_US&app=mp&mid=1j97gNHqYj-6M10RbW9CGAVNxUV4&forcekml=1&cid=mp&cv=jm93Tu_hxIY.en_US.';
+config.gMapsKey = process.env.GMAPSKEY || config.gMapsKey;
+config.mapLayersPath = process.env.MAPLAYERSPATH || config.mapLayersPath || 'https://www.google.com/maps/d/kml?hl=en_US&app=mp&mid=1j97gNHqYj-6M10RbW9CGAVNxUV4&forcekml=1&cid=mp&cv=jm93Tu_hxIY.en_US.';
 
-config.country = process.env.COUNTRY || modifiedConfig.country || 'Sweden';
-config.centerLat = parseFloat(process.env.CENTERLAT || modifiedConfig.centerLat || 59.3534372);
-config.centerLong = parseFloat(process.env.CENTERLONG || modifiedConfig.centerLong || 18.0044666);
-config.cornerOneLat = parseFloat(process.env.CORNERONELAT || modifiedConfig.cornerOneLat || 67.3926316);
-config.cornerOneLong = parseFloat(process.env.CORNERONELONG || modifiedConfig.cornerOneLong || 24.0936037);
-config.cornerTwoLat = parseFloat(process.env.CORNERTWOLAT || modifiedConfig.cornerTwoLat || 55.699443);
-config.cornerTwoLong = parseFloat(process.env.CORNERTWOLONG || modifiedConfig.cornerTwoLong || 10.3777913);
-config.defaultZoomLevel = parseInt(process.env.DEFAULTZOOMLEVEL || modifiedConfig.defaultZoomLevel || 15, 10);
+config.country = process.env.COUNTRY || config.country || 'Sweden';
+config.centerLat = parseFloat(process.env.CENTERLAT || config.centerLat || 59.3534372);
+config.centerLong = parseFloat(process.env.CENTERLONG || config.centerLong || 18.0044666);
+config.cornerOneLat = parseFloat(process.env.CORNERONELAT || config.cornerOneLat || 67.3926316);
+config.cornerOneLong = parseFloat(process.env.CORNERONELONG || config.cornerOneLong || 24.0936037);
+config.cornerTwoLat = parseFloat(process.env.CORNERTWOLAT || config.cornerTwoLat || 55.699443);
+config.cornerTwoLong = parseFloat(process.env.CORNERTWOLONG || config.cornerTwoLong || 10.3777913);
+config.defaultZoomLevel = parseInt(process.env.DEFAULTZOOMLEVEL || config.defaultZoomLevel || 15, 10);
 
 // Amount of messages retrieved with the history command
-config.historyLines = process.env.MAXHISTORY || modifiedConfig.historyLines || 80;
+config.historyLines = process.env.MAXHISTORY || config.historyLines || 80;
 
 /**
  * Max amount of history that will be retrieved
  * @type {number}
  */
-config.maxHistoryLines = process.env.MAXHISTORYLINES || modifiedConfig.maxHistoryLines || 200;
+config.maxHistoryLines = process.env.MAXHISTORYLINES || config.maxHistoryLines || 200;
 
 // Amount of messages sent at a time to client
-config.chunkLength = process.env.MAXCHUNK || modifiedConfig.chunkLength || 10;
+config.chunkLength = process.env.MAXCHUNK || config.chunkLength || 10;
 
 // Does the user have to be verified before being able to login?
-config.userVerify = userVerifyEnv !== undefined ? userVerifyEnv : modifiedConfig.userVerify;
+config.userVerify = userVerifyEnv !== undefined ? userVerifyEnv : config.userVerify;
 
 if (config.userVerify === undefined) {
   config.userVerify = false;
 }
 
 // Does the team have to be verified before being created?
-config.teamVerify = teamVerifyEnv !== undefined ? teamVerifyEnv : modifiedConfig.teamVerify;
+config.teamVerify = teamVerifyEnv !== undefined ? teamVerifyEnv : config.teamVerify;
 
 if (config.teamVerify === undefined) {
   config.teamVerify = false;
@@ -201,7 +197,7 @@ config.deviceAppend = '-device';
  */
 config.teamAppend = '-team';
 
-config.modes = modifiedConfig.modes || {
+config.modes = config.modes || {
   command: 'cmd',
   chat: 'chat',
 };
@@ -210,12 +206,12 @@ config.modes = modifiedConfig.modes || {
  * Default mode for command input.
  * Valid options are: cmd chat
  */
-config.defaultMode = process.env.DEFAULTMODE || modifiedConfig.defaultMode || config.modes.command;
+config.defaultMode = process.env.DEFAULTMODE || config.defaultMode || config.modes.command;
 
 /**
  * Should the user that initiated a hack and failed it be revealed to other users?
  */
-config.revealFailedHack = revealFailedHackEnv !== undefined ? revealFailedHackEnv : modifiedConfig.revealFailedHack;
+config.revealFailedHack = revealFailedHackEnv !== undefined ? revealFailedHackEnv : config.revealFailedHack;
 
 if (config.revealFailedHack === undefined) {
   config.revealFailedHack = true;
@@ -224,12 +220,12 @@ if (config.revealFailedHack === undefined) {
 /**
  * The number of years that will be subtracted/added to the current year
  */
-config.yearModification = modifiedConfig.yearModification || 0;
+config.yearModification = config.yearModification || 0;
 
 /**
  * Should the frontend force full screen on click?
  */
-config.forceFullscreen = forceFullscreenEnv !== undefined ? forceFullscreenEnv : modifiedConfig.forceFullscreen;
+config.forceFullscreen = forceFullscreenEnv !== undefined ? forceFullscreenEnv : config.forceFullscreen;
 
 if (config.forceFullscreen === undefined) {
   config.forceFullscreen = true;
@@ -238,7 +234,7 @@ if (config.forceFullscreen === undefined) {
 /**
  * Should the frontend ask for user tracking?
  */
-config.gpsTracking = gpsTrackingEnv !== undefined ? gpsTrackingEnv : modifiedConfig.gpsTracking;
+config.gpsTracking = gpsTrackingEnv !== undefined ? gpsTrackingEnv : config.gpsTracking;
 
 if (config.gpsTracking === undefined) {
   config.gpsTracking = true;
@@ -247,7 +243,7 @@ if (config.gpsTracking === undefined) {
 /**
  * Should the user be able to use commands in the frontend?
  */
-config.disableCommands = disableCommandsEnv !== undefined ? disableCommandsEnv : modifiedConfig.disableCommands;
+config.disableCommands = disableCommandsEnv !== undefined ? disableCommandsEnv : config.disableCommands;
 
 if (config.disableCommands === undefined) {
   config.disableCommands = false;
@@ -256,7 +252,7 @@ if (config.disableCommands === undefined) {
 /**
  * Should room names be hidden in print in the frontend?
  */
-config.hideRoomNames = hideRoomNamesEnv !== undefined ? hideRoomNamesEnv : modifiedConfig.hideRoomNames;
+config.hideRoomNames = hideRoomNamesEnv !== undefined ? hideRoomNamesEnv : config.hideRoomNames;
 
 if (config.hideRoomNames === undefined) {
   config.hideRoomNames = false;
@@ -265,7 +261,7 @@ if (config.hideRoomNames === undefined) {
 /**
  * Should time stamps be hidden in print in the frontend?
  */
-config.hideTimeStamp = hideTimeStampEnv !== undefined ? hideTimeStampEnv : modifiedConfig.hideTimeStamp;
+config.hideTimeStamp = hideTimeStampEnv !== undefined ? hideTimeStampEnv : config.hideTimeStamp;
 
 if (config.hideTimeStamp === undefined) {
   config.hideTimeStamp = false;
@@ -274,28 +270,28 @@ if (config.hideTimeStamp === undefined) {
 /**
  * Amount of weather reports that will be sent to the client
  */
-config.maxWeatherReports = process.env.MAXWEATHERREPORTS || modifiedConfig.maxWeatherReports || 8;
+config.maxWeatherReports = process.env.MAXWEATHERREPORTS || config.maxWeatherReports || 8;
 
 /**
  * Should the input start be static? Normal behaviour is to set input star to the room name that the user is in
  */
-config.staticInputStart = staticInputStartEnv !== undefined ? staticInputStartEnv : modifiedConfig.staticInputStart;
+config.staticInputStart = staticInputStartEnv !== undefined ? staticInputStartEnv : config.staticInputStart;
 
 /**
  * The string that will be shown in the beginning of the command input
  */
-config.defaultInputStart = process.env.DEFAULTINPUTSTART || modifiedConfig.defaultInputStart || 'RAZCMD';
+config.defaultInputStart = process.env.DEFAULTINPUTSTART || config.defaultInputStart || 'RAZCMD';
 
 /**
  * Amount of milliseconds between each increment/decrement of signal value (BBR game feature)
  * @type {number}
  */
-config.signalResetInterval = process.env.SIGNALRESETINTERVAL || modifiedConfig.signalResetInterval || 0;
+config.signalResetInterval = process.env.SIGNALRESETINTERVAL || config.signalResetInterval || 0;
 
 /**
  * Message that will be sent to client and can be printed
  */
-config.welcomeMessage = process.env.WELCOMEMESSAGE || modifiedConfig.welcomeMessage;
+config.welcomeMessage = process.env.WELCOMEMESSAGE || config.welcomeMessage;
 
 /**
  * Secret key used with JSON Web Token

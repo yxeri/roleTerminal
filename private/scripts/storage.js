@@ -383,10 +383,11 @@ function getUser() {
 
 /**
  * @static
- * @param {string} user - New user name
+ * @param {string} userName - New user name
  */
-function setUser(user) {
-  setLocalVal('user', user);
+function setUser(userName) {
+  domManipulator.setUserName(userName);
+  setLocalVal('user', userName);
 }
 
 /**

@@ -32,6 +32,7 @@ const router = new express.Router();
 function handle(io) {
   /**
    * @api {get} /positions/users Retrieve all user positions
+   * @apiVersion 5.0.1
    * @apiName GetUserPositions
    * @apiGroup Positions
    *
@@ -108,6 +109,7 @@ function handle(io) {
 
   /**
    * @api {get} /positions/users Retrieve specific user position
+   * @apiVersion 5.0.1
    * @apiName GetUserPosition
    * @apiGroup Positions
    *
@@ -186,6 +188,7 @@ function handle(io) {
 
   /**
    * @api {post} /positions/users Set position
+   * @apiVersion 5.0.1
    * @apiName SetPosition
    * @apiGroup Positions
    *

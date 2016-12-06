@@ -60,6 +60,10 @@ const statusField = document.getElementById('status');
 /**
  * @type {HTMLElement}
  */
+const nameField = document.getElementById('userName');
+/**
+ * @type {HTMLElement}
+ */
 const stationStats = document.getElementById('stationStats');
 /**
  * Div containing mainFeed, inputContainer and spacer
@@ -438,6 +442,13 @@ function setStatus(status) {
 }
 
 /**
+ * @param {string} userName - Current user name (main user name or alias)
+ */
+function setUserName(userName) {
+  nameField.textContent = `[${userName}]`;
+}
+
+/**
  * Calls function assigned to viewResizeCallback, if assigned
  */
 function resizeCallback() {
@@ -588,3 +599,4 @@ exports.setStationStats = setStationStats;
 exports.toggleStationStats = toggleStationStats;
 exports.toggleLantern = toggleLantern;
 exports.removeMenuItem = removeMenuItem;
+exports.setUserName = setUserName;

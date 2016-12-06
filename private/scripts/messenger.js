@@ -376,7 +376,7 @@ function consumeMessageQueue() {
  * @static
  * @param {Object} message - Message
  */
-function queueMessage(message) {
+function queueMessage(message = { text: [] }) {
   messageQueue.push(message);
   consumeMessageQueue();
 }

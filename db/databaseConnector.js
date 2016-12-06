@@ -494,31 +494,31 @@ function getUnverifiedTeams(callback) {
  * @param {Object} params.filter - Result filter
  * @param {Object} params.sort - Result sorting
  * @param {Object} params.user - User
+ * @param {string} params.type - Type of object to match against
  * @param {Function} params.callback - Callback
  */
-function matchPartial(params) {
-  if (!objectValidator.isValidData(params, { filter: true, sort: true, user: true, queryType: true, callback: true })) {
-    if (params.callback) {
-      params.callback(null, null);
-    }
+function matchPartial({ callback, partialName, queryType, filter, sort, user, type }) {
+  if (!objectValidator.isValidData({ callback, partialName, queryType, filter, sort, user, type }, { filter: true, sort: true, user: true, queryType: true, callback: true, type: true })) {
+    callback(null, null);
 
     return;
   }
 
-  let query;
+  const query = {};
 
-  if (params.partialName) {
-    query = {
-      $and: [
-        { userName: { $regex: `^${params.partialName}.*` } },
-        { visibility: { $lte: params.user.accessLevel } },
-      ],
-    };
+  if (partialName) {
+    if (type === 'userName') {
+      query.$and = [{ userName: { $regex: `^${partialName}.*` } }];
+    } else if (type === 'roomName') {
+      query.$and = [{ roomName: { $regex: `^${partialName}.*` } }];
+    }
   } else {
-    query = { visibility: { $lte: params.user.accessLevel } };
+    query.$and = [];
   }
 
-  params.queryType.find(query, params.filter).sort(params.sort).lean().exec((err, users) => {
+  query.$and.push({ visibility: { $lte: user.accessLevel } });
+
+  queryType.find(query, filter).sort(sort).lean().exec((err, matches) => {
     if (err) {
       logger.sendErrorMsg({
         code: logger.ErrorCodes.db,
@@ -527,7 +527,7 @@ function matchPartial(params) {
       });
     }
 
-    params.callback(err, users);
+    callback(err, matches);
   });
 }
 

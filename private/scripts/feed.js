@@ -289,7 +289,7 @@ function sendLocation() {
     socketHandler.emit('updateLocation', {
       type: 'user',
       position: preparePosition(mostAccuratePos),
-    });
+    }, () => {});
   }
 
   retrievePosition();
@@ -819,9 +819,10 @@ function scrollText(amount) {
  * Match found callback
  * @param {Object} error - Error. Will be set if something went wrong
  * @param {Object} params - Parameters
- * @param {string[]} params.matched - Found match/matches
+ * @param {Object} params.data - Data
+ * @param {string[]} params.data.matched - Found match/matches
  */
-function matchFound({ error, matched = [''] }) {
+function matchFound({ error, data: { matched = [''] } }) {
   if (error) {
     return;
   }
@@ -830,7 +831,7 @@ function matchFound({ error, matched = [''] }) {
     messenger.queueMessage({
       text: [matched.join(' - ')],
     });
-  } else {
+  } else if (matched[0]) {
     domManipulator.replaceLastInputPhrase(`${matched[0]} `);
   }
 }
@@ -869,6 +870,11 @@ function autoComplete() {
         }
         case 'myRooms': {
           socketHandler.emit('matchPartialMyRoom', { partialName: partial }, matchFound);
+
+          break;
+        }
+        case 'myAliases': {
+          socketHandler.emit('matchPartialAlias', { partialName: partial }, matchFound);
 
           break;
         }
@@ -1348,42 +1354,6 @@ function onDisconnect() {
 }
 
 /**
- * Called on login emit. Sets users info and starts map
- * @param {Object} params - Parameters
- * @param {Object} params.user - User information
- */
-function onLogin(params = {}) {
-  const user = params.user;
-  const mode = user.mode || 'cmd';
-
-  commandHandler.triggerCommand({ cmd: 'clear' });
-  storage.setUser(user.userName);
-  storage.setAccessLevel(user.accessLevel);
-  messenger.queueMessage({
-    text: [`Successfully logged in as ${user.userName}`],
-    text_se: [`Lyckades logga in som ${user.userName}`],
-  });
-  printWelcomeMessage();
-  commandHandler.triggerCommand({ cmd: 'mode', cmdParams: [mode] });
-
-  socketHandler.emit('updateDeviceSocketId', {
-    device: {
-      deviceId: storage.getDeviceId(),
-    },
-    user: {
-      userName: storage.getUser(),
-    },
-  });
-  socketHandler.emit('follow', {
-    room: {
-      roomName: 'public',
-      entered: true,
-    },
-  });
-  mapTools.startMap();
-}
-
-/**
  * @param {Object} params - Parameters
  * @param {boolean} params.noStepCall - Should next step function be skipped?
  * @param {boolean} params.freezeStep - Should the step stay the same after being called?
@@ -1524,18 +1494,6 @@ function onLogout() {
 }
 
 /**
- * Called on updateCommands emit
- * @param {Object} params - Parameters
- */
-function onUpdateCommands(params = { commands: [] }) {
-  const newCommands = params.commands;
-
-  for (let i = 0; i < newCommands.length; i += 1) {
-    commandHandler.updateCommand(newCommands[i]);
-  }
-}
-
-/**
  * Called on updateDeviceId emit. Sets new device ID
  * @param {string} newId - New device ID
  */
@@ -1570,78 +1528,6 @@ function onList(params = {}) {
       },
     });
   }
-}
-
-/**
- * Called on mapPositions emit. Adds new map positions
- * @param {Object} params - Parameters
- * @param {Object[]} params.positions - New map positions
- * @param {string} [params.team] - Name of the team that the user in the position belongs to. Valid for user positions
- * @param {Date} [params.currentTime] - Time of update of the positions
- */
-function onMapPositions(params) {
-  const mapPositions = params.positions || [];
-  const team = params.team;
-  const userName = storage.getUser() ? storage.getUser().toLowerCase() : '';
-
-  for (let i = 0; i < mapPositions.length; i += 1) {
-    const mapPosition = mapPositions[i];
-
-    if (mapPosition.positionName.toLowerCase() !== userName) {
-      const positionName = mapPosition.positionName;
-      const latitude = parseFloat(mapPosition.position.latitude);
-      const longitude = parseFloat(mapPosition.position.longitude);
-      const coordsCollection = mapPosition.position.coordsCollection;
-      const geometry = mapPosition.geometry;
-      const type = mapPosition.type;
-      const group = mapPosition.group;
-      const description = mapPosition.description;
-
-      if (geometry === 'line') {
-        mapTools.setLinePosition({
-          coordsCollection,
-          positionName,
-        });
-      } else if (geometry === 'polygon') {
-        mapTools.setPolygonPosition({
-          positionName,
-          coordsCollection,
-        });
-      } else if (geometry === 'point') {
-        mapTools.setMarkerPosition({
-          positionName,
-          position: {
-            latitude,
-            longitude,
-          },
-          description,
-          markerType: 'location',
-        });
-      } else if (type && type === 'user' && mapPosition.lastUpdated) {
-        const currentTime = new Date(params.currentTime);
-        const lastUpdated = new Date(mapPosition.lastUpdated);
-
-        if (currentTime - lastUpdated < (20 * 60 * 1000)) {
-          const userDescription = `Team: ${mapPosition.group || '-'}. Last seen: ${textTools.generateTimeStamp(lastUpdated, true)}`;
-
-          mapTools.setMarkerPosition({
-            lastUpdated,
-            positionName,
-            position: {
-              latitude,
-              longitude,
-            },
-            iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
-            hideLabel: true,
-            description: userDescription,
-            markerType: type,
-          });
-        }
-      }
-    }
-  }
-
-  mapTools.toggleMapLabels();
 }
 
 /**
@@ -1699,7 +1585,13 @@ function onStartup(params = { }) {
   storage.setRadioChannels(params.radioChannels);
   mapTools.setCornerCoords(storage.getCornerOneCoordinates(), storage.getCornerTwoCoordinates());
 
-  socketHandler.emit('getCommands');
+  socketHandler.emit('getCommands', '', ({ error, data: { commands } }) => {
+    if (error) {
+      throw new Error('Failed to retrieve commands');
+    }
+
+    commandHandler.onUpdateCommands({ commands });
+  });
   labels.setLanguage(storage.getDefaultLanguage());
   domManipulator.setMainView(document.getElementById('background'));
   commandHandler.addSpecialHelpOptions();
@@ -1750,6 +1642,8 @@ function onStartup(params = { }) {
           userName: 'NO_USER_LOGGED_IN',
         },
       });
+    } else {
+      domManipulator.setUserName(storage.getUser());
     }
 
     socketHandler.emit('updateId', {
@@ -1791,7 +1685,6 @@ socketHandler.startSocket({
   disconnect: onDisconnect,
   follow: roomHandler.onFollow,
   unfollow: roomHandler.onUnfollow,
-  login: onLogin,
   commandSuccess: onCommandSuccess,
   commandFail: onCommandFail,
   reconnectSuccess: onReconnectSuccess,
@@ -1799,11 +1692,11 @@ socketHandler.startSocket({
   morse: playMorse,
   ban: onBan,
   logout: onLogout,
-  updateCommands: onUpdateCommands,
+  updateCommands: commandHandler.onUpdateCommands,
   updateDeviceId: onUpdateDeviceId,
   list: onList,
   startup: onStartup,
-  mapPositions: onMapPositions,
+  mapPositions: mapTools.onMapPositions,
   videoMessage: onVideoMessage,
   commandStep: onCommandStep,
   reboot: onReboot,

@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema({
   authGroups: [{ type: String, unique: true }],
   mode: String,
   isTracked: Boolean,
+  aliases: [{ type: String, unique: true }],
 }, { collection: 'users' });
 
 const User = mongoose.model('User', userSchema);
@@ -750,6 +751,58 @@ function matchPartialUser(partialName, user, callback) {
     user,
     queryType: User,
     callback,
+    type: 'userName',
+  });
+}
+
+/**
+ * Get user by alias
+ * @param {string} alias - User alias
+ * @param {Function} callback - Callback
+ */
+function getUserByAlias(alias, callback) {
+  const query = {
+    $or: [
+      { userName: alias },
+      { aliases: { $in: [alias] } },
+    ],
+  };
+  const filter = { _id: 0, password: 0 };
+
+  User.findOne(query, filter).lean().exec((err, user) => {
+    if (err) {
+      logger.sendErrorMsg({
+        code: logger.ErrorCodes.db,
+        text: ['Failed to get user by alias'],
+        err,
+      });
+    }
+
+    callback(err, user);
+  });
+}
+
+/**
+ * Add an alias to the user, if a user with the alias or a matching user name doesn't already exist
+ * @param {string} userName - Name of the user to update
+ * @param {string} alias - User alias
+ * @param {Function} callback - Callback
+ */
+function addAlias(userName, alias, callback) {
+  getUser(alias, (err, user) => {
+    if (err || user === null) {
+      callback(err, null);
+    } else {
+      getUserByAlias(alias, (aliasErr, aliasUser) => {
+        if (aliasErr || aliasUser === null) {
+          callback(aliasErr, null);
+        } else {
+          const update = { $push: { aliases: alias } };
+
+          updateUserValue(userName, update, callback);
+        }
+      });
+    }
   });
 }
 
@@ -785,3 +838,5 @@ exports.matchPartialUser = matchPartialUser;
 exports.getUsersFollowingRoom = getUsersFollowingRoom;
 exports.removeRoomFromAllUsers = removeRoomFromAllUsers;
 exports.updateUserIsTracked = updateUserIsTracked;
+exports.getUserByAlias = getUserByAlias;
+exports.addAlias = addAlias;

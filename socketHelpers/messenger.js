@@ -232,19 +232,13 @@ function sendImportantMsg({ socket, message, device, callback }) {
 }
 
 /**
- * Sends a message to a room and stores it in history
- * Emits message
- * @param {Object} message - Message to be sent
- * @param {Object} user - User sending the message
- * @param {Function} callback - Client callback
+ * Store message in history and send to connected clients
+ * @param {Object} params.user - User sending the message
+ * @param {Function} params.callback - Callback
+ * @param {Object} params.message - Message to send
+ * @param {Object} params.io - Socket.io
  */
-function sendChatMsg({ message, user, callback, io }) {
-  if (!objectValidator.isValidData({ message, user, callback, io }, { user: { userName: true }, message: { text: true, roomName: true, userName: true }, io: true })) {
-    callback({ error: {} });
-
-    return;
-  }
-
+function sendAndStoreMsg({ user, callback, message, io }) {
   dbUser.getUser(user.userName, (userErr, foundUser) => {
     if (userErr || foundUser === null || !isUserFollowingRoom(foundUser, message.roomName)) {
       callback({ error: {} });
@@ -268,6 +262,53 @@ function sendChatMsg({ message, user, callback, io }) {
       callback({ data });
     });
   });
+}
+
+/**
+ * Sends a message to a room and stores it in history
+ * Emits message
+ * @param {Object} message - Message to be sent
+ * @param {Object} user - User sending the message
+ * @param {Function} callback - Client callback
+ */
+function sendChatMsg({ message, user, callback, io }) {
+  if (!objectValidator.isValidData({ message, user, callback, io }, { user: { userName: true }, message: { text: true, roomName: true, userName: true }, io: true })) {
+    callback({ error: {} });
+
+    return;
+  }
+
+  if (message.userName) {
+    dbUser.getUserByAlias(message.userName, (aliasErr, aliasUser) => {
+      if (aliasErr) {
+        callback({ error: {} });
+
+        return;
+      } else if (aliasUser === null || aliasUser.userName !== user.userName) {
+        callback({
+          error: {
+            called: sendChatMsg.name,
+            message: {
+              text: ['User name does not match user trying to send the message'],
+            },
+          },
+        });
+
+        return;
+      }
+
+      sendAndStoreMsg({ io, message, user, callback });
+    });
+  } else {
+    const modifiedMessage = message;
+    modifiedMessage.userName = user.userName;
+
+    if (modifiedMessage.roomName === 'team') {
+      modifiedMessage.roomName = user.team + appConfig.teamAppend;
+    }
+
+    sendAndStoreMsg({ io, message, user, callback });
+  }
 }
 
 /**

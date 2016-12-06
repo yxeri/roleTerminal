@@ -33,7 +33,7 @@ const commands = {};
 
 commands.whoami = {
   func: () => {
-    const data = {
+    const sendData = {
       user: { userName: storage.getUser() },
       device: { deviceId: storage.getDeviceId() },
     };
@@ -51,7 +51,7 @@ commands.whoami = {
 
       messenger.queueMessage({ text });
     });
-    socketHandler.emit('myRooms', data, ({ rooms, ownedRooms }) => {
+    socketHandler.emit('myRooms', sendData, ({ data: { rooms, ownedRooms } }) => {
       messenger.queueMessage({
         text: [
           'You are following rooms:',
@@ -89,7 +89,11 @@ commands.register = {
         commandHelper.data = data;
         commandHelper.hideInput = true;
         domManipulator.hideInput(true);
-        socketHandler.emit('userExists', commandHelper.data);
+        socketHandler.emit('userExists', commandHelper.data, ({ error }) => {
+          if (error) {
+            messenger.queueMessage({ text: error.text });
+          }
+        });
       } else {
         commandHandler.resetCommand(true);
         messenger.queueMessage({
@@ -172,7 +176,13 @@ commands.register = {
 
       if (password === commandHelper.data.user.password) {
         messenger.queueMessage({ text: labels.getText('info', 'congratulations') });
-        socketHandler.emit('register', commandHelper.data);
+        socketHandler.emit('register', commandHelper.data, ({ error, message }) => {
+          if (error) {
+            return;
+          }
+
+          messenger.queueMessage(message);
+        });
         commandHandler.abortCommand(commandHelper.command);
         commandHandler.resetCommand(false);
       } else {
@@ -245,7 +255,43 @@ commands.login = {
       const commandHelper = commandHandler.commandHelper;
       commandHelper.data.user.password = phrases[0];
 
-      socketHandler.emit('login', commandHelper.data);
+      socketHandler.emit('login', commandHelper.data, ({ error, data: { user } }) => {
+        if (error) {
+          return;
+        }
+
+        const mode = user.mode || 'cmd';
+
+        commandHandler.triggerCommand({ cmd: 'clear' });
+        storage.setUser(user.userName);
+        storage.setAccessLevel(user.accessLevel);
+        messenger.queueMessage({
+          text: [`Successfully logged in as ${user.userName}`],
+          text_se: [`Lyckades logga in som ${user.userName}`],
+        });
+        if (!storage.getFastMode()) {
+          const mainLogo = labels.getMessage('logos', 'mainLogo');
+          const razorLogo = labels.getMessage('logos', 'razor');
+
+          messenger.queueMessage(mainLogo);
+          messenger.queueMessage({ text: labels.getText('info', 'welcomeLoggedIn') });
+          messenger.queueMessage({ text: labels.getText('info', 'razorHacked') });
+          messenger.queueMessage(razorLogo);
+        }
+        commandHandler.triggerCommand({ cmd: 'mode', cmdParams: [mode] });
+
+        socketHandler.emit('updateDeviceSocketId', {
+          device: { deviceId: storage.getDeviceId() },
+          user: { userName: storage.getUser() },
+        });
+        socketHandler.emit('follow', {
+          room: {
+            roomName: 'public',
+            entered: true,
+          },
+        });
+        mapTools.startMap();
+      });
       commandHandler.abortCommand(commandHelper.command);
       commandHandler.triggerCommand({ cmd: 'clear' });
       commandHandler.resetCommand();
@@ -280,7 +326,15 @@ commands.password = {
       commandHelper.onStep += 1;
 
       domManipulator.setInputStart('New pass');
-      socketHandler.emit('checkPassword', data);
+      socketHandler.emit('checkPassword', data, ({ error, message }) => {
+        if (error) {
+          messenger.queueMessage({ text: error.text });
+
+          return;
+        }
+
+        messenger.queueMessage(message);
+      });
     },
     (phrases = []) => {
       const commandHelper = commandHandler.commandHelper;
@@ -298,7 +352,15 @@ commands.password = {
       const repeatedPassword = phrases[0];
 
       if (repeatedPassword === commandHelper.data.newPassword) {
-        socketHandler.emit('changePassword', commandHelper.data);
+        socketHandler.emit('changePassword', commandHelper.data, ({ error, message }) => {
+          if (error) {
+            messenger.queueMessage({ text: error.text });
+
+            return;
+          }
+
+          messenger.queueMessage(message);
+        });
         commandHandler.resetCommand(false);
       } else {
         commandHelper.onStep -= 1;
@@ -327,12 +389,28 @@ commands.password = {
 
 commands.logout = {
   func: () => {
-    socketHandler.emit('logout');
+    socketHandler.emit('logout', '', ({ error, message }) => {
+      if (error) {
+        return;
+      }
+
+      messenger.queueMessage(message);
+    });
   },
   accessLevel: 13,
   category: 'basic',
   clearAfterUse: true,
   commandName: 'logout',
+};
+
+commands.nick = {
+  func: () => {
+
+  },
+  autocomplete: { type: 'myAliases' },
+  accessLevel: 13,
+  category: 'basic',
+  commandName: 'nick',
 };
 
 module.exports = commands;

@@ -151,7 +151,7 @@ function getDevice(deviceCode, callback) {
  */
 function getAllDevices(callback) {
   const query = {};
-  const filter = { _id: 0 };
+  const filter = { _id: 0, socketId: 0 };
 
   Device.find(query, filter).lean().exec((err, devices) => {
     if (err) {

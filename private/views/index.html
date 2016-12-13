@@ -16,73 +16,61 @@
 
 <!doctype html>
 <html lang="en" id="html">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" type="text/css" href="styles/main.css"/>
-    <title>{{title}}</title>
-  </head>
-  <body>
-    <div id="background">
-      <ul class="feed" id="mainFeed">
-        <!-- Required for Safari to render text -->
-        <li>
-          <pre>&nbsp;</pre>
-        </li>
-      </ul>
-      <div id="inputContainer">
-        <span id="inputStart"></span><span id="userName"></span></span><span id="status"></span><span id="mode"></span><span id="cmd"></span>
-        <textarea id="cmdInput" value="" autocorrect="off" spellcheck="false" autocapitalize="none" autocapitalize="off" rows="1"></textarea>
-      </div>
-      <div id="spacer"></div>
-    </div>
-    <div id="stationStats" class="hide">
-    </div>
-    <div id="console" class="hide view">
-    </div>
-    <div id="map" class="hide view">
-    </div>
-    <div id="markerInfo" class="hide"></div>
-    <div id="videoHolder" class="hide view">
-      <!--<video id="videoPlayer" width="405" height="228"><source type="video/mp4"></video>-->
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" type="text/css" href="styles/main.css"/>
+  <title>{{title}}</title>
+</head>
+<body>
+<div id="background">
+  <div id="main">
     <div id="menu">
-      <!-- List items are generated with JS -->
-      <ul id="menuList">
-      </ul>
+      <div id="logo"><h1>razorOS</h1></div>
+      <div id="sysItems">
+        <div>
+          <div><h2>Map</h2></div>
+          <div><h2>Jobs</h2></div>
+        </div>
+        <div>
+          <div><h2>Chat</h2></div>
+          <div><h2>Home</h2></div>
+        </div>
+      </div>
     </div>
-    <script>
-      if (!Array.prototype.find) {
-        Array.prototype.find = function(predicate) {
-          'use strict';
-          if (this == null) {
-            throw new TypeError('Array.prototype.find called on null or undefined');
-          }
-          if (typeof predicate !== 'function') {
-            throw new TypeError('predicate must be a function');
-          }
-          var list = Object(this);
-          var length = list.length >>> 0;
-          var thisArg = arguments[1];
-          var value;
-
-          for (var i = 0; i < length; i++) {
-            value = list[i];
-            if (predicate.call(thisArg, value, i, list)) {
-              return value;
-            }
-          }
-          return undefined;
-        };
+  </div>
+</div>
+<script>
+  if (!Array.prototype.find) {
+    Array.prototype.find = function (predicate) {
+      'use strict';
+      if (this == null) {
+        throw new TypeError('Array.prototype.find called on null or undefined');
       }
-    </script>
-    <script src={{socketPath}} defer></script>
-    <script src="{{mainJs}}" defer></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" defer></script>
-    <script src="https://yxeri.github.io/js-map-label/minified/maplabel.js" defer></script>
-    <script src="https://yxeri.github.io/js-marker-clusterer/minified/markerclusterer.js" defer></script>
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      var value;
+
+      for (var i = 0; i < length; i++) {
+        value = list[i];
+        if (predicate.call(thisArg, value, i, list)) {
+          return value;
+        }
+      }
+      return undefined;
+    };
+  }
+</script>
+<script src={{socketPath}} defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" defer></script>
+<script src="https://yxeri.github.io/js-map-label/minified/maplabel.js" defer></script>
+<script src="https://yxeri.github.io/js-marker-clusterer/minified/markerclusterer.js" defer></script>
 </body>
 </html>

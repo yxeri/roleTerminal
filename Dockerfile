@@ -4,4 +4,4 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
-CMD [ "./docker-start.sh" ]
+CMD [ "./node_modules/roleHaven/docker-start.sh" ]

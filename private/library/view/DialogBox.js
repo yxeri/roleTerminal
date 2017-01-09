@@ -34,6 +34,12 @@ function createInput(input) {
   return inputElement;
 }
 
+/**
+ * Create and return a button element
+ * @param {string} text - Text in the button
+ * @param {Function} eventFunc - Callback when button is clicked
+ * @returns {Element} Button element
+ */
 function createButton({ text, eventFunc }) {
   const buttonElement = document.createElement('BUTTON');
 

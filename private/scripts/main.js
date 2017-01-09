@@ -35,11 +35,11 @@ const login = new DialogBox({
     left: {
       text: 'Register',
       eventFunc: () => {
-        if (login.inputs.find(input => input.getAttribute('name') === 'secondPassword')) {
-
-        } else {
-
-        }
+        // if (login.inputs.find(input => input.getAttribute('name') === 'secondPassword')) {
+        //
+        // } else {
+        //
+        // }
       },
     },
     right: {

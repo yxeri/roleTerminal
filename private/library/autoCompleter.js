@@ -44,3 +44,5 @@ function match(partial, items) {
 
   return matched;
 }
+
+exports.match = match;

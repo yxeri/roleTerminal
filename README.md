@@ -11,9 +11,10 @@ The master branch contains the latest and the stable releases. Stable releases a
 
 There's a container available at [Docker hub](https://hub.docker.com/r/yxeri/roleterminal/). Docker is the preferred method of deployment of the app.
 
-## Project owner
+## Development contributors
 
-* Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
+* Aleksandar Jankovic (Project owner) - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
+* Stanislav B - [Github](https://github.com/stanislavb)
 
 ## Other contributions
 

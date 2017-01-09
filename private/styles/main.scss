@@ -22,6 +22,8 @@
 $text-color: #00ffcc;
 $second-color: #ff02e5;
 $back-color: #11000f;
+$back-button: #76016a;
+$back-input: #007660;
 $padding: .2em;
 $border: 2px;
 
@@ -55,48 +57,63 @@ body {
 }
 
 h1 {
-  margin: .5em 0 .5em 0;
+  margin: $padding 0;
+}
+
+button {
+  margin: $padding;
+  padding: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  background-color: $back-button;
+  display: inline-block;
+  cursor: pointer;
+  color: $text-color;
+  font-family: GlassTTYVT220, monospace;
+  font-size: 1em;
+  -webkit-text-size-adjust: 100%;
+}
+
+input {
+  margin: $padding;
+  padding: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  background-color: $back-button;
+  display: inline-block;
+  cursor: pointer;
+  color: $text-color;
+  font-family: GlassTTYVT220, monospace;
+  font-size: 1em;
+  -webkit-text-size-adjust: 100%;
+  width: 95%;
 }
 
 #background {
   padding: $padding;
+  text-shadow: 2px 2px 2px $second-color;
+}
+
+#logo {
+  text-align: center;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  margin-bottom: $padding;
 }
 
 #main {
-  padding: $padding;
   border: $border solid $second-color;
   outline: 1px solid;
-  overflow: hidden;
-  text-shadow: 2px 2px 2px $second-color;
+}
 
-  #logo {
-    text-align: center;
-    border-bottom: $border solid $second-color;
-    box-shadow: 0 1px;
-  }
+#sysItems {
+  display: table;
+  margin: auto;
+  text-align: center;
 
-  #sysItems {
-    display: table;
-    width: 100%;
-
-    div {
-      display: table-row;
-      padding: 2em 0;
-
-      div {
-        display: table-cell;
-        text-align: center;
-        border-bottom: $border solid $second-color;
-        box-shadow: 0 1px;
-      }
-    }
-
-    div:last-child {
-      div {
-        border-bottom: none;
-        box-shadow: none;
-      }
-    }
+  span {
+    margin: 1em;
+    display: inline-block;
   }
 }
 
@@ -119,4 +136,28 @@ h1 {
   .gm-style-cc {
     display: none !important;
   }
+}
+
+.dialogBox {
+  padding: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  max-width: 20em;
+  text-align: right;
+  word-wrap: break-word;
+  z-index: 3;
+  top: 5em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: $back-color;
+  position: absolute;
+  -webkit-box-shadow: 1px 1px 4px 4px $back-input;
+  -moz-box-shadow: 1px 1px 4px 4px $back-input;
+  box-shadow: 1px 1px 4px 4px $back-input;
+}
+
+.description {
+  margin-bottom: $padding;
+  text-align: left;
 }

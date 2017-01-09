@@ -23,7 +23,6 @@
     "eslint-plugin-import": "2.0.0"
   },
   "dependencies": {
-    "roleHaven": "git://github.com/yxeri/roleHaven.git",
-    "xml2json": "0.10.0"
+    "roleHaven": "git://github.com/yxeri/roleHaven.git"
   }
 }

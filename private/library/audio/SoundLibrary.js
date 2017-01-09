@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Aleksandar Jankovic
+ Copyright 2016 Aleksandar Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,14 +14,26 @@
  limitations under the License.
  */
 
-/** @module */
+class SoundLibrary {
+  constructor() {
+    this.sounds = new Map();
+  }
 
-require('./messenger');
+  addSound(sound) {
+    this.sounds.set(sound.soundId, sound);
+  }
 
-/**
- * @static
- * @type {Object}
- */
-const commands = {};
+  getSound(soundId) {
+    return this.sounds.get(soundId);
+  }
 
-module.exports = commands;
+  removeSound(soundId) {
+    this.sounds.delete(soundId);
+  }
+
+  getAllSounds() {
+    return this.sounds.values;
+  }
+}
+
+module.exports = SoundLibrary;

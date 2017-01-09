@@ -27,18 +27,14 @@
 </head>
 <body>
 <div id="background">
+  <div id="logo"><h1>[ rOS ]</h1></div>
   <div id="main">
     <div id="menu">
-      <div id="logo"><h1>razorOS</h1></div>
       <div id="sysItems">
-        <div>
-          <div><h2>Map</h2></div>
-          <div><h2>Jobs</h2></div>
-        </div>
-        <div>
-          <div><h2>Chat</h2></div>
-          <div><h2>Home</h2></div>
-        </div>
+        <span><h2>[C]oms</h2></span>
+        <span><h2>[M]ap</h2></span>
+        <span><h2>[J]obs</h2></span>
+        <span><h2>[T]ools</h2></span>
       </div>
     </div>
   </div>
@@ -69,6 +65,7 @@
   }
 </script>
 <script src={{socketPath}} defer></script>
+<script src="{{mainJs}}" defer></script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" defer></script>
 <script src="https://yxeri.github.io/js-map-label/minified/maplabel.js" defer></script>
 <script src="https://yxeri.github.io/js-marker-clusterer/minified/markerclusterer.js" defer></script>

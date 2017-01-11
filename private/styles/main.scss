@@ -1,0 +1,180 @@
+/*
+ Copyright 2015 Aleksandar Jankovic
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+$text-color: #000000;
+$second-color: #696969;
+$back-color: #d9d9d9;
+$back-button: #d9d9d9;
+$back-input: #ffffff;
+$warning: #a50000;
+$padding: .2em;
+$border: 2px;
+$font-size: 1.2em;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+h1, h2, h3, h4 {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  background-color: $back-color;
+}
+
+body {
+  background-color: $back-color;
+  color: $text-color;
+  font-family: monospace;
+  font-size: $font-size;
+  -webkit-text-size-adjust: 100%;
+  text-shadow: 1px 1px 2px dimgray;
+}
+
+h1 {
+  margin: $padding 0;
+  font-size: $font-size;
+}
+
+h2, h3, h4, h5 {
+  font-size: $font-size;
+}
+
+button {
+  margin: $padding;
+  padding: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  background-color: $back-button;
+  display: inline-block;
+  cursor: pointer;
+  color: $text-color;
+  font-family: monospace;
+  font-size: .9em;
+  -webkit-text-size-adjust: 100%;
+  text-shadow: 1px 1px 2px dimgray;
+  float: right;
+}
+
+input {
+  margin: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  background-color: $back-button;
+  display: inline-block;
+  cursor: pointer;
+  color: $text-color;
+  font-family: monospace;
+  font-size: 1em;
+  -webkit-text-size-adjust: 100%;
+  width: 96%;
+}
+
+#background {
+  padding: $padding;
+  text-shadow: 1px 1px 2px $second-color;
+}
+
+#logo {
+  text-align: center;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  margin-bottom: $padding;
+}
+
+#main {
+  border: $border solid $second-color;
+  outline: 1px solid;
+}
+
+#sysItems {
+  display: table;
+  margin: auto;
+  text-align: center;
+
+  span {
+    margin: 1em;
+    display: inline-block;
+  }
+}
+
+#map {
+  overflow: hidden;
+  background-color: $back-color;
+
+  a {
+    display: none !important;
+  }
+
+  .gmnoprint {
+    display: none !important;
+  }
+
+  .gmnoscreen {
+    display: none !important;
+  }
+
+  .gm-style-cc {
+    display: none !important;
+  }
+}
+
+.dialogBox {
+  padding: $padding;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  max-width: 20em;
+  word-wrap: break-word;
+  z-index: 3;
+  top: 3em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: $back-color;
+  position: absolute;
+  -webkit-box-shadow: 1px 1px 4px 4px $second-color;
+  -moz-box-shadow: 1px 1px 4px 4px $second-color;
+  box-shadow: 1px 1px 4px 4px $second-color;
+}
+
+.description {
+  margin-bottom: $padding;
+  text-align: left;
+}
+
+.closeButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  line-height: .9em;
+  text-shadow: none;
+}
+
+.markedInput {
+  background-color: $warning;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "roleTerminal-vinterland",
+  "version": "1.0.0",
+  "description": "In-game tool/game for use at Vinterland event. Dependency: roleHaven",
+  "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
+  "private": true,
+  "scripts": {
+    "start": "node ./app.js",
+    "test": "DEBUG=eslint:cli-engine eslint ./",
+    "nsp": "nsp check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yxeri/roleTerminal-vinterland"
+  },
+  "bugs": {
+    "url": "https://github.com/yxeri/roleTerminal-vinterland/issues"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "eslint": "3.6.0",
+    "eslint-config-airbnb": "12.0.0",
+    "eslint-plugin-import": "2.0.0"
+  },
+  "dependencies": {
+    "roleHaven": "git://github.com/yxeri/roleHaven.git"
+  }
+}

@@ -1,0 +1,65 @@
+<!--
+ Copyright 2015 Aleksandar Jankovic
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!doctype html>
+<html lang="en" id="html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" type="text/css" href="styles/main.css"/>
+  <title>{{title}}</title>
+</head>
+<body>
+<div id="background">
+  <div id="logo"><h1>[Krismyndighetens Telenät]</h1></div>
+  <div id="main">
+  </div>
+</div>
+<script>
+  if (!Array.prototype.find) {
+    Array.prototype.find = function (predicate) {
+      'use strict';
+      if (this == null) {
+        throw new TypeError('Array.prototype.find called on null or undefined');
+      }
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      var value;
+
+      for (var i = 0; i < length; i++) {
+        value = list[i];
+        if (predicate.call(thisArg, value, i, list)) {
+          return value;
+        }
+      }
+      return undefined;
+    };
+  }
+</script>
+<script src={{socketPath}} defer></script>
+<script src="{{mainJs}}" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" defer></script>
+<script src="https://yxeri.github.io/js-map-label/minified/maplabel.js" defer></script>
+<script src="https://yxeri.github.io/js-marker-clusterer/minified/markerclusterer.js" defer></script>
+</body>
+</html>

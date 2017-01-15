@@ -16,7 +16,6 @@
 
 const DialogBox = require('../DialogBox');
 const storage = require('../../storage');
-const textTools = require('../../textTools');
 
 /**
  * Marks fields that are empty. Returns true if any of the fields were empty
@@ -71,9 +70,9 @@ class LoginBox extends DialogBox {
               user: {
                 userName: this.inputs.get('userName').value,
                 password: reenterPasswordInput.value,
-                registerDevice: textTools.createAlphaNumbericalString(12, false),
+                registerDevice: storage.getDeviceId(),
               },
-            }, ({ data, error }) => {
+            }, ({ error }) => {
               if (error) {
                 let errorText = 'Något gick fel. Kunde inte registrera användare';
 
@@ -87,7 +86,10 @@ class LoginBox extends DialogBox {
                 return;
               }
 
-              console.log('Successfully registered', data);
+              this.changeDescription({ text: 'Användaren är nu registrerad!', shouldAppend: true });
+              this.clearInput('userName');
+              this.clearInput('password');
+              this.clearInput('reenterPassword');
             });
           } else {
             this.changeDescription({ text: 'Lösenorden stämmer inte överens. Försök igen', shouldAppend: true });

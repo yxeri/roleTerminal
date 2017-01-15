@@ -111,6 +111,22 @@ function removeLocalVal(name) {
 }
 
 /**
+ * Get access level
+ * @returns {number} Access level
+ */
+function getAccessLevel() {
+  return getLocalVal('accessLevel');
+}
+
+/**
+ * Set access level
+ * @param {number} accessLevel - Access level
+ */
+function setAccessLevel(accessLevel) {
+  setLocalVal('accessLevel', accessLevel);
+}
+
+/**
  * Get user name
  * @returns {string} User name
  */
@@ -127,19 +143,27 @@ function setUserName(userName) {
 }
 
 /**
- * Get access level
- * @returns {number} Access level
+ * Remove user name
  */
-function getAccessLevel() {
+function removeUserName() {
+  removeLocalVal('userName');
+  setAccessLevel(0);
+}
+
+/**
+ * Get device ID
+ * @returns {string} Device ID
+ */
+function getDeviceId() {
   return getLocalVal('accessLevel');
 }
 
 /**
- * Set access level
- * @param {number} accessLevel - Access level
+ * Set device ID
+ * @param {string} deviceId - Device ID
  */
-function setAccessLevel(accessLevel) {
-  setLocalVal('accessLevel', accessLevel);
+function setDeviceId(deviceId) {
+  setLocalVal('accessLevel', deviceId);
 }
 
 exports.setLocalVal = setLocalVal;
@@ -147,5 +171,8 @@ exports.getLocalVal = getLocalVal;
 exports.removeLocalVal = removeLocalVal;
 exports.getUserName = getUserName;
 exports.setUserName = setUserName;
+exports.removeUserName = removeUserName;
 exports.getAccessLevel = getAccessLevel;
 exports.setAccessLevel = setAccessLevel;
+exports.getDeviceId = getDeviceId;
+exports.setDeviceId = setDeviceId;

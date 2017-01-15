@@ -25,7 +25,7 @@ $border: 2px;
 $font-size: 1.1em;
 $text-shadow: dimgray;
 
-html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button {
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input {
   margin: 0;
   padding: 0;
   border: 0;
@@ -46,9 +46,9 @@ html, body {
 
 html {
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  //-webkit-user-select: none;
+  //-moz-user-select: none;
+  //-ms-user-select: none;
   background-color: $back-color;
 }
 
@@ -154,7 +154,7 @@ li {
   text-shadow: 1px 1px 2px $second-color;
 }
 
-#logo {
+#top {
   text-align: center;
   margin-bottom: $padding;
   padding-bottom: $padding;
@@ -190,7 +190,7 @@ li {
 }
 
 #messenger {
-  max-height: 90vh;
+  max-height: calc(100vh - 6.6em);
   max-width: 50em;
   margin-left: auto;
   margin-right: auto;
@@ -198,6 +198,7 @@ li {
   textarea {
     width: 90%;
     max-width: 50em;
+    height: 2em;
   }
 
   li {
@@ -236,6 +237,10 @@ li {
   height: 100vh;
 }
 
+#logo {
+  font-weight: bold;
+}
+
 .dialogBox {
   padding: $padding;
   border: $border solid $second-color;
@@ -252,10 +257,6 @@ li {
   -webkit-box-shadow: 1px 1px 4px 4px $second-color;
   -moz-box-shadow: 1px 1px 4px 4px $second-color;
   box-shadow: 1px 1px 4px 4px $second-color;
-
-  .buttons:nth-child(2) {
-    margin-right: calc(2em - 1px);
-  }
 }
 
 .description {
@@ -285,7 +286,7 @@ li {
   top: .5em;
 
   button {
-    vertical-align: text-top;
+    vertical-align: top;
   }
 }
 
@@ -293,7 +294,7 @@ li {
   bottom: .5em;
 
   button {
-    vertical-align: text-bottom;
+    vertical-align: bottom;
   }
 }
 

@@ -25,6 +25,7 @@ class Messenger extends View {
     this.element.setAttribute('id', 'messenger');
 
     this.inputField = document.createElement('TEXTAREA');
+    this.inputField.setAttribute('rows', '3');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
 
     this.messageList = new ItemList({ isTopDown });
@@ -47,6 +48,7 @@ class Messenger extends View {
         this.messageList.element.lastChild.scrollIntoView();
         this.clearInputField();
       });
+      this.inputField.focus();
     });
 
     const inputArea = document.createElement('DIV');
@@ -67,6 +69,10 @@ class Messenger extends View {
 
   addMessage(message, options) {
     this.messageList.addItem(new Message(message, options));
+  }
+
+  addMessages(messages) {
+    this.messageList.addItems(messages);
   }
 
   resizeInputField() {

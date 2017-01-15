@@ -28,7 +28,28 @@ class SocketManager {
       this.socket.on(event, events[event]);
     }
 
-    this.autoReconnect();
+    /**
+     * Checks if the screen has been unresponsive for some time.
+     * Some devices disable Javascript when screen is off (iOS)
+     * They also fail to notice that they have been disconnected
+     * We check the time between heartbeats and if the time i
+     * over 10 seconds (example: when screen is turned off and then on)
+     * we force them to reconnect
+     */
+    const timeoutFunc = () => {
+      const now = (new Date()).getTime();
+      const diff = now - this.lastAlive;
+      const offBy = diff - 1000;
+      this.lastAlive = now;
+
+      if (offBy > 10000) {
+        this.reconnect();
+      }
+
+      setTimeout(timeoutFunc, 1000);
+    };
+
+    timeoutFunc();
   }
 
   addEvent(event, callback) {
@@ -41,8 +62,27 @@ class SocketManager {
   reconnect() {
     this.socket.disconnect();
     this.socket.connect({ forceNew: true });
-    this.socket.emit('updateId', { user: { userName: storage.getUserName() } }, () => {
-      console.log('reconnected');
+    this.socket.emit('updateId', {
+      user: {
+        userName: storage.getUserName(),
+      },
+      device: {
+        deviceId: storage.getDeviceId(),
+      },
+    }, ({ error, data }) => {
+      if (error) {
+        return;
+      }
+
+      const userName = storage.getUserName();
+
+      if (userName && data.anonUser) {
+        console.log('User does not exist. Logging you out');
+      } else if (data.anonUser) {
+        console.log('Anonymous!');
+      } else {
+        console.log('I remember you');
+      }
     });
   }
 
@@ -58,29 +98,6 @@ class SocketManager {
     } else {
       this.socket.emit(event, params, callback);
     }
-  }
-
-  /**
-   * Checks if the screen has been unresponsive for some time.
-   * Some devices disable Javascript when screen is off (iOS)
-   * They also fail to notice that they have been disconnected
-   * We check the time between heartbeats and if the time i
-   * over 10 seconds (example: when screen is turned off and then on)
-   * we force them to reconnect
-   */
-  autoReconnect() {
-    const now = (new Date()).getTime();
-    const diff = now - this.lastAlive;
-    const offBy = diff - 1000;
-    this.lastAlive = now;
-
-    console.log(offBy);
-
-    if (offBy > 10000) {
-      this.reconnect();
-    }
-
-    setTimeout(this.autoReconnect, 1000);
   }
 }
 

@@ -55,32 +55,64 @@ function createHeader({ headerItems, printable, parentElement }) {
   return paragraph;
 }
 
+/**
+ * Creates and returns list item
+ * @param {{textLine: string, extraClass: string, clickFunc: Function}[]} headerItems - Items to be appended to the header
+ * @param {string[]} text - Item text
+ * @param {boolean} printable - Should the item be printable
+ * @returns {Element} List item
+ */
+function createItem({ headerItems, text, printable }) {
+  const listItem = document.createElement('LI');
+  listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
+
+  for (const line of text) {
+    const paragraph = document.createElement('P');
+
+    if (line === '') {
+      paragraph.appendChild(document.createTextNode('\n'));
+    }
+
+    paragraph.appendChild(document.createTextNode(line));
+    listItem.appendChild(paragraph);
+  }
+
+  return listItem;
+}
+
 class ItemList {
   constructor({ isTopDown = false }) {
     this.isTopDown = isTopDown;
     this.element = document.createElement('UL');
   }
 
-  // TODO Create class
   addItem({ headerItems, text, printable }) {
-    const listItem = document.createElement('LI');
-    listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
-
-    for (const line of text) {
-      const paragraph = document.createElement('P');
-
-      if (line === '') {
-        paragraph.appendChild(document.createTextNode('\n'));
-      }
-
-      paragraph.appendChild(document.createTextNode(line));
-      listItem.appendChild(paragraph);
-    }
+    const listItem = createItem({ headerItems, text, printable });
 
     if (this.isTopDown) {
       this.element.insertBefore(listItem, this.element.firstChild);
     } else {
       this.element.appendChild(listItem);
+    }
+  }
+
+  addItems(items) {
+    const fragment = document.createDocumentFragment();
+
+    for (const item of items) {
+      const listItem = createItem(item);
+
+      if (this.isTopDown) {
+        fragment.insertBefore(listItem, fragment.firstChild);
+      } else {
+        fragment.appendChild(createItem(item));
+      }
+    }
+
+    if (this.isTopDown) {
+      this.element.insertBefore(fragment, this.element.firstChild);
+    } else {
+      this.element.appendChild(fragment);
     }
   }
 

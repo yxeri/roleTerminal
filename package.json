@@ -1,6 +1,6 @@
 {
   "name": "roleTerminal-vinterland",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "In-game tool/game for use at Vinterland event. Dependency: roleHaven",
   "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
   "private": true,

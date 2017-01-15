@@ -28,15 +28,6 @@ function isCloseToEnd(element, newElementHeight) {
 }
 
 /**
- * Scrolls the list view to the bottom
- * @static
- */
-function scrollView() {
-  // cmdInput.scrollIntoView();
-  window.scrollTo(0, document.body.scrollHeight);
-}
-
-/**
  * Goes into full screen with sent element
  * This is not supported in iOS Safari
  * @param {Element} element - The element which should be maximized to full screen
@@ -60,7 +51,6 @@ function isFullscreen() {
   return !window.screenTop && !window.screenY;
 }
 
-exports.scrollView = scrollView;
 exports.isCloseToEnd = isCloseToEnd;
 exports.goFullscreen = goFullScreen;
 exports.isFullscreen = isFullscreen;

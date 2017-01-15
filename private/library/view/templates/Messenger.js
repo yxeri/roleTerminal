@@ -44,6 +44,7 @@ class Messenger extends View {
         console.log(message);
 
         this.messageList.addItem(message);
+        this.messageList.element.lastChild.scrollIntoView();
         this.clearInputField();
       });
     });

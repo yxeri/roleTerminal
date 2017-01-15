@@ -73,14 +73,18 @@ function stringifyObject(value) {
  * @param {Object} item - Item to be set
  */
 function setLocalVal(name, item) {
-  localStorage.setItem(name, stringifyObject(item));
+  if (typeof item === 'string') {
+    localStorage.setItem(name, item);
+  } else {
+    localStorage.setItem(name, stringifyObject(item));
+  }
 }
 
 /**
  * Gets item from localStorage
  * @private
  * @param {string} name - Name of the item to be retrieved
- * @returns {Object} - Retrieved item
+ * @returns {Object|number|boolean|string} - Retrieved item
  */
 function getLocalVal(name) {
   const value = localStorage.getItem(name);
@@ -106,6 +110,42 @@ function removeLocalVal(name) {
   localStorage.removeItem(name);
 }
 
+/**
+ * Get user name
+ * @returns {string} User name
+ */
+function getUserName() {
+  return getLocalVal('userName');
+}
+
+/**
+ * Set user name
+ * @param {string} userName - User name
+ */
+function setUserName(userName) {
+  setLocalVal('userName', userName);
+}
+
+/**
+ * Get access level
+ * @returns {number} Access level
+ */
+function getAccessLevel() {
+  return getLocalVal('accessLevel');
+}
+
+/**
+ * Set access level
+ * @param {number} accessLevel - Access level
+ */
+function setAccessLevel(accessLevel) {
+  setLocalVal('accessLevel', accessLevel);
+}
+
 exports.setLocalVal = setLocalVal;
 exports.getLocalVal = getLocalVal;
 exports.removeLocalVal = removeLocalVal;
+exports.getUserName = getUserName;
+exports.setUserName = setUserName;
+exports.getAccessLevel = getAccessLevel;
+exports.setAccessLevel = setAccessLevel;

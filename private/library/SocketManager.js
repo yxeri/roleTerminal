@@ -14,8 +14,10 @@
  limitations under the License.
  */
 
+const storage = require('./storage');
+
 class SocketManager {
-  constructor({ socket, events }) {
+  constructor({ socket, events = {} }) {
     const eventKeys = Object.keys(events);
     this.socket = socket;
     this.lastAlive = (new Date()).getTime();
@@ -29,14 +31,17 @@ class SocketManager {
     this.autoReconnect();
   }
 
+  addEvent(event, callback) {
+    this.socket.on(event, callback);
+  }
+
   /**
    * Reconnect to socket.io
    */
   reconnect() {
     this.socket.disconnect();
     this.socket.connect({ forceNew: true });
-    this.socket.emit('updateId', {}, () => {
-      // TODO User and device should be sent to server
+    this.socket.emit('updateId', { user: { userName: storage.getUserName() } }, () => {
       console.log('reconnected');
     });
   }
@@ -68,6 +73,8 @@ class SocketManager {
     const diff = now - this.lastAlive;
     const offBy = diff - 1000;
     this.lastAlive = now;
+
+    console.log(offBy);
 
     if (offBy > 10000) {
       this.reconnect();

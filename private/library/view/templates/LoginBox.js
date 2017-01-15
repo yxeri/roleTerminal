@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2017 Aleksandar Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ class LoginBox extends DialogBox {
             }
 
             storage.setLocalVal('userName', data.user.userName);
-            storage.setLocalVal('acessLevel', data.user.accessLevel);
+            storage.setLocalVal('accessLevel', data.user.accessLevel);
             this.removeView();
           });
         },
@@ -137,6 +137,7 @@ class LoginBox extends DialogBox {
       inputType: 'password',
       required: true,
     }];
+
 
     super({
       buttons,

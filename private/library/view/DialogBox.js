@@ -14,24 +14,25 @@
  limitations under the License.
  */
 
-const View = require('./View');
+const View = require('./base/View');
 
+// TODO This should be a class
 /**
  * Create and return input element
  * @param {Object} input - Input
  * @returns {HTMLElement} - Input element
  */
-function createInput(input) {
+function createInput({ placeholder, inputName, inputType, required, extraClass }) {
   const inputElement = document.createElement('INPUT');
 
-  inputElement.setAttribute('placeholder', input.placeholder);
-  inputElement.setAttribute('name', input.inputName);
+  inputElement.setAttribute('placeholder', placeholder);
+  inputElement.setAttribute('name', inputName);
 
-  if (input.inputType) {
-    inputElement.setAttribute('type', input.inputType);
+  if (inputType) {
+    inputElement.setAttribute('type', inputType);
   }
 
-  if (input.required) {
+  if (required) {
     inputElement.addEventListener('blur', () => {
       if (inputElement.value === '') {
         inputElement.classList.add('markedInput');
@@ -43,8 +44,8 @@ function createInput(input) {
     });
   }
 
-  if (input.extraClass) {
-    inputElement.classList.add(input.extraClass);
+  if (extraClass) {
+    inputElement.classList.add(extraClass);
   }
 
   return inputElement;
@@ -83,14 +84,17 @@ class DialogBox extends View {
     });
     closeButton.classList.add('closeButton');
 
-    this.leftButton = createButton({
+    this.buttonsContainer = document.createElement('DIV');
+    this.buttonsContainer.classList.add('buttons');
+    this.buttonsContainer.appendChild(createButton({
       text: `[${buttons.left.text.charAt(0).toUpperCase()}]${buttons.left.text.slice(1)}`,
       eventFunc: buttons.left.eventFunc,
-    });
-    this.rightButton = createButton({
+    }));
+    this.buttonsContainer.appendChild(createButton({
       text: `[${buttons.right.text.charAt(0).toUpperCase()}]${buttons.right.text.slice(1)}`,
       eventFunc: buttons.right.eventFunc,
-    });
+    }));
+
     this.inputs = new Map();
 
     this.element.appendChild(closeButton);
@@ -103,16 +107,28 @@ class DialogBox extends View {
       this.element.appendChild(inputElement);
     }
 
-    this.element.appendChild(this.leftButton);
-    this.element.appendChild(this.rightButton);
+    this.element.appendChild(this.buttonsContainer);
     this.element.classList.add('dialogBox');
+
+    this.cover = document.createElement('DIV');
+    this.cover.setAttribute('id', 'cover');
+  }
+
+  appendTo(parentElement) {
+    parentElement.appendChild(this.cover);
+    super.appendTo(parentElement);
+  }
+
+  removeView() {
+    this.element.parentNode.removeChild(this.cover);
+    super.removeView();
   }
 
   addInput(input) {
     const inputElement = createInput(input);
 
     this.inputs.set(input.inputName, inputElement);
-    this.element.insertBefore(inputElement, this.leftButton);
+    this.element.insertBefore(inputElement, this.buttonsContainer);
   }
 
   removeInput(inputName) {

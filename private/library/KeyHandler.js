@@ -36,3 +36,11 @@
 //     break;
 //   }
 // }
+
+class KeyHandler {
+  constructor() {
+    this.keys = new Map();
+  }
+}
+
+module.exports = KeyHandler;

@@ -16,16 +16,6 @@
 
 let currentInput = {};
 
-// TODO Check if text area and do this
-/**
- * Sets the height of the textarea to fit all text
- * @param {Object} textArea - Text area to resize
- */
-function resizeTextarea() {
-//   textArea.style.height = 'auto';
-//   textArea.style.height = `${textArea.scrollHeight}px`;
-}
-
 /**
  * Set text in input field
  * @param {string} text - Text to be set
@@ -110,5 +100,4 @@ exports.focusInput = focusInput;
 exports.blurInput = blurInput;
 exports.replaceLastInputPhrase = replaceLastInputPhrase;
 exports.appendInputText = appendInputText;
-exports.resizeInput = resizeTextarea;
 exports.setCurrentInput = setCurrentInput;

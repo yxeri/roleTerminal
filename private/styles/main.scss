@@ -17,24 +17,31 @@
 $text-color: #000000;
 $second-color: #696969;
 $back-color: #d9d9d9;
-$back-button: #d9d9d9;
+$back-button: #ffffff;
 $back-input: #ffffff;
 $warning: #a50000;
 $padding: .2em;
 $border: 2px;
-$font-size: 1.2em;
+$font-size: 1.1em;
+$text-shadow: dimgray;
 
-html, body {
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button {
   margin: 0;
   padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+h1, h2, h3, h4, h5 {
+  font-size: $font-size;
+}
+
+html, body {
   overflow: hidden;
   height: 100%;
   width: 100%;
-}
-
-h1, h2, h3, h4 {
-  padding: 0;
-  margin: 0;
 }
 
 html {
@@ -46,26 +53,18 @@ html {
 }
 
 body {
+  line-height: 1;
   background-color: $back-color;
   color: $text-color;
   font-family: monospace;
   font-size: $font-size;
   -webkit-text-size-adjust: 100%;
-  text-shadow: 1px 1px 2px dimgray;
-}
-
-h1 {
-  margin: $padding 0;
-  font-size: $font-size;
-}
-
-h2, h3, h4, h5 {
-  font-size: $font-size;
+  text-shadow: 1px 1px 2px $text-shadow;
 }
 
 button {
-  margin: $padding;
   padding: $padding;
+  margin: $padding;
   border: $border solid $second-color;
   outline: 1px solid;
   background-color: $back-button;
@@ -73,41 +72,110 @@ button {
   cursor: pointer;
   color: $text-color;
   font-family: monospace;
-  font-size: .9em;
   -webkit-text-size-adjust: 100%;
-  text-shadow: 1px 1px 2px dimgray;
-  float: right;
+  text-shadow: 1px 1px 2px $text-shadow;
+  vertical-align: top;
 }
 
 input {
   margin: $padding;
   border: $border solid $second-color;
   outline: 1px solid;
-  background-color: $back-button;
+  background-color: $back-input;
   display: inline-block;
   cursor: pointer;
   color: $text-color;
   font-family: monospace;
-  font-size: 1em;
+  font-size: $font-size;
   -webkit-text-size-adjust: 100%;
   width: 96%;
 }
 
+textarea {
+  background-color: $back-input;
+  border: $border solid $second-color;
+  outline: 1px solid;
+  resize: none;
+}
+
+p {
+  margin: .5em 0 0 0;
+}
+
+p:first-child {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  p {
+    margin-left: .5em;
+  }
+
+  p:nth-child(2) {
+    margin-top: 0;
+  }
+
+  .header {
+    font-weight: bold;
+    border-bottom: 1px solid $second-color;
+    margin: .5em 0;
+
+    span {
+      margin-left: .5em;
+    }
+
+    span:first-child {
+      margin: 0;
+    }
+
+    button {
+      padding: 0;
+      margin: 0;
+      border: none;
+      vertical-align: text-bottom;
+      float: right;
+      opacity: .2;
+    }
+  }
+}
+
 #background {
+  border: $border solid $second-color;
+  outline: 1px solid;
+  width: calc(100% - 1em);
+  height: calc(100% - 1em);
+  margin-top: .15em;
+  margin-left: .15em;
   padding: $padding;
   text-shadow: 1px 1px 2px $second-color;
 }
 
 #logo {
   text-align: center;
-  border: $border solid $second-color;
-  outline: 1px solid;
   margin-bottom: $padding;
+  padding-bottom: $padding;
+  border-bottom: $border solid $second-color;
+  font-size: .9em;
+
+  span {
+    margin-left: .5em;
+  }
+
+  span:first-child {
+    margin: 0;
+  }
+}
+
+#title {
+  font-weight: bold;
 }
 
 #main {
-  border: $border solid $second-color;
-  outline: 1px solid;
+  overflow-y: scroll;
 }
 
 #sysItems {
@@ -118,6 +186,22 @@ input {
   span {
     margin: 1em;
     display: inline-block;
+  }
+}
+
+#messenger {
+  max-height: 90vh;
+  max-width: 50em;
+  margin-left: auto;
+  margin-right: auto;
+
+  textarea {
+    width: 90%;
+    max-width: 50em;
+  }
+
+  li {
+    max-width: 50em;
   }
 }
 
@@ -142,6 +226,16 @@ input {
   }
 }
 
+#cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
 .dialogBox {
   padding: $padding;
   border: $border solid $second-color;
@@ -158,6 +252,10 @@ input {
   -webkit-box-shadow: 1px 1px 4px 4px $second-color;
   -moz-box-shadow: 1px 1px 4px 4px $second-color;
   box-shadow: 1px 1px 4px 4px $second-color;
+
+  .buttons:nth-child(2) {
+    margin-right: calc(2em - 1px);
+  }
 }
 
 .description {
@@ -169,12 +267,41 @@ input {
   position: absolute;
   right: 0;
   top: 0;
-  margin: 0;
   padding: 0;
+  margin: 0;
   line-height: .9em;
   text-shadow: none;
 }
 
 .markedInput {
   background-color: $warning;
+}
+
+.hide {
+  display: none;
+}
+
+.topDown {
+  top: .5em;
+
+  button {
+    vertical-align: text-top;
+  }
+}
+
+.bottomUp {
+  bottom: .5em;
+
+  button {
+    vertical-align: text-bottom;
+  }
+}
+
+.inputArea {
+  position: absolute;
+  width: 95%;
+}
+
+.buttons {
+  float: right;
 }

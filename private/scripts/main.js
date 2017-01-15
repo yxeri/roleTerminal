@@ -16,19 +16,18 @@
 
 const SocketManager = require('../library/SocketManager');
 const LoginBox = require('../library/view/templates/LoginBox');
+const Messenger = require('../library/view/templates/Messenger');
 
 const mainView = document.getElementById('main');
 
-const events = {
-  message: ({ message }) => {
-    const span = document.createElement('SPAN');
+const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
 
-    span.appendChild(document.createTextNode(message.text.toString()));
-    mainView.appendChild(span);
-  },
-};
+const messenger = new Messenger({ isFullscreen: true, socketManager, sendButtonText: 'Skicka', isTopDown: false });
+messenger.appendTo(mainView);
 
-const socketManager = new SocketManager({ socket: io(), events }); // eslint-disable-line no-undef
+socketManager.addEvent('message', ({ message }) => {
+  messenger.addMessage(message, { printable: true });
+});
 
 new LoginBox({
   descriptionText: 'Endast för Krismyndigheten och Försvarsmakten',

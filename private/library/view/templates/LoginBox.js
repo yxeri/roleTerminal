@@ -53,6 +53,7 @@ class LoginBox extends DialogBox {
               required: true,
               extraClass: 'markedInput',
             });
+            this.focusInput('reenterpassword');
 
             return;
           }
@@ -89,7 +90,8 @@ class LoginBox extends DialogBox {
               this.changeDescription({ text: 'Användaren är nu registrerad!', shouldAppend: true });
               this.clearInput('userName');
               this.clearInput('password');
-              this.clearInput('reenterPassword');
+              this.removeInput('reenterPassword');
+              this.focusInput('userName');
             });
           } else {
             this.changeDescription({ text: 'Lösenorden stämmer inte överens. Försök igen', shouldAppend: true });

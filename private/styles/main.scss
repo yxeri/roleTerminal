@@ -198,7 +198,6 @@ li {
   textarea {
     width: 90%;
     max-width: 50em;
-    height: 2em;
   }
 
   li {
@@ -231,7 +230,7 @@ li {
   background-color: rgba(0, 0, 0, .6);
   z-index: 2;
   position: fixed;
-  top: 0;
+  top: 1.6em;
   left: 0;
   width: 100vw;
   height: 100vh;

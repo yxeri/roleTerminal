@@ -57,6 +57,12 @@ class SocketManager {
     this.socket.on(event, callback);
   }
 
+  addEvents(events) {
+    for (const event of events) {
+      this.addEvent(event.event, event.func);
+    }
+  }
+
   /**
    * Reconnect to socket.io
    */

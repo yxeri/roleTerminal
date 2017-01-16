@@ -12,5 +12,7 @@ logs:
 	docker-compose logs
 clean:
 	docker-compose rm --all
+localcompose:
+	rsync -aP --exclude=node_modules ../roleHaven ./ && docker-compose up --build
 
 .PHONY: build node_modules rmi compose open logs

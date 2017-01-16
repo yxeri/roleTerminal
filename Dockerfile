@@ -4,4 +4,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
-CMD [ "./node_modules/roleHaven/docker-start.sh" ]
+RUN npm prune && npm install
+
+CMD [ "/usr/src/app/node_modules/roleHaven/docker-start.sh" ]

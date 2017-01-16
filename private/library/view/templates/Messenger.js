@@ -42,8 +42,6 @@ class Messenger extends View {
 
         const message = new Message(data.message, { printable: true });
 
-        console.log(message);
-
         this.messageList.addItem(message);
         this.messageList.element.lastChild.scrollIntoView();
         this.clearInputField();

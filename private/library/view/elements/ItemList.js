@@ -24,8 +24,6 @@ function createHeader({ headerItems, printable, parentElement }) {
   const paragraph = document.createElement('P');
   paragraph.classList.add('header');
 
-  console.log(headerItems);
-
   for (const { textLine, extraClass, clickFunc } of headerItems) {
     const span = document.createElement('SPAN');
     span.appendChild(document.createTextNode(textLine));
@@ -93,10 +91,11 @@ class ItemList {
       this.element.insertBefore(listItem, this.element.firstChild);
     } else {
       this.element.appendChild(listItem);
+      this.element.lastChild.scrollIntoView();
     }
   }
 
-  addItems(items) {
+  addItems(items, shouldScroll) {
     const fragment = document.createDocumentFragment();
 
     for (const item of items) {
@@ -113,6 +112,10 @@ class ItemList {
       this.element.insertBefore(fragment, this.element.firstChild);
     } else {
       this.element.appendChild(fragment);
+
+      if (shouldScroll) {
+        this.element.lastChild.scrollIntoView();
+      }
     }
   }
 

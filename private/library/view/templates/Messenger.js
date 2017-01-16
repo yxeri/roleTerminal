@@ -40,10 +40,7 @@ class Messenger extends View {
           return;
         }
 
-        const message = new Message(data.message, { printable: true });
-
-        this.messageList.addItem(message);
-        this.messageList.element.lastChild.scrollIntoView();
+        this.messageList.addItem(new Message(data.message, { printable: true }));
         this.clearInputField();
       });
       this.inputField.focus();
@@ -69,8 +66,10 @@ class Messenger extends View {
     this.messageList.addItem(new Message(message, options));
   }
 
-  addMessages(messages) {
-    this.messageList.addItems(messages);
+  addMessages({ messages, options, shouldScroll }) {
+    const convertedMessages = messages.map(message => new Message(message, options));
+
+    this.messageList.addItems(convertedMessages, shouldScroll);
   }
 
   resizeInputField() {

@@ -17,101 +17,162 @@
 const SocketManager = require('../library/SocketManager');
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
-const Message = require('../library/view/elements/Message');
 const Time = require('../library/view/templates/Time');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const starter = require('../library/starter');
 const storage = require('../library/storage');
+const textTools = require('../library/textTools');
 
 const mainView = document.getElementById('main');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 
-const socketManager = new SocketManager({
-  socket: io(), // eslint-disable-line no-undef
-  events: {
-    disconnect: () => {
+if (storage.getDeviceId() === null) {
+  storage.setDeviceId(textTools.createAlphaNumbericalString(16, false));
+}
+
+console.log(textTools.createAlphaNumbericalString(16, false));
+
+if (!storage.getUserName()) {
+  storage.setAccessLevel(0);
+}
+
+window.addEventListener('error', (event) => {
+  /**
+   * Reloads page
+   * @private
+   */
+  function restart() {
+    window.location.reload();
+  }
+
+  console.log(event.error);
+  // setTimeout(restart, 3000);
+
+  return false;
+});
+
+const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
+const messenger = new Messenger({ isFullscreen: true, socketManager, sendButtonText: 'Skicka', isTopDown: false });
+
+socketManager.addEvents([
+  {
+    event: 'disconnect',
+    func: () => {
       onlineStatus.setOffline();
     },
-    reconnect: () => {
+  }, {
+    event: 'reconnect',
+    func: () => {
       onlineStatus.setOnline();
       socketManager.reconnectDone();
     },
-    startup: ({ yearModification }) => {
+  }, {
+    event: 'startup',
+    func: ({ yearModification }) => {
       storage.setLocalVal('yearModification', yearModification);
 
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
+
+      socketManager.emitEvent('updateId', {
+        user: { userName: storage.getUserName() },
+        device: { deviceId: storage.getDeviceId() },
+      }, ({ error, data = {} }) => {
+        console.log(error, data);
+        if (error) {
+          return;
+        }
+
+        const userName = storage.getUserName();
+
+        if (userName && data.anonUser) {
+          console.log('User does not exist. Logging you out');
+        } else if (data.anonUser) {
+          console.log('Anonymous!');
+        } else {
+          console.log('I remember you');
+        }
+
+        socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
+          if (historyError) {
+            console.log('history', historyError);
+
+            return;
+          }
+
+          console.log('history', historyData);
+
+          messenger.addMessages({ messages: historyData.messages, options: { printable: true } });
+        });
+      });
     },
-    message: ({ message }) => {
+  }, {
+    event: 'message',
+    func: ({ message }) => {
       console.log(message);
     },
+  }, {
+    event: 'chatMsg',
+    func: ({ message }) => {
+      messenger.addMessage(message, { printable: true });
+    },
+  }, {
+    event: 'chatMsgs',
+    func: ({ messages }) => {
+      messenger.addMessages({ options: { printable: true }, messages });
+    },
   },
-});
+]);
 
-const messenger = new Messenger({ isFullscreen: true, socketManager, sendButtonText: 'Skicka', isTopDown: false });
-messenger.appendTo(mainView);
-
-socketManager.addEvent('chatMsg', ({ message }) => {
-  messenger.addMessage(message, { printable: true });
-});
-
-messenger.addMessages([
-  new Message({
+messenger.addMessages({
+  messages: [{
     time: new Date(2013, 6, 21, 23, 21, 0),
     text: ['Ryssland har invaderat. Explosioner i Stockholm, Göteborg, Malmö, Köpenhamn. Kommunikationsinfrastrukturen skadad. Totalförsvaret mobiliserat.'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2013, 6, 22, 0, 2, 0),
     text: ['Kärnvapenexplosioner bekräftade i Stockholm, Göteborg, Malmö, Köpenhamn.'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2014, 4, 14, 0, 0, 0),
     text: ['Tidfunktion trasig i systemet. Har ej tillgång till tekniker. Tappat kontakt med andra centraler.'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2016, 1, 5, 0, 0, 0),
     text: ['Spridning av dödlig sjukdom. Leder till feber, utslag under armarna, hosta. Rekommenderar att undvika kontakt med andra människor.'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2016, 1, 19, 0, 0, 0),
     text: ['Rosen är röd och nu är jag död.'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2016, 1, 25, 0, 0, 0),
     text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 5 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE'],
     userName: 'Centralen',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
     text: ['Test test'],
     userName: 'OKÄND SÄNDARE',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
     text: ['trst test med namn'],
     userName: 'Värnhem',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
     text: ['Östbacken online. tidstämpeln verkar inte fungera. kommer försöka hämta gamla meddelanden'],
     userName: 'Östbacken',
-  }, { printable: false }),
-  new Message({
+  }, {
     time: new Date(2044, 9, 30, 12, 7, 0),
     text: ['Rifall är inkopplat. Jag fick igång tidstämpeln och har lyckats hämta några gamla meddelanden från "Centralen"'],
     userName: 'Rifall',
-  }, { printable: false }),
-]);
+  }],
+  options: { printable: false },
+  shouldScroll: true,
+});
+
+messenger.appendTo(mainView);
 
 new LoginBox({
   descriptionText: 'Endast för Krismyndigheten och Försvarsmakten',
   parentElement: mainView,
   socketManager,
 }).appendTo(mainView);
-
-starter(socketManager);

@@ -14,31 +14,12 @@
  limitations under the License.
  */
 
-button {
-  display: none;
+const View = require('../base/View');
+
+class MainMenu extends View {
+  constructor() {
+    super({ isFullscreen: true });
+  }
 }
 
-html, body, #background, #main {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-.print {
-  background-color: white;
-  color: black;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  margin: 0;
-  padding: 0;
-  outline: none;
-  text-shadow: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  border: none;
-}
+module.exports = MainMenu;

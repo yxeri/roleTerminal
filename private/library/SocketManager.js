@@ -21,6 +21,7 @@ class SocketManager {
     const eventKeys = Object.keys(events);
     this.socket = socket;
     this.lastAlive = (new Date()).getTime();
+    this.reconnecting = false;
 
     for (let i = 0; i < eventKeys.length; i += 1) {
       const event = eventKeys[i];
@@ -60,30 +61,33 @@ class SocketManager {
    * Reconnect to socket.io
    */
   reconnect() {
-    this.socket.disconnect();
-    this.socket.connect({ forceNew: true });
-    this.socket.emit('updateId', {
-      user: {
-        userName: storage.getUserName(),
-      },
-      device: {
-        deviceId: storage.getDeviceId(),
-      },
-    }, ({ error, data }) => {
-      if (error) {
-        return;
-      }
+    if (!this.reconnecting) {
+      this.reconnecting = true;
+      this.socket.disconnect();
+      this.socket.connect({ forceNew: true });
+      this.socket.emit('updateId', {
+        user: {
+          userName: storage.getUserName(),
+        },
+        device: {
+          deviceId: storage.getDeviceId(),
+        },
+      }, ({ error, data }) => {
+        if (error) {
+          return;
+        }
 
-      const userName = storage.getUserName();
+        const userName = storage.getUserName();
 
-      if (userName && data.anonUser) {
-        console.log('User does not exist. Logging you out');
-      } else if (data.anonUser) {
-        console.log('Anonymous!');
-      } else {
-        console.log('I remember you');
-      }
-    });
+        if (userName && data.anonUser) {
+          console.log('User does not exist. Logging you out');
+        } else if (data.anonUser) {
+          console.log('Anonymous!');
+        } else {
+          console.log('I remember you');
+        }
+      });
+    }
   }
 
   /**
@@ -98,6 +102,10 @@ class SocketManager {
     } else {
       this.socket.emit(event, params, callback);
     }
+  }
+
+  reconnectDone() {
+    this.reconnecting = false;
   }
 }
 

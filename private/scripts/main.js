@@ -34,12 +34,16 @@ const socketManager = new SocketManager({
     },
     reconnect: () => {
       onlineStatus.setOnline();
+      socketManager.reconnectDone();
     },
     startup: ({ yearModification }) => {
       storage.setLocalVal('yearModification', yearModification);
 
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
+    },
+    message: ({ message }) => {
+      console.log(message);
     },
   },
 });

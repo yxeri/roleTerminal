@@ -68,10 +68,11 @@ function createItem({ headerItems, text, printable }) {
     const paragraph = document.createElement('P');
 
     if (line === '') {
-      paragraph.appendChild(document.createTextNode('\n'));
+      paragraph.appendChild(document.createElement('BR'));
+    } else {
+      paragraph.appendChild(document.createTextNode(line));
     }
 
-    paragraph.appendChild(document.createTextNode(line));
     listItem.appendChild(paragraph);
   }
 

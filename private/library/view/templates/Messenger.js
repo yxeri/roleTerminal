@@ -19,9 +19,13 @@ const ItemList = require('../elements/ItemList');
 const Message = require('../elements/Message');
 
 class Messenger extends View {
-  constructor({ isFullscreen, socketManager, sendButtonText, isTopDown }) {
+  constructor({ isFullscreen, socketManager, sendButtonText, isTopDown, keyHandler }) {
     super({ isFullscreen });
 
+    this.keyHandler = keyHandler;
+    this.keyHandler.addKey(13, () => { this.sendMessage(); });
+
+    this.socketManager = socketManager;
     this.element.setAttribute('id', 'messenger');
 
     this.inputField = document.createElement('TEXTAREA');
@@ -33,17 +37,7 @@ class Messenger extends View {
     const sendButton = document.createElement('BUTTON');
     sendButton.appendChild(document.createTextNode(sendButtonText));
     sendButton.addEventListener('click', () => {
-      socketManager.emitEvent('chatMsg', { message: { text: this.inputField.value.split('\n'), roomName: 'public' } }, ({ data, error }) => {
-        if (error) {
-          console.log(error);
-
-          return;
-        }
-
-        this.messageList.addItem(new Message(data.message, { printable: true }));
-        this.clearInputField();
-      });
-      this.inputField.focus();
+      this.sendMessage();
     });
 
     const inputArea = document.createElement('DIV');
@@ -59,6 +53,22 @@ class Messenger extends View {
       inputArea.classList.add('bottomUp');
       this.element.appendChild(this.messageList.element);
       this.element.appendChild(inputArea);
+    }
+  }
+
+  sendMessage() {
+    if (this.inputField.value.trim() !== '') {
+      this.socketManager.emitEvent('chatMsg', { message: { text: this.inputField.value.split('\n'), roomName: 'public' } }, ({ data, error }) => {
+        if (error) {
+          console.log(error);
+
+          return;
+        }
+
+        this.messageList.addItem(new Message(data.message, { printable: true }));
+        this.clearInputField();
+      });
+      this.inputField.focus();
     }
   }
 
@@ -80,6 +90,11 @@ class Messenger extends View {
   clearInputField() {
     this.inputField.value = '';
     this.resizeInputField();
+  }
+
+  removeView() {
+    this.keyHandler.removeKey(13);
+    super.removeView();
   }
 }
 

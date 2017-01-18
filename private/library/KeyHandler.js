@@ -40,6 +40,44 @@
 class KeyHandler {
   constructor() {
     this.keys = new Map();
+    this.keyPressed = false;
+    this.triggerKeyPressed = false;
+    this.triggerKey = 18; // Alt
+
+    window.addEventListener('keydown', (event) => {
+      const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+      if (!this.triggerKeyPressed && keyCode === this.triggerKey) {
+        this.triggerKeyPressed = true;
+        event.preventDefault();
+      } else if (this.triggerKeyPressed && !this.keyPressed) {
+        const keyFunc = this.keys.get(keyCode);
+
+        if (keyFunc) {
+          keyFunc();
+          this.keyPressed = true;
+          event.preventDefault();
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (event) => {
+      const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+      if (keyCode === this.triggerKey) {
+        this.triggerKeyPressed = false;
+      } else {
+        this.keyPressed = false;
+      }
+    });
+  }
+
+  addKey(key, func) {
+    this.keys.set(key, func);
+  }
+
+  removeKey(key) {
+    this.keys.delete(key);
   }
 }
 

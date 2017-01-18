@@ -19,6 +19,7 @@ const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Time');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
+const KeyHandler = require('../library/KeyHandler');
 const storage = require('../library/storage');
 const textTools = require('../library/textTools');
 
@@ -51,7 +52,8 @@ window.addEventListener('error', (event) => {
 });
 
 const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
-const messenger = new Messenger({ isFullscreen: true, socketManager, sendButtonText: 'Skicka', isTopDown: false });
+const keyHandler = new KeyHandler();
+const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
 
 socketManager.addEvents([
   {
@@ -175,4 +177,5 @@ new LoginBox({
   descriptionText: 'Endast för Krismyndigheten och Försvarsmakten',
   parentElement: mainView,
   socketManager,
+  keyHandler,
 }).appendTo(mainView);

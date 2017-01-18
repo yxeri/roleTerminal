@@ -38,7 +38,7 @@ function markEmptyFields(loginBox, requiredFields) {
 }
 
 class LoginBox extends DialogBox {
-  constructor({ socketManager, descriptionText, parentElement }) {
+  constructor({ socketManager, descriptionText, parentElement, keyHandler }) {
     const buttons = {
       left: {
         text: 'Registrera',
@@ -142,12 +142,26 @@ class LoginBox extends DialogBox {
       required: true,
     }];
 
+    const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
+    let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
+
+    if (leftCharCode === rightCharCode) {
+      rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1);
+    }
+
+    const keyTriggers = new Map([
+      [leftCharCode, buttons.left.eventFunc],
+      [rightCharCode, buttons.right.eventFunc],
+    ]);
+
 
     super({
       buttons,
       descriptionText,
       parentElement,
       inputs,
+      keyHandler,
+      keyTriggers,
     });
   }
 }

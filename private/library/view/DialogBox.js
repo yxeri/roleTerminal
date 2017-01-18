@@ -67,8 +67,13 @@ function createButton({ text, eventFunc }) {
 }
 
 class DialogBox extends View {
-  constructor({ buttons, descriptionText, inputs = [] }) {
+  constructor({ buttons, descriptionText, keyHandler, keyTriggers = new Map(), inputs = [] }) {
     super({ isFullscreen: false });
+
+    this.keyHandler = keyHandler;
+    this.keyTriggers = keyTriggers;
+
+    this.keyTriggers.forEach((value, key) => this.keyHandler.addKey(key, value));
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
@@ -84,14 +89,23 @@ class DialogBox extends View {
     });
     closeButton.classList.add('closeButton');
 
+    const leftButtonChar = buttons.left.text.charAt(0);
+    let rightButtonChar = buttons.right.text.charAt(0);
+    let rightButtonText = `[${rightButtonChar.toUpperCase()}]${buttons.right.text.slice(1)}`;
+
+    if (leftButtonChar.toLowerCase() === rightButtonChar.toLowerCase()) {
+      rightButtonChar = buttons.right.text.charAt(1);
+      rightButtonText = `${buttons.right.text.charAt(0).toUpperCase()}[${buttons.right.text.charAt(1)}]${buttons.right.text.slice(2)}`;
+    }
+
     this.buttonsContainer = document.createElement('DIV');
     this.buttonsContainer.classList.add('buttons');
     this.buttonsContainer.appendChild(createButton({
-      text: `[${buttons.left.text.charAt(0).toUpperCase()}]${buttons.left.text.slice(1)}`,
+      text: `[${leftButtonChar.toUpperCase()}]${buttons.left.text.slice(1)}`,
       eventFunc: buttons.left.eventFunc,
     }));
     this.buttonsContainer.appendChild(createButton({
-      text: `[${buttons.right.text.charAt(0).toUpperCase()}]${buttons.right.text.slice(1)}`,
+      text: rightButtonText,
       eventFunc: buttons.right.eventFunc,
     }));
 
@@ -121,6 +135,7 @@ class DialogBox extends View {
 
   removeView() {
     this.element.parentNode.removeChild(this.cover);
+    this.keyTriggers.forEach((value, key) => this.keyHandler.removeKey(key));
     super.removeView();
   }
 

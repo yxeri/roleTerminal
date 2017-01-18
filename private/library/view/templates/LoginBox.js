@@ -164,6 +164,11 @@ class LoginBox extends DialogBox {
       keyTriggers,
     });
   }
+
+  appendTo(parentElement) {
+    super.appendTo(parentElement);
+    this.inputs.get('userName').focus();
+  }
 }
 
 module.exports = LoginBox;

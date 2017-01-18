@@ -47,7 +47,7 @@ class KeyHandler {
     window.addEventListener('keydown', (event) => {
       const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
-      if (!this.triggerKeyPressed && keyCode === this.triggerKey) {
+      if (keyCode === this.triggerKey) {
         this.triggerKeyPressed = true;
         event.preventDefault();
       } else if (this.triggerKeyPressed && !this.keyPressed) {

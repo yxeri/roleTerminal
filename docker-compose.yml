@@ -10,4 +10,4 @@ roleterminal-vinterland:
     ports:
         - "8888:8888"
     volumes:
-        - images:/usr/src/app/public/images
+        - /usr/src/app/public/images

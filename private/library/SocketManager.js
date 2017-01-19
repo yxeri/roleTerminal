@@ -50,7 +50,16 @@ class SocketManager {
       setTimeout(timeoutFunc, 1000);
     };
 
+    const pingServer = () => {
+      if (storage.getUserName()) {
+        this.emitEvent('iAmAlive');
+      }
+
+      setTimeout(pingServer, 5000);
+    };
+
     timeoutFunc();
+    pingServer();
   }
 
   addEvent(event, callback) {

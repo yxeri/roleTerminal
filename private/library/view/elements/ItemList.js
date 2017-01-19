@@ -26,7 +26,7 @@ function createHeader({ headerItems, printable, parentElement }) {
 
   for (const { textLine, extraClass, clickFunc } of headerItems) {
     const span = document.createElement('SPAN');
-    span.appendChild(document.createTextNode(textLine));
+    span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
 
     if (clickFunc) {
       span.addEventListener('click', clickFunc);

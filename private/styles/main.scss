@@ -25,6 +25,7 @@ $padding: .2em;
 $border: 2px;
 $font-size: 1.1em;
 $text-shadow: dimgray;
+$view-width: 50em;
 
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input {
   margin: 0;
@@ -89,7 +90,6 @@ input {
   font-family: monospace;
   font-size: $font-size;
   -webkit-text-size-adjust: 100%;
-  width: 96%;
   border-radius: 0;
 }
 
@@ -111,6 +111,10 @@ p:first-child {
 
 ul {
   list-style: none;
+
+  li:last-child {
+    margin-bottom: 1em;
+  }
 }
 
 li {
@@ -147,6 +151,16 @@ li {
       text-shadow: none;
     }
   }
+
+  img {
+    margin-top: .5em;
+  }
+}
+
+img {
+  max-width: 100%;
+  max-height: 30em;
+  outline: 1px solid;
 }
 
 #background {
@@ -200,18 +214,21 @@ li {
 }
 
 #messenger {
-  max-height: calc(100vh - 6.6em);
-  max-width: 50em;
+  max-width: $view-width;
   margin-left: auto;
   margin-right: auto;
 
   textarea {
-    width: 90%;
-    max-width: 50em;
+    width: 100%;
+    max-width: $view-width;
   }
 
   li {
-    max-width: 50em;
+    max-width: $view-width;
+  }
+
+  .buttons {
+    margin-right: -.5em;
   }
 }
 
@@ -250,6 +267,13 @@ li {
   font-weight: bold;
 }
 
+.imagePreview {
+  max-height: 15em;
+  max-width: 15em;
+  border: $border solid $second-color;
+  outline: 1px solid;
+}
+
 .dialogBox {
   padding: $padding;
   border: $border solid $second-color;
@@ -266,6 +290,11 @@ li {
   -webkit-box-shadow: 1px 1px 4px 4px $second-color;
   -moz-box-shadow: 1px 1px 4px 4px $second-color;
   box-shadow: 1px 1px 4px 4px $second-color;
+
+  input {
+    width: calc(100% - .65em);
+    max-width: 20em;
+  }
 }
 
 .description {
@@ -291,25 +320,14 @@ li {
   display: none;
 }
 
-.topDown {
-  top: .5em;
-
-  button {
-    vertical-align: top;
-  }
-}
-
 .bottomUp {
   bottom: .5em;
-
-  button {
-    vertical-align: bottom;
-  }
 }
 
 .inputArea {
   position: absolute;
-  width: 95%;
+  width: 100%;
+  max-width: $view-width;
 }
 
 .buttons {
@@ -323,15 +341,16 @@ li {
     max-width: calc(100% - 1.5em);
 
     textarea {
-      width: calc(100% - .15em);
+      width: 100%;
       max-width: 100%;
+    }
+
+    .buttons {
+      margin-right: -.5em;
     }
   }
 
-  .bottomUp {
-    button {
-      float: right;
-      margin-right: -.15em;
-    }
+  .inputArea {
+    max-width: calc(100% - 1.5em);
   }
 }

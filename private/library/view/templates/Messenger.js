@@ -34,16 +34,63 @@ class Messenger extends View {
 
     this.messageList = new ItemList({ isTopDown });
 
+    const imagePreview = document.createElement('IMG');
+    imagePreview.classList.add('imagePreview');
+    imagePreview.classList.add('hide');
+
+    const imageInput = document.createElement('INPUT');
+    imageInput.classList.add('hide');
+    imageInput.setAttribute('type', 'file');
+    imageInput.setAttribute('accept', 'image/png, image/jpeg');
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        imagePreview.classList.remove('hide');
+        imagePreview.setAttribute('src', reader.result);
+        imagePreview.setAttribute('name', file.name);
+      });
+
+      reader.readAsDataURL(file);
+    });
+
     const sendButton = document.createElement('BUTTON');
     sendButton.appendChild(document.createTextNode(sendButtonText));
     sendButton.addEventListener('click', () => {
-      this.sendMessage();
+      const imageSource = imagePreview.getAttribute('src');
+
+      if (!imageSource) {
+        this.sendMessage();
+      } else {
+        this.sendMessage({
+          source: imageSource,
+          imageName: imagePreview.getAttribute('name'),
+        });
+
+        imagePreview.removeAttribute('src');
+        imagePreview.removeAttribute('name');
+        imagePreview.classList.add('hide');
+      }
     });
+
+    const imageButton = document.createElement('BUTTON');
+    imageButton.appendChild(document.createTextNode('Bild'));
+    imageButton.appendChild(imageInput);
+    imageButton.addEventListener('click', () => {
+      imageInput.click();
+    });
+
+    const buttons = document.createElement('DIV');
+    buttons.classList.add('buttons');
+    buttons.appendChild(imageButton);
+    buttons.appendChild(sendButton);
 
     const inputArea = document.createElement('DIV');
     inputArea.classList.add('inputArea');
+    inputArea.appendChild(imagePreview);
     inputArea.appendChild(this.inputField);
-    inputArea.appendChild(sendButton);
+    inputArea.appendChild(buttons);
 
     if (isTopDown) {
       inputArea.classList.add('topDown');
@@ -56,9 +103,19 @@ class Messenger extends View {
     }
   }
 
-  sendMessage() {
+  sendMessage(image) {
     if (this.inputField.value.trim() !== '') {
-      this.socketManager.emitEvent('chatMsg', { message: { text: this.inputField.value.split('\n'), roomName: 'public' } }, ({ data, error }) => {
+      const chatMsgData = {
+        message: {
+          text: this.inputField.value.split('\n'),
+          roomName: 'public' },
+      };
+
+      if (image) {
+        chatMsgData.image = image;
+      }
+
+      this.socketManager.emitEvent('chatMsg', chatMsgData, ({ data, error }) => {
         if (error) {
           console.log(error);
 

@@ -60,7 +60,7 @@ function createHeader({ headerItems, printable, parentElement }) {
  * @param {boolean} printable - Should the item be printable
  * @returns {Element} List item
  */
-function createItem({ headerItems, text, printable }) {
+function createItem({ headerItems, text, printable, image }) {
   const listItem = document.createElement('LI');
   listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
 
@@ -76,6 +76,16 @@ function createItem({ headerItems, text, printable }) {
     listItem.appendChild(paragraph);
   }
 
+  if (image) {
+    const paragraph = document.createElement('P');
+    const imageContainer = document.createElement('IMG');
+
+    imageContainer.setAttribute('src', `images/${image.fileName}`);
+
+    paragraph.appendChild(imageContainer);
+    listItem.appendChild(paragraph);
+  }
+
   return listItem;
 }
 
@@ -85,8 +95,8 @@ class ItemList {
     this.element = document.createElement('UL');
   }
 
-  addItem({ headerItems, text, printable }) {
-    const listItem = createItem({ headerItems, text, printable });
+  addItem({ headerItems, text, printable, image }) {
+    const listItem = createItem({ headerItems, text, printable, image });
 
     if (this.isTopDown) {
       this.element.insertBefore(listItem, this.element.firstChild);

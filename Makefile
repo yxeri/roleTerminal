@@ -13,6 +13,6 @@ logs:
 clean:
 	docker-compose rm --all
 localcompose:
-	rsync -aP --exclude=node_modules ../roleHaven ./ && docker-compose up --build
+	rsync -aP --exclude="node_modules" --exclude=".git" --exclude=".idea" --exclude=".DS_Store" ../roleHaven ./ && docker-compose up --build
 
 .PHONY: build node_modules rmi compose open logs

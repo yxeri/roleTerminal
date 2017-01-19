@@ -17,7 +17,7 @@
 const textTools = require('../../textTools');
 
 class Message {
-  constructor({ time: date, text, userName }, { printable }) { // roomName, extraClass, customSender, morseCode
+  constructor({ time: date, text, userName, image }, { printable }) { // roomName, extraClass, customSender, morseCode
     const timeStamp = textTools.generateTimeStamp({ date });
 
     this.printable = printable;
@@ -32,6 +32,7 @@ class Message {
       { textLine: timeStamp.fullDate },
     ];
     this.text = text;
+    this.image = image;
   }
 }
 

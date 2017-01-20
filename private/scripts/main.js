@@ -72,6 +72,8 @@ socketManager.addEvents([
     func: ({ yearModification }) => {
       storage.setLocalVal('yearModification', yearModification);
 
+      messenger.appendTo(mainView);
+
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
 
@@ -101,9 +103,7 @@ socketManager.addEvents([
             return;
           }
 
-          console.log('history', historyData);
-
-          messenger.addMessages({ messages: historyData.messages, options: { printable: true } });
+          messenger.addMessages({ messages: historyData.messages, options: { printable: true }, shouldScroll: true });
         });
       });
     },
@@ -170,8 +170,6 @@ messenger.addMessages({
   options: { printable: false },
   shouldScroll: true,
 });
-
-messenger.appendTo(mainView);
 
 new LoginBox({
   descriptionText: 'Endast för Krismyndigheten och Försvarsmakten',

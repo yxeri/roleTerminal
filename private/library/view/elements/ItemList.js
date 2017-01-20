@@ -78,11 +78,13 @@ function createItem({ headerItems, text, printable, image }) {
 
   if (image) {
     const paragraph = document.createElement('P');
-    const imageContainer = document.createElement('IMG');
+    const imageObj = new Image();
+    imageObj.addEventListener('load', () => {
+      listItem.scrollIntoView();
+    });
+    imageObj.src = `images/${image.fileName}`;
 
-    imageContainer.setAttribute('src', `images/${image.fileName}`);
-
-    paragraph.appendChild(imageContainer);
+    paragraph.appendChild(imageObj);
     listItem.appendChild(paragraph);
   }
 
@@ -102,7 +104,7 @@ class ItemList {
       this.element.insertBefore(listItem, this.element.firstChild);
     } else {
       this.element.appendChild(listItem);
-      this.element.lastChild.scrollIntoView();
+      this.scrollToBottom();
     }
   }
 
@@ -125,13 +127,17 @@ class ItemList {
       this.element.appendChild(fragment);
 
       if (shouldScroll) {
-        this.element.lastChild.scrollIntoView();
+        this.scrollToBottom();
       }
     }
   }
 
   appendTo(parentElement) {
     parentElement.appendChild(this.element);
+  }
+
+  scrollToBottom() {
+    this.element.lastChild.scrollIntoView();
   }
 }
 

@@ -53,44 +53,6 @@ function createHeader({ headerItems, printable, parentElement }) {
   return paragraph;
 }
 
-/**
- * Creates and returns list item
- * @param {{textLine: string, extraClass: string, clickFunc: Function}[]} headerItems - Items to be appended to the header
- * @param {string[]} text - Item text
- * @param {boolean} printable - Should the item be printable
- * @returns {Element} List item
- */
-function createItem({ headerItems, text, printable, image }) {
-  const listItem = document.createElement('LI');
-  listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
-
-  for (const line of text) {
-    const paragraph = document.createElement('P');
-
-    if (line === '') {
-      paragraph.appendChild(document.createElement('BR'));
-    } else {
-      paragraph.appendChild(document.createTextNode(line));
-    }
-
-    listItem.appendChild(paragraph);
-  }
-
-  if (image) {
-    const paragraph = document.createElement('P');
-    const imageObj = new Image();
-    imageObj.addEventListener('load', () => {
-      listItem.scrollIntoView();
-    });
-    imageObj.src = `images/${image.fileName}`;
-
-    paragraph.appendChild(imageObj);
-    listItem.appendChild(paragraph);
-  }
-
-  return listItem;
-}
-
 class ItemList {
   constructor({ isTopDown = false }) {
     this.isTopDown = isTopDown;
@@ -98,7 +60,7 @@ class ItemList {
   }
 
   addItem({ headerItems, text, printable, image }) {
-    const listItem = createItem({ headerItems, text, printable, image });
+    const listItem = this.createItem({ headerItems, text, printable, image });
 
     if (this.isTopDown) {
       this.element.insertBefore(listItem, this.element.firstChild);
@@ -112,12 +74,12 @@ class ItemList {
     const fragment = document.createDocumentFragment();
 
     for (const item of items) {
-      const listItem = createItem(item);
+      const listItem = this.createItem(item);
 
       if (this.isTopDown) {
         fragment.insertBefore(listItem, fragment.firstChild);
       } else {
-        fragment.appendChild(createItem(item));
+        fragment.appendChild(this.createItem(item));
       }
     }
 
@@ -130,6 +92,46 @@ class ItemList {
         this.scrollToBottom();
       }
     }
+  }
+
+  /**
+   * Creates and returns list item
+   * @param {{textLine: string, extraClass: string, clickFunc: Function}[]} headerItems - Items to be appended to the header
+   * @param {string[]} text - Item text
+   * @param {boolean} printable - Should the item be printable
+   * @returns {Element} List item
+   */
+  createItem({ headerItems, text, printable, image }) {
+    const listItem = document.createElement('LI');
+    listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
+
+    for (const line of text) {
+      const paragraph = document.createElement('P');
+
+      if (line === '') {
+        paragraph.appendChild(document.createElement('BR'));
+      } else {
+        paragraph.appendChild(document.createTextNode(line));
+      }
+
+      listItem.appendChild(paragraph);
+    }
+
+    if (image) {
+      const paragraph = document.createElement('P');
+      const imageObj = new Image();
+      imageObj.addEventListener('load', () => {
+        if (listItem.isSameNode(this.element.lastChild)) {
+          this.scrollToBottom();
+        }
+      });
+      imageObj.src = `images/${image.fileName}`;
+
+      paragraph.appendChild(imageObj);
+      listItem.appendChild(paragraph);
+    }
+
+    return listItem;
   }
 
   appendTo(parentElement) {

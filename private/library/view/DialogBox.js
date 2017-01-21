@@ -67,7 +67,7 @@ function createButton({ text, eventFunc }) {
 }
 
 class DialogBox extends View {
-  constructor({ buttons, descriptionText, keyHandler, keyTriggers = new Map(), inputs = [] }) {
+  constructor({ buttons, text, keyHandler, keyTriggers = new Map(), inputs = [] }) {
     super({ isFullscreen: false });
 
     this.keyHandler = keyHandler;
@@ -77,9 +77,13 @@ class DialogBox extends View {
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
-    const paragraph = document.createElement('P');
-    paragraph.appendChild(document.createTextNode(descriptionText));
-    this.descriptionContainer.appendChild(paragraph);
+
+    for (const line of text) {
+      const paragraph = document.createElement('P');
+
+      paragraph.appendChild(document.createTextNode(line));
+      this.descriptionContainer.appendChild(paragraph);
+    }
 
     const closeButton = createButton({
       text: 'X',

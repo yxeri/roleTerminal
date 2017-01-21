@@ -89,9 +89,23 @@ socketManager.addEvents([
         const userName = storage.getUserName();
 
         if (userName && data.anonUser) {
-          console.log('User does not exist. Logging you out');
+          new LoginBox({
+            text: [
+              'Endast för Krismyndigheten och Försvarsmakten',
+              'Din användare kunde inte hittas i databasen',
+              'Ni behöver registrera en ny användare',
+            ],
+            parentElement: mainView,
+            socketManager,
+            keyHandler,
+          }).appendTo(mainView);
         } else if (data.anonUser) {
-          console.log('Anonymous!');
+          new LoginBox({
+            text: ['Endast för Krismyndigheten och Försvarsmakten'],
+            parentElement: mainView,
+            socketManager,
+            keyHandler,
+          }).appendTo(mainView);
         } else {
           console.log('I remember you');
         }
@@ -170,10 +184,3 @@ messenger.addMessages({
   options: { printable: false },
   shouldScroll: true,
 });
-
-new LoginBox({
-  descriptionText: 'Endast för Krismyndigheten och Försvarsmakten',
-  parentElement: mainView,
-  socketManager,
-  keyHandler,
-}).appendTo(mainView);

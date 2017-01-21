@@ -38,7 +38,7 @@ function markEmptyFields(loginBox, requiredFields) {
 }
 
 class LoginBox extends DialogBox {
-  constructor({ socketManager, descriptionText, parentElement, keyHandler }) {
+  constructor({ socketManager, text, parentElement, keyHandler }) {
     const buttons = {
       left: {
         text: 'Registrera',
@@ -157,7 +157,7 @@ class LoginBox extends DialogBox {
 
     super({
       buttons,
-      descriptionText,
+      text,
       parentElement,
       inputs,
       keyHandler,

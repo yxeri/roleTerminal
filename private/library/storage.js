@@ -143,9 +143,9 @@ function setUserName(userName) {
 }
 
 /**
- * Remove user name
+ * Remove user name and set access level to 0
  */
-function removeUserName() {
+function removeUser() {
   removeLocalVal('userName');
   setAccessLevel(0);
 }
@@ -171,7 +171,7 @@ exports.getLocalVal = getLocalVal;
 exports.removeLocalVal = removeLocalVal;
 exports.getUserName = getUserName;
 exports.setUserName = setUserName;
-exports.removeUserName = removeUserName;
+exports.removeUser = removeUser;
 exports.getAccessLevel = getAccessLevel;
 exports.setAccessLevel = setAccessLevel;
 exports.getDeviceId = getDeviceId;

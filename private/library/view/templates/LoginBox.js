@@ -124,8 +124,8 @@ class LoginBox extends DialogBox {
               return;
             }
 
-            storage.setLocalVal('userName', data.user.userName);
-            storage.setLocalVal('accessLevel', data.user.accessLevel);
+            storage.setUserName(data.user.userName);
+            storage.setAccessLevel(data.user.accessLevel);
             this.removeView();
           });
         },

@@ -34,9 +34,8 @@ class Messenger extends View {
 
     this.messageList = new ItemList({ isTopDown });
 
-    const imagePreview = document.createElement('IMG');
-    imagePreview.classList.add('imagePreview');
-    imagePreview.classList.add('hide');
+    this.imagePreview = new Image();
+    this.imagePreview.classList.add('hide');
 
     const imageInput = document.createElement('INPUT');
     imageInput.classList.add('hide');
@@ -47,9 +46,11 @@ class Messenger extends View {
       const reader = new FileReader();
 
       reader.addEventListener('load', () => {
-        imagePreview.classList.remove('hide');
-        imagePreview.setAttribute('src', reader.result);
-        imagePreview.setAttribute('name', file.name);
+        this.imagePreview.classList.remove('hide');
+        this.imagePreview.setAttribute('src', reader.result);
+        this.imagePreview.setAttribute('name', file.name);
+        this.imagePreview.classList.add('imagePreview');
+        this.inputField.focus();
       });
 
       reader.readAsDataURL(file);
@@ -58,20 +59,7 @@ class Messenger extends View {
     const sendButton = document.createElement('BUTTON');
     sendButton.appendChild(document.createTextNode(sendButtonText));
     sendButton.addEventListener('click', () => {
-      const imageSource = imagePreview.getAttribute('src');
-
-      if (!imageSource) {
-        this.sendMessage();
-      } else {
-        this.sendMessage({
-          source: imageSource,
-          imageName: imagePreview.getAttribute('name'),
-        });
-
-        imagePreview.removeAttribute('src');
-        imagePreview.removeAttribute('name');
-        imagePreview.classList.add('hide');
-      }
+      this.sendMessage();
     });
 
     const imageButton = document.createElement('BUTTON');
@@ -88,7 +76,7 @@ class Messenger extends View {
 
     const inputArea = document.createElement('DIV');
     inputArea.classList.add('inputArea');
-    inputArea.appendChild(imagePreview);
+    inputArea.appendChild(this.imagePreview);
     inputArea.appendChild(this.inputField);
     inputArea.appendChild(buttons);
 
@@ -103,7 +91,7 @@ class Messenger extends View {
     }
   }
 
-  sendMessage(image) {
+  sendMessage() {
     if (this.inputField.value.trim() !== '') {
       const chatMsgData = {
         message: {
@@ -111,8 +99,21 @@ class Messenger extends View {
           roomName: 'public' },
       };
 
-      if (image) {
-        chatMsgData.image = image;
+      const imageSource = this.imagePreview.getAttribute('src');
+
+      if (imageSource) {
+        console.log(this.imagePreview.getAttribute('name'), this.imagePreview.width, this.imagePreview.height);
+
+        chatMsgData.image = {
+          source: imageSource,
+          imageName: this.imagePreview.getAttribute('name'),
+          width: this.imagePreview.naturalWidth,
+          height: this.imagePreview.naturalHeight,
+        };
+
+        this.imagePreview.removeAttribute('src');
+        this.imagePreview.removeAttribute('name');
+        this.imagePreview.classList.add('hide');
       }
 
       this.socketManager.emitEvent('chatMsg', chatMsgData, ({ data, error }) => {

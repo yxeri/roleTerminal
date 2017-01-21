@@ -120,18 +120,24 @@ class ItemList {
     if (image) {
       const paragraph = document.createElement('P');
       const imageObj = new Image();
+
       imageObj.addEventListener('error', () => {
         paragraph.classList.add('hide');
       });
       imageObj.addEventListener('load', () => {
-        if (listItem.isSameNode(this.element.lastChild)) {
-          this.scrollToBottom();
-        }
+        imageObj.classList.add('autoHeight');
       });
-      imageObj.src = `images/${image.fileName}`;
+
+      imageObj.setAttribute('src', `images/${image.fileName}`);
+      imageObj.setAttribute('width', image.width);
+      imageObj.setAttribute('height', image.height);
 
       paragraph.appendChild(imageObj);
       listItem.appendChild(paragraph);
+
+      if (listItem.isSameNode(this.element.lastChild)) {
+        this.scrollToBottom();
+      }
     }
 
     return listItem;

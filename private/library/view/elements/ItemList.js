@@ -120,6 +120,9 @@ class ItemList {
     if (image) {
       const paragraph = document.createElement('P');
       const imageObj = new Image();
+      imageObj.addEventListener('error', () => {
+        paragraph.classList.add('hide');
+      });
       imageObj.addEventListener('load', () => {
         if (listItem.isSameNode(this.element.lastChild)) {
           this.scrollToBottom();

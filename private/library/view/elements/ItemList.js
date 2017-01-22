@@ -44,7 +44,7 @@ function createHeader({ headerItems, printable, parentElement }) {
     button.addEventListener('click', () => {
       parentElement.classList.add('print');
       window.print();
-      setTimeout(() => { parentElement.classList.remove('print'); }, 1000);
+      setTimeout(() => { parentElement.classList.remove('print'); }, 500);
     });
     button.appendChild(document.createTextNode('Print'));
     paragraph.appendChild(button);

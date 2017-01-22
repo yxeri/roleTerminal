@@ -141,10 +141,8 @@ class Messenger extends View {
   }
 
   resizeInputField() {
-    if (parseInt(this.inputField.style.height.replace('px', ''), 10) !== this.inputField.scrollHeight) {
-      this.inputField.style.height = 'auto';
-      this.inputField.style.height = `${this.inputField.scrollHeight + 10}px`;
-    }
+    this.inputField.style.height = 'auto';
+    this.inputField.style.height = `${this.inputField.scrollHeight + 10}px`;
   }
 
   clearInputField() {

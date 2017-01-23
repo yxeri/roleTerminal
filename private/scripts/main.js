@@ -25,12 +25,11 @@ const textTools = require('../library/textTools');
 
 const mainView = document.getElementById('main');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
+const isTouchDevice = navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iP(hone|ad|od)/i);
 
 if (storage.getDeviceId() === null) {
   storage.setDeviceId(textTools.createAlphaNumbericalString(16, false));
 }
-
-console.log(textTools.createAlphaNumbericalString(16, false));
 
 if (!storage.getUserName()) {
   storage.setAccessLevel(0);
@@ -55,7 +54,7 @@ const socketManager = new SocketManager({ socket: io() }); // eslint-disable-lin
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
 
-keyHandler.addKey(112, () => {
+const goFullScreen = () => {
   const element = document.documentElement;
 
   if (element.requestFullscreen) {
@@ -65,7 +64,15 @@ keyHandler.addKey(112, () => {
   } else if (element.mozRequestFullScreen) {
     element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
   }
-});
+};
+
+keyHandler.addKey(112, goFullScreen);
+
+if (isTouchDevice) {
+  window.addEventListener('click', () => {
+    goFullScreen();
+  });
+}
 
 socketManager.addEvents([
   {

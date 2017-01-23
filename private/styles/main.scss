@@ -181,7 +181,6 @@ img {
   margin-bottom: $padding;
   padding-bottom: $padding;
   border-bottom: $border solid $second-color;
-  font-size: .9em;
 
   span {
     margin-left: .5em;
@@ -259,7 +258,7 @@ img {
   background-color: rgba(0, 0, 0, .6);
   z-index: 2;
   position: fixed;
-  top: 1.6em;
+  top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;

@@ -55,6 +55,18 @@ const socketManager = new SocketManager({ socket: io() }); // eslint-disable-lin
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
 
+keyHandler.addKey(112, () => {
+  const element = document.documentElement;
+
+  if (element.requestFullscreen) {
+    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
+});
+
 socketManager.addEvents([
   {
     event: 'disconnect',

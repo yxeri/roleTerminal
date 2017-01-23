@@ -118,6 +118,7 @@ socketManager.addEvents([
             socketManager,
             keyHandler,
           }).appendTo(mainView);
+          storage.removeUser();
         } else if (data.anonUser) {
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],

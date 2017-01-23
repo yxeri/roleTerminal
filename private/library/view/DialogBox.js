@@ -66,8 +66,21 @@ function createButton({ text, eventFunc }) {
   return buttonElement;
 }
 
+/**
+ * Creates and returns a paragraph element
+ * @param {string} line - Line of text
+ * @returns {Element} Paragraph
+ */
+function createParagraph(line) {
+  const paragraph = document.createElement('P');
+
+  paragraph.appendChild(document.createTextNode(line));
+
+  return paragraph;
+}
+
 class DialogBox extends View {
-  constructor({ buttons, text, keyHandler, keyTriggers = new Map(), inputs = [] }) {
+  constructor({ buttons, description = [], extraDescription = [], keyHandler, keyTriggers = new Map(), inputs = [] }) {
     super({ isFullscreen: false });
 
     this.keyHandler = keyHandler;
@@ -78,12 +91,17 @@ class DialogBox extends View {
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
 
-    for (const line of text) {
-      const paragraph = document.createElement('P');
-
-      paragraph.appendChild(document.createTextNode(line));
-      this.descriptionContainer.appendChild(paragraph);
+    for (const line of description) {
+      this.descriptionContainer.appendChild(createParagraph(line));
     }
+
+    this.extraDescription = document.createElement('DIV');
+
+    for (const line of extraDescription) {
+      this.extraDescription.appendChild(createParagraph(line));
+    }
+
+    this.descriptionContainer.appendChild(this.extraDescription);
 
     const closeButton = createButton({
       text: 'X',
@@ -183,28 +201,18 @@ class DialogBox extends View {
     }
   }
 
-  changeDescription({ text, shouldAppend }) {
-    if (shouldAppend) {
-      const newParagraph = document.createElement('P');
-      newParagraph.appendChild(document.createTextNode(text));
-      newParagraph.setAttribute('name', 'info');
+  changeExtraDescription({ text = [] }) {
+    const fragment = document.createDocumentFragment();
 
-      const lastChildName = this.descriptionContainer.lastChild.getAttribute('name');
+    for (const line of text) {
+      const paragraph = document.createElement('P');
 
-      console.log('name:', lastChildName);
-      console.log(this.descriptionContainer.lastChild);
-
-      console.log(lastChildName !== null);
-      console.log(lastChildName === 'info');
-
-      if (lastChildName !== null && lastChildName === 'info') {
-        this.descriptionContainer.replaceChild(newParagraph, this.descriptionContainer.lastChild);
-      } else {
-        this.descriptionContainer.appendChild(newParagraph);
-      }
-    } else {
-      this.descriptionContainer.replaceChild(document.createTextNode(text), this.descriptionContainer.firstChild);
+      paragraph.appendChild(document.createTextNode(line));
+      fragment.appendChild(paragraph);
     }
+
+    this.extraDescription.innerHTML = ' ';
+    this.extraDescription.appendChild(fragment);
   }
 }
 

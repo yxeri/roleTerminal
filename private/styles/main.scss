@@ -302,6 +302,12 @@ img {
 .description {
   margin-bottom: $padding;
   text-align: left;
+
+  div {
+    p:first-child {
+      margin: .5em 0 0 0;
+    }
+  }
 }
 
 .closeButton {

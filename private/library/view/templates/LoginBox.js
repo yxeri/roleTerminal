@@ -38,7 +38,7 @@ function markEmptyFields(loginBox, requiredFields) {
 }
 
 class LoginBox extends DialogBox {
-  constructor({ socketManager, text, parentElement, keyHandler }) {
+  constructor({ socketManager, description, extraDescription, parentElement, keyHandler }) {
     const buttons = {
       left: {
         text: 'Registrera',
@@ -61,7 +61,7 @@ class LoginBox extends DialogBox {
           const emptyFields = markEmptyFields(this, [this.inputs.get('userName'), this.inputs.get('password'), this.inputs.get('reenterPassword')]);
 
           if (emptyFields) {
-            this.changeDescription({ text: 'Alla obligatoriska fält måste vara ifyllda!', shouldAppend: true });
+            this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
 
             return;
           }
@@ -82,19 +82,19 @@ class LoginBox extends DialogBox {
                   errorText = error.text_se.toString();
                 }
 
-                this.changeDescription({ text: errorText, shouldAppend: true });
+                this.changeExtraDescription({ text: [errorText] });
 
                 return;
               }
 
-              this.changeDescription({ text: 'Användaren är nu registrerad!', shouldAppend: true });
+              this.changeExtraDescription({ text: ['Användaren är nu registrerad!'] });
               this.clearInput('userName');
               this.clearInput('password');
               this.removeInput('reenterPassword');
               this.focusInput('userName');
             });
           } else {
-            this.changeDescription({ text: 'Lösenorden stämmer inte överens. Försök igen', shouldAppend: true });
+            this.changeExtraDescription({ text: ['Lösenorden stämmer inte överens. Försök igen'] });
             this.clearInput('password');
             this.clearInput('reenterPassword');
             this.focusInput('password');
@@ -107,7 +107,7 @@ class LoginBox extends DialogBox {
           const emptyFields = markEmptyFields(this, [this.inputs.get('userName'), this.inputs.get('password')]);
 
           if (emptyFields) {
-            this.changeDescription({ text: 'Alla obligatoriska fält måste vara ifyllda!', shouldAppend: true });
+            this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
 
             return;
           }
@@ -119,7 +119,7 @@ class LoginBox extends DialogBox {
             },
           }, ({ error, data }) => {
             if (error) {
-              this.changeDescription({ text: 'Något gick fel. Misslyckades med att logga in', shouldAppend: true });
+              this.changeExtraDescription({ text: ['Något gick fel. Misslyckades med att logga in'] });
 
               return;
             }
@@ -157,7 +157,8 @@ class LoginBox extends DialogBox {
 
     super({
       buttons,
-      text,
+      description,
+      extraDescription,
       parentElement,
       inputs,
       keyHandler,

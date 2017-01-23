@@ -109,8 +109,8 @@ socketManager.addEvents([
 
         if (userName && data.anonUser) {
           new LoginBox({
-            text: [
-              'Endast för Krismyndigheten och Försvarsmakten',
+            description: ['Endast för Krismyndigheten och Försvarsmakten'],
+            extraDescription: [
               'Din användare kunde inte hittas i databasen',
               'Ni behöver registrera en ny användare',
             ],
@@ -120,7 +120,8 @@ socketManager.addEvents([
           }).appendTo(mainView);
         } else if (data.anonUser) {
           new LoginBox({
-            text: ['Endast för Krismyndigheten och Försvarsmakten'],
+            description: ['Endast för Krismyndigheten och Försvarsmakten'],
+            extraDescription: ['Skriv in ert användarnamn och lösenord'],
             parentElement: mainView,
             socketManager,
             keyHandler,

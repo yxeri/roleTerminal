@@ -22,8 +22,10 @@ const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const KeyHandler = require('../library/KeyHandler');
 const storage = require('../library/storage');
 const textTools = require('../library/textTools');
+const accessRestrictor = require('../library/accessRestrictor');
 
 const mainView = document.getElementById('main');
+const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const isTouchDevice = navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iP(hone|ad|od)/i);
 
@@ -53,6 +55,8 @@ window.addEventListener('error', (event) => {
 const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
+
+accessRestrictor.addAccessView(messenger);
 
 const goFullScreen = () => {
   const element = document.documentElement;
@@ -91,6 +95,7 @@ socketManager.addEvents([
     func: ({ yearModification }) => {
       storage.setLocalVal('yearModification', yearModification);
 
+      messenger.toggleAccessElements(storage.getAccessLevel());
       messenger.appendTo(mainView);
 
       onlineStatus.setOnline();
@@ -100,7 +105,6 @@ socketManager.addEvents([
         user: { userName: storage.getUserName() },
         device: { deviceId: storage.getDeviceId() },
       }, ({ error, data = {} }) => {
-        console.log(error, data);
         if (error) {
           return;
         }
@@ -108,6 +112,8 @@ socketManager.addEvents([
         const userName = storage.getUserName();
 
         if (userName && data.anonUser) {
+          storage.removeUser();
+          accessRestrictor.toggleAllAccessViews(storage.getAccessLevel());
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],
             extraDescription: [
@@ -118,7 +124,6 @@ socketManager.addEvents([
             socketManager,
             keyHandler,
           }).appendTo(mainView);
-          storage.removeUser();
         } else if (data.anonUser) {
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],
@@ -182,7 +187,7 @@ messenger.addMessages({
     text: ['Rosen är röd och nu är jag död.'],
     userName: 'Centralen',
   }, {
-    time: new Date(2016, 1, 25, 0, 0, 0),
+    time: new Date(2016, 1, 24, 0, 0, 0),
     text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 5 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE'],
     userName: 'Centralen',
   }, {

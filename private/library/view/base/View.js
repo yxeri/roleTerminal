@@ -23,6 +23,7 @@ class View {
     }
 
     this.element = element;
+    this.accessElements = [];
   }
 
   hideView() {
@@ -47,6 +48,16 @@ class View {
 
   removeView() {
     this.element.parentNode.removeChild(this.element);
+  }
+
+  toggleAccessElements(accessLevel) {
+    for (const element of this.accessElements) {
+      if (accessLevel >= element.accessLevel) {
+        element.element.classList.remove('hide');
+      } else {
+        element.element.classList.add('hide');
+      }
+    }
   }
 }
 

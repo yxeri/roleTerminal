@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const accessRestrictor = require('./accessRestrictor');
+
 // TODO Move all converters to a converter file
 
 /**
@@ -84,7 +86,7 @@ function setLocalVal(name, item) {
  * Gets item from localStorage
  * @private
  * @param {string} name - Name of the item to be retrieved
- * @returns {Object|number|boolean|string} - Retrieved item
+ * @returns {Object|number|boolean|string|[]} - Retrieved item
  */
 function getLocalVal(name) {
   const value = localStorage.getItem(name);
@@ -124,6 +126,7 @@ function getAccessLevel() {
  */
 function setAccessLevel(accessLevel) {
   setLocalVal('accessLevel', accessLevel);
+  accessRestrictor.toggleAllAccessViews(accessLevel);
 }
 
 /**
@@ -148,6 +151,7 @@ function setUserName(userName) {
 function removeUser() {
   removeLocalVal('userName');
   setAccessLevel(0);
+  removeLocalVal('aliases');
 }
 
 /**
@@ -166,6 +170,22 @@ function setDeviceId(deviceId) {
   setLocalVal('accessLevel', deviceId);
 }
 
+/**
+ * Get user aliases
+ * @returns {string[]} User aliases
+ */
+function getAliases() {
+  return getLocalVal('aliases');
+}
+
+/**
+ * Set user aliases
+ * @param {string[]} aliases - User aliases
+ */
+function setAliases(aliases) {
+  setLocalVal('accessLevel', aliases);
+}
+
 exports.setLocalVal = setLocalVal;
 exports.getLocalVal = getLocalVal;
 exports.removeLocalVal = removeLocalVal;
@@ -176,3 +196,5 @@ exports.getAccessLevel = getAccessLevel;
 exports.setAccessLevel = setAccessLevel;
 exports.getDeviceId = getDeviceId;
 exports.setDeviceId = setDeviceId;
+exports.setAliases = setAliases;
+exports.getAliases = getAliases;

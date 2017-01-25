@@ -17,26 +17,6 @@
 const DialogBox = require('../DialogBox');
 const storage = require('../../storage');
 
-/**
- * Marks fields that are empty. Returns true if any of the fields were empty
- * @private
- * @param {LoginBox} loginBox - This LoginBox object
- * @param {HTMLElement[]} requiredFields - Fields to be checked
- * @returns {boolean} Are any of the fields empty?
- */
-function markEmptyFields(loginBox, requiredFields) {
-  let emptyFields = false;
-
-  for (const input of requiredFields) {
-    if (input.value === '') {
-      emptyFields = true;
-      loginBox.markInput(input.getAttribute('name'));
-    }
-  }
-
-  return emptyFields;
-}
-
 class LoginBox extends DialogBox {
   constructor({ socketManager, description, extraDescription, parentElement, keyHandler }) {
     const buttons = {
@@ -53,12 +33,13 @@ class LoginBox extends DialogBox {
               required: true,
               extraClass: 'markedInput',
             });
+            this.markEmptyFields();
             this.focusInput('reenterpassword');
 
             return;
           }
 
-          const emptyFields = markEmptyFields(this, [this.inputs.get('userName'), this.inputs.get('password'), this.inputs.get('reenterPassword')]);
+          const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
             this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
@@ -104,7 +85,7 @@ class LoginBox extends DialogBox {
       right: {
         text: 'Logga in',
         eventFunc: () => {
-          const emptyFields = markEmptyFields(this, [this.inputs.get('userName'), this.inputs.get('password')]);
+          const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
             this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
@@ -142,19 +123,6 @@ class LoginBox extends DialogBox {
       required: true,
     }];
 
-    const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
-    let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
-
-    if (leftCharCode === rightCharCode) {
-      rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1);
-    }
-
-    const keyTriggers = new Map([
-      [leftCharCode, buttons.left.eventFunc],
-      [rightCharCode, buttons.right.eventFunc],
-    ]);
-
-
     super({
       buttons,
       description,
@@ -162,7 +130,6 @@ class LoginBox extends DialogBox {
       parentElement,
       inputs,
       keyHandler,
-      keyTriggers,
     });
   }
 

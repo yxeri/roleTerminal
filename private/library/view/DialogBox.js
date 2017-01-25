@@ -42,6 +42,8 @@ function createInput({ placeholder, inputName, inputType, required, extraClass }
     inputElement.addEventListener('input', () => {
       inputElement.classList.remove('markedInput');
     });
+
+    inputElement.setAttribute('required', 'true');
   }
 
   if (extraClass) {
@@ -80,11 +82,23 @@ function createParagraph(line) {
 }
 
 class DialogBox extends View {
-  constructor({ buttons, description = [], extraDescription = [], keyHandler, keyTriggers = new Map(), inputs = [] }) {
+  constructor({ buttons, description = [], extraDescription = [], keyHandler, inputs = [] }) {
     super({ isFullscreen: false });
 
     this.keyHandler = keyHandler;
-    this.keyTriggers = keyTriggers;
+
+    // TODO Duplicate code. Should this be moved into DialogBox?
+    const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
+    let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
+
+    if (leftCharCode === rightCharCode) {
+      rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1);
+    }
+
+    this.keyTriggers = new Map([
+      [leftCharCode, buttons.left.eventFunc],
+      [rightCharCode, buttons.right.eventFunc],
+    ]);
 
     this.keyTriggers.forEach((value, key) => this.keyHandler.addKey(key, value));
 
@@ -148,6 +162,24 @@ class DialogBox extends View {
 
     this.cover = document.createElement('DIV');
     this.cover.setAttribute('id', 'cover');
+  }
+
+  /**
+   * Marks fields that are empty. Returns true if any of the fields were empty
+   * @returns {boolean} Are any of the fields empty?
+   */
+  markEmptyFields() {
+    const requiredFields = Array.from(this.inputs.values()).filter(field => field.getAttribute('required') === 'true');
+    let emptyFields = false;
+
+    for (const input of requiredFields) {
+      if (input.value === '') {
+        emptyFields = true;
+        this.markInput(input.getAttribute('name'));
+      }
+    }
+
+    return emptyFields;
   }
 
   appendTo(parentElement) {

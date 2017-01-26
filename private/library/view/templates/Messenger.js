@@ -15,7 +15,7 @@
  */
 
 const View = require('../base/View');
-const ItemList = require('../elements/ItemList');
+const ItemList = require('../elements/MessageList');
 const Message = require('../elements/Message');
 const DialogBox = require('../DialogBox');
 

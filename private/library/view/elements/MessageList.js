@@ -53,7 +53,7 @@ function createHeader({ headerItems, printable, parentElement }) {
   return paragraph;
 }
 
-class ItemList {
+class MessageList {
   constructor({ isTopDown = false }) {
     this.isTopDown = isTopDown;
     this.element = document.createElement('UL');
@@ -152,4 +152,4 @@ class ItemList {
   }
 }
 
-module.exports = ItemList;
+module.exports = MessageList;

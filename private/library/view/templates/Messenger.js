@@ -17,7 +17,6 @@
 const View = require('../base/View');
 const ItemList = require('../elements/MessageList');
 const Message = require('../elements/Message');
-const DialogBox = require('../DialogBox');
 
 class Messenger extends View {
   constructor({ isFullscreen, socketManager, sendButtonText, isTopDown, keyHandler }) {
@@ -78,67 +77,19 @@ class Messenger extends View {
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');
 
-    const aliasButton = document.createElement('BUTTON');
-    aliasButton.appendChild(document.createTextNode('Alias'));
-
-    aliasButton.addEventListener('click', () => {
-      const dialog = new DialogBox({
-        buttons: {
-          left: {
-            text: 'Avbryt',
-            eventFunc: () => {
-              this.removeView();
-            },
-          },
-          right: {
-            text: 'Skapa',
-            eventFunc: () => {
-              console.log('Skapa', dialog.markEmptyFields(), dialog.inputs.get('alias').value);
-              if (!dialog.markEmptyFields()) {
-                socketManager.emitEvent('addAlias', { alias: dialog.inputs.get('alias').value }, (err, aliases) => {
-                  if (err) {
-                    if (err.text) {
-                      dialog.changeExtraDescription({ text: err.text });
-                    }
-
-                    return;
-                  }
-
-
-                });
-              }
-            },
-          },
-        },
-        description: [
-          'Skriv in ett nytt alias. Ni kommer kunna välja att skicka meddelande med detta alias istället för ert användarnamn',
-          'Skriv in ett av dina existerande alias om ni vill ändra det',
-        ],
-        parentElement: this.element.parentElement,
-        inputs: [{
-          placeholder: 'Alias',
-          inputName: 'alias',
-          required: true,
-        }],
-        keyHandler,
-      });
-      dialog.appendTo(this.element.parentElement);
-    });
-    aliasButton.classList.add('hide');
-    this.accessElements.push({
-      element: aliasButton,
-      accessLevel: 2,
-    });
-
-    buttons.appendChild(aliasButton);
     buttons.appendChild(imageButton);
     buttons.appendChild(sendButton);
 
     const inputArea = document.createElement('DIV');
     inputArea.classList.add('inputArea');
+    inputArea.classList.add('hide');
     inputArea.appendChild(this.imagePreview);
     inputArea.appendChild(this.inputField);
     inputArea.appendChild(buttons);
+    this.accessElements.push({
+      element: inputArea,
+      accessLevel: 1,
+    });
 
     if (isTopDown) {
       inputArea.classList.add('topDown');
@@ -162,8 +113,6 @@ class Messenger extends View {
       const imageSource = this.imagePreview.getAttribute('src');
 
       if (imageSource) {
-        console.log(this.imagePreview.getAttribute('name'), this.imagePreview.width, this.imagePreview.height);
-
         chatMsgData.image = {
           source: imageSource,
           imageName: this.imagePreview.getAttribute('name'),

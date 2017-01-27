@@ -52,7 +52,7 @@ class View {
 
   toggleAccessElements(accessLevel) {
     for (const element of this.accessElements) {
-      if (accessLevel >= element.accessLevel) {
+      if ((isNaN(element.maxAccessLevel) || accessLevel <= element.maxAccessLevel) && accessLevel >= element.accessLevel) {
         element.element.classList.remove('hide');
       } else {
         element.element.classList.add('hide');

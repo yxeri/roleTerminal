@@ -20,12 +20,12 @@ const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Time');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const KeyHandler = require('../library/KeyHandler');
+const MainMenu = require('../library/view/templates/MainMenu');
 const storage = require('../library/storage');
 const textTools = require('../library/textTools');
 const accessRestrictor = require('../library/accessRestrictor');
 
 const mainView = document.getElementById('main');
-const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const isTouchDevice = navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iP(hone|ad|od)/i);
 
@@ -55,8 +55,16 @@ window.addEventListener('error', (event) => {
 const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
+const topMenu = new MainMenu({ socketManager, keyHandler, parentElement: mainView });
+const top = document.getElementById('top');
 
 accessRestrictor.addAccessView(messenger);
+accessRestrictor.addAccessView(topMenu);
+topMenu.appendTo(top);
+
+top.addEventListener('click', () => {
+  topMenu.element.classList.toggle('hide');
+});
 
 const goFullScreen = () => {
   const element = document.documentElement;
@@ -113,7 +121,6 @@ socketManager.addEvents([
 
         if (userName && data.anonUser) {
           storage.removeUser();
-          accessRestrictor.toggleAllAccessViews(storage.getAccessLevel());
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],
             extraDescription: [
@@ -135,6 +142,8 @@ socketManager.addEvents([
         } else {
           console.log('I remember you');
         }
+
+        accessRestrictor.toggleAllAccessViews(storage.getAccessLevel());
 
         socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
           if (historyError) {

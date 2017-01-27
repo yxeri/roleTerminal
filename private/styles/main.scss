@@ -191,7 +191,7 @@ img {
     margin: 0;
   }
 
-  div {
+  div:first-child {
     max-width: 21em;
     margin: 0 auto;
     text-align: left;
@@ -273,13 +273,15 @@ img {
   border-bottom: 2px solid $second-color;
   width: calc(100% - 1em);
 
-  li {
-    max-width: 21em;
-    margin: 0 auto;
+  ul {
+    li {
+      max-width: 21em;
+      margin: 0 auto;
 
-    button {
-      width: 100%;
-      text-align: left;
+      button {
+        width: 100%;
+        text-align: left;
+      }
     }
   }
 }

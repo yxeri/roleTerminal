@@ -87,6 +87,10 @@ class Messenger extends View {
     aliasUpdater.addAliasList(aliasList, aliasListButton);
     aliasDiv.appendChild(aliasList);
     aliasDiv.appendChild(aliasListButton);
+    this.accessElements.push({
+      element: aliasDiv,
+      accessLevel: 2,
+    });
 
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');

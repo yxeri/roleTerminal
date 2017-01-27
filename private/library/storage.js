@@ -15,6 +15,7 @@
  */
 
 const accessRestrictor = require('./accessRestrictor');
+const aliasUpdater = require('./aliasUpdater');
 
 // TODO Move all converters to a converter file
 
@@ -89,18 +90,7 @@ function setLocalVal(name, item) {
  * @returns {Object|number|boolean|string|[]} - Retrieved item
  */
 function getLocalVal(name) {
-  const value = localStorage.getItem(name);
-  const type = typeof value;
-
-  if (Array.isArray(value) || type === 'object') {
-    return convertToObject(value);
-  } else if (type === 'number') {
-    return convertToNumber(value);
-  } else if (type === 'boolean' || (type === 'string' && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false'))) {
-    return convertToBoolean(value);
-  }
-
-  return value;
+  return localStorage.getItem(name);
 }
 
 /**
@@ -117,7 +107,7 @@ function removeLocalVal(name) {
  * @returns {number} Access level
  */
 function getAccessLevel() {
-  return getLocalVal('accessLevel');
+  return convertToNumber(getLocalVal('accessLevel'));
 }
 
 /**
@@ -152,6 +142,7 @@ function removeUser() {
   removeLocalVal('userName');
   setAccessLevel(0);
   removeLocalVal('aliases');
+  removeLocalVal('selectedAlias');
 }
 
 /**
@@ -167,7 +158,7 @@ function getDeviceId() {
  * @param {string} deviceId - Device ID
  */
 function setDeviceId(deviceId) {
-  setLocalVal('accessLevel', deviceId);
+  setLocalVal('deviceId', deviceId);
 }
 
 /**
@@ -175,7 +166,7 @@ function setDeviceId(deviceId) {
  * @returns {string[]} User aliases
  */
 function getAliases() {
-  return getLocalVal('aliases');
+  return convertToObject(getLocalVal('aliases'));
 }
 
 /**
@@ -183,7 +174,48 @@ function getAliases() {
  * @param {string[]} aliases - User aliases
  */
 function setAliases(aliases) {
-  setLocalVal('accessLevel', aliases);
+  if (aliases) {
+    const sortedAliases = aliases.sort();
+
+    setLocalVal('aliases', stringifyObject(sortedAliases));
+    aliasUpdater.updateAliasLists(sortedAliases);
+  } else {
+    aliasUpdater.updateAliasLists(null);
+  }
+}
+
+/**
+ * Add a user alias
+ * @param {string} alias - User alias
+ */
+function addAlias(alias) {
+  const aliases = getAliases();
+  aliases.push(alias.toLowerCase());
+
+  setAliases(aliases);
+}
+
+/**
+ * Set selected alias
+ * @param {string} alias - Selected alias
+ */
+function setSelectedAlias(alias) {
+  setLocalVal('selectedAlias', alias.toLowerCase());
+}
+
+/**
+ * Get selected alias
+ * @returns {string} Selected alias
+ */
+function getSelectedAlias() {
+  return getLocalVal('selectedAlias');
+}
+
+/**
+ * Remove selected alias
+ */
+function removeSelectedAlias() {
+  removeLocalVal('selectedAlias');
 }
 
 exports.setLocalVal = setLocalVal;
@@ -198,3 +230,7 @@ exports.getDeviceId = getDeviceId;
 exports.setDeviceId = setDeviceId;
 exports.setAliases = setAliases;
 exports.getAliases = getAliases;
+exports.addAlias = addAlias;
+exports.setSelectedAlias = setSelectedAlias;
+exports.getSelectedAlias = getSelectedAlias;
+exports.removeSelectedAlias = removeSelectedAlias;

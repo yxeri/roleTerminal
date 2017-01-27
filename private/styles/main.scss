@@ -376,6 +376,20 @@ img {
 
 .buttons {
   float: right;
+
+  div {
+    display: inline-block;
+
+    ul {
+      position: absolute;
+      bottom: 2em;
+      background-color: $back-color;
+
+      li:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
 }
 
 .autoHeight {

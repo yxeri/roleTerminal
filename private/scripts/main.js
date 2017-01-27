@@ -24,6 +24,7 @@ const MainMenu = require('../library/view/templates/MainMenu');
 const storage = require('../library/storage');
 const textTools = require('../library/textTools');
 const accessRestrictor = require('../library/accessRestrictor');
+const aliasUpdater = require('../library/aliasUpdater');
 
 const mainView = document.getElementById('main');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
@@ -140,6 +141,7 @@ socketManager.addEvents([
             keyHandler,
           }).appendTo(mainView);
         } else {
+          aliasUpdater.updateAliasLists(storage.getAliases());
           console.log('I remember you');
         }
 

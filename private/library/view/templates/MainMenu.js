@@ -64,16 +64,20 @@ class MainMenu extends View {
           right: {
             text: 'Skapa',
             eventFunc: () => {
-              console.log('Skapa', dialog.markEmptyFields(), dialog.inputs.get('alias').value);
               if (!dialog.markEmptyFields()) {
-                socketManager.emitEvent('addAlias', { alias: dialog.inputs.get('alias').value }, (err, aliases) => {
-                  if (err) {
-                    if (err.text) {
-                      dialog.changeExtraDescription({ text: err.text });
+                const alias = dialog.inputs.get('alias').value;
+
+                socketManager.emitEvent('addAlias', { alias }, ({ error }) => {
+                  if (error) {
+                    if (error.text) {
+                      dialog.changeExtraDescription({ text: error.text });
                     }
 
                     return;
                   }
+
+                  storage.addAlias(alias);
+                  dialog.removeView();
                 });
               }
             },
@@ -83,7 +87,7 @@ class MainMenu extends View {
           'Skriv in ett nytt alias. Ni kommer kunna välja att skicka meddelande med detta alias istället för ert användarnamn',
           'Skriv in ett av dina existerande alias om ni vill ändra det',
         ],
-        parentElement: this.element.parentElement,
+        parentElement,
         inputs: [{
           placeholder: 'Alias',
           inputName: 'alias',
@@ -91,7 +95,7 @@ class MainMenu extends View {
         }],
         keyHandler,
       });
-      dialog.appendTo(this.element.parentElement);
+      dialog.appendTo(parentElement);
     });
     this.accessElements.push({
       element: aliasRow,

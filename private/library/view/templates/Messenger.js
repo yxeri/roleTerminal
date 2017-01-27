@@ -18,6 +18,9 @@ const View = require('../base/View');
 const ItemList = require('../elements/MessageList');
 const Message = require('../elements/Message');
 
+const aliasUpdater = require('../../aliasUpdater');
+const storage = require('../../storage');
+
 class Messenger extends View {
   constructor({ isFullscreen, socketManager, sendButtonText, isTopDown, keyHandler }) {
     super({ isFullscreen });
@@ -74,9 +77,21 @@ class Messenger extends View {
       accessLevel: 2,
     });
 
+    const aliasDiv = document.createElement('DIV');
+    const aliasListButton = document.createElement('BUTTON');
+    const aliasList = document.createElement('UL');
+    aliasList.classList.add('hide');
+    aliasListButton.addEventListener('click', () => {
+      aliasList.classList.toggle('hide');
+    });
+    aliasUpdater.addAliasList(aliasList, aliasListButton);
+    aliasDiv.appendChild(aliasList);
+    aliasDiv.appendChild(aliasListButton);
+
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');
 
+    buttons.appendChild(aliasDiv);
     buttons.appendChild(imageButton);
     buttons.appendChild(sendButton);
 
@@ -123,6 +138,12 @@ class Messenger extends View {
         this.imagePreview.removeAttribute('src');
         this.imagePreview.removeAttribute('name');
         this.imagePreview.classList.add('hide');
+      }
+
+      const selectedAlias = storage.getSelectedAlias();
+
+      if (selectedAlias) {
+        chatMsgData.message.userName = selectedAlias;
       }
 
       this.socketManager.emitEvent('chatMsg', chatMsgData, ({ data, error }) => {

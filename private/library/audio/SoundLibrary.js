@@ -16,23 +16,29 @@
 
 class SoundLibrary {
   constructor() {
-    this.sounds = new Map();
+    this.sounds = [];
   }
 
   addSound(sound) {
-    this.sounds.set(sound.soundId, sound);
+    this.sounds.push({ soundId: sound.soundId, sound });
   }
 
-  getSound(soundId) {
-    return this.sounds.get(soundId);
+  getSound(sentSoundId) {
+    const sound = this.sounds.find(({ soundId }) => soundId === sentSoundId);
+
+    if (sound) {
+      return sound.sound;
+    }
+
+    return null;
   }
 
-  removeSound(soundId) {
-    this.sounds.delete(soundId);
-  }
+  removeSound(sentSoundId) {
+    const soundIndex = this.sounds.findIndex(({ soundId }) => soundId === sentSoundId);
 
-  getAllSounds() {
-    return this.sounds.values;
+    if (soundIndex > -1) {
+      this.sounds.splice(soundIndex, 1);
+    }
   }
 }
 

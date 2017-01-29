@@ -23,7 +23,7 @@ class LoginBox extends DialogBox {
       left: {
         text: 'Registrera',
         eventFunc: () => {
-          const reenterPasswordInput = this.inputs.get('reenterPassword');
+          const reenterPasswordInput = this.inputs.find(({ inputName }) => inputName === 'reenterPassword');
 
           if (!reenterPasswordInput) {
             this.addInput({
@@ -47,11 +47,11 @@ class LoginBox extends DialogBox {
             return;
           }
 
-          if (reenterPasswordInput.value === this.inputs.get('password').value) {
+          if (reenterPasswordInput.inputElement.value === this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
             socketManager.emitEvent('register', {
               user: {
-                userName: this.inputs.get('userName').value,
-                password: reenterPasswordInput.value,
+                userName: this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.value,
+                password: reenterPasswordInput.inputElement.value,
                 registerDevice: storage.getDeviceId(),
               },
             }, ({ error }) => {
@@ -95,8 +95,8 @@ class LoginBox extends DialogBox {
 
           socketManager.emitEvent('login', {
             user: {
-              userName: this.inputs.get('userName').value,
-              password: this.inputs.get('password').value,
+              userName: this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.value,
+              password: this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
             },
           }, ({ error, data }) => {
             if (error) {
@@ -136,7 +136,7 @@ class LoginBox extends DialogBox {
 
   appendTo(parentElement) {
     super.appendTo(parentElement);
-    this.inputs.get('userName').focus();
+    this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.focus();
   }
 }
 

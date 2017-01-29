@@ -95,25 +95,19 @@ class DialogBox extends View {
       rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1);
     }
 
-    this.keyTriggers = new Map([
-      [leftCharCode, buttons.left.eventFunc],
-      [rightCharCode, buttons.right.eventFunc],
-    ]);
+    this.keyTriggers = [
+      { charCode: leftCharCode, func: buttons.left.eventFunc },
+      { charCode: rightCharCode, func: buttons.right.eventFunc },
+    ];
 
-    this.keyTriggers.forEach((value, key) => this.keyHandler.addKey(key, value));
+    this.keyTriggers.forEach(({ charCode, func }) => this.keyHandler.addKey(charCode, func));
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
-
-    for (const line of description) {
-      this.descriptionContainer.appendChild(createParagraph(line));
-    }
+    description.forEach(line => this.descriptionContainer.appendChild(createParagraph(line)));
 
     this.extraDescription = document.createElement('DIV');
-
-    for (const line of extraDescription) {
-      this.extraDescription.appendChild(createParagraph(line));
-    }
+    extraDescription.forEach(line => this.extraDescription.appendChild(createParagraph(line)));
 
     this.descriptionContainer.appendChild(this.extraDescription);
 
@@ -145,17 +139,17 @@ class DialogBox extends View {
       eventFunc: buttons.right.eventFunc,
     }));
 
-    this.inputs = new Map();
+    this.inputs = [];
 
     this.element.appendChild(closeButton);
     this.element.appendChild(this.descriptionContainer);
 
-    for (const input of inputs) {
+    inputs.forEach((input) => {
       const inputElement = createInput(input);
 
-      this.inputs.set(input.inputName, inputElement);
+      this.inputs.push({ inputName: input.inputName, inputElement });
       this.element.appendChild(inputElement);
-    }
+    });
 
     this.element.appendChild(this.buttonsContainer);
     this.element.classList.add('dialogBox');
@@ -169,15 +163,15 @@ class DialogBox extends View {
    * @returns {boolean} Are any of the fields empty?
    */
   markEmptyFields() {
-    const requiredFields = Array.from(this.inputs.values()).filter(field => field.getAttribute('required') === 'true');
+    const requiredFields = this.inputs.filter(({ inputElement }) => inputElement.getAttribute('required') === true);
     let emptyFields = false;
 
-    for (const input of requiredFields) {
+    requiredFields.forEach(({ inputElement: input }) => {
       if (input.value === '') {
         emptyFields = true;
         this.markInput(input.getAttribute('name'));
       }
-    }
+    });
 
     return emptyFields;
   }
@@ -196,52 +190,52 @@ class DialogBox extends View {
   addInput(input) {
     const inputElement = createInput(input);
 
-    this.inputs.set(input.inputName, inputElement);
+    this.inputs.push({ inputName: input.inputName, inputElement });
     this.element.insertBefore(inputElement, this.buttonsContainer);
   }
 
-  removeInput(inputName) {
-    const input = this.inputs.get(inputName);
+  removeInput(sentInputName) {
+    const inputIndex = this.inputs.findIndex(({ inputName }) => sentInputName === inputName);
 
-    if (input) {
-      this.element.removeChild(input);
-      this.inputs.delete(inputName);
+    if (inputIndex > -1) {
+      this.element.removeChild(this.inputs[inputIndex].inputElement);
+      this.inputs.splice(inputIndex, 1);
     }
   }
 
-  clearInput(inputName) {
-    const input = this.inputs.get(inputName);
+  clearInput(sentInputName) {
+    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
     if (input) {
-      input.value = '';
+      input.inputElement.value = '';
     }
   }
 
-  focusInput(inputName) {
-    const input = this.inputs.get(inputName);
+  focusInput(sentInputName) {
+    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
     if (input) {
-      input.focus();
+      input.inputElement.focus();
     }
   }
 
-  markInput(inputName) {
-    const input = this.inputs.get(inputName);
+  markInput(sentInputName) {
+    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
     if (input) {
-      input.classList.add('markedInput');
+      input.inputElement.classList.add('markedInput');
     }
   }
 
   changeExtraDescription({ text = [] }) {
     const fragment = document.createDocumentFragment();
 
-    for (const line of text) {
+    text.forEach((line) => {
       const paragraph = document.createElement('P');
 
       paragraph.appendChild(document.createTextNode(line));
       fragment.appendChild(paragraph);
-    }
+    });
 
     this.extraDescription.innerHTML = ' ';
     this.extraDescription.appendChild(fragment);

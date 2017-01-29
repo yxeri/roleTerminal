@@ -34,12 +34,12 @@ function addAliasList(aliasList, button) {
 function updateAliasLists(aliases) {
   console.log('aliases', aliases, 'aliasesLists', aliasLists);
 
-  for (const list of aliasLists) {
+  aliasLists.forEach((list) => {
     if (aliases) {
       const fragment = document.createDocumentFragment();
       const fullAliasList = [storage.getUserName()].concat(aliases);
 
-      for (const alias of fullAliasList) {
+      fullAliasList.forEach((alias) => {
         const row = document.createElement('LI');
         const button = document.createElement('BUTTON');
         button.appendChild(document.createTextNode(alias));
@@ -56,7 +56,7 @@ function updateAliasLists(aliases) {
 
         row.appendChild(button);
         fragment.appendChild(row);
-      }
+      });
 
       list.aliasList.innerHTML = ' ';
       list.aliasList.appendChild(fragment);
@@ -71,7 +71,7 @@ function updateAliasLists(aliases) {
     } else {
       list.button.classList.add('hide');
     }
-  }
+  });
 }
 
 exports.addAliasList = addAliasList;

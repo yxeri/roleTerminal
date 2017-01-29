@@ -24,7 +24,7 @@ function createHeader({ headerItems, printable, parentElement }) {
   const paragraph = document.createElement('P');
   paragraph.classList.add('header');
 
-  for (const { textLine, extraClass, clickFunc } of headerItems) {
+  headerItems.forEach(({ textLine, extraClass, clickFunc }) => {
     const span = document.createElement('SPAN');
     span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
 
@@ -37,7 +37,7 @@ function createHeader({ headerItems, printable, parentElement }) {
     }
 
     paragraph.appendChild(span);
-  }
+  });
 
   if (printable) {
     const button = document.createElement('BUTTON');
@@ -73,7 +73,7 @@ class MessageList {
   addItems(items, shouldScroll) {
     const fragment = document.createDocumentFragment();
 
-    for (const item of items) {
+    items.forEach((item) => {
       const listItem = this.createItem(item);
 
       if (this.isTopDown) {
@@ -81,7 +81,7 @@ class MessageList {
       } else {
         fragment.appendChild(this.createItem(item));
       }
-    }
+    });
 
     if (this.isTopDown) {
       this.element.insertBefore(fragment, this.element.firstChild);
@@ -105,7 +105,7 @@ class MessageList {
     const listItem = document.createElement('LI');
     listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
 
-    for (const line of text) {
+    text.forEach((line) => {
       const paragraph = document.createElement('P');
 
       if (line === '') {
@@ -115,7 +115,7 @@ class MessageList {
       }
 
       listItem.appendChild(paragraph);
-    }
+    });
 
     if (image) {
       const paragraph = document.createElement('P');

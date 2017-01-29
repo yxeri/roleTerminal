@@ -51,13 +51,13 @@ class View {
   }
 
   toggleAccessElements(accessLevel) {
-    for (const element of this.accessElements) {
+    this.accessElements.forEach((element) => {
       if ((isNaN(element.maxAccessLevel) || accessLevel <= element.maxAccessLevel) && accessLevel >= element.accessLevel) {
         element.element.classList.remove('hide');
       } else {
         element.element.classList.add('hide');
       }
-    }
+    });
   }
 }
 

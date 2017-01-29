@@ -58,9 +58,7 @@ class SocketManager {
   }
 
   addEvents(events) {
-    for (const event of events) {
-      this.addEvent(event.event, event.func);
-    }
+    events.forEach(event => this.addEvent(event.event, event.func));
   }
 
   /**

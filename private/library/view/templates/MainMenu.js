@@ -65,7 +65,7 @@ class MainMenu extends View {
             text: 'Skapa',
             eventFunc: () => {
               if (!dialog.markEmptyFields()) {
-                const alias = dialog.inputs.get('alias').value;
+                const alias = dialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value;
 
                 socketManager.emitEvent('addAlias', { alias }, ({ error }) => {
                   if (error) {

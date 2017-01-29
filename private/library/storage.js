@@ -44,17 +44,26 @@ function convertToBoolean(value) {
 }
 
 /**
- * Convert string to int or float
+ * Convert string to int
  * @param {string} value - Value to be converted
  * @returns {number|null} Converted number. null if the value was not a number
  */
-function convertToNumber(value) {
+function convertToInt(value) {
   if (isNaN(value)) {
     return null;
   }
 
-  if (Number.isInteger(value)) {
-    return parseInt(value, 10);
+  return parseInt(value, 10);
+}
+
+/**
+ * Convert string to float
+ * @param {string} value - Value to be converted
+ * @returns {number|null} Converted number. null if the value was not a number
+ */
+function convertToFloat(value) {
+  if (isNaN(value)) {
+    return null;
   }
 
   return parseFloat(value);
@@ -107,7 +116,7 @@ function removeLocalVal(name) {
  * @returns {number} Access level
  */
 function getAccessLevel() {
-  return convertToNumber(getLocalVal('accessLevel'));
+  return convertToInt(getLocalVal('accessLevel'));
 }
 
 /**

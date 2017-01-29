@@ -39,19 +39,19 @@
 
 class KeyHandler {
   constructor() {
-    this.keys = new Map();
+    this.keys = [];
     this.keyPressed = false;
     this.triggerKeyPressed = false;
     this.triggerKey = 18; // Alt
 
     window.addEventListener('keydown', (event) => {
-      const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+      const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
-      if (keyCode === this.triggerKey) {
+      if (sentKeyCode === this.triggerKey) {
         this.triggerKeyPressed = true;
         event.preventDefault();
       } else if (this.triggerKeyPressed && !this.keyPressed) {
-        const keyFunc = this.keys.get(keyCode);
+        const keyFunc = this.keys.find(({ keyCode }) => keyCode === sentKeyCode).func;
 
         if (keyFunc) {
           keyFunc();
@@ -73,11 +73,15 @@ class KeyHandler {
   }
 
   addKey(key, func) {
-    this.keys.set(key, func);
+    this.keys.push({ keyCode: key, func });
   }
 
   removeKey(key) {
-    this.keys.delete(key);
+    const keyIndex = this.keys.findIndex(({ keyCode }) => keyCode === key);
+
+    if (keyIndex > -1) {
+      this.keys.splice(keyIndex, 1);
+    }
   }
 }
 

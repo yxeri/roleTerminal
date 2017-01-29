@@ -80,12 +80,9 @@ const goFullScreen = () => {
 };
 
 keyHandler.addKey(112, goFullScreen);
-
-if (isTouchDevice) {
-  window.addEventListener('click', () => {
-    goFullScreen();
-  });
-}
+window.addEventListener('click', () => {
+  goFullScreen();
+});
 
 socketManager.addEvents([
   {

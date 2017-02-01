@@ -19,12 +19,16 @@ class DeviceChecker {
    * @param {boolean} params.isStandalone - Is the Safari browser in standalone mode (opened through shortcut from Home screen in iOS)?
    * @param {string} params.userAgent - Browser user agent
    */
-  constructor({ isStandalone, userAgent }) {
+  constructor({ isStandalone = false, userAgent = '' }) {
     this.isStandalone = isStandalone;
     this.DeviceEnum = {
-      IOS: 1,
-      ANDROID: 2,
-      OTHER: 3,
+      IOS: 'ios',
+      ANDROID: 'android',
+      OTHER: 'other',
+    };
+    this.BrowserEnum = {
+      SAFARIDESKTOP: 'safari desktop',
+      OTHER: 'other',
     };
     this.deviceType = (() => {
       if (userAgent.match(/iP(hone|ad|od)/i) !== null) {
@@ -35,7 +39,14 @@ class DeviceChecker {
 
       return this.DeviceEnum.OTHER;
     })();
-    this.isTouchDevice = (() => (this.deviceType === this.DeviceEnum.IOS || this.deviceType === this.DeviceEnum.ANDROID))();
+    this.browserType = (() => {
+      if (this.deviceType !== this.DeviceEnum.IOS && userAgent.match(/Safari/)) {
+        return this.BrowserEnum.SAFARIDESKTOP;
+      }
+
+      return this.BrowserEnum.OTHER;
+    })();
+    this.isTouchDevice = this.deviceType === this.DeviceEnum.IOS || this.deviceType === this.DeviceEnum.ANDROID;
   }
 }
 

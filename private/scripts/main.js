@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+require('../library/polyfills');
+
 const SocketManager = require('../library/SocketManager');
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
@@ -21,6 +23,7 @@ const Time = require('../library/view/templates/Time');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const KeyHandler = require('../library/KeyHandler');
 const MainMenu = require('../library/view/templates/MainMenu');
+const DeviceChecker = require('../library/DeviceChecker');
 const storage = require('../library/storage');
 const textTools = require('../library/textTools');
 const accessRestrictor = require('../library/accessRestrictor');
@@ -28,7 +31,6 @@ const aliasUpdater = require('../library/aliasUpdater');
 
 const mainView = document.getElementById('main');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
-const isTouchDevice = navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iP(hone|ad|od)/i);
 
 if (storage.getDeviceId() === null) {
   storage.setDeviceId(textTools.createAlphaNumbericalString(16, false));
@@ -53,6 +55,7 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
+const deviceChecker = new DeviceChecker({ isStandalone: window.navigator.standalone, userAgent: window.navigator.userAgent });
 const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });

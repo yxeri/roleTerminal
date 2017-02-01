@@ -34,7 +34,7 @@ class LoginBox extends DialogBox {
               extraClass: 'markedInput',
             });
             this.markEmptyFields();
-            this.focusInput('reenterpassword');
+            this.focusInput('reenterPassword');
 
             return;
           }
@@ -54,21 +54,22 @@ class LoginBox extends DialogBox {
                 password: reenterPasswordInput.inputElement.value,
                 registerDevice: storage.getDeviceId(),
               },
-            }, ({ error }) => {
+            }, ({ error, data }) => {
               if (error) {
-                let errorText = 'Något gick fel. Kunde inte registrera användare';
-
-                // TODO Specify language
-                if (error.text_se) {
-                  errorText = error.text_se.toString();
-                }
-
-                this.changeExtraDescription({ text: [errorText] });
+                this.changeExtraDescription({ text: ['Något gick fel. Kunde inte registrera användare'] });
 
                 return;
               }
 
-              this.changeExtraDescription({ text: ['Användaren är nu registrerad!'] });
+              const text = [];
+
+              if (data.requiresVerification) {
+                text.push('Användaren är registrerad, men för att kunna logga in måste den verifieras av en administratör');
+              } else {
+                text.push('Användaren är nu registrerad! Användaren kan nu logga in');
+              }
+
+              this.changeExtraDescription({ text });
               this.clearInput('userName');
               this.clearInput('password');
               this.removeInput('reenterPassword');

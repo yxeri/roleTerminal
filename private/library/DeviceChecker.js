@@ -48,6 +48,10 @@ class DeviceChecker {
     })();
     this.isTouchDevice = this.deviceType === this.DeviceEnum.IOS || this.deviceType === this.DeviceEnum.ANDROID;
   }
+
+  isLandscape() {
+    return window.innerWidth > window.innerHeight;
+  }
 }
 
 module.exports = DeviceChecker;

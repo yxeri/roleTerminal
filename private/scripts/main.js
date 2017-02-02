@@ -30,6 +30,7 @@ const accessRestrictor = require('../library/accessRestrictor');
 const aliasUpdater = require('../library/aliasUpdater');
 
 const mainView = document.getElementById('main');
+const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 
 if (storage.getDeviceId() === null) {
@@ -60,7 +61,6 @@ const socketManager = new SocketManager({ socket: io() }); // eslint-disable-lin
 const keyHandler = new KeyHandler();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
 const topMenu = new MainMenu({ socketManager, keyHandler, parentElement: mainView });
-const top = document.getElementById('top');
 
 accessRestrictor.addAccessView(messenger);
 accessRestrictor.addAccessView(topMenu);
@@ -69,6 +69,20 @@ topMenu.appendTo(top);
 top.addEventListener('click', () => {
   topMenu.element.classList.toggle('hide');
 });
+
+if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
+  if (!deviceChecker.isLandscape()) {
+    top.classList.add('appleMenuFix');
+  }
+
+  window.addEventListener('orientationchange', () => {
+    if (deviceChecker.isLandscape()) {
+      top.classList.remove('appleMenuFix');
+    } else {
+      top.classList.add('appleMenuFix');
+    }
+  });
+}
 
 const goFullScreen = () => {
   const element = document.documentElement;
@@ -250,7 +264,7 @@ messenger.addMessages({
     userName: 'Värnhem',
   }, {
     time: new Date(2045, 2, 9, 10, 30, 6),
-    text: ['Ledningen till Rifall är lagad, igen. Meddelanden verkar inte ha lagrats'],
+    text: ['Ledningen till Rifall är lagad, igen.'],
     userName: 'Rifall',
   }],
   options: { printable: false },

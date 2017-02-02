@@ -175,7 +175,8 @@ img {
 #top {
   text-align: center;
   margin-bottom: $padding;
-  padding-bottom: $padding;
+  padding-top: $padding;
+  padding-bottom: $padding * 2;
   border-bottom: $border solid $second-color;
   cursor: pointer;
   -webkit-touch-callout: none;
@@ -361,7 +362,7 @@ img {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 
 .bottomUp {

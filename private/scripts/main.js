@@ -189,24 +189,48 @@ messenger.addMessages({
     text: ['Kärnvapenexplosioner bekräftade i Stockholm, Göteborg, Malmö, Köpenhamn.'],
     userName: 'Centralen',
   }, {
+    time: new Date(2013, 6, 26, 10, 0, 5),
+    text: ['Uppsamlingsläger etablerade runt drabbade städer.'],
+    userName: 'Centralen',
+  }, {
     time: new Date(2014, 4, 14, 0, 0, 0),
     text: ['Tidfunktion trasig i systemet. Har ej tillgång till tekniker. Tappat kontakt med andra centraler.'],
     userName: 'Centralen',
   }, {
-    time: new Date(2016, 1, 5, 0, 0, 0),
-    text: ['Spridning av dödlig sjukdom. Leder till feber, utslag under armarna, hosta. Rekommenderar att undvika kontakt med andra människor.'],
+    time: new Date(2015, 6, 7, 0, 0, 0),
+    text: ['Är någon kvar där ute?'],
     userName: 'Centralen',
   }, {
-    time: new Date(2016, 1, 19, 0, 0, 0),
-    text: ['Rosen är röd och nu är jag död.'],
+    time: new Date(2015, 11, 29, 0, 0, 0),
+    text: ['Kontakt med uppsamlingslägrena fortfarande bruten. Ingen kontakt med militära styrkor. Ingen kontakt med civila grupper.'],
+    userName: 'Centralen',
+  }, {
+    time: new Date(2016, 1, 5, 0, 0, 0),
+    text: ['PRIORITERAT MEDDELANDE. Spridning av dödlig sjukdom. Leder till feber, utslag under armarna, hosta. Rekommendation: undvik större grupperingar. Undvik kontakt med personer som uppvisar dessa symptom.'],
+    userName: 'Centralen',
+  }, {
+    time: new Date(2016, 1, 7, 0, 0, 0),
+    text: ['Centralen är inte längre säker. Vi kommer att flytta till punkt 72C.'],
+    userName: 'Centralen',
+  }, {
+    time: new Date(2016, 1, 10, 0, 0, 0),
+    text: ['Vi misslyckades med att försöka omlokalisera oss.'],
+    userName: 'Centralen',
+  }, {
+    time: new Date(2016, 1, 16, 0, 0, 0),
+    text: ['rosen ärröd oh nu är jag ddöd'],
     userName: 'Centralen',
   }, {
     time: new Date(2016, 1, 24, 0, 0, 0),
     text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 5 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE'],
     userName: 'Centralen',
   }, {
+    time: new Date(2016, 11, 14, 0, 0, 0),
+    text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 300 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE. DETTA ÄR ETT SLUTGILTIGT MEDDELANDE. CENTRALEN ÄR INAKTIV'],
+    userName: 'Centralen',
+  }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
-    text: ['Test test'],
+    text: ['test test'],
     userName: 'OKÄND SÄNDARE',
   }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
@@ -214,11 +238,19 @@ messenger.addMessages({
     userName: 'Värnhem',
   }, {
     time: new Date(2044, 8, 10, 0, 0, 0),
-    text: ['Östbacken online. tidstämpeln verkar inte fungera. kommer försöka hämta gamla meddelanden'],
+    text: ['Östbacken inkopplade. Tiden fungerar inte'],
     userName: 'Östbacken',
   }, {
     time: new Date(2044, 9, 30, 12, 7, 0),
     text: ['Rifall är inkopplat. Jag fick igång tidstämpeln och har lyckats hämta några gamla meddelanden från "Centralen"'],
+    userName: 'Rifall',
+  }, {
+    time: new Date(2044, 9, 30, 19, 0, 17),
+    text: ['det här gjoirde vi bra'],
+    userName: 'Värnhem',
+  }, {
+    time: new Date(2045, 2, 9, 10, 30, 6),
+    text: ['Ledningen till Rifall är lagad, igen. Meddelanden verkar inte ha lagrats'],
     userName: 'Rifall',
   }],
   options: { printable: false },

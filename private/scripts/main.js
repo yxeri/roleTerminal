@@ -228,7 +228,7 @@ messenger.addMessages({
     userName: 'Centralen',
   }, {
     time: new Date(2016, 1, 10, 0, 0, 0),
-    text: ['Vi misslyckades med att försöka omlokalisera oss.'],
+    text: ['omlokaliseringen misslyckades'],
     userName: 'Centralen',
   }, {
     time: new Date(2016, 1, 16, 0, 0, 0),

@@ -14,20 +14,13 @@
  limitations under the License.
  */
 
-const storage = require('./storage');
+const storage = require('./StorageManager');
 
 class SocketManager {
-  constructor({ socket, events = {} }) {
-    const eventKeys = Object.keys(events);
-    this.socket = socket;
+  constructor() {
+    this.socket = io(); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
-
-    for (let i = 0; i < eventKeys.length; i += 1) {
-      const event = eventKeys[i];
-
-      this.socket.on(event, events[event]);
-    }
 
     /**
      * Checks if the screen has been unresponsive for some time.
@@ -113,4 +106,6 @@ class SocketManager {
   }
 }
 
-module.exports = SocketManager;
+const socketManager = new SocketManager();
+
+module.exports = socketManager;

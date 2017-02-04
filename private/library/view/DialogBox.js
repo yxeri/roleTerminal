@@ -15,6 +15,7 @@
  */
 
 const View = require('./base/View');
+const keyHandler = require('../KeyHandler');
 
 // TODO This should be a class
 /**
@@ -34,14 +35,9 @@ function createInput({ placeholder, inputName, inputType, required, extraClass }
 
   if (required) {
     inputElement.addEventListener('blur', () => {
-      if (inputElement.value === '') {
-        inputElement.classList.add('markedInput');
-      }
+      if (inputElement.value === '') { inputElement.classList.add('markedInput'); }
     });
-
-    inputElement.addEventListener('input', () => {
-      inputElement.classList.remove('markedInput');
-    });
+    inputElement.addEventListener('input', () => { inputElement.classList.remove('markedInput'); });
 
     inputElement.setAttribute('required', 'true');
   }
@@ -82,25 +78,21 @@ function createParagraph(line) {
 }
 
 class DialogBox extends View {
-  constructor({ buttons, description = [], extraDescription = [], keyHandler, inputs = [] }) {
+  constructor({ buttons, description = [], extraDescription = [], inputs = [] }) {
     super({ isFullscreen: false });
-
-    this.keyHandler = keyHandler;
 
     // TODO Duplicate code. Should this be moved into DialogBox?
     const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
     let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
 
-    if (leftCharCode === rightCharCode) {
-      rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1);
-    }
+    if (leftCharCode === rightCharCode) { rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1); }
 
     this.keyTriggers = [
       { charCode: leftCharCode, func: buttons.left.eventFunc },
       { charCode: rightCharCode, func: buttons.right.eventFunc },
     ];
 
-    this.keyTriggers.forEach(({ charCode, func }) => this.keyHandler.addKey(charCode, func));
+    this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
@@ -113,9 +105,7 @@ class DialogBox extends View {
 
     const closeButton = createButton({
       text: 'X',
-      eventFunc: () => {
-        this.removeView();
-      },
+      eventFunc: () => { this.removeView(); },
     });
     closeButton.classList.add('closeButton');
 
@@ -183,7 +173,7 @@ class DialogBox extends View {
 
   removeView() {
     this.element.parentNode.removeChild(this.cover);
-    this.keyTriggers.forEach((value, key) => this.keyHandler.removeKey(key));
+    this.keyTriggers.forEach((value, key) => keyHandler.removeKey(key));
     super.removeView();
   }
 
@@ -206,25 +196,19 @@ class DialogBox extends View {
   clearInput(sentInputName) {
     const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
-    if (input) {
-      input.inputElement.value = '';
-    }
+    if (input) { input.inputElement.value = ''; }
   }
 
   focusInput(sentInputName) {
     const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
-    if (input) {
-      input.inputElement.focus();
-    }
+    if (input) { input.inputElement.focus(); }
   }
 
   markInput(sentInputName) {
     const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
 
-    if (input) {
-      input.inputElement.classList.add('markedInput');
-    }
+    if (input) { input.inputElement.classList.add('markedInput'); }
   }
 
   changeExtraDescription({ text = [] }) {

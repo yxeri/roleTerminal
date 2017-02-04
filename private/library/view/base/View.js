@@ -18,37 +18,21 @@ class View {
   constructor({ isFullscreen }) {
     const element = document.createElement('DIV');
 
-    if (isFullscreen) {
-      element.classList.add('fullscreen');
-    }
+    if (isFullscreen) { element.classList.add('fullscreen'); }
 
     this.element = element;
     this.accessElements = [];
   }
 
-  hideView() {
-    this.element.classList.add('hide');
-  }
+  hideView() { this.element.classList.add('hide'); }
+  showView() { this.element.classList.remove('hide'); }
+  goFullscreen() { this.element.classList.add('fullscreen'); }
 
-  showView() {
-    this.element.classList.remove('hide');
-  }
+  goWindowed() { this.element.classList.remove('fullscreen'); }
 
-  goFullscreen() {
-    this.element.classList.add('fullscreen');
-  }
+  appendTo(parentElement) { parentElement.appendChild(this.element); }
 
-  goWindowed() {
-    this.element.classList.remove('fullscreen');
-  }
-
-  appendTo(parentElement) {
-    parentElement.appendChild(this.element);
-  }
-
-  removeView() {
-    this.element.parentNode.removeChild(this.element);
-  }
+  removeView() { this.element.parentNode.removeChild(this.element); }
 
   toggleAccessElements(accessLevel) {
     this.accessElements.forEach((element) => {

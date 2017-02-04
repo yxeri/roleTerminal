@@ -17,10 +17,13 @@
 const View = require('../base/View');
 const DialogBox = require('../DialogBox');
 const LoginBox = require('./LoginBox');
-const storage = require('../../storage');
+const storageManager = require('../../StorageManager');
+const aliasUpdater = require('../../AliasUpdater');
+const keyHandler = require('../../KeyHandler');
+const socketManager = require('../../SocketManager');
 
 class MainMenu extends View {
-  constructor({ socketManager, parentElement, keyHandler }) {
+  constructor({ parentElement }) {
     super({ isFullscreen: false });
     this.element.setAttribute('id', 'mainMenu');
     this.element.classList.add('hide');
@@ -69,14 +72,12 @@ class MainMenu extends View {
 
                 socketManager.emitEvent('addAlias', { alias }, ({ error }) => {
                   if (error) {
-                    if (error.text) {
-                      dialog.changeExtraDescription({ text: error.text });
-                    }
+                    dialog.changeExtraDescription({ text: error.text });
 
                     return;
                   }
 
-                  storage.addAlias(alias);
+                  aliasUpdater.addAlias(alias);
                   dialog.removeView();
                 });
               }
@@ -108,7 +109,7 @@ class MainMenu extends View {
     logoutRow.lastChild.appendChild(document.createTextNode('Logga ut'));
     logoutRow.classList.add('hide');
     logoutRow.addEventListener('click', () => {
-      storage.removeUser();
+      storageManager.removeUser();
       aliasRow.classList.add('hide');
       new LoginBox({
         description: ['Endast för Krismyndigheten och Försvarsmakten'],

@@ -85,4 +85,6 @@ class KeyHandler {
   }
 }
 
-module.exports = KeyHandler;
+const keyHandler = new KeyHandler();
+
+module.exports = keyHandler;

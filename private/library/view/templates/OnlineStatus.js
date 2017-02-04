@@ -19,17 +19,9 @@ class OnlineStatus {
     this.element = statusElement;
   }
 
-  setOffline() {
-    this.setStatus('OFFLINE');
-  }
-
-  setOnline() {
-    this.setStatus('ONLINE');
-  }
-
-  setStatus(status) {
-    this.element.replaceChild(document.createTextNode(status.toUpperCase()), this.element.firstChild);
-  }
+  setOffline() { this.setStatus('OFFLINE'); }
+  setOnline() { this.setStatus('ONLINE'); }
+  setStatus(status) { this.element.replaceChild(document.createTextNode(status.toUpperCase()), this.element.firstChild); }
 }
 
 module.exports = OnlineStatus;

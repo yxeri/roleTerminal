@@ -18,17 +18,16 @@ const View = require('../base/View');
 const ItemList = require('../elements/MessageList');
 const Message = require('../elements/Message');
 
-const aliasUpdater = require('../../aliasUpdater');
-const storage = require('../../storage');
+const keyHandler = require('../../KeyHandler');
+const socketManager = require('../../SocketManager');
+const aliasUpdater = require('../../AliasUpdater');
+const storage = require('../../StorageManager');
 
 class Messenger extends View {
-  constructor({ isFullscreen, socketManager, sendButtonText, isTopDown, keyHandler }) {
+  constructor({ isFullscreen, sendButtonText, isTopDown }) {
     super({ isFullscreen });
 
-    this.keyHandler = keyHandler;
-    this.keyHandler.addKey(13, () => { this.sendMessage(); });
-
-    this.socketManager = socketManager;
+    keyHandler.addKey(13, () => { this.sendMessage(); });
     this.element.setAttribute('id', 'messenger');
 
     this.inputField = document.createElement('TEXTAREA');
@@ -61,16 +60,12 @@ class Messenger extends View {
 
     const sendButton = document.createElement('BUTTON');
     sendButton.appendChild(document.createTextNode(sendButtonText));
-    sendButton.addEventListener('click', () => {
-      this.sendMessage();
-    });
+    sendButton.addEventListener('click', () => { this.sendMessage(); });
 
     const imageButton = document.createElement('BUTTON');
     imageButton.appendChild(document.createTextNode('Bild'));
     imageButton.appendChild(imageInput);
-    imageButton.addEventListener('click', () => {
-      imageInput.click();
-    });
+    imageButton.addEventListener('click', () => { imageInput.click(); });
     imageButton.classList.add('hide');
     this.accessElements.push({
       element: imageButton,
@@ -81,9 +76,7 @@ class Messenger extends View {
     const aliasListButton = document.createElement('BUTTON');
     const aliasList = document.createElement('UL');
     aliasList.classList.add('hide');
-    aliasListButton.addEventListener('click', () => {
-      aliasList.classList.toggle('hide');
-    });
+    aliasListButton.addEventListener('click', () => { aliasList.classList.toggle('hide'); });
     aliasUpdater.addAliasList(aliasList, aliasListButton);
     aliasDiv.appendChild(aliasList);
     aliasDiv.appendChild(aliasListButton);
@@ -146,11 +139,9 @@ class Messenger extends View {
 
       const selectedAlias = storage.getSelectedAlias();
 
-      if (selectedAlias) {
-        chatMsgData.message.userName = selectedAlias;
-      }
+      if (selectedAlias) { chatMsgData.message.userName = selectedAlias; }
 
-      this.socketManager.emitEvent('chatMsg', chatMsgData, ({ data, error }) => {
+      socketManager.emitEvent('chatMsg', chatMsgData, ({ data, error }) => {
         if (error) {
           console.log(error);
 
@@ -185,7 +176,7 @@ class Messenger extends View {
   }
 
   removeView() {
-    this.keyHandler.removeKey(13);
+    keyHandler.removeKey(13);
     super.removeView();
   }
 }

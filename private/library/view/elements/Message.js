@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-const textTools = require('../../textTools');
+const textTools = require('../../TextTools');
 
 class Message {
   constructor({ time: date, text, userName, image }, { printable }) { // roomName, extraClass, customSender, morseCode

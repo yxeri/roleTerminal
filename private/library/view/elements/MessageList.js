@@ -15,6 +15,23 @@
  */
 
 /**
+ * Create and return a button that triggers print
+ * @param {Element} parentElement - The container that will be visible in print
+ * @returns {Element} Print button
+ */
+function createPrintButton(parentElement) {
+  const button = document.createElement('BUTTON');
+  button.addEventListener('click', () => {
+    parentElement.classList.add('print');
+    window.print();
+    setTimeout(() => { parentElement.classList.remove('print'); }, 500);
+  });
+  button.appendChild(document.createTextNode('Print'));
+
+  return button;
+}
+
+/**
  * Create and return header paragraph
  * @param {{textLine: string, extraClass: string, clickFunc: Function}[]} headerItems - Items to be appended to the header
  * @param {boolean} printable - Should the item that the header is part of be printable
@@ -28,27 +45,13 @@ function createHeader({ headerItems, printable, parentElement }) {
     const span = document.createElement('SPAN');
     span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
 
-    if (clickFunc) {
-      span.addEventListener('click', clickFunc);
-    }
-
-    if (extraClass) {
-      span.classList.add(extraClass);
-    }
+    if (clickFunc) { span.addEventListener('click', clickFunc); }
+    if (extraClass) { span.classList.add(extraClass); }
 
     paragraph.appendChild(span);
   });
 
-  if (printable) {
-    const button = document.createElement('BUTTON');
-    button.addEventListener('click', () => {
-      parentElement.classList.add('print');
-      window.print();
-      setTimeout(() => { parentElement.classList.remove('print'); }, 500);
-    });
-    button.appendChild(document.createTextNode('Print'));
-    paragraph.appendChild(button);
-  }
+  if (printable) { paragraph.appendChild(createPrintButton(parentElement)); }
 
   return paragraph;
 }
@@ -88,9 +91,7 @@ class MessageList {
     } else {
       this.element.appendChild(fragment);
 
-      if (shouldScroll) {
-        this.scrollToBottom();
-      }
+      if (shouldScroll) { this.scrollToBottom(); }
     }
   }
 
@@ -121,12 +122,8 @@ class MessageList {
       const paragraph = document.createElement('P');
       const imageObj = new Image();
 
-      imageObj.addEventListener('error', () => {
-        paragraph.classList.add('hide');
-      });
-      imageObj.addEventListener('load', () => {
-        imageObj.classList.add('autoHeight');
-      });
+      imageObj.addEventListener('error', () => { paragraph.classList.add('hide'); });
+      imageObj.addEventListener('load', () => { imageObj.classList.add('autoHeight'); });
 
       imageObj.setAttribute('src', `images/${image.fileName}`);
       imageObj.setAttribute('width', image.width);
@@ -135,9 +132,7 @@ class MessageList {
       paragraph.appendChild(imageObj);
       listItem.appendChild(paragraph);
 
-      if (listItem.isSameNode(this.element.lastChild)) {
-        this.scrollToBottom();
-      }
+      if (listItem.isSameNode(this.element.lastChild)) { this.scrollToBottom(); }
     }
 
     return listItem;

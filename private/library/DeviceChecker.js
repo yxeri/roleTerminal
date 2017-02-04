@@ -15,12 +15,15 @@
  */
 
 class DeviceChecker {
+  /** @namespace window.navigator.standalone */
+
   /**
    * @param {boolean} params.isStandalone - Is the Safari browser in standalone mode (opened through shortcut from Home screen in iOS)?
    * @param {string} params.userAgent - Browser user agent
    */
-  constructor({ isStandalone = false, userAgent = '' }) {
-    this.isStandalone = isStandalone;
+  constructor() {
+    const userAgent = window.navigator.userAgent;
+    this.isStandalone = window.navigator.standalone;
     this.DeviceEnum = {
       IOS: 'ios',
       ANDROID: 'android',
@@ -49,9 +52,12 @@ class DeviceChecker {
     this.isTouchDevice = this.deviceType === this.DeviceEnum.IOS || this.deviceType === this.DeviceEnum.ANDROID;
   }
 
+  // TODO Move this
   isLandscape() {
     return window.innerWidth > window.innerHeight;
   }
 }
 
-module.exports = DeviceChecker;
+const deviceChecker = new DeviceChecker();
+
+module.exports = deviceChecker;

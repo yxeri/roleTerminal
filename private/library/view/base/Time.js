@@ -14,34 +14,9 @@
  limitations under the License.
  */
 
-const storage = require('../../storage');
-const textTools = require('../../textTools');
-
 class Time {
-  constructor(timeElement) {
-    this.element = timeElement;
-
-    this.updateTime();
-  }
-
-  /**
-   * Updates time in DOM
-   */
-  updateTime() {
-    const date = new Date();
-    const yearModification = parseInt(storage.getLocalVal('yearModification'), 10);
-
-    if (!isNaN(yearModification)) {
-      date.setFullYear(date.getFullYear() + yearModification);
-    }
-
-    if (date.getSeconds() > 59) {
-      date.setMinutes(date.getMinutes() + 1);
-    }
-
-    const beautifulDate = textTools.generateTimeStamp({ date });
-
-    this.element.replaceChild(document.createTextNode(`${beautifulDate.halfTime} ${beautifulDate.fullDate}`), this.element.firstChild);
+  constructor(element) {
+    this.element = element;
   }
 
   /**

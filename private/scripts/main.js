@@ -16,29 +16,29 @@
 
 require('../library/polyfills');
 
-const SocketManager = require('../library/SocketManager');
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
-const Time = require('../library/view/templates/Time');
+const Time = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const KeyHandler = require('../library/KeyHandler');
 const MainMenu = require('../library/view/templates/MainMenu');
-const DeviceChecker = require('../library/DeviceChecker');
-const storage = require('../library/storage');
-const textTools = require('../library/textTools');
-const accessRestrictor = require('../library/accessRestrictor');
-const aliasUpdater = require('../library/aliasUpdater');
+const keyHandler = require('../library/KeyHandler');
+const deviceChecker = require('../library/DeviceChecker');
+const socketManager = require('../library/SocketManager');
+const storageManager = require('../library/StorageManager');
+const textTools = require('../library/TextTools');
+const accessRestrictor = require('../library/AccessRestrictor');
+const aliasUpdater = require('../library/AliasUpdater');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 
-if (storage.getDeviceId() === null) {
-  storage.setDeviceId(textTools.createAlphaNumbericalString(16, false));
+if (storageManager.getDeviceId() === null) {
+  storageManager.setDeviceId(textTools.createAlphaNumbericalString(16, false));
 }
 
-if (!storage.getUserName()) {
-  storage.setAccessLevel(0);
+if (!storageManager.getUserName()) {
+  storageManager.setAccessLevel(0);
 }
 
 window.addEventListener('error', (event) => {
@@ -56,11 +56,8 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
-const deviceChecker = new DeviceChecker({ isStandalone: window.navigator.standalone, userAgent: window.navigator.userAgent });
-const socketManager = new SocketManager({ socket: io() }); // eslint-disable-line no-undef
-const keyHandler = new KeyHandler();
-const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false, socketManager, keyHandler });
-const topMenu = new MainMenu({ socketManager, keyHandler, parentElement: mainView });
+const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false });
+const topMenu = new MainMenu({ parentElement: mainView });
 
 accessRestrictor.addAccessView(messenger);
 accessRestrictor.addAccessView(topMenu);
@@ -119,26 +116,26 @@ socketManager.addEvents([
   }, {
     event: 'startup',
     func: ({ yearModification }) => {
-      storage.setLocalVal('yearModification', yearModification);
+      storageManager.setLocalVal('yearModification', yearModification);
 
-      messenger.toggleAccessElements(storage.getAccessLevel());
+      messenger.toggleAccessElements(storageManager.getAccessLevel());
       messenger.appendTo(mainView);
 
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
 
       socketManager.emitEvent('updateId', {
-        user: { userName: storage.getUserName() },
-        device: { deviceId: storage.getDeviceId() },
+        user: { userName: storageManager.getUserName() },
+        device: { deviceId: storageManager.getDeviceId() },
       }, ({ error, data = {} }) => {
         if (error) {
           return;
         }
 
-        const userName = storage.getUserName();
+        const userName = storageManager.getUserName();
 
         if (userName && data.anonUser) {
-          storage.removeUser();
+          storageManager.removeUser();
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],
             extraDescription: [
@@ -158,11 +155,13 @@ socketManager.addEvents([
             keyHandler,
           }).appendTo(mainView);
         } else {
-          aliasUpdater.updateAliasLists(storage.getAliases());
+          // TODO Duplicate code with LoginBox?
+          aliasUpdater.updateAliasLists(data.user.aliases);
+          storageManager.setAccessLevel(data.user.accessLevel);
           console.log('I remember you');
         }
 
-        accessRestrictor.toggleAllAccessViews(storage.getAccessLevel());
+        accessRestrictor.toggleAllAccessViews(storageManager.getAccessLevel());
 
         socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
           if (historyError) {

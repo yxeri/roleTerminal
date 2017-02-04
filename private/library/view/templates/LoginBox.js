@@ -15,10 +15,12 @@
  */
 
 const DialogBox = require('../DialogBox');
-const storage = require('../../storage');
+const storageManager = require('../../StorageManager');
+const socketManager = require('../../SocketManager');
+const aliasUpdater = require('../../AliasUpdater');
 
 class LoginBox extends DialogBox {
-  constructor({ socketManager, description, extraDescription, parentElement, keyHandler }) {
+  constructor({ description, extraDescription, parentElement }) {
     const buttons = {
       left: {
         text: 'Registrera',
@@ -52,7 +54,7 @@ class LoginBox extends DialogBox {
               user: {
                 userName: this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.value,
                 password: reenterPasswordInput.inputElement.value,
-                registerDevice: storage.getDeviceId(),
+                registerDevice: storageManager.getDeviceId(),
               },
             }, ({ error, data }) => {
               if (error) {
@@ -106,9 +108,9 @@ class LoginBox extends DialogBox {
               return;
             }
 
-            storage.setUserName(data.user.userName);
-            storage.setAccessLevel(data.user.accessLevel);
-            storage.setAliases(data.user.aliases);
+            storageManager.setUserName(data.user.userName);
+            storageManager.setAccessLevel(data.user.accessLevel);
+            aliasUpdater.updateAliasLists(data.user.aliases);
             this.removeView();
           });
         },
@@ -131,7 +133,6 @@ class LoginBox extends DialogBox {
       extraDescription,
       parentElement,
       inputs,
-      keyHandler,
     });
   }
 

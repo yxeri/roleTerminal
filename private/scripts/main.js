@@ -98,11 +98,9 @@ const goFullScreen = () => {
 
 keyHandler.addKey(112, goFullScreen);
 
-if (deviceChecker.browserType !== deviceChecker.BrowserEnum.SAFARIDESKTOP) {
-  window.addEventListener('click', () => {
-    goFullScreen();
-  });
-}
+window.addEventListener('click', () => {
+  goFullScreen();
+});
 
 socketManager.addEvents([
   {

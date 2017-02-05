@@ -155,6 +155,7 @@ img {
   max-height: 30em;
   outline: 1px solid;
   width: auto;
+  -webkit-filter: grayscale(100%) opacity(.6);
   filter: grayscale(100%) opacity(.6);
 }
 

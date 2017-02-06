@@ -22,7 +22,8 @@ $back-button: #ffffff;
 $back-input: #ffffff;
 $warning: #a50000;
 $padding: .2em;
-$border: 2px;
+$border: .2em;
+$outline: .1em;
 $font-size: 1.1em;
 $text-shadow: dimgray;
 $view-width: 50em;
@@ -66,9 +67,8 @@ body {
 
 button {
   padding: $padding;
-  margin: $padding;
   border: $border solid $second-color;
-  outline: 1px solid;
+  outline: $outline solid;
   background-color: $back-button;
   color: $text-color;
   display: inline-block;
@@ -82,7 +82,7 @@ button {
 input {
   margin: $padding;
   border: $border solid $second-color;
-  outline: 1px solid;
+  outline: $outline solid;
   background-color: $back-input;
   display: inline-block;
   cursor: pointer;
@@ -96,7 +96,7 @@ input {
 textarea {
   background-color: $back-input;
   border: $border solid $second-color;
-  outline: 1px solid;
+  outline: $outline solid;
   resize: none;
   border-radius: 0;
 }
@@ -124,7 +124,7 @@ li {
 
   .header {
     font-weight: bold;
-    border-bottom: 1px solid $second-color;
+    border-bottom: $outline solid $second-color;
     margin: .8em 0 .5em 0;
 
     span {
@@ -137,7 +137,6 @@ li {
 
     button {
       padding: 0;
-      margin: 0;
       border: none;
       vertical-align: text-bottom;
       float: right;
@@ -156,17 +155,17 @@ li {
 img {
   max-width: 100%;
   max-height: 30em;
-  outline: 1px solid;
+  outline: $outline solid;
   width: auto;
 }
 
 #background {
   border: $border solid $second-color;
-  outline: 1px solid;
-  width: calc(100% - 1em);
-  height: calc(100% - 1em);
-  margin-top: .15em;
-  margin-left: .15em;
+  outline: $outline solid;
+  width: calc(100% - 1.1em);
+  height: calc(100% - 1.1em);
+  margin-top: $padding;
+  margin-left: $padding;
   padding: $padding;
   text-shadow: 1px 1px 2px $text-shadow;
   overflow-x: hidden;
@@ -225,12 +224,7 @@ img {
   max-width: $view-width;
   margin-left: auto;
   margin-right: auto;
-
-  textarea {
-    width: 100%;
-    max-width: $view-width;
-    max-height: 90vh;
-  }
+  padding-right: -1vw;
 
   li {
     max-width: $view-width;
@@ -238,10 +232,6 @@ img {
 
   li:last-child {
     margin-bottom: 1em;
-  }
-
-  .buttons {
-    margin-right: -.5em;
   }
 }
 
@@ -268,11 +258,10 @@ img {
 
 #mainMenu {
   position: absolute;
-  margin-top: .5em;
-  padding-bottom: .2em;
+  margin-top: .7em;
   background-color: $back-color;
-  border-bottom: 2px solid $second-color;
-  width: calc(100% - 1em);
+  border-bottom: $border solid $second-color;
+  width: calc(100% - 1.3em);
   z-index: 4;
 
   ul {
@@ -285,6 +274,10 @@ img {
         text-align: left;
       }
     }
+  }
+
+  button {
+    margin: $padding 0;
   }
 }
 
@@ -306,13 +299,13 @@ img {
   max-height: 15em;
   max-width: 15em;
   border: $border solid $second-color;
-  outline: 1px solid;
+  outline: $outline solid;
 }
 
 .dialogBox {
   padding: $padding;
   border: $border solid $second-color;
-  outline: 1px solid;
+  outline: $outline solid;
   max-width: 20em;
   word-wrap: break-word;
   z-index: 3;
@@ -327,8 +320,12 @@ img {
   box-shadow: 1px 1px 4px 4px $second-color;
 
   input {
-    width: calc(100% - .65em);
+    width: calc(100% - .8em);
     max-width: 20em;
+  }
+
+  .buttons {
+    margin: $padding $padding $padding 0;
   }
 }
 
@@ -374,6 +371,16 @@ img {
   position: absolute;
   width: 100%;
   max-width: $view-width;
+
+  textarea {
+    width: 100%;
+    max-width: $view-width - ($border + $outline);
+    max-height: 90vh;
+  }
+
+  .buttons {
+    margin: $padding / 2 0;
+  }
 }
 
 .buttons {
@@ -392,6 +399,10 @@ img {
       }
     }
   }
+
+  button {
+    margin-left: $padding * 2;
+  }
 }
 
 .autoHeight {
@@ -406,7 +417,11 @@ img {
   #messenger {
     margin-left: 0;
     margin-right: 0;
-    max-width: calc(100% - 1.3em);
+    max-width: calc(100% - 1.5em);
+  }
+
+  .inputArea {
+    max-width: calc(100% - 1.4em);
 
     textarea {
       width: 100%;
@@ -414,17 +429,13 @@ img {
     }
 
     .buttons {
-      margin-right: -.5em;
+      margin-right: -.3em;
     }
-  }
-
-  .inputArea {
-    max-width: calc(100% - 1.3em);
   }
 
   li {
     p {
-      margin-left: .5em;
+      margin-left: .1em;
     }
   }
 }

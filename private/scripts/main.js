@@ -27,7 +27,8 @@ const socketManager = require('../library/SocketManager');
 const storageManager = require('../library/StorageManager');
 const textTools = require('../library/TextTools');
 const accessRestrictor = require('../library/AccessRestrictor');
-const aliasUpdater = require('../library/AliasUpdater');
+const viewTools = require('../library/ViewTools');
+const eventCentral = require('../library/EventCentral');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
@@ -40,6 +41,8 @@ if (storageManager.getDeviceId() === null) {
 if (!storageManager.getUserName()) {
   storageManager.setAccessLevel(0);
 }
+
+eventCentral.addWatcher({ watcherParent: this, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { storageManager.setAliases(aliases); } });
 
 window.addEventListener('error', (event) => {
   /**
@@ -68,12 +71,12 @@ top.addEventListener('click', () => {
 });
 
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
-  if (!deviceChecker.isLandscape()) {
+  if (!viewTools.isLandscape()) {
     top.classList.add('appleMenuFix');
   }
 
   window.addEventListener('orientationchange', () => {
-    if (deviceChecker.isLandscape()) {
+    if (viewTools.isLandscape()) {
       top.classList.remove('appleMenuFix');
     } else {
       top.classList.add('appleMenuFix');
@@ -81,22 +84,10 @@ if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
   });
 }
 
-const goFullScreen = () => {
-  const element = document.documentElement;
-
-  if (element.requestFullscreen) {
-    element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-  }
-};
-
-keyHandler.addKey(112, goFullScreen);
+keyHandler.addKey(112, viewTools.goFullScreen);
 
 window.addEventListener('click', () => {
-  goFullScreen();
+  viewTools.goFullScreen();
 });
 
 socketManager.addEvents([
@@ -154,9 +145,8 @@ socketManager.addEvents([
           }).appendTo(mainView);
         } else {
           // TODO Duplicate code with LoginBox?
-          aliasUpdater.updateAliasLists(data.user.aliases);
           storageManager.setAccessLevel(data.user.accessLevel);
-          console.log('I remember you');
+          eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
         accessRestrictor.toggleAllAccessViews(storageManager.getAccessLevel());
@@ -180,7 +170,7 @@ socketManager.addEvents([
   }, {
     event: 'chatMsg',
     func: ({ message }) => {
-      messenger.addMessage(message, { printable: true });
+      messenger.addMessage({ message, options: { printable: true } });
     },
   }, {
     event: 'chatMsgs',

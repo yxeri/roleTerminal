@@ -17,7 +17,7 @@
 const DialogBox = require('../DialogBox');
 const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
-const aliasUpdater = require('../../AliasUpdater');
+const eventCentral = require('../../EventCentral');
 
 class LoginBox extends DialogBox {
   constructor({ description, extraDescription, parentElement }) {
@@ -110,7 +110,7 @@ class LoginBox extends DialogBox {
 
             storageManager.setUserName(data.user.userName);
             storageManager.setAccessLevel(data.user.accessLevel);
-            aliasUpdater.updateAliasLists(data.user.aliases);
+            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
             this.removeView();
           });
         },

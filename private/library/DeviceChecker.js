@@ -51,11 +51,6 @@ class DeviceChecker {
     })();
     this.isTouchDevice = this.deviceType === this.DeviceEnum.IOS || this.deviceType === this.DeviceEnum.ANDROID;
   }
-
-  // TODO Move this
-  isLandscape() {
-    return window.innerWidth > window.innerHeight;
-  }
 }
 
 const deviceChecker = new DeviceChecker();

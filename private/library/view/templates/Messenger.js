@@ -20,8 +20,8 @@ const Message = require('../elements/Message');
 
 const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
-const aliasUpdater = require('../../AliasUpdater');
-const storage = require('../../StorageManager');
+const storageManager = require('../../StorageManager');
+const eventCentral = require('../../EventCentral');
 
 class Messenger extends View {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
@@ -77,7 +77,48 @@ class Messenger extends View {
     const aliasList = document.createElement('UL');
     aliasList.classList.add('hide');
     aliasListButton.addEventListener('click', () => { aliasList.classList.toggle('hide'); });
-    aliasUpdater.addAliasList(aliasList, aliasListButton);
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.ALIAS,
+      func: ({ aliases }) => {
+        if (aliases.length > 0) {
+          const fragment = document.createDocumentFragment();
+          const fullAliasList = [storageManager.getUserName()].concat(aliases);
+
+          fullAliasList.forEach((alias) => {
+            const row = document.createElement('LI');
+            const button = document.createElement('BUTTON');
+            button.appendChild(document.createTextNode(alias));
+            button.addEventListener('click', () => {
+              if (storageManager.getUserName() !== alias) {
+                storageManager.setSelectedAlias(alias);
+              } else {
+                storageManager.removeSelectedAlias();
+              }
+
+              aliasListButton.replaceChild(document.createTextNode(`Alias: ${alias}`), aliasListButton.firstChild);
+              aliasList.classList.toggle('hide');
+            });
+
+            row.appendChild(button);
+            fragment.appendChild(row);
+          });
+
+          aliasList.innerHTML = ' '; // eslint-disable-line no-param-reassign
+          aliasList.appendChild(fragment);
+
+          const chosenName = `Alias: ${storageManager.getSelectedAlias() || storageManager.getUserName() || ''}`;
+
+          if (aliasListButton.firstChild) {
+            aliasListButton.replaceChild(document.createTextNode(chosenName), aliasListButton.firstChild);
+          } else {
+            aliasListButton.appendChild(document.createTextNode(chosenName));
+          }
+        } else {
+          aliasListButton.classList.add('hide');
+        }
+      },
+    });
     aliasDiv.appendChild(aliasList);
     aliasDiv.appendChild(aliasListButton);
     this.accessElements.push({
@@ -137,7 +178,7 @@ class Messenger extends View {
         this.imagePreview.classList.add('hide');
       }
 
-      const selectedAlias = storage.getSelectedAlias();
+      const selectedAlias = storageManager.getSelectedAlias();
 
       if (selectedAlias) { chatMsgData.message.userName = selectedAlias; }
 
@@ -148,15 +189,15 @@ class Messenger extends View {
           return;
         }
 
-        this.messageList.addItem(new Message(data.message, { printable: true }));
+        this.addMessage({ message: data.message, options: { printable: true }, shouldScroll: true });
         this.clearInputField();
       });
       this.inputField.focus();
     }
   }
 
-  addMessage(message, options) {
-    this.messageList.addItem(new Message(message, options));
+  addMessage({ message, options, shouldScroll }) {
+    this.messageList.addItem(new Message(message, options), shouldScroll);
   }
 
   addMessages({ messages, options, shouldScroll }) {

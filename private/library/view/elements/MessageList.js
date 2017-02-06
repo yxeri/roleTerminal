@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const viewTools = require('../../ViewTools');
+
 /**
  * Create and return a button that triggers print
  * @param {Element} parentElement - The container that will be visible in print
@@ -62,14 +64,17 @@ class MessageList {
     this.element = document.createElement('UL');
   }
 
-  addItem({ headerItems, text, printable, image }) {
+  addItem({ headerItems, text, printable, image }, shouldScroll) {
     const listItem = this.createItem({ headerItems, text, printable, image });
 
     if (this.isTopDown) {
       this.element.insertBefore(listItem, this.element.firstChild);
     } else {
       this.element.appendChild(listItem);
-      this.scrollToBottom();
+
+      if (!this.scrolledToBottom(shouldScroll)) {
+        console.log('New message!');
+      }
     }
   }
 
@@ -91,7 +96,9 @@ class MessageList {
     } else {
       this.element.appendChild(fragment);
 
-      if (shouldScroll) { this.scrollToBottom(); }
+      if (!this.scrolledToBottom(shouldScroll)) {
+        console.log('New messages!');
+      }
     }
   }
 
@@ -133,7 +140,7 @@ class MessageList {
       paragraph.appendChild(imageObj);
       listItem.appendChild(paragraph);
 
-      if (listItem.isSameNode(this.element.lastChild)) { this.scrollToBottom(); }
+      if (listItem.isSameNode(this.element.lastChild)) { this.scrolledToBottom(); }
     }
 
     return listItem;
@@ -143,8 +150,14 @@ class MessageList {
     parentElement.appendChild(this.element);
   }
 
-  scrollToBottom() {
-    this.element.lastChild.scrollIntoView();
+  scrolledToBottom(shouldScroll) {
+    if (shouldScroll || viewTools.isCloseToEnd(this.element, this.element.lastChild.getBoundingClientRect().height)) {
+      this.element.lastChild.scrollIntoView();
+
+      return true;
+    }
+
+    return false;
   }
 }
 

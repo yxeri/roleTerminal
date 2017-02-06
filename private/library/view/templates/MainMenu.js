@@ -18,9 +18,9 @@ const View = require('../base/View');
 const DialogBox = require('../DialogBox');
 const LoginBox = require('./LoginBox');
 const storageManager = require('../../StorageManager');
-const aliasUpdater = require('../../AliasUpdater');
 const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
+const eventCentral = require('../../EventCentral');
 
 class MainMenu extends View {
   constructor({ parentElement }) {
@@ -77,7 +77,8 @@ class MainMenu extends View {
                     return;
                   }
 
-                  aliasUpdater.addAlias(alias);
+                  storageManager.addAlias(alias);
+                  eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: storageManager.getAliases() } });
                   dialog.removeView();
                 });
               }

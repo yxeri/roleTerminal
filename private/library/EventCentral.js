@@ -17,8 +17,10 @@
 class EventCentral {
   constructor() {
     this.Events = {
-      MESSAGE: 'message',
-      ALIAS: 'alias',
+      CHATMSG: 'Chat message retrieved',
+      ALIAS: 'Aliases changed',
+      ACCESS: 'Access level changed',
+      MESSAGE: 'Message retrieved',
     };
     this.eventWatchers = {};
   }

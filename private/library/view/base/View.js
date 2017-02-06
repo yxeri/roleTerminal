@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const eventCentral = require('../../EventCentral');
+
 class View {
   constructor({ isFullscreen }) {
     const element = document.createElement('DIV');
@@ -22,6 +24,8 @@ class View {
 
     this.element = element;
     this.accessElements = [];
+
+    eventCentral.addWatcher({ watcherParent: this, event: eventCentral.Events.ACCESS, func: ({ accessLevel }) => { this.toggleAccessElements(accessLevel); } });
   }
 
   hideView() { this.element.classList.add('hide'); }

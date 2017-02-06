@@ -26,7 +26,6 @@ const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
 const storageManager = require('../library/StorageManager');
 const textTools = require('../library/TextTools');
-const accessRestrictor = require('../library/AccessRestrictor');
 const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
 
@@ -62,8 +61,6 @@ window.addEventListener('error', (event) => {
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false });
 const topMenu = new MainMenu({ parentElement: mainView });
 
-accessRestrictor.addAccessView(messenger);
-accessRestrictor.addAccessView(topMenu);
 topMenu.appendTo(top);
 
 top.addEventListener('click', () => {
@@ -125,6 +122,7 @@ socketManager.addEvents([
 
         if (userName && data.anonUser) {
           storageManager.removeUser();
+
           new LoginBox({
             description: ['Endast för Krismyndigheten och Försvarsmakten'],
             extraDescription: [
@@ -148,8 +146,6 @@ socketManager.addEvents([
           storageManager.setAccessLevel(data.user.accessLevel);
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
-
-        accessRestrictor.toggleAllAccessViews(storageManager.getAccessLevel());
 
         socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
           if (historyError) {

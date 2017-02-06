@@ -111,7 +111,7 @@ class MainMenu extends View {
     logoutRow.classList.add('hide');
     logoutRow.addEventListener('click', () => {
       storageManager.removeUser();
-      aliasRow.classList.add('hide');
+
       new LoginBox({
         description: ['Endast för Krismyndigheten och Försvarsmakten'],
         extraDescription: ['Skriv in ert användarnamn och lösenord'],

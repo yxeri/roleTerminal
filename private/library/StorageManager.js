@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const accessRestrictor = require('./AccessRestrictor');
 const converters = require('./Converters');
+const eventCentral = require('./EventCentral');
 
 class StorageManager {
   /**
@@ -61,7 +61,7 @@ class StorageManager {
    */
   static setAccessLevel(accessLevel) {
     this.setLocalVal('accessLevel', accessLevel);
-    accessRestrictor.toggleAllAccessViews(accessLevel);
+    eventCentral.triggerEvent({ event: eventCentral.Events.ACCESS, params: { accessLevel } });
   }
 
   /**

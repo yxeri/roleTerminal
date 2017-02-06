@@ -173,7 +173,7 @@ class DialogBox extends View {
 
   removeView() {
     this.element.parentNode.removeChild(this.cover);
-    this.keyTriggers.forEach((value, key) => keyHandler.removeKey(key));
+    this.keyTriggers.forEach(({ charCode }) => keyHandler.removeKey(charCode));
     super.removeView();
   }
 

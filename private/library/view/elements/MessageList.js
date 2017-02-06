@@ -120,6 +120,7 @@ class MessageList {
 
     if (image) {
       const paragraph = document.createElement('P');
+      paragraph.classList.add('image');
       const imageObj = new Image();
 
       imageObj.addEventListener('error', () => { paragraph.classList.add('hide'); });

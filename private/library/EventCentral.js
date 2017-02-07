@@ -46,13 +46,18 @@ class EventCentral {
    * @param {Function} func - Function to call
    */
   removeWatcher({ watcherParent, event, func }) {
-    const index = this.eventWatchers[event].findIndex(watcher => watcher.watcherParent === watcherParent && watcher.func === func);
-    this.eventWatchers[event].splice(index, 1);
+    if (this.eventWatchers[event]) {
+      const index = this.eventWatchers[event].findIndex(watcher => watcher.watcherParent === watcherParent && watcher.func === func);
+      this.eventWatchers[event].splice(index, 1);
+    }
+
     console.log(this.eventWatchers[event]);
   }
 
   triggerEvent({ event, params = {} }) {
-    this.eventWatchers[event].forEach(watcher => watcher.func(params));
+    if (this.eventWatchers[event]) {
+      this.eventWatchers[event].forEach(watcher => watcher.func(params));
+    }
   }
 }
 

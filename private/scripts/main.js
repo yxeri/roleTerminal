@@ -104,9 +104,7 @@ socketManager.addEvents([
     func: ({ yearModification }) => {
       storageManager.setLocalVal('yearModification', yearModification);
 
-      messenger.toggleAccessElements(storageManager.getAccessLevel());
       messenger.appendTo(mainView);
-
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
 

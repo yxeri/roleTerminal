@@ -198,6 +198,8 @@ img {
     max-width: 21em;
     margin: 0 auto;
   }
+
+  color: #001e15;
 }
 
 #title {
@@ -207,7 +209,7 @@ img {
 #main {
   overflow-y: scroll;
   overflow-x: hidden;
-  height: calc(100% - 7em);
+  height: calc(100% - 2em);
   width: 101vw;
 }
 
@@ -237,6 +239,7 @@ img {
 }
 
 #map {
+  height: 100%;
   overflow: hidden;
   background-color: $back-color;
 
@@ -262,7 +265,7 @@ img {
   margin-top: .7em;
   background-color: $back-color;
   border-bottom: $border solid $second-color;
-  width: calc(100% - 1.3em);
+  width: calc(100% - 1.1em);
   z-index: 4;
 
   ul {
@@ -293,6 +296,17 @@ img {
 
 #logo {
   font-weight: bold;
+}
+
+#markerInfo {
+  font-size: .8em;
+  font-weight: bold;
+  position: absolute;
+  border: solid 1px;
+  padding: 0.1em;
+  background-color: $back-color;
+  z-index: 3;
+  max-width: 15em;
 }
 
 .imagePreview {
@@ -409,8 +423,27 @@ img {
   height: auto;
 }
 
+/*
+ * Adds spacing for the status bar in iOS full screen mode
+ */
 .appleMenuFix {
   padding-top: .7em !important;
+}
+
+/*
+ * Set on #main when the messenger is in the main view
+ * Leaves room for the input field
+ */
+.messengerMain {
+  height: calc(100% - 7em) !important;
+}
+
+/*
+ * Set on #main when the map is in the main view
+ * Avoids the map expanding out of view
+ */
+.mapMain {
+  width: auto !important;
 }
 
 @media (max-width: 750px) {

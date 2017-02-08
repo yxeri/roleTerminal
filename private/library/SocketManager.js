@@ -74,6 +74,7 @@ class SocketManager {
           return;
         }
 
+        // TODO Duplicate code
         const userName = storage.getUserName();
 
         if (userName && data.anonUser) {

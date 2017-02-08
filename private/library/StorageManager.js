@@ -152,6 +152,47 @@ class StorageManager {
    * @static
    */
   static removeSelectedAlias() { this.removeLocalVal('selectedAlias'); }
+
+  /**
+   * Set center coordinates for the map
+   * @static
+   * @param {number} longitude - Longitude
+   * @param {number} latitude - Latitude
+   */
+  static setCenterCoordinates(longitude, latitude) { this.setLocalVal('centerCoordinates', converters.stringifyObject({ longitude, latitude })); }
+
+  static getCenterCoordinates() { return converters.convertToObject(this.getLocalVal('centerCoordinates')); }
+
+  /**
+   * Set corner one coordinates for the map
+   * @static
+   * @param {number} longitude - Longitude
+   * @param {number} latitude - Latitude
+   */
+  static setCornerOneCoordinates(longitude, latitude) { this.setLocalVal('cornerOneCoordinates', converters.stringifyObject({ longitude, latitude })); }
+
+  static getCornerOneCoordinates() { return converters.convertToObject(this.getLocalVal('cornerOneCoordinates')); }
+
+  /**
+   * Set corner two coordinates for the map
+   * @static
+   * @param {number} longitude - Longitude
+   * @param {number} latitude - Latitude
+   */
+  static setCornerTwoCoordinates(longitude, latitude) { this.setLocalVal('cornerTwoCoordinates', converters.stringifyObject({ longitude, latitude })); }
+
+  static getCornerTwoCoordinates() { return converters.convertToObject(this.getLocalVal('cornerTwoCoordinates')); }
+
+  /**
+   * Set default zoom level on the map
+   * @static
+   * @param {number} defaultZoomLevel - Default zoom level on the map
+   */
+  static setDefaultZoomLevel(defaultZoomLevel) { this.setLocalVal('defaultZoomLevel', defaultZoomLevel); }
+
+  static getDefaultZoomlevel() { return converters.convertToInt(this.getLocalVal('defaultZoomLevel')); }
 }
+
+eventCentral.addWatcher({ watcherParent: StorageManager, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { StorageManager.setAliases(aliases); } });
 
 module.exports = StorageManager;

@@ -153,6 +153,14 @@ class Messenger extends View {
       this.element.appendChild(this.messageList.element);
       this.element.appendChild(inputArea);
     }
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.CHATMSG,
+      func: ({ messages, options, shouldScroll }) => {
+        this.messageList.addItems(messages.map(message => new Message(message, options)), shouldScroll);
+      },
+    });
   }
 
   sendMessage() {
@@ -189,21 +197,11 @@ class Messenger extends View {
           return;
         }
 
-        this.addMessage({ message: data.message, options: { printable: true }, shouldScroll: true });
+        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: data.messages, options: { printable: true }, shouldScroll: true } });
         this.clearInputField();
       });
       this.inputField.focus();
     }
-  }
-
-  addMessage({ message, options, shouldScroll }) {
-    this.messageList.addItem(new Message(message, options), shouldScroll);
-  }
-
-  addMessages({ messages, options, shouldScroll }) {
-    const convertedMessages = messages.map(message => new Message(message, options));
-
-    this.messageList.addItems(convertedMessages, shouldScroll);
   }
 
   resizeInputField() {
@@ -218,7 +216,13 @@ class Messenger extends View {
 
   removeView() {
     keyHandler.removeKey(13);
+    this.element.parentNode.classList.remove('messengerMain');
     super.removeView();
+  }
+
+  appendTo(parentElement) {
+    parentElement.classList.add('messengerMain');
+    super.appendTo(parentElement);
   }
 }
 

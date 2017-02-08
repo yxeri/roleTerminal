@@ -64,20 +64,6 @@ class MessageList {
     this.element = document.createElement('UL');
   }
 
-  addItem({ headerItems, text, printable, image }, shouldScroll) {
-    const listItem = this.createItem({ headerItems, text, printable, image });
-
-    if (this.isTopDown) {
-      this.element.insertBefore(listItem, this.element.firstChild);
-    } else {
-      this.element.appendChild(listItem);
-
-      if (!this.scrolledToBottom(shouldScroll)) {
-        console.log('New message!');
-      }
-    }
-  }
-
   addItems(items, shouldScroll) {
     const fragment = document.createDocumentFragment();
 

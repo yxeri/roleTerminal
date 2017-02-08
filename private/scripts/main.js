@@ -21,6 +21,7 @@ const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const MainMenu = require('../library/view/templates/MainMenu');
+const WorldMap = require('../library/view/worldMap/WorldMap');
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
@@ -41,8 +42,6 @@ if (!storageManager.getUserName()) {
   storageManager.setAccessLevel(0);
 }
 
-eventCentral.addWatcher({ watcherParent: this, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { storageManager.setAliases(aliases); } });
-
 window.addEventListener('error', (event) => {
   /**
    * Reloads page
@@ -59,6 +58,69 @@ window.addEventListener('error', (event) => {
 });
 
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false });
+const map = new WorldMap({
+  mapView: WorldMap.MapViews.OVERVIEW,
+  clusterStyle: {
+    gridSize: 24,
+    maxZoom: 17,
+    zoomOnClick: false,
+    singleSize: true,
+    averageCenter: true,
+    styles: [{
+      width: 22,
+      height: 22,
+      iconAnchor: [11, 11],
+      textSize: 11,
+      url: 'images/m.png',
+    }],
+  },
+  mapStyles: [
+    {
+      featureType: 'all',
+      elementType: 'all',
+      stylers: [
+        { color: '#d9d9d9' },
+      ],
+    }, {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [
+        { color: '#000000' },
+      ],
+    }, {
+      featureType: 'road',
+      elementType: 'labels',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'poi',
+      elementType: 'all',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'administrative',
+      elementType: 'all',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'water',
+      elementType: 'all',
+      stylers: [
+        { color: '#ffffff' },
+      ],
+    },
+  ],
+  labelStyle: {
+    fontFamily: 'monospace',
+    fontColor: '#00ffcc',
+    strokeColor: '#001e15',
+    fontSize: 12,
+  },
+  mapBackground: '#d9d9d9',
+});
 const topMenu = new MainMenu({ parentElement: mainView });
 
 topMenu.appendTo(top);
@@ -101,10 +163,13 @@ socketManager.addEvents([
     },
   }, {
     event: 'startup',
-    func: ({ yearModification }) => {
+    func: ({ yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel }) => {
       storageManager.setLocalVal('yearModification', yearModification);
+      storageManager.setCenterCoordinates(centerLong, centerLat);
+      storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
+      storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
+      storageManager.setDefaultZoomLevel(defaultZoomLevel);
 
-      messenger.appendTo(mainView);
       onlineStatus.setOnline();
       new Time(document.getElementById('time')).startClock();
 
@@ -145,6 +210,14 @@ socketManager.addEvents([
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
+        map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+        map.setCenterCoordinates(storageManager.getCenterCoordinates());
+        map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
+        map.appendTo(mainView);
+        map.startMap();
+
+        // messenger.appendTo(mainView);
+
         socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
           if (historyError) {
             console.log('history', historyError);
@@ -152,7 +225,7 @@ socketManager.addEvents([
             return;
           }
 
-          messenger.addMessages({ messages: historyData.messages, options: { printable: true }, shouldScroll: true });
+          eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: true }, shouldScroll: true } });
         });
       });
     },
@@ -162,92 +235,9 @@ socketManager.addEvents([
       console.log(message);
     },
   }, {
-    event: 'chatMsg',
-    func: ({ message }) => {
-      messenger.addMessage({ message, options: { printable: true } });
-    },
-  }, {
     event: 'chatMsgs',
     func: ({ messages }) => {
-      messenger.addMessages({ options: { printable: true }, messages });
+      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: true } } });
     },
   },
 ]);
-
-messenger.addMessages({
-  messages: [{
-    time: new Date(2013, 6, 21, 23, 21, 0),
-    text: ['Ryssland har invaderat. Explosioner i Stockholm, Göteborg, Malmö, Köpenhamn. Kommunikationsinfrastrukturen skadad. Totalförsvaret mobiliserat.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2013, 6, 22, 0, 2, 0),
-    text: ['Kärnvapenexplosioner bekräftade i Stockholm, Göteborg, Malmö, Köpenhamn.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2013, 6, 26, 10, 0, 5),
-    text: ['Uppsamlingsläger etablerade runt drabbade städer.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2014, 4, 14, 0, 0, 0),
-    text: ['Tidfunktion trasig i systemet. Har ej tillgång till tekniker. Tappat kontakt med andra centraler.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2015, 6, 7, 0, 0, 0),
-    text: ['Är någon kvar där ute?'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2015, 11, 29, 0, 0, 0),
-    text: ['Kontakt med uppsamlingslägrena fortfarande bruten. Ingen kontakt med militära styrkor. Ingen kontakt med civila grupper.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 1, 5, 0, 0, 0),
-    text: ['PRIORITERAT MEDDELANDE. Spridning av dödlig sjukdom. Leder till feber, utslag under armarna, hosta. Rekommendation: undvik större grupperingar. Undvik kontakt med personer som uppvisar dessa symptom.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 1, 7, 0, 0, 0),
-    text: ['Centralen är inte längre säker. Vi kommer att flytta till punkt 72C.'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 1, 10, 0, 0, 0),
-    text: ['omlokaliseringen misslyckades'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 1, 16, 0, 0, 0),
-    text: ['rosen ärröd oh nu är jag ddöd'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 1, 24, 0, 0, 0),
-    text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 5 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2016, 11, 14, 0, 0, 0),
-    text: ['HUVUDCENTRALEN HAR VARIT INAKTIV I 300 DAGAR. DETTA ÄR ETT AUTOMATISERAT MEDDELANDE. DETTA ÄR ETT SLUTGILTIGT MEDDELANDE. CENTRALEN ÄR INAKTIV'],
-    userName: 'Centralen',
-  }, {
-    time: new Date(2044, 8, 10, 0, 0, 0),
-    text: ['test test'],
-    userName: 'OKÄND SÄNDARE',
-  }, {
-    time: new Date(2044, 8, 10, 0, 0, 0),
-    text: ['trst test med namn'],
-    userName: 'Värnhem',
-  }, {
-    time: new Date(2044, 8, 10, 0, 0, 0),
-    text: ['Östbacken inkopplade. Tiden fungerar inte'],
-    userName: 'Östbacken',
-  }, {
-    time: new Date(2044, 9, 30, 12, 7, 0),
-    text: ['Rifall är inkopplat. Jag fick igång tidstämpeln och har lyckats hämta några gamla meddelanden från "Centralen"'],
-    userName: 'Rifall',
-  }, {
-    time: new Date(2044, 9, 30, 19, 0, 17),
-    text: ['det här gjoirde vi bra'],
-    userName: 'Värnhem',
-  }, {
-    time: new Date(2045, 2, 9, 10, 30, 6),
-    text: ['Ledningen till Rifall är lagad, igen.'],
-    userName: 'Rifall',
-  }],
-  options: { printable: false },
-  shouldScroll: true,
-});

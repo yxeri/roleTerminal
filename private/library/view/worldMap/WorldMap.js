@@ -32,11 +32,10 @@ class WorldMap extends View {
 
   constructor({
     isFullscreen,
-    mapView,
+    mapView = MapViews.NONE,
     markers = {},
     cornerCoordinates = {},
     centerCoordinates = {},
-    maxShortDescription = 200,
     zoomLevel = 15,
     mapBackground = '#FFFFFF',
     mapStyles = [],
@@ -46,7 +45,7 @@ class WorldMap extends View {
     super({ isFullscreen });
     this.element.setAttribute('id', 'map');
 
-    this.mapView = mapView || MapViews.NONE;
+    this.mapView = mapView;
     this.markers = markers;
     this.labels = {};
     this.cornerCoordinates = cornerCoordinates;
@@ -54,7 +53,7 @@ class WorldMap extends View {
     this.infoElement = document.createElement('DIV');
     this.infoElement.setAttribute('id', 'markerInfo');
     this.hideMarkerInfo();
-    this.maxShortDescription = maxShortDescription;
+    this.infoElement.addEventListener('click', () => { this.hideMarkerInfo(); });
     this.defaultZoomLevel = zoomLevel;
     this.labelStyle = labelStyle;
     this.clusterer = null;
@@ -116,9 +115,9 @@ class WorldMap extends View {
   createMarker({ markerName, position, iconUrl, description, title, markerType, opacity, hideLabel, ignoreCluster }) {
     const icon = {
       url: iconUrl || '/images/mapicon.png',
-      size: new google.maps.Size(16, 16),
+      size: new google.maps.Size(14, 14),
       origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(8, 8),
+      anchor: new google.maps.Point(7, 7),
     };
     const snakeCaseTitle = title.replace(/\s/g, '_');
     const markerId = Object.keys(this.markers).length + 1;
@@ -136,10 +135,7 @@ class WorldMap extends View {
     this.markers[markerName].markerId = markerId;
     this.markers[markerName].markerType = markerType;
 
-    if (description) {
-      this.markers[markerName].addedShortDesc = description.length > this.maxShortDescription ? `${description.slice(0, this.maxShortDescription)}..` : `${description}`;
-      this.markers[markerName].addedExpandedDesc = description.length > this.maxShortDescription ? `${description.slice(this.maxShortDescription)}` : undefined;
-    }
+    if (description) { this.markers[markerName].description = description.replace(/(<img)(.+?)(\s)\/>/g, ''); }
 
     if (!hideLabel) {
       this.createLabel({
@@ -162,7 +158,21 @@ class WorldMap extends View {
 
       this.infoElement.style.left = `${xy.x}px`;
       this.infoElement.style.top = `${xy.y}px`;
-      this.infoElement.textContent = `${marker.addedTitle}.${'\n'}${marker.addedShortDesc || ''}`;
+
+      const infoText = document.createElement('DIV');
+      const titleParagraph = document.createElement('P');
+      titleParagraph.appendChild(document.createTextNode(marker.addedTitle));
+      const paragraph = document.createElement('P');
+      paragraph.appendChild(document.createTextNode(marker.description || ''));
+      infoText.appendChild(titleParagraph);
+      infoText.appendChild(paragraph);
+
+      if (this.infoElement.lastChild) {
+        this.infoElement.replaceChild(infoText, this.infoElement.lastChild);
+      } else {
+        this.infoElement.appendChild(infoText);
+      }
+
       this.showMarkerInfo();
     });
   }
@@ -366,7 +376,6 @@ class WorldMap extends View {
    * @param {{longitude: Number, latitude: Number}} cornerTwoCoords - Corner lat and long coordinates
    */
   setCornerCoordinates(cornerOneCoords, cornerTwoCoords) {
-    console.log(cornerOneCoords, cornerTwoCoords);
     this.cornerCoordinates.cornerOne = cornerOneCoords;
     this.cornerCoordinates.cornerTwo = cornerTwoCoords;
   }
@@ -376,7 +385,6 @@ class WorldMap extends View {
    * @param {{longitude: Number, latitude: Number}} centerCoordinates - Center lat and long coordinates
    */
   setCenterCoordinates(centerCoordinates) {
-    console.log(centerCoordinates);
     this.centerCoordinates = centerCoordinates;
   }
 
@@ -385,7 +393,6 @@ class WorldMap extends View {
    * @param {number} defaultZoomLevel - Default zoom level
    */
   setDefaultZoomLevel(defaultZoomLevel) {
-    console.log(defaultZoomLevel);
     this.defaultZoomLevel = defaultZoomLevel;
   }
 
@@ -416,11 +423,7 @@ class WorldMap extends View {
 
     if (!marker) { return null; }
 
-    let description = marker.addedShortDesc;
-
-    if (marker.addedExpandedDesc) { description = marker.addedShortDesc.slice(0, marker.addedShortDesc.length - 2) + marker.addedExpandedDesc; }
-
-    return { title: marker.addedTitle, description };
+    return { title: marker.addedTitle, description: marker.description };
   }
 
   /**

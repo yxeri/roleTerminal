@@ -67,11 +67,11 @@ const map = new WorldMap({
     singleSize: true,
     averageCenter: true,
     styles: [{
-      width: 22,
-      height: 22,
-      iconAnchor: [11, 11],
-      textSize: 11,
-      url: 'images/m.png',
+      width: 24,
+      height: 24,
+      iconAnchor: [12, 12],
+      textSize: 12,
+      url: 'images/mapcluster.png',
     }],
   },
   mapStyles: [

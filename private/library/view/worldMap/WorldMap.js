@@ -414,7 +414,6 @@ class WorldMap extends View {
 
   /**
    * Get description from the map marker
-   * @static
    * @param {Number} markerId - ID of the map marker
    * @returns {{title: string, description: string}|null} - Title and escription of the map marker
    */
@@ -428,7 +427,6 @@ class WorldMap extends View {
 
   /**
    * Creates the map and retrieves positions from server and Google maps
-   * @static
    */
   startMap() {
     // Will stop and retry to create map if external files have not finished loading
@@ -476,10 +474,12 @@ class WorldMap extends View {
     this.element.appendChild(this.infoElement);
     this.attachMapListeners();
 
-    socketManager.emitEvent('getGooglePositions', {}, ({ error, data: { positions = [], team, currentTime } }) => {
-      if (error) {
+    socketManager.emitEvent('getGooglePositions', {}, ({ error, data }) => {
+      if (error || !data) {
         return;
       }
+
+      const { positions, team, currentTime } = data;
 
       const userName = storageManager.getUserName() ? storageManager.getUserName().toLowerCase() : '';
 

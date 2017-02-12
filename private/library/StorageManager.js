@@ -191,6 +191,15 @@ class StorageManager {
   static setDefaultZoomLevel(defaultZoomLevel) { this.setLocalVal('defaultZoomLevel', defaultZoomLevel); }
 
   static getDefaultZoomlevel() { return converters.convertToInt(this.getLocalVal('defaultZoomLevel')); }
+
+  /**
+   * Set year modification
+   * @static
+   * @param {number} yearModification - Amount of years that will be increased/decreased to current year
+   */
+  static setYearModification(yearModification) { this.setLocalVal('yearModification', yearModification); }
+
+  static getYearModification() { return converters.convertToInt(this.getLocalVal('yearModification')); }
 }
 
 eventCentral.addWatcher({ watcherParent: StorageManager, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { StorageManager.setAliases(aliases); } });

@@ -17,8 +17,8 @@
 const textTools = require('../../TextTools');
 
 class Message {
-  constructor({ time: date, text, userName, image }, { printable }) { // roomName, extraClass, customSender, morseCode
-    const timeStamp = textTools.generateTimeStamp({ date });
+  constructor({ time: date, text, userName, image }, { printable, lockDate }) { // roomName, extraClass, customSender, morseCode
+    const timeStamp = textTools.generateTimeStamp({ date, lockDate });
 
     this.printable = printable;
     this.headerItems = [

@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const storageManager = require('./StorageManager');
+
 /**
  * Characters used when generating random text
  * Removed l and i to decrease user errors when reading the random strings
@@ -55,15 +57,16 @@ class TextTools {
    * @param {Object} params - Parameters
    * @param {Date|number} params.date - Date
    * @param {Number} [params.offset] - Should hours be modified from the final time?
+   * @param {boolean} [params.lockYear] - Should the year stay unmodified?
    * @returns {Object} Human-readable time and date
    */
-  static generateTimeStamp({ date, offset }) {
+  static generateTimeStamp({ date, offset, lockDate }) {
     const newDate = new Date(date);
     const timeStamp = {};
+    const yearModification = storageManager.getYearModification();
 
-    if (offset) {
-      newDate.setHours(newDate.getHours() + offset);
-    }
+    if (offset) { newDate.setHours(newDate.getHours() + offset); }
+    if (!lockDate && !isNaN(yearModification)) { newDate.setFullYear(newDate.getFullYear() + parseInt(yearModification, 10)); }
 
     timeStamp.mins = this.beautifyNumber(newDate.getMinutes());
     timeStamp.hours = this.beautifyNumber(newDate.getHours());

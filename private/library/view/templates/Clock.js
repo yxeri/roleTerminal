@@ -15,7 +15,6 @@
  */
 
 const Time = require('../base/Time');
-const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 
 class Clock extends Time {
@@ -30,9 +29,7 @@ class Clock extends Time {
    */
   updateTime() {
     const date = new Date();
-    const yearModification = parseInt(storageManager.getLocalVal('yearModification'), 10);
 
-    if (!isNaN(yearModification)) { date.setFullYear(date.getFullYear() + yearModification); }
     if (date.getSeconds() > 59) { date.setMinutes(date.getMinutes() + 1); }
 
     const beautifulDate = textTools.generateTimeStamp({ date });

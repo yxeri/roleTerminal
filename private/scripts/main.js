@@ -164,7 +164,7 @@ socketManager.addEvents([
   }, {
     event: 'startup',
     func: ({ yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel }) => {
-      storageManager.setLocalVal('yearModification', yearModification);
+      storageManager.setYearModification(yearModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);

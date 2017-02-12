@@ -462,7 +462,7 @@ class WorldMap extends View {
     }
 
     if (!this.clusterer) {
-      this.clusterer = new MarkerClusterer(this.map, Object.keys(this.markers).map(key => this.markers[key]), this.clusterStyle);
+      this.clusterer = new MarkerClusterer(this.map, Object.keys(this.markers || {}).map(key => this.markers[key]), this.clusterStyle);
     }
 
     if (!this.overlay) {

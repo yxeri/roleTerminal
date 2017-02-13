@@ -51,10 +51,10 @@ class KeyHandler {
         this.triggerKeyPressed = true;
         event.preventDefault();
       } else if (this.triggerKeyPressed && !this.keyPressed) {
-        const keyFunc = this.keys.find(({ keyCode }) => keyCode === sentKeyCode).func;
+        const storedKey = this.keys.find(({ keyCode }) => keyCode === sentKeyCode);
 
-        if (keyFunc) {
-          keyFunc();
+        if (storedKey) {
+          storedKey.func();
           this.keyPressed = true;
           event.preventDefault();
         }

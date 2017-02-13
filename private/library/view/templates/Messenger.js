@@ -196,7 +196,7 @@ class Messenger extends View {
           return;
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: data.messages, options: { printable: true }, shouldScroll: true } });
+        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: data.messages, options: { printable: false }, shouldScroll: true } });
         this.clearInputField();
       });
       this.focusInput();

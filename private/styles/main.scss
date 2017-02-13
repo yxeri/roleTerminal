@@ -14,20 +14,23 @@
  limitations under the License.
  */
 
-$text-color: #000000;
-$second-color: #696969;
+$text-color: #00ffcc;
+$second-color: #ff02e5;
 $light-color: #aaaaaa;
-$back-color: #d9d9d9;
-$back-button: #ffffff;
-$back-input: #ffffff;
-$warning: #a50000;
+$back-color: #11000f;
+$back-button: #1b0019;
+$back-input: #1b0019;
+$warning: #ff02e5;
 $padding: .2em;
 $border: .2em;
 $outline: .1em;
 $font-size: 1.1em;
-$text-shadow: dimgray;
+$text-shadow-color: #ff02e5;
+$text-shadow: 1px 1px 3px $text-shadow-color;
 $view-width: 50em;
 $menu-width: 21em;
+$box-shadow: inset 0 0 4px $second-color;
+$bottom-box-shadow: 0 2px 1px -1px $text-color;
 
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input {
   margin: 0;
@@ -65,12 +68,13 @@ body {
   font-family: monospace;
   font-size: $font-size;
   -webkit-text-size-adjust: 100%;
-  text-shadow: 1px 1px 2px $text-shadow;
+  text-shadow: $text-shadow;
 }
 
 button {
   padding: $padding;
   border: $border solid $second-color;
+  box-shadow: $box-shadow;
   outline: $outline solid;
   background-color: $back-button;
   color: $text-color;
@@ -78,13 +82,14 @@ button {
   cursor: pointer;
   font-family: monospace;
   -webkit-text-size-adjust: 100%;
-  text-shadow: 1px 1px 2px $text-shadow;
+  text-shadow: $text-shadow;
   vertical-align: top;
 }
 
 input {
   margin: $padding;
   border: $border solid $second-color;
+  box-shadow: $box-shadow;
   outline: $outline solid;
   background-color: $back-input;
   display: inline-block;
@@ -99,7 +104,8 @@ input {
 textarea {
   background-color: $back-input;
   border: $border solid $second-color;
-  outline: $outline solid;
+  box-shadow: $box-shadow;
+  outline: $outline solid $text-color;
   resize: none;
   border-radius: 0;
 }
@@ -126,8 +132,8 @@ li {
   }
 
   .header {
-    font-weight: bold;
     border-bottom: $outline solid $second-color;
+    box-shadow: $bottom-box-shadow;
     margin: .8em 0 .5em 0;
 
     span {
@@ -164,13 +170,14 @@ img {
 
 #background {
   border: $border solid $second-color;
+  box-shadow: $box-shadow;
   outline: $outline solid;
   width: calc(100% - 1.1em);
   height: calc(100% - 1.1em);
   margin-top: $padding;
   margin-left: $padding;
   padding: $padding;
-  text-shadow: 1px 1px 2px $text-shadow;
+  text-shadow: $text-shadow;
   overflow: hidden;
 }
 
@@ -180,6 +187,7 @@ img {
   padding-top: $padding;
   padding-bottom: $padding * 2;
   border-bottom: $border solid $second-color;
+  box-shadow: $bottom-box-shadow;
   cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -195,15 +203,13 @@ img {
   }
 }
 
-#title {
-  font-weight: bold;
-}
-
 #main {
   overflow-y: scroll;
   overflow-x: hidden;
   height: calc(100% - 2em);
   width: 101vw;
+  background: url(/images/logo.png) no-repeat 50% 50%;
+  background-size: contain;
 }
 
 #sysItems {
@@ -287,10 +293,6 @@ img {
   height: 100vh;
 }
 
-#logo {
-  font-weight: bold;
-}
-
 #markerInfo {
   top: 0 !important;
   left: 0 !important;
@@ -328,8 +330,6 @@ img {
 }
 
 #home {
-  background: url(/images/logo.png) no-repeat 50% 50%;
-  background-size: contain;
   width: calc(100% - 1.1em);
   height: 100%;
   overflow: hidden;
@@ -351,8 +351,8 @@ img {
     button {
       flex-grow: 1;
       -webkit-flex-grow: 1;
-      width: 45%;
-      max-width: 45%;
+      width: 42%;
+      max-width: 42%;
       margin: 0 .5em 1em .5em;
     }
   }

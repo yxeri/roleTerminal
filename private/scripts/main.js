@@ -58,7 +58,7 @@ window.addEventListener('error', (event) => {
 });
 
 const home = new Home();
-const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false });
+const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const map = new WorldMap({
   mapView: WorldMap.MapViews.OVERVIEW,
   clusterStyle: {
@@ -73,6 +73,7 @@ const map = new WorldMap({
       iconAnchor: [12, 12],
       textSize: 12,
       url: 'images/mapcluster.png',
+      textColor: '00ffcc',
     }],
   },
   mapStyles: [
@@ -80,13 +81,13 @@ const map = new WorldMap({
       featureType: 'all',
       elementType: 'all',
       stylers: [
-        { color: '#d9d9d9' },
+        { color: '#11000f' },
       ],
     }, {
       featureType: 'road',
       elementType: 'geometry',
       stylers: [
-        { color: '#000000' },
+        { color: '#00ffcc' },
       ],
     }, {
       featureType: 'road',
@@ -110,7 +111,7 @@ const map = new WorldMap({
       featureType: 'water',
       elementType: 'all',
       stylers: [
-        { color: '#ffffff' },
+        { color: '#ff02e5' },
       ],
     },
   ],
@@ -187,8 +188,8 @@ socketManager.addEvents([
           linkName: 'Login',
           startFunc: () => {
             new LoginBox({
-              description: ['Endast för Krismyndigheten och Försvarsmakten'],
-              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+              extraDescription: ['Input your user name and password'],
               parentElement: mainView,
               socketManager,
               keyHandler,
@@ -205,8 +206,8 @@ socketManager.addEvents([
             storageManager.removeUser();
 
             new LoginBox({
-              description: ['Endast för Krismyndigheten och Försvarsmakten'],
-              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+              extraDescription: ['Enter your user name and password'],
               parentElement: mainView,
               socketManager,
               keyHandler,
@@ -233,10 +234,10 @@ socketManager.addEvents([
           storageManager.removeUser();
 
           new LoginBox({
-            description: ['Endast för Krismyndigheten och Försvarsmakten'],
+            description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
             extraDescription: [
-              'Din användare kunde inte hittas i databasen',
-              'Ni behöver registrera en ny användare',
+              'Your user was not found in the database',
+              'You need to register a new user to boost your productivity',
             ],
             parentElement: mainView,
             socketManager,
@@ -246,8 +247,8 @@ socketManager.addEvents([
         } else if (data.anonUser) {
           if (!socketManager.hasConnected) {
             new LoginBox({
-              description: ['Endast för Krismyndigheten och Försvarsmakten'],
-              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+              extraDescription: ['Enter your user name and password'],
               parentElement: mainView,
               socketManager,
               keyHandler,
@@ -272,7 +273,7 @@ socketManager.addEvents([
               return;
             }
 
-            eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: true }, shouldScroll: true } });
+            eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: false }, shouldScroll: true } });
           });
         }
 
@@ -287,7 +288,7 @@ socketManager.addEvents([
   }, {
     event: 'chatMsgs',
     func: ({ messages }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: true } } });
+      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: false } } });
     },
   },
 ]);

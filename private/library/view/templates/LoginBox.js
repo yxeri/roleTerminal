@@ -29,7 +29,7 @@ class LoginBox extends DialogBox {
 
           if (!reenterPasswordInput) {
             this.addInput({
-              placeholder: 'Återupprepa lösenordet',
+              placeholder: 'Re-enter your password',
               inputName: 'reenterPassword',
               inputType: 'password',
               required: true,
@@ -44,7 +44,7 @@ class LoginBox extends DialogBox {
           const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
-            this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
+            this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
 
             return;
           }
@@ -58,7 +58,7 @@ class LoginBox extends DialogBox {
               },
             }, ({ error, data }) => {
               if (error) {
-                this.changeExtraDescription({ text: ['Något gick fel. Kunde inte registrera användare'] });
+                this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
                 return;
               }
@@ -66,9 +66,9 @@ class LoginBox extends DialogBox {
               const text = [];
 
               if (data.requiresVerification) {
-                text.push('Användaren är registrerad, men för att kunna logga in måste den verifieras av en administratör');
+                text.push('Your user has been registered, but you need to contact an administrator to get it verified');
               } else {
-                text.push('Användaren är nu registrerad! Användaren kan nu logga in');
+                text.push('Your user has been registered! You may now access O3C');
               }
 
               this.changeExtraDescription({ text });
@@ -78,7 +78,7 @@ class LoginBox extends DialogBox {
               this.focusInput('userName');
             });
           } else {
-            this.changeExtraDescription({ text: ['Lösenorden stämmer inte överens. Försök igen'] });
+            this.changeExtraDescription({ text: ['Passwords do not match. Try again'] });
             this.clearInput('password');
             this.clearInput('reenterPassword');
             this.focusInput('password');
@@ -91,7 +91,7 @@ class LoginBox extends DialogBox {
           const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
-            this.changeExtraDescription({ text: ['Alla obligatoriska fält måste vara ifyllda!'] });
+            this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
 
             return;
           }
@@ -103,7 +103,7 @@ class LoginBox extends DialogBox {
             },
           }, ({ error, data }) => {
             if (error) {
-              this.changeExtraDescription({ text: ['Något gick fel. Misslyckades med att logga in'] });
+              this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
               return;
             }
@@ -117,11 +117,11 @@ class LoginBox extends DialogBox {
       },
     };
     const inputs = [{
-      placeholder: 'Användarnamn',
+      placeholder: 'User name',
       inputName: 'userName',
       required: true,
     }, {
-      placeholder: 'Lösenord',
+      placeholder: 'Password',
       inputName: 'password',
       inputType: 'password',
       required: true,

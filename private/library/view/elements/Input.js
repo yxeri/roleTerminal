@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2017 Aleksandar Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,32 +14,26 @@
  limitations under the License.
  */
 
-class SoundLibrary {
+class Input {
   constructor() {
-    this.sounds = [];
+    this.element = document.createElement('INPUT');
   }
 
-  addSound(sound) {
-    this.sounds.push({ soundId: sound.soundId, sound });
-  }
+  blur() { this.element.blur(); }
 
-  getSound(sentSoundId) {
-    const sound = this.sounds.find(({ soundId }) => soundId === sentSoundId);
+  focus() { this.element.focus(); }
 
-    if (sound) {
-      return sound.sound;
-    }
+  clear() { this.element.value = ''; }
 
-    return null;
-  }
+  mark() { this.element.classList.add('markedInput'); }
 
-  removeSound(sentSoundId) {
-    const soundIndex = this.sounds.findIndex(({ soundId }) => soundId === sentSoundId);
+  unmark() { this.element.classList.remove('markedInput'); }
 
-    if (soundIndex > -1) {
-      this.sounds.splice(soundIndex, 1);
-    }
-  }
+  appendText() {}
+
+  setText() {}
+
+  getText() { return this.element.value; }
 }
 
-module.exports = SoundLibrary;
+module.exports = Input;

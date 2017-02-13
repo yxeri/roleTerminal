@@ -14,31 +14,79 @@
  limitations under the License.
  */
 
+const storage = require('./StorageManager');
+
 class SocketManager {
-  constructor({ socket, events }) {
-    const eventKeys = Object.keys(events);
-    this.socket = socket;
+  constructor() {
+    this.socket = io(); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
+    this.reconnecting = false;
+    this.hasConnected = false;
 
-    for (let i = 0; i < eventKeys.length; i += 1) {
-      const event = eventKeys[i];
+    /**
+     * Checks if the screen has been unresponsive for some time.
+     * Some devices disable Javascript when screen is off (iOS)
+     * They also fail to notice that they have been disconnected
+     * We check the time between heartbeats and if the time i
+     * over 10 seconds (example: when screen is turned off and then on)
+     * we force them to reconnect
+     */
+    const timeoutFunc = () => {
+      const now = (new Date()).getTime();
+      const diff = now - this.lastAlive;
+      const offBy = diff - 1000;
+      this.lastAlive = now;
 
-      this.socket.on(event, events[event]);
-    }
+      if (offBy > 10000) {
+        this.reconnect();
+      }
 
-    this.autoReconnect();
+      setTimeout(timeoutFunc, 1000);
+    };
+
+    timeoutFunc();
+  }
+
+  addEvent(event, callback) {
+    this.socket.on(event, callback);
+  }
+
+  addEvents(events) {
+    events.forEach(event => this.addEvent(event.event, event.func));
   }
 
   /**
    * Reconnect to socket.io
    */
   reconnect() {
-    this.socket.disconnect();
-    this.socket.connect({ forceNew: true });
-    this.socket.emit('updateId', {}, () => {
-      // TODO User and device should be sent to server
-      console.log('reconnected');
-    });
+    if (!this.reconnecting) {
+      this.reconnecting = true;
+      this.socket.disconnect();
+      this.socket.connect({ forceNew: true });
+      this.socket.emit('updateId', {
+        user: {
+          userName: storage.getUserName(),
+        },
+        device: {
+          deviceId: storage.getDeviceId(),
+        },
+      }, ({ error, data }) => {
+        if (error) {
+          return;
+        }
+
+        // TODO Duplicate code
+        const userName = storage.getUserName();
+
+        if (userName && data.anonUser) {
+          console.log('User does not exist. Logging you out');
+        } else if (data.anonUser) {
+          console.log('Anonymous!');
+        } else {
+          console.log('I remember you');
+        }
+      });
+    }
   }
 
   /**
@@ -55,26 +103,11 @@ class SocketManager {
     }
   }
 
-  /**
-   * Checks if the screen has been unresponsive for some time.
-   * Some devices disable Javascript when screen is off (iOS)
-   * They also fail to notice that they have been disconnected
-   * We check the time between heartbeats and if the time i
-   * over 10 seconds (example: when screen is turned off and then on)
-   * we force them to reconnect
-   */
-  autoReconnect() {
-    const now = (new Date()).getTime();
-    const diff = now - this.lastAlive;
-    const offBy = diff - 1000;
-    this.lastAlive = now;
+  reconnectDone() { this.reconnecting = false; }
 
-    if (offBy > 10000) {
-      this.reconnect();
-    }
-
-    setTimeout(this.autoReconnect, 1000);
-  }
+  setConnected() { this.hasConnected = true; }
 }
 
-module.exports = SocketManager;
+const socketManager = new SocketManager();
+
+module.exports = socketManager;

@@ -436,6 +436,8 @@ class WorldMap extends View {
       return;
     }
 
+    this.started = true;
+
     if (!this.map) {
       this.map = new google.maps.Map(this.element, {
         center: {
@@ -528,6 +530,10 @@ class WorldMap extends View {
   appendTo(parentElement) {
     parentElement.classList.add('mapMain');
     super.appendTo(parentElement);
+
+    if (!this.started) {
+      this.startMap();
+    }
   }
 
   removeView() {

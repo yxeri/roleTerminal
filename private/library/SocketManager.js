@@ -21,6 +21,7 @@ class SocketManager {
     this.socket = io(); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
+    this.hasConnected = false;
 
     /**
      * Checks if the screen has been unresponsive for some time.
@@ -102,9 +103,9 @@ class SocketManager {
     }
   }
 
-  reconnectDone() {
-    this.reconnecting = false;
-  }
+  reconnectDone() { this.reconnecting = false; }
+
+  setConnected() { this.hasConnected = true; }
 }
 
 const socketManager = new SocketManager();

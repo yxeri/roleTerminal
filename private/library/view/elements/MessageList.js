@@ -138,12 +138,18 @@ class MessageList {
 
   scrolledToBottom(shouldScroll) {
     if (shouldScroll || viewTools.isCloseToEnd(this.element, this.element.lastChild.getBoundingClientRect().height)) {
-      this.element.lastChild.scrollIntoView();
+      this.scroll(false);
 
       return true;
     }
 
     return false;
+  }
+
+  scroll() {
+    if (!this.isTopDown) {
+      this.element.lastChild.scrollIntoView();
+    }
   }
 }
 

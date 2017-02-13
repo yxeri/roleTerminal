@@ -20,8 +20,8 @@ const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const MainMenu = require('../library/view/templates/MainMenu');
 const WorldMap = require('../library/view/worldMap/WorldMap');
+const Home = require('../library/view/templates/Home');
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
@@ -57,6 +57,7 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
+const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Skicka', isTopDown: false });
 const map = new WorldMap({
   mapView: WorldMap.MapViews.OVERVIEW,
@@ -121,13 +122,11 @@ const map = new WorldMap({
   },
   mapBackground: '#d9d9d9',
 });
-const topMenu = new MainMenu({ parentElement: mainView });
-
-topMenu.appendTo(top);
 
 top.addEventListener('click', () => {
-  topMenu.element.classList.toggle('hide');
+  home.appendTo(mainView);
 });
+keyHandler.addKey(32, () => { home.appendTo(mainView); });
 
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
   if (!viewTools.isLandscape()) {
@@ -170,8 +169,22 @@ socketManager.addEvents([
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
 
-      onlineStatus.setOnline();
-      new Time(document.getElementById('time')).startClock();
+      if (!socketManager.hasConnected) {
+        onlineStatus.setOnline();
+        new Time(document.getElementById('time')).startClock();
+
+        home.addLink({
+          linkName: 'Coms',
+          startFunc: () => { messenger.appendTo(mainView); },
+          endFunc: () => { messenger.removeView(); },
+        });
+        home.addLink({
+          linkName: 'Map',
+          startFunc: () => { map.appendTo(mainView); },
+          endFunc: () => { map.removeView(); },
+        });
+        home.appendTo(mainView);
+      }
 
       socketManager.emitEvent('updateId', {
         user: { userName: storageManager.getUserName() },
@@ -197,36 +210,38 @@ socketManager.addEvents([
             keyHandler,
           }).appendTo(mainView);
         } else if (data.anonUser) {
-          new LoginBox({
-            description: ['Endast för Krismyndigheten och Försvarsmakten'],
-            extraDescription: ['Skriv in ert användarnamn och lösenord'],
-            parentElement: mainView,
-            socketManager,
-            keyHandler,
-          }).appendTo(mainView);
+          if (!socketManager.hasConnected) {
+            new LoginBox({
+              description: ['Endast för Krismyndigheten och Försvarsmakten'],
+              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              parentElement: mainView,
+              socketManager,
+              keyHandler,
+            }).appendTo(mainView);
+          }
         } else {
           // TODO Duplicate code with LoginBox?
           storageManager.setAccessLevel(data.user.accessLevel);
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
-        map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-        map.setCenterCoordinates(storageManager.getCenterCoordinates());
-        map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
-        map.appendTo(mainView);
-        map.startMap();
+        if (!socketManager.hasConnected) {
+          map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+          map.setCenterCoordinates(storageManager.getCenterCoordinates());
+          map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 
-        // messenger.appendTo(mainView);
+          socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
+            if (historyError) {
+              console.log('history', historyError);
 
-        socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
-          if (historyError) {
-            console.log('history', historyError);
+              return;
+            }
 
-            return;
-          }
+            eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: true }, shouldScroll: true } });
+          });
+        }
 
-          eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: true }, shouldScroll: true } });
-        });
+        socketManager.setConnected();
       });
     },
   }, {

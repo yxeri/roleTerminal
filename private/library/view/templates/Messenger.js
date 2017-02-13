@@ -27,7 +27,6 @@ class Messenger extends View {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
     super({ isFullscreen });
 
-    keyHandler.addKey(13, () => { this.sendMessage(); });
     this.element.setAttribute('id', 'messenger');
 
     this.inputField = document.createElement('TEXTAREA');
@@ -52,7 +51,7 @@ class Messenger extends View {
         this.imagePreview.setAttribute('src', reader.result);
         this.imagePreview.setAttribute('name', file.name);
         this.imagePreview.classList.add('imagePreview');
-        this.inputField.focus();
+        this.focusInput();
       });
 
       reader.readAsDataURL(file);
@@ -200,7 +199,7 @@ class Messenger extends View {
         eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: data.messages, options: { printable: true }, shouldScroll: true } });
         this.clearInputField();
       });
-      this.inputField.focus();
+      this.focusInput();
     }
   }
 
@@ -220,9 +219,16 @@ class Messenger extends View {
     super.removeView();
   }
 
+  focusInput() {
+    this.inputField.focus();
+  }
+
   appendTo(parentElement) {
+    keyHandler.addKey(13, () => { this.sendMessage(); });
     parentElement.classList.add('messengerMain');
     super.appendTo(parentElement);
+    this.focusInput();
+    this.messageList.scroll();
   }
 }
 

@@ -47,9 +47,9 @@ window.addEventListener('error', (event) => {
    * Reloads page
    * @private
    */
-  function restart() {
-    window.location.reload();
-  }
+  // function restart() {
+  //   window.location.reload();
+  // }
 
   console.log(event.error);
   // setTimeout(restart, 3000);

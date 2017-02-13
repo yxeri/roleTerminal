@@ -2,3 +2,5 @@ node_modules
 out
 private/required
 docs
+public
+roleHaven

@@ -29,10 +29,6 @@ class Input {
 
   unmark() { this.element.classList.remove('markedInput'); }
 
-  appendText() {}
-
-  setText() {}
-
   getText() { return this.element.value; }
 }
 

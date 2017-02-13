@@ -27,25 +27,36 @@ class Home extends View {
     this.activeLink = '';
   }
 
-  addLink({ linkName, startFunc, endFunc }) {
+  addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome }) {
     this.links.push({ linkName, startFunc, endFunc });
 
     const button = document.createElement('BUTTON');
     button.setAttribute('id', `${linkName}_link`);
     button.appendChild(document.createTextNode(linkName.toUpperCase()));
     button.addEventListener('click', () => {
-      this.triggerLink(linkName);
+      this.triggerLink(linkName, keepHome);
     });
+
+    if (!isNaN(accessLevel)) {
+      this.accessElements.push({
+        element: button,
+        accessLevel,
+        maxAccessLevel,
+      });
+    }
 
     this.element.firstChild.appendChild(button);
   }
 
-  triggerLink(linkName) {
+  triggerLink(linkName, keepHome) {
     if (this.activeLink !== '') { this.endLink(linkName); }
 
-    this.removeView();
     this.links.find(link => link.linkName === linkName).startFunc();
-    this.activeLink = linkName;
+
+    if (!keepHome) {
+      this.removeView();
+      this.activeLink = linkName;
+    }
   }
 
   endLink(linkName) {

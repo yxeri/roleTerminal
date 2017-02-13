@@ -183,6 +183,39 @@ socketManager.addEvents([
           startFunc: () => { map.appendTo(mainView); },
           endFunc: () => { map.removeView(); },
         });
+        home.addLink({
+          linkName: 'Login',
+          startFunc: () => {
+            new LoginBox({
+              description: ['Endast för Krismyndigheten och Försvarsmakten'],
+              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              parentElement: mainView,
+              socketManager,
+              keyHandler,
+            }).appendTo(mainView);
+          },
+          endFunc: () => {},
+          accessLevel: 0,
+          maxAccessLevel: 0,
+          keepHome: true,
+        });
+        home.addLink({
+          linkName: 'Logout',
+          startFunc: () => {
+            storageManager.removeUser();
+
+            new LoginBox({
+              description: ['Endast för Krismyndigheten och Försvarsmakten'],
+              extraDescription: ['Skriv in ert användarnamn och lösenord'],
+              parentElement: mainView,
+              socketManager,
+              keyHandler,
+            }).appendTo(mainView);
+          },
+          endFunc: () => {},
+          accessLevel: 1,
+          keepHome: true,
+        });
         home.appendTo(mainView);
       }
 
@@ -209,6 +242,7 @@ socketManager.addEvents([
             socketManager,
             keyHandler,
           }).appendTo(mainView);
+          storageManager.setAccessLevel(0);
         } else if (data.anonUser) {
           if (!socketManager.hasConnected) {
             new LoginBox({
@@ -219,6 +253,7 @@ socketManager.addEvents([
               keyHandler,
             }).appendTo(mainView);
           }
+          storageManager.setAccessLevel(0);
         } else {
           // TODO Duplicate code with LoginBox?
           storageManager.setAccessLevel(data.user.accessLevel);

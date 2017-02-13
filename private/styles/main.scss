@@ -351,7 +351,9 @@ img {
     button {
       flex-grow: 1;
       -webkit-flex-grow: 1;
-      margin: 0 .5em;
+      width: 45%;
+      max-width: 45%;
+      margin: 0 .5em 1em .5em;
     }
   }
 }

@@ -74,6 +74,7 @@ const map = new WorldMap({
       textSize: 12,
       url: 'images/mapcluster.png',
       textColor: '00ffcc',
+      fontFamily: 'monospace',
     }],
   },
   mapStyles: [
@@ -169,9 +170,9 @@ socketManager.addEvents([
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
+      onlineStatus.setOnline();
 
       if (!socketManager.hasConnected) {
-        onlineStatus.setOnline();
         new Time(document.getElementById('time')).startClock();
 
         home.addLink({

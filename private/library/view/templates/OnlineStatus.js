@@ -21,7 +21,13 @@ class OnlineStatus {
 
   setOffline() { this.setStatus('OFFLINE'); }
   setOnline() { this.setStatus('ONLINE'); }
-  setStatus(status) { this.element.replaceChild(document.createTextNode(status.toUpperCase()), this.element.firstChild); }
+  setStatus(status) {
+    const span = document.createElement('SPAN');
+    span.appendChild(document.createTextNode(status.toUpperCase()));
+    span.classList.add('flash');
+
+    this.element.replaceChild(span, this.element.firstChild);
+  }
 }
 
 module.exports = OnlineStatus;

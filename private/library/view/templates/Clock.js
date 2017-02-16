@@ -30,11 +30,15 @@ class Clock extends Time {
   updateTime() {
     const date = new Date();
 
-    if (date.getSeconds() > 59) { date.setMinutes(date.getMinutes() + 1); }
+    if (date.getSeconds() > 59) {
+      date.setMinutes(date.getMinutes() + 1);
+    }
 
     const beautifulDate = textTools.generateTimeStamp({ date });
+    const span = document.createElement('SPAN');
+    span.appendChild(document.createTextNode(`${beautifulDate.halfTime} ${beautifulDate.fullDate}`));
 
-    this.element.replaceChild(document.createTextNode(`${beautifulDate.halfTime} ${beautifulDate.fullDate}`), this.element.firstChild);
+    this.element.replaceChild(span, this.element.firstChild);
   }
 }
 

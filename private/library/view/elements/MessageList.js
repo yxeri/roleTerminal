@@ -64,16 +64,16 @@ class MessageList {
     this.element = document.createElement('UL');
   }
 
-  addItems(items, shouldScroll) {
+  addItems(items, { shouldScroll, animation }) {
     const fragment = document.createDocumentFragment();
 
     items.forEach((item) => {
-      const listItem = this.createItem(item);
+      const listItem = this.createItem(item, { animation });
 
       if (this.isTopDown) {
         fragment.insertBefore(listItem, fragment.firstChild);
       } else {
-        fragment.appendChild(this.createItem(item));
+        fragment.appendChild(listItem);
       }
     });
 
@@ -95,9 +95,10 @@ class MessageList {
    * @param {boolean} printable - Should the item be printable
    * @returns {Element} List item
    */
-  createItem({ headerItems, text, printable, image }) {
+  createItem({ headerItems, text, printable, image }, { animation }) {
     const listItem = document.createElement('LI');
     listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
+    if (animation) { listItem.classList.add(animation); }
 
     text.forEach((line) => {
       const paragraph = document.createElement('P');

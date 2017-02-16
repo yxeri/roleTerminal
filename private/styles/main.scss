@@ -496,6 +496,41 @@ img {
   width: auto !important;
 }
 
+.flash {
+  -webkit-animation-name: flash;
+  -webkit-animation-duration: .8s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease-in-out;
+  animation: flash;
+  animation-duration: .8s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+@-webkit-keyframes flash {
+  0% {
+    background-color: $text-color;
+    text-shadow: none;
+  }
+
+  100% {
+    background-color: inherit;
+    text-shadow: inherit;
+  }
+}
+
+@keyframes flash {
+  0% {
+    background-color: $text-color;
+    text-shadow: none;
+  }
+
+  100% {
+    background-color: inherit;
+    text-shadow: inherit;
+  }
+}
+
 @media (max-width: 750px) {
   #messenger {
     margin-left: 0;
@@ -517,6 +552,8 @@ img {
   }
 
   li {
+    border-color: $second-color;
+
     p {
       margin-left: .1em;
     }

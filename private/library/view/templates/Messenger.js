@@ -157,7 +157,11 @@ class Messenger extends View {
       watcherParent: this,
       event: eventCentral.Events.CHATMSG,
       func: ({ messages, options, shouldScroll }) => {
-        this.messageList.addItems(messages.map(message => new Message(message, options)), shouldScroll);
+        const itemsOptions = { shouldScroll };
+
+        if (messages.length < 2) { itemsOptions.animation = 'flash'; }
+
+        this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
       },
     });
   }
@@ -217,6 +221,10 @@ class Messenger extends View {
     keyHandler.removeKey(13);
     this.element.parentNode.classList.remove('messengerMain');
     super.removeView();
+
+    this.messageList.element.childNodes.forEach((listItem) => {
+      listItem.classList.remove('flash');
+    });
   }
 
   focusInput() {

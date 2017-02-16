@@ -267,14 +267,27 @@ socketManager.addEvents([
           map.setCenterCoordinates(storageManager.getCenterCoordinates());
           map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 
-          socketManager.emitEvent('history', { lines: 10000 }, ({ data: historyData, historyError }) => {
+          if (!storageManager.getRoom()) {
+            storageManager.setRoom('public');
+          }
+
+          eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
+          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 10000 }, ({ data: historyData, historyError }) => {
             if (historyError) {
               console.log('history', historyError);
 
               return;
             }
 
-            eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: historyData.messages, options: { printable: false }, shouldScroll: true } });
+            eventCentral.triggerEvent({
+              event: eventCentral.Events.CHATMSG,
+              params: {
+                messages: historyData.messages,
+                options: { printable: false },
+                shouldScroll: true,
+                isHistory: true,
+              },
+            });
           });
         }
 

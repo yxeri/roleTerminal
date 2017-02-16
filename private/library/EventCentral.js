@@ -21,6 +21,7 @@ class EventCentral {
       ALIAS: 'Aliases changed',
       ACCESS: 'Access level changed',
       MESSAGE: 'Message retrieved',
+      SWITCHROOM: 'Switched room',
     };
     this.eventWatchers = {};
   }

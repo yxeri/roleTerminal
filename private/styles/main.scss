@@ -15,16 +15,17 @@
  */
 
 $text-color: #00ffcc;
+$darker-text-color: #00d7a9;
 $second-color: #ff02e5;
 $light-color: #aaaaaa;
 $back-color: #11000f;
 $back-button: #1b0019;
 $back-input: #1b0019;
-$warning: #ff02e5;
+$note-color: #cd02b7;
 $padding: .2em;
 $border: .2em;
 $outline: .1em;
-$font-size: 1.1em;
+$font-size: 1em;
 $text-shadow-color: #ff02e5;
 $text-shadow: 1px 1px 3px $text-shadow-color;
 $view-width: 50em;
@@ -84,6 +85,11 @@ button {
   -webkit-text-size-adjust: 100%;
   text-shadow: $text-shadow;
   vertical-align: top;
+  text-overflow: ellipsis;
+}
+
+::-webkit-input-placeholder {
+  color: $darker-text-color;
 }
 
 input {
@@ -94,7 +100,7 @@ input {
   background-color: $back-input;
   display: inline-block;
   cursor: pointer;
-  color: $text-color;
+  color: $darker-text-color;
   font-family: monospace;
   font-size: $font-size;
   -webkit-text-size-adjust: 100%;
@@ -234,7 +240,7 @@ img {
   }
 
   li:last-child {
-    margin-bottom: 1em;
+    margin-bottom: 2em;
   }
 }
 
@@ -359,6 +365,10 @@ img {
   }
 }
 
+.selected {
+  background-color: $note-color;
+}
+
 .imagePreview {
   max-height: 15em;
   max-width: 15em;
@@ -420,7 +430,7 @@ img {
 }
 
 .markedInput {
-  background-color: $warning;
+  background-color: $note-color;
 }
 
 .hide {
@@ -448,15 +458,26 @@ img {
 }
 
 .buttons {
+  display: flex;
   float: right;
 
   div {
     display: inline-block;
+    margin-right: $padding * 2;
 
     ul {
       position: absolute;
       bottom: 2em;
       background-color: $back-color;
+
+      li {
+        margin-bottom: $padding;
+
+        button {
+          width: 100%;
+          text-align: left;
+        }
+      }
 
       li:last-child {
         margin-bottom: 0 !important;
@@ -465,12 +486,20 @@ img {
   }
 
   button {
-    margin-left: $padding * 2;
+    margin-right: $padding * 2;
+  }
+
+  button:last-child {
+    margin-right: 0;
   }
 }
 
 .autoHeight {
   height: auto;
+}
+
+.list {
+
 }
 
 /*
@@ -498,18 +527,18 @@ img {
 
 .flash {
   -webkit-animation-name: flash;
-  -webkit-animation-duration: .8s;
+  -webkit-animation-duration: .5s;
   -webkit-animation-iteration-count: 1;
   -webkit-animation-timing-function: ease-in-out;
   animation: flash;
-  animation-duration: .8s;
+  animation-duration: .5s;
   animation-iteration-count: 1;
   animation-timing-function: ease-in-out;
 }
 
 @-webkit-keyframes flash {
   0% {
-    background-color: $text-color;
+    background-color: $second-color;
     text-shadow: none;
   }
 
@@ -521,7 +550,7 @@ img {
 
 @keyframes flash {
   0% {
-    background-color: $text-color;
+    background-color: $second-color;
     text-shadow: none;
   }
 

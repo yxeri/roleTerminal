@@ -62,7 +62,7 @@ class Messenger extends View {
     sendButton.addEventListener('click', () => { this.sendMessage(); });
 
     const imageButton = document.createElement('BUTTON');
-    imageButton.appendChild(document.createTextNode('Bild'));
+    imageButton.appendChild(document.createTextNode('Pic'));
     imageButton.appendChild(imageInput);
     imageButton.addEventListener('click', () => { imageInput.click(); });
     imageButton.classList.add('hide');
@@ -74,6 +74,7 @@ class Messenger extends View {
     const aliasDiv = document.createElement('DIV');
     const aliasListButton = document.createElement('BUTTON');
     const aliasList = document.createElement('UL');
+    aliasList.classList.add('list');
     aliasList.classList.add('hide');
     aliasListButton.addEventListener('click', () => { aliasList.classList.toggle('hide'); });
     eventCentral.addWatcher({
@@ -125,41 +126,66 @@ class Messenger extends View {
       accessLevel: 2,
     });
 
+    this.roomsList = document.createElement('UL');
+    const roomsDiv = document.createElement('DIV');
+    const roomsButton = document.createElement('BUTTON');
+    roomsButton.addEventListener('click', () => { this.toggleRoomsList(); });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.SWITCHROOM,
+      func: ({ room }) => {
+        const chosenRoom = `Room: ${room}`;
+
+        this.createRoomsList();
+
+        if (roomsButton.firstChild) {
+          roomsButton.replaceChild(document.createTextNode(chosenRoom), roomsButton.firstChild);
+        } else {
+          roomsButton.appendChild(document.createTextNode(chosenRoom));
+        }
+      },
+    });
+    roomsDiv.appendChild(this.roomsList);
+    roomsDiv.appendChild(roomsButton);
+
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');
 
+    buttons.appendChild(roomsDiv);
     buttons.appendChild(aliasDiv);
     buttons.appendChild(imageButton);
     buttons.appendChild(sendButton);
 
-    const inputArea = document.createElement('DIV');
-    inputArea.classList.add('inputArea');
-    inputArea.classList.add('hide');
-    inputArea.appendChild(this.imagePreview);
-    inputArea.appendChild(this.inputField);
-    inputArea.appendChild(buttons);
+    this.inputArea = document.createElement('DIV');
+    this.inputArea.classList.add('inputArea');
+    this.inputArea.classList.add('hide');
+    this.inputArea.appendChild(this.imagePreview);
+    this.inputArea.appendChild(this.inputField);
+    this.inputArea.appendChild(buttons);
     this.accessElements.push({
-      element: inputArea,
+      element: this.inputArea,
       accessLevel: 1,
     });
 
     if (isTopDown) {
-      inputArea.classList.add('topDown');
-      this.element.appendChild(inputArea);
+      this.inputArea.classList.add('topDown');
+      this.element.appendChild(this.inputArea);
       this.element.appendChild(this.messageList.element);
     } else {
-      inputArea.classList.add('bottomUp');
+      this.inputArea.classList.add('bottomUp');
       this.element.appendChild(this.messageList.element);
-      this.element.appendChild(inputArea);
+      this.element.appendChild(this.inputArea);
     }
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.CHATMSG,
-      func: ({ messages, options, shouldScroll }) => {
-        const itemsOptions = { shouldScroll };
-
-        if (messages.length < 2) { itemsOptions.animation = 'flash'; }
+      func: ({ messages, options, shouldScroll, isHistory }) => {
+        const itemsOptions = {
+          animation: 'flash',
+          shouldScroll,
+          isHistory,
+        };
 
         this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
       },
@@ -209,7 +235,7 @@ class Messenger extends View {
 
   resizeInputField() {
     this.inputField.style.height = 'auto';
-    this.inputField.style.height = `${this.inputField.scrollHeight + 10}px`;
+    this.inputField.style.height = `${this.inputField.scrollHeight}px`;
   }
 
   clearInputField() {
@@ -231,7 +257,63 @@ class Messenger extends View {
     this.inputField.focus();
   }
 
+  switchRoom(room) {
+    storageManager.setRoom(room);
+    this.messageList.element.innerHTML = '';
+  }
+
+  createRoomsList() {
+    if (this.roomsList.childNodes.length === 0) {
+      socketManager.emitEvent('myRooms', {}, ({ error, data: { rooms } }) => {
+        if (error) {
+          console.log(error);
+
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < rooms.length; i += 1) {
+          const room = rooms[i];
+          const listItem = document.createElement('LI');
+          const button = document.createElement('BUTTON');
+          button.appendChild(document.createTextNode(`[${i + 1}]${room}`));
+          button.addEventListener('click', () => {
+            this.switchRoom(room);
+
+            socketManager.emitEvent('history', { room: { roomName: room }, lines: 10000 }, ({ data: historyData, historyError }) => {
+              if (historyError) {
+                console.log('history', historyError);
+
+                return;
+              }
+
+              eventCentral.triggerEvent({
+                event: eventCentral.Events.CHATMSG,
+                params: {
+                  messages: historyData.messages,
+                  options: { printable: false },
+                  shouldScroll: true,
+                  isHistory: true,
+                },
+              });
+            });
+          });
+          listItem.appendChild(button);
+          fragment.appendChild(listItem);
+        }
+
+        this.roomsList.appendChild(fragment);
+      });
+    }
+  }
+
+  toggleRoomsList() {
+    this.roomsList.classList.toggle('hide');
+  }
+
   appendTo(parentElement) {
+    this.createRoomsList();
     keyHandler.addKey(13, () => { this.sendMessage(); });
     parentElement.classList.add('messengerMain');
     super.appendTo(parentElement);

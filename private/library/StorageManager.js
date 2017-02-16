@@ -200,6 +200,13 @@ class StorageManager {
   static setYearModification(yearModification) { this.setLocalVal('yearModification', yearModification); }
 
   static getYearModification() { return converters.convertToInt(this.getLocalVal('yearModification')); }
+
+  static setRoom(room) {
+    this.setLocalVal('room', room);
+    eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room } });
+  }
+
+  static getRoom() { return this.getLocalVal('room'); }
 }
 
 eventCentral.addWatcher({ watcherParent: StorageManager, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { StorageManager.setAliases(aliases); } });

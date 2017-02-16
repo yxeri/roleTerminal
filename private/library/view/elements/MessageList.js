@@ -64,11 +64,15 @@ class MessageList {
     this.element = document.createElement('UL');
   }
 
-  addItems(items, { shouldScroll, animation }) {
+  addItems(items, { shouldScroll, animation, isHistory }) {
     const fragment = document.createDocumentFragment();
 
     items.forEach((item) => {
-      const listItem = this.createItem(item, { animation });
+      const listItemOptions = {};
+
+      if (!isHistory) { listItemOptions.animation = animation; }
+
+      const listItem = this.createItem(item, listItemOptions);
 
       if (this.isTopDown) {
         fragment.insertBefore(listItem, fragment.firstChild);
@@ -148,7 +152,7 @@ class MessageList {
   }
 
   scroll() {
-    if (!this.isTopDown) {
+    if (!this.isTopDown && this.element.lastChild) {
       this.element.lastChild.scrollIntoView();
     }
   }

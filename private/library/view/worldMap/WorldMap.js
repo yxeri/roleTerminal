@@ -37,7 +37,7 @@ class WorldMap extends View {
     cornerCoordinates = {},
     centerCoordinates = {},
     zoomLevel = 15,
-    mapBackground = '#FFFFFF',
+    mapBackground = '#000000',
     mapStyles = [],
     labelStyle = {},
     clusterStyle = {},

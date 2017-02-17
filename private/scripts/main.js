@@ -122,7 +122,7 @@ const map = new WorldMap({
     strokeColor: '#001e15',
     fontSize: 12,
   },
-  mapBackground: '#d9d9d9',
+  mapBackground: '#11000f',
 });
 
 top.addEventListener('click', () => {

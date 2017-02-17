@@ -15,23 +15,7 @@
  */
 
 const viewTools = require('../../ViewTools');
-
-/**
- * Create and return a button that triggers print
- * @param {Element} parentElement - The container that will be visible in print
- * @returns {Element} Print button
- */
-function createPrintButton(parentElement) {
-  const button = document.createElement('BUTTON');
-  button.addEventListener('click', () => {
-    parentElement.classList.add('print');
-    window.print();
-    setTimeout(() => { parentElement.classList.remove('print'); }, 500);
-  });
-  button.appendChild(document.createTextNode('Print'));
-
-  return button;
-}
+const elementCreator = require('../../ElementCreator');
 
 /**
  * Create and return header paragraph
@@ -53,7 +37,18 @@ function createHeader({ headerItems, printable, parentElement }) {
     paragraph.appendChild(span);
   });
 
-  if (printable) { paragraph.appendChild(createPrintButton(parentElement)); }
+  if (printable) {
+    const button = elementCreator.createButton({
+      func: () => {
+        parentElement.classList.add('print');
+        window.print();
+        setTimeout(() => { parentElement.classList.remove('print'); }, 500);
+      },
+      text: 'Print',
+    });
+
+    paragraph.appendChild(button);
+  }
 
   return paragraph;
 }

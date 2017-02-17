@@ -119,12 +119,12 @@ class LoginBox extends DialogBox {
     const inputs = [{
       placeholder: 'User name',
       inputName: 'userName',
-      required: true,
+      isRequired: true,
     }, {
       placeholder: 'Password',
       inputName: 'password',
-      inputType: 'password',
-      required: true,
+      type: 'password',
+      isRequired: true,
     }];
 
     super({

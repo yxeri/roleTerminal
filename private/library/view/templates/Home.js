@@ -15,6 +15,7 @@
  */
 
 const View = require('../base/View');
+const elementCreator = require('../../ElementCreator');
 
 class Home extends View {
   constructor() {
@@ -30,11 +31,9 @@ class Home extends View {
   addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome }) {
     this.links.push({ linkName, startFunc, endFunc });
 
-    const button = document.createElement('BUTTON');
-    button.setAttribute('id', `${linkName}_link`);
-    button.appendChild(document.createTextNode(linkName.toUpperCase()));
-    button.addEventListener('click', () => {
-      this.triggerLink(linkName, keepHome);
+    const button = elementCreator.createButton({
+      func: () => { this.triggerLink(linkName, keepHome); },
+      text: linkName.toUpperCase(),
     });
 
     if (!isNaN(accessLevel)) {

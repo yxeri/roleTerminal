@@ -16,72 +16,12 @@
 
 const View = require('./base/View');
 const keyHandler = require('../KeyHandler');
-
-// TODO This should be a class
-/**
- * Create and return input element
- * @param {Object} input - Input
- * @returns {HTMLElement} - Input element
- */
-function createInput({ placeholder, inputName, inputType, required, extraClass }) {
-  const inputElement = document.createElement('INPUT');
-
-  inputElement.setAttribute('placeholder', placeholder);
-  inputElement.setAttribute('name', inputName);
-
-  if (inputType) {
-    inputElement.setAttribute('type', inputType);
-  }
-
-  if (required) {
-    inputElement.addEventListener('blur', () => {
-      if (inputElement.value === '') { inputElement.classList.add('markedInput'); }
-    });
-    inputElement.addEventListener('input', () => { inputElement.classList.remove('markedInput'); });
-
-    inputElement.setAttribute('required', 'true');
-  }
-
-  if (extraClass) {
-    inputElement.classList.add(extraClass);
-  }
-
-  return inputElement;
-}
-
-/**
- * Create and return a button element
- * @param {string} text - Text in the button
- * @param {Function} eventFunc - Callback when button is clicked
- * @returns {Element} Button element
- */
-function createButton({ text, eventFunc }) {
-  const buttonElement = document.createElement('BUTTON');
-
-  buttonElement.appendChild(document.createTextNode(text));
-  buttonElement.addEventListener('click', eventFunc);
-
-  return buttonElement;
-}
-
-/**
- * Creates and returns a paragraph element
- * @param {string} line - Line of text
- * @returns {Element} Paragraph
- */
-function createParagraph(line) {
-  const paragraph = document.createElement('P');
-
-  paragraph.appendChild(document.createTextNode(line));
-
-  return paragraph;
-}
+const elementCreator = require('../ElementCreator');
 
 class DialogBox extends View {
   constructor({ buttons, description = [], extraDescription = [], inputs = [] }) {
     super({ isFullscreen: false });
 
-    // TODO Duplicate code. Should this be moved into DialogBox?
     const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
     let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
 
@@ -96,18 +36,18 @@ class DialogBox extends View {
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
-    description.forEach(line => this.descriptionContainer.appendChild(createParagraph(line)));
+    description.forEach(text => this.descriptionContainer.appendChild(elementCreator.createParagraph({ text })));
 
     this.extraDescription = document.createElement('DIV');
-    extraDescription.forEach(line => this.extraDescription.appendChild(createParagraph(line)));
+    extraDescription.forEach(text => this.extraDescription.appendChild(elementCreator.createParagraph({ text })));
 
     this.descriptionContainer.appendChild(this.extraDescription);
 
-    const closeButton = createButton({
+    const closeButton = elementCreator.createButton({
       text: 'X',
-      eventFunc: () => { this.removeView(); },
+      func: () => { this.removeView(); },
+      classes: ['closeButton'],
     });
-    closeButton.classList.add('closeButton');
 
     const leftButtonChar = buttons.left.text.charAt(0);
     let rightButtonChar = buttons.right.text.charAt(0);
@@ -120,13 +60,13 @@ class DialogBox extends View {
 
     this.buttonsContainer = document.createElement('DIV');
     this.buttonsContainer.classList.add('buttons');
-    this.buttonsContainer.appendChild(createButton({
+    this.buttonsContainer.appendChild(elementCreator.createButton({
       text: `[${leftButtonChar.toUpperCase()}]${buttons.left.text.slice(1)}`,
-      eventFunc: buttons.left.eventFunc,
+      func: buttons.left.eventFunc,
     }));
-    this.buttonsContainer.appendChild(createButton({
+    this.buttonsContainer.appendChild(elementCreator.createButton({
       text: rightButtonText,
-      eventFunc: buttons.right.eventFunc,
+      func: buttons.right.eventFunc,
     }));
 
     this.inputs = [];
@@ -135,7 +75,7 @@ class DialogBox extends View {
     this.element.appendChild(this.descriptionContainer);
 
     inputs.forEach((input) => {
-      const inputElement = createInput(input);
+      const inputElement = elementCreator.createInput(input);
 
       this.inputs.push({ inputName: input.inputName, inputElement });
       this.element.appendChild(inputElement);
@@ -178,10 +118,15 @@ class DialogBox extends View {
   }
 
   addInput(input) {
-    const inputElement = createInput(input);
+    const inputElement = elementCreator.createInput(input);
+    console.log(inputElement);
 
     this.inputs.push({ inputName: input.inputName, inputElement });
     this.element.insertBefore(inputElement, this.buttonsContainer);
+  }
+
+  findInput(sentInputName) {
+    return this.inputs.find(({ inputName }) => sentInputName === inputName);
   }
 
   removeInput(sentInputName) {
@@ -194,19 +139,19 @@ class DialogBox extends View {
   }
 
   clearInput(sentInputName) {
-    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
+    const input = this.findInput(sentInputName);
 
     if (input) { input.inputElement.value = ''; }
   }
 
   focusInput(sentInputName) {
-    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
+    const input = this.findInput(sentInputName);
 
     if (input) { input.inputElement.focus(); }
   }
 
   markInput(sentInputName) {
-    const input = this.inputs.find(({ inputName }) => sentInputName === inputName);
+    const input = this.findInput(sentInputName);
 
     if (input) { input.inputElement.classList.add('markedInput'); }
   }

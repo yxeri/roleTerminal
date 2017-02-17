@@ -22,6 +22,7 @@ const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
+const elementCreator = require('../../ElementCreator');
 
 class Messenger extends View {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
@@ -57,26 +58,31 @@ class Messenger extends View {
       reader.readAsDataURL(file);
     });
 
-    const sendButton = document.createElement('BUTTON');
-    sendButton.appendChild(document.createTextNode(sendButtonText));
-    sendButton.addEventListener('click', () => { this.sendMessage(); });
+    const sendButton = elementCreator.createButton({
+      func: () => { this.sendMessage(); },
+      text: sendButtonText,
+    });
 
-    const imageButton = document.createElement('BUTTON');
-    imageButton.appendChild(document.createTextNode('Pic'));
+
+    const imageButton = elementCreator.createButton({
+      func: () => { imageInput.click(); },
+      text: 'Pic',
+      classes: ['hide'],
+    });
     imageButton.appendChild(imageInput);
-    imageButton.addEventListener('click', () => { imageInput.click(); });
-    imageButton.classList.add('hide');
     this.accessElements.push({
       element: imageButton,
       accessLevel: 2,
     });
 
     const aliasDiv = document.createElement('DIV');
-    const aliasListButton = document.createElement('BUTTON');
-    const aliasList = document.createElement('UL');
-    aliasList.classList.add('list');
-    aliasList.classList.add('hide');
-    aliasListButton.addEventListener('click', () => { aliasList.classList.toggle('hide'); });
+    const aliasList = elementCreator.createList({
+      classes: ['list', 'hide'],
+    });
+    const aliasListButton = elementCreator.createButton({
+      func: () => { aliasList.classList.toggle('hide'); },
+      text: '-',
+    });
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.ALIAS,
@@ -87,17 +93,18 @@ class Messenger extends View {
 
           fullAliasList.forEach((alias) => {
             const row = document.createElement('LI');
-            const button = document.createElement('BUTTON');
-            button.appendChild(document.createTextNode(alias));
-            button.addEventListener('click', () => {
-              if (storageManager.getUserName() !== alias) {
-                storageManager.setSelectedAlias(alias);
-              } else {
-                storageManager.removeSelectedAlias();
-              }
+            const button = elementCreator.createButton({
+              func: () => {
+                if (storageManager.getUserName() !== alias) {
+                  storageManager.setSelectedAlias(alias);
+                } else {
+                  storageManager.removeSelectedAlias();
+                }
 
-              aliasListButton.replaceChild(document.createTextNode(`Alias: ${alias}`), aliasListButton.firstChild);
-              aliasList.classList.toggle('hide');
+                aliasListButton.replaceChild(document.createTextNode(`Alias: ${alias}`), aliasListButton.firstChild);
+                aliasList.classList.toggle('hide');
+              },
+              text: alias,
             });
 
             row.appendChild(button);
@@ -107,13 +114,7 @@ class Messenger extends View {
           aliasList.innerHTML = ' '; // eslint-disable-line no-param-reassign
           aliasList.appendChild(fragment);
 
-          const chosenName = `Alias: ${storageManager.getSelectedAlias() || storageManager.getUserName() || ''}`;
-
-          if (aliasListButton.firstChild) {
-            aliasListButton.replaceChild(document.createTextNode(chosenName), aliasListButton.firstChild);
-          } else {
-            aliasListButton.appendChild(document.createTextNode(chosenName));
-          }
+          elementCreator.setButtonText(aliasListButton, `Alias: ${storageManager.getSelectedAlias() || storageManager.getUserName() || ''}`);
         } else {
           aliasListButton.classList.add('hide');
         }
@@ -128,8 +129,10 @@ class Messenger extends View {
 
     this.roomsList = document.createElement('UL');
     const roomsDiv = document.createElement('DIV');
-    const roomsButton = document.createElement('BUTTON');
-    roomsButton.addEventListener('click', () => { this.toggleRoomsList(); });
+    const roomsButton = elementCreator.createButton({
+      func: () => { this.toggleRoomsList(); },
+      text: '-',
+    });
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SWITCHROOM,
@@ -137,12 +140,7 @@ class Messenger extends View {
         const chosenRoom = `Room: ${room}`;
 
         this.createRoomsList();
-
-        if (roomsButton.firstChild) {
-          roomsButton.replaceChild(document.createTextNode(chosenRoom), roomsButton.firstChild);
-        } else {
-          roomsButton.appendChild(document.createTextNode(chosenRoom));
-        }
+        elementCreator.setButtonText(roomsButton, chosenRoom);
       },
     });
     roomsDiv.appendChild(this.roomsList);
@@ -276,28 +274,29 @@ class Messenger extends View {
         for (let i = 0; i < rooms.length; i += 1) {
           const room = rooms[i];
           const listItem = document.createElement('LI');
-          const button = document.createElement('BUTTON');
-          button.appendChild(document.createTextNode(`[${i + 1}]${room}`));
-          button.addEventListener('click', () => {
-            this.switchRoom(room);
+          const button = elementCreator.createButton({
+            func: () => {
+              this.switchRoom(room);
 
-            socketManager.emitEvent('history', { room: { roomName: room }, lines: 10000 }, ({ data: historyData, historyError }) => {
-              if (historyError) {
-                console.log('history', historyError);
+              socketManager.emitEvent('history', { room: { roomName: room }, lines: 10000 }, ({ data: historyData, historyError }) => {
+                if (historyError) {
+                  console.log('history', historyError);
 
-                return;
-              }
+                  return;
+                }
 
-              eventCentral.triggerEvent({
-                event: eventCentral.Events.CHATMSG,
-                params: {
-                  messages: historyData.messages,
-                  options: { printable: false },
-                  shouldScroll: true,
-                  isHistory: true,
-                },
+                eventCentral.triggerEvent({
+                  event: eventCentral.Events.CHATMSG,
+                  params: {
+                    messages: historyData.messages,
+                    options: { printable: false },
+                    shouldScroll: true,
+                    isHistory: true,
+                  },
+                });
               });
-            });
+            },
+            text: `[${i + 1}]${room}`,
           });
           listItem.appendChild(button);
           fragment.appendChild(listItem);

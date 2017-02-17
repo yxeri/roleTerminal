@@ -30,7 +30,7 @@ $text-shadow-color: #ff02e5;
 $text-shadow: 1px 1px 3px $text-shadow-color;
 $view-width: 50em;
 $menu-width: 21em;
-$box-shadow: inset 0 0 4px $second-color;
+$box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px $text-color;
 
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input {
@@ -75,8 +75,8 @@ body {
 button {
   padding: $padding;
   border: $border solid $second-color;
-  box-shadow: $box-shadow;
-  outline: $outline solid;
+  box-shadow: $box-shadow $second-color;
+  outline: $outline solid $text-color;
   background-color: $back-button;
   color: $text-color;
   display: inline-block;
@@ -88,6 +88,12 @@ button {
   text-overflow: ellipsis;
 }
 
+button:focus {
+  border: $border solid $text-color;
+  box-shadow: $box-shadow $text-color;
+  outline: $outline solid $text-color;
+}
+
 ::-webkit-input-placeholder {
   color: $darker-text-color;
 }
@@ -95,8 +101,8 @@ button {
 input {
   margin: $padding;
   border: $border solid $second-color;
-  box-shadow: $box-shadow;
-  outline: $outline solid;
+  box-shadow: $box-shadow $second-color;
+  outline: $outline solid $text-color;
   background-color: $back-input;
   display: inline-block;
   cursor: pointer;
@@ -107,14 +113,26 @@ input {
   border-radius: 0;
 }
 
+input:focus {
+  border: $border solid $text-color;
+  box-shadow: $box-shadow $text-color;
+  outline: $outline solid $text-color;
+}
+
 textarea {
   background-color: $back-input;
   border: $border solid $second-color;
-  box-shadow: $box-shadow;
+  box-shadow: $box-shadow $second-color;
   outline: $outline solid $text-color;
   resize: none;
   border-radius: 0;
   color: $text-color;
+}
+
+textarea:focus {
+  border: $border solid $text-color;
+  box-shadow: $box-shadow $text-color;
+  outline: $outline solid $text-color;
 }
 
 p {
@@ -171,14 +189,14 @@ li {
 img {
   max-width: 100%;
   max-height: 30em;
-  outline: $outline solid;
+  outline: $outline solid $text-color;
   width: auto;
 }
 
 #background {
   border: $border solid $second-color;
-  box-shadow: $box-shadow;
-  outline: $outline solid;
+  box-shadow: $box-shadow $second-color;
+  outline: $outline solid $text-color;
   width: calc(100% - 1.1em);
   height: calc(100% - 1.1em);
   margin-top: $padding;
@@ -373,13 +391,13 @@ img {
   max-height: 15em;
   max-width: 15em;
   border: $border solid $second-color;
-  outline: $outline solid;
+  outline: $outline solid $text-color;
 }
 
 .dialogBox {
   padding: $padding;
   border: $border solid $second-color;
-  outline: $outline solid;
+  outline: $outline solid $text-color;
   max-width: 20em;
   word-wrap: break-word;
   z-index: 10;
@@ -399,7 +417,7 @@ img {
   }
 
   .buttons {
-    margin: $padding $padding $padding 0;
+    margin: $padding ($padding + .1em) $padding 0;
   }
 }
 

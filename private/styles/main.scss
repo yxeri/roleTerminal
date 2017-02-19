@@ -88,7 +88,7 @@ button {
   text-overflow: ellipsis;
 }
 
-button:focus {
+button:focus, button:hover {
   border: $border solid $text-color;
   box-shadow: $box-shadow $text-color;
   outline: $outline solid $text-color;
@@ -113,7 +113,7 @@ input {
   border-radius: 0;
 }
 
-input:focus {
+input:focus, input:hover {
   border: $border solid $text-color;
   box-shadow: $box-shadow $text-color;
   outline: $outline solid $text-color;
@@ -129,7 +129,7 @@ textarea {
   color: $text-color;
 }
 
-textarea:focus {
+textarea:focus, textarea:hover {
   border: $border solid $text-color;
   box-shadow: $box-shadow $text-color;
   outline: $outline solid $text-color;
@@ -231,6 +231,7 @@ img {
 #main {
   overflow-y: scroll;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   height: calc(100% - 2em);
   width: 101vw;
   background: url(/images/logo.png) no-repeat 50% 50%;
@@ -318,9 +319,17 @@ img {
   height: 100vh;
 }
 
+#mapClickMenu {
+  position: absolute;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
 #markerInfo {
-  top: 0 !important;
-  left: 0 !important;
+  top: .1em !important;
+  left: .1em !important;
   position: absolute;
   z-index: 2;
   max-width: 40em;
@@ -333,10 +342,12 @@ img {
   max-height: 95vh;
   background-color: $back-color;
   border: solid $border $second-color;
+  outline: $outline solid $text-color;
 
   div {
     width: calc(100% + 2em);
     overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
     max-height: 90vh;
 
     p {

@@ -125,6 +125,10 @@ const map = new WorldMap({
   mapBackground: '#11000f',
 });
 
+mainView.addEventListener('contextmenu', (event) => {
+  event.preventDefault();
+});
+
 top.addEventListener('click', () => {
   home.appendTo(mainView);
 });

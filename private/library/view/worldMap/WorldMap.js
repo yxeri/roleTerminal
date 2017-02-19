@@ -18,6 +18,7 @@ const View = require('../base/View');
 const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
+const elementCreator = require('../../ElementCreator');
 
 const MapViews = {
   OVERVIEW: 'overview',
@@ -50,9 +51,8 @@ class WorldMap extends View {
     this.labels = {};
     this.cornerCoordinates = cornerCoordinates;
     this.centerCoordinates = centerCoordinates;
-    this.infoElement = document.createElement('DIV');
-    this.infoElement.setAttribute('id', 'markerInfo');
-    this.hideMarkerInfo();
+    this.infoElement = elementCreator.createContainer({ elementId: 'markerInfo', classes: ['hide'] });
+    this.mapClickMenu = elementCreator.createContainer({ elementId: 'mapClickMenu', classes: ['hide'] });
     this.infoElement.addEventListener('click', () => { this.hideMarkerInfo(); });
     this.defaultZoomLevel = zoomLevel;
     this.labelStyle = labelStyle;
@@ -74,6 +74,38 @@ class WorldMap extends View {
    */
   setMapView(view) {
     this.mapView = view;
+  }
+
+  createClickMenu(event) {
+    const projection = this.overlay.getProjection();
+    const xy = projection.fromLatLngToContainerPixel(event.latLng);
+
+    this.mapClickMenu.style.left = `${xy.x + 5}px`;
+    this.mapClickMenu.style.top = `${xy.y + 5}px`;
+
+    const list = elementCreator.createList({
+      elements: [
+        elementCreator.createButton({
+          text: 'Add marker',
+          func: () => {
+            this.createMarker({
+              markerName: `${event.latLng.lat()}${event.latLng.lng()}`,
+              title: `${event.latLng.lat()}${event.latLng.lng()}`,
+              description: `${event.latLng.lat()}${event.latLng.lng()}`,
+              markerType: 'customLocation',
+              position: {
+                longitude: event.latLng.lng(),
+                latitude: event.latLng.lat(),
+              },
+            });
+            this.hideClickMenu();
+          },
+        }),
+      ],
+    });
+
+    elementCreator.replaceOnlyChild(this.mapClickMenu, list);
+    this.showClickMenu();
   }
 
   /**
@@ -105,12 +137,12 @@ class WorldMap extends View {
    * @param {string} params.markerName - Name of the map marker
    * @param {string} params.title - Title of the marker description
    * @param {string} params.markerType - Type of the marker
-   * @param {number} params.opacity - Opacity of the marker in the view
-   * @param {boolean} params.hideLabel - Should the label be hidden in the view?
-   * @param {boolean} params.ignoreCluster - Should the marker be excluded from clusters?
-   * @param {string} params.iconUrl - Path to a custom icon image
    * @param {{longitude: Number, latitude: Number}} params.position - Long and lat coordinates of the map marker
-   * @param {string} params.description - Description for map marker, which will be shown on click or command
+   * @param {string} [params.iconUrl] - Path to a custom icon image
+   * @param {string} [params.description] - Description for map marker, which will be shown on click or command
+   * @param {number} [params.opacity] - Opacity of the marker in the view
+   * @param {boolean} [params.hideLabel] - Should the label be hidden in the view?
+   * @param {boolean} [params.ignoreCluster] - Should the marker be excluded from clusters?
    */
   createMarker({ markerName, position, iconUrl, description, title, markerType, opacity, hideLabel, ignoreCluster }) {
     const icon = {
@@ -119,7 +151,6 @@ class WorldMap extends View {
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(7, 7),
     };
-    const snakeCaseTitle = title.replace(/\s/g, '_');
     const markerId = Object.keys(this.markers).length + 1;
 
     this.markers[markerName] = new google.maps.Marker({
@@ -131,13 +162,15 @@ class WorldMap extends View {
       icon,
     });
 
-    this.markers[markerName].addedTitle = title;
     this.markers[markerName].markerId = markerId;
     this.markers[markerName].markerType = markerType;
 
     if (description) { this.markers[markerName].description = description.replace(/(<img)(.+?)(\s)\/>/g, ''); }
 
-    if (!hideLabel) {
+    if (!hideLabel && title) {
+      const snakeCaseTitle = title.replace(/\s/g, '_');
+      this.markers[markerName].addedTitle = title;
+
       this.createLabel({
         positionName: title,
         labelText: snakeCaseTitle.length > 18 ? `${markerId}:${snakeCaseTitle.slice(0, 18)}..` : `${markerId}:${snakeCaseTitle}`,
@@ -153,27 +186,26 @@ class WorldMap extends View {
 
     google.maps.event.addListener(this.markers[markerName], 'click', () => {
       const marker = this.markers[markerName];
-      const projection = this.overlay.getProjection();
-      const xy = projection.fromLatLngToContainerPixel(marker.getPosition());
 
-      this.infoElement.style.left = `${xy.x}px`;
-      this.infoElement.style.top = `${xy.y}px`;
+      if (marker.addedTitle) {
+        const projection = this.overlay.getProjection();
+        const xy = projection.fromLatLngToContainerPixel(marker.getPosition());
 
-      const infoText = document.createElement('DIV');
-      const titleParagraph = document.createElement('P');
-      titleParagraph.appendChild(document.createTextNode(marker.addedTitle));
-      const paragraph = document.createElement('P');
-      paragraph.appendChild(document.createTextNode(marker.description || ''));
-      infoText.appendChild(titleParagraph);
-      infoText.appendChild(paragraph);
+        this.infoElement.style.left = `${xy.x}px`;
+        this.infoElement.style.top = `${xy.y}px`;
 
-      if (this.infoElement.lastChild) {
-        this.infoElement.replaceChild(infoText, this.infoElement.lastChild);
+        const infoText = document.createElement('DIV');
+        const titleParagraph = document.createElement('P');
+        titleParagraph.appendChild(document.createTextNode(marker.addedTitle));
+        const paragraph = document.createElement('P');
+        paragraph.appendChild(document.createTextNode(marker.description || ''));
+        infoText.appendChild(titleParagraph);
+        infoText.appendChild(paragraph);
+        elementCreator.replaceOnlyChild(this.infoElement, infoText);
+        this.showMarkerInfo();
       } else {
-        this.infoElement.appendChild(infoText);
+        this.hideMarkerInfo();
       }
-
-      this.showMarkerInfo();
     });
   }
 
@@ -331,6 +363,8 @@ class WorldMap extends View {
    * Add listeners to map
    */
   attachMapListeners() {
+    let longClick = false;
+
     google.maps.event.addListener(this.clusterer, 'clusterclick', (cluster) => {
       const bounds = new google.maps.LatLngBounds();
       const markers = cluster.getMarkers();
@@ -343,11 +377,39 @@ class WorldMap extends View {
       this.realignMap(cluster.getMarkers());
     });
 
-    google.maps.event.addListener(this.map, 'click', () => { console.log('click map'); this.hideMarkerInfo(); });
-    google.maps.event.addListener(this.map, 'dragstart', () => { console.log('dragstart'); this.hideMarkerInfo(); });
-    google.maps.event.addListener(this.map, 'zoom_changed', () => { console.log('zoomchange'); this.hideMarkerInfo(); });
+    google.maps.event.addListener(this.map, 'dragstart', () => {
+      longClick = false;
+      this.hideMarkerInfo();
+      this.hideClickMenu();
+    });
+    google.maps.event.addListener(this.map, 'zoom_changed', () => {
+      this.hideMarkerInfo();
+      this.hideClickMenu();
+    });
     google.maps.event.addListener(this.map, 'idle', () => { this.toggleMapLabels(); });
+    google.maps.event.addListener(this.map, 'rightclick', (event) => {
+      this.hideMarkerInfo();
+      this.createClickMenu(event);
+    });
+    google.maps.event.addListener(this.map, 'mousedown', (event) => {
+      longClick = true;
+      this.hideMarkerInfo();
+      this.hideClickMenu();
+
+      setTimeout(() => {
+        if (longClick) {
+          this.createClickMenu(event);
+        }
+      }, 500);
+    });
+    google.maps.event.addListener(this.map, 'mouseup', () => {
+      longClick = false;
+    });
   }
+
+  showClickMenu() { this.mapClickMenu.classList.remove('hide'); }
+
+  hideClickMenu() { this.mapClickMenu.classList.add('hide'); }
 
   showMarkerInfo() { this.infoElement.classList.remove('hide'); }
 
@@ -474,6 +536,7 @@ class WorldMap extends View {
     }
 
     this.element.appendChild(this.infoElement);
+    this.element.appendChild(this.mapClickMenu);
     this.attachMapListeners();
 
     socketManager.emitEvent('getGooglePositions', {}, ({ error, data }) => {

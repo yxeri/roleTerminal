@@ -15,9 +15,10 @@
  */
 
 class ElementCreator {
-  static createContainer({ classes = [] }) {
+  static createContainer({ classes = [], elementId }) {
     const container = document.createElement('DIV');
     this.setClasses(container, classes);
+    this.setElementId(container, elementId);
 
     return container;
   }
@@ -46,7 +47,7 @@ class ElementCreator {
     const list = document.createElement('UL');
     this.setClasses(list, classes);
 
-    elements.forEach((item) => { list.appendChild(this.createList({ element: item })); });
+    elements.forEach((item) => { list.appendChild(this.createListItem({ element: item })); });
 
     return list;
   }
@@ -77,23 +78,25 @@ class ElementCreator {
 
     this.setClasses(input, classes);
 
-    console.log('will send', input);
-
     return input;
   }
 
-  static setButtonText(button, text) {
-    const textNode = document.createTextNode(text);
-
-    if (button.firstChild) {
-      button.replaceChild(textNode, button.firstChild);
-    } else {
-      button.appendChild(textNode);
-    }
+  static setElementId(element, id) {
+    if (id) { element.setAttribute('id', id); }
   }
+
+  static setButtonText(button, text) { this.replaceOnlyChild(button, document.createTextNode(text)); }
 
   static setClasses(element, classes = []) {
     classes.forEach(cssClass => element.classList.add(cssClass));
+  }
+
+  static replaceOnlyChild(element, newChild) {
+    if (element.firstChild) {
+      element.replaceChild(newChild, element.firstChild);
+    } else {
+      element.appendChild(newChild);
+    }
   }
 }
 

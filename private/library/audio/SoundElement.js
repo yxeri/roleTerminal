@@ -21,9 +21,11 @@ class SoundElement {
    * @param {string} params.path - Path to the file
    * @param {string} params.soundId - Identification of the sound element
    */
-  constructor({ path, soundId }) {
+  constructor({ path, soundId, volume = 1 }) {
     this.audio = new Audio();
     this.audio.src = path;
+    this.audio.currentTime = 0;
+    this.audio.volume = volume;
     this.soundId = soundId;
   }
 
@@ -32,15 +34,21 @@ class SoundElement {
    * @param {Number} [params.volume] - Volume for the audio
    */
   playAudio({ startTime, volume }) {
-    if (startTime) {
-      this.audio.currentTime = startTime;
-    }
+    if (this.audio.ended || this.audio.currentTime === 0) {
+      if (startTime) {
+        this.audio.currentTime = startTime;
+      } else {
+        this.audio.currentTime = 0;
+      }
 
-    if (volume) {
-      this.audio.volume = volume;
-    }
+      if (volume) {
+        this.audio.volume = volume;
+      } else {
+        this.audio.volume = 1;
+      }
 
-    this.audio.play();
+      this.audio.play();
+    }
   }
 
   /**

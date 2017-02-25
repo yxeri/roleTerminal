@@ -33,7 +33,7 @@ class DocsViewer extends View {
         return;
       }
 
-      const archives = (data.archives || []).map((archive) => {
+      const archives = (data.archives || []).map((archive) => { // eslint-disable-line arrow-body-style
         return elementCreator.createButton({
           func: () => {},
           text: `${archive.title || archive.archiveId}`,

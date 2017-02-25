@@ -16,30 +16,32 @@
 
 class SoundLibrary {
   constructor() {
-    this.sounds = [];
+    this.sounds = {};
   }
 
   addSound(sound) {
-    this.sounds.push({ soundId: sound.soundId, sound });
+    this.sounds[sound.soundId] = sound;
   }
 
   getSound(sentSoundId) {
-    const sound = this.sounds.find(({ soundId }) => soundId === sentSoundId);
-
-    if (sound) {
-      return sound.sound;
+    if (this.sounds[sentSoundId]) {
+      return this.sounds[sentSoundId];
     }
 
     return null;
   }
 
-  removeSound(sentSoundId) {
-    const soundIndex = this.sounds.findIndex(({ soundId }) => soundId === sentSoundId);
-
-    if (soundIndex > -1) {
-      this.sounds.splice(soundIndex, 1);
+  playSound(soundId, params = {}) {
+    if (this.sounds[soundId]) {
+      this.sounds[soundId].playAudio(params);
     }
+  }
+
+  removeSound(sentSoundId) {
+    this.sounds[sentSoundId] = null;
   }
 }
 
-module.exports = SoundLibrary;
+const soundLibrary = new SoundLibrary();
+
+module.exports = soundLibrary;

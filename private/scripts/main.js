@@ -154,7 +154,7 @@ if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
 
 soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
 soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
 
 eventCentral.addWatcher({
   watcherParent: messenger,

@@ -21,12 +21,13 @@ class SoundElement {
    * @param {string} params.path - Path to the file
    * @param {string} params.soundId - Identification of the sound element
    */
-  constructor({ path, soundId, volume = 1 }) {
+  constructor({ path, soundId, volume = 1, multi = false }) {
     this.audio = new Audio();
     this.audio.src = path;
     this.audio.currentTime = 0;
     this.audio.volume = volume;
     this.soundId = soundId;
+    this.multi = multi;
   }
 
   /**

@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const SoundElement = require('./SoundElement');
+
 class SoundLibrary {
   constructor() {
     this.sounds = {};
@@ -32,8 +34,21 @@ class SoundLibrary {
   }
 
   playSound(soundId, params = {}) {
-    if (this.sounds[soundId]) {
-      this.sounds[soundId].playAudio(params);
+    const sound = this.sounds[soundId];
+
+    if (sound) {
+      if (!sound.multi) {
+        sound.playAudio(params);
+      } else {
+        const newSound = {
+          path: sound.audio.src,
+          volume: sound.audio.volume,
+          soundId: sound.soundId,
+          multi: sound.multi,
+        };
+
+        new SoundElement(newSound).playAudio({});
+      }
     }
   }
 

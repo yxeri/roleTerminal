@@ -20,6 +20,7 @@ You should set these environmental variable before deploying the app:
 
 * Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 * Stanislav B - [Github](https://github.com/stanislavb)
+* Sebastian Streiffert
 
 ## Other contributions
 

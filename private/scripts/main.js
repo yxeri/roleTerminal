@@ -21,7 +21,9 @@ const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const WorldMap = require('../library/view/worldMap/WorldMap');
+const DocsViewer = require('../library/view/templates/DocsViewer');
 const Home = require('../library/view/templates/Home');
+const SoundElement = require('../library/audio/SoundElement');
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
@@ -29,6 +31,7 @@ const storageManager = require('../library/StorageManager');
 const textTools = require('../library/TextTools');
 const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
+const soundLibrary = require('../library/audio/SoundLibrary');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
@@ -59,6 +62,7 @@ window.addEventListener('error', (event) => {
 
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
+const docsViewer = new DocsViewer({ isFullscreen: true });
 const map = new WorldMap({
   mapView: WorldMap.MapViews.OVERVIEW,
   clusterStyle: {
@@ -148,6 +152,16 @@ if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
   });
 }
 
+soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput' }));
+
+eventCentral.addWatcher({
+  watcherParent: messenger,
+  event: eventCentral.Events.CHATMSG,
+  func: () => { soundLibrary.playSound('msgReceived'); },
+});
+
 keyHandler.addKey(112, viewTools.goFullScreen);
 
 window.addEventListener('click', () => {
@@ -188,6 +202,11 @@ socketManager.addEvents([
           linkName: 'Map',
           startFunc: () => { map.appendTo(mainView); },
           endFunc: () => { map.removeView(); },
+        });
+        home.addLink({
+          linkName: 'Docs',
+          startFunc: () => { docsViewer.appendTo(mainView); },
+          endFunc: () => { docsViewer.removeView(); },
         });
         home.addLink({
           linkName: 'Login',
@@ -307,6 +326,11 @@ socketManager.addEvents([
     event: 'chatMsgs',
     func: ({ messages }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: false } } });
+    },
+  }, {
+    event: 'document',
+    func: () => {
+      // eventCentral.triggerEvent({ event:})
     },
   },
 ]);

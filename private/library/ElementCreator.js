@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const soundLibrary = require('./audio/SoundLibrary');
+
 class ElementCreator {
   static createContainer({ classes = [], elementId }) {
     const container = document.createElement('DIV');
@@ -33,12 +35,15 @@ class ElementCreator {
     return listItem;
   }
 
-  static createButton({ func, text, classes = [] }) {
+  static createButton({ func = () => {}, text, classes = [] }) {
     const button = document.createElement('BUTTON');
     button.appendChild(document.createTextNode(text));
     this.setClasses(button, classes);
 
-    if (func) { button.addEventListener('click', func); }
+    button.addEventListener('click', () => {
+      soundLibrary.playSound('button');
+      func();
+    });
 
     return button;
   }

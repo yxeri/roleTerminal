@@ -37,15 +37,22 @@
 //   }
 // }
 
+const soundLibrary = require('./audio/SoundLibrary');
+
 class KeyHandler {
   constructor() {
     this.keys = [];
     this.keyPressed = false;
     this.triggerKeyPressed = false;
     this.triggerKey = 18; // Alt
+    this.sound = null;
 
     window.addEventListener('keydown', (event) => {
       const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+      if (!this.triggerKeyPressed && sentKeyCode !== 16 && sentKeyCode !== this.triggerKey) {
+        soundLibrary.playSound('keyInput');
+      }
 
       if (sentKeyCode === this.triggerKey) {
         this.triggerKeyPressed = true;
@@ -70,6 +77,10 @@ class KeyHandler {
         this.keyPressed = false;
       }
     });
+  }
+
+  setSoundOnType(sound) {
+    this.sound = sound;
   }
 
   addKey(key, func) {

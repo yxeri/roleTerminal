@@ -33,6 +33,18 @@ $menu-width: 21em;
 $box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px $text-color;
 
+@mixin borderOutline {
+  border: $border solid $second-color;
+  box-shadow: $box-shadow $second-color;
+  outline: $outline solid $text-color;
+}
+
+@mixin selectedBorderOutline {
+  border: $border solid $text-color;
+  box-shadow: $box-shadow $text-color;
+  outline: $outline solid $text-color;
+}
+
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input {
   margin: 0;
   padding: 0;
@@ -73,10 +85,8 @@ body {
 }
 
 button {
+  @include borderOutline;
   padding: $padding;
-  border: $border solid $second-color;
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
   background-color: $back-button;
   color: $text-color;
   display: inline-block;
@@ -88,10 +98,8 @@ button {
   text-overflow: ellipsis;
 }
 
-button:focus, button:hover {
-  border: $border solid $text-color;
-  box-shadow: $box-shadow $text-color;
-  outline: $outline solid $text-color;
+button:focus, button:hover, textarea:focus, textarea:hover, input:focus, input:hover, button:active {
+  @include selectedBorderOutline;
 }
 
 ::-webkit-input-placeholder {
@@ -99,10 +107,8 @@ button:focus, button:hover {
 }
 
 input {
+  @include borderOutline;
   margin: $padding;
-  border: $border solid $second-color;
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
   background-color: $back-input;
   display: inline-block;
   cursor: pointer;
@@ -113,26 +119,12 @@ input {
   border-radius: 0;
 }
 
-input:focus, input:hover {
-  border: $border solid $text-color;
-  box-shadow: $box-shadow $text-color;
-  outline: $outline solid $text-color;
-}
-
 textarea {
+  @include borderOutline;
   background-color: $back-input;
-  border: $border solid $second-color;
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
   resize: none;
   border-radius: 0;
   color: $text-color;
-}
-
-textarea:focus, textarea:hover {
-  border: $border solid $text-color;
-  box-shadow: $box-shadow $text-color;
-  outline: $outline solid $text-color;
 }
 
 p {
@@ -194,9 +186,7 @@ img {
 }
 
 #background {
-  border: $border solid $second-color;
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
+  @include borderOutline;
   width: calc(100% - 1.1em);
   height: calc(100% - 1.1em);
   margin-top: $padding;
@@ -328,6 +318,7 @@ img {
 }
 
 #markerInfo {
+  @include borderOutline;
   top: .1em !important;
   left: .1em !important;
   position: absolute;
@@ -341,8 +332,6 @@ img {
   height: auto;
   max-height: 95vh;
   background-color: $back-color;
-  border: solid $border $second-color;
-  outline: $outline solid $text-color;
 
   div {
     width: calc(100% + 2em);
@@ -406,9 +395,8 @@ img {
 }
 
 .dialogBox {
+  @include borderOutline;
   padding: $padding;
-  border: $border solid $second-color;
-  outline: $outline solid $text-color;
   max-width: 20em;
   word-wrap: break-word;
   z-index: 10;
@@ -418,9 +406,6 @@ img {
   margin: 0 auto;
   background-color: $back-color;
   position: absolute;
-  -webkit-box-shadow: 1px 1px 4px 4px $second-color;
-  -moz-box-shadow: 1px 1px 4px 4px $second-color;
-  box-shadow: 1px 1px 4px 4px $second-color;
 
   input {
     width: calc(100% - .8em);
@@ -565,6 +550,10 @@ img {
   animation-timing-function: ease-in-out;
 }
 
+.borderOutline {
+
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $second-color;
@@ -615,6 +604,12 @@ img {
     p {
       margin-left: .1em;
     }
+  }
+}
+
+@media (max-width: 540px) {
+  #mrkerInfo {
+    max-width: calc(100% - .5em);
   }
 }
 

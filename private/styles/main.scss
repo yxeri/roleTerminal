@@ -243,6 +243,7 @@ img {
   max-width: $view-width;
   margin-left: auto;
   margin-right: auto;
+  word-wrap: break-word;
 
   li {
     max-width: $view-width;

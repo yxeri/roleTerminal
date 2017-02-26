@@ -16,6 +16,7 @@
 
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
+const soundLibrary = require('../../audio/SoundLibrary');
 
 class Home extends View {
   constructor() {
@@ -65,6 +66,8 @@ class Home extends View {
   }
 
   appendTo(parentElement) {
+    soundLibrary.playSound('topBar');
+
     if (this.activeLink === '' && this.previousLink !== '') {
       this.triggerLink(this.previousLink);
     } else {

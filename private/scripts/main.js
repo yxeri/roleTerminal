@@ -129,6 +129,11 @@ const map = new WorldMap({
   mapBackground: '#11000f',
 });
 
+soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/topBar.wav', soundId: 'topBar' }));
+
 mainView.addEventListener('contextmenu', (event) => {
   event.preventDefault();
 });
@@ -151,10 +156,6 @@ if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
     }
   });
 }
-
-soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
 
 eventCentral.addWatcher({
   watcherParent: messenger,

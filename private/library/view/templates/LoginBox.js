@@ -18,6 +18,7 @@ const DialogBox = require('../DialogBox');
 const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
+const soundLibrary = require('../../audio/SoundLibrary');
 
 class LoginBox extends DialogBox {
   constructor({ description, extraDescription, parentElement }) {
@@ -31,7 +32,7 @@ class LoginBox extends DialogBox {
             this.addInput({
               placeholder: 'Re-enter your password',
               inputName: 'reenterPassword',
-              inputType: 'password',
+              type: 'password',
               required: true,
               extraClass: 'markedInput',
             });
@@ -44,6 +45,7 @@ class LoginBox extends DialogBox {
           const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
+            soundLibrary.playSound('fail');
             this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
 
             return;
@@ -58,6 +60,7 @@ class LoginBox extends DialogBox {
               },
             }, ({ error, data }) => {
               if (error) {
+                soundLibrary.playSound('fail');
                 this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
                 return;
@@ -78,6 +81,7 @@ class LoginBox extends DialogBox {
               this.focusInput('userName');
             });
           } else {
+            soundLibrary.playSound('fail');
             this.changeExtraDescription({ text: ['Passwords do not match. Try again'] });
             this.clearInput('password');
             this.clearInput('reenterPassword');
@@ -91,6 +95,7 @@ class LoginBox extends DialogBox {
           const emptyFields = this.markEmptyFields();
 
           if (emptyFields) {
+            soundLibrary.playSound('fail');
             this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
 
             return;
@@ -103,6 +108,7 @@ class LoginBox extends DialogBox {
             },
           }, ({ error, data }) => {
             if (error) {
+              soundLibrary.playSound('fail');
               this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
               return;

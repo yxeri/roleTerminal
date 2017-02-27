@@ -19,6 +19,7 @@ const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const elementCreator = require('../../ElementCreator');
+const soundLibrary = require('../../audio/SoundLibrary');
 
 const MapViews = {
   OVERVIEW: 'overview',
@@ -186,6 +187,8 @@ class WorldMap extends View {
 
     google.maps.event.addListener(this.markers[markerName], 'click', () => {
       const marker = this.markers[markerName];
+
+      soundLibrary.playSound('button2');
 
       if (marker.addedTitle) {
         const projection = this.overlay.getProjection();
@@ -368,6 +371,8 @@ class WorldMap extends View {
     google.maps.event.addListener(this.clusterer, 'clusterclick', (cluster) => {
       const bounds = new google.maps.LatLngBounds();
       const markers = cluster.getMarkers();
+
+      soundLibrary.playSound('button2');
 
       for (let i = 0; i < markers.length; i += 1) {
         bounds.extend(markers[i].getPosition());

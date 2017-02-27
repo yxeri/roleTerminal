@@ -46,16 +46,7 @@ if (!storageManager.getUserName()) {
 }
 
 window.addEventListener('error', (event) => {
-  /**
-   * Reloads page
-   * @private
-   */
-  // function restart() {
-  //   window.location.reload();
-  // }
-
   console.log(event.error);
-  // setTimeout(restart, 3000);
 
   return false;
 });
@@ -131,6 +122,8 @@ const map = new WorldMap({
 
 soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
 soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/button2.wav', soundId: 'button2' }));
+soundLibrary.addSound(new SoundElement({ path: '/sounds/fail.wav', soundId: 'fail' }));
 soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
 soundLibrary.addSound(new SoundElement({ path: '/sounds/topBar.wav', soundId: 'topBar' }));
 

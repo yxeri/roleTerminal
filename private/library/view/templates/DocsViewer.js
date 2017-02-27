@@ -51,7 +51,8 @@ class DocsViewer extends View {
               }
 
               const docFragment = document.createDocumentFragment();
-              docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.archiveId} - ${archiveData.archive.title}` }));
+              docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
+              docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId}` }));
 
               for (const line of archiveData.archive.text) {
                 docFragment.appendChild(elementCreator.createParagraph({ text: line }));

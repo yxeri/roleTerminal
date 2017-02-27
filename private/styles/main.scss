@@ -254,6 +254,23 @@ img {
   }
 }
 
+#docsViewer {
+  max-width: $view-width + 10em;
+  margin-left: auto;
+  margin-right: auto;
+  word-wrap: break-word;
+  display: flex;
+
+  div:first-child {
+    max-width: 10em;
+  }
+
+  div:last-child {
+    max-width: $view-width - 1em;
+    margin-left: 1em;
+  }
+}
+
 #map {
   height: 100%;
   overflow: hidden;
@@ -538,6 +555,11 @@ img {
  */
 .mapMain {
   width: auto !important;
+}
+
+.title {
+  font-size: 1.2em;
+  text-decoration: underline;
 }
 
 .flash {

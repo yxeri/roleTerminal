@@ -22,7 +22,12 @@ class DocsViewer extends View {
   constructor({ isFullscreen }) {
     super({ isFullscreen });
 
+    this.element.setAttribute('id', 'docsViewer');
     this.docsSelect = elementCreator.createContainer({});
+    this.viewer = elementCreator.createContainer({});
+
+    this.element.appendChild(this.docsSelect);
+    this.element.appendChild(this.viewer);
   }
 
   populateList() {
@@ -33,15 +38,40 @@ class DocsViewer extends View {
         return;
       }
 
+      console.log(data);
+
       const archives = (data.archives || []).map((archive) => { // eslint-disable-line arrow-body-style
         return elementCreator.createButton({
-          func: () => {},
+          func: () => {
+            socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
+              if (archiveError) {
+                console.log(archiveError);
+
+                return;
+              }
+
+              const docFragment = document.createDocumentFragment();
+              docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.archiveId} - ${archiveData.archive.title}` }));
+
+              for (const line of archiveData.archive.text) {
+                docFragment.appendChild(elementCreator.createParagraph({ text: line }));
+              }
+
+              this.viewer.innerHTML = '';
+              this.viewer.appendChild(docFragment);
+            });
+          },
           text: `${archive.title || archive.archiveId}`,
         });
       });
 
       elementCreator.replaceOnlyChild(this.docsSelect, elementCreator.createList({ elements: archives, classes: ['itemSelect'] }));
     });
+  }
+
+  appendTo(parentElement) {
+    this.populateList();
+    super.appendTo(parentElement);
   }
 }
 

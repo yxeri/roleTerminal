@@ -260,18 +260,22 @@ img {
   margin-right: auto;
   word-wrap: break-word;
   display: flex;
+  margin-top: .1em;
 
   div:first-child {
-    max-width: 10em;
+    max-width: 15em;
+    margin-left: .1em;
   }
 
   div:last-child {
-    max-width: $view-width - 1em;
+    max-width: $view-width - 6em;
     margin-left: 1em;
+    margin-right: 2em;
   }
 
   button {
     width: 100%;
+    margin-bottom: .3em;
   }
 }
 

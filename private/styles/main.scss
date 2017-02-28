@@ -263,12 +263,12 @@ img {
   margin-top: .1em;
 
   div:first-child {
+    min-width: 25%;
     max-width: 15em;
     margin-left: .1em;
   }
 
   div:last-child {
-    max-width: $view-width - 6em;
     margin-left: 1em;
     margin-right: 2em;
   }

@@ -18,6 +18,20 @@ const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 
+// TODO Duplicate code in DialogBox
+function markEmptyFields(inputs) {
+  let emptyFields = false;
+
+  inputs.forEach((input) => {
+    if (input.value === '') {
+      emptyFields = true;
+      input.classList.add('markedInput');
+    }
+  });
+
+  return emptyFields;
+}
+
 class DocsViewer extends View {
   constructor({ isFullscreen }) {
     super({ isFullscreen });
@@ -30,7 +44,35 @@ class DocsViewer extends View {
     this.element.appendChild(this.viewer);
   }
 
+  appendArchives(archives = []) {
+    return archives.map((archive) => { // eslint-disable-line arrow-body-style
+      return elementCreator.createButton({
+        func: () => {
+          socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
+            if (archiveError) {
+              console.log(archiveError);
+
+              return;
+            }
+
+            const docFragment = document.createDocumentFragment();
+            docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
+            docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId}` }));
+
+            archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
+
+            this.viewer.innerHTML = '';
+            this.viewer.appendChild(docFragment);
+          });
+        },
+        text: `${archive.title || archive.archiveId}`,
+      });
+    });
+  }
+
   populateList() {
+    this.docsSelect.innerHTML = '';
+
     socketManager.emitEvent('getArchivesList', {}, ({ error, data }) => {
       if (error) {
         console.log(error);
@@ -38,35 +80,73 @@ class DocsViewer extends View {
         return;
       }
 
-      console.log(data);
+      const listFragment = document.createDocumentFragment();
 
-      const archives = (data.archives || []).map((archive) => { // eslint-disable-line arrow-body-style
-        return elementCreator.createButton({
-          func: () => {
-            socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
-              if (archiveError) {
-                console.log(archiveError);
+      listFragment.appendChild(elementCreator.createButton({
+        text: 'Create doc',
+        func: () => {
+          const docFragment = document.createDocumentFragment();
+          const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
+          const idInput = elementCreator.createInput({ placeholder: 'Unique ID to access the document with', inputName: 'docId', isRequired: true });
+          const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
+          const visibilitySet = elementCreator.createRadioSet({
+            title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
+            optionName: 'visibility',
+            options: [
+              { optionId: 'visPublic', optionLabel: 'Everyone' },
+              { optionId: 'visTeam', optionLabel: 'My team' },
+              { optionId: 'visPrivate', optionLabel: 'Only those with the correct ID' },
+            ],
+          });
 
-                return;
+          // TODO Duplicate code in Messenger
+          bodyInput.addEventListener('input', () => {
+            bodyInput.style.height = 'auto';
+            bodyInput.style.height = `${bodyInput.scrollHeight}px`;
+          });
+
+          docFragment.appendChild(titleInput);
+          docFragment.appendChild(idInput);
+          docFragment.appendChild(bodyInput);
+          docFragment.appendChild(visibilitySet);
+          docFragment.appendChild(elementCreator.createButton({
+            text: 'Save',
+            func: () => {
+              if (!markEmptyFields([titleInput, bodyInput])) {
+                const archive = {
+                  title: titleInput.value,
+                  archiveId: idInput.value,
+                  text: bodyInput.value.split('\n'),
+                  isPublic: document.getElementById('visPublic').checked === true,
+                };
+
+                socketManager.emitEvent('createArchive', archive, ({ archiveError }) => {
+                  if (archiveError) {
+                    console.log(archiveError);
+
+                    return;
+                  }
+
+                  this.viewer.innerHTML = '';
+                  this.viewer.appendChild(document.createTextNode('Document has been saved'));
+                });
               }
+            },
+          }));
 
-              const docFragment = document.createDocumentFragment();
-              docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
-              docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId}` }));
+          this.viewer.appendChild(docFragment);
+        },
+      }));
 
-              for (const line of archiveData.archive.text) {
-                docFragment.appendChild(elementCreator.createParagraph({ text: line }));
-              }
+      if (data.userArchives.length) {
+        listFragment.appendChild(elementCreator.createParagraph({ text: 'Yours', classes: ['center'] }));
+        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives) }));
+      }
 
-              this.viewer.innerHTML = '';
-              this.viewer.appendChild(docFragment);
-            });
-          },
-          text: `${archive.title || archive.archiveId}`,
-        });
-      });
+      listFragment.appendChild(elementCreator.createParagraph({ text: 'Public', classes: ['center'] }));
+      listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.archives) }));
 
-      elementCreator.replaceOnlyChild(this.docsSelect, elementCreator.createList({ elements: archives, classes: ['itemSelect'] }));
+      this.docsSelect.appendChild(listFragment);
     });
   }
 

@@ -29,12 +29,13 @@ class Home extends View {
     this.activeLink = '';
   }
 
-  addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome }) {
+  addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes }) {
     this.links.push({ linkName, startFunc, endFunc });
 
     const button = elementCreator.createButton({
       func: () => { this.triggerLink(linkName, keepHome); },
       text: linkName.toUpperCase(),
+      classes,
     });
 
     if (!isNaN(accessLevel)) {

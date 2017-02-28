@@ -217,10 +217,12 @@ socketManager.addEvents([
           accessLevel: 0,
           maxAccessLevel: 0,
           keepHome: true,
+          classes: ['hide'],
         });
         home.addLink({
           linkName: 'Logout',
           startFunc: () => {
+            socketManager.emitEvent('logout');
             storageManager.removeUser();
 
             new LoginBox({
@@ -234,6 +236,7 @@ socketManager.addEvents([
           endFunc: () => {},
           accessLevel: 1,
           keepHome: true,
+          classes: ['hide'],
         });
         home.appendTo(mainView);
       }

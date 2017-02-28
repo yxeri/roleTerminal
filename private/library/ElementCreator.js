@@ -65,11 +65,35 @@ class ElementCreator {
     return paragraph;
   }
 
-  static createInput({ type, placeholder, inputName, isRequired, classes = [] }) {
-    const input = document.createElement('INPUT');
+  static createRadioSet({ title, optionName, options = [] }) {
+    const fieldset = document.createElement('FIELDSET');
+    const legend = document.createElement('LEGEND');
+    legend.appendChild(document.createTextNode(title));
+    fieldset.appendChild(legend);
+
+    options.forEach((option) => {
+      const inputLabel = document.createElement('LABEL');
+      inputLabel.setAttribute('for', option.optionId);
+      const input = document.createElement('INPUT');
+      input.setAttribute('type', 'radio');
+      input.setAttribute('id', option.optionId);
+      input.setAttribute('name', optionName);
+
+      inputLabel.appendChild(input);
+      inputLabel.appendChild(document.createElement('SPAN'));
+      inputLabel.appendChild(document.createTextNode(option.optionLabel));
+      fieldset.appendChild(inputLabel);
+    });
+
+    return fieldset;
+  }
+
+  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine }) {
+    const input = multiLine ? document.createElement('TEXTAREA') : document.createElement('INPUT');
 
     input.setAttribute('placeholder', placeholder);
     input.setAttribute('name', inputName);
+    input.setAttribute('type', 'text');
 
     if (type) { input.setAttribute('type', type); }
 

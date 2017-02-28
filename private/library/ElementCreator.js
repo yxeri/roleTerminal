@@ -57,8 +57,9 @@ class ElementCreator {
     return list;
   }
 
-  static createParagraph({ text }) {
+  static createParagraph({ text, classes = [] }) {
     const paragraph = document.createElement('P');
+    this.setClasses(paragraph, classes);
     paragraph.appendChild(document.createTextNode(text));
 
     return paragraph;

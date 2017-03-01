@@ -32,6 +32,7 @@ $view-width: 50em;
 $menu-width: 21em;
 $box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px $text-color;
+$inner-container-width: calc(100% - 1.1em);
 
 @mixin borderOutline {
   border: $border solid $second-color;
@@ -195,7 +196,7 @@ img {
 
 #background {
   @include borderOutline;
-  width: calc(100% - 1.1em);
+  width: $inner-container-width;
   height: calc(100% - 1.1em);
   margin-top: $padding;
   margin-left: $padding;
@@ -216,9 +217,14 @@ img {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+  width: 101vw;
+
+  div {
+    width: $inner-container-width;
+  }
 
   span {
-    margin-left: .5em;
+    margin: 0 .25em;
   }
 
   span:first-child {
@@ -248,10 +254,14 @@ img {
 }
 
 #messenger {
-  max-width: $view-width;
-  margin-left: auto;
-  margin-right: auto;
+  width: $inner-container-width;
   word-wrap: break-word;
+
+  .msgContainer {
+    max-width: $view-width;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
   li {
     max-width: $view-width;
@@ -263,14 +273,17 @@ img {
 }
 
 #docsViewer {
-  max-width: $view-width + 10em;
-  margin-left: auto;
-  margin-right: auto;
   word-wrap: break-word;
-  display: flex;
   margin-top: .1em;
 
-  div:first-child {
+  .docsContainer {
+    max-width: $view-width + 10em;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+  }
+
+  .docsList {
     min-width: 25%;
     max-width: 15em;
     margin-left: .1em;
@@ -285,7 +298,7 @@ img {
     }
   }
 
-  div:last-child {
+  .docsViewer {
     margin-left: 1em;
     margin-right: 2em;
 
@@ -361,7 +374,7 @@ img {
   margin-top: .7em;
   background-color: $back-color;
   border-bottom: $border solid $second-color;
-  width: calc(100% - 1.1em);
+  width: $inner-container-width;
   z-index: 8;
 
   ul {
@@ -436,7 +449,7 @@ img {
 }
 
 #home {
-  width: calc(100% - 1.1em);
+  width: $inner-container-width;
   height: 100%;
   overflow: hidden;
 
@@ -457,8 +470,8 @@ img {
     button {
       flex-grow: 1;
       -webkit-flex-grow: 1;
-      width: 42%;
-      max-width: 42%;
+      width: calc(50% - 1em);
+      max-width: calc(50% - 1em);
       margin: 0 .5em 1em .5em;
     }
   }

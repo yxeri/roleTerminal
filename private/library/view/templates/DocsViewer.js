@@ -42,11 +42,13 @@ class DocsViewer extends View {
     super({ isFullscreen });
 
     this.element.setAttribute('id', 'docsViewer');
-    this.docsSelect = elementCreator.createContainer({});
-    this.viewer = elementCreator.createContainer({});
+    const container = elementCreator.createContainer({ classes: ['docsContainer'] });
+    this.docsSelect = elementCreator.createContainer({ classes: ['docsList'] });
+    this.viewer = elementCreator.createContainer({ classes: ['docsViewer'] });
 
-    this.element.appendChild(this.docsSelect);
-    this.element.appendChild(this.viewer);
+    container.appendChild(this.docsSelect);
+    container.appendChild(this.viewer);
+    this.element.appendChild(container);
   }
 
   appendArchives(archives = []) {

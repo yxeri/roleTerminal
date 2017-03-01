@@ -29,7 +29,6 @@ class Messenger extends View {
     super({ isFullscreen });
 
     this.element.setAttribute('id', 'messenger');
-
     this.inputField = document.createElement('TEXTAREA');
     this.inputField.setAttribute('rows', '3');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
@@ -165,15 +164,19 @@ class Messenger extends View {
       accessLevel: 1,
     });
 
+    const container = elementCreator.createContainer({ classes: ['msgContainer'] });
+
     if (isTopDown) {
       this.inputArea.classList.add('topDown');
-      this.element.appendChild(this.inputArea);
-      this.element.appendChild(this.messageList.element);
+      container.appendChild(this.inputArea);
+      container.appendChild(this.messageList.element);
     } else {
       this.inputArea.classList.add('bottomUp');
-      this.element.appendChild(this.messageList.element);
-      this.element.appendChild(this.inputArea);
+      container.appendChild(this.messageList.element);
+      container.appendChild(this.inputArea);
     }
+
+    this.element.appendChild(container);
 
     eventCentral.addWatcher({
       watcherParent: this,

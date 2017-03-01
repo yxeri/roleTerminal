@@ -44,8 +44,6 @@ class SoundElement {
 
       if (volume) {
         this.audio.volume = volume;
-      } else {
-        this.audio.volume = 1;
       }
 
       this.audio.play();

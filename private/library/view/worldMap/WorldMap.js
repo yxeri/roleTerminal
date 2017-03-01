@@ -601,6 +601,8 @@ class WorldMap extends View {
 
     if (!this.started) {
       this.startMap();
+    } else {
+      google.maps.event.trigger(this.map, 'resize');
     }
   }
 

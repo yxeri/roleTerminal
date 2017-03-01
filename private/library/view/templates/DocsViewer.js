@@ -62,7 +62,8 @@ class DocsViewer extends View {
 
             const docFragment = document.createDocumentFragment();
             docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
-            docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId}` }));
+            docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId.toUpperCase()}` }));
+            docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${archiveData.archive.isPublic ? 'Yes' : 'No'}` }));
 
             archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
@@ -90,6 +91,8 @@ class DocsViewer extends View {
       listFragment.appendChild(elementCreator.createButton({
         text: 'Create doc',
         func: () => {
+          this.viewer.innerHTML = '';
+
           const docFragment = document.createDocumentFragment();
           const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
           const idInput = elementCreator.createInput({ placeholder: 'Unique ID to access the document with', inputName: 'docId', isRequired: true });

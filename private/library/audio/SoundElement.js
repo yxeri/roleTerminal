@@ -25,6 +25,7 @@ class SoundElement {
     this.audio = new Audio();
     this.audio.src = path;
     this.audio.volume = volume;
+    this.audio.currentTime = 0;
     this.soundId = soundId;
     this.multi = multi;
   }
@@ -34,7 +35,7 @@ class SoundElement {
    * @param {Number} [params.volume] - Volume for the audio
    */
   playAudio({ startTime, volume }) {
-    if (this.audio.ended || (this.audio.currentTime && this.audio.currentTime === 0)) {
+    if (this.audio.ended || this.audio.currentTime === 0) {
       if (startTime) {
         this.audio.currentTime = startTime;
       } else {

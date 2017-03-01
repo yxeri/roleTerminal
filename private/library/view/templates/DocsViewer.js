@@ -19,6 +19,11 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 
 // TODO Duplicate code in DialogBox
+/**
+ * Mark empty fields. Returns true if one of them were empty
+ * @param {HTMLInputElement[]} inputs - Inputs to check
+ * @returns {boolean} Is one of the fields empty?
+ */
 function markEmptyFields(inputs) {
   let emptyFields = false;
 

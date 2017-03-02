@@ -48,11 +48,17 @@ class ElementCreator {
     return button;
   }
 
-  static createList({ elements = [], classes = [] }) {
+  static createList({ elements = [], classes = [], elementId }) {
     const list = document.createElement('UL');
     this.setClasses(list, classes);
 
-    elements.forEach((item) => { list.appendChild(this.createListItem({ element: item })); });
+    if (elementId) {
+      list.setAttribute('id', elementId);
+    }
+
+    elements.forEach((item) => {
+      list.appendChild(this.createListItem({ element: item }));
+    });
 
     return list;
   }

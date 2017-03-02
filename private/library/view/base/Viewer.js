@@ -15,7 +15,6 @@
  */
 
 const View = require('./View');
-const elementCreator = require('../../ElementCreator');
 
 class Viewer extends View {
   constructor({ isFullscreen, viewId }) {

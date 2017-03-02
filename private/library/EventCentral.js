@@ -22,7 +22,7 @@ class EventCentral {
       ACCESS: 'Access level changed',
       MESSAGE: 'Message retrieved',
       SWITCHROOM: 'Switched room',
-      DOC: 'New document',
+      ARCHIVE: 'New archive',
     };
     this.eventWatchers = {};
   }

@@ -325,9 +325,9 @@ socketManager.addEvents([
       eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: false } } });
     },
   }, {
-    event: 'document',
-    func: () => {
-      // eventCentral.triggerEvent({ event:})
+    event: 'archive',
+    func: ({ archive }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.DOC, params: { archive } });
     },
   },
 ]);

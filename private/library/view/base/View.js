@@ -17,10 +17,11 @@
 const eventCentral = require('../../EventCentral');
 
 class View {
-  constructor({ isFullscreen }) {
-    const element = document.createElement('DIV');
+  constructor({ isFullscreen, viewId, elementType }) {
+    const element = document.createElement(elementType || 'DIV');
 
     if (isFullscreen) { element.classList.add('fullscreen'); }
+    if (viewId) { element.setAttribute('id', viewId); }
 
     this.element = element;
     this.accessElements = [];
@@ -29,7 +30,9 @@ class View {
   }
 
   hideView() { this.element.classList.add('hide'); }
+
   showView() { this.element.classList.remove('hide'); }
+
   goFullscreen() { this.element.classList.add('fullscreen'); }
 
   goWindowed() { this.element.classList.remove('fullscreen'); }
@@ -46,6 +49,10 @@ class View {
         element.element.classList.add('hide');
       }
     });
+  }
+
+  clearView() {
+    this.element.innerHTML = '';
   }
 }
 

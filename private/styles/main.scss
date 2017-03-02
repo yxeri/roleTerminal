@@ -242,17 +242,6 @@ img {
   background-size: contain;
 }
 
-#sysItems {
-  display: table;
-  margin: auto;
-  text-align: center;
-
-  span {
-    margin: 1em;
-    display: inline-block;
-  }
-}
-
 #messenger {
   width: $inner-container-width;
   word-wrap: break-word;
@@ -366,30 +355,6 @@ img {
 
   .gm-style-cc {
     display: none !important;
-  }
-}
-
-#mainMenu {
-  position: absolute;
-  margin-top: .7em;
-  background-color: $back-color;
-  border-bottom: $border solid $second-color;
-  width: $inner-container-width;
-  z-index: 8;
-
-  ul {
-    li {
-      max-width: $menu-width;
-      margin: 0 auto;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
-
-  button {
-    margin: $padding 0;
   }
 }
 

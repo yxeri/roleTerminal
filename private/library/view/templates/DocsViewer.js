@@ -17,6 +17,7 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
+const storageManager = require('../../StorageManager');
 
 // TODO Duplicate code in DialogBox
 /**
@@ -104,8 +105,15 @@ class DocsViewer extends View {
             optionName: 'visibility',
             options: [
               { optionId: 'visPublic', optionLabel: 'Everyone' },
-              { optionId: 'visTeam', optionLabel: 'My team' },
               { optionId: 'visPrivate', optionLabel: 'Only those with the correct ID' },
+            ],
+          });
+          const teamSet = elementCreator.createRadioSet({
+            title: 'Should the document be added to the team directory?',
+            optionName: 'team',
+            options: [
+              { optionId: 'teamYes', optionLabel: 'Yes' },
+              { optionId: 'teamNo', optionLabel: 'No' },
             ],
           });
 
@@ -119,6 +127,7 @@ class DocsViewer extends View {
           docFragment.appendChild(idInput);
           docFragment.appendChild(bodyInput);
           docFragment.appendChild(visibilitySet);
+          docFragment.appendChild(teamSet);
           docFragment.appendChild(elementCreator.createButton({
             text: 'Save',
             func: () => {
@@ -128,6 +137,7 @@ class DocsViewer extends View {
                   archiveId: idInput.value,
                   text: bodyInput.value.split('\n'),
                   isPublic: document.getElementById('visPublic').checked === true,
+                  teamDir: document.getElementById('teamYes').checked === true,
                 };
 
                 socketManager.emitEvent('createArchive', archive, ({ archiveError }) => {
@@ -150,11 +160,16 @@ class DocsViewer extends View {
 
       if (data.userArchives.length) {
         listFragment.appendChild(elementCreator.createParagraph({ text: 'Yours', classes: ['center'] }));
-        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives) }));
+        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives), elementId: 'userDocuments' }));
+      }
+
+      if (storageManager.getTeam()) {
+        listFragment.appendChild(elementCreator.createParagraph({ text: 'Team', classes: ['center'] }));
+        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives), elementId: 'teamDocuments' }));
       }
 
       listFragment.appendChild(elementCreator.createParagraph({ text: 'Public', classes: ['center'] }));
-      listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.archives) }));
+      listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.archives), elementId: 'publicDocuments' }));
 
       this.docsSelect.appendChild(listFragment);
     });

@@ -116,6 +116,7 @@ class LoginBox extends DialogBox {
 
             storageManager.setUserName(data.user.userName);
             storageManager.setAccessLevel(data.user.accessLevel);
+            storageManager.setTeam(data.user.team);
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
             this.removeView();
           });

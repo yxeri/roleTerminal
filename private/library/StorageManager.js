@@ -207,6 +207,10 @@ class StorageManager {
   }
 
   static getRoom() { return this.getLocalVal('room'); }
+
+  static setTeam(team) { this.setLocalVal('team', team); }
+
+  static getTeam() { return this.getLocalVal('team'); }
 }
 
 eventCentral.addWatcher({ watcherParent: StorageManager, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { StorageManager.setAliases(aliases); } });

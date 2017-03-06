@@ -208,7 +208,11 @@ class StorageManager {
 
   static getRoom() { return this.getLocalVal('room'); }
 
-  static setTeam(team) { this.setLocalVal('team', team); }
+  static setTeam(team) {
+    if (team) {
+      this.setLocalVal('team', team);
+    }
+  }
 
   static getTeam() { return this.getLocalVal('team'); }
 }

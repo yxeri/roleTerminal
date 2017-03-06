@@ -15,6 +15,7 @@
  */
 
 const View = require('../base/View');
+const List = require('../base/List');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -98,7 +99,7 @@ class DocsViewer extends View {
 
           const docFragment = document.createDocumentFragment();
           const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
-          const idInput = elementCreator.createInput({ placeholder: 'Unique ID to access the document with', inputName: 'docId', isRequired: true });
+          const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with', inputName: 'docId', isRequired: true });
           const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
           const visibilitySet = elementCreator.createRadioSet({
             title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
@@ -127,7 +128,7 @@ class DocsViewer extends View {
           docFragment.appendChild(idInput);
           docFragment.appendChild(bodyInput);
           docFragment.appendChild(visibilitySet);
-          docFragment.appendChild(teamSet);
+          if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
           docFragment.appendChild(elementCreator.createButton({
             text: 'Save',
             func: () => {
@@ -137,7 +138,7 @@ class DocsViewer extends View {
                   archiveId: idInput.value,
                   text: bodyInput.value.split('\n'),
                   isPublic: document.getElementById('visPublic').checked === true,
-                  teamDir: document.getElementById('teamYes').checked === true,
+                  teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
                 };
 
                 socketManager.emitEvent('createArchive', archive, ({ archiveError }) => {
@@ -159,17 +160,14 @@ class DocsViewer extends View {
       }));
 
       if (data.userArchives.length) {
-        listFragment.appendChild(elementCreator.createParagraph({ text: 'Yours', classes: ['center'] }));
-        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives), elementId: 'userDocuments' }));
+        listFragment.appendChild(new List({ viewId: 'userDocuments', listItems: this.appendArchives(data.userArchives), shouldSort: true, title: 'Yours' }).element);
       }
 
       if (storageManager.getTeam()) {
-        listFragment.appendChild(elementCreator.createParagraph({ text: 'Team', classes: ['center'] }));
-        listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.userArchives), elementId: 'teamDocuments' }));
+        listFragment.appendChild(new List({ viewId: 'teamDocuments', listItems: this.appendArchives(data.userArchives), shouldSort: true, title: 'Team' }).element);
       }
 
-      listFragment.appendChild(elementCreator.createParagraph({ text: 'Public', classes: ['center'] }));
-      listFragment.appendChild(elementCreator.createList({ elements: this.appendArchives(data.archives), elementId: 'publicDocuments' }));
+      listFragment.appendChild(new List({ viewId: 'publicDocuments', listItems: this.appendArchives(data.archives), shouldSort: true, title: 'Public' }).element);
 
       this.docsSelect.appendChild(listFragment);
     });

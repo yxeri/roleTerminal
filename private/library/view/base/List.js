@@ -49,11 +49,19 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, listItems }) {
+  constructor({ isFullscreen, viewId, shouldSort, listItems, title }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.shouldSort = shouldSort;
+
+    if (title) {
+      const titleElement = document.createElement('P');
+
+      titleElement.classList.add('listTitle');
+      titleElement.appendChild(document.createTextNode(title));
+      this.element.appendChild(titleElement);
+    }
 
     this.element.appendChild(elementCreator.createList({ elements: listItems }));
   }

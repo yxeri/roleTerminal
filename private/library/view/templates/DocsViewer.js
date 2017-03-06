@@ -16,6 +16,7 @@
 
 const View = require('../base/View');
 const List = require('../base/List');
+const Viewer = require('../base/Viewer');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -44,9 +45,9 @@ class DocsViewer extends View {
     super({ isFullscreen });
 
     this.element.setAttribute('id', 'docsViewer');
-    const container = elementCreator.createContainer({ classes: ['docsContainer'] });
-    this.docsSelect = elementCreator.createContainer({ classes: ['docsList'] });
-    this.viewer = elementCreator.createContainer({ classes: ['docsViewer'] });
+    const container = elementCreator.createContainer({ classes: ['viewContainer'] });
+    this.docsSelect = elementCreator.createContainer({ classes: ['list'] });
+    this.viewer = new Viewer({}).element;
 
     container.appendChild(this.docsSelect);
     container.appendChild(this.viewer);
@@ -117,6 +118,7 @@ class DocsViewer extends View {
               { optionId: 'teamNo', optionLabel: 'No' },
             ],
           });
+          const buttons = elementCreator.createContainer({ classes: ['buttons'] });
 
           // TODO Duplicate code in Messenger
           bodyInput.addEventListener('input', () => {
@@ -129,7 +131,7 @@ class DocsViewer extends View {
           docFragment.appendChild(bodyInput);
           docFragment.appendChild(visibilitySet);
           if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
-          docFragment.appendChild(elementCreator.createButton({
+          buttons.appendChild(elementCreator.createButton({
             text: 'Save',
             func: () => {
               if (!markEmptyFields([titleInput, bodyInput])) {
@@ -154,6 +156,7 @@ class DocsViewer extends View {
               }
             },
           }));
+          docFragment.appendChild(buttons);
 
           this.viewer.appendChild(docFragment);
         },

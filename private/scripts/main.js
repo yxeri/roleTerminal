@@ -292,7 +292,7 @@ socketManager.addEvents([
           }
 
           eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
-          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 10000 }, ({ data: historyData, historyError }) => {
+          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 50 }, ({ data: historyData, historyError }) => {
             if (historyError) {
               console.log('history', historyError);
 
@@ -327,7 +327,7 @@ socketManager.addEvents([
   }, {
     event: 'archive',
     func: ({ archive }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.DOC, params: { archive } });
+      eventCentral.triggerEvent({ event: eventCentral.Events.ARCHIVE, params: { archive } });
     },
   },
 ]);

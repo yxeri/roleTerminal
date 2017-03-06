@@ -33,6 +33,8 @@ $menu-width: 21em;
 $box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px $text-color;
 $inner-container-width: calc(100% - 1.1em);
+$list-width: 11em;
+$short-list-width: 7em;
 
 @mixin borderOutline {
   border: $border solid $second-color;
@@ -243,101 +245,25 @@ img {
 }
 
 #messenger {
-  width: $inner-container-width;
+  width: calc(100% - 2em);
   word-wrap: break-word;
 
-  .msgContainer {
-    max-width: $view-width;
-    margin-left: auto;
-    margin-right: auto;
+  .list {
+    position: fixed;
+    overflow-y: scroll;
+    height: calc(100% - 3em);
+    width: 100%;
   }
 
-  li {
-    max-width: $view-width;
-  }
-
-  li:last-child {
-    margin-bottom: 2em;
-  }
-
-  .buttons {
-    margin-right: -.3em;
+  .viewer {
+    margin-left: 12em;
+    width: calc(100% - 12em);
   }
 }
 
 #docsViewer {
   word-wrap: break-word;
   margin-top: .1em;
-
-  .docsContainer {
-    max-width: $view-width + 10em;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-  }
-
-  .docsList {
-    min-width: 25%;
-    max-width: 15em;
-    margin-left: .1em;
-
-    p {
-      margin: .2em 0 .4em 0;
-    }
-
-    button {
-      width: 100%;
-      margin-bottom: .4em;
-    }
-  }
-
-  .docsViewer {
-    margin-left: 1em;
-    margin-right: 2em;
-
-    button {
-      float: right;
-      margin-right: -.3em;
-      margin-top: .1em;
-    }
-
-    input {
-      margin-left: 0;
-      width: 100%;
-    }
-
-    input[type=radio] {
-      width: auto;
-    }
-
-    input:first-child {
-      margin-top: 0;
-    }
-
-    legend {
-      margin: .3em 0;
-    }
-
-    label {
-      display: block;
-      margin-bottom: .3em;
-
-      span {
-        @include borderOutline;
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-        vertical-align: middle;
-        cursor: pointer;
-        margin-right: .3em;
-      }
-    }
-
-    textarea {
-      margin: .2em 0;
-      width: 100%;
-    }
-  }
 }
 
 #map {
@@ -446,6 +372,88 @@ img {
   }
 }
 
+.list {
+  width: $list-width;
+  margin-left: .1em;
+  padding-left: .1em;
+  z-index: 1;
+
+  p {
+    margin: .2em 0 .4em 0;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: .4em;
+  }
+}
+
+.viewContainer {
+  max-width: $view-width + 15em;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+
+  > ul {
+    width: 100%;
+  }
+}
+
+.menuList {
+  width: $list-width;
+}
+
+.viewer {
+  margin-left: 1em;
+  margin-right: 2em;
+  z-index: 2;
+
+  li {
+    max-width: $view-width;
+  }
+
+  li:last-child {
+    margin-bottom: 2em;
+  }
+
+  input {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  input[type=radio] {
+    width: auto;
+  }
+
+  input:first-child {
+    margin-top: 0;
+  }
+
+  legend {
+    margin: .3em 0;
+  }
+
+  label {
+    display: block;
+    margin-bottom: .3em;
+
+    span {
+      @include borderOutline;
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+      cursor: pointer;
+      margin-right: .3em;
+    }
+  }
+
+  textarea {
+    margin: .2em 0;
+    width: 100%;
+  }
+}
+
 .selected {
   background-color: $note-color;
 }
@@ -520,7 +528,7 @@ img {
 
 .inputArea {
   position: absolute;
-  width: $inner-container-width;
+  width: calc(100% - 13.6em);
   max-width: $view-width;
 
   textarea {
@@ -529,13 +537,14 @@ img {
   }
 
   .buttons {
-    margin: $padding / 2 0;
+    margin-top: $padding / 2;
   }
 }
 
 .buttons {
   display: flex;
   float: right;
+  margin-right: -.3em;
 
   div {
     display: inline-block;
@@ -574,10 +583,6 @@ img {
   height: auto;
 }
 
-.list {
-
-}
-
 /*
  * Adds spacing for the status bar in iOS full screen mode
  */
@@ -599,6 +604,7 @@ img {
  */
 .mapMain {
   width: auto !important;
+  overflow-y: hidden !important;
 }
 
 .title {
@@ -619,10 +625,6 @@ img {
   animation-duration: .5s;
   animation-iteration-count: 1;
   animation-timing-function: ease-in-out;
-}
-
-.borderOutline {
-
 }
 
 @-webkit-keyframes flash {
@@ -660,6 +662,27 @@ img {
 @media (max-width: 540px) {
   #mrkerInfo {
     max-width: calc(100% - .5em);
+  }
+}
+
+@media (max-width: 480px) {
+  .list {
+    width: $short-list-width;
+  }
+
+  .menuList {
+    width: $short-list-width;
+  }
+
+  #messenger {
+    .viewer {
+      margin-left: 8em;
+      width: calc(100% - 8em);
+    }
+  }
+
+  .inputArea {
+    width: calc(100% - 9.6em);
   }
 }
 

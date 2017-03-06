@@ -16,6 +16,7 @@
 
 /** @namespace Audio */
 
+// iOS 7 will throw an undefined error if audio.currenTime is accessed. That's why the checks have been added
 class SoundElement {
   /**
    * @param {string} params.path - Path to the file
@@ -25,9 +26,10 @@ class SoundElement {
     this.audio = new Audio();
     this.audio.src = path;
     this.audio.volume = volume;
-    this.audio.currentTime = 0;
     this.soundId = soundId;
     this.multi = multi;
+
+    if (this.audio.currentTime) { this.audio.currentTime = 0; }
   }
 
   /**
@@ -36,10 +38,12 @@ class SoundElement {
    */
   playAudio({ startTime, volume }) {
     if (this.audio.ended || this.audio.currentTime === 0) {
-      if (startTime) {
-        this.audio.currentTime = startTime;
-      } else {
-        this.audio.currentTime = 0;
+      if (this.audio.currentTime) {
+        if (startTime) {
+          this.audio.currentTime = startTime;
+        } else {
+          this.audio.currentTime = 0;
+        }
       }
 
       if (volume) {
@@ -62,8 +66,9 @@ class SoundElement {
    */
   resetAudio() {
     this.audio.pause();
-    this.audio.currentTime = 0;
     this.audio.volume = 1;
+
+    if (this.audio.currentTime) { this.audio.currentTime = 0; }
   }
 
   /**

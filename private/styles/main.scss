@@ -259,6 +259,10 @@ img {
   li:last-child {
     margin-bottom: 2em;
   }
+
+  .buttons {
+    margin-right: -.3em;
+  }
 }
 
 #docsViewer {
@@ -516,12 +520,11 @@ img {
 
 .inputArea {
   position: absolute;
-  width: 100%;
+  width: $inner-container-width;
   max-width: $view-width;
 
   textarea {
     width: 100%;
-    max-width: $view-width - ($border + $outline);
     max-height: 90vh;
   }
 
@@ -603,7 +606,7 @@ img {
   text-decoration: underline;
 }
 
-.center {
+.listTitle {
   text-align: center;
 }
 
@@ -647,28 +650,7 @@ img {
 }
 
 @media (max-width: 750px) {
-  #messenger {
-    margin-left: 0;
-    margin-right: 0;
-    max-width: calc(100% - 1.5em);
-  }
-
-  .inputArea {
-    max-width: calc(100% - 1.4em);
-
-    textarea {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .buttons {
-      margin-right: -.3em;
-    }
-  }
-
   li {
-    border-color: $second-color;
-
     p {
       margin-left: .1em;
     }

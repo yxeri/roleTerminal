@@ -26,6 +26,13 @@ const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
+/**
+ * Creates a list and returns the element
+ * @param {string[]} rooms - Room names to add to the list
+ * @param {string} title - List title
+ * @param {boolean} shouldSort - Should the list be sorted?
+ * @returns {*} Element
+ */
 function createList({ rooms, title, shouldSort }) {
   const list = new List({
     title,

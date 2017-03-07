@@ -267,36 +267,7 @@ class Messenger extends View {
 
       if (ownedRooms.length > 0) { fragment.appendChild(this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: true }).element); }
       if (followedRooms.length > 0) {
-        const followList = new List({
-          title: 'Following',
-          shouldSort: false,
-          listItems: followedRooms.map((room) => {
-            return elementCreator.createButton({
-              text: room,
-              func: () => {
-                this.switchRoom(room);
-
-                socketManager.emitEvent('history', { room: { roomName: room }, lines: 50 }, ({ data: historyData, error: historyError }) => {
-                  if (historyError) {
-                    console.log('history', historyError);
-
-                    return;
-                  }
-
-                  eventCentral.triggerEvent({
-                    event: eventCentral.Events.CHATMSG,
-                    params: {
-                      messages: historyData.messages,
-                      options: { printable: false },
-                      shouldScroll: true,
-                      isHistory: true,
-                    },
-                  });
-                });
-              },
-            });
-          }),
-        });
+        const followList = this.createList({ rooms: followedRooms, title: 'Following', shouldSort: false });
 
         eventCentral.addWatcher({
           watcherParent: followList,
@@ -358,34 +329,24 @@ class Messenger extends View {
           func: () => {
             this.switchRoom(room);
 
-            socketManager.emitEvent('follow', { room: { roomName: room } }, ({ error: followError }) => {
-              if (followError) {
-                console.log('follow', followError);
+            socketManager.emitEvent('history', {
+              room: { roomName: room },
+              lines: 50,
+            }, ({ data: historyData, error: historyError }) => {
+              if (historyError) {
+                console.log('history', historyError);
 
                 return;
               }
 
               eventCentral.triggerEvent({
-                event: eventCentral.Events.FOLLOWROOM,
-                params: { roomName: room },
-              });
-
-              socketManager.emitEvent('history', { room: { roomName: room }, lines: 50 }, ({ data: historyData, error: historyError }) => {
-                if (historyError) {
-                  console.log('history', historyError);
-
-                  return;
-                }
-
-                eventCentral.triggerEvent({
-                  event: eventCentral.Events.CHATMSG,
-                  params: {
-                    messages: historyData.messages,
-                    options: { printable: false },
-                    shouldScroll: true,
-                    isHistory: true,
-                  },
-                });
+                event: eventCentral.Events.CHATMSG,
+                params: {
+                  messages: historyData.messages,
+                  options: { printable: false },
+                  shouldScroll: true,
+                  isHistory: true,
+                },
               });
             });
           },

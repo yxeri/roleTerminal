@@ -23,6 +23,8 @@ class EventCentral {
       MESSAGE: 'Message retrieved',
       SWITCHROOM: 'Switched room',
       ARCHIVE: 'New archive',
+      FOLLOWROOM: 'Followed room',
+      UNFOLLOWROOM: 'Unfollowed room',
     };
     this.eventWatchers = {};
   }

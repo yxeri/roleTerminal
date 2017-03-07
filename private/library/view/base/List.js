@@ -68,9 +68,9 @@ class List extends View {
 
   addItem({ listItem }) {
     if (this.shouldSort) {
-      this.element.replaceChild(this.list, createSortedList(this.element.firstChild, listItem));
+      this.element.replaceChild(this.list, createSortedList(this.element.lastChild, listItem));
     } else {
-      this.element.firstChild.appendChild(listItem);
+      this.element.lastChild.appendChild(listItem);
     }
   }
 

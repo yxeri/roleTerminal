@@ -292,7 +292,7 @@ socketManager.addEvents([
           }
 
           eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
-          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 50 }, ({ data: historyData, historyError }) => {
+          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 50 }, ({ data: historyData, error: historyError }) => {
             if (historyError) {
               console.log('history', historyError);
 

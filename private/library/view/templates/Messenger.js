@@ -26,48 +26,6 @@ const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
-/**
- * Creates a list and returns the element
- * @param {string[]} rooms - Room names to add to the list
- * @param {string} title - List title
- * @param {boolean} shouldSort - Should the list be sorted?
- * @returns {*} Element
- */
-function createList({ rooms, title, shouldSort }) {
-  const list = new List({
-    title,
-    shouldSort: shouldSort || false,
-    listItems: rooms.map((room) => {
-      return elementCreator.createButton({
-        text: room,
-        func: () => {
-          this.switchRoom(room);
-
-          socketManager.emitEvent('history', { room: { roomName: room }, lines: 50 }, ({ data: historyData, historyError }) => {
-            if (historyError) {
-              console.log('history', historyError);
-
-              return;
-            }
-
-            eventCentral.triggerEvent({
-              event: eventCentral.Events.CHATMSG,
-              params: {
-                messages: historyData.messages,
-                options: { printable: false },
-                shouldScroll: true,
-                isHistory: true,
-              },
-            });
-          });
-        },
-      });
-    }),
-  });
-
-  return list.element;
-}
-
 class Messenger extends View {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
     super({ isFullscreen });
@@ -226,7 +184,8 @@ class Messenger extends View {
       const chatMsgData = {
         message: {
           text: this.inputField.value.split('\n'),
-          roomName: 'public' },
+          roomName: storageManager.getRoom(),
+        },
       };
 
       const imageSource = this.imagePreview.getAttribute('src');
@@ -295,6 +254,8 @@ class Messenger extends View {
   }
 
   populateList() {
+    this.chatSelect.innerHTML = '';
+
     socketManager.emitEvent('listRooms', {}, ({ error, data: { rooms, followedRooms = [], ownedRooms = [] } }) => {
       if (error) {
         console.log(error);
@@ -304,10 +265,76 @@ class Messenger extends View {
 
       const fragment = document.createDocumentFragment();
 
-      if (ownedRooms.length > 0) { fragment.appendChild(createList({ rooms: ownedRooms, title: 'Yours', shouldSort: true })); }
-      if (followedRooms.length > 0) { fragment.appendChild(createList({ rooms: followedRooms, title: 'Following' })); }
+      if (ownedRooms.length > 0) { fragment.appendChild(this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: true }).element); }
+      if (followedRooms.length > 0) {
+        const followList = new List({
+          title: 'Following',
+          shouldSort: false,
+          listItems: followedRooms.map((room) => {
+            return elementCreator.createButton({
+              text: room,
+              func: () => {
+                this.switchRoom(room);
 
-      fragment.appendChild(createList({ rooms, title: 'Rooms', shouldSort: true }));
+                socketManager.emitEvent('history', { room: { roomName: room }, lines: 50 }, ({ data: historyData, error: historyError }) => {
+                  if (historyError) {
+                    console.log('history', historyError);
+
+                    return;
+                  }
+
+                  eventCentral.triggerEvent({
+                    event: eventCentral.Events.CHATMSG,
+                    params: {
+                      messages: historyData.messages,
+                      options: { printable: false },
+                      shouldScroll: true,
+                      isHistory: true,
+                    },
+                  });
+                });
+              },
+            });
+          }),
+        });
+
+        eventCentral.addWatcher({
+          watcherParent: followList,
+          event: eventCentral.Events.FOLLOWROOM,
+          func: ({ roomName }) => {
+            followList.addItem({
+              listItem: elementCreator.createButton({
+                text: roomName,
+                func: () => {
+                  this.switchRoom(roomName);
+
+                  socketManager.emitEvent('history', { room: { roomName }, lines: 50 }, ({ data: historyData, error: historyError }) => {
+                    if (historyError) {
+                      console.log('history', historyError);
+
+                      return;
+                    }
+
+                    eventCentral.triggerEvent({
+                      event: eventCentral.Events.CHATMSG,
+                      params: {
+                        messages: historyData.messages,
+                        options: { printable: false },
+                        shouldScroll: true,
+                        isHistory: true,
+                      },
+                    });
+                  });
+                },
+              }),
+            });
+          },
+        });
+
+        fragment.appendChild(followList.element);
+      }
+
+      fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element);
       this.chatSelect.appendChild(fragment);
     });
   }
@@ -319,6 +346,52 @@ class Messenger extends View {
     super.appendTo(parentElement);
     this.focusInput();
     this.messageList.scroll();
+  }
+
+  createList({ rooms, title, shouldSort }) {
+    return new List({
+      title,
+      shouldSort: shouldSort || false,
+      listItems: rooms.map((room) => {
+        return elementCreator.createButton({
+          text: room,
+          func: () => {
+            this.switchRoom(room);
+
+            socketManager.emitEvent('follow', { room: { roomName: room } }, ({ error: followError }) => {
+              if (followError) {
+                console.log('follow', followError);
+
+                return;
+              }
+
+              eventCentral.triggerEvent({
+                event: eventCentral.Events.FOLLOWROOM,
+                params: { roomName: room },
+              });
+
+              socketManager.emitEvent('history', { room: { roomName: room }, lines: 50 }, ({ data: historyData, error: historyError }) => {
+                if (historyError) {
+                  console.log('history', historyError);
+
+                  return;
+                }
+
+                eventCentral.triggerEvent({
+                  event: eventCentral.Events.CHATMSG,
+                  params: {
+                    messages: historyData.messages,
+                    options: { printable: false },
+                    shouldScroll: true,
+                    isHistory: true,
+                  },
+                });
+              });
+            });
+          },
+        });
+      }),
+    });
   }
 }
 

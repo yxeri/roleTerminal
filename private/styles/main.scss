@@ -32,10 +32,9 @@ $view-width: 50em;
 $menu-width: 21em;
 $box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px $text-color;
-$inner-container-width: calc(100vw - 1.1em);
-$inner-container-height: calc(100vh - 1.1em);
-$list-width: 11em;
-$short-list-width: 7em;
+$inner-container-width: calc(100vw - .7em);
+$inner-container-height: calc(100% - .7em);
+$short-list-width: 8em;
 
 @mixin borderOutline {
   border: $border solid $second-color;
@@ -70,7 +69,7 @@ h1, h2, h3, h4, h5 {
 
 html, body {
   overflow: hidden;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
 }
 
@@ -203,7 +202,6 @@ img {
   height: $inner-container-height;
   margin-top: $padding;
   margin-left: $padding;
-  padding: $padding;
   text-shadow: $text-shadow;
   overflow: hidden;
 }
@@ -221,8 +219,10 @@ img {
   -moz-user-select: none;
   user-select: none;
   width: 100vw;
+  height: 1.2em;
 
   div {
+    margin-top: .2em;
     width: $inner-container-width;
   }
 
@@ -239,33 +239,37 @@ img {
   overflow: hidden;
   background: url(/images/logo.png) no-repeat 50% 50%;
   background-size: contain;
-  height: calc(100vh - 3em);
+  height: 100%;
+
+  > div:last-child {
+    height: calc(100% - 2.2em);
+  }
 }
 
 #messenger {
   word-wrap: break-word;
-  height: inherit;
-
-  .list {
-    -webkit-overflow-scrolling: touch;
-  }
 
   .viewer {
+    overflow: hidden;
+
     ul {
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
-      height: calc(100vh - 9em);
+      height: calc(100% - 2em);
     }
 
     ul::-webkit-scrollbar {
       width: 0 !important;
+    }
+
+    .buttons {
+      margin-bottom: .4em;
     }
   }
 }
 
 #docsViewer {
   word-wrap: break-word;
-  margin-top: .1em;
 
   .viewer {
     overflow-y: scroll;
@@ -303,7 +307,7 @@ img {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
 }
 
 #mapClickMenu {
@@ -353,26 +357,24 @@ img {
 
 #home {
   width: $inner-container-width;
-  height: 100%;
   overflow: hidden;
 
   div {
-    margin-top: 1em;
     max-width: $menu-width + 1em;
     margin-left: auto;
     margin-right: auto;
-    display: flex;
     display: -webkit-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: center;
     -webkit-flex-direction: row;
     -webkit-flex-wrap: wrap;
     -webkit-align-content: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
 
     button {
-      flex-grow: 1;
       -webkit-flex-grow: 1;
+      flex-grow: 1;
       width: calc(50% - 1em);
       max-width: calc(50% - 1em);
       margin: 0 .5em 1em .5em;
@@ -381,7 +383,7 @@ img {
 }
 
 .list {
-  width: $list-width;
+  width: $short-list-width;
   min-width: $short-list-width;
   padding: $padding;
   margin-right: .6em;
@@ -389,10 +391,10 @@ img {
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  height: 100%;
+  height: calc(100% - .2em);
 
   p {
-    margin: .2em 0 .4em 0;
+    margin: 0 0 .4em 0;
   }
 
   button {
@@ -407,9 +409,10 @@ img {
 
 .viewContainer {
   max-width: $view-width + 15em;
-  height: inherit;
+  height: 100%;
   margin-left: auto;
   margin-right: auto;
+  display: -webkit-flex;
   display: flex;
 
   > ul {
@@ -418,9 +421,9 @@ img {
 }
 
 .viewer {
-  max-width: $view-width + 15em - $list-width - 1em;
-  width: 100%;
-  height: calc(100vh - 3em);
+  max-width: $view-width + 15em - $short-list-width - 1em;
+  width: calc(100% - 9.6em);
+  height: calc(100% - .2em);
 
   li {
     max-width: $view-width;
@@ -463,7 +466,7 @@ img {
   }
 
   textarea {
-    margin: .2em 0;
+    margin: .2em;
     width: 100%;
   }
 }
@@ -540,32 +543,30 @@ img {
   display: none !important;
 }
 
-.bottomUp {
-  bottom: .5em;
-}
-
 .inputArea {
   height: 6em;
   max-width: $view-width;
   background-color: $back-color;
 
   textarea {
-    width: 100%;
+    width: calc(100% - .6em);
     max-height: 90vh;
   }
 
   .buttons {
     margin-top: $padding / 2;
+    width: calc(100% - .1em);
   }
 }
 
 .buttons {
+  display: -webkit-flex;
+  -webkit-justify-content: flex-end;
   display: flex;
-  float: right;
-  margin-right: -.3em;
+  justify-content: flex-end;
+  margin-right: .1em;
 
   div {
-    display: inline-block;
     margin-right: $padding * 2;
 
     ul {
@@ -658,49 +659,5 @@ img {
   100% {
     background-color: inherit;
     text-shadow: inherit;
-  }
-}
-
-@media (max-width: 750px) {
-  li {
-    p {
-      margin-left: .1em;
-    }
-  }
-}
-
-@media (max-width: 540px) {
-  #mrkerInfo {
-    max-width: calc(100% - .5em);
-  }
-}
-
-@media (max-width: 480px) {
-  .list {
-    width: $short-list-width;
-  }
-
-  .inputArea {
-    width: 100%;
-  }
-}
-
-@media (max-height: 479px) {
-  #markerInfo {
-    max-height: 85vh;
-
-    div {
-      max-height: 85vh;
-    }
-  }
-}
-
-@media (max-height: 240px) {
-  #markerInfo {
-    max-height: 80vh;
-
-    div {
-      max-height: 80vh;
-    }
   }
 }

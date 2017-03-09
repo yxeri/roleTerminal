@@ -147,21 +147,21 @@ class Messenger extends View {
       accessLevel: 1,
     });
 
-    const viewer = new Viewer({}).element;
+    this.viewer = new Viewer({}).element;
     const container = elementCreator.createContainer({ classes: ['viewContainer'] });
 
     if (isTopDown) {
       this.inputArea.classList.add('topDown');
-      viewer.appendChild(this.inputArea);
-      viewer.appendChild(this.messageList.element);
+      this.viewer.appendChild(this.inputArea);
+      this.viewer.appendChild(this.messageList.element);
     } else {
       this.inputArea.classList.add('bottomUp');
-      viewer.appendChild(this.messageList.element);
-      viewer.appendChild(this.inputArea);
+      this.viewer.appendChild(this.messageList.element);
+      this.viewer.appendChild(this.inputArea);
     }
 
     container.appendChild(this.chatSelect);
-    container.appendChild(viewer);
+    container.appendChild(this.viewer);
     this.element.appendChild(container);
 
     eventCentral.addWatcher({
@@ -224,6 +224,7 @@ class Messenger extends View {
   resizeInputField() {
     this.inputField.style.height = 'auto';
     this.inputField.style.height = `${this.inputField.scrollHeight}px`;
+    this.viewer.scrollTop = this.viewer.scrollHeight;
   }
 
   clearInputField() {
@@ -313,7 +314,6 @@ class Messenger extends View {
   appendTo(parentElement) {
     this.populateList();
     keyHandler.addKey(13, () => { this.sendMessage(); });
-    parentElement.classList.add('messengerMain');
     super.appendTo(parentElement);
     this.focusInput();
     this.messageList.scroll();

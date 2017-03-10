@@ -255,7 +255,7 @@ img {
     ul {
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
-      height: calc(100% - 2em);
+      height: calc(100% - 6em);
     }
 
     ul::-webkit-scrollbar {
@@ -363,6 +363,7 @@ img {
     max-width: $menu-width + 1em;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 1em;
     display: -webkit-flex;
     -webkit-flex-direction: row;
     -webkit-flex-wrap: wrap;
@@ -550,7 +551,7 @@ img {
 
   textarea {
     width: calc(100% - .6em);
-    max-height: 90vh;
+    max-height: 80vh;
   }
 
   .buttons {

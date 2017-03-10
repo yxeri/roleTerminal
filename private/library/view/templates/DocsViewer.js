@@ -73,6 +73,7 @@ class DocsViewer extends View {
             archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
             this.viewer.innerHTML = '';
+            this.viewer.scrollTop = this.viewer.scrollHeight;
             this.viewer.appendChild(docFragment);
           });
         },

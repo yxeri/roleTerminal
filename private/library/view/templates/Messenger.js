@@ -25,6 +25,28 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
+const viewTools = require('../../ViewTools');
+
+function getHistory({ roomName, lines = 50, infiniteScroll = false }) {
+  socketManager.emitEvent('history', { room: { roomName }, lines }, ({ data: historyData, error: historyError }) => {
+    if (historyError) {
+      console.log('history', historyError);
+
+      return;
+    }
+
+    eventCentral.triggerEvent({
+      event: eventCentral.Events.CHATMSG,
+      params: {
+        messages: historyData.messages,
+        options: { printable: false },
+        shouldScroll: !infiniteScroll,
+        isHistory: true,
+        infiniteScroll,
+      },
+    });
+  });
+}
 
 class Messenger extends View {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
@@ -34,7 +56,7 @@ class Messenger extends View {
     this.inputField = document.createElement('TEXTAREA');
     this.inputField.setAttribute('rows', '3');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
-
+    this.selectedItem = null;
     this.messageList = new MessageList({ isTopDown });
     this.chatSelect = elementCreator.createContainer({ classes: ['list'] });
 
@@ -148,6 +170,7 @@ class Messenger extends View {
     });
 
     this.viewer = new Viewer({}).element;
+    this.viewer.classList.add('selectedView');
     const container = elementCreator.createContainer({ classes: ['viewContainer'] });
 
     if (isTopDown) {
@@ -159,6 +182,14 @@ class Messenger extends View {
       this.viewer.appendChild(this.messageList.element);
       this.viewer.appendChild(this.inputArea);
     }
+
+    this.viewer.addEventListener('mousewheel', () => {
+      if (this.viewer.firstElementChild) {
+        if (!this.messageList.isTopDown && viewTools.isCloseToTop(this.viewer.firstElementChild)) {
+          // getHistory({ roomName: storageManager.getRoom() });
+        }
+      }
+    });
 
     container.appendChild(this.chatSelect);
     container.appendChild(this.viewer);
@@ -175,6 +206,20 @@ class Messenger extends View {
         };
 
         this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.SWITCHROOM,
+      func: ({ room }) => {
+        this.messageList.element.classList.remove('flash');
+
+        setTimeout(() => {
+          this.messageList.element.innerHTML = '';
+          this.messageList.element.classList.add('flash');
+          getHistory({ roomName: room, switchedRoom: true });
+        }, 100);
       },
     });
   }
@@ -237,6 +282,8 @@ class Messenger extends View {
     this.element.parentNode.classList.remove('messengerMain');
     super.removeView();
 
+    this.messageList.element.classList.remove('flash');
+
     // forEach on childNodes does not work in iOS 7
     for (let i = 0; i < this.messageList.element.childNodes.length; i += 1) {
       const listItem = this.messageList.element.childNodes[i];
@@ -249,22 +296,23 @@ class Messenger extends View {
     this.inputField.focus();
   }
 
-  switchRoom(room) {
-    storageManager.setRoom(room);
-    this.messageList.element.innerHTML = '';
-  }
-
   populateList() {
     this.chatSelect.innerHTML = '';
 
-    socketManager.emitEvent('listRooms', {}, ({ error, data: { rooms, followedRooms = [], ownedRooms = [] } }) => {
+    socketManager.emitEvent('listRooms', {}, ({ error, data }) => {
       if (error) {
         console.log(error);
 
         return;
       }
 
+      const { rooms = [], followedRooms = [], ownedRooms = [] } = data;
       const fragment = document.createDocumentFragment();
+
+      fragment.appendChild(elementCreator.createButton({
+        text: 'Create room',
+        func: () => {},
+      }));
 
       if (ownedRooms.length > 0) { fragment.appendChild(this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: true }).element); }
       if (followedRooms.length > 0) {
@@ -278,25 +326,7 @@ class Messenger extends View {
               listItem: elementCreator.createButton({
                 text: roomName,
                 func: () => {
-                  this.switchRoom(roomName);
-
-                  socketManager.emitEvent('history', { room: { roomName }, lines: 50 }, ({ data: historyData, error: historyError }) => {
-                    if (historyError) {
-                      console.log('history', historyError);
-
-                      return;
-                    }
-
-                    eventCentral.triggerEvent({
-                      event: eventCentral.Events.CHATMSG,
-                      params: {
-                        messages: historyData.messages,
-                        options: { printable: false },
-                        shouldScroll: true,
-                        isHistory: true,
-                      },
-                    });
-                  });
+                  storageManager.setRoom(roomName);
                 },
               }),
             });
@@ -305,17 +335,14 @@ class Messenger extends View {
 
         fragment.appendChild(followList.element);
       }
-
-      fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element);
+      if (rooms.length > 0) { fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element); }
       this.chatSelect.appendChild(fragment);
     });
   }
 
   appendTo(parentElement) {
-    this.populateList();
     keyHandler.addKey(13, () => { this.sendMessage(); });
     super.appendTo(parentElement);
-    this.focusInput();
     this.messageList.scroll();
   }
 
@@ -324,33 +351,20 @@ class Messenger extends View {
       title,
       shouldSort: shouldSort || false,
       listItems: rooms.map((room) => {
-        return elementCreator.createButton({
+        const button = elementCreator.createButton({
           text: room,
           func: () => {
-            this.switchRoom(room);
+            if (this.selectedItem) {
+              this.selectedItem.classList.remove('selectedItem');
+            }
 
-            socketManager.emitEvent('history', {
-              room: { roomName: room },
-              lines: 50,
-            }, ({ data: historyData, error: historyError }) => {
-              if (historyError) {
-                console.log('history', historyError);
-
-                return;
-              }
-
-              eventCentral.triggerEvent({
-                event: eventCentral.Events.CHATMSG,
-                params: {
-                  messages: historyData.messages,
-                  options: { printable: false },
-                  shouldScroll: true,
-                  isHistory: true,
-                },
-              });
-            });
+            this.selectedItem = button.parentElement;
+            this.selectedItem.classList.add('selectedItem');
+            storageManager.setRoom(room);
           },
         });
+
+        return button;
       }),
     });
   }

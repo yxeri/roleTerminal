@@ -186,6 +186,8 @@ class WorldMap extends View {
     }
 
     google.maps.event.addListener(this.markers[markerName], 'click', () => {
+      this.hideMarkerInfo();
+
       const marker = this.markers[markerName];
 
       soundLibrary.playSound('button2');
@@ -206,8 +208,6 @@ class WorldMap extends View {
         infoText.appendChild(paragraph);
         elementCreator.replaceOnlyChild(this.infoElement, infoText);
         this.showMarkerInfo();
-      } else {
-        this.hideMarkerInfo();
       }
     });
   }
@@ -416,9 +416,17 @@ class WorldMap extends View {
 
   hideClickMenu() { this.mapClickMenu.classList.add('hide'); }
 
-  showMarkerInfo() { this.infoElement.classList.remove('hide'); }
+  showMarkerInfo() {
+    setTimeout(() => {
+      this.infoElement.classList.remove('hide');
+      this.infoElement.classList.add('flash');
+    }, 100);
+  }
 
-  hideMarkerInfo() { this.infoElement.classList.add('hide'); }
+  hideMarkerInfo() {
+    this.infoElement.classList.remove('flash');
+    this.infoElement.classList.add('hide');
+  }
 
   /**
    * Reset view port, which recreates all clusters

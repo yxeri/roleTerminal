@@ -48,6 +48,7 @@ class DocsViewer extends View {
     const container = elementCreator.createContainer({ classes: ['viewContainer'] });
     this.docsSelect = elementCreator.createContainer({ classes: ['list'] });
     this.viewer = new Viewer({}).element;
+    this.selectedItem = null;
 
     container.appendChild(this.docsSelect);
     container.appendChild(this.viewer);
@@ -56,8 +57,16 @@ class DocsViewer extends View {
 
   appendArchives(archives = []) {
     return archives.map((archive) => { // eslint-disable-line arrow-body-style
-      return elementCreator.createButton({
+      const button = elementCreator.createButton({
         func: () => {
+          if (this.selectedItem) {
+            this.selectedItem.classList.remove('selectedItem');
+          }
+
+          this.viewer.classList.add('selectedView');
+          this.selectedItem = button.parentElement;
+          this.selectedItem.classList.add('selectedItem');
+
           socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
             if (archiveError) {
               console.log(archiveError);
@@ -72,13 +81,20 @@ class DocsViewer extends View {
 
             archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
-            this.viewer.innerHTML = '';
-            this.viewer.scrollTop = this.viewer.scrollHeight;
-            this.viewer.appendChild(docFragment);
+            this.viewer.classList.remove('flash');
+
+            setTimeout(() => {
+              this.viewer.innerHTML = '';
+              this.viewer.classList.add('flash');
+              this.viewer.scrollTop = this.viewer.scrollHeight;
+              this.viewer.appendChild(docFragment);
+            }, 100);
           });
         },
         text: `${archive.title || archive.archiveId}`,
       });
+
+      return button;
     });
   }
 
@@ -177,9 +193,9 @@ class DocsViewer extends View {
     });
   }
 
-  appendTo(parentElement) {
-    this.populateList();
-    super.appendTo(parentElement);
+  removeView() {
+    this.viewer.classList.remove('flash');
+    super.removeView();
   }
 }
 

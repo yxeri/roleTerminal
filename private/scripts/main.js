@@ -162,6 +162,69 @@ window.addEventListener('click', () => {
   viewTools.goFullScreen();
 });
 
+home.addLink({
+  linkName: 'Coms',
+  startFunc: () => { messenger.appendTo(mainView); },
+  endFunc: () => { messenger.removeView(); },
+});
+home.addLink({
+  linkName: 'Map',
+  startFunc: () => { map.appendTo(mainView); },
+  endFunc: () => { map.removeView(); },
+});
+home.addLink({
+  linkName: 'Docs',
+  startFunc: () => { docsViewer.appendTo(mainView); },
+  endFunc: () => { docsViewer.removeView(); },
+});
+home.addLink({
+  linkName: 'Login',
+  startFunc: () => {
+    new LoginBox({
+      description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+      extraDescription: ['Input your user name and password'],
+      parentElement: mainView,
+      socketManager,
+      keyHandler,
+    }).appendTo(mainView);
+  },
+  endFunc: () => {},
+  accessLevel: 0,
+  maxAccessLevel: 0,
+  keepHome: true,
+  classes: ['hide'],
+});
+home.addLink({
+  linkName: 'Logout',
+  startFunc: () => {
+    socketManager.emitEvent('logout');
+    storageManager.removeUser();
+
+    new LoginBox({
+      description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+      extraDescription: ['Enter your user name and password'],
+      parentElement: mainView,
+      socketManager,
+      keyHandler,
+    }).appendTo(mainView);
+  },
+  endFunc: () => {},
+  accessLevel: 1,
+  keepHome: true,
+  classes: ['hide'],
+});
+home.appendTo(mainView);
+
+if (!storageManager.getRoom()) {
+  storageManager.setRoom('public');
+}
+
+eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
+
+map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+map.setCenterCoordinates(storageManager.getCenterCoordinates());
+map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
+
 socketManager.addEvents([
   {
     event: 'disconnect',
@@ -186,59 +249,9 @@ socketManager.addEvents([
 
       if (!socketManager.hasConnected) {
         new Time(document.getElementById('time')).startClock();
-
-        home.addLink({
-          linkName: 'Coms',
-          startFunc: () => { messenger.appendTo(mainView); },
-          endFunc: () => { messenger.removeView(); },
-        });
-        home.addLink({
-          linkName: 'Map',
-          startFunc: () => { map.appendTo(mainView); },
-          endFunc: () => { map.removeView(); },
-        });
-        home.addLink({
-          linkName: 'Docs',
-          startFunc: () => { docsViewer.appendTo(mainView); },
-          endFunc: () => { docsViewer.removeView(); },
-        });
-        home.addLink({
-          linkName: 'Login',
-          startFunc: () => {
-            new LoginBox({
-              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-              extraDescription: ['Input your user name and password'],
-              parentElement: mainView,
-              socketManager,
-              keyHandler,
-            }).appendTo(mainView);
-          },
-          endFunc: () => {},
-          accessLevel: 0,
-          maxAccessLevel: 0,
-          keepHome: true,
-          classes: ['hide'],
-        });
-        home.addLink({
-          linkName: 'Logout',
-          startFunc: () => {
-            socketManager.emitEvent('logout');
-            storageManager.removeUser();
-
-            new LoginBox({
-              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-              extraDescription: ['Enter your user name and password'],
-              parentElement: mainView,
-              socketManager,
-              keyHandler,
-            }).appendTo(mainView);
-          },
-          endFunc: () => {},
-          accessLevel: 1,
-          keepHome: true,
-          classes: ['hide'],
-        });
-        home.appendTo(mainView);
+        map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+        map.setCenterCoordinates(storageManager.getCenterCoordinates());
+        map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
 
       socketManager.emitEvent('updateId', {
@@ -248,6 +261,9 @@ socketManager.addEvents([
         if (error) {
           return;
         }
+
+        messenger.populateList();
+        docsViewer.populateList();
 
         const userName = storageManager.getUserName();
 
@@ -280,35 +296,6 @@ socketManager.addEvents([
           // TODO Duplicate code with LoginBox?
           storageManager.setAccessLevel(data.user.accessLevel);
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
-        }
-
-        if (!socketManager.hasConnected) {
-          map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-          map.setCenterCoordinates(storageManager.getCenterCoordinates());
-          map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
-
-          if (!storageManager.getRoom()) {
-            storageManager.setRoom('public');
-          }
-
-          eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
-          socketManager.emitEvent('history', { room: { roomName: storageManager.getRoom() }, lines: 50 }, ({ data: historyData, error: historyError }) => {
-            if (historyError) {
-              console.log('history', historyError);
-
-              return;
-            }
-
-            eventCentral.triggerEvent({
-              event: eventCentral.Events.CHATMSG,
-              params: {
-                messages: historyData.messages,
-                options: { printable: false },
-                shouldScroll: true,
-                isHistory: true,
-              },
-            });
-          });
         }
 
         socketManager.setConnected();

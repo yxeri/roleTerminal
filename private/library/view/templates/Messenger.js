@@ -27,6 +27,12 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const viewTools = require('../../ViewTools');
 
+/**
+ * Retrieve history and trigger CHATMSG event
+ * @param {string} roomName - Name of the room to retrieve history from
+ * @param {number} lines - Number of lines to retrieve
+ * @param {boolean} infiniteScroll Did infinite scroll trigger the history retrieval?
+ */
 function getHistory({ roomName, lines = 50, infiniteScroll = false }) {
   socketManager.emitEvent('history', { room: { roomName }, lines }, ({ data: historyData, error: historyError }) => {
     if (historyError) {

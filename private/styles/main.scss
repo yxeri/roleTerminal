@@ -17,6 +17,7 @@
 $text-color: #00ffcc;
 $darker-text-color: #00d7a9;
 $second-color: #ff02e5;
+$flash-color: #ff02e5;
 $light-color: #aaaaaa;
 $back-color: #11000f;
 $back-button: #1b0019;
@@ -267,6 +268,10 @@ img {
     .buttons {
       margin-bottom: .4em;
     }
+
+    textarea {
+      width: calc(100% - .2em);
+    }
   }
 }
 
@@ -277,6 +282,11 @@ img {
     overflow-y: scroll;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+
+    textarea {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 }
 
@@ -408,7 +418,6 @@ img {
   }
 
   p {
-    margin: 0 0 .4em 0;
     width: 8em;
   }
 
@@ -447,7 +456,7 @@ img {
 
   input {
     margin-left: 0;
-    width: 100%;
+    width: calc(100% - .2em);
   }
 
   input[type=radio] {
@@ -456,6 +465,12 @@ img {
 
   input:first-child {
     margin-top: 0;
+  }
+
+  textarea {
+    margin-top: $padding;
+    margin-bottom: $padding;
+    width: calc(100% - .2em);
   }
 
   legend {
@@ -475,11 +490,6 @@ img {
       cursor: pointer;
       margin-right: .3em;
     }
-  }
-
-  textarea {
-    margin: .2em;
-    width: 100%;
   }
 }
 
@@ -604,7 +614,7 @@ img {
   }
 
   button:last-child {
-    margin-right: 0;
+    margin-right: -$padding;
   }
 }
 
@@ -666,8 +676,8 @@ img {
 
 @-webkit-keyframes flash {
   0% {
-    background-color: $second-color;
-    color: $second-color;
+    background-color: $flash-color;
+    color: $flash-color;
     text-shadow: none;
   }
 
@@ -680,8 +690,8 @@ img {
 
 @keyframes flash {
   0% {
-    background-color: $second-color;
-    color: $second-color;
+    background-color: $flash-color;
+    color: $flash-color;
     text-shadow: none;
   }
 

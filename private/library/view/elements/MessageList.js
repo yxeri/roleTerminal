@@ -57,6 +57,7 @@ class MessageList {
   constructor({ isTopDown = false }) {
     this.isTopDown = isTopDown;
     this.element = document.createElement('UL');
+    this.lastItem = {};
   }
 
   addItems(items, { shouldScroll, animation, isHistory }) {
@@ -64,6 +65,8 @@ class MessageList {
 
     items.forEach((item) => {
       const listItemOptions = {};
+
+      listItemOptions.skipHeader = this.lastItem.headerItems && item.headerItems[0].textLine === this.lastItem.headerItems[0].textLine;
 
       if (!isHistory) { listItemOptions.animation = animation; }
 
@@ -74,6 +77,8 @@ class MessageList {
       } else {
         fragment.appendChild(listItem);
       }
+
+      this.lastItem = item;
     });
 
     if (this.isTopDown) {
@@ -94,9 +99,13 @@ class MessageList {
    * @param {boolean} printable - Should the item be printable
    * @returns {Element} List item
    */
-  createItem({ headerItems, text, printable, image }, { animation }) {
+  createItem({ headerItems, text, printable, image }, { animation, skipHeader }) {
     const listItem = document.createElement('LI');
-    listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
+
+    if (!skipHeader) {
+      listItem.appendChild(createHeader({ parentElement: listItem, headerItems, printable }));
+    }
+
     if (animation) { listItem.classList.add(animation); }
 
     text.forEach((line) => {

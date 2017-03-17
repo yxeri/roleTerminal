@@ -57,7 +57,7 @@ class MessageList {
   constructor({ isTopDown = false }) {
     this.isTopDown = isTopDown;
     this.element = document.createElement('UL');
-    this.lastItem = {};
+    this.lastItem = { headerItems: [''] };
   }
 
   addItems(items, { shouldScroll, animation, isHistory }) {
@@ -66,7 +66,7 @@ class MessageList {
     items.forEach((item) => {
       const listItemOptions = {};
 
-      listItemOptions.skipHeader = this.lastItem.headerItems && item.headerItems[0].textLine === this.lastItem.headerItems[0].textLine;
+      listItemOptions.skipHeader = item.headerItems[0].textLine === this.lastItem.headerItems[0].textLine;
 
       if (!isHistory) { listItemOptions.animation = animation; }
 
@@ -90,6 +90,8 @@ class MessageList {
         console.log('New messages!');
       }
     }
+
+    this.lastItem = { headerItems: [''] };
   }
 
   /**

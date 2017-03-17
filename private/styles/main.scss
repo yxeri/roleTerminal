@@ -250,6 +250,10 @@ img {
       -webkit-overflow-scrolling: touch;
       height: calc(100% - 6em);
 
+      li:first-child {
+        margin-top: 1em;
+      }
+
       li {
         p:last-child {
           padding-bottom: $padding;

@@ -649,11 +649,11 @@ img {
 
 .flash {
   -webkit-animation-name: flash;
-  -webkit-animation-duration: .5s;
+  -webkit-animation-duration: .2s;
   -webkit-animation-iteration-count: 1;
   -webkit-animation-timing-function: ease-in-out;
   animation: flash;
-  animation-duration: .5s;
+  animation-duration: .2s;
   animation-iteration-count: 1;
   animation-timing-function: ease-in-out;
 }
@@ -671,7 +671,7 @@ img {
   border-top: 1px solid;
   border-left: 1px solid;
   border-bottom: 1px solid;
-  background-color: rgba(0, 255, 204, .05);
+  background-color: rgba(0, 255, 204, .1);
 }
 
 .fullHeight {

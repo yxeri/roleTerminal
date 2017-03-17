@@ -151,7 +151,7 @@ class DocsViewer extends View {
           buttons.appendChild(elementCreator.createButton({
             text: 'Save',
             func: () => {
-              if (!markEmptyFields([titleInput, bodyInput])) {
+              if (!markEmptyFields([titleInput, bodyInput, idInput])) {
                 const archive = {
                   title: titleInput.value,
                   archiveId: idInput.value,
@@ -160,7 +160,7 @@ class DocsViewer extends View {
                   teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
                 };
 
-                socketManager.emitEvent('createArchive', archive, ({ archiveError }) => {
+                socketManager.emitEvent('createArchive', archive, ({ error: archiveError }) => {
                   if (archiveError) {
                     console.log(archiveError);
 

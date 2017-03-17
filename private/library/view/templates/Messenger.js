@@ -19,6 +19,7 @@ const MessageList = require('../elements/MessageList');
 const Message = require('../elements/Message');
 const Viewer = require('../base/Viewer');
 const List = require('../base/List');
+const DialogBox = require('../DialogBox');
 
 const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
@@ -26,6 +27,7 @@ const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const viewTools = require('../../ViewTools');
+const soundLibrary = require('../../audio/SoundLibrary');
 
 /**
  * Retrieve history and trigger CHATMSG event
@@ -49,6 +51,7 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false }) {
         shouldScroll: !infiniteScroll,
         isHistory: true,
         infiniteScroll,
+        following: historyData.following,
       },
     });
   });
@@ -204,12 +207,22 @@ class Messenger extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.CHATMSG,
-      func: ({ messages, options, shouldScroll, isHistory }) => {
+      func: ({ messages, options, shouldScroll, isHistory, following }) => {
         const itemsOptions = {
           animation: 'flash',
           shouldScroll,
           isHistory,
         };
+
+        if (isHistory) {
+          if (following) {
+            this.inputArea.classList.remove('hide');
+            this.messageList.element.classList.remove('fullHeight');
+          } else {
+            this.inputArea.classList.add('hide');
+            this.messageList.element.classList.add('fullHeight');
+          }
+        }
 
         this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
       },
@@ -224,6 +237,7 @@ class Messenger extends View {
         setTimeout(() => {
           this.messageList.element.innerHTML = '';
           this.messageList.element.classList.add('flash');
+
           getHistory({ roomName: room, switchedRoom: true });
         }, 100);
       },
@@ -317,17 +331,94 @@ class Messenger extends View {
 
       fragment.appendChild(elementCreator.createButton({
         text: 'Create room',
-        func: () => {},
+        func: () => {
+          const createDialog = new DialogBox({
+            buttons: {
+              left: {
+                text: 'Cancel',
+                eventFunc: () => {
+                  createDialog.removeView();
+                },
+              },
+              right: {
+                text: 'Create',
+                eventFunc: () => {
+                  const emptyFields = createDialog.markEmptyFields();
+
+                  if (emptyFields) {
+                    soundLibrary.playSound('fail');
+                    createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                    return;
+                  }
+
+                  socketManager.emitEvent('createRoom', {
+                    room: {
+                      roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
+                      password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
+                    },
+                  }, ({ error: createError, data: roomData }) => {
+                    if (createError) {
+                      console.log(createError);
+
+                      return;
+                    }
+
+                    eventCentral.triggerEvent({
+                      event: eventCentral.Events.CREATEROOM,
+                      params: { room: { roomName: roomData.room.roomName } },
+                    });
+                    eventCentral.triggerEvent({
+                      event: eventCentral.Events.FOLLOWROOM,
+                      params: { room: { roomName: roomData.room.roomName } },
+                    });
+                    createDialog.removeView();
+                  });
+                },
+              },
+            },
+            inputs: [{
+              placeholder: 'Name of the room',
+              inputName: 'roomName',
+              isRequired: true,
+            }, {
+              placeholder: 'Optional passowrd',
+              inputName: 'password',
+            }],
+            description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
+            extraDescription: ['Enter a name and optional password for the room'],
+          });
+          createDialog.appendTo(this.element.parentElement);
+        },
       }));
 
-      if (ownedRooms.length > 0) { fragment.appendChild(this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: true }).element); }
+      if (ownedRooms.length > 0) {
+        const ownedList = this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: false });
+
+        eventCentral.addWatcher({
+          watcherParent: ownedList,
+          event: eventCentral.Events.CREATEROOM,
+          func: ({ room: { roomName } }) => {
+            ownedList.addItem({
+              listItem: elementCreator.createButton({
+                text: roomName,
+                func: () => {
+                  storageManager.setRoom(roomName);
+                },
+              }),
+            });
+          },
+        });
+
+        fragment.appendChild(ownedList.element);
+      }
       if (followedRooms.length > 0) {
         const followList = this.createList({ rooms: followedRooms, title: 'Following', shouldSort: false });
 
         eventCentral.addWatcher({
           watcherParent: followList,
           event: eventCentral.Events.FOLLOWROOM,
-          func: ({ roomName }) => {
+          func: ({ room: { roomName } }) => {
             followList.addItem({
               listItem: elementCreator.createButton({
                 text: roomName,

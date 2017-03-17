@@ -93,7 +93,7 @@ class DialogBox extends View {
    * @returns {boolean} Are any of the fields empty?
    */
   markEmptyFields() {
-    const requiredFields = this.inputs.filter(({ inputElement }) => inputElement.getAttribute('required') === true);
+    const requiredFields = this.inputs.filter(({ inputElement }) => inputElement.getAttribute('required') === 'true');
     let emptyFields = false;
 
     requiredFields.forEach(({ inputElement: input }) => {
@@ -162,6 +162,7 @@ class DialogBox extends View {
     text.forEach((line) => {
       const paragraph = document.createElement('P');
 
+      paragraph.classList.add('flash');
       paragraph.appendChild(document.createTextNode(line));
       fragment.appendChild(paragraph);
     });

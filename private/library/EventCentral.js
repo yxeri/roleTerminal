@@ -25,6 +25,8 @@ class EventCentral {
       ARCHIVE: 'New archive',
       FOLLOWROOM: 'Followed room',
       UNFOLLOWROOM: 'Unfollowed room',
+      NEWROOM: 'New room',
+      CREATEROOM: 'Created room',
     };
     this.eventWatchers = {};
   }

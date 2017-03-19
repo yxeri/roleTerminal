@@ -20,6 +20,7 @@ const Viewer = require('../base/Viewer');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
+const eventCentral = require('../../EventCentral');
 
 // TODO Duplicate code in DialogBox
 /**
@@ -53,6 +54,16 @@ class DocsViewer extends View {
     container.appendChild(this.docsSelect);
     container.appendChild(this.viewer);
     this.element.appendChild(container);
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.ACCESS,
+      func: () => {
+        this.viewer.innerHTML = '';
+        this.viewer.classList.remove('selectedView');
+        this.populateList();
+      },
+    });
   }
 
   appendArchives(archives = []) {
@@ -110,7 +121,7 @@ class DocsViewer extends View {
 
       const listFragment = document.createDocumentFragment();
 
-      listFragment.appendChild(elementCreator.createButton({
+      const createButton = elementCreator.createButton({
         text: 'Create doc',
         func: () => {
           this.viewer.innerHTML = '';
@@ -147,7 +158,9 @@ class DocsViewer extends View {
           docFragment.appendChild(idInput);
           docFragment.appendChild(bodyInput);
           docFragment.appendChild(visibilitySet);
+
           if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
+
           buttons.appendChild(elementCreator.createButton({
             text: 'Save',
             func: () => {
@@ -177,7 +190,14 @@ class DocsViewer extends View {
 
           this.viewer.appendChild(docFragment);
         },
-      }));
+      });
+
+      this.accessElements.push({
+        element: createButton,
+        accessLevel: 1,
+      });
+
+      listFragment.appendChild(createButton);
 
       if (data.userArchives.length) {
         listFragment.appendChild(new List({ viewId: 'userDocuments', listItems: this.appendArchives(data.userArchives), shouldSort: true, title: 'Yours' }).element);

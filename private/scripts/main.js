@@ -45,6 +45,8 @@ if (!storageManager.getUserName()) {
   storageManager.setAccessLevel(0);
 }
 
+storageManager.setRoom('');
+
 window.addEventListener('error', (event) => {
   console.log(event.error);
 
@@ -197,16 +199,10 @@ home.addLink({
 home.addLink({
   linkName: 'Logout',
   startFunc: () => {
-    socketManager.emitEvent('logout');
-    storageManager.removeUser();
-
-    new LoginBox({
-      description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-      extraDescription: ['Enter your user name and password'],
-      parentElement: mainView,
-      socketManager,
-      keyHandler,
-    }).appendTo(mainView);
+    socketManager.emitEvent('logout', {}, () => {
+      storageManager.removeUser();
+      storageManager.setRoom('');
+    });
   },
   endFunc: () => {},
   accessLevel: 1,
@@ -214,10 +210,6 @@ home.addLink({
   classes: ['hide'],
 });
 home.appendTo(mainView);
-
-if (!storageManager.getRoom()) {
-  storageManager.setRoom('public');
-}
 
 eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
 
@@ -262,38 +254,12 @@ socketManager.addEvents([
           return;
         }
 
-        messenger.populateList();
-        docsViewer.populateList();
-
         const userName = storageManager.getUserName();
 
-        if (userName && data.anonUser) {
+        if ((userName && data.anonUser) || data.anonUser) {
           storageManager.removeUser();
-
-          new LoginBox({
-            description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-            extraDescription: [
-              'Your user was not found in the database',
-              'You need to register a new user to boost your productivity',
-            ],
-            parentElement: mainView,
-            socketManager,
-            keyHandler,
-          }).appendTo(mainView);
-          storageManager.setAccessLevel(0);
-        } else if (data.anonUser) {
-          if (!socketManager.hasConnected) {
-            new LoginBox({
-              description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-              extraDescription: ['Enter your user name and password'],
-              parentElement: mainView,
-              socketManager,
-              keyHandler,
-            }).appendTo(mainView);
-          }
           storageManager.setAccessLevel(0);
         } else {
-          // TODO Duplicate code with LoginBox?
           storageManager.setAccessLevel(data.user.accessLevel);
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
@@ -315,6 +281,12 @@ socketManager.addEvents([
     event: 'archive',
     func: ({ archive }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.ARCHIVE, params: { archive } });
+    },
+  }, {
+    event: 'logout',
+    func: () => {
+      storageManager.removeUser();
+      storageManager.setRoom('');
     },
   },
 ]);

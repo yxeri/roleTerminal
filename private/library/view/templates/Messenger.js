@@ -234,12 +234,26 @@ class Messenger extends View {
       func: ({ room }) => {
         this.messageList.element.classList.remove('flash');
 
-        setTimeout(() => {
-          this.messageList.element.innerHTML = '';
-          this.messageList.element.classList.add('flash');
+        if (storageManager.getRoom() !== '') {
+          setTimeout(() => {
+            this.messageList.element.innerHTML = '';
+            this.messageList.element.classList.add('flash');
 
-          getHistory({ roomName: room, switchedRoom: true });
-        }, 100);
+            getHistory({ roomName: room, switchedRoom: true });
+          }, 100);
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.ACCESS,
+      func: () => {
+        storageManager.setRoom('');
+        this.viewer.classList.remove('selectedView');
+        this.messageList.element.innerHTML = '';
+        this.inputArea.classList.add('hide');
+        this.populateList();
       },
     });
   }
@@ -329,7 +343,8 @@ class Messenger extends View {
       const { rooms = [], followedRooms = [], ownedRooms = [] } = data;
       const fragment = document.createDocumentFragment();
 
-      fragment.appendChild(elementCreator.createButton({
+      const createButton = elementCreator.createButton({
+        classes: ['hide'],
         text: 'Create room',
         func: () => {
           const createDialog = new DialogBox({
@@ -390,7 +405,13 @@ class Messenger extends View {
           });
           createDialog.appendTo(this.element.parentElement);
         },
-      }));
+      });
+
+      fragment.appendChild(createButton);
+      this.accessElements.push({
+        element: createButton,
+        accessLevel: 1,
+      });
 
       if (ownedRooms.length > 0) {
         const ownedList = this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: false });
@@ -432,7 +453,10 @@ class Messenger extends View {
 
         fragment.appendChild(followList.element);
       }
-      if (rooms.length > 0) { fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element); }
+      if (rooms.length > 0) {
+        fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element);
+      }
+
       this.chatSelect.appendChild(fragment);
     });
   }
@@ -456,6 +480,7 @@ class Messenger extends View {
             }
 
             this.selectedItem = button.parentElement;
+            this.viewer.classList.add('selectedView');
             this.selectedItem.classList.add('selectedItem');
             storageManager.setRoom(room);
           },

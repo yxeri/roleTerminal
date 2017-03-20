@@ -19,6 +19,7 @@ const SoundElement = require('./SoundElement');
 class SoundLibrary {
   constructor() {
     this.sounds = {};
+    this.isEnabled = false;
   }
 
   addSound(sound) {
@@ -34,22 +35,28 @@ class SoundLibrary {
   }
 
   playSound(soundId, params = {}) {
-    const sound = this.sounds[soundId];
+    if (this.isEnabled) {
+      const sound = this.sounds[soundId];
 
-    if (sound) {
-      if (!sound.multi) {
-        sound.playAudio(params);
-      } else {
-        const newSound = {
-          path: sound.audio.src,
-          volume: sound.audio.volume,
-          soundId: sound.soundId,
-          multi: sound.multi,
-        };
+      if (sound) {
+        if (!sound.multi) {
+          sound.playAudio(params);
+        } else {
+          const newSound = {
+            path: sound.audio.src,
+            volume: sound.audio.volume,
+            soundId: sound.soundId,
+            multi: sound.multi,
+          };
 
-        new SoundElement(newSound).playAudio({});
+          new SoundElement(newSound).playAudio({});
+        }
       }
     }
+  }
+
+  toggleSounds() {
+    this.isEnabled = !this.isEnabled;
   }
 
   removeSound(sentSoundId) {

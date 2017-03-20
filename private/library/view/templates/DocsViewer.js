@@ -55,161 +55,154 @@ class DocsViewer extends View {
     container.appendChild(this.viewer);
     this.element.appendChild(container);
 
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.ACCESS,
-      func: () => {
-        this.viewer.innerHTML = '';
-        this.viewer.classList.remove('selectedView');
-        this.populateList();
-      },
-    });
+    this.populateList();
   }
 
-  appendArchives(archives = []) {
-    return archives.map((archive) => { // eslint-disable-line arrow-body-style
-      const button = elementCreator.createButton({
-        func: () => {
-          if (this.selectedItem) {
-            this.selectedItem.classList.remove('selectedItem');
+  createArchiveButton(archive) {
+    const button = elementCreator.createButton({
+      text: `${archive.title || archive.archiveId}`,
+      func: () => {
+        if (this.selectedItem) {
+          this.selectedItem.classList.remove('selectedItem');
+        }
+
+        this.selectedItem = button.parentElement;
+        this.viewer.classList.add('selectedView');
+        this.selectedItem.classList.add('selectedItem');
+
+        socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
+          if (archiveError) {
+            console.log(archiveError);
+
+            return;
           }
 
-          this.viewer.classList.add('selectedView');
-          this.selectedItem = button.parentElement;
-          this.selectedItem.classList.add('selectedItem');
+          const docFragment = document.createDocumentFragment();
+          docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
+          docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId.toUpperCase()}` }));
+          docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${archiveData.archive.isPublic ? 'Yes' : 'No'}` }));
 
-          socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
-            if (archiveError) {
-              console.log(archiveError);
+          archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
-              return;
-            }
+          this.viewer.classList.remove('flash');
 
-            const docFragment = document.createDocumentFragment();
-            docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
-            docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId.toUpperCase()}` }));
-            docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${archiveData.archive.isPublic ? 'Yes' : 'No'}` }));
-
-            archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
-
-            this.viewer.classList.remove('flash');
-
-            setTimeout(() => {
-              this.viewer.innerHTML = '';
-              this.viewer.classList.add('flash');
-              this.viewer.scrollTop = this.viewer.scrollHeight;
-              this.viewer.appendChild(docFragment);
-            }, 100);
-          });
-        },
-        text: `${archive.title || archive.archiveId}`,
-      });
-
-      return button;
+          setTimeout(() => {
+            this.viewer.innerHTML = '';
+            this.viewer.classList.add('flash');
+            this.viewer.scrollTop = this.viewer.scrollHeight;
+            this.viewer.appendChild(docFragment);
+          }, 100);
+        });
+      },
     });
+
+    return button;
   }
 
   populateList() {
-    this.docsSelect.innerHTML = '';
+    const userDocs = new List({ viewId: 'userDocuments', shouldSort: true, title: 'Yours' });
+    const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
 
-    socketManager.emitEvent('getArchivesList', {}, ({ error, data }) => {
-      if (error) {
-        console.log(error);
+    const createButton = elementCreator.createButton({
+      text: 'Create doc',
+      func: () => {
+        this.viewer.innerHTML = '';
 
-        return;
-      }
+        const docFragment = document.createDocumentFragment();
+        const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
+        const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with', inputName: 'docId', isRequired: true });
+        const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
+        const visibilitySet = elementCreator.createRadioSet({
+          title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
+          optionName: 'visibility',
+          options: [
+            { optionId: 'visPublic', optionLabel: 'Everyone' },
+            { optionId: 'visPrivate', optionLabel: 'Only those with the correct ID' },
+          ],
+        });
+        const teamSet = elementCreator.createRadioSet({
+          title: 'Should the document be added to the team directory?',
+          optionName: 'team',
+          options: [
+            { optionId: 'teamYes', optionLabel: 'Yes' },
+            { optionId: 'teamNo', optionLabel: 'No' },
+          ],
+        });
+        const buttons = elementCreator.createContainer({ classes: ['buttons'] });
 
-      const listFragment = document.createDocumentFragment();
+        // TODO Duplicate code in Messenger
+        bodyInput.addEventListener('input', () => {
+          bodyInput.style.height = 'auto';
+          bodyInput.style.height = `${bodyInput.scrollHeight}px`;
+        });
 
-      const createButton = elementCreator.createButton({
-        text: 'Create doc',
-        func: () => {
-          this.viewer.innerHTML = '';
+        docFragment.appendChild(titleInput);
+        docFragment.appendChild(idInput);
+        docFragment.appendChild(bodyInput);
+        docFragment.appendChild(visibilitySet);
 
-          const docFragment = document.createDocumentFragment();
-          const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
-          const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with', inputName: 'docId', isRequired: true });
-          const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
-          const visibilitySet = elementCreator.createRadioSet({
-            title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
-            optionName: 'visibility',
-            options: [
-              { optionId: 'visPublic', optionLabel: 'Everyone' },
-              { optionId: 'visPrivate', optionLabel: 'Only those with the correct ID' },
-            ],
-          });
-          const teamSet = elementCreator.createRadioSet({
-            title: 'Should the document be added to the team directory?',
-            optionName: 'team',
-            options: [
-              { optionId: 'teamYes', optionLabel: 'Yes' },
-              { optionId: 'teamNo', optionLabel: 'No' },
-            ],
-          });
-          const buttons = elementCreator.createContainer({ classes: ['buttons'] });
+        if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
 
-          // TODO Duplicate code in Messenger
-          bodyInput.addEventListener('input', () => {
-            bodyInput.style.height = 'auto';
-            bodyInput.style.height = `${bodyInput.scrollHeight}px`;
-          });
+        buttons.appendChild(elementCreator.createButton({
+          text: 'Save',
+          func: () => {
+            if (!markEmptyFields([titleInput, bodyInput, idInput])) {
+              const archive = {
+                title: titleInput.value,
+                archiveId: idInput.value,
+                text: bodyInput.value.split('\n'),
+                isPublic: document.getElementById('visPublic').checked === true,
+                teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
+              };
 
-          docFragment.appendChild(titleInput);
-          docFragment.appendChild(idInput);
-          docFragment.appendChild(bodyInput);
-          docFragment.appendChild(visibilitySet);
+              socketManager.emitEvent('createArchive', archive, ({ error: archiveError }) => {
+                if (archiveError) {
+                  console.log(archiveError);
 
-          if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
+                  return;
+                }
 
-          buttons.appendChild(elementCreator.createButton({
-            text: 'Save',
-            func: () => {
-              if (!markEmptyFields([titleInput, bodyInput, idInput])) {
-                const archive = {
-                  title: titleInput.value,
-                  archiveId: idInput.value,
-                  text: bodyInput.value.split('\n'),
-                  isPublic: document.getElementById('visPublic').checked === true,
-                  teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
-                };
+                this.viewer.innerHTML = '';
+                this.viewer.appendChild(document.createTextNode('Document has been saved'));
+              });
+            }
+          },
+        }));
+        docFragment.appendChild(buttons);
 
-                socketManager.emitEvent('createArchive', archive, ({ error: archiveError }) => {
-                  if (archiveError) {
-                    console.log(archiveError);
+        this.viewer.appendChild(docFragment);
+      },
+    });
 
-                    return;
-                  }
+    this.docsSelect.appendChild(createButton);
+    this.docsSelect.appendChild(userDocs.element);
+    this.docsSelect.appendChild(publicDocs.element);
 
-                  this.viewer.innerHTML = '';
-                  this.viewer.appendChild(document.createTextNode('Document has been saved'));
-                });
-              }
-            },
-          }));
-          docFragment.appendChild(buttons);
+    this.accessElements.push({
+      element: createButton,
+      accessLevel: 1,
+    });
 
-          this.viewer.appendChild(docFragment);
-        },
-      });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.USER,
+      func: () => {
+        this.viewer.innerHTML = '';
+        this.viewer.classList.remove('selectedView');
 
-      this.accessElements.push({
-        element: createButton,
-        accessLevel: 1,
-      });
+        socketManager.emitEvent('getArchivesList', {}, ({ error, data }) => {
+          if (error) {
+            console.log(error);
 
-      listFragment.appendChild(createButton);
+            return;
+          }
 
-      if (data.userArchives.length) {
-        listFragment.appendChild(new List({ viewId: 'userDocuments', listItems: this.appendArchives(data.userArchives), shouldSort: true, title: 'Yours' }).element);
-      }
+          const { userArchives = [], archives = [] } = data;
 
-      if (storageManager.getTeam()) {
-        listFragment.appendChild(new List({ viewId: 'teamDocuments', listItems: this.appendArchives(data.userArchives), shouldSort: true, title: 'Team' }).element);
-      }
-
-      listFragment.appendChild(new List({ viewId: 'publicDocuments', listItems: this.appendArchives(data.archives), shouldSort: true, title: 'Public' }).element);
-
-      this.docsSelect.appendChild(listFragment);
+          userDocs.replaceAllItems({ items: userArchives.map(archive => this.createArchiveButton(archive)) });
+          publicDocs.replaceAllItems({ items: archives.map(archive => this.createArchiveButton(archive)) });
+        });
+      },
     });
   }
 

@@ -668,6 +668,9 @@ img {
 }
 
 .selectedView {
+  padding-top: -1px;
+  padding-left: -1px;
+  padding-bottom: -1px;
   border-top: 1px solid;
   border-left: 1px solid;
   border-bottom: 1px solid;

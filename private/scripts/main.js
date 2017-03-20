@@ -41,12 +41,6 @@ if (storageManager.getDeviceId() === null) {
   storageManager.setDeviceId(textTools.createAlphaNumbericalString(16, false));
 }
 
-if (!storageManager.getUserName()) {
-  storageManager.setAccessLevel(0);
-}
-
-storageManager.setRoom('');
-
 window.addEventListener('error', (event) => {
   console.log(event.error);
 
@@ -153,9 +147,32 @@ if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
 }
 
 eventCentral.addWatcher({
+  watcherParent: this,
+  event: eventCentral.Events.LOGOUT,
+  func: () => {
+    storageManager.removeUser();
+    storageManager.setRoom('');
+    eventCentral.triggerEvent({ event: eventCentral.Events.USER });
+  },
+});
+
+eventCentral.addWatcher({
+  watcherParent: this,
+  event: eventCentral.Events.LOGIN,
+  func: () => {
+    eventCentral.triggerEvent({ event: eventCentral.Events.USER });
+  },
+});
+
+eventCentral.addWatcher({
   watcherParent: messenger,
   event: eventCentral.Events.CHATMSG,
   func: () => { soundLibrary.playSound('msgReceived'); },
+});
+
+eventCentral.triggerEvent({
+  event: eventCentral.Events.SWITCHROOM,
+  params: { room: storageManager.getRoom() },
 });
 
 keyHandler.addKey(112, viewTools.goFullScreen);
@@ -163,6 +180,10 @@ keyHandler.addKey(112, viewTools.goFullScreen);
 window.addEventListener('click', () => {
   viewTools.goFullScreen();
 });
+
+if (!storageManager.getUserName()) {
+  eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+}
 
 home.addLink({
   linkName: 'Coms',
@@ -199,9 +220,12 @@ home.addLink({
 home.addLink({
   linkName: 'Logout',
   startFunc: () => {
-    socketManager.emitEvent('logout', {}, () => {
-      storageManager.removeUser();
-      storageManager.setRoom('');
+    socketManager.emitEvent('logout', {}, (error) => {
+      if (error) {
+        console.log(error);
+      }
+
+      eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
     });
   },
   endFunc: () => {},
@@ -210,8 +234,6 @@ home.addLink({
   classes: ['hide'],
 });
 home.appendTo(mainView);
-
-eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room: storageManager.getRoom() } });
 
 map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
 map.setCenterCoordinates(storageManager.getCenterCoordinates());
@@ -264,6 +286,7 @@ socketManager.addEvents([
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
+        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: {} });
         socketManager.setConnected();
       });
     },
@@ -285,8 +308,7 @@ socketManager.addEvents([
   }, {
     event: 'logout',
     func: () => {
-      storageManager.removeUser();
-      storageManager.setRoom('');
+      eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: {} });
     },
   },
 ]);

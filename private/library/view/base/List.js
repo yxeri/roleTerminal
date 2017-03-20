@@ -49,7 +49,7 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, listItems, title }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
@@ -63,19 +63,30 @@ class List extends View {
       this.element.appendChild(titleElement);
     }
 
-    this.element.appendChild(elementCreator.createList({ elements: listItems }));
+    this.element.appendChild(elementCreator.createList({ elements: items }));
   }
 
-  addItem({ listItem }) {
+  addItem({ item }) {
     if (this.shouldSort) {
-      this.element.replaceChild(this.list, createSortedList(this.element.lastChild, listItem));
+      this.element.replaceChild(this.list, createSortedList(this.element.lastElementChild, elementCreator.createListItem(item)));
     } else {
-      this.element.lastChild.appendChild(listItem);
+      this.element.lastElementChild.appendChild(elementCreator.createListItem(item));
     }
   }
 
-  replaceAllItems({ list }) {
-    this.element.replaceChild(this.element.firstChild, list);
+  addItems({ items }) {
+    const fragment = document.createDocumentFragment();
+
+    items.forEach(item => fragment.appendChild(elementCreator.createListItem(item)));
+    this.addItem({ listItem: fragment });
+  }
+
+  replaceAllItems({ items }) {
+    const list = elementCreator.createList({
+      elements: items,
+    });
+
+    this.element.replaceChild(list, this.element.lastElementChild);
   }
 }
 

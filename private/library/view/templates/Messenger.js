@@ -26,7 +26,6 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
-const viewTools = require('../../ViewTools');
 const soundLibrary = require('../../audio/SoundLibrary');
 
 /**
@@ -194,7 +193,7 @@ class Messenger extends View {
 
     this.viewer.addEventListener('mousewheel', () => {
       if (this.viewer.firstElementChild) {
-        if (!this.messageList.isTopDown && viewTools.isCloseToTop(this.viewer.firstElementChild)) {
+        if (!this.messageList.isTopDown) {
           // getHistory({ roomName: storageManager.getRoom() });
         }
       }
@@ -245,17 +244,7 @@ class Messenger extends View {
       },
     });
 
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.ACCESS,
-      func: () => {
-        storageManager.setRoom('');
-        this.viewer.classList.remove('selectedView');
-        this.messageList.element.innerHTML = '';
-        this.inputArea.classList.add('hide');
-        this.populateList();
-      },
-    });
+    this.populateList();
   }
 
   sendMessage() {
@@ -331,133 +320,137 @@ class Messenger extends View {
   }
 
   populateList() {
-    this.chatSelect.innerHTML = '';
-
-    socketManager.emitEvent('listRooms', {}, ({ error, data }) => {
-      if (error) {
-        console.log(error);
-
-        return;
-      }
-
-      const { rooms = [], followedRooms = [], ownedRooms = [] } = data;
-      const fragment = document.createDocumentFragment();
-
-      const createButton = elementCreator.createButton({
-        classes: ['hide'],
-        text: 'Create room',
-        func: () => {
-          const createDialog = new DialogBox({
-            buttons: {
-              left: {
-                text: 'Cancel',
-                eventFunc: () => {
-                  createDialog.removeView();
-                },
+    const ownedList = new List({
+      title: 'Yours',
+      shouldSort: false,
+    });
+    const followList = new List({
+      title: 'Following',
+      shouldSort: false,
+    });
+    const roomsList = new List({
+      title: 'Rooms',
+      shouldSort: true,
+    });
+    const createButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Create room',
+      func: () => {
+        const createDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                createDialog.removeView();
               },
-              right: {
-                text: 'Create',
-                eventFunc: () => {
-                  const emptyFields = createDialog.markEmptyFields();
+            },
+            right: {
+              text: 'Create',
+              eventFunc: () => {
+                const emptyFields = createDialog.markEmptyFields();
 
-                  if (emptyFields) {
-                    soundLibrary.playSound('fail');
-                    createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                socketManager.emitEvent('createRoom', {
+                  room: {
+                    roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
+                    password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
+                  },
+                }, ({ error: createError, data: roomData }) => {
+                  if (createError) {
+                    console.log(createError);
 
                     return;
                   }
 
-                  socketManager.emitEvent('createRoom', {
-                    room: {
-                      roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
-                      password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
-                    },
-                  }, ({ error: createError, data: roomData }) => {
-                    if (createError) {
-                      console.log(createError);
-
-                      return;
-                    }
-
-                    eventCentral.triggerEvent({
-                      event: eventCentral.Events.CREATEROOM,
-                      params: { room: { roomName: roomData.room.roomName } },
-                    });
-                    eventCentral.triggerEvent({
-                      event: eventCentral.Events.FOLLOWROOM,
-                      params: { room: { roomName: roomData.room.roomName } },
-                    });
-                    createDialog.removeView();
+                  eventCentral.triggerEvent({
+                    event: eventCentral.Events.CREATEROOM,
+                    params: { room: { roomName: roomData.room.roomName } },
                   });
-                },
+                  eventCentral.triggerEvent({
+                    event: eventCentral.Events.FOLLOWROOM,
+                    params: { room: { roomName: roomData.room.roomName } },
+                  });
+                  createDialog.removeView();
+                });
               },
             },
-            inputs: [{
-              placeholder: 'Name of the room',
-              inputName: 'roomName',
-              isRequired: true,
-            }, {
-              placeholder: 'Optional passowrd',
-              inputName: 'password',
-            }],
-            description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
-            extraDescription: ['Enter a name and optional password for the room'],
-          });
-          createDialog.appendTo(this.element.parentElement);
-        },
-      });
-
-      fragment.appendChild(createButton);
-      this.accessElements.push({
-        element: createButton,
-        accessLevel: 1,
-      });
-
-      if (ownedRooms.length > 0) {
-        const ownedList = this.createList({ rooms: ownedRooms, title: 'Yours', shouldSort: false });
-
-        eventCentral.addWatcher({
-          watcherParent: ownedList,
-          event: eventCentral.Events.CREATEROOM,
-          func: ({ room: { roomName } }) => {
-            ownedList.addItem({
-              listItem: elementCreator.createButton({
-                text: roomName,
-                func: () => {
-                  storageManager.setRoom(roomName);
-                },
-              }),
-            });
           },
+          inputs: [{
+            placeholder: 'Name of the room',
+            inputName: 'roomName',
+            isRequired: true,
+          }, {
+            placeholder: 'Optional passowrd',
+            inputName: 'password',
+          }],
+          description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
+          extraDescription: ['Enter a name and optional password for the room'],
         });
+        createDialog.appendTo(this.element.parentElement);
+      },
+    });
 
-        fragment.appendChild(ownedList.element);
-      }
-      if (followedRooms.length > 0) {
-        const followList = this.createList({ rooms: followedRooms, title: 'Following', shouldSort: false });
+    this.chatSelect.appendChild(createButton);
+    this.chatSelect.appendChild(ownedList.element);
+    this.chatSelect.appendChild(followList.element);
+    this.chatSelect.appendChild(roomsList.element);
 
-        eventCentral.addWatcher({
-          watcherParent: followList,
-          event: eventCentral.Events.FOLLOWROOM,
-          func: ({ room: { roomName } }) => {
-            followList.addItem({
-              listItem: elementCreator.createButton({
-                text: roomName,
-                func: () => {
-                  storageManager.setRoom(roomName);
-                },
-              }),
-            });
-          },
+    this.accessElements.push({
+      element: createButton,
+      accessLevel: 1,
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: ownedList,
+      event: eventCentral.Events.CREATEROOM,
+      func: ({ room: { roomName } }) => {
+        ownedList.addItem({ item: this.createRoomButton(roomName) });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: followList,
+      event: eventCentral.Events.FOLLOWROOM,
+      func: ({ room: { roomName } }) => {
+        followList.addItem({ item: this.createRoomButton(roomName) });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: roomsList,
+      event: eventCentral.Events.NEWROOM,
+      func: ({ room: { roomName } }) => {
+        roomsList.addItem({ item: this.createRoomButton(roomName) });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.USER,
+      func: () => {
+        this.messageList.element.innerHTML = '';
+        this.viewer.classList.remove('selectedView');
+
+        socketManager.emitEvent('listRooms', {}, ({ error, data }) => {
+          if (error) {
+            console.log(error);
+
+            return;
+          }
+
+          const { rooms = [], followedRooms = [], ownedRooms = [] } = data;
+
+          ownedList.replaceAllItems({ items: ownedRooms.map(room => this.createRoomButton(room)) });
+          followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton(room)) });
+          roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton(room)) });
         });
-
-        fragment.appendChild(followList.element);
-      }
-      if (rooms.length > 0) {
-        fragment.appendChild(this.createList({ rooms, title: 'Rooms', shouldSort: true }).element);
-      }
-
-      this.chatSelect.appendChild(fragment);
+      },
     });
   }
 
@@ -467,28 +460,22 @@ class Messenger extends View {
     this.messageList.scroll();
   }
 
-  createList({ rooms, title, shouldSort }) {
-    return new List({
-      title,
-      shouldSort: shouldSort || false,
-      listItems: rooms.map((room) => {
-        const button = elementCreator.createButton({
-          text: room,
-          func: () => {
-            if (this.selectedItem) {
-              this.selectedItem.classList.remove('selectedItem');
-            }
+  createRoomButton(roomName) {
+    const button = elementCreator.createButton({
+      text: roomName,
+      func: () => {
+        if (this.selectedItem) {
+          this.selectedItem.classList.remove('selectedItem');
+        }
 
-            this.selectedItem = button.parentElement;
-            this.viewer.classList.add('selectedView');
-            this.selectedItem.classList.add('selectedItem');
-            storageManager.setRoom(room);
-          },
-        });
-
-        return button;
-      }),
+        this.selectedItem = button.parentElement;
+        this.viewer.classList.add('selectedView');
+        this.selectedItem.classList.add('selectedItem');
+        storageManager.setRoom(roomName);
+      },
     });
+
+    return button;
   }
 }
 

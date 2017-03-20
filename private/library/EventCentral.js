@@ -27,6 +27,9 @@ class EventCentral {
       UNFOLLOWROOM: 'Unfollowed room',
       NEWROOM: 'New room',
       CREATEROOM: 'Created room',
+      USER: 'Switched user',
+      LOGOUT: 'Logged out',
+      LOGIN: 'Logged in',
     };
     this.eventWatchers = {};
   }

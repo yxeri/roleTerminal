@@ -27,10 +27,16 @@ class ElementCreator {
 
   static createListItem({ element, func, classes }) {
     const listItem = document.createElement('LI');
-    listItem.appendChild(element);
-    this.setClasses(listItem, classes);
 
-    if (func) { listItem.addEventListener('click', func); }
+    if (element) {
+      listItem.appendChild(element);
+    }
+
+    if (func) {
+      listItem.addEventListener('click', func);
+    }
+
+    this.setClasses(listItem, classes);
 
     return listItem;
   }

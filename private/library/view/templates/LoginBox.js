@@ -146,7 +146,6 @@ class LoginBox extends DialogBox {
 
   appendTo(parentElement) {
     super.appendTo(parentElement);
-    this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.focus();
   }
 }
 

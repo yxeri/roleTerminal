@@ -109,6 +109,7 @@ class DialogBox extends View {
   appendTo(parentElement) {
     parentElement.appendChild(this.cover);
     super.appendTo(parentElement);
+    this.inputs[0].inputElement.focus();
   }
 
   removeView() {
@@ -119,7 +120,6 @@ class DialogBox extends View {
 
   addInput(input) {
     const inputElement = elementCreator.createInput(input);
-    console.log(inputElement);
 
     this.inputs.push({ inputName: input.inputName, inputElement });
     this.element.insertBefore(inputElement, this.buttonsContainer);

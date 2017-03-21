@@ -104,6 +104,7 @@ class DocsViewer extends View {
     const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
 
     const createButton = elementCreator.createButton({
+      classes: ['hide'],
       text: 'Create doc',
       func: () => {
         this.viewer.innerHTML = '';
@@ -207,8 +208,8 @@ class DocsViewer extends View {
   }
 
   removeView() {
-    this.viewer.classList.remove('flash');
     super.removeView();
+    this.viewer.classList.remove('flash');
   }
 }
 

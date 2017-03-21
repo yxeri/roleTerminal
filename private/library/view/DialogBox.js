@@ -77,6 +77,13 @@ class DialogBox extends View {
     inputs.forEach((input) => {
       const inputElement = elementCreator.createInput(input);
 
+      if (inputElement.type === 'textarea') {
+        inputElement.addEventListener('input', () => {
+          inputElement.style.height = 'auto';
+          inputElement.style.height = `${inputElement.scrollHeight}px`;
+        });
+      }
+
       this.inputs.push({ inputName: input.inputName, inputElement });
       this.element.appendChild(inputElement);
     });

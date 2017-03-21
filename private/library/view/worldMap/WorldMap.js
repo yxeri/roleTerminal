@@ -15,11 +15,13 @@
  */
 
 const View = require('../base/View');
+const DialogBox = require('../DialogBox');
 const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
+const eventCentral = require('../../EventCentral');
 
 const MapViews = {
   OVERVIEW: 'overview',
@@ -53,7 +55,8 @@ class WorldMap extends View {
     this.cornerCoordinates = cornerCoordinates;
     this.centerCoordinates = centerCoordinates;
     this.infoElement = elementCreator.createContainer({ elementId: 'markerInfo', classes: ['hide'] });
-    this.mapClickMenu = elementCreator.createContainer({ elementId: 'mapClickMenu', classes: ['hide'] });
+    this.mapClickMenu = elementCreator.createContainer({ elementId: 'mapClickMenu', classes: ['hide', 'clickMenu'] });
+    this.markerClickMenu = elementCreator.createContainer({ elementId: 'markerClickMenu', classes: ['hide', 'clickMenu'] });
     this.infoElement.addEventListener('click', () => { this.hideMarkerInfo(); });
     this.defaultZoomLevel = zoomLevel;
     this.labelStyle = labelStyle;
@@ -63,6 +66,21 @@ class WorldMap extends View {
     this.mapBackground = mapBackground;
     this.map = null;
     this.overlay = null;
+    this.movingMarker = null;
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.MYPOSITION,
+      func: ({ position }) => {
+        this.setUserPosition({
+          longitude: position.coords.longitude,
+          latitude: position.coords.latitude,
+          timestamp: position.timestamp,
+          accuracy: position.coords.accuracy,
+          heading: position.coords.heading,
+        });
+      },
+    });
   }
 
   static get MapViews() {
@@ -77,7 +95,40 @@ class WorldMap extends View {
     this.mapView = view;
   }
 
-  createClickMenu(event) {
+  createMarkerClickMenu(event, marker) {
+    const projection = this.overlay.getProjection();
+    const xy = projection.fromLatLngToContainerPixel(event.latLng);
+
+    this.markerClickMenu.style.left = `${xy.x + 5}px`;
+    this.markerClickMenu.style.top = `${xy.y + 5}px`;
+
+    const list = elementCreator.createList({
+      elements: [
+        elementCreator.createButton({
+          text: 'Move marker',
+          func: () => {
+            this.movingMarker = marker;
+
+            google.maps.event.addListener(this.map, 'mousemove', (moveEvent) => {
+              this.setMarkerPosition({
+                positionName: marker.addedTitle,
+                position: {
+                  latitude: moveEvent.latLng.lat(),
+                  longitude: moveEvent.latLng.lng(),
+                },
+              }, { emit: false });
+            });
+            this.hideMarkerClicKMenu();
+          },
+        }),
+      ],
+    });
+
+    elementCreator.replaceOnlyChild(this.markerClickMenu, list);
+    this.showMarkerClickMenu();
+  }
+
+  createMapClickMenu(event) {
     const projection = this.overlay.getProjection();
     const xy = projection.fromLatLngToContainerPixel(event.latLng);
 
@@ -87,42 +138,90 @@ class WorldMap extends View {
     const list = elementCreator.createList({
       elements: [
         elementCreator.createButton({
-          text: 'Add marker',
+          text: 'Create marker',
           func: () => {
-            this.createMarker({
-              markerName: `${event.latLng.lat()}${event.latLng.lng()}`,
-              title: `${event.latLng.lat()}${event.latLng.lng()}`,
-              description: `${event.latLng.lat()}${event.latLng.lng()}`,
-              markerType: 'customLocation',
-              position: {
-                longitude: event.latLng.lng(),
-                latitude: event.latLng.lat(),
+            const markerDialog = new DialogBox({
+              buttons: {
+                left: {
+                  text: 'Cancel',
+                  eventFunc: () => {
+                    markerDialog.removeView();
+                  },
+                },
+                right: {
+                  text: 'Create',
+                  eventFunc: () => {
+                    const location = {
+                      longitude: event.latLng.lng(),
+                      latitude: event.latLng.lat(),
+                      title: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
+                      description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value,
+                    };
+
+                    socketManager.emitEvent('updateLocation', { location }, ({ error }) => {
+                      if (error) {
+                        console.log(error);
+
+                        return;
+                      }
+
+                      this.createMarker({
+                        markerName: location.title.toLowerCase(),
+                        title: location.title,
+                        description: location.description,
+                        markerType: 'custom',
+                        iconUrl: 'images/mapiconcreated.png',
+                        position: {
+                          longitude: event.latLng.lng(),
+                          latitude: event.latLng.lat(),
+                        },
+                      }, { emit: true });
+                      markerDialog.removeView();
+                    });
+                  },
+                },
               },
+              inputs: [{
+                placeholder: 'Name of the location',
+                inputName: 'markerName',
+                isRequired: true,
+              }, {
+                placeholder: 'Description',
+                inputName: 'description',
+                multiLine: true,
+              }],
+              description: ['Mark a location that offers the maximum amount of team synergy'],
+              extraDescription: [''],
             });
-            this.hideClickMenu();
+            markerDialog.appendTo(this.element.parentElement);
+            this.hideMapClickMenu();
           },
+        }),
+        elementCreator.createButton({
+          text: 'Ping',
+          func: () => {},
         }),
       ],
     });
 
     elementCreator.replaceOnlyChild(this.mapClickMenu, list);
-    this.showClickMenu();
+    this.showMapClickMenu();
   }
 
   /**
    * Creates a label at the location of another object
    * The name of the position will be used as text for the label
    * @param {string} params.positionName - Name of the position
-   * @param {string} params.text - Text that will be printed
+   * @param {string} params.labelText - Text that will be printed
    * @param {string} [params.align] - Text alignment (left|right)
    * @param {{latitude: Number, longitude: Number}} params.position - Long and lat coordinates of the label
    */
-  createLabel({ positionName, text, align = 'right', position }) {
+  createLabel({ positionName, labelText, align = 'right', position }) {
     const lowerPositionName = positionName.toLowerCase();
     const labelOptions = {
       position: new google.maps.LatLng(position.latitude, position.longitude),
+      text: labelText || positionName,
       align,
-      text,
     };
 
     Object.keys(this.labelStyle).forEach((name) => { labelOptions[name] = this.labelStyle[name]; });
@@ -145,7 +244,7 @@ class WorldMap extends View {
    * @param {boolean} [params.hideLabel] - Should the label be hidden in the view?
    * @param {boolean} [params.ignoreCluster] - Should the marker be excluded from clusters?
    */
-  createMarker({ markerName, position, iconUrl, description, title, markerType, opacity, hideLabel, ignoreCluster }) {
+  createMarker({ markerName, position, iconUrl, description, title, markerType, opacity, hideLabel, ignoreCluster }, { emit }) {
     const icon = {
       url: iconUrl || '/images/mapicon.png',
       size: new google.maps.Size(14, 14),
@@ -153,6 +252,7 @@ class WorldMap extends View {
       anchor: new google.maps.Point(7, 7),
     };
     const markerId = Object.keys(this.markers).length + 1;
+    let longClick = false;
 
     this.markers[markerName] = new google.maps.Marker({
       position: {
@@ -169,14 +269,7 @@ class WorldMap extends View {
     if (description) { this.markers[markerName].description = description.replace(/(<img)(.+?)(\s)\/>/g, ''); }
 
     if (!hideLabel && title) {
-      const snakeCaseTitle = title.replace(/\s/g, '_');
       this.markers[markerName].addedTitle = title;
-
-      this.createLabel({
-        positionName: title,
-        labelText: snakeCaseTitle.length > 18 ? `${markerId}:${snakeCaseTitle.slice(0, 18)}..` : `${markerId}:${snakeCaseTitle}`,
-        position,
-      });
     }
 
     this.markers[markerName].setMap(this.map);
@@ -185,10 +278,24 @@ class WorldMap extends View {
       this.clusterer.addMarker(this.markers[markerName]);
     }
 
-    google.maps.event.addListener(this.markers[markerName], 'click', () => {
-      this.hideMarkerInfo();
-
+    google.maps.event.addListener(this.markers[markerName], 'click', (event) => {
       const marker = this.markers[markerName];
+
+      if (this.movingMarker !== null) {
+        google.maps.event.clearListeners(this.map, 'mousemove');
+        this.setMarkerPosition({
+          positionName: marker.addedTitle,
+          position: {
+            latitude: event.latLng.lat(),
+            longitude: event.latLng.lng(),
+          },
+        }, { emit: true });
+        this.movingMarker = null;
+
+        return;
+      }
+
+      this.hideMarkerInfo();
 
       soundLibrary.playSound('button2');
 
@@ -210,6 +317,25 @@ class WorldMap extends View {
         this.showMarkerInfo();
       }
     });
+
+    google.maps.event.addListener(this.markers[markerName], 'rightclick', (event) => {
+      this.createMarkerClickMenu(event, this.markers[markerName]);
+    });
+    google.maps.event.addListener(this.markers[markerName], 'mousedown', (event) => {
+      longClick = true;
+      this.hideMarkerInfo();
+      this.hideMapClickMenu();
+      this.hideMarkerClicKMenu();
+
+      setTimeout(() => {
+        if (longClick) {
+          this.createMarkerClickMenu(event, this.markers[markerName]);
+        }
+      }, 500);
+    });
+    google.maps.event.addListener(this.markers[markerName], 'mouseup', () => {
+      longClick = false;
+    });
   }
 
   /**
@@ -225,7 +351,7 @@ class WorldMap extends View {
    * @param {boolean} [params.hideLabel] - Should the label be hidden?
    * @param {string} [params.iconUrl] - Path to custom map marker icon
    */
-  setMarkerPosition({ positionName, position, lastUpdated, markerType, hideLabel, iconUrl, description }) {
+  setMarkerPosition({ positionName, position, lastUpdated, markerType, hideLabel, iconUrl, description }, { emit }) {
     const markerName = positionName.toLowerCase();
     const marker = this.markers[markerName];
 
@@ -242,7 +368,13 @@ class WorldMap extends View {
         iconUrl,
         description,
         markerType,
-      });
+      }, { emit });
+    }
+
+    console.log('emit', emit);
+
+    if (emit) {
+      socketManager.emitEvent('updateLocation', { location: { longitude: position.longitude, latitude: position.latitude, title: positionName } });
     }
   }
 
@@ -271,7 +403,7 @@ class WorldMap extends View {
       title: 'You',
       iconUrl: '/images/mapiconyou.png',
       hideLabel: true,
-    });
+    }, { emit: false });
   }
 
   /**
@@ -382,28 +514,47 @@ class WorldMap extends View {
       this.realignMap(cluster.getMarkers());
     });
 
+    google.maps.event.addListener(this.map, 'click', (event) => {
+      if (this.movingMarker !== null) {
+        this.setMarkerPosition({
+          positionName: this.movingMarker.addedTitle,
+          position: {
+            latitude: event.latLng.lat(),
+            longitude: event.latLng.lng(),
+          },
+        }, { emit: true });
+        google.maps.event.clearListeners(this.map, 'mousemove');
+        this.movingMarker = null;
+      }
+    });
     google.maps.event.addListener(this.map, 'dragstart', () => {
       longClick = false;
       this.hideMarkerInfo();
-      this.hideClickMenu();
+      this.hideMapClickMenu();
+      this.hideMarkerClicKMenu();
     });
     google.maps.event.addListener(this.map, 'zoom_changed', () => {
       this.hideMarkerInfo();
-      this.hideClickMenu();
+      this.hideMapClickMenu();
+      this.hideMarkerClicKMenu();
     });
-    google.maps.event.addListener(this.map, 'idle', () => { this.toggleMapLabels(); });
+    google.maps.event.addListener(this.map, 'idle', () => {
+      this.toggleMapLabels();
+    });
     google.maps.event.addListener(this.map, 'rightclick', (event) => {
       this.hideMarkerInfo();
-      this.createClickMenu(event);
+      this.hideMarkerClicKMenu();
+      this.createMapClickMenu(event);
     });
     google.maps.event.addListener(this.map, 'mousedown', (event) => {
       longClick = true;
       this.hideMarkerInfo();
-      this.hideClickMenu();
+      this.hideMapClickMenu();
+      this.hideMarkerClicKMenu();
 
       setTimeout(() => {
         if (longClick) {
-          this.createClickMenu(event);
+          this.createMapClickMenu(event);
         }
       }, 500);
     });
@@ -412,9 +563,13 @@ class WorldMap extends View {
     });
   }
 
-  showClickMenu() { this.mapClickMenu.classList.remove('hide'); }
+  showMapClickMenu() { this.mapClickMenu.classList.remove('hide'); }
 
-  hideClickMenu() { this.mapClickMenu.classList.add('hide'); }
+  hideMapClickMenu() { this.mapClickMenu.classList.add('hide'); }
+
+  showMarkerClickMenu() { this.markerClickMenu.classList.remove('hide'); }
+
+  hideMarkerClicKMenu() { this.markerClickMenu.classList.add('hide'); }
 
   showMarkerInfo() {
     setTimeout(() => {
@@ -550,18 +705,18 @@ class WorldMap extends View {
 
     this.element.appendChild(this.infoElement);
     this.element.appendChild(this.mapClickMenu);
+    this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
 
-    socketManager.emitEvent('getGooglePositions', {}, ({ error, data }) => {
+    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'users'] }, ({ error, data }) => {
       if (error || !data) {
         return;
       }
 
-      const { positions, team, currentTime } = data;
-
+      const { locations, team, currentTime } = data;
       const userName = storageManager.getUserName() ? storageManager.getUserName().toLowerCase() : '';
 
-      positions.forEach(({ positionName, position, geometry, type, group, description, lastUpdated }) => {
+      locations.forEach(({ positionName, position, geometry, type, group, description, lastUpdated }) => {
         if (positionName.toLowerCase() !== userName) {
           const latitude = parseFloat(position.latitude);
           const longitude = parseFloat(position.longitude);
@@ -575,7 +730,18 @@ class WorldMap extends View {
               },
               description,
               markerType: 'location',
-            });
+            }, { emit: false });
+          } else if (type === 'custom') {
+            this.setMarkerPosition({
+              positionName,
+              position: {
+                latitude,
+                longitude,
+              },
+              description,
+              markerType: 'custom',
+              iconUrl: 'images/mapiconcreated.png',
+            }, { emit: false });
           } else if (type && type === 'user' && lastUpdated) {
             const date = new Date(lastUpdated);
 
@@ -593,7 +759,7 @@ class WorldMap extends View {
                 hideLabel: true,
                 description: userDescription,
                 markerType: type,
-              });
+              }, { emit: false });
             }
           }
         }
@@ -617,6 +783,7 @@ class WorldMap extends View {
   removeView() {
     this.element.parentNode.classList.remove('mapMain');
     super.removeView();
+    this.infoElement.classList.remove('flash');
   }
 }
 

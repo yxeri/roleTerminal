@@ -53,6 +53,7 @@ class List extends View {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
+    this.element.classList.add('hide');
     this.shouldSort = shouldSort;
 
     if (title) {
@@ -68,25 +69,35 @@ class List extends View {
 
   addItem({ item }) {
     if (this.shouldSort) {
-      this.element.replaceChild(this.list, createSortedList(this.element.lastElementChild, elementCreator.createListItem(item)));
+      this.element.replaceChild(this.list, createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item })));
     } else {
-      this.element.lastElementChild.appendChild(elementCreator.createListItem(item));
+      this.element.lastElementChild.appendChild(elementCreator.createListItem({ element: item }));
     }
+
+    this.toggleList();
   }
 
   addItems({ items }) {
     const fragment = document.createDocumentFragment();
 
-    items.forEach(item => fragment.appendChild(elementCreator.createListItem(item)));
+    items.forEach(item => fragment.appendChild(elementCreator.createListItem({ element: item })));
     this.addItem({ listItem: fragment });
+    this.toggleList();
   }
 
   replaceAllItems({ items }) {
-    const list = elementCreator.createList({
-      elements: items,
-    });
+    const list = elementCreator.createList({ elements: items });
 
     this.element.replaceChild(list, this.element.lastElementChild);
+    this.toggleList();
+  }
+
+  toggleList() {
+    if (this.element.lastElementChild.childNodes.length > 0) {
+      this.element.classList.remove('hide');
+    } else {
+      this.element.classList.add('hide');
+    }
   }
 }
 

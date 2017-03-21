@@ -322,12 +322,18 @@ img {
   height: 100%;
 }
 
-#mapClickMenu {
+.clickMenu {
   position: absolute;
   z-index: 2;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+
+  ul {
+    li {
+      margin-bottom: .3em;
+    }
+  }
 }
 
 #markerInfo {
@@ -528,6 +534,11 @@ img {
 
   .buttons {
     margin: $padding ($padding + .3em) $padding 0;
+  }
+
+  textarea {
+    width: calc(100% - .8em);
+    margin-left: $padding;
   }
 }
 

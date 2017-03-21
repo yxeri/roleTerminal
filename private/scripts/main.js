@@ -24,6 +24,8 @@ const WorldMap = require('../library/view/worldMap/WorldMap');
 const DocsViewer = require('../library/view/templates/DocsViewer');
 const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
+const Tracker = require('../library/view/worldMap/Tracker');
+
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
@@ -36,6 +38,7 @@ const soundLibrary = require('../library/audio/SoundLibrary');
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
+const tracker = new Tracker();
 
 soundLibrary.toggleSounds();
 

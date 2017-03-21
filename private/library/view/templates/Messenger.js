@@ -143,7 +143,7 @@ class Messenger extends View {
             fragment.appendChild(row);
           });
 
-          aliasList.innerHTML = ' '; // eslint-disable-line no-param-reassign
+          aliasList.innerHTML = '';
           aliasList.appendChild(fragment);
 
           elementCreator.setButtonText(aliasListButton, `Alias: ${storageManager.getSelectedAlias() || storageManager.getUserName() || ''}`);
@@ -320,10 +320,6 @@ class Messenger extends View {
   }
 
   populateList() {
-    const ownedList = new List({
-      title: 'Yours',
-      shouldSort: false,
-    });
     const followList = new List({
       title: 'Following',
       shouldSort: false,
@@ -356,12 +352,12 @@ class Messenger extends View {
                   return;
                 }
 
-                socketManager.emitEvent('createRoom', {
-                  room: {
-                    roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
-                    password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
-                  },
-                }, ({ error: createError, data: roomData }) => {
+                const room = {
+                  roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
+                  password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
+                };
+
+                socketManager.emitEvent('createRoom', { room }, ({ error: createError, data: { room: createdRoom } }) => {
                   if (createError) {
                     console.log(createError);
 
@@ -370,11 +366,11 @@ class Messenger extends View {
 
                   eventCentral.triggerEvent({
                     event: eventCentral.Events.CREATEROOM,
-                    params: { room: { roomName: roomData.room.roomName } },
+                    params: { room: { roomName: createdRoom.roomName } },
                   });
                   eventCentral.triggerEvent({
                     event: eventCentral.Events.FOLLOWROOM,
-                    params: { room: { roomName: roomData.room.roomName } },
+                    params: { room: { roomName: createdRoom.roomName } },
                   });
                   createDialog.removeView();
                 });
@@ -397,7 +393,6 @@ class Messenger extends View {
     });
 
     this.chatSelect.appendChild(createButton);
-    this.chatSelect.appendChild(ownedList.element);
     this.chatSelect.appendChild(followList.element);
     this.chatSelect.appendChild(roomsList.element);
 
@@ -407,17 +402,10 @@ class Messenger extends View {
     });
 
     eventCentral.addWatcher({
-      watcherParent: ownedList,
-      event: eventCentral.Events.CREATEROOM,
-      func: ({ room: { roomName } }) => {
-        ownedList.addItem({ item: this.createRoomButton(roomName) });
-      },
-    });
-
-    eventCentral.addWatcher({
       watcherParent: followList,
       event: eventCentral.Events.FOLLOWROOM,
       func: ({ room: { roomName } }) => {
+        console.log('follow', roomName);
         followList.addItem({ item: this.createRoomButton(roomName) });
       },
     });
@@ -444,9 +432,8 @@ class Messenger extends View {
             return;
           }
 
-          const { rooms = [], followedRooms = [], ownedRooms = [] } = data;
+          const { rooms = [], followedRooms = [] } = data;
 
-          ownedList.replaceAllItems({ items: ownedRooms.map(room => this.createRoomButton(room)) });
           followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton(room)) });
           roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton(room)) });
         });

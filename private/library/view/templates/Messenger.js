@@ -34,10 +34,11 @@ const soundLibrary = require('../../audio/SoundLibrary');
  * @param {number} lines - Number of lines to retrieve
  * @param {boolean} infiniteScroll Did infinite scroll trigger the history retrieval?
  */
-function getHistory({ roomName, lines = 50, infiniteScroll = false }) {
+function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = () => {} }) {
   socketManager.emitEvent('history', { room: { roomName }, lines }, ({ data: historyData, error: historyError }) => {
     if (historyError) {
-      console.log('history', historyError);
+      console.log(historyError);
+      callback({ error: historyError });
 
       return;
     }
@@ -230,7 +231,7 @@ class Messenger extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SWITCHROOM,
-      func: ({ room }) => {
+      func: ({ room: roomName }) => {
         this.messageList.element.classList.remove('flash');
 
         if (storageManager.getRoom() !== '') {
@@ -238,7 +239,7 @@ class Messenger extends View {
             this.messageList.element.innerHTML = '';
             this.messageList.element.classList.add('flash');
 
-            getHistory({ roomName: room, switchedRoom: true });
+            getHistory({ roomName, switchedRoom: true });
           }, 100);
         }
       },
@@ -458,7 +459,57 @@ class Messenger extends View {
         this.selectedItem = button.parentElement;
         this.viewer.classList.add('selectedView');
         this.selectedItem.classList.add('selectedItem');
-        storageManager.setRoom(roomName);
+
+        socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error }) => {
+          if (error) {
+            const passwordDialog = new DialogBox({
+              buttons: {
+                left: {
+                  text: 'Cancel',
+                  eventFunc: () => { passwordDialog.removeView(); },
+                },
+                right: {
+                  text: 'Confirm',
+                  eventFunc: () => {
+                    socketManager.emitEvent('follow', {
+                      room: {
+                        password: passwordDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
+                        roomName,
+                      },
+                    }, ({ error: followError }) => {
+                      if (followError) {
+                        console.log(followError);
+                        passwordDialog.changeExtraDescription({ text: ['Incorrect password'] });
+
+                        return;
+                      }
+
+                      eventCentral.triggerEvent({
+                        event: eventCentral.Events.FOLLOWROOM,
+                        params: { room: { roomName } },
+                      });
+                      storageManager.setRoom(roomName);
+                      passwordDialog.removeView();
+                    });
+                  },
+                },
+              },
+              inputs: [{
+                placeholder: 'Password',
+                inputName: 'password',
+                type: 'password',
+                isRequired: true,
+              }],
+              description: ['You need authorization to join the room'],
+              extraDescription: ['Input the correct password to proceed'],
+            });
+            passwordDialog.appendTo(this.element.parentElement);
+
+            return;
+          }
+
+          storageManager.setRoom(roomName);
+        });
       },
     });
 

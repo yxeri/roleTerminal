@@ -16,6 +16,7 @@
 
 const View = require('../base/View');
 const DialogBox = require('../DialogBox');
+const MapMarker = require('./MapMarker');
 const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -57,7 +58,7 @@ class WorldMap extends View {
     this.infoElement = elementCreator.createContainer({ elementId: 'markerInfo', classes: ['hide'] });
     this.mapClickMenu = elementCreator.createContainer({ elementId: 'mapClickMenu', classes: ['hide', 'clickMenu'] });
     this.markerClickMenu = elementCreator.createContainer({ elementId: 'markerClickMenu', classes: ['hide', 'clickMenu'] });
-    this.infoElement.addEventListener('click', () => { this.hideMarkerInfo(); });
+    this.infoElement.addEventListener('click', () => { console.log('hide marker'); this.hideMarkerInfo(); });
     this.defaultZoomLevel = zoomLevel;
     this.labelStyle = labelStyle;
     this.clusterer = null;
@@ -110,13 +111,10 @@ class WorldMap extends View {
             this.movingMarker = marker;
 
             google.maps.event.addListener(this.map, 'mousemove', (moveEvent) => {
-              this.setMarkerPosition({
-                positionName: marker.addedTitle,
-                position: {
-                  latitude: moveEvent.latLng.lat(),
-                  longitude: moveEvent.latLng.lng(),
-                },
-              }, { emit: false });
+              this.movingMarker.setPosition({
+                latitude: moveEvent.latLng.lat(),
+                longitude: moveEvent.latLng.lng(),
+              });
             });
             this.hideMarkerClicKMenu();
           },
@@ -152,10 +150,12 @@ class WorldMap extends View {
                   text: 'Create',
                   eventFunc: () => {
                     const location = {
-                      longitude: event.latLng.lng(),
-                      latitude: event.latLng.lat(),
+                      coordinates: {
+                        longitude: event.latLng.lng(),
+                        latitude: event.latLng.lat(),
+                      },
                       title: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
-                      description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value,
+                      description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
                     };
 
                     socketManager.emitEvent('updateLocation', { location }, ({ error }) => {
@@ -165,17 +165,23 @@ class WorldMap extends View {
                         return;
                       }
 
-                      this.createMarker({
-                        markerName: location.title.toLowerCase(),
+                      this.markers[location.title] = new MapMarker({
                         title: location.title,
                         description: location.description,
                         markerType: 'custom',
-                        iconUrl: 'images/mapiconcreated.png',
-                        position: {
+                        icon: {
+                          url: 'images/mapiconcreated.png',
+                        },
+                        coordinates: {
                           longitude: event.latLng.lng(),
                           latitude: event.latLng.lat(),
                         },
-                      }, { emit: true });
+                        worldMap: this,
+                        map: this.map,
+                        owner: storageManager.getUserName(),
+                        team: storageManager.getTeam(),
+                      });
+                      this.clusterer.addMarker(this.markers[location.title].marker);
                       markerDialog.removeView();
                     });
                   },
@@ -211,171 +217,22 @@ class WorldMap extends View {
   /**
    * Creates a label at the location of another object
    * The name of the position will be used as text for the label
-   * @param {string} params.positionName - Name of the position
+   * @param {string} params.title - Name of the position
    * @param {string} params.labelText - Text that will be printed
    * @param {string} [params.align] - Text alignment (left|right)
    * @param {{latitude: Number, longitude: Number}} params.position - Long and lat coordinates of the label
    */
-  createLabel({ positionName, labelText, align = 'right', position }) {
-    const lowerPositionName = positionName.toLowerCase();
+  createLabel({ title, labelText, align = 'right', coordinates }) {
     const labelOptions = {
-      position: new google.maps.LatLng(position.latitude, position.longitude),
-      text: labelText || positionName,
+      position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
+      text: labelText || title,
       align,
     };
 
     Object.keys(this.labelStyle).forEach((name) => { labelOptions[name] = this.labelStyle[name]; });
 
-    this.labels[lowerPositionName] = new MapLabel(labelOptions);
-    this.labels[lowerPositionName].setMap(this.map);
-  }
-
-  /**
-   * Creates a map marker, adds it to the map and calls the creation of a label (if flag is set)
-   * @private
-   * @param {Object} params - Parameters
-   * @param {string} params.markerName - Name of the map marker
-   * @param {string} params.title - Title of the marker description
-   * @param {string} params.markerType - Type of the marker
-   * @param {{longitude: Number, latitude: Number}} params.position - Long and lat coordinates of the map marker
-   * @param {string} [params.iconUrl] - Path to a custom icon image
-   * @param {string} [params.description] - Description for map marker, which will be shown on click or command
-   * @param {number} [params.opacity] - Opacity of the marker in the view
-   * @param {boolean} [params.hideLabel] - Should the label be hidden in the view?
-   * @param {boolean} [params.ignoreCluster] - Should the marker be excluded from clusters?
-   */
-  createMarker({ markerName, position, iconUrl, description, title, markerType, opacity, hideLabel, ignoreCluster }, { emit }) {
-    const icon = {
-      url: iconUrl || '/images/mapicon.png',
-      size: new google.maps.Size(14, 14),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(7, 7),
-    };
-    const markerId = Object.keys(this.markers).length + 1;
-    let longClick = false;
-
-    this.markers[markerName] = new google.maps.Marker({
-      position: {
-        lat: position.latitude,
-        lng: position.longitude,
-      },
-      opacity: opacity || 0.9,
-      icon,
-    });
-
-    this.markers[markerName].markerId = markerId;
-    this.markers[markerName].markerType = markerType;
-
-    if (description) { this.markers[markerName].description = description.replace(/(<img)(.+?)(\s)\/>/g, ''); }
-
-    if (!hideLabel && title) {
-      this.markers[markerName].addedTitle = title;
-    }
-
-    this.markers[markerName].setMap(this.map);
-
-    if (!ignoreCluster && this.clusterer) {
-      this.clusterer.addMarker(this.markers[markerName]);
-    }
-
-    google.maps.event.addListener(this.markers[markerName], 'click', (event) => {
-      const marker = this.markers[markerName];
-
-      if (this.movingMarker !== null) {
-        google.maps.event.clearListeners(this.map, 'mousemove');
-        this.setMarkerPosition({
-          positionName: marker.addedTitle,
-          position: {
-            latitude: event.latLng.lat(),
-            longitude: event.latLng.lng(),
-          },
-        }, { emit: true });
-        this.movingMarker = null;
-
-        return;
-      }
-
-      this.hideMarkerInfo();
-
-      soundLibrary.playSound('button2');
-
-      if (marker.addedTitle) {
-        const projection = this.overlay.getProjection();
-        const xy = projection.fromLatLngToContainerPixel(marker.getPosition());
-
-        this.infoElement.style.left = `${xy.x}px`;
-        this.infoElement.style.top = `${xy.y}px`;
-
-        const infoText = document.createElement('DIV');
-        const titleParagraph = document.createElement('P');
-        titleParagraph.appendChild(document.createTextNode(marker.addedTitle));
-        const paragraph = document.createElement('P');
-        paragraph.appendChild(document.createTextNode(marker.description || ''));
-        infoText.appendChild(titleParagraph);
-        infoText.appendChild(paragraph);
-        elementCreator.replaceOnlyChild(this.infoElement, infoText);
-        this.showMarkerInfo();
-      }
-    });
-
-    google.maps.event.addListener(this.markers[markerName], 'rightclick', (event) => {
-      this.createMarkerClickMenu(event, this.markers[markerName]);
-    });
-    google.maps.event.addListener(this.markers[markerName], 'mousedown', (event) => {
-      longClick = true;
-      this.hideMarkerInfo();
-      this.hideMapClickMenu();
-      this.hideMarkerClicKMenu();
-
-      setTimeout(() => {
-        if (longClick) {
-          this.createMarkerClickMenu(event, this.markers[markerName]);
-        }
-      }, 500);
-    });
-    google.maps.event.addListener(this.markers[markerName], 'mouseup', () => {
-      longClick = false;
-    });
-  }
-
-  /**
-   * Sets new position for a map marker
-   * Creates a new map marker if it doesn't exist
-   * @static
-   * @param {Object} params - Parameters
-   * @param {string} params.positionName - Name of the map marker
-   * @param {{latitude: Number, longitude: Number}} params.position - Latitude and longitude coordinates for the map marker
-   * @param {string} params.description - Description for map marker, which will be shown on click or command
-   * @param {string} params.markerType - Type of marker
-   * @param {Date} [params.lastUpdated] - Time of last update
-   * @param {boolean} [params.hideLabel] - Should the label be hidden?
-   * @param {string} [params.iconUrl] - Path to custom map marker icon
-   */
-  setMarkerPosition({ positionName, position, lastUpdated, markerType, hideLabel, iconUrl, description }, { emit }) {
-    const markerName = positionName.toLowerCase();
-    const marker = this.markers[markerName];
-
-    if (marker) {
-      marker.setPosition(new google.maps.LatLng(position.latitude, position.longitude));
-      marker.lastUpdated = lastUpdated;
-    } else {
-      this.createMarker({
-        lastUpdated,
-        position,
-        markerName,
-        title: positionName,
-        hideLabel,
-        iconUrl,
-        description,
-        markerType,
-      }, { emit });
-    }
-
-    console.log('emit', emit);
-
-    if (emit) {
-      socketManager.emitEvent('updateLocation', { location: { longitude: position.longitude, latitude: position.latitude, title: positionName } });
-    }
+    this.labels[title] = new MapLabel(labelOptions);
+    this.labels[title].setMap(this.map);
   }
 
   /**
@@ -394,16 +251,18 @@ class WorldMap extends View {
 
   /**
    * Creates the map marker representing this user
-   * @param {{longitude: Number, latitude:Number}} position - Long and lat coordinates of the map marker
+   * @param {{longitude: Number, latitude:Number}} coordinates - Long and lat coordinates of the map marker
    */
-  createThisUserMarker(position) {
-    this.createMarker({
-      markerName: 'I',
-      position,
+  createThisUserMarker(coordinates) {
+    this.markers.I = new MapMarker({
+      coordinates,
       title: 'You',
-      iconUrl: '/images/mapiconyou.png',
-      hideLabel: true,
-    }, { emit: false });
+      icon: {
+        url: '/images/mapiconyou.png',
+      },
+      map: this.map,
+      worldMap: this,
+    });
   }
 
   /**
@@ -516,14 +375,21 @@ class WorldMap extends View {
 
     google.maps.event.addListener(this.map, 'click', (event) => {
       if (this.movingMarker !== null) {
-        this.setMarkerPosition({
-          positionName: this.movingMarker.addedTitle,
-          position: {
-            latitude: event.latLng.lat(),
-            longitude: event.latLng.lng(),
-          },
-        }, { emit: true });
         google.maps.event.clearListeners(this.map, 'mousemove');
+        this.movingMarker.setPosition({
+          latitude: event.latLng.lat(),
+          longitude: event.latLng.lng(),
+          lastUpdated: new Date(),
+        });
+        socketManager.emitEvent('updateLocation', {
+          location: {
+            coordinates: {
+              longitude: event.latLng.lng(),
+              latitude: event.latLng.lat(),
+            },
+            title: this.movingMarker.title,
+          },
+        });
         this.movingMarker = null;
       }
     });
@@ -537,9 +403,6 @@ class WorldMap extends View {
       this.hideMarkerInfo();
       this.hideMapClickMenu();
       this.hideMarkerClicKMenu();
-    });
-    google.maps.event.addListener(this.map, 'idle', () => {
-      this.toggleMapLabels();
     });
     google.maps.event.addListener(this.map, 'rightclick', (event) => {
       this.hideMarkerInfo();
@@ -571,7 +434,31 @@ class WorldMap extends View {
 
   hideMarkerClicKMenu() { this.markerClickMenu.classList.add('hide'); }
 
-  showMarkerInfo() {
+  showMarkerInfo({ position, title, description = [] }) {
+    this.hideMarkerInfo();
+
+    const projection = this.overlay.getProjection();
+    const xy = projection.fromLatLngToContainerPixel(position);
+
+    this.infoElement.style.left = `${xy.x}px`;
+    this.infoElement.style.top = `${xy.y}px`;
+
+    const infoText = document.createElement('DIV');
+    const titleParagraph = document.createElement('P');
+    titleParagraph.appendChild(document.createTextNode(title));
+
+    const fragment = document.createDocumentFragment();
+
+    description.forEach((line) => {
+      const paragraph = document.createElement('P');
+      paragraph.appendChild(document.createTextNode(line));
+      fragment.appendChild(paragraph);
+    });
+
+    infoText.appendChild(titleParagraph);
+    infoText.appendChild(fragment);
+    elementCreator.replaceOnlyChild(this.infoElement, infoText);
+
     setTimeout(() => {
       this.infoElement.classList.remove('hide');
       this.infoElement.classList.add('flash');
@@ -643,19 +530,6 @@ class WorldMap extends View {
   }
 
   /**
-   * Get description from the map marker
-   * @param {Number} markerId - ID of the map marker
-   * @returns {{title: string, description: string}|null} - Title and escription of the map marker
-   */
-  getInfoText(markerId) {
-    const marker = this.markers[Object.keys(this.markers).find(markerName => this.markers[markerName].markerId === parseInt(markerId, 10))];
-
-    if (!marker) { return null; }
-
-    return { title: marker.addedTitle, description: marker.description };
-  }
-
-  /**
    * Creates the map and retrieves positions from server and Google maps
    */
   startMap() {
@@ -694,7 +568,7 @@ class WorldMap extends View {
     }
 
     if (!this.clusterer) {
-      this.clusterer = new MarkerClusterer(this.map, Object.keys(this.markers || {}).map(key => this.markers[key]), this.clusterStyle);
+      this.clusterer = new MarkerClusterer(this.map, [], this.clusterStyle);
     }
 
     if (!this.overlay) {
@@ -713,53 +587,73 @@ class WorldMap extends View {
         return;
       }
 
-      const { locations, team, currentTime } = data;
+      const { locations, currentTime } = data;
       const userName = storageManager.getUserName() ? storageManager.getUserName().toLowerCase() : '';
 
-      locations.forEach(({ positionName, position, geometry, type, group, description, lastUpdated }) => {
-        if (positionName.toLowerCase() !== userName) {
-          const latitude = parseFloat(position.latitude);
-          const longitude = parseFloat(position.longitude);
+      locations.forEach(({ title, coordinates, geometry, markerType, group, description, lastUpdated, team, owner }) => {
+        const descriptionArray = Array.isArray(description) ? description : [description];
+
+        if (title && title.toLowerCase() !== userName) {
+          const latitude = parseFloat(coordinates.latitude);
+          const longitude = parseFloat(coordinates.longitude);
 
           if (geometry === 'point') {
-            this.setMarkerPosition({
-              positionName,
-              position: {
+            this.markers[title] = new MapMarker({
+              title,
+              coordinates: {
                 latitude,
                 longitude,
               },
-              description,
+              description: descriptionArray,
               markerType: 'location',
-            }, { emit: false });
-          } else if (type === 'custom') {
-            this.setMarkerPosition({
-              positionName,
-              position: {
+              map: this.map,
+              worldMap: this,
+              owner,
+              team,
+            });
+            this.clusterer.addMarker(this.markers[title].marker);
+          } else if (markerType === 'custom') {
+            this.markers[title] = new MapMarker({
+              title,
+              coordinates: {
                 latitude,
                 longitude,
               },
-              description,
+              description: descriptionArray,
               markerType: 'custom',
-              iconUrl: 'images/mapiconcreated.png',
-            }, { emit: false });
-          } else if (type && type === 'user' && lastUpdated) {
+              icon: {
+                url: 'images/mapiconcreated.png',
+              },
+              map: this.map,
+              worldMap: this,
+              owner,
+              team,
+            });
+            this.clusterer.addMarker(this.markers[title].marker);
+          } else if (markerType && markerType === 'user' && lastUpdated) {
             const date = new Date(lastUpdated);
 
             if (currentTime - date < (20 * 60 * 1000)) {
-              const userDescription = `Team: ${group || '-'}. Last seen: ${textTools.generateTimeStamp({ date })}`;
+              const userDescription = [`Team: ${group || '-'}. Last seen: ${textTools.generateTimeStamp({ date })}`];
 
-              this.setMarkerPosition({
-                date,
-                positionName,
-                position: {
+              this.markers[title] = new MapMarker({
+                lastUpdated: date,
+                title,
+                coordinates: {
                   latitude,
                   longitude,
                 },
-                iconUrl: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
-                hideLabel: true,
+                icon: {
+                  url: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+                },
                 description: userDescription,
-                markerType: type,
-              }, { emit: false });
+                markerType,
+                map: this.map,
+                worldMap: this,
+                owner,
+                team,
+              });
+              this.clusterer.addMarker(this.markers[title].marker);
             }
           }
         }

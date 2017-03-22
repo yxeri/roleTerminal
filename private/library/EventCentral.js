@@ -32,6 +32,7 @@ class EventCentral {
       LOGIN: 'Logged in',
       CREATEARCHIVE: 'Created archive',
       MYPOSITION: 'User position',
+      UPDATEDPOSITION: 'Updated position',
     };
     this.eventWatchers = {};
   }

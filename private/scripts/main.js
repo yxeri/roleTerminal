@@ -40,6 +40,7 @@ const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const tracker = new Tracker();
 
+tracker.startTracker();
 soundLibrary.toggleSounds();
 
 if (storageManager.getDeviceId() === null) {

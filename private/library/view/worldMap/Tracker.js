@@ -18,7 +18,6 @@ const eventCentral = require('../../EventCentral');
 
 class Tracker {
   constructor() {
-    this.startTracker();
   }
 
   startTracker() {

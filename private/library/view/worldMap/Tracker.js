@@ -17,9 +17,6 @@
 const eventCentral = require('../../EventCentral');
 
 class Tracker {
-  constructor() {
-  }
-
   startTracker() {
     this.watchId = navigator.geolocation.watchPosition((position) => {
       if (position) {

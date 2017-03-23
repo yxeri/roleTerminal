@@ -17,6 +17,8 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class Home extends View {
   constructor() {
@@ -24,9 +26,28 @@ class Home extends View {
 
     this.element.setAttribute('id', 'home');
     this.element.appendChild(document.createElement('DIV'));
+    this.element.appendChild(document.createElement('DIV'));
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.USER,
+      func: () => {
+        this.element.lastElementChild.innerHTML = '';
+        const userParagraph = document.createElement('P');
+        userParagraph.appendChild(document.createTextNode(`User: ${storageManager.getUserName() || '-'}`));
+        const teamParagraph = document.createElement('P');
+        teamParagraph.appendChild(document.createTextNode(`Team: ${storageManager.getTeam() || '-'}`));
+        const accessParagraph = document.createElement('P');
+        accessParagraph.appendChild(document.createTextNode(`Access level: ${storageManager.getAccessLevel()}`));
+
+        this.element.lastElementChild.appendChild(userParagraph);
+        this.element.lastElementChild.appendChild(teamParagraph);
+        this.element.lastElementChild.appendChild(accessParagraph);
+      },
+    });
   }
 
   addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes }) {

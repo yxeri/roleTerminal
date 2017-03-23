@@ -206,30 +206,6 @@ class Messenger extends View {
 
     eventCentral.addWatcher({
       watcherParent: this,
-      event: eventCentral.Events.CHATMSG,
-      func: ({ messages, options, shouldScroll, isHistory, following }) => {
-        const itemsOptions = {
-          animation: 'flash',
-          shouldScroll,
-          isHistory,
-        };
-
-        if (isHistory) {
-          if (following) {
-            this.inputArea.classList.remove('hide');
-            this.messageList.element.classList.remove('fullHeight');
-          } else {
-            this.inputArea.classList.add('hide');
-            this.messageList.element.classList.add('fullHeight');
-          }
-        }
-
-        this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
-      },
-    });
-
-    eventCentral.addWatcher({
-      watcherParent: this,
       event: eventCentral.Events.SWITCHROOM,
       func: ({ room: roomName }) => {
         this.messageList.element.classList.remove('flash');
@@ -403,10 +379,44 @@ class Messenger extends View {
     });
 
     eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.CHATMSG,
+      func: ({ messages, options, shouldScroll, isHistory, following }) => {
+        const roomName = messages[0].roomName;
+
+        if (roomName === storageManager.getRoom()) {
+          const itemsOptions = {
+            animation: 'flash',
+            shouldScroll,
+            isHistory,
+          };
+
+          if (isHistory) {
+            if (following) {
+              this.inputArea.classList.remove('hide');
+              this.messageList.element.classList.remove('fullHeight');
+            } else {
+              this.inputArea.classList.add('hide');
+              this.messageList.element.classList.add('fullHeight');
+            }
+          }
+
+          this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
+        } else {
+          const listItems = Array.from(followList.element.lastElementChild.getElementsByTagName('LI'));
+          const listItem = listItems.find(item => item.firstElementChild.innerText === roomName);
+
+          if (listItem) {
+            listItem.firstElementChild.classList.add('selected');
+          }
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
       watcherParent: followList,
       event: eventCentral.Events.FOLLOWROOM,
       func: ({ room: { roomName } }) => {
-        console.log('follow', roomName);
         followList.addItem({ item: this.createRoomButton(roomName) });
       },
     });
@@ -459,6 +469,7 @@ class Messenger extends View {
         this.selectedItem = button.parentElement;
         this.viewer.classList.add('selectedView');
         this.selectedItem.classList.add('selectedItem');
+        button.classList.remove('selected');
 
         socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error }) => {
           if (error) {

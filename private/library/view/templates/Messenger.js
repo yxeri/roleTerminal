@@ -52,6 +52,7 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = (
         isHistory: true,
         infiniteScroll,
         following: historyData.following,
+        room: { roomName },
       },
     });
   });
@@ -254,7 +255,7 @@ class Messenger extends View {
           return;
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages: data.messages, options: { printable: false }, shouldScroll: true } });
+        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { room: { roomName: storageManager.getRoom() }, messages: data.messages, options: { printable: false }, shouldScroll: true } });
         this.clearInputField();
       });
       this.focusInput();
@@ -376,8 +377,8 @@ class Messenger extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.CHATMSG,
-      func: ({ messages, options, shouldScroll, isHistory, following }) => {
-        const roomName = messages.length > 0 ? messages[0].roomName : '';
+      func: ({ messages, options, shouldScroll, isHistory, following, room }) => {
+        const { roomName } = room;
 
         if (roomName === storageManager.getRoom()) {
           const itemsOptions = {
@@ -398,7 +399,7 @@ class Messenger extends View {
 
           this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
         } else {
-          const listItem = findItem(followList, storageManager.getRoom());
+          const listItem = findItem(followList, roomName);
 
           if (listItem) {
             listItem.firstElementChild.classList.add('selected');
@@ -491,7 +492,6 @@ class Messenger extends View {
           this.selectedItem.classList.remove('selectedItem');
         }
 
-        this.viewer.classList.add('selectedView');
         button.classList.remove('selected');
 
         socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error }) => {

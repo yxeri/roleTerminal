@@ -402,7 +402,7 @@ img {
   flex-direction: row;
   flex-wrap: wrap;
 
-  div:first-child {
+  > div:first-child {
     margin-top: $padding * 2;
     margin-left: $padding * 2;
     margin-right: 1em;
@@ -423,7 +423,7 @@ img {
     }
   }
 
-  div:last-child {
+  > div:last-child {
     -webkit-flex-grow: 1;
     flex-grow: 1;
   }
@@ -448,7 +448,7 @@ img {
   }
 
   p {
-    width: 8em;
+    width: 6.5em;
   }
 
   button {

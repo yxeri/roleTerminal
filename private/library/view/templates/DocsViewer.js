@@ -49,6 +49,7 @@ class DocsViewer extends View {
     const container = elementCreator.createContainer({ classes: ['viewContainer'] });
     this.docsSelect = elementCreator.createContainer({ classes: ['list'] });
     this.viewer = new Viewer({}).element;
+    this.viewer.classList.add('selectedView');
     this.selectedItem = null;
 
     container.appendChild(this.docsSelect);
@@ -68,7 +69,6 @@ class DocsViewer extends View {
         }
 
         this.selectedItem = button.parentElement;
-        this.viewer.classList.add('selectedView');
         this.selectedItem.classList.add('selectedItem');
 
         socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
@@ -190,7 +190,6 @@ class DocsViewer extends View {
       event: eventCentral.Events.USER,
       func: () => {
         this.viewer.innerHTML = '';
-        this.viewer.classList.remove('selectedView');
 
         socketManager.emitEvent('getArchivesList', {}, ({ error, data }) => {
           if (error) {

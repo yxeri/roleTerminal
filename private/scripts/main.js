@@ -145,7 +145,7 @@ boot.setQueue([
     },
   },
 ]);
-boot.appendTo(mainView);
+// boot.appendTo(mainView);
 
 tracker.startTracker();
 soundLibrary.toggleSounds();
@@ -410,8 +410,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'chatMsgs',
-    func: ({ messages }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { messages, options: { printable: false } } });
+    func: ({ messages, room }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { room, messages, options: { printable: false } } });
     },
   }, {
     event: 'archive',

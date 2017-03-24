@@ -292,7 +292,7 @@ socketManager.addEvents([
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: {} });
+        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: userName !== data.user.userName } });
         socketManager.setConnected();
       });
     },

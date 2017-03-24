@@ -261,6 +261,10 @@ class TextTools {
     return text;
   }
 
+  static replaceWhitespace(string) {
+    return Array.from(string).map(char => this.findOneReplace(char, ' ', this.createMixedString(1, false, true))).join('');
+  }
+
   /**
    * Copies string to avoid the original being consumed
    * @static

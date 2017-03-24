@@ -25,6 +25,7 @@ const DocsViewer = require('../library/view/templates/DocsViewer');
 const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
 const Tracker = require('../library/view/worldMap/Tracker');
+const Boot = require('../library/view/templates/TextAnimation');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -39,6 +40,112 @@ const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const tracker = new Tracker();
+
+const boot = new Boot({ removeTime: 4000 });
+boot.setQueue([
+  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
+  {
+    func: boot.printLines,
+    params: {
+      code: true,
+      classes: 'logo',
+      array: [
+        '                          ####',
+        '                ####    #########    ####',
+        '               ###########################',
+        '              #############################',
+        '            #######        ##   #  ##########',
+        '      ##########           ##    #  ###  ##########',
+        '     #########             #########   #   #########',
+        '       #####               ##     ########   #####',
+        '     #####                 ##     ##     ##########',
+        '     ####                  ##      ##     #   ######',
+        ' #######                   ##########     ##    ########',
+        '########                   ##       ########     ########',
+        ' ######      Organica      ##       #      #############',
+        '   ####     Oracle         ##       #      ##     ####',
+        '   ####     Operations     ##       #      ##    #####',
+        '   ####      Center        ##       #      ###########',
+        '########                   ##       #########    ########',
+        '########                   ##########      #    #########',
+        ' ########                  ##      ##     ## ###########',
+        '     #####                 ##      ##     ### #####',
+        '       #####               ##     ########   #####',
+        '      #######              ##########   #  ########',
+        '     ###########           ##    ##    # ###########',
+        '      #############        ##    #   #############',
+        '            ################################',
+        '              ############################',
+        '              #######  ##########  #######',
+        '                ###      ######      ###',
+        '                          ####',
+      ],
+    },
+  },
+  {
+    func: boot.printLines,
+    params: {
+      code: false,
+      array: [
+        'Welcome to the Oracle, employee UNDEFINED.',
+        'May you have a productive day!',
+        '',
+        'Establishing uplink to relays',
+      ],
+    },
+  },
+  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 4, binary: true } },
+  {
+    func: boot.printLines,
+    params: {
+      code: false,
+      array: [
+        'Uplink established',
+        'Booting OOC 5.0',
+      ],
+    },
+  },
+  {
+    func: boot.printLines,
+    params: {
+      classes: 'logo',
+      code: false,
+      array: [
+        'THIS RELEASE OF OOC WAS BROUGHT TO YOU BY',
+        '   ####',
+        '###############',
+        ' #####  #########                                           ####',
+        '  ####     #######  ########     ###########    ####     ###########',
+        '  ####    ######      #######   ####   #####  ########    ####   #####',
+        '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
+        '  #########        ####    ####     ####   #####     ##############',
+        '  #### ######     ####     #####  ####     #######   ###  ########',
+        '  ####   ######  ##### #### #### ############  #######    ####   ###',
+        ' ######    #############    ################     ###      ####    #####',
+        '########     ########        ####                        ######      #####   ##',
+        '               ###########        ##                                    ###### ',
+        '                    ###############',
+        '                  Razor  #####  Demos - Warez - Honey',
+        'ENJOY',
+      ],
+    },
+  },
+  {
+    func: boot.printLines,
+    params: {
+      code: false,
+      array: [
+        'Loading',
+        '...',
+        '...',
+        '...',
+        '...',
+        '...',
+      ],
+    },
+  },
+]);
+// boot.appendTo(mainView);
 
 tracker.startTracker();
 soundLibrary.toggleSounds();

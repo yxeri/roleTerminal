@@ -492,7 +492,6 @@ class Messenger extends View {
         }
 
         this.viewer.classList.add('selectedView');
-
         button.classList.remove('selected');
 
         socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error }) => {

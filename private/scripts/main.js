@@ -145,7 +145,7 @@ boot.setQueue([
     },
   },
 ]);
-// boot.appendTo(mainView);
+boot.appendTo(mainView);
 
 tracker.startTracker();
 soundLibrary.toggleSounds();

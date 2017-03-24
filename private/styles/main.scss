@@ -391,7 +391,8 @@ img {
 }
 
 #home {
-  width: $inner-container-width;
+  width: 22em;
+  margin: 0 auto;
   overflow: hidden;
   display: -webkit-flex;
   -webkit-flex-direction: row;

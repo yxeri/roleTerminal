@@ -59,8 +59,9 @@ class DocsViewer extends View {
   }
 
   createArchiveButton(archive) {
+    const title = `${archive.title || archive.archiveId}`;
     const button = elementCreator.createButton({
-      text: `${archive.title || archive.archiveId}`,
+      text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
         if (this.selectedItem) {
           this.selectedItem.classList.remove('selectedItem');

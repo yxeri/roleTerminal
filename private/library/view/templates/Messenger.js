@@ -57,6 +57,12 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = (
   });
 }
 
+/**
+ * Finds and returns the list item that contains the button with sent text
+ * @param {Object} list - List item
+ * @param {string} text - Text to compare to
+ * @returns {HTMLLIElement} List item element
+ */
 function findItem(list, text) {
   const listItems = Array.from(list.element.lastElementChild.getElementsByTagName('LI'));
 
@@ -210,7 +216,7 @@ class Messenger extends View {
     container.appendChild(this.viewer);
     this.element.appendChild(container);
 
-    this.populateList();
+    this.populate();
   }
 
   sendMessage() {
@@ -285,7 +291,7 @@ class Messenger extends View {
     this.inputField.focus();
   }
 
-  populateList() {
+  populate() {
     const followList = new List({
       title: 'Following',
       shouldSort: false,

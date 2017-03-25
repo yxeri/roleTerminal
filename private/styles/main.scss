@@ -29,7 +29,7 @@ $outline: .1em;
 $font-size: 1em;
 $text-shadow-color: #ff02e5;
 $text-shadow: 1px 1px 3px $text-shadow-color;
-$view-width: 50em;
+$view-width: 65em;
 $menu-width: 21em;
 $box-shadow: inset 0 0 4px;
 $bottom-box-shadow: 0 2px 1px -1px;
@@ -71,7 +71,7 @@ h1, h2, h3, h4, h5 {
 html, body {
   overflow: hidden;
   height: 100%;
-  width: 100vw;
+  width: 100%;
 }
 
 html {
@@ -429,10 +429,6 @@ img {
   }
 }
 
-.fullscreen {
-  height: calc(100% - 2.2em);
-}
-
 .list {
   width: $short-list-width;
   min-width: $short-list-width;
@@ -461,9 +457,9 @@ img {
   width: 0 !important;
 }
 
-.viewContainer {
-  max-width: $view-width + 15em;
-  height: 100%;
+.container {
+  max-width: $view-width;
+  height: calc(100% - 2.2em);
   margin-left: auto;
   margin-right: auto;
   display: -webkit-flex;
@@ -475,8 +471,8 @@ img {
 }
 
 .viewer {
-  max-width: $view-width + 15em - $short-list-width - 1em;
-  width: calc(100% - 7.6em);
+  max-width: $view-width - $short-list-width - 1em;
+  width: calc(100% - #{$short-list-width} + .6em);
   height: calc(100% - .6em);
   padding: $padding;
 
@@ -703,9 +699,7 @@ img {
 }
 
 .selectedView {
-  padding-top: -1px;
-  padding-left: -1px;
-  padding-bottom: -1px;
+  padding: -1px .2em -1px -1px;
   border-top: 1px solid;
   border-left: 1px solid;
   border-bottom: 1px solid;

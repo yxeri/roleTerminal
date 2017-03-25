@@ -15,13 +15,26 @@
  */
 
 const View = require('./View');
+const elementCreator = require('../../ElementCreator');
 
-class Viewer extends View {
-  constructor({ isFullscreen, viewId }) {
-    super({ isFullscreen, viewId });
+class StandardView extends View {
+  constructor({ isFullscreen }) {
+    super({ isFullscreen });
+    this.element.classList.add('container');
+    this.viewer = elementCreator.createContainer({ classes: ['viewer'] });
+    this.itemList = elementCreator.createContainer({ classes: ['list'] });
 
-    this.element.classList.add('viewer');
+    this.element.append(this.itemList);
+    this.element.append(this.viewer);
+  }
+
+  showList() {
+    this.itemList.remove('hide');
+  }
+
+  hideList() {
+    this.itemList.add('hide');
   }
 }
 
-module.exports = Viewer;
+module.exports = StandardView;

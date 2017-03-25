@@ -14,9 +14,8 @@
  limitations under the License.
  */
 
-const View = require('../base/View');
 const List = require('../base/List');
-const Viewer = require('../base/Viewer');
+const StandardView = require('../base/StandardView');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -41,20 +40,13 @@ function markEmptyFields(inputs) {
   return emptyFields;
 }
 
-class DocsViewer extends View {
+class DocsViewer extends StandardView {
   constructor({ isFullscreen }) {
     super({ isFullscreen });
 
     this.element.setAttribute('id', 'docsViewer');
-    const container = elementCreator.createContainer({ classes: ['viewContainer'] });
-    this.docsSelect = elementCreator.createContainer({ classes: ['list'] });
-    this.viewer = new Viewer({}).element;
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
-
-    container.appendChild(this.docsSelect);
-    container.appendChild(this.viewer);
-    this.element.appendChild(container);
 
     this.populateList();
   }
@@ -176,9 +168,9 @@ class DocsViewer extends View {
       },
     });
 
-    this.docsSelect.appendChild(createButton);
-    this.docsSelect.appendChild(userDocs.element);
-    this.docsSelect.appendChild(publicDocs.element);
+    this.itemList.appendChild(createButton);
+    this.itemList.appendChild(userDocs.element);
+    this.itemList.appendChild(publicDocs.element);
 
     this.accessElements.push({
       element: createButton,

@@ -14,10 +14,9 @@
  limitations under the License.
  */
 
-const View = require('../base/View');
+const StandardView = require('../base/StandardView');
 const MessageList = require('../elements/MessageList');
 const Message = require('../elements/Message');
-const Viewer = require('../base/Viewer');
 const List = require('../base/List');
 const DialogBox = require('../DialogBox');
 
@@ -70,7 +69,7 @@ function findItem(list, text) {
   return listItems.find(item => item.firstElementChild.innerText === text);
 }
 
-class Messenger extends View {
+class Messenger extends StandardView {
   constructor({ isFullscreen, sendButtonText, isTopDown }) {
     super({ isFullscreen });
 
@@ -80,7 +79,6 @@ class Messenger extends View {
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
     this.messageList = new MessageList({ isTopDown });
-    this.chatSelect = elementCreator.createContainer({ classes: ['list'] });
 
     this.imagePreview = new Image();
     this.imagePreview.classList.add('hide');
@@ -191,9 +189,7 @@ class Messenger extends View {
       accessLevel: 1,
     });
 
-    this.viewer = new Viewer({}).element;
     this.viewer.classList.add('selectedView');
-    const container = elementCreator.createContainer({ classes: ['viewContainer'] });
 
     if (isTopDown) {
       this.inputArea.classList.add('topDown');
@@ -212,10 +208,6 @@ class Messenger extends View {
         }
       }
     });
-
-    container.appendChild(this.chatSelect);
-    container.appendChild(this.viewer);
-    this.element.appendChild(container);
 
     this.populate();
   }
@@ -365,9 +357,9 @@ class Messenger extends View {
       },
     });
 
-    this.chatSelect.appendChild(createButton);
-    this.chatSelect.appendChild(followList.element);
-    this.chatSelect.appendChild(roomsList.element);
+    this.itemList.appendChild(createButton);
+    this.itemList.appendChild(followList.element);
+    this.itemList.appendChild(roomsList.element);
 
     this.accessElements.push({
       element: createButton,

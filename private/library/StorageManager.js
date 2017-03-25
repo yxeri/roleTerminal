@@ -94,7 +94,7 @@ class StorageManager {
    * @static
    * @returns {string} Device ID
    */
-  static getDeviceId() { return this.getLocalVal('accessLevel'); }
+  static getDeviceId() { return this.getLocalVal('deviceId'); }
 
   /**
    * Set device ID

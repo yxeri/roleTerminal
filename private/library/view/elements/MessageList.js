@@ -141,10 +141,6 @@ class MessageList {
     return listItem;
   }
 
-  appendTo(parentElement) {
-    parentElement.appendChild(this.element);
-  }
-
   scrolledToBottom(shouldScroll) {
     if (shouldScroll || viewTools.isCloseToEnd(this.element, this.element.lastChild.getBoundingClientRect().height)) {
       this.scroll(false);

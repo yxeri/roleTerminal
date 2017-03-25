@@ -19,7 +19,8 @@ const textTools = require('../../TextTools');
 
 class Boot extends View {
   constructor({ removeTime = 4000 }) {
-    super({ isFullscreen: true, viewId: 'boot' });
+    super({ isFullscreen: true });
+    this.element.classList.add('textAnimation');
     this.queue = [];
     this.removeTime = removeTime;
   }
@@ -49,7 +50,7 @@ class Boot extends View {
     if (line) {
       setTimeout(() => {
         const span = document.createElement('SPAN');
-        const text = code && Math.random() > 0.7 ? textTools.replaceWhitespace(line) : line;
+        const text = code && Math.random() > 0.8 ? textTools.replaceWhitespace(line) : line;
 
         if (classes) {
           span.classList.add(classes);

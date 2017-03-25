@@ -193,19 +193,6 @@ img {
   width: auto;
 }
 
-#boot {
-  background-color: $back-color;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-}
-
 #background {
   @include borderOutline;
   width: $inner-container-width;
@@ -468,6 +455,19 @@ img {
   > ul {
     width: 100%;
   }
+}
+
+.textAnimation {
+  background-color: $back-color;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .viewer {

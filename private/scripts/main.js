@@ -41,7 +41,7 @@ const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const tracker = new Tracker();
 
-const boot = new Boot({ removeTime: 4000 });
+const boot = new Boot({ removeTime: 5000 });
 boot.setQueue([
   { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
   {
@@ -130,6 +130,18 @@ boot.setQueue([
       ],
     },
   },
+  {
+    func: boot.printLines,
+    params: {
+      code: false,
+      array: [
+        'Organica approved device detected',
+        'Rewriting firmware...',
+        'Overriding lock...',
+      ],
+    },
+  },
+  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
   {
     func: boot.printLines,
     params: {

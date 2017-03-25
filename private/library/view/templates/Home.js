@@ -43,6 +43,7 @@ class Home extends View {
         fragment.appendChild(elementCreator.createParagraph({ text: `User: ${storageManager.getUserName() || '-'}` }));
         fragment.appendChild(elementCreator.createParagraph({ text: `Team: ${storageManager.getTeam() || '-'}` }));
         fragment.appendChild(elementCreator.createParagraph({ text: `Access level: ${storageManager.getAccessLevel()}` }));
+        fragment.appendChild(elementCreator.createParagraph({ text: `DID: ${storageManager.getDeviceId()}` }));
         this.element.lastElementChild.firstElementChild.appendChild(fragment);
 
         const fakeFragment = document.createDocumentFragment();

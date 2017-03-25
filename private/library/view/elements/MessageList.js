@@ -90,8 +90,6 @@ class MessageList {
         console.log('New messages!');
       }
     }
-
-    this.lastItem = { headerItems: [''] };
   }
 
   /**

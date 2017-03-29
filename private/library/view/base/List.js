@@ -49,22 +49,44 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.element.classList.add('hide');
     this.shouldSort = shouldSort;
+    this.showingList = showingList;
+    this.toggleElement = elementCreator.createContainer({ });
 
     if (title) {
       const titleElement = document.createElement('P');
-
       titleElement.classList.add('listTitle');
+      titleElement.classList.add('clickable');
+
+      titleElement.addEventListener('click', () => {
+        this.toggleList();
+      });
+
+      if (!this.showingList) {
+        this.toggleElement.classList.add('collapsedIcon');
+      } else {
+        this.toggleElement.classList.add('expandedIcon');
+      }
+
+      titleElement.appendChild(this.toggleElement);
       titleElement.appendChild(document.createTextNode(title));
       this.element.appendChild(titleElement);
+    } else {
+      this.showingList = true;
     }
 
-    this.element.appendChild(elementCreator.createList({ elements: items }));
+    const list = elementCreator.createList({ elements: items });
+
+    if (!this.showingList) {
+      list.classList.add('hide');
+    }
+
+    this.element.appendChild(list);
   }
 
   addItem({ item }) {
@@ -74,7 +96,7 @@ class List extends View {
       this.element.lastElementChild.appendChild(elementCreator.createListItem({ element: item }));
     }
 
-    this.toggleList();
+    this.toggleView();
   }
 
   addItems({ items }) {
@@ -82,22 +104,40 @@ class List extends View {
 
     items.forEach(item => fragment.appendChild(elementCreator.createListItem({ element: item })));
     this.addItem({ listItem: fragment });
-    this.toggleList();
+    this.toggleView();
   }
 
   replaceAllItems({ items }) {
     const list = elementCreator.createList({ elements: items });
 
+    if (!this.showingList) {
+      list.classList.add('hide');
+    }
+
     this.element.replaceChild(list, this.element.lastElementChild);
-    this.toggleList();
+    this.toggleView();
   }
 
-  toggleList() {
+  toggleView() {
     if (this.element.lastElementChild.childNodes.length > 0) {
       this.element.classList.remove('hide');
     } else {
       this.element.classList.add('hide');
     }
+  }
+
+  toggleList() {
+    if (!this.showingList) {
+      this.toggleElement.classList.remove('collapsedIcon');
+      this.toggleElement.classList.add('expandedIcon');
+      this.showingList = true;
+    } else {
+      this.toggleElement.classList.remove('expandedIcon');
+      this.toggleElement.classList.add('collapsedIcon');
+      this.showingList = false;
+    }
+
+    this.element.lastElementChild.classList.toggle('hide');
   }
 }
 

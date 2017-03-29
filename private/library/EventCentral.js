@@ -62,8 +62,6 @@ class EventCentral {
       const index = this.eventWatchers[event].findIndex(watcher => watcher.watcherParent === watcherParent && watcher.func === func);
       this.eventWatchers[event].splice(index, 1);
     }
-
-    console.log(this.eventWatchers[event]);
   }
 
   triggerEvent({ event, params = {} }) {

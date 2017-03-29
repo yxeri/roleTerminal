@@ -93,6 +93,7 @@ class DocsViewer extends StandardView {
   }
 
   populateList() {
+    const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
     const userDocs = new List({ viewId: 'userDocuments', shouldSort: true, title: 'Yours' });
     const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
 
@@ -167,8 +168,9 @@ class DocsViewer extends StandardView {
         this.viewer.appendChild(docFragment);
       },
     });
+    systemList.addItem({ item: createButton });
 
-    this.itemList.appendChild(createButton);
+    this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(userDocs.element);
     this.itemList.appendChild(publicDocs.element);
 

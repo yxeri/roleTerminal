@@ -26,6 +26,7 @@ const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
 const Tracker = require('../library/view/worldMap/Tracker');
 const Boot = require('../library/view/templates/TextAnimation');
+const Profile = require('../library/view/templates/Profile');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -175,6 +176,7 @@ window.addEventListener('error', (event) => {
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const docsViewer = new DocsViewer({ isFullscreen: true });
+const profile = new Profile();
 const map = new WorldMap({
   mapView: WorldMap.MapViews.OVERVIEW,
   clusterStyle: {
@@ -311,21 +313,6 @@ if (!storageManager.getUserName()) {
 }
 
 home.addLink({
-  linkName: 'Coms',
-  startFunc: () => { messenger.appendTo(mainView); },
-  endFunc: () => { messenger.removeView(); },
-});
-home.addLink({
-  linkName: 'Map',
-  startFunc: () => { map.appendTo(mainView); },
-  endFunc: () => { map.removeView(); },
-});
-home.addLink({
-  linkName: 'Docs',
-  startFunc: () => { docsViewer.appendTo(mainView); },
-  endFunc: () => { docsViewer.removeView(); },
-});
-home.addLink({
   linkName: 'Login',
   startFunc: () => {
     new LoginBox({
@@ -341,6 +328,28 @@ home.addLink({
   maxAccessLevel: 0,
   keepHome: true,
   classes: ['hide'],
+});
+home.addLink({
+  linkName: 'Me',
+  startFunc: () => { profile.appendTo(mainView); },
+  endFunc: () => { profile.removeView(); },
+  accessLevel: 1,
+  classes: ['hide'],
+});
+home.addLink({
+  linkName: 'Coms',
+  startFunc: () => { messenger.appendTo(mainView); },
+  endFunc: () => { messenger.removeView(); },
+});
+home.addLink({
+  linkName: 'Map',
+  startFunc: () => { map.appendTo(mainView); },
+  endFunc: () => { map.removeView(); },
+});
+home.addLink({
+  linkName: 'Docs',
+  startFunc: () => { docsViewer.appendTo(mainView); },
+  endFunc: () => { docsViewer.removeView(); },
 });
 home.addLink({
   linkName: 'Logout',

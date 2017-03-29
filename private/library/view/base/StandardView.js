@@ -18,8 +18,8 @@ const View = require('./View');
 const elementCreator = require('../../ElementCreator');
 
 class StandardView extends View {
-  constructor({ isFullscreen }) {
-    super({ isFullscreen });
+  constructor({ isFullscreen, viewId }) {
+    super({ isFullscreen, viewId });
     this.element.classList.add('container');
     this.viewer = elementCreator.createContainer({ classes: ['viewer'] });
     this.itemList = elementCreator.createContainer({ classes: ['list'] });

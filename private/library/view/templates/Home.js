@@ -17,42 +17,14 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const textTools = require('../../TextTools');
 
 class Home extends View {
   constructor() {
-    super({ isFullscreen: false });
+    super({ isFullscreen: false, viewId: 'home' });
 
-    this.element.setAttribute('id', 'home');
-    this.element.appendChild(document.createElement('DIV'));
-    this.element.appendChild(document.createElement('DIV'));
-    this.element.lastElementChild.appendChild(document.createElement('DIV'));
-    this.element.lastElementChild.appendChild(document.createElement('DIV'));
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';
-
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.USER,
-      func: () => {
-        const fragment = document.createDocumentFragment();
-        this.element.lastElementChild.firstElementChild.innerHTML = '';
-        fragment.appendChild(elementCreator.createParagraph({ text: `User: ${storageManager.getUserName() || '-'}` }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `Team: ${storageManager.getTeam() || '-'}` }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `Access level: ${storageManager.getAccessLevel()}` }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `DID: ${storageManager.getDeviceId()}` }));
-        this.element.lastElementChild.firstElementChild.appendChild(fragment);
-
-        const fakeFragment = document.createDocumentFragment();
-        fakeFragment.appendChild(elementCreator.createParagraph({ text: `Relay: ${textTools.createAlphaNumbericalString(4, true)}` }));
-        fakeFragment.appendChild(elementCreator.createParagraph({ text: 'v.4.0.1a' }));
-
-        this.element.lastElementChild.lastElementChild.appendChild(fakeFragment);
-      },
-    });
   }
 
   addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes }) {
@@ -72,7 +44,7 @@ class Home extends View {
       });
     }
 
-    this.element.firstChild.appendChild(button);
+    this.element.appendChild(button);
   }
 
   triggerLink(linkName, keepHome) {

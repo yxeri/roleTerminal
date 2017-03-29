@@ -285,6 +285,7 @@ class Messenger extends StandardView {
   }
 
   populate() {
+    const systemList = new List({ title: 'SYSTEM', shouldSort: false });
     const followList = new List({
       title: 'Following',
       shouldSort: false,
@@ -293,6 +294,7 @@ class Messenger extends StandardView {
       title: 'Rooms',
       shouldSort: true,
     });
+
     const createButton = elementCreator.createButton({
       classes: ['hide'],
       text: 'Create room',
@@ -356,8 +358,9 @@ class Messenger extends StandardView {
         createDialog.appendTo(this.element.parentElement);
       },
     });
+    systemList.addItem({ item: createButton });
 
-    this.itemList.appendChild(createButton);
+    this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(followList.element);
     this.itemList.appendChild(roomsList.element);
 

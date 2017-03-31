@@ -443,7 +443,6 @@ socketManager.addEvents([
   }, {
     event: 'logout',
     func: () => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: {} });
       eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
     },
   },

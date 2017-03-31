@@ -41,7 +41,7 @@ class ElementCreator {
     return listItem;
   }
 
-  static createButton({ func = () => {}, text, classes = [] }) {
+  static createButton({ func = () => {}, text, classes = [], data }) {
     const button = document.createElement('BUTTON');
     button.appendChild(document.createTextNode(text));
     this.setClasses(button, classes);
@@ -50,6 +50,10 @@ class ElementCreator {
       soundLibrary.playSound('button');
       func();
     });
+
+    if (data) {
+      button.setAttribute('data', data);
+    }
 
     return button;
   }

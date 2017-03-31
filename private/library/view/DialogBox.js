@@ -116,7 +116,10 @@ class DialogBox extends View {
   appendTo(parentElement) {
     parentElement.appendChild(this.cover);
     super.appendTo(parentElement);
-    this.inputs[0].inputElement.focus();
+
+    if (this.inputs[0]) {
+      this.inputs[0].inputElement.focus();
+    }
   }
 
   removeView() {

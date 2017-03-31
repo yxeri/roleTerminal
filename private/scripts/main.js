@@ -278,8 +278,9 @@ eventCentral.addWatcher({
   event: eventCentral.Events.LOGOUT,
   func: () => {
     storageManager.removeUser();
-    storageManager.setRoom('');
-    eventCentral.triggerEvent({ event: eventCentral.Events.USER });
+    eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
+    storageManager.setRoom('public');
+    eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room: { roomName: 'public' } } });
   },
 });
 
@@ -287,7 +288,7 @@ eventCentral.addWatcher({
   watcherParent: this,
   event: eventCentral.Events.LOGIN,
   func: () => {
-    eventCentral.triggerEvent({ event: eventCentral.Events.USER });
+    eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
   },
 });
 
@@ -420,7 +421,7 @@ socketManager.addEvents([
           eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: userName !== data.user.userName } });
+        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName } });
         socketManager.setConnected();
       });
     },
@@ -431,8 +432,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'chatMsgs',
-    func: ({ messages, room }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { room, messages, options: { printable: false } } });
+    func: ({ messages, room, whisper }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { whisper, room, messages, options: { printable: false } } });
     },
   }, {
     event: 'archive',
@@ -443,6 +444,7 @@ socketManager.addEvents([
     event: 'logout',
     func: () => {
       eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: {} });
+      eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
     },
   },
 ]);

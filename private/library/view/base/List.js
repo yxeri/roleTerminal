@@ -103,7 +103,7 @@ class List extends View {
     const fragment = document.createDocumentFragment();
 
     items.forEach(item => fragment.appendChild(elementCreator.createListItem({ element: item })));
-    this.addItem({ listItem: fragment });
+    this.element.lastElementChild.appendChild(fragment);
     this.toggleView();
   }
 

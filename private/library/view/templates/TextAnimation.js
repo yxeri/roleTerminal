@@ -18,11 +18,12 @@ const View = require('../base/View');
 const textTools = require('../../TextTools');
 
 class Boot extends View {
-  constructor({ removeTime = 4000 }) {
+  constructor({ removeTime = 4000, lineTime = 50 }) {
     super({ isFullscreen: true });
     this.element.classList.add('textAnimation');
     this.queue = [];
     this.removeTime = removeTime;
+    this.lineTime = lineTime;
   }
 
   addCode({ iteration, maxIteration, row, maxRows, binary }) {
@@ -34,10 +35,10 @@ class Boot extends View {
     span.scrollIntoView();
 
     if (iteration < maxIteration) {
-      setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary }); }, 50);
+      setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary }); }, this.lineTime);
     } else if (row < maxRows) {
       this.element.appendChild(document.createElement('BR'));
-      setTimeout(() => { this.addCode({ iteration: 0, maxIteration, row: row + 1, maxRows, binary }); }, 50);
+      setTimeout(() => { this.addCode({ iteration: 0, maxIteration, row: row + 1, maxRows, binary }); }, this.lineTime);
     } else {
       this.element.appendChild(document.createElement('BR'));
       this.next();

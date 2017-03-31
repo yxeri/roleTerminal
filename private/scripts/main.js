@@ -445,5 +445,10 @@ socketManager.addEvents([
     func: () => {
       eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
     },
+  }, {
+    event: 'bcastMsg',
+    func: ({ message }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.BCASTMSG, params: { message } });
+    },
   },
 ]);

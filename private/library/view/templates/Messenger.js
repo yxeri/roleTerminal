@@ -29,6 +29,18 @@ const soundLibrary = require('../../audio/SoundLibrary');
 const textTools = require('../../TextTools');
 
 /**
+ * Takes a list of user names and filters out current users user name and aliases
+ * @param {string[]} users - List of users
+ * @returns {string[]} List of users, excluding current user name and aliases
+ */
+function filterUserAliases(users) {
+  const aliases = storageManager.getAliases();
+  aliases.push(storageManager.getUserName());
+
+  return users.filter(user => aliases.indexOf(user) === -1);
+}
+
+/**
  * Converts room name to sender and receiver user names
  * @param {string} sentRoomName Whisper room name and user name combined
  * @returns {{userName: string, whisperTo: string}} Name of the user sending whisper and user that is whispered to
@@ -386,11 +398,11 @@ class Messenger extends StandardView {
             isRequired: true,
           }],
           description: [
-            textTools.createMixedString(15, false, true),
-            textTools.createMixedString(15, false, true),
-            'Cracked by Razor, for your enjoyment',
-            textTools.createMixedString(15, false, true),
-            textTools.createMixedString(15, false, true),
+            textTools.createMixedString(60, false, true),
+            'Alter Ego Creator 0.0.2',
+            'Made available by Razor',
+            'For your enjoyment',
+            textTools.createMixedString(63, false, true),
           ],
           extraDescription: ['Enter your new alias'],
         });
@@ -493,8 +505,6 @@ class Messenger extends StandardView {
           }
         }
 
-        console.log(roomName);
-
         if (roomName === storageManager.getRoom()) {
           const itemsOptions = {
             animation: 'flash',
@@ -520,6 +530,34 @@ class Messenger extends StandardView {
             listItem.firstElementChild.classList.add('selected');
           }
         }
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.BCASTMSG,
+      func: ({ message }) => {
+        const itemsOptions = {
+          animation: 'flash',
+          shouldScroll: true,
+        };
+
+        const intro = [
+          '-------------------------------',
+          'THIS IS A PUBLIC ANNOUNCEMENT',
+          'EMPLOYEE. STAND AT ATTENTION',
+          '-------------------------------',
+        ];
+        const extro = [
+          '-------------------------------',
+          'END OF MESSAGE',
+          'RETURN TO YOUR DUTY',
+          '-------------------------------',
+        ];
+
+        message.text = intro.concat(message.text).concat(extro);
+
+        this.messageList.addItems([new Message(message, {})], itemsOptions);
       },
     });
 
@@ -580,9 +618,10 @@ class Messenger extends StandardView {
             }
 
             const { onlineUsers, offlineUsers } = data;
+            const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
             const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-            userList.replaceAllItems({ items: onlineUsers.concat(offlineUsers).map(listUserName => this.createWhisperButton({ roomName: userName, whisperTo: listUserName })) });
+            userList.replaceAllItems({ items: allUsers.map(listUserName => this.createWhisperButton({ roomName: userName, whisperTo: listUserName })) });
           });
         } else {
           userList.replaceAllItems({ items: [] });

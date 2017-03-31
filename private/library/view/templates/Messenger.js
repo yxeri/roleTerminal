@@ -120,6 +120,7 @@ class Messenger extends StandardView {
     this.inputField.setAttribute('rows', '3');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
+    this.selectedAliasItem = null;
     this.messageList = new MessageList({ isTopDown });
 
     this.imagePreview = new Image();
@@ -161,62 +162,9 @@ class Messenger extends StandardView {
       accessLevel: 2,
     });
 
-    const aliasDiv = document.createElement('DIV');
-    const aliasList = elementCreator.createList({
-      classes: ['list', 'hide'],
-    });
-    const aliasListButton = elementCreator.createButton({
-      func: () => { aliasList.classList.toggle('hide'); },
-      text: '-',
-    });
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.ALIAS,
-      func: ({ aliases }) => {
-        if (aliases.length > 0) {
-          const fragment = document.createDocumentFragment();
-          const fullAliasList = [storageManager.getUserName()].concat(aliases);
-
-          fullAliasList.forEach((alias) => {
-            const row = document.createElement('LI');
-            const button = elementCreator.createButton({
-              func: () => {
-                if (storageManager.getUserName() !== alias) {
-                  storageManager.setSelectedAlias(alias);
-                } else {
-                  storageManager.removeSelectedAlias();
-                }
-
-                aliasListButton.replaceChild(document.createTextNode(`Alias: ${alias}`), aliasListButton.firstChild);
-                aliasList.classList.toggle('hide');
-              },
-              text: alias,
-            });
-
-            row.appendChild(button);
-            fragment.appendChild(row);
-          });
-
-          aliasList.innerHTML = '';
-          aliasList.appendChild(fragment);
-
-          elementCreator.setButtonText(aliasListButton, `Alias: ${storageManager.getSelectedAlias() || storageManager.getUserName() || ''}`);
-        } else {
-          aliasListButton.classList.add('hide');
-        }
-      },
-    });
-    aliasDiv.appendChild(aliasList);
-    aliasDiv.appendChild(aliasListButton);
-    this.accessElements.push({
-      element: aliasDiv,
-      accessLevel: 2,
-    });
-
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');
 
-    buttons.appendChild(aliasDiv);
     buttons.appendChild(imageButton);
     buttons.appendChild(sendButton);
 
@@ -333,6 +281,10 @@ class Messenger extends StandardView {
       title: 'SYSTEM',
       shouldSort: false,
     });
+    const aliasList = new List({
+      title: 'ALIASES',
+      shouldSort: true,
+    });
     const followList = new List({
       title: 'Following',
       shouldSort: false,
@@ -374,7 +326,7 @@ class Messenger extends StandardView {
                   return;
                 }
 
-                const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value;
+                const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
 
                 socketManager.emitEvent('addAlias', { alias }, ({ error: createError }) => {
                   if (createError) {
@@ -384,7 +336,7 @@ class Messenger extends StandardView {
                   }
 
                   eventCentral.triggerEvent({
-                    event: eventCentral.Events.ALIAS,
+                    event: eventCentral.Events.NEWALIAS,
                     params: { alias },
                   });
                   createDialog.removeView();
@@ -476,11 +428,20 @@ class Messenger extends StandardView {
     systemList.addItems({ items: [createButton, createAliasButton] });
 
     this.itemList.appendChild(systemList.element);
+    this.itemList.appendChild(aliasList.element);
     this.itemList.appendChild(followList.element);
     this.itemList.appendChild(roomsList.element);
     this.itemList.appendChild(userList.element);
     this.itemList.appendChild(privateList.element);
 
+    this.accessElements.push({
+      element: systemList.element,
+      accessLevel: 1,
+    });
+    this.accessElements.push({
+      element: aliasList.element,
+      accessLevel: 1,
+    });
     this.accessElements.push({
       element: createButton,
       accessLevel: 1,
@@ -488,6 +449,27 @@ class Messenger extends StandardView {
     this.accessElements.push({
       element: createAliasButton,
       accessLevel: 1,
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.ALIAS,
+      func: ({ alias }) => {
+        const aliasItem = findItem(aliasList, alias);
+
+        if (aliasItem) {
+          this.selectedAliasItem = aliasItem;
+          this.selectedAliasItem.classList.add('selectedItem');
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.NEWALIAS,
+      func: ({ alias }) => {
+        aliasList.addItem({ item: this.createAliasButton({ alias }) });
+      },
     });
 
     eventCentral.addWatcher({
@@ -610,6 +592,20 @@ class Messenger extends StandardView {
       event: eventCentral.Events.USER,
       func: ({ changedUser }) => {
         if (storageManager.getAccessLevel() > 0) {
+          const aliases = storageManager.getAliases();
+
+          if (aliases.length > 0) {
+            const selectedAlias = storageManager.getSelectedAlias() || storageManager.getUserName();
+
+            aliasList.replaceAllItems({ items: aliases.map(alias => this.createAliasButton({ alias })) });
+            aliasList.addItem({ item: this.createAliasButton({ alias: storageManager.getUserName() }) });
+            aliasList.toggleList(true);
+
+            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
+          } else {
+            aliasList.replaceAllItems({ items: [] });
+          }
+
           socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
             if (error) {
               console.log(error);
@@ -624,6 +620,7 @@ class Messenger extends StandardView {
             userList.replaceAllItems({ items: allUsers.map(listUserName => this.createWhisperButton({ roomName: userName, whisperTo: listUserName })) });
           });
         } else {
+          aliasList.replaceAllItems({ items: [] });
           userList.replaceAllItems({ items: [] });
         }
 
@@ -659,6 +656,26 @@ class Messenger extends StandardView {
     keyHandler.addKey(13, () => { this.sendMessage(); });
     super.appendTo(parentElement);
     this.messageList.scroll();
+  }
+
+  createAliasButton({ alias }) {
+    return elementCreator.createButton({
+      data: alias,
+      text: alias,
+      func: () => {
+        if (this.selectedAliasItem) {
+          this.selectedAliasItem.classList.remove('selectedItem');
+        }
+
+        if (alias !== storageManager.getUserName()) {
+          storageManager.setSelectedAlias(alias);
+        } else {
+          storageManager.removeSelectedAlias();
+        }
+
+        eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias } });
+      },
+    });
   }
 
   createWhisperButton({ roomName, whisperTo, data }) {

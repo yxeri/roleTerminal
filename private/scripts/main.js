@@ -418,7 +418,7 @@ socketManager.addEvents([
           storageManager.setAccessLevel(0);
         } else {
           storageManager.setAccessLevel(data.user.accessLevel);
-          eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
+          storageManager.setAliases(data.user.aliases || []);
         }
 
         eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName } });

@@ -18,6 +18,7 @@ class EventCentral {
   constructor() {
     this.Events = {
       CHATMSG: 'Chat message retrieved',
+      NEWALIAS: 'New alias',
       ALIAS: 'Aliases changed',
       ACCESS: 'Access level changed',
       MESSAGE: 'Message retrieved',
@@ -33,6 +34,7 @@ class EventCentral {
       CREATEARCHIVE: 'Created archive',
       MYPOSITION: 'User position',
       UPDATEDPOSITION: 'Updated position',
+      BCASTMSG: 'Broadcast message',
     };
     this.eventWatchers = {};
   }

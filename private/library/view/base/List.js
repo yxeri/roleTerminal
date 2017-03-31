@@ -21,31 +21,31 @@ const elementCreator = require('../../ElementCreator');
  * Sorts a list of items. Appends a new item if set
  * @param {HTMLUListElement} list - The list to sort
  * @param {HTMLLIElement} newItem - New item to append
- * @returns {HTMLUListElement} Sorted list
+ * @returns {DocumentFragment} Sorted list
  */
 function createSortedList(list, newItem) {
-  const sortedList = list.cloneNode(true);
+  const fragment = document.createDocumentFragment();
 
-  if (newItem) { sortedList.appendChild(newItem); }
+  if (newItem) { list.appendChild(newItem); }
 
-  sortedList.childNodes.sort((a, b) => {
-    if (isNaN(a) && isNaN(b)) {
-      const aValue = a.value.toLowerCase();
-      const bValue = b.value.toLowerCase();
+  const array = Array.from(list.childNodes);
 
-      if (aValue < bValue) {
-        return -1;
-      } else if (aValue > bValue) {
-        return 1;
-      }
+  array.sort((a, b) => {
+    const aValue = a.firstElementChild.innerText.toLowerCase();
+    const bValue = b.firstElementChild.innerText.toLowerCase();
 
-      return 0;
+    if (aValue < bValue) {
+      return -1;
+    } else if (aValue > bValue) {
+      return 1;
     }
 
-    return a.value - b.value;
+    return 0;
   });
 
-  return sortedList;
+  array.forEach(item => fragment.appendChild(item));
+
+  return fragment;
 }
 
 class List extends View {
@@ -91,7 +91,10 @@ class List extends View {
 
   addItem({ item }) {
     if (this.shouldSort) {
-      this.element.replaceChild(this.list, createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item })));
+      const fragment = createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item }));
+
+      this.element.lastElementChild.innerHTML = '';
+      this.element.lastElementChild.appendChild(fragment);
     } else {
       this.element.lastElementChild.appendChild(elementCreator.createListItem({ element: item }));
     }
@@ -126,8 +129,8 @@ class List extends View {
     }
   }
 
-  toggleList() {
-    if (!this.showingList) {
+  toggleList(show) {
+    if (!this.showingList || show) {
       this.toggleElement.classList.remove('collapsedIcon');
       this.toggleElement.classList.add('expandedIcon');
       this.showingList = true;

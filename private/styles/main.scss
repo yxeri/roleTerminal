@@ -640,25 +640,6 @@ img {
 
   div {
     margin-right: $padding * 2;
-
-    ul {
-      position: absolute;
-      bottom: 2em;
-      background-color: $back-color;
-
-      li {
-        margin-bottom: $padding;
-
-        button {
-          width: 100%;
-          text-align: left;
-        }
-      }
-
-      li:last-child {
-        margin-bottom: 0 !important;
-      }
-    }
   }
 
   button {

@@ -436,9 +436,9 @@ socketManager.addEvents([
       eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { whisper, room, messages, options: { printable: false } } });
     },
   }, {
-    event: 'archive',
-    func: ({ archive }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.ARCHIVE, params: { archive } });
+    event: 'docFile',
+    func: ({ docFile }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.DOCFILE, params: { docFile } });
     },
   }, {
     event: 'logout',

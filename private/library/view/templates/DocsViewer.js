@@ -51,8 +51,8 @@ class DocsViewer extends StandardView {
     this.populateList();
   }
 
-  createArchiveButton(archive) {
-    const title = `${archive.title || archive.archiveId}`;
+  createDocFileButton(docFile) {
+    const title = `${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
       text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
@@ -63,19 +63,19 @@ class DocsViewer extends StandardView {
         this.selectedItem = button.parentElement;
         this.selectedItem.classList.add('selectedItem');
 
-        socketManager.emitEvent('getArchive', { archiveId: archive.archiveId }, ({ archiveError, data: archiveData }) => {
-          if (archiveError) {
-            console.log(archiveError);
+        socketManager.emitEvent('getDocFile', { docFileId: docFile.docFileId }, ({ docFileError, data: docFileData }) => {
+          if (docFileError) {
+            console.log(docFileError);
 
             return;
           }
 
           const docFragment = document.createDocumentFragment();
-          docFragment.appendChild(elementCreator.createParagraph({ text: `${archiveData.archive.title}`, classes: ['title'] }));
-          docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${archiveData.archive.archiveId.toUpperCase()}` }));
-          docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${archiveData.archive.isPublic ? 'Yes' : 'No'}` }));
+          docFragment.appendChild(elementCreator.createParagraph({ text: `${docFileData.docFile.title}`, classes: ['title'] }));
+          docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFileData.docFile.docFileId.toUpperCase()}` }));
+          docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFileData.docFile.isPublic ? 'Yes' : 'No'}` }));
 
-          archiveData.archive.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
+          docFileData.docFile.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
           this.viewer.classList.remove('flash');
 
@@ -142,17 +142,17 @@ class DocsViewer extends StandardView {
           text: 'Save',
           func: () => {
             if (!markEmptyFields([titleInput, bodyInput, idInput])) {
-              const archive = {
+              const docFile = {
                 title: titleInput.value,
-                archiveId: idInput.value,
+                docFileId: idInput.value,
                 text: bodyInput.value.split('\n'),
                 isPublic: document.getElementById('visPublic').checked === true,
                 teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
               };
 
-              socketManager.emitEvent('createArchive', archive, ({ error: archiveError }) => {
-                if (archiveError) {
-                  console.log(archiveError);
+              socketManager.emitEvent('createDocFile', docFile, ({ error: docFileError }) => {
+                if (docFileError) {
+                  console.log(docFileError);
 
                   return;
                 }
@@ -185,17 +185,17 @@ class DocsViewer extends StandardView {
       func: () => {
         this.viewer.innerHTML = '';
 
-        socketManager.emitEvent('getArchivesList', {}, ({ error, data }) => {
+        socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {
           if (error) {
             console.log(error);
 
             return;
           }
 
-          const { userArchives = [], archives = [] } = data;
+          const { userDocFiles = [], docFiles = [] } = data;
 
-          userDocs.replaceAllItems({ items: userArchives.map(archive => this.createArchiveButton(archive)) });
-          publicDocs.replaceAllItems({ items: archives.map(archive => this.createArchiveButton(archive)) });
+          userDocs.replaceAllItems({ items: userDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          publicDocs.replaceAllItems({ items: docFiles.map(docFile => this.createDocFileButton(docFile)) });
         });
       },
     });

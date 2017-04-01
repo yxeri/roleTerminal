@@ -217,6 +217,4 @@ class StorageManager {
   static getTeam() { return this.getLocalVal('team'); }
 }
 
-eventCentral.addWatcher({ watcherParent: StorageManager, event: eventCentral.Events.ALIAS, func: ({ aliases }) => { StorageManager.setAliases(aliases); } });
-
 module.exports = StorageManager;

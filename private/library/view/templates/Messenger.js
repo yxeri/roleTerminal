@@ -631,9 +631,16 @@ class Messenger extends StandardView {
             return;
           }
 
-          const { rooms = [], followedRooms = [] } = data;
+          const { rooms = [], followedRooms = [], whisperRooms = [] } = data;
 
           followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room })) });
+          followList.addItems({
+            items: whisperRooms.map((room) => {
+              const { whisperTo, userName } = convertWhisperRoomName(room);
+
+              return this.createWhisperButton({ roomName: `${userName} <-> ${whisperTo}`, data: room });
+            }),
+          });
           roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton({ roomName: room })) });
 
           const listItem = findItem(followList, storageManager.getRoom());
@@ -697,11 +704,19 @@ class Messenger extends StandardView {
           const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
           const whisperRoomName = `${userName}-whisper-${whisperTo}`;
 
-          eventCentral.triggerEvent({
-            event: eventCentral.Events.FOLLOWROOM,
-            params: { room: { roomName: `${userName} <-> ${whisperTo}` }, data: whisperRoomName, whisper: true },
+          socketManager.emitEvent('followWhisper', { room: { roomName: whisperRoomName } }, ({ error }) => {
+            if (error) {
+              console.log(error);
+
+              return;
+            }
+
+            eventCentral.triggerEvent({
+              event: eventCentral.Events.FOLLOWROOM,
+              params: { room: { roomName: `${userName} <-> ${whisperTo}` }, data: whisperRoomName, whisper: true },
+            });
+            storageManager.setRoom(whisperRoomName);
           });
-          storageManager.setRoom(whisperRoomName);
         }
       },
     });

@@ -16,10 +16,12 @@
 
 const List = require('../base/List');
 const StandardView = require('../base/StandardView');
+const DialogBox = require('../DialogBox');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
+const soundLibrary = require('../../audio/SoundLibrary');
 
 // TODO Duplicate code in DialogBox
 /**
@@ -51,6 +53,24 @@ class DocsViewer extends StandardView {
     this.populateList();
   }
 
+  showDoc(docFile) {
+    const docFragment = document.createDocumentFragment();
+    docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.title}`, classes: ['title'] }));
+    docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFile.docFileId.toUpperCase()}` }));
+    docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFile.isPublic ? 'Yes' : 'No'}` }));
+
+    docFile.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
+
+    this.viewer.classList.remove('flash');
+
+    setTimeout(() => {
+      this.viewer.innerHTML = '';
+      this.viewer.classList.add('flash');
+      this.viewer.scrollTop = this.viewer.scrollHeight;
+      this.viewer.appendChild(docFragment);
+    }, 100);
+  }
+
   createDocFileButton(docFile) {
     const title = `${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
@@ -70,21 +90,7 @@ class DocsViewer extends StandardView {
             return;
           }
 
-          const docFragment = document.createDocumentFragment();
-          docFragment.appendChild(elementCreator.createParagraph({ text: `${docFileData.docFile.title}`, classes: ['title'] }));
-          docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFileData.docFile.docFileId.toUpperCase()}` }));
-          docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFileData.docFile.isPublic ? 'Yes' : 'No'}` }));
-
-          docFileData.docFile.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
-
-          this.viewer.classList.remove('flash');
-
-          setTimeout(() => {
-            this.viewer.innerHTML = '';
-            this.viewer.classList.add('flash');
-            this.viewer.scrollTop = this.viewer.scrollHeight;
-            this.viewer.appendChild(docFragment);
-          }, 100);
+          this.showDoc(docFileData.docFile);
         });
       },
     });
@@ -97,6 +103,61 @@ class DocsViewer extends StandardView {
     const userDocs = new List({ viewId: 'userDocuments', shouldSort: true, title: 'Yours' });
     const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
 
+    const searchButton = elementCreator.createButton({
+      text: 'ID search',
+      func: () => {
+        const idDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                idDialog.removeView();
+              },
+            },
+            right: {
+              text: 'Search',
+              eventFunc: () => {
+                const emptyFields = idDialog.markEmptyFields();
+
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  idDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                const documentId = idDialog.inputs.find(({ inputName }) => inputName === 'documentId').inputElement.value.toLowerCase();
+
+                socketManager.emitEvent('getDocFile', { docFileId: documentId }, ({ error: docError, data: { docFile } }) => {
+                  if (docError) {
+                    console.log(docError);
+
+                    return;
+                  } else if (!docFile || docFile === null) {
+                    idDialog.changeExtraDescription({ text: ['Unable to retrieve document with sent ID. Please try again'] });
+
+                    return;
+                  }
+
+                  this.showDoc(docFile);
+                  idDialog.removeView();
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Document ID',
+            inputName: 'documentId',
+            isRequired: true,
+          }],
+          description: [
+            'Retrieve a document from the archives',
+          ],
+          extraDescription: ['Enter the ID of the document'],
+        });
+        idDialog.appendTo(this.element.parentElement);
+      },
+    });
     const createButton = elementCreator.createButton({
       classes: ['hide'],
       text: 'Create doc',
@@ -168,7 +229,7 @@ class DocsViewer extends StandardView {
         this.viewer.appendChild(docFragment);
       },
     });
-    systemList.addItem({ item: createButton });
+    systemList.addItems({ items: [searchButton, createButton] });
 
     this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(userDocs.element);

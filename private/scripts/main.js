@@ -27,6 +27,7 @@ const SoundElement = require('../library/audio/SoundElement');
 const Tracker = require('../library/view/worldMap/Tracker');
 const Boot = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
+const Wallet = require('../library/view/templates/Wallet');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -176,6 +177,7 @@ window.addEventListener('error', (event) => {
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const docsViewer = new DocsViewer({ isFullscreen: true });
+const wallet = new Wallet();
 const profile = new Profile();
 const map = new WorldMap({
   mapView: WorldMap.MapViews.OVERVIEW,
@@ -353,6 +355,13 @@ home.addLink({
   endFunc: () => { docsViewer.removeView(); },
 });
 home.addLink({
+  linkName: 'Wallet',
+  startFunc: () => { wallet.appendTo(mainView); },
+  endFunc: () => { wallet.removeView(); },
+  classes: ['hide'],
+  accessLevel: 1,
+});
+home.addLink({
   linkName: 'Logout',
   startFunc: () => {
     socketManager.emitEvent('logout', {}, (error) => {
@@ -449,6 +458,11 @@ socketManager.addEvents([
     event: 'bcastMsg',
     func: ({ message }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.BCASTMSG, params: { message } });
+    },
+  }, {
+    event: 'transaction',
+    func: ({ transaction }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.TRANSACTION, params: { transaction } });
     },
   },
 ]);

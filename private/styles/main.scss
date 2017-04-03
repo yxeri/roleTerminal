@@ -405,6 +405,29 @@ img {
   display: block;
 }
 
+#wallet {
+  .viewer {
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    li {
+      border-bottom: 1px solid $text-color;
+      padding: .5em 0 .5em .5em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    > p {
+      text-align: center;
+      border-bottom: 1px solid $text-color;
+      padding-top: .2em;
+      padding-bottom: .5em;
+    }
+  }
+}
+
 .list {
   width: $short-list-width;
   min-width: $short-list-width;

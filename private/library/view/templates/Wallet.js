@@ -177,46 +177,48 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
-        socketManager.emitEvent('getWallet', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
+        if (storageManager.getAccessLevel() > 0) {
+          socketManager.emitEvent('getWallet', {}, ({ error, data }) => {
+            if (error) {
+              console.log(error);
 
-            return;
-          }
-
-          this.walletAmount = data.wallet.amount;
-          this.changeWalletAmount({ amount: 0, from: '' });
-        });
-
-        socketManager.emitEvent('getAllTransactions', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
-
-            return;
-          }
-
-          const { toTransactions, fromTransactions } = data;
-          const allTransactions = toTransactions.concat(fromTransactions);
-
-          allTransactions.sort((a, b) => {
-            const aValue = a.time;
-            const bValue = b.time;
-
-            if (aValue < bValue) {
-              return 1;
-            } else if (aValue > bValue) {
-              return -1;
+              return;
             }
 
-            return 0;
+            this.walletAmount = data.wallet.amount;
+            this.changeWalletAmount({ amount: 0, from: '' });
           });
 
-          const fragment = document.createDocumentFragment();
-          allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
+          socketManager.emitEvent('getAllTransactions', {}, ({ error, data }) => {
+            if (error) {
+              console.log(error);
 
-          this.viewer.lastElementChild.innerHTML = '';
-          this.viewer.lastElementChild.appendChild(fragment);
-        });
+              return;
+            }
+
+            const { toTransactions, fromTransactions } = data;
+            const allTransactions = toTransactions.concat(fromTransactions);
+
+            allTransactions.sort((a, b) => {
+              const aValue = a.time;
+              const bValue = b.time;
+
+              if (aValue < bValue) {
+                return 1;
+              } else if (aValue > bValue) {
+                return -1;
+              }
+
+              return 0;
+            });
+
+            const fragment = document.createDocumentFragment();
+            allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
+
+            this.viewer.lastElementChild.innerHTML = '';
+            this.viewer.lastElementChild.appendChild(fragment);
+          });
+        }
       },
     });
 

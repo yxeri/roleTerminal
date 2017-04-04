@@ -220,6 +220,7 @@ class DocsViewer extends StandardView {
 
                 this.viewer.innerHTML = '';
                 this.viewer.appendChild(document.createTextNode('Document has been saved'));
+                eventCentral.triggerEvent({ event: eventCentral.Events.CREATEDOCFILE, params: { docFile } });
               });
             }
           },
@@ -238,6 +239,14 @@ class DocsViewer extends StandardView {
     this.accessElements.push({
       element: createButton,
       accessLevel: 1,
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.CREATEDOCFILE,
+      func: ({ docFile }) => {
+        userDocs.addItem({ item: this.createDocFileButton(docFile) });
+      },
     });
 
     eventCentral.addWatcher({

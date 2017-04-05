@@ -101,6 +101,7 @@ class DocsViewer extends StandardView {
   populateList() {
     const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
     const userDocs = new List({ viewId: 'userDocuments', shouldSort: true, title: 'Yours' });
+    const teamDocs = new List({ viewId: 'teamDocuments', shouldSort: true, title: 'Team' });
     const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
 
     const searchButton = elementCreator.createButton({
@@ -234,11 +235,28 @@ class DocsViewer extends StandardView {
 
     this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(userDocs.element);
+    this.itemList.appendChild(teamDocs.element);
     this.itemList.appendChild(publicDocs.element);
 
     this.accessElements.push({
       element: createButton,
       accessLevel: 1,
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.DOCFILE,
+      func: ({ docFile }) => {
+        const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+
+        if (docFile.creator === userName) {
+          userDocs.addItem({ item: this.createDocFileButton(docFile) });
+        } else if (docFile.team && docFile.team !== '') {
+          teamDocs.addItem({ item: this.createDocFileButton(docFile) });
+        } else if (docFile.isPublic) {
+          publicDocs.addItem({ item: this.createDocFileButton(docFile) });
+        }
+      },
     });
 
     eventCentral.addWatcher({
@@ -262,10 +280,11 @@ class DocsViewer extends StandardView {
             return;
           }
 
-          const { userDocFiles = [], docFiles = [] } = data;
+          const { userDocFiles = [], publicDocFiles = [], teamDocFiles = [] } = data;
 
           userDocs.replaceAllItems({ items: userDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          publicDocs.replaceAllItems({ items: docFiles.map(docFile => this.createDocFileButton(docFile)) });
+          teamDocs.replaceAllItems({ items: teamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          publicDocs.replaceAllItems({ items: publicDocFiles.map(docFile => this.createDocFileButton(docFile)) });
         });
       },
     });

@@ -149,25 +149,25 @@ class WorldMap extends View {
                 right: {
                   text: 'Create',
                   eventFunc: () => {
-                    const location = {
+                    const position = {
                       coordinates: {
                         longitude: event.latLng.lng(),
                         latitude: event.latLng.lat(),
                       },
-                      title: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
+                      positionName: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
                       description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
                     };
 
-                    socketManager.emitEvent('updateLocation', { location }, ({ error }) => {
+                    socketManager.emitEvent('updatePosition', { position }, ({ error }) => {
                       if (error) {
                         console.log(error);
 
                         return;
                       }
 
-                      this.markers[location.title] = new MapMarker({
-                        title: location.title,
-                        description: location.description,
+                      this.markers[position.positionName] = new MapMarker({
+                        positionName: position.positionName,
+                        description: position.description,
                         markerType: 'custom',
                         icon: {
                           url: 'images/mapiconcreated.png',
@@ -181,14 +181,14 @@ class WorldMap extends View {
                         owner: storageManager.getUserName(),
                         team: storageManager.getTeam(),
                       });
-                      this.clusterer.addMarker(this.markers[location.title].marker);
+                      this.clusterer.addMarker(this.markers[position.positionName].marker);
                       markerDialog.removeView();
                     });
                   },
                 },
               },
               inputs: [{
-                placeholder: 'Name of the location',
+                placeholder: 'Name of the position',
                 inputName: 'markerName',
                 isRequired: true,
               }, {
@@ -196,7 +196,7 @@ class WorldMap extends View {
                 inputName: 'description',
                 multiLine: true,
               }],
-              description: ['Mark a location that offers the maximum amount of team synergy'],
+              description: ['Mark a position that offers the maximum amount of team synergy'],
               extraDescription: [''],
             });
             markerDialog.appendTo(this.element.parentElement);
@@ -215,24 +215,24 @@ class WorldMap extends View {
   }
 
   /**
-   * Creates a label at the location of another object
+   * Creates a label at the position of another object
    * The name of the position will be used as text for the label
-   * @param {string} params.title - Name of the position
+   * @param {string} params.positionName - Name of the position
    * @param {string} params.labelText - Text that will be printed
    * @param {string} [params.align] - Text alignment (left|right)
    * @param {{latitude: Number, longitude: Number}} params.position - Long and lat coordinates of the label
    */
-  createLabel({ title, labelText, align = 'right', coordinates }) {
+  createLabel({ positionName, labelText, align = 'right', coordinates }) {
     const labelOptions = {
       position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
-      text: labelText || title,
+      text: labelText || positionName,
       align,
     };
 
     Object.keys(this.labelStyle).forEach((name) => { labelOptions[name] = this.labelStyle[name]; });
 
-    this.labels[title] = new MapLabel(labelOptions);
-    this.labels[title].setMap(this.map);
+    this.labels[positionName] = new MapLabel(labelOptions);
+    this.labels[positionName].setMap(this.map);
   }
 
   /**
@@ -256,7 +256,7 @@ class WorldMap extends View {
   createThisUserMarker(coordinates) {
     this.markers.I = new MapMarker({
       coordinates,
-      title: 'You',
+      positionName: 'You',
       icon: {
         url: '/images/mapiconyou.png',
       },
@@ -381,13 +381,13 @@ class WorldMap extends View {
           longitude: event.latLng.lng(),
           lastUpdated: new Date(),
         });
-        socketManager.emitEvent('updateLocation', {
-          location: {
+        socketManager.emitEvent('updatePosition', {
+          position: {
             coordinates: {
               longitude: event.latLng.lng(),
               latitude: event.latLng.lat(),
             },
-            title: this.movingMarker.title,
+            positionName: this.movingMarker.positionName,
           },
         });
         this.movingMarker = null;
@@ -434,7 +434,7 @@ class WorldMap extends View {
 
   hideMarkerClicKMenu() { this.markerClickMenu.classList.add('hide'); }
 
-  showMarkerInfo({ position, title, description = [] }) {
+  showMarkerInfo({ position, positionName, description = [] }) {
     this.hideMarkerInfo();
 
     const projection = this.overlay.getProjection();
@@ -445,7 +445,7 @@ class WorldMap extends View {
 
     const infoText = document.createElement('DIV');
     const titleParagraph = document.createElement('P');
-    titleParagraph.appendChild(document.createTextNode(title));
+    titleParagraph.appendChild(document.createTextNode(positionName));
 
     const fragment = document.createDocumentFragment();
 
@@ -582,39 +582,39 @@ class WorldMap extends View {
     this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
 
-    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'users'] }, ({ error, data }) => {
+    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
       if (error || !data) {
         return;
       }
 
-      const { locations, currentTime } = data;
+      const { positions, currentTime } = data;
       const userName = storageManager.getUserName() ? storageManager.getUserName().toLowerCase() : '';
 
-      locations.forEach(({ title, coordinates, geometry, markerType, group, description, lastUpdated, team, owner }) => {
+      positions.forEach(({ positionName, coordinates, geometry, markerType, description, lastUpdated, team, owner }) => {
         const descriptionArray = Array.isArray(description) ? description : [description];
 
-        if (title && title.toLowerCase() !== userName) {
+        if (positionName && positionName.toLowerCase() !== userName) {
           const latitude = parseFloat(coordinates.latitude);
           const longitude = parseFloat(coordinates.longitude);
 
-          if (geometry === 'point') {
-            this.markers[title] = new MapMarker({
-              title,
+          if (markerType === 'world' && geometry === 'point') {
+            this.markers[positionName] = new MapMarker({
+              positionName,
               coordinates: {
                 latitude,
                 longitude,
               },
               description: descriptionArray,
-              markerType: 'location',
+              markerType: 'world',
               map: this.map,
               worldMap: this,
               owner,
               team,
             });
-            this.clusterer.addMarker(this.markers[title].marker);
+            this.clusterer.addMarker(this.markers[positionName].marker);
           } else if (markerType === 'custom') {
-            this.markers[title] = new MapMarker({
-              title,
+            this.markers[positionName] = new MapMarker({
+              positionName,
               coordinates: {
                 latitude,
                 longitude,
@@ -629,22 +629,25 @@ class WorldMap extends View {
               owner,
               team,
             });
-            this.clusterer.addMarker(this.markers[title].marker);
-          } else if (markerType && markerType === 'user' && lastUpdated) {
+            this.clusterer.addMarker(this.markers[positionName].marker);
+          } else if (markerType === 'user' && lastUpdated) {
             const date = new Date(lastUpdated);
+            const currentDate = new Date(currentTime);
 
-            if (currentTime - date < (20 * 60 * 1000)) {
-              const userDescription = [`Team: ${group || '-'}. Last seen: ${textTools.generateTimeStamp({ date })}`];
+            if (currentDate - date < (20 * 60 * 1000)) {
+              const beautifiedDate = textTools.generateTimeStamp({ date });
 
-              this.markers[title] = new MapMarker({
+              const userDescription = [`Team: ${team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+
+              this.markers[positionName] = new MapMarker({
                 lastUpdated: date,
-                title,
+                positionName,
                 coordinates: {
                   latitude,
                   longitude,
                 },
                 icon: {
-                  url: team && group && team === group ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+                  url: team && team === (storageManager.getTeam() || '') ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
                 },
                 description: userDescription,
                 markerType,
@@ -653,7 +656,7 @@ class WorldMap extends View {
                 owner,
                 team,
               });
-              this.clusterer.addMarker(this.markers[title].marker);
+              this.clusterer.addMarker(this.markers[positionName].marker);
             }
           }
         }

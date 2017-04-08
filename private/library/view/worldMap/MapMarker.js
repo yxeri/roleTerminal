@@ -19,7 +19,7 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 
 class MapMarker {
-  constructor({ coordinates: { longitude, latitude }, markerType, icon = {}, description = [], title, lastUpdated, map, worldMap, owner, team }) {
+  constructor({ coordinates: { longitude, latitude }, markerType, icon = {}, description = [], positionName, lastUpdated, map, worldMap, owner, team }) {
     this.marker = new google.maps.Marker({
       position: {
         lat: latitude,
@@ -35,7 +35,7 @@ class MapMarker {
     });
     this.markerType = markerType;
     this.description = description;
-    this.title = title;
+    this.positionName = positionName;
     this.lastUpdated = lastUpdated || new Date();
     this.map = map;
     this.worldMap = worldMap;
@@ -52,18 +52,18 @@ class MapMarker {
           longitude: event.latLng.lng(),
           lastUpdated: new Date(),
         });
-        socketManager.emitEvent('updateLocation', {
-          location: {
+        socketManager.emitEvent('updatePosition', {
+          position: {
             coordinates: {
               longitude: event.latLng.lng(),
               latitude: event.latLng.lat(),
             },
-            title: this.title,
+            positionName: this.positionName,
           },
         });
         this.movingMarker = null;
-      } else if (this.title) {
-        worldMap.showMarkerInfo({ position: this.getPosition(), title: this.title, description: this.description });
+      } else if (this.positionName) {
+        worldMap.showMarkerInfo({ position: this.getPosition(), positionName: this.positionName, description: this.description });
       }
     });
 

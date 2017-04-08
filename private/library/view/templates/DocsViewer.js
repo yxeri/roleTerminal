@@ -55,7 +55,7 @@ class DocsViewer extends StandardView {
 
   showDoc(docFile) {
     const docFragment = document.createDocumentFragment();
-    docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.title}`, classes: ['title'] }));
+    docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.positionName}`, classes: ['positionName'] }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFile.docFileId.toUpperCase()}` }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFile.isPublic ? 'Yes' : 'No'}` }));
 
@@ -72,7 +72,7 @@ class DocsViewer extends StandardView {
   }
 
   createDocFileButton(docFile) {
-    const title = `${docFile.title || docFile.docFileId}`;
+    const title = `${docFile.positionName || docFile.docFileId}`;
     const button = elementCreator.createButton({
       text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
@@ -270,8 +270,10 @@ class DocsViewer extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: () => {
-        this.viewer.innerHTML = '';
+      func: ({ changedUser }) => {
+        if (changedUser) {
+          this.viewer.innerHTML = '';
+        }
 
         socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {
           if (error) {

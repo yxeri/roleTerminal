@@ -21,7 +21,7 @@ const eventCentral = require('../../EventCentral');
 const soundLibrary = require('../../audio/SoundLibrary');
 
 class LoginBox extends DialogBox {
-  constructor({ description, extraDescription, parentElement }) {
+  constructor({ description, extraDescription, parentElement, closeFunc }) {
     const buttons = {
       left: {
         text: 'Registrera',
@@ -141,6 +141,7 @@ class LoginBox extends DialogBox {
       extraDescription,
       parentElement,
       inputs,
+      closeFunc,
     });
   }
 

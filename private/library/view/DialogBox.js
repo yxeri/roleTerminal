@@ -19,18 +19,16 @@ const keyHandler = require('../KeyHandler');
 const elementCreator = require('../ElementCreator');
 
 class DialogBox extends View {
-  constructor({ buttons, description = [], extraDescription = [], inputs = [] }) {
-    super({ isFullscreen: false });
+  constructor({ buttons, description = [], extraDescription = [], inputs = [], closeFunc }) {
+    super({ isFullscreen: false, closeFunc });
 
     const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
     let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
 
     if (leftCharCode === rightCharCode) { rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1); }
 
-    this.keyTriggers = [
-      { charCode: leftCharCode, func: buttons.left.eventFunc },
-      { charCode: rightCharCode, func: buttons.right.eventFunc },
-    ];
+    this.addKeyTrigger({ charCode: leftCharCode, func: buttons.left.eventFunc });
+    this.addKeyTrigger({ charCode: rightCharCode, func: buttons.right.eventFunc });
 
     this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
 
@@ -124,7 +122,7 @@ class DialogBox extends View {
 
   removeView() {
     this.element.parentNode.removeChild(this.cover);
-    this.keyTriggers.forEach(({ charCode }) => keyHandler.removeKey(charCode));
+    this.disableKeyTriggers();
     super.removeView();
   }
 

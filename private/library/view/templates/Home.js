@@ -17,6 +17,21 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
+const keyHandler = require('../../KeyHandler');
+
+/**
+ * Adds [] to show which character is used as the shortcut character
+ * @param {string} text Whole string
+ * @param {number} index Index of the character
+ * @returns {string} String with added [] around one character
+ */
+function wrapChar(text, index) {
+  if (index === 0) {
+    return `[${text.charAt(0)}]${text.slice(1)}`;
+  }
+
+  return `${text.slice(0, index)}[${text.charAt(index)}]${text.slice(index + 1)}`;
+}
 
 class Home extends View {
   constructor() {
@@ -27,14 +42,33 @@ class Home extends View {
     this.activeLink = '';
   }
 
-  addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes }) {
+  addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes, shortcut }) {
     this.links.push({ linkName, startFunc, endFunc });
 
+    const text = linkName.toUpperCase();
     const button = elementCreator.createButton({
       func: () => { this.triggerLink(linkName, keepHome); },
-      text: linkName.toUpperCase(),
+      text,
       classes,
     });
+
+    if (shortcut) {
+      const getChar = (stringArray, iteration) => {
+        if (stringArray) {
+          const charCode = stringArray.shift().charCodeAt(0);
+
+          if (this.keyTriggers.map(keyTrigger => keyTrigger.charCode).indexOf(charCode) > -1) {
+            getChar(stringArray, iteration + 1);
+          } else {
+            this.addKeyTrigger({ accessLevel, maxAccessLevel, charCode, func: () => { this.triggerLink(linkName, keepHome); } });
+            button.innerHTML = '';
+            button.appendChild(document.createTextNode(wrapChar(text, iteration)));
+          }
+        }
+      };
+
+      getChar(Array.from(text), 0);
+    }
 
     if (!isNaN(accessLevel)) {
       this.accessElements.push({
@@ -48,9 +82,15 @@ class Home extends View {
   }
 
   triggerLink(linkName, keepHome) {
-    if (this.activeLink !== '') { this.endLink(linkName); }
+    const foundLink = this.links.find(link => link.linkName === linkName);
 
-    this.links.find(link => link.linkName === linkName).startFunc();
+    if (this.activeLink !== '') {
+      this.endLink(linkName);
+    } else {
+      this.disableKeyTriggers();
+    }
+
+    if (foundLink.startFunc) { foundLink.startFunc(); }
 
     if (!keepHome) {
       this.removeView();
@@ -59,7 +99,12 @@ class Home extends View {
   }
 
   endLink(linkName) {
-    this.links.find(link => link.linkName === linkName).endFunc();
+    const foundLink = this.links.find(link => link.linkName === linkName);
+
+    this.enableKeyTriggers();
+
+    if (foundLink.endFunc) { foundLink.endFunc(); }
+
     this.previousLink = this.activeLink;
     this.activeLink = '';
   }

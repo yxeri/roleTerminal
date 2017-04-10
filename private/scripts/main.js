@@ -324,6 +324,7 @@ home.addLink({
       parentElement: mainView,
       socketManager,
       keyHandler,
+      closeFunc: () => { home.endLink('Login'); },
     }).appendTo(mainView);
   },
   endFunc: () => {},
@@ -331,28 +332,33 @@ home.addLink({
   maxAccessLevel: 0,
   keepHome: true,
   classes: ['hide'],
+  shortcut: true,
 });
 home.addLink({
-  linkName: 'Me',
+  linkName: 'Profile',
   startFunc: () => { profile.appendTo(mainView); },
   endFunc: () => { profile.removeView(); },
   accessLevel: 1,
   classes: ['hide'],
+  shortcut: true,
 });
 home.addLink({
   linkName: 'Coms',
   startFunc: () => { messenger.appendTo(mainView); },
   endFunc: () => { messenger.removeView(); },
+  shortcut: true,
 });
 home.addLink({
   linkName: 'Map',
   startFunc: () => { map.appendTo(mainView); },
   endFunc: () => { map.removeView(); },
+  shortcut: true,
 });
 home.addLink({
   linkName: 'Docs',
   startFunc: () => { docsViewer.appendTo(mainView); },
   endFunc: () => { docsViewer.removeView(); },
+  shortcut: true,
 });
 home.addLink({
   linkName: 'Wallet',
@@ -360,6 +366,7 @@ home.addLink({
   endFunc: () => { wallet.removeView(); },
   classes: ['hide'],
   accessLevel: 1,
+  shortcut: true,
 });
 home.addLink({
   linkName: 'Logout',
@@ -370,12 +377,13 @@ home.addLink({
       }
 
       eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+      home.endLink('Logout');
     });
   },
-  endFunc: () => {},
   accessLevel: 1,
   keepHome: true,
   classes: ['hide'],
+  shortcut: true,
 });
 home.appendTo(mainView);
 

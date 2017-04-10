@@ -60,7 +60,7 @@ class KeyHandler {
       } else if (this.triggerKeyPressed && !this.keyPressed) {
         const storedKey = this.keys.find(({ keyCode }) => keyCode === sentKeyCode);
 
-        if (storedKey) {
+        if (storedKey && !storedKey.disabled) {
           storedKey.func();
           this.keyPressed = true;
           event.preventDefault();
@@ -84,7 +84,13 @@ class KeyHandler {
   }
 
   addKey(key, func) {
-    this.keys.push({ keyCode: key, func });
+    const storedKey = this.keys.find(({ keyCode }) => key === keyCode);
+
+    if (!storedKey) {
+      this.keys.push({ keyCode: key, func });
+    } else {
+      storedKey.func = func;
+    }
   }
 
   removeKey(key) {

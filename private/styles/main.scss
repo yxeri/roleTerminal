@@ -349,7 +349,7 @@ img {
   -moz-user-select: none;
   user-select: none;
   height: auto;
-  max-height: calc(100% - .5em);
+  max-height: calc(100% - 3em);
   background-color: $back-color;
   overflow-x: hidden;
   overflow-y: scroll;

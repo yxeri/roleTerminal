@@ -17,7 +17,6 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
-const keyHandler = require('../../KeyHandler');
 
 /**
  * Adds [] to show which character is used as the shortcut character

@@ -58,7 +58,7 @@ class WorldMap extends View {
     this.infoElement = elementCreator.createContainer({ elementId: 'markerInfo', classes: ['hide'] });
     this.mapClickMenu = elementCreator.createContainer({ elementId: 'mapClickMenu', classes: ['hide', 'clickMenu'] });
     this.markerClickMenu = elementCreator.createContainer({ elementId: 'markerClickMenu', classes: ['hide', 'clickMenu'] });
-    this.infoElement.addEventListener('click', () => { console.log('hide marker'); this.hideMarkerInfo(); });
+    this.infoElement.addEventListener('click', () => { this.hideMarkerInfo(); });
     this.defaultZoomLevel = zoomLevel;
     this.labelStyle = labelStyle;
     this.clusterer = null;

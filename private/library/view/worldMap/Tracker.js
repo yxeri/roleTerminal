@@ -34,11 +34,9 @@ class Tracker {
     }, { enableHighAccuracy: true });
 
     setTimeout(() => {
-      console.log('Removing watch');
       navigator.geolocation.clearWatch(this.watchId);
 
       setTimeout(() => {
-        console.log('Starting watch');
         this.startTracker();
       }, 30000);
     }, 10000);

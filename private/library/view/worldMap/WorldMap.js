@@ -156,6 +156,7 @@ class WorldMap extends View {
                       },
                       positionName: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
                       description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
+                      markerType: 'custom',
                     };
 
                     socketManager.emitEvent('updatePosition', { position }, ({ error }) => {
@@ -373,26 +374,6 @@ class WorldMap extends View {
       this.realignMap(cluster.getMarkers());
     });
 
-    google.maps.event.addListener(this.map, 'click', (event) => {
-      if (this.movingMarker !== null) {
-        google.maps.event.clearListeners(this.map, 'mousemove');
-        this.movingMarker.setPosition({
-          latitude: event.latLng.lat(),
-          longitude: event.latLng.lng(),
-          lastUpdated: new Date(),
-        });
-        socketManager.emitEvent('updatePosition', {
-          position: {
-            coordinates: {
-              longitude: event.latLng.lng(),
-              latitude: event.latLng.lat(),
-            },
-            positionName: this.movingMarker.positionName,
-          },
-        });
-        this.movingMarker = null;
-      }
-    });
     google.maps.event.addListener(this.map, 'dragstart', () => {
       longClick = false;
       this.hideMarkerInfo();
@@ -612,24 +593,6 @@ class WorldMap extends View {
               team,
             });
             this.clusterer.addMarker(this.markers[positionName].marker);
-          } else if (markerType === 'custom') {
-            this.markers[positionName] = new MapMarker({
-              positionName,
-              coordinates: {
-                latitude,
-                longitude,
-              },
-              description: descriptionArray,
-              markerType: 'custom',
-              icon: {
-                url: 'images/mapiconcreated.png',
-              },
-              map: this.map,
-              worldMap: this,
-              owner,
-              team,
-            });
-            this.clusterer.addMarker(this.markers[positionName].marker);
           } else if (markerType === 'user' && lastUpdated) {
             const date = new Date(lastUpdated);
             const currentDate = new Date(currentTime);
@@ -658,6 +621,24 @@ class WorldMap extends View {
               });
               this.clusterer.addMarker(this.markers[positionName].marker);
             }
+          } else if (markerType) {
+            this.markers[positionName] = new MapMarker({
+              coordinates: {
+                latitude,
+                longitude,
+              },
+              description: descriptionArray,
+              icon: {
+                url: 'images/mapiconcreated.png',
+              },
+              map: this.map,
+              worldMap: this,
+              positionName,
+              markerType,
+              owner,
+              team,
+            });
+            this.clusterer.addMarker(this.markers[positionName].marker);
           }
         }
       });

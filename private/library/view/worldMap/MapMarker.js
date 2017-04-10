@@ -59,9 +59,10 @@ class MapMarker {
               latitude: event.latLng.lat(),
             },
             positionName: this.positionName,
+            markerType: this.markerType,
           },
         });
-        this.movingMarker = null;
+        worldMap.movingMarker = null;
       } else if (this.positionName) {
         worldMap.showMarkerInfo({ position: this.getPosition(), positionName: this.positionName, description: this.description });
       }

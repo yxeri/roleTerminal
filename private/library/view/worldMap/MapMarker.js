@@ -71,7 +71,7 @@ class MapMarker {
     let longClick = false;
 
     google.maps.event.addListener(this.marker, 'rightclick', (event) => {
-      if (this.owner === storageManager.getUserName() || this.team === storageManager.getTeam()) {
+      if (this.markerType === 'custom' && this.owner === storageManager.getUserName()) {
         worldMap.createMarkerClickMenu(event, this);
       }
     });
@@ -79,7 +79,7 @@ class MapMarker {
       longClick = true;
 
       setTimeout(() => {
-        if (longClick && (this.owner === storageManager.getUserName() || this.team === storageManager.getTeam())) {
+        if (longClick && this.markerType === 'custom' && this.owner === storageManager.getUserName()) {
           worldMap.createMarkerClickMenu(event, this);
         }
       }, 500);

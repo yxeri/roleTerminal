@@ -47,8 +47,7 @@ class WorldMap extends View {
     labelStyle = {},
     clusterStyle = {},
   }) {
-    super({ isFullscreen });
-    this.element.setAttribute('id', 'map');
+    super({ isFullscreen, viewId: 'map' });
 
     this.mapView = mapView;
     this.markers = markers;

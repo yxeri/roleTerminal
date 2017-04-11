@@ -28,6 +28,7 @@ const Tracker = require('../library/view/worldMap/Tracker');
 const Boot = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
+const Terminal = require('../library/view/templates/Terminal');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -174,6 +175,7 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
+const terminal = new Terminal();
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const docsViewer = new DocsViewer({ isFullscreen: true });
@@ -366,6 +368,14 @@ home.addLink({
   endFunc: () => { wallet.removeView(); },
   classes: ['hide'],
   accessLevel: 1,
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'Terminal',
+  startFunc: () => { terminal.appendTo(mainView); },
+  endFunc: () => { terminal.removeView(); },
+  accessLevel: 1,
+  classes: ['hide'],
   shortcut: true,
 });
 home.addLink({

@@ -127,6 +127,16 @@ class ElementCreator {
     return input;
   }
 
+  static createSpan({ text, classes = [] }) {
+    const span = document.createElement('SPAN');
+
+    span.appendChild(document.createTextNode(text));
+
+    this.setClasses(span, classes);
+
+    return span;
+  }
+
   static setElementId(element, id) {
     if (id) { element.setAttribute('id', id); }
   }

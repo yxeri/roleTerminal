@@ -17,7 +17,7 @@
 const View = require('../base/View');
 const textTools = require('../../TextTools');
 
-class Boot extends View {
+class TextAnimation extends View {
   constructor({ removeTime = 4000, lineTime = 50 }) {
     super({ isFullscreen: true });
     this.element.classList.add('textAnimation');
@@ -32,7 +32,10 @@ class Boot extends View {
 
     span.appendChild(text);
     this.element.appendChild(span);
-    span.scrollIntoView();
+
+    if (iteration === 0) {
+      span.scrollIntoView();
+    }
 
     if (iteration < maxIteration) {
       setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary }); }, this.lineTime);
@@ -92,4 +95,4 @@ class Boot extends View {
   }
 }
 
-module.exports = Boot;
+module.exports = TextAnimation;

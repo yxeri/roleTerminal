@@ -25,7 +25,7 @@ const DocsViewer = require('../library/view/templates/DocsViewer');
 const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
 const Tracker = require('../library/view/worldMap/Tracker');
-const Boot = require('../library/view/templates/TextAnimation');
+const TextAnimation = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
 const Terminal = require('../library/view/templates/Terminal');
@@ -44,7 +44,7 @@ const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const tracker = new Tracker();
 
-const boot = new Boot({ removeTime: 5000 });
+const boot = new TextAnimation({ removeTime: 5000 });
 boot.setQueue([
   { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
   {

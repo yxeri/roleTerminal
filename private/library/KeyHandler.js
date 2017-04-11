@@ -57,10 +57,10 @@ class KeyHandler {
       if (sentKeyCode === this.triggerKey) {
         this.triggerKeyPressed = true;
         event.preventDefault();
-      } else if (this.triggerKeyPressed && !this.keyPressed) {
+      } else if (!this.keyPressed) {
         const storedKey = this.keys.find(({ keyCode }) => keyCode === sentKeyCode);
 
-        if (storedKey && !storedKey.disabled) {
+        if (storedKey && (this.triggerKeyPressed || storedKey.triggerless)) {
           storedKey.func();
           this.keyPressed = true;
           event.preventDefault();
@@ -83,13 +83,14 @@ class KeyHandler {
     this.sound = sound;
   }
 
-  addKey(key, func) {
+  addKey(key, func, triggerless) {
     const storedKey = this.keys.find(({ keyCode }) => key === keyCode);
 
     if (!storedKey) {
-      this.keys.push({ keyCode: key, func });
+      this.keys.push({ keyCode: key, func, triggerless });
     } else {
       storedKey.func = func;
+      storedKey.triggerless = triggerless;
     }
   }
 

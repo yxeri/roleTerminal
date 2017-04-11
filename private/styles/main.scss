@@ -438,6 +438,10 @@ img {
     height: calc(100% - 1.8em);
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+
+    li {
+      margin: .3em 0;
+    }
   }
 
   #terminalFeed::-webkit-scrollbar {
@@ -753,6 +757,7 @@ img {
 }
 
 .logo {
+  font-size: .9em;
   white-space: pre;
 }
 

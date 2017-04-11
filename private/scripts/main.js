@@ -44,14 +44,14 @@ const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const tracker = new Tracker();
 
-const boot = new TextAnimation({ removeTime: 5000 });
+const boot = new TextAnimation({ removeTime: 3000 });
 boot.setQueue([
   { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
   {
     func: boot.printLines,
     params: {
-      code: true,
-      classes: 'logo',
+      corruption: true,
+      classes: ['logo'],
       array: [
         '                          ####',
         '                ####    #########    ####',
@@ -88,7 +88,7 @@ boot.setQueue([
   {
     func: boot.printLines,
     params: {
-      code: false,
+      corruption: false,
       array: [
         'Welcome to the Oracle, employee UNDEFINED.',
         'May you have a productive day!',
@@ -97,11 +97,11 @@ boot.setQueue([
       ],
     },
   },
-  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 4, binary: true } },
+  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2, binary: true } },
   {
     func: boot.printLines,
     params: {
-      code: false,
+      corruption: false,
       array: [
         'Uplink established',
         'Booting OOC 5.0',
@@ -111,8 +111,8 @@ boot.setQueue([
   {
     func: boot.printLines,
     params: {
-      classes: 'logo',
-      code: false,
+      classes: ['logo'],
+      corruption: true,
       array: [
         'THIS RELEASE OF OOC WAS BROUGHT TO YOU BY',
         '   ####',
@@ -136,7 +136,7 @@ boot.setQueue([
   {
     func: boot.printLines,
     params: {
-      code: false,
+      corruption: false,
       array: [
         'Organica approved device detected',
         'Rewriting firmware...',
@@ -144,11 +144,12 @@ boot.setQueue([
       ],
     },
   },
-  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
+  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 1 } },
   {
     func: boot.printLines,
     params: {
-      code: false,
+      corruption: true,
+      corruptionAmount: 0.4,
       array: [
         'Loading',
         '...',
@@ -176,6 +177,51 @@ window.addEventListener('error', (event) => {
 });
 
 const terminal = new Terminal();
+terminal.addCommand({
+  commandName: 'calibrationAdjustment',
+  accessLevel: 1,
+  startFunc: () => {
+    terminal.queueMessage({
+      message: {
+        text: [
+          'Checking signal strength ...',
+          'Retrieving station data ...',
+        ],
+      },
+    });
+
+    socketManager.emitEvent('getCalibrationMission', {}, ({ error, data }) => {
+      if (error) {
+        console.log(error);
+      }
+
+      const { mission, isNew } = data;
+
+      if (isNew) {
+        terminal.queueMessage({
+          message: {
+            text: [
+              'Signal strength is low!',
+              'Station is in need of manual calibration',
+            ],
+          },
+        });
+      }
+
+      terminal.queueMessage({
+        message: {
+          text: [
+            `You have been assigned to calibrate station ${mission.stationId}`,
+            `Proceed to station ${mission.stationId} and start the calibration process`,
+            `Your assigned verification code is: ${mission.code}`,
+            'END OF MESSAGE',
+          ],
+        },
+      });
+    });
+  },
+});
+
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const docsViewer = new DocsViewer({ isFullscreen: true });

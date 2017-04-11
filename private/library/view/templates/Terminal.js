@@ -15,6 +15,9 @@
  */
 
 const View = require('../base/View');
+const TextAnimation = require('./TextAnimation');
+const textTools = require('../../TextTools');
+
 const elementCreator = require('../../ElementCreator');
 
 class Terminal extends View {
@@ -29,80 +32,39 @@ class Terminal extends View {
     this.printing = false;
     this.shortQueue = [];
     this.timeout = 50;
+    this.firstRun = true;
+    this.commands = [];
+  }
 
-    this.queueMessage({
-      message: {
-        text: [
-          '                          ####',
-          '                ####    #########    ####',
-          '               ###########################',
-          '              #############################',
-          '            #######        ##   #  ##########',
-          '      ##########           ##    #  ###  ##########',
-          '     #########             #########   #   #########',
-          '       #####               ##     ########   #####',
-          '     #####                 ##     ##     ##########',
-          '     ####                  ##      ##     #   ######',
-          ' #######                   ##########     ##    ########',
-          '########                   ##       ########     ########',
-          ' ######      Organica      ##       #      #############',
-          '   ####     Oracle         ##       #      ##     ####',
-          '   ####     Operations     ##       #      ##    #####',
-          '   ####      Center        ##       #      ###########',
-          '########                   ##       #########    ########',
-          '########                   ##########      #    #########',
-          ' ########                  ##      ##     ## ###########',
-          '     #####                 ##      ##     ### #####',
-          '       #####               ##     ########   #####',
-          '      #######              ##########   #  ########',
-          '     ###########           ##    ##    # ###########',
-          '      #############        ##    #   #############',
-          '            ################################',
-          '              ############################',
-          '              #######  ##########  #######',
-          '                ###      ######      ###',
-          '                          ####',
-        ],
-        classes: ['logo'],
-      },
-    });
-    this.queueMessage({
-      message: {
-        text: [
-          'Welcome to the Oracle of Organica',
-          'Please login to start your productive day!',
-          'You can retrieve instructions on how to use the terminal with the tab button or typing double space without any other input',
-          'You can also type "help" to retrieve the same instructions',
-          'Learn these valuable skills to increase your productivity!',
-        ],
-      },
-    });
-    this.queueMessage({
-      message: {
-        text: [
-          '   ####',
-          '###############',
-          ' #####  #########                                           ####',
-          '  ####     #######  ########     ###########    ####     ###########',
-          '  ####    ######      #######   ####   #####  ########    ####   #####',
-          '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
-          '  #########        ####    ####     ####   #####     ##############',
-          '  #### ######     ####     #####  ####     #######   ###  ########',
-          '  ####   ######  ##### #### #### ############  #######    ####   ###',
-          ' ######    #############    ################     ###      ####    #####',
-          '########     ########        ####                        ######      #####   ##',
-          '               ###########        ##                                    ###### ',
-          '                    ###############',
-          '                  Razor  #####  Demos - Warez - Honey',
-        ],
-        classes: ['logo'],
-      },
-    });
-    this.queueMessage({
-      message: {
-        text: ['## This terminal has been cracked by your friendly Razor team. Enjoy! ##'],
-      },
-    });
+  addCommand(command) {
+    this.commands.push(command);
+  }
+
+  triggerCommand() {
+    const inputValue = this.terminalInput.value;
+
+    if (inputValue === '') {
+      this.queueMessage({ message: { text: ['$'] } });
+    } else {
+      const sentCommandName = textTools.trimSpace(inputValue);
+      const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
+
+      if (command) {
+        this.queueMessage({
+          message: {
+            text: [
+              `$ ${inputValue}`,
+              `Running command ${command.commandName}:`,
+            ],
+          },
+        });
+        command.startFunc();
+      } else {
+        this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`] } });
+      }
+    }
+
+    this.terminalInput.value = '';
   }
 
   addRow(message) {
@@ -145,9 +107,144 @@ class Terminal extends View {
   }
 
   appendTo(parentElement) {
-    super.appendTo(parentElement);
-    this.terminalInput.focus();
-    this.consumeQueue();
+    if (!this.firstRun) {
+      super.appendTo(parentElement);
+      this.enableKeyTriggers();
+      this.terminalInput.focus();
+      this.consumeQueue();
+    } else {
+      this.addKeyTrigger({
+        charCode: 13, // Enter
+        triggerless: true,
+        func: () => {
+          this.triggerCommand();
+        },
+      });
+      this.startBootSequence(parentElement);
+    }
+  }
+
+  removeView() {
+    this.disableKeyTriggers();
+    super.removeView();
+  }
+
+  startBootSequence(parentElement) {
+    const boot = new TextAnimation({ removeTime: 3000 });
+
+    boot.setQueue([
+      {
+        func: boot.printLines,
+        params: {
+          corruption: true,
+          corruptionAmount: 0.5,
+          classes: ['logo'],
+          array: [
+            '                          ####',
+            '                ####    #########    ####',
+            '               ###########################',
+            '              #############################',
+            '            #######        ##   #  ##########',
+            '      ##########           ##    #  ###  ##########',
+            '     #########             #########   #   #########',
+            '       #####               ##     ########   #####',
+            '     #####                 ##     ##     ##########',
+            '     ####                  ##      ##     #   ######',
+            ' #######                   ##########     ##    ########',
+            '########                   ##       ########     ########',
+            ' ######      Organica      ##       #      #############',
+            '   ####     Oracle         ##       #      ##     ####',
+            '   ####     Operations     ##       #      ##    #####',
+            '   ####      Center        ##       #      ###########',
+            '########                   ##       #########    ########',
+            '########                   ##########      #    #########',
+            ' ########                  ##      ##     ## ###########',
+            '     #####                 ##      ##     ### #####',
+            '       #####               ##     ########   #####',
+            '      #######              ##########   #  ########',
+            '     ###########           ##    ##    # ###########',
+            '      #############        ##    #   #############',
+            '            ################################',
+            '              ############################',
+            '              #######  ##########  #######',
+            '                ###      ######      ###',
+            '                          ####',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          waitTime: 3000,
+          array: [
+            'Oracle System Administrator Toolset',
+            'OSAT ACCESS AUTHENTICATION',
+            'PERMITTED ONLY BY AUTHORIZED PERSONNEL',
+            'ACCESS DENIED',
+            'ACCESS DENIED',
+            'ACCESS DENIED',
+            'ACCESS DENIED',
+            'ACCESS DENIED',
+            'Loading...',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          waitTime: 2000,
+          array: [
+            'ACCESS GRANTED',
+            'Welcome, administrator Charlotte Jenkins',
+            'Your field report is 721 days late',
+            'Oracle status: HQ CONNECTION FAILED',
+            'OSAT version: UNDEFINED',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          classes: ['logo'],
+          waitTime: 2000,
+          array: [
+            'THIS RELEASE OF OSAT WAS BROUGHT TO YOU BY',
+            '   ####',
+            '###############',
+            ' #####  #########                                           ####',
+            '  ####     #######  ########     ###########    ####     ###########',
+            '  ####    ######      #######   ####   #####  ########    ####   #####',
+            '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
+            '  #########        ####    ####     ####   #####     ##############',
+            '  #### ######     ####     #####  ####     #######   ###  ########',
+            '  ####   ######  ##### #### #### ############  #######    ####   ###',
+            ' ######    #############    ################     ###      ####    #####',
+            '########     ########        ####                        ######      #####   ##',
+            '               ###########        ##                                    ###### ',
+            '                    ###############',
+            '                  Razor  #####  Demos - Warez - Honey',
+            'ENJOY',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          array: [
+            'Loading',
+            '...',
+            '...',
+            '...',
+            '...',
+            '...',
+          ],
+        },
+      },
+    ]);
+    boot.setEndFunc(() => {
+      this.firstRun = false;
+      this.appendTo(parentElement);
+    });
+    boot.appendTo(parentElement);
   }
 }
 

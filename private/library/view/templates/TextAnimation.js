@@ -26,7 +26,7 @@ class TextAnimation extends View {
     this.lineTime = lineTime;
   }
 
-  addCode({ iteration, maxIteration, row, maxRows, binary }) {
+  addCode({ iteration, maxIteration, row, maxRows, binary, waitTime = 300 }) {
     const span = document.createElement('SPAN');
     const text = document.createTextNode(!binary ? textTools.createMixedString(5, false, true) : textTools.createBinaryString(5));
 
@@ -38,36 +38,40 @@ class TextAnimation extends View {
     }
 
     if (iteration < maxIteration) {
-      setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary }); }, this.lineTime);
+      setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary, waitTime }); }, this.lineTime);
     } else if (row < maxRows) {
       this.element.appendChild(document.createElement('BR'));
-      setTimeout(() => { this.addCode({ iteration: 0, maxIteration, row: row + 1, maxRows, binary }); }, this.lineTime);
+      setTimeout(() => { this.addCode({ iteration: 0, maxIteration, row: row + 1, maxRows, binary, waitTime }); }, this.lineTime);
     } else {
-      this.element.appendChild(document.createElement('BR'));
-      this.next();
+      setTimeout(() => {
+        this.element.appendChild(document.createElement('BR'));
+        this.next();
+      }, waitTime);
     }
   }
 
-  printLines({ array, classes, code }) {
+  printLines({ array, classes, corruption = false, corruptionAmount = 0.2, waitTime = 300 }) {
     const line = array.shift();
 
     if (line) {
       setTimeout(() => {
         const span = document.createElement('SPAN');
-        const text = code && Math.random() > 0.8 ? textTools.replaceWhitespace(line) : line;
+        const text = corruption && Math.random() < corruptionAmount ? textTools.replaceWhitespace(line) : line;
 
         if (classes) {
-          span.classList.add(classes);
+          classes.forEach(cssClass => span.classList.add(cssClass));
         }
         span.appendChild(document.createTextNode(text));
         this.element.appendChild(span);
         span.scrollIntoView();
         this.element.appendChild(document.createElement('BR'));
-        this.printLines({ array, classes, code });
+        this.printLines({ array, classes, corruption, corruptionAmount, waitTime });
       }, 50);
     } else {
-      this.element.appendChild(document.createElement('BR'));
-      this.next();
+      setTimeout(() => {
+        this.element.appendChild(document.createElement('BR'));
+        this.next();
+      }, waitTime);
     }
   }
 
@@ -81,12 +85,22 @@ class TextAnimation extends View {
     if (nextObj) {
       nextObj.func.call(this, nextObj.params);
     } else {
-      setTimeout(() => { this.removeView(); }, this.removeTime);
+      setTimeout(() => {
+        this.removeView();
+
+        if (this.endFunc) {
+          this.endFunc();
+        }
+      }, this.removeTime);
     }
   }
 
   setQueue(array) {
     this.queue = array;
+  }
+
+  setEndFunc(func) {
+    this.endFunc = func;
   }
 
   appendTo(parentElement) {

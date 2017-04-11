@@ -72,16 +72,16 @@ class View {
     this.keyTriggers.push(keyTrigger);
 
     if ((!keyTrigger.accessLevel || keyTrigger.accessLevel <= userAccessLevel) && (!keyTrigger.maxAccessLevel || keyTrigger.maxAccessLevel >= userAccessLevel)) {
-      keyHandler.addKey(keyTrigger.charCode, keyTrigger.func);
+      keyHandler.addKey(keyTrigger.charCode, keyTrigger.func, keyTrigger.triggerless);
     }
   }
 
   enableKeyTriggers() {
     const userAccessLevel = storageManager.getAccessLevel();
 
-    this.keyTriggers.forEach(({ charCode, func, accessLevel, maxAccessLevel }) => {
+    this.keyTriggers.forEach(({ charCode, func, accessLevel, maxAccessLevel, triggerless }) => {
       if ((!accessLevel || accessLevel <= userAccessLevel) && (!maxAccessLevel || maxAccessLevel >= userAccessLevel)) {
-        keyHandler.addKey(charCode, func);
+        keyHandler.addKey(charCode, func, triggerless);
       }
     });
   }

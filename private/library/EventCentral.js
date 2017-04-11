@@ -36,6 +36,7 @@ class EventCentral {
       UPDATEDPOSITION: 'Updated position',
       BCASTMSG: 'Broadcast message',
       TRANSACTION: 'New transaction',
+      POSITIONS: 'Positions received',
     };
     this.eventWatchers = {};
   }

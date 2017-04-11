@@ -96,8 +96,8 @@ class MapMarker {
     }
   }
 
-  setPosition({ latitude, longitude, lastUpdated }) {
-    this.marker.setPosition(new google.maps.LatLng(latitude, longitude));
+  setPosition({ coordinates, lastUpdated }) {
+    this.marker.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
     this.lastUpdated = lastUpdated || new Date();
   }
 

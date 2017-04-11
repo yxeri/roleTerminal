@@ -15,15 +15,46 @@
  */
 
 const eventCentral = require('../../EventCentral');
+const socketManager = require('../../SocketManager');
+
+/**
+ * Convert from geolocation position
+ * @param {Object} position Geolocation position
+ * @returns {Object} Converted position
+ */
+function convertPosition(position) {
+  return {
+    coordinates: {
+      longitude: position.coords.longitude,
+      latitude: position.coords.latitude,
+      speed: position.coords.speed,
+      heading: position.coords.heading,
+      accuracy: position.coords.accuracy,
+    },
+    lastUpdated: new Date(),
+  };
+}
 
 class Tracker {
+  constructor() {
+    this.latestPositions = [];
+  }
+
   startTracker() {
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.MYPOSITION,
+      func: ({ position }) => {
+        this.latestPositions.push(position);
+      },
+    });
+
     this.watchId = navigator.geolocation.watchPosition((position) => {
       if (position) {
         this.isTracking = true;
         eventCentral.triggerEvent({
           event: eventCentral.Events.MYPOSITION,
-          params: { position },
+          params: { position: convertPosition(position) },
         });
       } else {
         this.isTracking = false;
@@ -35,11 +66,41 @@ class Tracker {
 
     setTimeout(() => {
       navigator.geolocation.clearWatch(this.watchId);
+      this.sendBestPosition();
 
       setTimeout(() => {
+        this.latestPositions = [];
         this.startTracker();
-      }, 30000);
-    }, 10000);
+      }, 15000);
+    }, 15000);
+  }
+
+  getBestPosition() {
+    const positions = Array.from(this.latestPositions);
+
+    let bestPosition = null;
+
+    if (positions.length > 0) {
+      while (positions.length > 0) {
+        const position = positions.pop();
+
+        if (position.coordinates && (!bestPosition || position.coordinates.accuracy < bestPosition.coordinates.accuracy)) {
+          bestPosition = position;
+        }
+      }
+    }
+
+    return bestPosition;
+  }
+
+  sendBestPosition() {
+    const position = this.getBestPosition();
+
+    socketManager.emitEvent('updateUserPosition', { position }, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
   }
 }
 

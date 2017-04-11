@@ -73,13 +73,7 @@ class WorldMap extends View {
       watcherParent: this,
       event: eventCentral.Events.MYPOSITION,
       func: ({ position }) => {
-        this.setUserPosition({
-          longitude: position.coords.longitude,
-          latitude: position.coords.latitude,
-          timestamp: position.timestamp,
-          accuracy: position.coords.accuracy,
-          heading: position.coords.heading,
-        });
+        this.setUserPosition({ position });
       },
     });
   }
@@ -252,31 +246,40 @@ class WorldMap extends View {
 
   /**
    * Creates the map marker representing this user
-   * @param {{longitude: Number, latitude:Number}} coordinates - Long and lat coordinates of the map marker
+   * @param {Object} position New position
    */
-  createThisUserMarker(coordinates) {
+  createThisUserMarker({ position }) {
     this.markers.I = new MapMarker({
-      coordinates,
+      coordinates: position.coordinates,
+      markerType: 'you',
       positionName: 'You',
+      team: storageManager.getTeam() || '',
+      owner: storageManager.getUserName() || '',
       icon: {
         url: '/images/mapiconyou.png',
       },
       map: this.map,
       worldMap: this,
+      description: ['You'],
     });
   }
 
   /**
    * Sets new position to the user's map marker
    * Creates a new map marker if it doesn't exist
-   * @param {{longitude: Number, latitude:Number}} position - Long and lat coordinates of the map marker
+   * @param {Object} position New position
    */
-  setUserPosition(position) {
+  setUserPosition({ position }) {
+    const beautifiedDate = textTools.generateTimeStamp({ date: position.lastUpdated });
+
     if (this.markers.I) {
-      this.markers.I.setPosition(new google.maps.LatLng(position.latitude, position.longitude));
+      this.markers.I.setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
+      this.markers.I.description = [`Last updated: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
     } else {
-      this.createThisUserMarker(position);
+      this.createThisUserMarker({ position });
     }
+
+    console.log('I', this.markers.I);
   }
 
   /**
@@ -563,88 +566,141 @@ class WorldMap extends View {
     this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
 
+    /**
+     * User position marker can be created before map exists. That's why we add it to the map here
+     */
+    if (this.markers.I) {
+      this.markers.I.marker.setMap(this.map);
+    }
+
     socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
       if (error || !data) {
         return;
       }
 
       const { positions, currentTime } = data;
-      const userName = storageManager.getUserName() ? storageManager.getUserName().toLowerCase() : '';
+      const userName = storageManager.getUserName() || '';
 
-      positions.forEach(({ positionName, coordinates, geometry, markerType, description, lastUpdated, team, owner }) => {
-        const descriptionArray = Array.isArray(description) ? description : [description];
-
-        if (positionName && positionName.toLowerCase() !== userName) {
-          const latitude = parseFloat(coordinates.latitude);
-          const longitude = parseFloat(coordinates.longitude);
-
-          if (markerType === 'world' && geometry === 'point') {
-            this.markers[positionName] = new MapMarker({
-              positionName,
-              coordinates: {
-                latitude,
-                longitude,
-              },
-              description: descriptionArray,
-              markerType: 'world',
-              map: this.map,
-              worldMap: this,
-              owner,
-              team,
-            });
-            this.clusterer.addMarker(this.markers[positionName].marker);
-          } else if (markerType === 'user' && lastUpdated) {
-            const date = new Date(lastUpdated);
-            const currentDate = new Date(currentTime);
-
-            if (currentDate - date < (20 * 60 * 1000)) {
-              const beautifiedDate = textTools.generateTimeStamp({ date });
-
-              const userDescription = [`Team: ${team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
-
-              this.markers[positionName] = new MapMarker({
-                lastUpdated: date,
-                positionName,
-                coordinates: {
-                  latitude,
-                  longitude,
-                },
-                icon: {
-                  url: team && team === (storageManager.getTeam() || '') ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
-                },
-                description: userDescription,
-                markerType,
-                map: this.map,
-                worldMap: this,
-                owner,
-                team,
-              });
-              this.clusterer.addMarker(this.markers[positionName].marker);
-            }
-          } else if (markerType) {
-            this.markers[positionName] = new MapMarker({
-              coordinates: {
-                latitude,
-                longitude,
-              },
-              description: descriptionArray,
-              icon: {
-                url: 'images/mapiconcreated.png',
-              },
-              map: this.map,
-              worldMap: this,
-              positionName,
-              markerType,
-              owner,
-              team,
-            });
-            this.clusterer.addMarker(this.markers[positionName].marker);
-          }
-        }
+      positions.forEach((position) => {
+        this.createMarker({ position, userName, currentTime });
       });
 
       this.realignMap(this.markers);
     });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.POSITIONS,
+      func: ({ positions, currentTime }) => {
+        const userName = storageManager.getUserName() || '';
+
+        positions.forEach((position) => {
+          const positionName = position.positionName;
+
+          if (positionName) {
+            if (this.markers[positionName]) {
+              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
+
+              if (position.markerType && position.markerType === 'user') {
+                const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
+
+                this.markers[positionName].description = [`Team: ${position.team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+              }
+            } else {
+              this.createMarker({ position, userName, currentTime });
+            }
+          }
+        });
+      },
+    });
+  }
+
+  /**
+   * Create map marker
+   * @param {string} params.position.positionName Name of the position
+   * @param {Object} params.position.coordinates Coordinates
+   * @param {number} params.position.coordinates.longitude Longitude
+   * @param {number} params.position.coordinates.latitude Latitude
+   * @param {number} params.position.coordinates.accuracy Accuracy in meters
+   * @param {number|null} params.position.coordinates.speed Speed in m/s
+   * @param {number|null} params.position.coordinates.heading Heading in degrees
+   * @param {Object} [params.position.geometry] Google geometry, for complex objects
+   * @param {string} params.position.markerType Marker type
+   * @param {Date} params.position.lastUpdated Date for when the position was last updated
+   * @param {string} params.position.owner User name of the owner
+   * @param {string} params.userName user name of the current user
+   * @param {Date} params.currentTime Current time sent from server
+   * @param {string[]} [params.position.description] Position description
+   * @param {string} [params.position.team] Name of the team that the position is part of
+   */
+  createMarker({ position: { positionName, coordinates, geometry, markerType, description, lastUpdated, team, owner }, userName, currentTime }) {
+    if (positionName && positionName.toLowerCase() !== userName) {
+      const latitude = parseFloat(coordinates.latitude);
+      const longitude = parseFloat(coordinates.longitude);
+
+      if (markerType === 'world' && geometry === 'point') {
+        this.markers[positionName] = new MapMarker({
+          coordinates: {
+            latitude,
+            longitude,
+          },
+          map: this.map,
+          worldMap: this,
+          positionName,
+          description,
+          markerType,
+          owner,
+          team,
+        });
+        this.clusterer.addMarker(this.markers[positionName].marker);
+      } else if (markerType === 'user' && lastUpdated) {
+        const date = new Date(lastUpdated);
+        const currentDate = new Date(currentTime);
+
+        if (currentDate - date < (20 * 60 * 1000)) {
+          const beautifiedDate = textTools.generateTimeStamp({ date });
+
+          const userDescription = [`Team: ${team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+
+          this.markers[positionName] = new MapMarker({
+            lastUpdated: date,
+            coordinates: {
+              latitude,
+              longitude,
+            },
+            icon: {
+              url: team && team === (storageManager.getTeam() || '') ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
+            },
+            description: userDescription,
+            map: this.map,
+            worldMap: this,
+            markerType,
+            positionName,
+            owner,
+            team,
+          });
+          this.clusterer.addMarker(this.markers[positionName].marker);
+        }
+      } else if (markerType) {
+        this.markers[positionName] = new MapMarker({
+          coordinates: {
+            latitude,
+            longitude,
+          },
+          icon: {
+            url: 'images/mapiconcreated.png',
+          },
+          map: this.map,
+          worldMap: this,
+          description,
+          positionName,
+          markerType,
+          owner,
+          team,
+        });
+        this.clusterer.addMarker(this.markers[positionName].marker);
+      }
+    }
   }
 
   appendTo(parentElement) {

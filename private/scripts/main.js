@@ -472,5 +472,11 @@ socketManager.addEvents([
     func: ({ transaction }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.TRANSACTION, params: { transaction } });
     },
+  }, {
+    event: 'mapPositions',
+    func: ({ positions, currentTime }) => {
+      console.log('mapPositions', positions);
+      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions, currentTime } });
+    },
   },
 ]);

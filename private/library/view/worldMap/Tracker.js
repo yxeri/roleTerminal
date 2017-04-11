@@ -96,7 +96,7 @@ class Tracker {
   sendBestPosition() {
     const position = this.getBestPosition();
 
-    if (!position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
+    if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
       console.log('Requires position: { coordinates: { latitude, longitude, accuracy }} to send user position');
 
       return;

@@ -46,7 +46,7 @@ class Terminal extends View {
     if (inputValue === '') {
       this.queueMessage({ message: { text: ['$'] } });
     } else {
-      const sentCommandName = textTools.trimSpace(inputValue);
+      const sentCommandName = textTools.trimSpace(inputValue.toLowerCase());
       const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
 
       if (command) {

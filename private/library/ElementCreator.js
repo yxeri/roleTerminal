@@ -127,10 +127,17 @@ class ElementCreator {
     return input;
   }
 
-  static createSpan({ text, classes = [] }) {
+  static createSpan({ text, classes = [], func }) {
     const span = document.createElement('SPAN');
 
     span.appendChild(document.createTextNode(text));
+
+    if (func) {
+      span.addEventListener('click', () => {
+        soundLibrary.playSound('button');
+        func();
+      });
+    }
 
     this.setClasses(span, classes);
 

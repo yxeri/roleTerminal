@@ -40,11 +40,11 @@ class Terminal extends View {
     this.commands.push(command);
   }
 
-  triggerCommand() {
-    const inputValue = this.terminalInput.value;
+  triggerCommand(value) {
+    const inputValue = value || this.terminalInput.value;
 
     if (inputValue === '') {
-      this.queueMessage({ message: { text: ['$'] } });
+      this.queueMessage({ message: { text: ['$', 'Commands:'], elements: this.getClickableCommandNames() } });
     } else {
       const sentCommandName = textTools.trimSpace(inputValue.toLowerCase());
       const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
@@ -60,7 +60,7 @@ class Terminal extends View {
         });
         command.startFunc();
       } else {
-        this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`] } });
+        this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`, 'Commands:'], elements: this.getClickableCommandNames() } });
       }
     }
 
@@ -78,6 +78,9 @@ class Terminal extends View {
       row.scrollIntoView();
       setTimeout(() => { this.addRow(message); }, this.timeout);
     } else {
+      if (message.elements) {
+        this.appendRow({ elements: message.elements });
+      }
       this.consumeShortQueue();
     }
   }
@@ -127,6 +130,27 @@ class Terminal extends View {
   removeView() {
     this.disableKeyTriggers();
     super.removeView();
+  }
+
+  getClickableCommandNames() {
+    return this.commands.map(({ commandName }) => {
+      return elementCreator.createSpan({
+        text: commandName,
+        classes: ['clickable'],
+        func: () => {
+          this.triggerCommand(commandName);
+        },
+      });
+    });
+  }
+
+  appendRow({ elements }) {
+    const listItem = elementCreator.createListItem({});
+
+    elements.forEach(element => listItem.appendChild(element));
+
+    this.element.firstElementChild.appendChild(listItem);
+    listItem.scrollIntoView();
   }
 
   startBootSequence(parentElement) {
@@ -243,6 +267,17 @@ class Terminal extends View {
     boot.setEndFunc(() => {
       this.firstRun = false;
       this.appendTo(parentElement);
+      this.queueMessage({
+        message: {
+          text: [
+            'OSAT identity: C. Jenkins',
+            'Your actions will be monitored',
+            'Input or click on the command you want to run',
+            'Commands:',
+          ],
+          elements: this.getClickableCommandNames(),
+        },
+      });
     });
     boot.appendTo(parentElement);
   }

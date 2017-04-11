@@ -436,11 +436,18 @@ img {
   #terminalFeed {
     padding-left: .4em;
     height: calc(100% - 1.8em);
+    overflow-x: hidden;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
 
     li {
       margin: .3em 0;
+
+      .clickable {
+        text-decoration: underline;
+        margin-right: .5em;
+      }
     }
   }
 

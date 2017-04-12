@@ -40,6 +40,55 @@ class Terminal extends View {
     this.commands.push(command);
   }
 
+  clearInput() {
+    this.terminalInput.value = '';
+  }
+
+  autoCompleteCommand() {
+    const commands = this.getCommandNames();
+    const matched = [];
+    const inputValue = this.terminalInput.value.toLowerCase();
+    let matches;
+
+    commands.forEach((commandName) => {
+      const lowerCommand = commandName.toLowerCase();
+      matches = false;
+
+      for (let j = 0; j < inputValue.length; j += 1) {
+        if (inputValue.charAt(j) === lowerCommand.charAt(j)) {
+          matches = true;
+        } else {
+          matches = false;
+
+          break;
+        }
+      }
+
+      if (matches) {
+        matched.push(commandName);
+      }
+    });
+
+    if (matched.length === 1) {
+      this.terminalInput.value = matched[0];
+    } else if (matched.length > 0) {
+      this.queueMessage({
+        message: {
+          text: ['$ Multiple matched commands:'],
+          elements: matched.map((commandName) => {
+            return elementCreator.createSpan({
+              text: commandName,
+              classes: ['clickable'],
+              func: () => {
+                this.triggerCommand(commandName);
+              },
+            });
+          }),
+        },
+      });
+    }
+  }
+
   triggerCommand(value) {
     const inputValue = value || this.terminalInput.value;
 
@@ -64,7 +113,7 @@ class Terminal extends View {
       }
     }
 
-    this.terminalInput.value = '';
+    this.clearInput();
   }
 
   addRow(message) {
@@ -123,6 +172,13 @@ class Terminal extends View {
           this.triggerCommand();
         },
       });
+      this.addKeyTrigger({
+        charCode: 9, // Tab
+        triggerless: true,
+        func: () => {
+          this.autoCompleteCommand();
+        },
+      });
       this.startBootSequence(parentElement);
     }
   }
@@ -130,6 +186,10 @@ class Terminal extends View {
   removeView() {
     this.disableKeyTriggers();
     super.removeView();
+  }
+
+  getCommandNames() {
+    return this.commands.map(({ commandName}) => commandName);
   }
 
   getClickableCommandNames() {

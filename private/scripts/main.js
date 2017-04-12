@@ -531,8 +531,12 @@ socketManager.addEvents([
   }, {
     event: 'mapPositions',
     func: ({ positions, currentTime }) => {
-      console.log('mapPositions', positions);
       eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions, currentTime } });
+    },
+  }, {
+    event: 'terminal',
+    func: (params) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
     },
   },
 ]);

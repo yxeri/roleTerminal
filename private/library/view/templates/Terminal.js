@@ -17,7 +17,7 @@
 const View = require('../base/View');
 const TextAnimation = require('./TextAnimation');
 const textTools = require('../../TextTools');
-
+const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
 class Terminal extends View {
@@ -180,6 +180,32 @@ class Terminal extends View {
         },
       });
       this.startBootSequence(parentElement);
+      eventCentral.addWatcher({
+        watcherParent: this,
+        event: eventCentral.Events.TERMINAL,
+        func: ({ mission }) => {
+          if (mission) {
+            switch (mission.missionType) {
+              case 'calibrationMission': {
+                if (mission.cancelled) {
+                  this.queueMessage({
+                    message: { text: ['CALIBRATION FAILED', 'Your calibration task was aborted', 'You will receive no payment'] },
+                  });
+                } else {
+                  this.queueMessage({
+                    message: { text: ['CALIBRATION SUCCESSFUL', 'Your calibration task was successful', 'You have received your payment'] },
+                  });
+                }
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+          }
+        },
+      });
     }
   }
 

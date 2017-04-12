@@ -37,6 +37,7 @@ class EventCentral {
       BCASTMSG: 'Broadcast message',
       TRANSACTION: 'New transaction',
       POSITIONS: 'Positions received',
+      TERMINAL: 'System message',
     };
     this.eventWatchers = {};
   }

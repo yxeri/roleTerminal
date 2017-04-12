@@ -189,7 +189,7 @@ class Terminal extends View {
   }
 
   getCommandNames() {
-    return this.commands.map(({ commandName}) => commandName);
+    return this.commands.map(({ commandName }) => commandName);
   }
 
   getClickableCommandNames() {

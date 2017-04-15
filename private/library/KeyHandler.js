@@ -46,8 +46,13 @@ class KeyHandler {
     this.triggerKeyPressed = false;
     this.triggerKey = 18; // Alt
     this.sound = null;
+    this.paused = false;
 
     window.addEventListener('keydown', (event) => {
+      if (this.paused) {
+        return;
+      }
+
       const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
       if (!this.triggerKeyPressed && sentKeyCode !== 16 && sentKeyCode !== this.triggerKey) {
@@ -69,6 +74,10 @@ class KeyHandler {
     });
 
     window.addEventListener('keyup', (event) => {
+      if (this.paused) {
+        return;
+      }
+
       const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
       if (keyCode === this.triggerKey) {
@@ -100,6 +109,14 @@ class KeyHandler {
     if (keyIndex > -1) {
       this.keys.splice(keyIndex, 1);
     }
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  unpause() {
+    this.paused = false;
   }
 }
 

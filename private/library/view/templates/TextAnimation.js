@@ -16,6 +16,7 @@
 
 const View = require('../base/View');
 const textTools = require('../../TextTools');
+const keyHandler = require('../../KeyHandler');
 
 class TextAnimation extends View {
   constructor({ removeTime = 4000, lineTime = 50 }) {
@@ -76,6 +77,7 @@ class TextAnimation extends View {
   }
 
   start() {
+    keyHandler.pause();
     this.next();
   }
 
@@ -87,6 +89,7 @@ class TextAnimation extends View {
     } else {
       setTimeout(() => {
         this.removeView();
+        keyHandler.unpause();
 
         if (this.endFunc) {
           this.endFunc();

@@ -37,7 +37,7 @@ function createTransactionItem({ transaction: { to, from, amount, time, note } }
   const date = textTools.generateTimeStamp({ date: time });
 
   listItem.appendChild(elementCreator.createParagraph({ text: `${date.fullTime} ${date.fullDate}` }));
-  listItem.appendChild(elementCreator.createParagraph({ text: `${to} -> ${from}` }));
+  listItem.appendChild(elementCreator.createParagraph({ text: `${from} -> ${to}` }));
   listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount}d` }));
 
   if (note) {

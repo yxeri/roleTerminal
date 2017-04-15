@@ -429,14 +429,6 @@ home.addLink({
                 ],
               });
 
-              const message = {
-                text: [
-                  '',
-                ],
-                roomName: 'public',
-                coordinates: position.coordinates,
-              };
-
               eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
             });
           },

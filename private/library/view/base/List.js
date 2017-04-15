@@ -31,8 +31,8 @@ function createSortedList(list, newItem) {
   const array = Array.from(list.childNodes);
 
   array.sort((a, b) => {
-    const aValue = a.firstElementChild.innerText.toLowerCase();
-    const bValue = b.firstElementChild.innerText.toLowerCase();
+    const aValue = a.firstElementChild.textContent.toLowerCase();
+    const bValue = b.firstElementChild.textContent.toLowerCase();
 
     if (aValue < bValue) {
       return -1;

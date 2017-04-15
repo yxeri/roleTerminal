@@ -35,7 +35,8 @@ class View {
       event: eventCentral.Events.ACCESS,
       func: ({ accessLevel }) => {
         this.toggleAccessElements(accessLevel);
-      } });
+      },
+    });
   }
 
   hideView() { this.element.classList.add('hide'); }

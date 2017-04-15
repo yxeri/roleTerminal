@@ -29,6 +29,7 @@ const TextAnimation = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
 const Terminal = require('../library/view/templates/Terminal');
+const ButtonBox = require('../library/view/templates/ButtonBox');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -38,6 +39,7 @@ const textTools = require('../library/TextTools');
 const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
 const soundLibrary = require('../library/audio/SoundLibrary');
+const elementCreator = require('../library/ElementCreator');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
@@ -228,7 +230,7 @@ const docsViewer = new DocsViewer({ isFullscreen: true });
 const wallet = new Wallet();
 const profile = new Profile();
 const map = new WorldMap({
-  mapView: WorldMap.MapViews.OVERVIEW,
+  mapView: WorldMap.MapViews.AREA,
   clusterStyle: {
     gridSize: 24,
     maxZoom: 17,
@@ -364,7 +366,7 @@ if (!storageManager.getUserName()) {
 }
 
 home.addLink({
-  linkName: 'Login',
+  linkName: 'login',
   startFunc: () => {
     new LoginBox({
       description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
@@ -372,7 +374,7 @@ home.addLink({
       parentElement: mainView,
       socketManager,
       keyHandler,
-      closeFunc: () => { home.endLink('Login'); },
+      closeFunc: () => { home.endLink('login'); },
     }).appendTo(mainView);
   },
   endFunc: () => {},
@@ -383,7 +385,188 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Profile',
+  linkName: 'panic',
+  startFunc: () => {
+    const panicBox = new ButtonBox({
+      description: [
+        'Employee UNDEFINED. You have pressed the panic button. Remain calm to minimize blood leakage and increase your survivability',
+        'By proceeding, you agree to have your position retrieved and sent to those who can best help you',
+        'Choose the option that best describes your current situation:',
+        ' ',
+        '"I\'m being murdered by a "',
+      ],
+      buttons: [
+        elementCreator.createButton({
+          text: 'Group of Panzerwolves',
+          func: () => {
+            const position = tracker.getBestPosition();
+            const pingInfo = {
+              pingType: 'panzerwolves',
+            };
+
+            socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+              if (error) {
+                console.log(error);
+                panicBox.removeView();
+
+                return;
+              }
+
+              panicBox.changeDescription({
+                text: [
+                  'You have selected: "I\'m being murdered by a group of Panzerwolves"',
+                  'The Organica corporation and the Panzerwolves have a written non-aggression pact',
+                  'We recommend that you cite Agreement 233.75.1.12 to cease the murder process',
+                  'A team of lawyers will be sent to your location',
+                ],
+              });
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Thank you!',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+
+              const message = {
+                text: [
+                  '',
+                ],
+                roomName: 'public',
+                coordinates: position.coordinates,
+              };
+
+              eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+            });
+          },
+        }),
+        elementCreator.createButton({
+          text: 'Organica re-education team',
+          func: () => {
+            const position = tracker.getBestPosition();
+            const pingInfo = {
+              pingType: 'organica',
+            };
+
+            socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+              if (error) {
+                console.log(error);
+                panicBox.removeView();
+
+                return;
+              }
+
+              panicBox.changeDescription({
+                text: [
+                  'You have selected: "I\'m being murdered by a Organica re-education"',
+                  'You have been found in breach of your employment contract. Reason: {UNDEFINED}',
+                  'Re-education is mandatory for low productivity and contract breaches',
+                  'A second re-education team will be sent to your location to speed up the re-education process',
+                ],
+              });
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Thank you!',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+
+              eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+            });
+          },
+        }),
+        elementCreator.createButton({
+          text: 'Mugger with a gun and/or knife',
+          func: () => {
+            const position = tracker.getBestPosition();
+            const pingInfo = {
+              pingType: 'team',
+            };
+            const team = storageManager.getTeam();
+
+            if (team) {
+              socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+                if (error) {
+                  console.log(error);
+                  panicBox.removeView();
+
+                  return;
+                }
+
+                panicBox.changeDescription({
+                  text: [
+                    'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
+                    'We have to remind you that allowing non-employees to take your assigned Organica equipment is a breech of your employment contract',
+                    'We advice you to make certain that none of your equipment is stolen, before and after your death',
+                    'Your location will be sent to your team',
+                  ],
+                });
+                panicBox.replaceButtons({
+                  buttons: [
+                    elementCreator.createButton({
+                      text: 'Thank you!',
+                      func: () => { panicBox.removeView(); },
+                    }),
+                  ],
+                });
+
+                eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+              });
+            } else {
+              panicBox.changeDescription({
+                text: [
+                  'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
+                  'Warning! We have no record of you being part of a team',
+                  'Only employees with the rank "Productive Team Member" or higher may use this service',
+                  'No notification will be sent',
+                ],
+              });
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Oh no...',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+            }
+          },
+        }),
+        elementCreator.createButton({
+          text: '... Actually, I am fine',
+          func: () => {
+            panicBox.changeDescription({
+              text: [
+                'You have selected: "... Actually, I am fine"',
+                'Warning! You have wasted seconds of Organica-owned time',
+                'We will fine you 100 credits. NaN has been deducted from your wallet',
+              ],
+            });
+            panicBox.replaceButtons({
+              buttons: [
+                elementCreator.createButton({
+                  text: 'I will immediately sign up for voluntary re-education',
+                  func: () => { panicBox.removeView(); },
+                }),
+              ],
+            });
+          },
+        }),
+      ],
+    });
+    panicBox.appendTo(mainView);
+  },
+  endFunc: () => {},
+  accessLevel: 1,
+  classes: ['hide'],
+  keepHome: true,
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'profile',
   startFunc: () => { profile.appendTo(mainView); },
   endFunc: () => { profile.removeView(); },
   accessLevel: 1,
@@ -391,25 +574,25 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Coms',
+  linkName: 'coms',
   startFunc: () => { messenger.appendTo(mainView); },
   endFunc: () => { messenger.removeView(); },
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Map',
+  linkName: 'map',
   startFunc: () => { map.appendTo(mainView); },
   endFunc: () => { map.removeView(); },
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Docs',
+  linkName: 'docs',
   startFunc: () => { docsViewer.appendTo(mainView); },
   endFunc: () => { docsViewer.removeView(); },
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Wallet',
+  linkName: 'wallet',
   startFunc: () => { wallet.appendTo(mainView); },
   endFunc: () => { wallet.removeView(); },
   classes: ['hide'],
@@ -417,7 +600,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Terminal',
+  linkName: 'terminal',
   startFunc: () => { terminal.appendTo(mainView); },
   endFunc: () => { terminal.removeView(); },
   accessLevel: 1,
@@ -425,7 +608,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'Logout',
+  linkName: 'logout',
   startFunc: () => {
     socketManager.emitEvent('logout', {}, (error) => {
       if (error) {
@@ -433,7 +616,7 @@ home.addLink({
       }
 
       eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
-      home.endLink('Logout');
+      home.endLink('logout');
     });
   },
   accessLevel: 1,
@@ -537,6 +720,11 @@ socketManager.addEvents([
     event: 'terminal',
     func: (params) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
+    },
+  }, {
+    event: 'pingMap',
+    func: ({ position, pingInfo }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position, pingInfo } });
     },
   },
 ]);

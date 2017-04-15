@@ -637,6 +637,17 @@ img {
   }
 }
 
+.buttonBox {
+  button:first-child {
+    margin-top: .5em;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: .5em;
+  }
+}
+
 .description {
   margin-bottom: $padding;
   text-align: left;

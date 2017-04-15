@@ -17,6 +17,7 @@
 const View = require('../base/View');
 const DialogBox = require('../DialogBox');
 const MapMarker = require('./MapMarker');
+const Label = require('./Label');
 const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -51,6 +52,7 @@ class WorldMap extends View {
 
     this.mapView = mapView;
     this.markers = markers;
+    this.pings = {};
     this.labels = {};
     this.cornerCoordinates = cornerCoordinates;
     this.centerCoordinates = centerCoordinates;
@@ -73,6 +75,14 @@ class WorldMap extends View {
       event: eventCentral.Events.MYPOSITION,
       func: ({ position }) => {
         this.setUserPosition({ position });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.PINGMAP,
+      func: ({ position, pingInfo }) => {
+        this.createPing({ position, pingInfo });
       },
     });
   }
@@ -199,34 +209,29 @@ class WorldMap extends View {
         }),
         elementCreator.createButton({
           text: 'Ping',
-          func: () => {},
+          func: () => {
+            const position = {
+              coordinates: {
+                longitude: event.latLng.lng(),
+                latitude: event.latLng.lat(),
+              },
+            };
+            const pingInfo = {
+              pingType: 'notification',
+              userName: storageManager.getUserName(),
+            };
+
+            socketManager.emitEvent('pingMap', { position, pingInfo }, () => {
+
+            });
+            this.hideMapClickMenu();
+          },
         }),
       ],
     });
 
     elementCreator.replaceOnlyChild(this.mapClickMenu, list);
     this.showMapClickMenu();
-  }
-
-  /**
-   * Creates a label at the position of another object
-   * The name of the position will be used as text for the label
-   * @param {string} params.positionName - Name of the position
-   * @param {string} params.labelText - Text that will be printed
-   * @param {string} [params.align] - Text alignment (left|right)
-   * @param {{latitude: Number, longitude: Number}} params.position - Long and lat coordinates of the label
-   */
-  createLabel({ positionName, labelText, align = 'right', coordinates }) {
-    const labelOptions = {
-      position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
-      text: labelText || positionName,
-      align,
-    };
-
-    Object.keys(this.labelStyle).forEach((name) => { labelOptions[name] = this.labelStyle[name]; });
-
-    this.labels[positionName] = new MapLabel(labelOptions);
-    this.labels[positionName].setMap(this.map);
   }
 
   /**
@@ -277,8 +282,6 @@ class WorldMap extends View {
     } else {
       this.createThisUserMarker({ position });
     }
-
-    console.log('I', this.markers.I);
   }
 
   /**
@@ -614,6 +617,41 @@ class WorldMap extends View {
     });
   }
 
+  createPing({ position = {}, pingInfo = {} }) {
+    const ping = new google.maps.Circle({
+      center: new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude),
+      strokeColor: '#00ffcc',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#ff02e5',
+      fillOpacity: 0.35,
+      radius: 100,
+    });
+    const labelText = (() => {
+      switch (pingInfo.pingType) {
+        case 'organica': {
+          return 'Organica företagsfest';
+        }
+        case 'panzerwolves': {
+          return 'Panzerwolf raid';
+        }
+        default: {
+          return 'Unknown activity';
+        }
+      }
+    })();
+    const label = new Label({
+      positionName: `${pingInfo.userName}-ping`,
+      coordinates: position.coordinates,
+      labelText,
+    });
+
+    if (this.map) {
+      ping.setMap(this.map);
+      label.setMap(this.map);
+    }
+  }
+
   /**
    * Create map marker
    * @param {string} params.position.positionName Name of the position
@@ -637,21 +675,23 @@ class WorldMap extends View {
       const latitude = parseFloat(coordinates.latitude);
       const longitude = parseFloat(coordinates.longitude);
 
-      if (markerType === 'world' && geometry === 'point') {
-        this.markers[positionName] = new MapMarker({
-          coordinates: {
-            latitude,
-            longitude,
-          },
-          map: this.map,
-          worldMap: this,
-          positionName,
-          description,
-          markerType,
-          owner,
-          team,
-        });
-        this.clusterer.addMarker(this.markers[positionName].marker);
+      if (markerType === 'world') {
+        if (geometry === 'point') {
+          this.markers[positionName] = new MapMarker({
+            coordinates: {
+              latitude,
+              longitude,
+            },
+            map: this.map,
+            worldMap: this,
+            positionName,
+            description,
+            markerType,
+            owner,
+            team,
+          });
+          this.clusterer.addMarker(this.markers[positionName].marker);
+        }
       } else if (markerType === 'user' && lastUpdated) {
         const date = new Date(lastUpdated);
         const currentDate = new Date(currentTime);

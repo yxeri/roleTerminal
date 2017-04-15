@@ -38,6 +38,9 @@ class EventCentral {
       TRANSACTION: 'New transaction',
       POSITIONS: 'Positions received',
       TERMINAL: 'System message',
+      NEWMEMBER: 'New team member',
+      USERSTATUS: 'User sent status update',
+      PINGMAP: 'Ping map',
     };
     this.eventWatchers = {};
   }

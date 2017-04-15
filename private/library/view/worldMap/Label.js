@@ -22,47 +22,45 @@ class Label {
    * Creates a label at the location of another object
    * The name of the position will be used as text for the label
    * @param {string} params.positionName - Name of the position that the label is connected to
-   * @param {{latitude: number, longitude: number}} params.position - Long and lat coordinates of the label
+   * @param {{latitude: number, longitude: number}} params.coordinates - Long and lat coordinates of the label
    * @param {string} params.labelText - Text that will be printed
    * @param {string} [params.align] - Text alignment (left|right)
    * @param {string} [params.fontFamily] - Font family
    * @param {string} [params.fontColor] - Font color
    * @param {string} [params.strokeColor] - Stroke color (around the text)
    * @param {number} [params.fontSize] - Font size
-   * @param {WorldMap} [params.worldMap] - WorldMap that the label should be attached to
+   * @param {WorldMap} [params.map] - Map that the label should be attached to
    */
-  constructor({ positionName, position, labelText, align, fontFamily, fontColor, strokeColor, fontSize, worldMap }) {
+  constructor({ positionName, coordinates, labelText, align = 'right', fontFamily = 'monospace', fontColor = '#00ffcc', strokeColor = '#001e15', fontSize = 12, map = null }) {
     this.positionName = positionName.toLowerCase();
-    this.worldMap = worldMap || null;
+    this.map = map;
     this.mapLabel = new MapLabel({
       text: labelText,
-      position: new google.maps.LatLng(position.latitude, position.longitude),
-      align: align || 'right',
-      fontFamily: fontFamily || 'GlassTTYVT220',
-      fontColor: fontColor || '#00ffcc',
-      strokeColor: strokeColor || '#001e15',
-      fontSize: fontSize || 12,
-      map: worldMap || null,
+      position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
+      align,
+      fontFamily,
+      fontColor,
+      strokeColor,
+      fontSize,
+      map,
     });
   }
 
-  set worldMap(map) {
-    this.worldMap = map;
+  setMap(map) {
+    this.map = map;
     this.mapLabel.setMap(map);
-  }
-
-  get worldMap() {
-    return this.worldMap;
   }
 
   hideLabel() {
     this.mapLabel.setMap(null);
-    this.worldMap.redraw();
   }
 
   showLabel() {
-    this.mapLabel.setMap(this.worldMap.map);
-    this.worldMap.redraw();
+    this.mapLabel.setMap(this.map);
+  }
+
+  setPosition({ coordinates }) {
+    this.mapLabel.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
   }
 }
 

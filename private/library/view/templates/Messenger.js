@@ -106,6 +106,10 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = (
  * @returns {HTMLLIElement} List item element
  */
 function findItem(list, text) {
+  if (!list.element.lastElementChild) {
+    return null;
+  }
+
   const listItems = Array.from(list.element.lastElementChild.getElementsByTagName('LI'));
 
   return listItems.find(item => (item.firstElementChild.getAttribute('data') || '') === text);
@@ -284,6 +288,7 @@ class Messenger extends StandardView {
     const aliasList = new List({
       title: 'ALIASES',
       shouldSort: true,
+      minimumToShow: 2,
     });
     const followList = new List({
       title: 'Following',
@@ -590,7 +595,7 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: ({ changedUser }) => {
+      func: ({ changedUser, firstConnection }) => {
         if (storageManager.getAccessLevel() > 0) {
           const aliases = storageManager.getAliases();
 
@@ -599,11 +604,24 @@ class Messenger extends StandardView {
 
             aliasList.replaceAllItems({ items: aliases.map(alias => this.createAliasButton({ alias })) });
             aliasList.addItem({ item: this.createAliasButton({ alias: storageManager.getUserName() }) });
-            aliasList.toggleList(true);
 
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
+
+            if (firstConnection || changedUser) {
+              aliasList.toggleList(true);
+            }
           } else {
+            const userName = storageManager.getUserName();
+
             aliasList.replaceAllItems({ items: [] });
+            aliasList.addItem({ item: this.createAliasButton({ alias: userName }) });
+
+            const listItem = findItem(aliasList, userName);
+
+            if (listItem) {
+              this.selectedItem = listItem;
+              this.selectedItem.classList.add('selectedItem');
+            }
           }
 
           socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
@@ -641,6 +659,11 @@ class Messenger extends StandardView {
               return this.createWhisperButton({ roomName: `${userName} <-> ${whisperTo}`, data: room });
             }),
           });
+
+          if (followedRooms.length > 0 && (firstConnection || changedUser)) {
+            followList.toggleList(true);
+          }
+
           roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton({ roomName: room })) });
 
           const listItem = findItem(followList, storageManager.getRoom());

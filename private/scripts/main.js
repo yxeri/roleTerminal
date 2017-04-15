@@ -669,7 +669,7 @@ socketManager.addEvents([
           storageManager.setAliases(data.user.aliases);
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName } });
+        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });
         socketManager.setConnected();
       });
     },

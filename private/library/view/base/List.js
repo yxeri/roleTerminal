@@ -49,13 +49,14 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1 }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.element.classList.add('hide');
     this.shouldSort = shouldSort;
     this.showingList = showingList;
+    this.minimumToShow = minimumToShow;
     this.toggleElement = elementCreator.createContainer({ });
 
     if (title) {
@@ -122,7 +123,7 @@ class List extends View {
   }
 
   toggleView() {
-    if (this.element.lastElementChild.childNodes.length > 0) {
+    if (this.element.lastElementChild.childNodes.length > (this.minimumToShow - 1)) {
       this.element.classList.remove('hide');
     } else {
       this.element.classList.add('hide');
@@ -133,14 +134,14 @@ class List extends View {
     if (!this.showingList || show) {
       this.toggleElement.classList.remove('collapsedIcon');
       this.toggleElement.classList.add('expandedIcon');
+      this.element.lastElementChild.classList.remove('hide');
       this.showingList = true;
     } else {
       this.toggleElement.classList.remove('expandedIcon');
       this.toggleElement.classList.add('collapsedIcon');
+      this.element.lastElementChild.classList.add('hide');
       this.showingList = false;
     }
-
-    this.element.lastElementChild.classList.toggle('hide');
   }
 }
 

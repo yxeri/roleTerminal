@@ -16,6 +16,7 @@
 
 const viewTools = require('../../ViewTools');
 const elementCreator = require('../../ElementCreator');
+const eventCentral = require('../../EventCentral');
 
 /**
  * Create and return header paragraph
@@ -58,6 +59,12 @@ class MessageList {
     this.isTopDown = isTopDown;
     this.element = document.createElement('UL');
     this.lastItem = { headerItems: [''] };
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.SWITCHROOM,
+      func: () => { this.lastItem = { headerItems: [''] }; },
+    });
   }
 
   addItems(items, { shouldScroll, animation, isHistory }) {

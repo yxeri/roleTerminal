@@ -70,7 +70,7 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = (
     roomName = userName;
   }
 
-  socketManager.emitEvent('history', { room: { roomName }, lines, whisperTo }, ({ data: historyData, error: historyError }) => {
+  socketManager.emitEvent('getHistory', { room: { roomName }, lines, whisperTo }, ({ data: historyData, error: historyError }) => {
     if (historyError) {
       console.log(historyError);
       callback({ error: historyError });

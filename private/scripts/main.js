@@ -691,7 +691,7 @@ socketManager.addEvents([
   }, {
     event: 'logout',
     func: () => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
+      eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
     },
   }, {
     event: 'bcastMsg',

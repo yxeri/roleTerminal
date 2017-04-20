@@ -19,7 +19,7 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 
 class MapMarker {
-  constructor({ coordinates: { longitude, latitude }, markerType, icon = {}, description = [], positionName, lastUpdated, map, worldMap, owner, team }) {
+  constructor({ icon = {}, description = [], shouldCluster = false, team = '', owner = '', lastUpdated = new Date(), coordinates: { longitude, latitude }, markerType, positionName, map, worldMap }) {
     this.marker = new google.maps.Marker({
       position: {
         lat: latitude,
@@ -36,11 +36,12 @@ class MapMarker {
     this.markerType = markerType;
     this.description = description;
     this.positionName = positionName;
-    this.lastUpdated = lastUpdated || new Date();
+    this.lastUpdated = lastUpdated;
     this.map = map;
     this.worldMap = worldMap;
-    this.owner = owner || '';
-    this.team = team || '';
+    this.owner = owner;
+    this.team = team;
+    this.shouldCluster = shouldCluster;
 
     google.maps.event.addListener(this.marker, 'click', (event) => {
       soundLibrary.playSound('button2');

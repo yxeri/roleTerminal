@@ -18,6 +18,7 @@ const View = require('../base/View');
 const DialogBox = require('../DialogBox');
 const MapMarker = require('./MapMarker');
 const Label = require('./Label');
+const List = require('../base/List');
 const textTools = require('../../TextTools');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
@@ -27,7 +28,6 @@ const eventCentral = require('../../EventCentral');
 
 const MapViews = {
   OVERVIEW: 'overview',
-  ME: 'me',
   CLUSTER: 'cluster',
   AREA: 'area',
   NONE: '',
@@ -69,6 +69,36 @@ class WorldMap extends View {
     this.map = null;
     this.overlay = null;
     this.movingMarker = null;
+    this.userList = new List({ title: 'Users', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.worldList = new List({ title: 'World', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.otherList = new List({ title: 'Others', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
+
+    this.userList.element.addEventListener('click', () => {
+      [this.worldList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+    });
+    this.worldList.element.addEventListener('click', () => {
+      [this.userList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+    });
+    this.otherList.element.addEventListener('click', () => {
+      [this.userList, this.worldList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+    });
+
+    const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['mapMenu'] });
+    const meButton = elementCreator.createSpan({
+      text: 'Me',
+      classes: ['clickable'],
+      func: () => {
+        if (this.markers.I) {
+          this.realignMap([this.markers.I]);
+        }
+      },
+    });
+
+    mapMenu.appendChild(this.worldList.element);
+    mapMenu.appendChild(this.userList.element);
+    mapMenu.appendChild(this.otherList.element);
+    mapMenu.appendChild(meButton);
+    this.element.appendChild(mapMenu);
 
     eventCentral.addWatcher({
       watcherParent: this,
@@ -77,13 +107,110 @@ class WorldMap extends View {
         this.setUserPosition({ position });
       },
     });
-
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.PINGMAP,
       func: ({ position, pingInfo }) => {
         this.createPing({ position, pingInfo });
       },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.USER,
+      func: () => {
+        this.retrievePositions(() => {
+          const world = [];
+          const users = [];
+          const others = Object.keys(this.markers).filter((positionName) => {
+            if (this.markers[positionName].markerType === 'custom') {
+              return true;
+            }
+
+            if (this.markers[positionName].markerType === 'users') {
+              users.push(positionName);
+            } else if (this.markers[positionName].markerType === 'world') {
+              world.push(positionName);
+            }
+
+            return false;
+          });
+
+          this.replaceListItems(world, this.worldList);
+          this.replaceListItems(users, this.userList);
+          this.replaceListItems(others, this.otherList);
+        });
+      },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.POSITIONS,
+      func: ({ positions, currentTime }) => {
+        const userName = storageManager.getUserName() || '';
+
+        positions.forEach((position) => {
+          const positionName = position.positionName;
+
+          if (positionName) {
+            if (this.markers[positionName]) {
+              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
+
+              if (position.markerType && position.markerType === 'user') {
+                const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
+
+                this.markers[positionName].description = [`Team: ${position.team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+              }
+            } else {
+              this.createMarker({ position, userName, currentTime });
+
+              switch (position.markerType) {
+                case 'world': {
+                  this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
+
+                  break;
+                }
+                case 'user': {
+                  this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
+
+                  break;
+                }
+                case 'custom': {
+                  this.otherList.addItem({ item: this.createListButton(positionName, this.otherList) });
+
+                  break;
+                }
+                default: {
+                  break;
+                }
+              }
+            }
+          }
+        });
+      },
+    });
+  }
+
+  resetClusterer(markers = []) {
+    if (!this.clusterer) {
+      this.clusterer = new MarkerClusterer(this.map, [], this.clusterStyle);
+    }
+
+    this.clusterer.clearMarkers();
+    this.clusterer.addMarkers(markers);
+  }
+
+  createListButton(positionName, parentList) {
+    return elementCreator.createButton({
+      text: positionName,
+      func: () => {
+        this.realignMap([this.markers[positionName]]);
+        parentList.toggleList();
+      },
+    });
+  }
+
+  replaceListItems(list, listToChange) {
+    listToChange.replaceAllItems({
+      items: list.map((positionName) => this.createListButton(positionName, listToChange)),
     });
   }
 
@@ -297,32 +424,28 @@ class WorldMap extends View {
 
   /**
    * Creates new bounds and re-centers the map based on the map view
-   * @param {Object[]} markers - Map markers used to create bounds
+   * @param {Object[]} [sentMarkers] - Map markers used to create bounds
    */
-  realignMap(markers) {
+  realignMap(sentMarkers) {
     const bounds = new google.maps.LatLngBounds();
     let centerPos = this.map.getCenter();
 
     google.maps.event.trigger(this.map, 'resize');
 
-    if (this.mapView === MapViews.OVERVIEW) {
-      const markerKeys = Object.keys(markers);
-
-      for (let i = 0; i < markerKeys.length; i += 1) {
-        const marker = markerKeys[i];
-
-        bounds.extend(markers[marker].getPosition());
-      }
+    if (sentMarkers) {
+      Object.keys(sentMarkers).forEach(markerName => bounds.extend(sentMarkers[markerName].getPosition()));
 
       this.map.fitBounds(bounds);
       centerPos = bounds.getCenter();
-    } else if (this.mapView === MapViews.ME && markers.I) {
-      centerPos = markers.I.getPosition();
-      this.map.setZoom(18);
+    } else if (this.mapView === MapViews.OVERVIEW) {
+      Object.keys(this.markers).forEach(markerName => bounds.extend(this.markers[markerName].getPosition()));
+
+      this.map.fitBounds(bounds);
+      centerPos = bounds.getCenter();
     } else if (this.mapView === MapViews.CLUSTER) {
-      if (markers) {
-        for (let i = 0; i < markers.length; i += 1) {
-          const marker = markers[i];
+      if (this.markers) {
+        for (let i = 0; i < this.markers.length; i += 1) {
+          const marker = this.markers[i];
 
           bounds.extend(marker.getPosition());
         }
@@ -333,11 +456,6 @@ class WorldMap extends View {
     } else if (this.mapView === MapViews.AREA) {
       bounds.extend(new google.maps.LatLng(this.cornerCoordinates.cornerOne.latitude, this.cornerCoordinates.cornerOne.longitude));
       bounds.extend(new google.maps.LatLng(this.cornerCoordinates.cornerTwo.latitude, this.cornerCoordinates.cornerTwo.longitude));
-
-      this.map.fitBounds(bounds);
-      centerPos = bounds.getCenter();
-    } else if (markers[this.mapView]) {
-      bounds.extend(markers[this.mapView].getPosition());
 
       this.map.fitBounds(bounds);
       centerPos = bounds.getCenter();
@@ -376,7 +494,7 @@ class WorldMap extends View {
       }
 
       this.setMapView(MapViews.CLUSTER);
-      this.realignMap(cluster.getMarkers());
+      this.realignMap();
     });
 
     google.maps.event.addListener(this.map, 'dragstart', () => {
@@ -515,6 +633,28 @@ class WorldMap extends View {
     this.map.setZoom(this.map.getZoom() - 1);
   }
 
+  retrievePositions(callback = () => {}) {
+    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
+      if (error || !data) {
+        return;
+      }
+
+      const { positions, currentTime } = data;
+      const userName = storageManager.getUserName() || '';
+
+      positions.forEach((position) => {
+        this.createMarker({ position, userName, currentTime });
+      });
+
+      if (this.map) {
+        this.resetClusterer(Object.keys(this.markers).filter(positionName => this.markers[positionName].shouldCluster).map(positionName => this.markers[positionName].marker));
+        this.realignMap();
+      }
+
+      callback();
+    });
+  }
+
   /**
    * Creates the map and retrieves positions from server and Google maps
    */
@@ -553,9 +693,7 @@ class WorldMap extends View {
       });
     }
 
-    if (!this.clusterer) {
-      this.clusterer = new MarkerClusterer(this.map, [], this.clusterStyle);
-    }
+    this.resetClusterer();
 
     if (!this.overlay) {
       this.overlay = new google.maps.OverlayView();
@@ -575,46 +713,7 @@ class WorldMap extends View {
       this.markers.I.marker.setMap(this.map);
     }
 
-    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
-      if (error || !data) {
-        return;
-      }
-
-      const { positions, currentTime } = data;
-      const userName = storageManager.getUserName() || '';
-
-      positions.forEach((position) => {
-        this.createMarker({ position, userName, currentTime });
-      });
-
-      this.realignMap(this.markers);
-    });
-
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.POSITIONS,
-      func: ({ positions, currentTime }) => {
-        const userName = storageManager.getUserName() || '';
-
-        positions.forEach((position) => {
-          const positionName = position.positionName;
-
-          if (positionName) {
-            if (this.markers[positionName]) {
-              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
-
-              if (position.markerType && position.markerType === 'user') {
-                const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
-
-                this.markers[positionName].description = [`Team: ${position.team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
-              }
-            } else {
-              this.createMarker({ position, userName, currentTime });
-            }
-          }
-        });
-      },
-    });
+    this.retrievePositions();
   }
 
   createPing({ position = {}, pingInfo = {} }) {
@@ -684,13 +783,13 @@ class WorldMap extends View {
             },
             map: this.map,
             worldMap: this,
+            shouldCluster: true,
             positionName,
             description,
             markerType,
             owner,
             team,
           });
-          this.clusterer.addMarker(this.markers[positionName].marker);
         }
       } else if (markerType === 'user' && lastUpdated) {
         const date = new Date(lastUpdated);
@@ -698,7 +797,6 @@ class WorldMap extends View {
 
         if (currentDate - date < (20 * 60 * 1000)) {
           const beautifiedDate = textTools.generateTimeStamp({ date });
-
           const userDescription = [`Team: ${team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
 
           this.markers[positionName] = new MapMarker({
@@ -718,7 +816,6 @@ class WorldMap extends View {
             owner,
             team,
           });
-          this.clusterer.addMarker(this.markers[positionName].marker);
         }
       } else if (markerType) {
         this.markers[positionName] = new MapMarker({
@@ -731,13 +828,13 @@ class WorldMap extends View {
           },
           map: this.map,
           worldMap: this,
+          shouldCluster: true,
           description,
           positionName,
           markerType,
           owner,
           team,
         });
-        this.clusterer.addMarker(this.markers[positionName].marker);
       }
     }
   }

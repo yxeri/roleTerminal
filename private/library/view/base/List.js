@@ -20,11 +20,11 @@ const elementCreator = require('../../ElementCreator');
 /**
  * Sorts a list of items. Appends a new item if set
  * @param {HTMLUListElement} list - The list to sort
- * @param {HTMLLIElement} newItem - New item to append
+ * @param {HTMLLIElement} [newItem] - New item to append
  * @returns {DocumentFragment} Sorted list
  */
 function createSortedList(list, newItem) {
-  const fragment = document.createDocumentFragment();
+  const newList = elementCreator.createList({});
 
   if (newItem) { list.appendChild(newItem); }
 
@@ -43,21 +43,24 @@ function createSortedList(list, newItem) {
     return 0;
   });
 
-  array.forEach(item => fragment.appendChild(item));
+  array.forEach(item => newList.appendChild(item));
 
-  return fragment;
+  return newList;
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1 }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
-    this.element.classList.add('hide');
     this.shouldSort = shouldSort;
     this.showingList = showingList;
     this.minimumToShow = minimumToShow;
     this.toggleElement = elementCreator.createContainer({ });
+
+    if (!showTitle) {
+      this.element.classList.add('hide');
+    }
 
     if (title) {
       const titleElement = document.createElement('P');
@@ -92,10 +95,9 @@ class List extends View {
 
   addItem({ item }) {
     if (this.shouldSort) {
-      const fragment = createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item }));
+      const list = createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item }));
 
-      this.element.lastElementChild.innerHTML = '';
-      this.element.lastElementChild.appendChild(fragment);
+      this.element.replaceChild(list, this.element.lastElementChild);
     } else {
       this.element.lastElementChild.appendChild(elementCreator.createListItem({ element: item }));
     }
@@ -112,7 +114,7 @@ class List extends View {
   }
 
   replaceAllItems({ items }) {
-    const list = elementCreator.createList({ elements: items });
+    const list = this.shouldSort ? createSortedList(elementCreator.createList({ elements: items })) : elementCreator.createList({ elements: items });
 
     if (!this.showingList) {
       list.classList.add('hide');

@@ -210,7 +210,7 @@ class WorldMap extends View {
 
   replaceListItems(list, listToChange) {
     listToChange.replaceAllItems({
-      items: list.map((positionName) => this.createListButton(positionName, listToChange)),
+      items: list.map(positionName => this.createListButton(positionName, listToChange)),
     });
   }
 

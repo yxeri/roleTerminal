@@ -717,6 +717,9 @@ img {
   }
 
   div {
+    border-top: 1px solid;
+    margin-top: .5em;
+
     p:first-child {
       margin: .5em 0 0 0;
     }

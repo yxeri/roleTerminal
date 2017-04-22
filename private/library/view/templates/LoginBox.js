@@ -69,7 +69,7 @@ class LoginBox extends DialogBox {
               const text = [];
 
               if (data.requiresVerification) {
-                text.push('Your user has been registered, but you need to contact an administrator to get it verified');
+                text.push('Your user has been registered, but your account is not yet active. You need to contact an administrator to get your account verified!');
               } else {
                 text.push('Your user has been registered! You may now access O3C');
               }
@@ -109,7 +109,24 @@ class LoginBox extends DialogBox {
           }, ({ error, data }) => {
             if (error) {
               soundLibrary.playSound('fail');
-              this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
+
+              switch (error.type) {
+                case 'needs verification': {
+                  this.changeExtraDescription({ text: ['Your account may need to be verified. Please contact an administrator.', 'Unable to login'] });
+
+                  break;
+                }
+                case 'does not exist': {
+                  this.changeExtraDescription({ text: ['Incorrect user name and/or password'] });
+
+                  break;
+                }
+                default: {
+                  this.changeExtraDescription({ text: ['Something went wrong. Failed to log in'] });
+
+                  break;
+                }
+              }
 
               return;
             }

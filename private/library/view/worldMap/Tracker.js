@@ -16,6 +16,7 @@
 
 const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
+const storageManager = require('../../StorageManager');
 
 /**
  * Convert from geolocation position
@@ -94,6 +95,10 @@ class Tracker {
   }
 
   sendBestPosition() {
+    if (!storageManager.getUserName()) {
+      return;
+    }
+
     const position = this.getBestPosition();
 
     if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {

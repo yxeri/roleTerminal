@@ -55,9 +55,10 @@ class DocsViewer extends StandardView {
 
   showDoc(docFile) {
     const docFragment = document.createDocumentFragment();
-    docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.positionName}`, classes: ['positionName'] }));
+    docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.title}`, classes: ['title'] }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFile.docFileId.toUpperCase()}` }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFile.isPublic ? 'Yes' : 'No'}` }));
+    docFragment.appendChild(elementCreator.createParagraph({ text: '------' }));
 
     docFile.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
 
@@ -72,7 +73,7 @@ class DocsViewer extends StandardView {
   }
 
   createDocFileButton(docFile) {
-    const title = `${docFile.positionName || docFile.docFileId}`;
+    const title = `${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
       text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
@@ -88,6 +89,11 @@ class DocsViewer extends StandardView {
             console.log(docFileError);
 
             return;
+          } else if (!docFileData.docFile) {
+            const paragraph = elementCreator.createParagraph({ text: `${docFile.docFileId} - File not found` });
+
+            this.viewer.innerHTML = '';
+            this.viewer.appendChild(paragraph);
           }
 
           this.showDoc(docFileData.docFile);

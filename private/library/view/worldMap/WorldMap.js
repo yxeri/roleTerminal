@@ -154,7 +154,7 @@ class WorldMap extends View {
        * @param {Date} params.positions[].lastUpdated Last position change
        * @param {Date} params.currentTime Current time, sent from server
        */
-      func: function addPositionsToLists({ positions, currentTime }) => {
+      func: function addPositionsToLists({ positions, currentTime }) {
         const userName = storageManager.getUserName() || '';
 
         positions.forEach((position) => {

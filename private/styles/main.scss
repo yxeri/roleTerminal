@@ -23,11 +23,11 @@ $back-color: #11000f;
 $back-button: #1b0019;
 $back-input: #1b0019;
 $note-color: #cd02b7;
+$text-shadow-color: #ff02e5;
 $padding: .2em;
 $border: .2em;
 $outline: .1em;
 $font-size: 1em;
-$text-shadow-color: #ff02e5;
 $text-shadow: 1px 1px 3px $text-shadow-color;
 $view-width: 65em;
 $menu-width: 21em;
@@ -149,7 +149,7 @@ ul {
 
 li {
   p {
-    margin-left: .5em;
+    margin-left: .2em;
   }
 
   p:nth-child(2) {
@@ -286,6 +286,10 @@ img {
     textarea {
       margin-left: 0;
       margin-right: 0;
+    }
+
+    p {
+      margin-left: .2em;
     }
   }
 }
@@ -473,7 +477,7 @@ img {
 
     li {
       border-bottom: 1px solid $text-color;
-      padding: .5em 0 .5em .5em;
+      padding: .5em 0 .5em .2em;
     }
 
     p {

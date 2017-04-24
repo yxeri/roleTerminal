@@ -19,7 +19,7 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 
 class MapMarker {
-  constructor({ icon = {}, description = [], shouldCluster = false, team = '', owner = '', lastUpdated = new Date(), coordinates: { longitude, latitude }, markerType, positionName, map, worldMap }) {
+  constructor({ icon = {}, description = [], shouldCluster = false, team = '', owner = '', lastUpdated = new Date(), coordinates: { longitude, latitude, accuracy = 0 }, markerType, positionName, map, worldMap }) {
     this.marker = new google.maps.Marker({
       position: {
         lat: latitude,
@@ -33,6 +33,7 @@ class MapMarker {
         anchor: icon.anchor || new google.maps.Point(7, 7),
       },
     });
+    this.accuracy = accuracy;
     this.markerType = markerType;
     this.description = description;
     this.positionName = positionName;
@@ -98,6 +99,8 @@ class MapMarker {
   }
 
   setPosition({ coordinates, lastUpdated }) {
+    this.setMap(this.map);
+
     this.marker.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
     this.lastUpdated = lastUpdated || new Date();
   }

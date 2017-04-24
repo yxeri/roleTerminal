@@ -39,9 +39,7 @@ function convertPosition(position) {
 class Tracker {
   constructor() {
     this.latestPositions = [];
-  }
 
-  startTracker() {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.MYPOSITION,
@@ -49,31 +47,42 @@ class Tracker {
         this.latestPositions.push(position);
       },
     });
+  }
 
+  startTracker() {
     this.watchId = navigator.geolocation.watchPosition((position) => {
       if (position) {
         this.isTracking = true;
+
         eventCentral.triggerEvent({
           event: eventCentral.Events.MYPOSITION,
           params: { position: convertPosition(position) },
         });
-      } else {
-        this.isTracking = false;
       }
     }, (err) => {
-      this.isTracking = false;
       console.log(err);
     }, { enableHighAccuracy: true });
 
+    this.startSendTimeout();
+
     setTimeout(() => {
       navigator.geolocation.clearWatch(this.watchId);
-      this.sendBestPosition();
 
       setTimeout(() => {
         this.latestPositions = [];
         this.startTracker();
       }, 15000);
-    }, 15000);
+    }, 20000);
+  }
+
+  startSendTimeout() {
+    setTimeout(() => {
+      if (this.latestPositions.length > 0) {
+        this.sendBestPosition();
+      }
+
+      this.startSendTimeout();
+    }, 5000);
   }
 
   getBestPosition() {
@@ -102,7 +111,9 @@ class Tracker {
     const position = this.getBestPosition();
 
     if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
-      console.log('Requires position: { coordinates: { latitude, longitude, accuracy }} to send user position');
+      return;
+    } else if (position.coordinates.accuracy > 200) {
+      console.log('Position is not accurate enough. Accuracy:', position.coordinates.accuracy);
 
       return;
     }

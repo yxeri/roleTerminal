@@ -113,6 +113,14 @@ class List extends View {
     this.toggleView();
   }
 
+  removeItem({ name }) {
+    const newList = elementCreator.createList({
+      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => element.textContent.toLowerCase() !== name.toLowerCase()),
+    });
+
+    this.element.replaceChild(newList, this.element.lastElementChild);
+  }
+
   replaceAllItems({ items }) {
     const list = this.shouldSort ? createSortedList(elementCreator.createList({ elements: items })) : elementCreator.createList({ elements: items });
 

@@ -69,6 +69,7 @@ class WorldMap extends View {
     this.map = null;
     this.overlay = null;
     this.movingMarker = null;
+    this.maxUserAge = (20 * 60 * 1000);
     this.userList = new List({ title: 'Users', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.worldList = new List({ title: 'World', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.otherList = new List({ title: 'Others', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
@@ -117,8 +118,8 @@ class WorldMap extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: function retrievePositionsOnUserChange() {
-        this.retrievePositions(() => {
+      func: () => {
+        this.retrievePositions({ callback: () => {
           const world = [];
           const users = [];
           const others = Object.keys(this.markers).filter((positionName) => {
@@ -126,7 +127,7 @@ class WorldMap extends View {
               return true;
             }
 
-            if (this.markers[positionName].markerType === 'users') {
+            if (this.markers[positionName].markerType === 'user') {
               users.push(positionName);
             } else if (this.markers[positionName].markerType === 'world') {
               world.push(positionName);
@@ -138,7 +139,7 @@ class WorldMap extends View {
           this.replaceListItems(world, this.worldList);
           this.replaceListItems(users, this.userList);
           this.replaceListItems(others, this.otherList);
-        });
+        } });
       },
     });
     eventCentral.addWatcher({
@@ -154,7 +155,7 @@ class WorldMap extends View {
        * @param {Date} params.positions[].lastUpdated Last position change
        * @param {Date} params.currentTime Current time, sent from server
        */
-      func: function addPositionsToLists({ positions, currentTime }) {
+      func: ({ positions, currentTime }) => {
         const userName = storageManager.getUserName() || '';
 
         positions.forEach((position) => {
@@ -167,7 +168,12 @@ class WorldMap extends View {
               if (position.markerType && position.markerType === 'user') {
                 const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
 
-                this.markers[positionName].description = [`Team: ${position.team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+                // TODO Duplicate code
+                this.markers[positionName].description = [
+                  `Team: ${position.team || '-'}`,
+                  `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                  `Accuracy: ${position.coordinates.accuracy} meters`,
+                ];
               }
             } else {
               this.createMarker({ position, userName, currentTime });
@@ -197,6 +203,39 @@ class WorldMap extends View {
         });
       },
     });
+
+    this.startAgeChecker();
+  }
+
+  startAgeChecker() {
+    setTimeout(() => {
+      Object.keys(this.markers).forEach((positionName) => {
+        if (positionName !== 'You') {
+          const marker = this.markers[positionName];
+
+          switch (marker.markerType) {
+            case 'user': {
+              const currentTime = new Date();
+              const lastUpdated = new Date(marker.lastUpdated);
+
+              console.log(positionName, currentTime, lastUpdated, currentTime - lastUpdated, this.maxUserAge);
+
+              if (currentTime - lastUpdated > this.maxUserAge) {
+                marker.setMap(null);
+                this.userList.removeItem({ name: positionName });
+              }
+
+              break;
+            }
+            default: {
+              break;
+            }
+          }
+        }
+      });
+
+      this.startAgeChecker();
+    }, 60000);
   }
 
   resetClusterer(markers = []) {
@@ -643,7 +682,7 @@ class WorldMap extends View {
     this.map.setZoom(this.map.getZoom() - 1);
   }
 
-  retrievePositions(callback = () => {}) {
+  retrievePositions({ callback = () => {} }) {
     socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
       if (error || !data) {
         return;
@@ -723,7 +762,7 @@ class WorldMap extends View {
       this.markers.I.marker.setMap(this.map);
     }
 
-    this.retrievePositions();
+    this.retrievePositions({});
   }
 
   createPing({ position = {}, pingInfo = {} }) {
@@ -805,9 +844,14 @@ class WorldMap extends View {
         const date = new Date(lastUpdated);
         const currentDate = new Date(currentTime);
 
-        if (currentDate - date < (20 * 60 * 1000)) {
+        if (currentDate - date < this.maxUserAge) {
           const beautifiedDate = textTools.generateTimeStamp({ date });
-          const userDescription = [`Team: ${team || '-'}`, `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+          // TODO Duplicate code
+          const userDescription = [
+            `Team: ${team || '-'}`,
+            `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+            `Accuracy: ${coordinates.accuracy} meters`,
+          ];
 
           this.markers[positionName] = new MapMarker({
             lastUpdated: date,

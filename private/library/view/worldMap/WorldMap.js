@@ -117,7 +117,7 @@ class WorldMap extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: () => {
+      func: function retrievePositionsOnUserChange() {
         this.retrievePositions(() => {
           const world = [];
           const users = [];
@@ -144,7 +144,17 @@ class WorldMap extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.POSITIONS,
-      func: ({ positions, currentTime }) => {
+      /**
+       * Add positions to lists
+       * @param {Object[]} params.positions Positions
+       * @param {string} params.positions[].positionName Name of the position
+       * @param {Object} params.positions[].coordinates GPS coordinates
+       * @param {string} params.positions[].markerType Type of marker
+       * @param {string} params.positions[].team Team name
+       * @param {Date} params.positions[].lastUpdated Last position change
+       * @param {Date} params.currentTime Current time, sent from server
+       */
+      func: function addPositionsToLists({ positions, currentTime }) => {
         const userName = storageManager.getUserName() || '';
 
         positions.forEach((position) => {

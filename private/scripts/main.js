@@ -24,7 +24,6 @@ const WorldMap = require('../library/view/worldMap/WorldMap');
 const DocsViewer = require('../library/view/templates/DocsViewer');
 const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
-const Tracker = require('../library/view/worldMap/Tracker');
 const TextAnimation = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
@@ -40,11 +39,11 @@ const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
 const soundLibrary = require('../library/audio/SoundLibrary');
 const elementCreator = require('../library/ElementCreator');
+const tracker = require('../library/view/worldMap/Tracker');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
-const tracker = new Tracker();
 
 const boot = new TextAnimation({ removeTime: 3000 });
 boot.setQueue([

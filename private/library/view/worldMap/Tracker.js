@@ -38,6 +38,7 @@ function convertPosition(position) {
 
 class Tracker {
   constructor() {
+    this.latestBestPosition = {};
     this.latestPositions = [];
 
     eventCentral.addWatcher({
@@ -109,6 +110,7 @@ class Tracker {
     }
 
     const position = this.getBestPosition();
+    this.latestBestPosition = position;
 
     if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
       return;
@@ -126,4 +128,6 @@ class Tracker {
   }
 }
 
-module.exports = Tracker;
+const tracker = new Tracker();
+
+module.exports = tracker;

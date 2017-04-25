@@ -16,13 +16,14 @@
 
 const StandardView = require('../base/StandardView');
 const List = require('../base/List');
+const DialogBox = require('../DialogBox');
 const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
 const soundLibrary = require('../../audio/SoundLibrary');
-const DialogBox = require('../DialogBox');
+const tracker = require('../worldMap/Tracker');
 
 /**
  * Create a transaction list item
@@ -101,6 +102,7 @@ class Wallet extends StandardView {
                   to: userName,
                   amount: transDialog.inputs.find(({ inputName }) => inputName === 'amount').inputElement.value,
                   note: transDialog.inputs.find(({ inputName }) => inputName === 'note').inputElement.value,
+                  coordinates: tracker.latestBestPosition.coordinates,
                 };
 
                 socketManager.emitEvent('createTransaction', { transaction }, ({ error: createError, data }) => {

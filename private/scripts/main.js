@@ -726,7 +726,14 @@ socketManager.addEvents([
     func: (params) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
     },
-  }, {
-    },
   },
+  // {
+  //   event: 'roomFollower',
+  //   func: ({ userName, roomName, isFollowing }) => {
+  //
+  //   },
+  // }, {
+  //   event: 'ban',
+  //   func: () => {},
+  // },
 ]);

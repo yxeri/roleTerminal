@@ -402,7 +402,7 @@ home.addLink({
               coordinates: tracker.getBestPosition().coordinates,
               description: ['Panzerwolf raid'],
               markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-ping`,
+              positionName: `${storageManager.getUserName()}-panic-ping`,
               isPublic: true,
               isStatic: true,
             };
@@ -443,7 +443,7 @@ home.addLink({
               coordinates: tracker.getBestPosition().coordinates,
               description: ['Organica företagsfest'],
               markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-ping`,
+              positionName: `${storageManager.getUserName()}-panic-ping`,
               isPublic: true,
               isStatic: true,
             };
@@ -485,7 +485,7 @@ home.addLink({
               coordinates: tracker.getBestPosition().coordinates,
               description: [`${userName} under attack`],
               markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-ping`,
+              positionName: `${storageManager.getUserName()}-panic-team-ping`,
               isPublic: false,
               isStatic: true,
             };
@@ -727,9 +727,6 @@ socketManager.addEvents([
       eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
     },
   }, {
-    event: 'pingMap',
-    func: ({ position, pingInfo }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position, pingInfo } });
     },
   },
 ]);

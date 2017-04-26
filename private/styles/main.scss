@@ -299,6 +299,12 @@ img {
   overflow: hidden;
   background-color: $back-color;
 
+  canvas {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
   .mapMenu {
     border-left: $border solid $second-color;
     border-right: $border solid $second-color;
@@ -593,6 +599,7 @@ img {
   cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
 
 }

@@ -231,7 +231,7 @@ const profile = new Profile();
 const map = new WorldMap({
   mapView: WorldMap.MapViews.AREA,
   clusterStyle: {
-    gridSize: 24,
+    gridSize: 22,
     maxZoom: 17,
     zoomOnClick: false,
     singleSize: true,
@@ -398,12 +398,16 @@ home.addLink({
         elementCreator.createButton({
           text: 'Group of Panzerwolves',
           func: () => {
-            const position = tracker.getBestPosition();
-            const pingInfo = {
-              pingType: 'panzerwolves',
+            const position = {
+              coordinates: tracker.getBestPosition().coordinates,
+              description: ['Panzerwolf raid'],
+              markerType: 'ping',
+              positionName: `${storageManager.getUserName()}-ping`,
+              isPublic: true,
+              isStatic: true,
             };
 
-            socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
                 console.log(error);
                 panicBox.removeView();
@@ -428,19 +432,23 @@ home.addLink({
                 ],
               });
 
-              eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
             });
           },
         }),
         elementCreator.createButton({
           text: 'Organica re-education team',
           func: () => {
-            const position = tracker.getBestPosition();
-            const pingInfo = {
-              pingType: 'organica',
+            const position = {
+              coordinates: tracker.getBestPosition().coordinates,
+              description: ['Organica företagsfest'],
+              markerType: 'ping',
+              positionName: `${storageManager.getUserName()}-ping`,
+              isPublic: true,
+              isStatic: true,
             };
 
-            socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
                 console.log(error);
                 panicBox.removeView();
@@ -465,21 +473,27 @@ home.addLink({
                 ],
               });
 
-              eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
             });
           },
         }),
         elementCreator.createButton({
           text: 'Mugger with a gun and/or knife',
           func: () => {
-            const position = tracker.getBestPosition();
-            const pingInfo = {
-              pingType: 'team',
+            const userName = storageManager.getUserName();
+            const position = {
+              coordinates: tracker.getBestPosition().coordinates,
+              description: [`${userName} under attack`],
+              markerType: 'ping',
+              positionName: `${storageManager.getUserName()}-ping`,
+              isPublic: false,
+              isStatic: true,
             };
+
             const team = storageManager.getTeam();
 
             if (team) {
-              socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+              socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
                 if (error) {
                   console.log(error);
                   panicBox.removeView();
@@ -504,7 +518,7 @@ home.addLink({
                   ],
                 });
 
-                eventCentral.triggerEvent({ event: eventCentral.Events.PINGMAP, params: { position: data.position, pingInfo: data.pingInfo } });
+                eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
               });
             } else {
               panicBox.changeDescription({

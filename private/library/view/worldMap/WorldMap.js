@@ -113,13 +113,6 @@ class WorldMap extends View {
     });
     eventCentral.addWatcher({
       watcherParent: this,
-      event: eventCentral.Events.PINGMAP,
-      func: ({ position, pingInfo }) => {
-        this.createPing({ position, pingInfo });
-      },
-    });
-    eventCentral.addWatcher({
-      watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
         this.retrievePositions({ callback: () => {
@@ -165,7 +158,21 @@ class WorldMap extends View {
           const positionName = position.positionName;
 
           if (positionName) {
-            if (this.markers[positionName]) {
+            if (position.markerType === 'ping') {
+              const pingObj = this.pings[positionName];
+
+              if (pingObj) {
+                const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
+
+                pingObj.ping.setCenter(latLng);
+                pingObj.label.setText({ text: position.description[0] });
+                pingObj.label.setPosition({ coordinates: position.coordinates });
+                pingObj.ping.setMap(this.map);
+                pingObj.label.setMap(this.map);
+              } else {
+                this.createPing({ position });
+              }
+            } else if (this.markers[positionName]) {
               this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
 
               if (position.markerType && position.markerType === 'user') {
@@ -215,38 +222,37 @@ class WorldMap extends View {
       Object.keys(this.pings).forEach((pingName) => {
         const pingObj = this.pings[pingName];
         const currentTime = new Date();
+        const lastUpdated = new Date(pingObj.createdAt);
 
-        if (currentTime - pingObj.createdAt > this.maxPingAge) {
+        if (currentTime - lastUpdated > this.maxPingAge) {
           pingObj.ping.setMap(null);
           pingObj.label.setMap(null);
         }
       });
 
       Object.keys(this.markers).forEach((positionName) => {
-        if (positionName !== 'You') {
-          const marker = this.markers[positionName];
+        const marker = this.markers[positionName];
 
-          switch (marker.markerType) {
-            case 'user': {
-              const currentTime = new Date();
-              const lastUpdated = new Date(marker.lastUpdated);
+        switch (marker.markerType) {
+          case 'user': {
+            const currentTime = new Date();
+            const lastUpdated = new Date(marker.lastUpdated);
 
-              if (currentTime - lastUpdated > this.maxUserAge) {
-                marker.setMap(null);
-                this.userList.removeItem({ name: positionName });
-              }
-
-              break;
+            if (currentTime - lastUpdated > this.maxUserAge) {
+              marker.setMap(null);
+              this.userList.removeItem({ name: positionName });
             }
-            default: {
-              break;
-            }
+
+            break;
+          }
+          default: {
+            break;
           }
         }
       });
 
       this.startAgeChecker();
-    }, 60000);
+    }, 30000);
   }
 
   resetClusterer(markers = []) {
@@ -349,30 +355,14 @@ class WorldMap extends View {
                       markerType: 'custom',
                     };
 
-                    socketManager.emitEvent('updatePosition', { position }, ({ error }) => {
+                    socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
                       if (error) {
                         console.log(error);
 
                         return;
                       }
 
-                      this.markers[position.positionName] = new MapMarker({
-                        positionName: position.positionName,
-                        description: position.description,
-                        markerType: 'custom',
-                        icon: {
-                          url: 'images/mapiconcreated.png',
-                        },
-                        coordinates: {
-                          longitude: event.latLng.lng(),
-                          latitude: event.latLng.lat(),
-                        },
-                        worldMap: this,
-                        map: this.map,
-                        owner: storageManager.getUserName(),
-                        team: storageManager.getTeam(),
-                      });
-                      this.clusterer.addMarker(this.markers[position.positionName].marker);
+                      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
                       markerDialog.removeView();
                     });
                   },
@@ -397,23 +387,26 @@ class WorldMap extends View {
         elementCreator.createButton({
           text: 'Ping',
           func: () => {
+            const userName = storageManager.getUserName();
             const position = {
               coordinates: {
                 longitude: event.latLng.lng(),
                 latitude: event.latLng.lat(),
+                accuracy: 0,
               },
-            };
-            const pingInfo = {
-              pingType: 'notification',
-              userName: storageManager.getUserName(),
+              markerType: 'ping',
+              positionName: `${userName}-ping`,
+              isPublic: true,
+              isStatic: true,
+              description: ['Unknown activity'],
             };
 
-            socketManager.emitEvent('pingMap', { position, pingInfo }, ({ error, data }) => {
+            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
                 return;
               }
 
-              this.createPing({ position: data.position, pingInfo: data.pingInfo });
+              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
             });
             this.hideMapClickMenu();
           },
@@ -470,6 +463,7 @@ class WorldMap extends View {
     if (this.markers.I) {
       this.markers.I.setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
       this.markers.I.description = [`Last updated: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+      this.markers.I.setMap(this.map);
     } else {
       this.createThisUserMarker({ position });
     }
@@ -506,17 +500,6 @@ class WorldMap extends View {
 
       this.map.fitBounds(bounds);
       centerPos = bounds.getCenter();
-    } else if (this.mapView === MapViews.CLUSTER) {
-      if (this.markers) {
-        for (let i = 0; i < this.markers.length; i += 1) {
-          const marker = this.markers[i];
-
-          bounds.extend(marker.getPosition());
-        }
-
-        this.map.fitBounds(bounds);
-        centerPos = bounds.getCenter();
-      }
     } else if (this.mapView === MapViews.AREA) {
       bounds.extend(new google.maps.LatLng(this.cornerCoordinates.cornerOne.latitude, this.cornerCoordinates.cornerOne.longitude));
       bounds.extend(new google.maps.LatLng(this.cornerCoordinates.cornerTwo.latitude, this.cornerCoordinates.cornerTwo.longitude));
@@ -553,16 +536,14 @@ class WorldMap extends View {
 
       soundLibrary.playSound('button2');
 
-      for (let i = 0; i < markers.length; i += 1) {
-        bounds.extend(markers[i].getPosition());
-      }
+      markers.forEach(marker => bounds.extend(marker.getPosition()));
 
-      this.setMapView(MapViews.CLUSTER);
-      this.realignMap();
+      this.realignMap(markers);
     });
 
     google.maps.event.addListener(this.map, 'dragstart', () => {
       longClick = false;
+
       this.hideMarkerInfo();
       this.hideMapClickMenu();
       this.hideMarkerClicKMenu();
@@ -579,6 +560,7 @@ class WorldMap extends View {
     });
     google.maps.event.addListener(this.map, 'mousedown', (event) => {
       longClick = true;
+
       this.hideMarkerInfo();
       this.hideMapClickMenu();
       this.hideMarkerClicKMenu();
@@ -698,7 +680,7 @@ class WorldMap extends View {
   }
 
   retrievePositions({ callback = () => {} }) {
-    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user'] }, ({ error, data }) => {
+    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user', 'ping'] }, ({ error, data }) => {
       if (error || !data) {
         return;
       }
@@ -707,7 +689,11 @@ class WorldMap extends View {
       const userName = storageManager.getUserName() || '';
 
       positions.forEach((position) => {
-        this.createMarker({ position, userName, currentTime });
+        if (position.markerType === 'ping') {
+          this.createPing({ position });
+        } else {
+          this.createMarker({ position, userName, currentTime });
+        }
       });
 
       if (this.map) {
@@ -777,54 +763,35 @@ class WorldMap extends View {
       this.markers.I.marker.setMap(this.map);
     }
 
-    Object.keys(this.pings).forEach((pingName) => {
-      const pingObj = this.pings[pingName];
-      const currentTime = new Date();
-
-      if (currentTime - pingObj.createdAt < this.maxPingAge) {
-        pingObj.ping.setMap(this.map);
-        pingObj.label.setMap(this.map);
-      }
-    });
-
     this.retrievePositions({});
   }
 
-  createPing({ position = {}, pingInfo = {} }) {
-    const pingName = `${pingInfo.userName}-ping`;
-    const ping = new google.maps.Circle({
-      center: new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude),
-      strokeColor: '#00ffcc',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#ff02e5',
-      fillOpacity: 0.35,
-      radius: 100,
-    });
-    const labelText = (() => {
-      switch (pingInfo.pingType) {
-        case 'organica': {
-          return 'Organica företagsfest';
-        }
-        case 'panzerwolves': {
-          return 'Panzerwolf raid';
-        }
-        default: {
-          return 'Unknown activity';
-        }
+  createPing({ position = {} }) {
+    const currentTime = new Date();
+    const lastUpdated = new Date(position.lastUpdated);
+
+    if (currentTime - lastUpdated < this.maxPingAge) {
+      const ping = new google.maps.Circle({
+        center: new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude),
+        strokeColor: '#00ffcc',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#ff02e5',
+        fillOpacity: 0.35,
+        radius: 120,
+      });
+      const label = new Label({
+        positionName: position.positionName,
+        coordinates: position.coordinates,
+        labelText: position.description[0],
+      });
+
+      this.pings[position.positionName] = { ping, label, createdAt: position.lastUpdated };
+
+      if (this.map) {
+        ping.setMap(this.map);
+        label.setMap(this.map);
       }
-    })();
-    const label = new Label({
-      positionName: pingName,
-      coordinates: position.coordinates,
-      labelText,
-    });
-
-    this.pings[pingName] = { ping, label, createdAt: new Date() };
-
-    if (this.map) {
-      ping.setMap(this.map);
-      label.setMap(this.map);
     }
   }
 

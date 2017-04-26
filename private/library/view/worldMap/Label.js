@@ -60,7 +60,11 @@ class Label {
   }
 
   setPosition({ coordinates }) {
-    this.mapLabel.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
+    this.mapLabel.set('position', new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
+  }
+
+  setText({ text }) {
+    this.mapLabel.set('text', text);
   }
 }
 

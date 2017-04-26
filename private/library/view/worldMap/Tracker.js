@@ -114,9 +114,7 @@ class Tracker {
 
     if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
       return;
-    } else if (position.coordinates.accuracy > 200) {
-      console.log('Position is not accurate enough. Accuracy:', position.coordinates.accuracy);
-
+    } else if (position.coordinates.accuracy > 240) {
       return;
     }
 

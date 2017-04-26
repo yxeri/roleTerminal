@@ -44,17 +44,21 @@ class KeyHandler {
     this.keys = [];
     this.keyPressed = false;
     this.triggerKeyPressed = false;
-    this.triggerKey = 18; // Alt
-    this.sound = null;
     this.paused = false;
+    this.triggerKey = 16; // Alt
+    this.ignoredKeys = {};
 
     window.addEventListener('keydown', (event) => {
-      if (this.paused) {
+      const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+
+      if (this.pause || this.ignoredKeys[sentKeyCode]) {
+        event.preventDefault();
+        event.stopPropagation();
+
         return;
       }
 
-      const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
-
+      // Will not play sound if shift is pressed (16)
       if (!this.triggerKeyPressed && sentKeyCode !== 16 && sentKeyCode !== this.triggerKey) {
         soundLibrary.playSound('keyInput');
       }
@@ -88,10 +92,6 @@ class KeyHandler {
     });
   }
 
-  setSoundOnType(sound) {
-    this.sound = sound;
-  }
-
   addKey(key, func, triggerless) {
     const storedKey = this.keys.find(({ keyCode }) => key === keyCode);
 
@@ -117,6 +117,14 @@ class KeyHandler {
 
   unpause() {
     this.paused = false;
+  }
+
+  setTriggerKey(keyCode) {
+    this.triggerKey = keyCode;
+  }
+
+  addIgnoredKey(keyCode) {
+    this.ignoredKeys[keyCode] = keyCode;
   }
 }
 

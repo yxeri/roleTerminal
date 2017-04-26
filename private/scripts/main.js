@@ -177,6 +177,14 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
+window.addEventListener('beforeunload', (event) => {
+  const string = 'Quitting';
+
+  event.returnValue = string;
+
+  return string;
+});
+
 const terminal = new Terminal();
 terminal.addCommand({
   commandName: 'calibrationAdjustment',
@@ -308,6 +316,12 @@ mainView.addEventListener('contextmenu', (event) => {
 top.addEventListener('click', () => {
   home.appendTo(mainView);
 });
+
+keyHandler.setTriggerKey(18); // Alt
+keyHandler.addIgnoredKey(17); // Ctrl
+keyHandler.addIgnoredKey(27); // Esc
+keyHandler.addIgnoredKey(91); // Win/Cmd
+keyHandler.addIgnoredKey(93); // Win/Cmd
 keyHandler.addKey(32, () => { home.appendTo(mainView); });
 
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {

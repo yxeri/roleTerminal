@@ -22,6 +22,7 @@ const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const soundLibrary = require('../../audio/SoundLibrary');
+const textTools = require('../../TextTools');
 
 // TODO Duplicate code in DialogBox
 /**
@@ -173,7 +174,7 @@ class DocsViewer extends StandardView {
 
         const docFragment = document.createDocumentFragment();
         const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
-        const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with', inputName: 'docId', isRequired: true });
+        const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true });
         const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
         const visibilitySet = elementCreator.createRadioSet({
           title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
@@ -210,6 +211,14 @@ class DocsViewer extends StandardView {
           text: 'Save',
           func: () => {
             if (!markEmptyFields([titleInput, bodyInput, idInput])) {
+              if (!textTools.isInternationalAllowed(idInput.value)) {
+                idInput.classList.add('markedInput');
+                idInput.setAttribute('placeholder', 'Has to be alphanumerical (a-z, 0-9)');
+                idInput.value = '';
+
+                return;
+              }
+
               const docFile = {
                 title: titleInput.value,
                 docFileId: idInput.value,

@@ -38,7 +38,8 @@ const specials = '/\\!;:#&*';
  * @type {string}
  */
 const binary = '01';
-const allowedRegex = /^[\w\d\såäöÅÄÖ\-]+$/g;
+const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/g;
+const internationalRegex = /^[\w\d]+$/g;
 
 class TextTools {
   /**
@@ -272,6 +273,10 @@ class TextTools {
    * @returns {string} - String copy
    */
   static copyString(string) { return string && string !== null ? JSON.parse(JSON.stringify(string)) : ''; }
+
+  static isInternationalAllowed(text) {
+    return internationalRegex.test(text);
+  }
 }
 
 

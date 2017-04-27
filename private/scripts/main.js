@@ -177,15 +177,8 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
-window.addEventListener('beforeunload', (event) => {
-  const string = 'Quitting';
-
-  event.returnValue = string;
-
-  return string;
-});
-
 const terminal = new Terminal();
+
 terminal.addCommand({
   commandName: 'calibrationAdjustment',
   accessLevel: 1,

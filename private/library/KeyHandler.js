@@ -51,7 +51,7 @@ class KeyHandler {
     window.addEventListener('keydown', (event) => {
       const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
 
-      if (this.pause || this.ignoredKeys[sentKeyCode]) {
+      if (this.paused || this.ignoredKeys[sentKeyCode]) {
         event.preventDefault();
         event.stopPropagation();
 

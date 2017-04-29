@@ -75,6 +75,10 @@ class DialogBox extends View {
     inputs.forEach((input) => {
       const inputElement = elementCreator.createInput(input);
 
+      if (input.maxLength) {
+        inputElement.setAttribute('maxlength', input.maxLength);
+      }
+
       if (inputElement.type === 'textarea') {
         inputElement.addEventListener('input', () => {
           inputElement.style.height = 'auto';

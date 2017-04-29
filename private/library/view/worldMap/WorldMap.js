@@ -75,16 +75,21 @@ class WorldMap extends View {
     this.maxPingAge = maxPingAge;
     this.userList = new List({ title: 'Users', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.worldList = new List({ title: 'World', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.teamList = new List({ title: 'Team', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 1 });
     this.otherList = new List({ title: 'Others', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
 
+    // TODO Ugly and duplicated
     this.userList.element.addEventListener('click', () => {
-      [this.worldList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.worldList, this.otherList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
     this.worldList.element.addEventListener('click', () => {
-      [this.userList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.userList, this.otherList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
     this.otherList.element.addEventListener('click', () => {
-      [this.userList, this.worldList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.userList, this.worldList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+    });
+    this.teamList.element.addEventListener('click', () => {
+      [this.userList, this.worldList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
 
     const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['mapMenu'] });
@@ -100,6 +105,7 @@ class WorldMap extends View {
 
     mapMenu.appendChild(this.worldList.element);
     mapMenu.appendChild(this.userList.element);
+    mapMenu.appendChild(this.teamList.element);
     mapMenu.appendChild(this.otherList.element);
     mapMenu.appendChild(meButton);
     this.element.appendChild(mapMenu);
@@ -116,16 +122,24 @@ class WorldMap extends View {
       event: eventCentral.Events.USER,
       func: () => {
         this.retrievePositions({ callback: () => {
+          const team = storageManager.getTeam();
           const world = [];
+          const teamUsers = [];
           const users = [];
           const others = Object.keys(this.markers).filter((positionName) => {
-            if (this.markers[positionName].markerType === 'custom') {
+            const marker = this.markers[positionName];
+
+            if (marker.markerType === 'custom') {
               return true;
             }
 
-            if (this.markers[positionName].markerType === 'user') {
-              users.push(positionName);
-            } else if (this.markers[positionName].markerType === 'world') {
+            if (marker.markerType === 'user') {
+              if (team && marker.team && team === marker.team) {
+                teamUsers.push(positionName);
+              } else {
+                users.push(positionName);
+              }
+            } else if (marker.markerType === 'world') {
               world.push(positionName);
             }
 
@@ -134,6 +148,7 @@ class WorldMap extends View {
 
           this.replaceListItems(world, this.worldList);
           this.replaceListItems(users, this.userList);
+          this.replaceListItems(teamUsers, this.teamList);
           this.replaceListItems(others, this.otherList);
         } });
       },
@@ -268,8 +283,15 @@ class WorldMap extends View {
     return elementCreator.createButton({
       text: positionName,
       func: () => {
-        this.realignMap([this.markers[positionName]]);
+        const marker = this.markers[positionName];
+
+        this.realignMap([marker]);
         parentList.toggleList();
+        marker.showDescription();
+
+        if (marker.markerType === 'user' || marker.markerType === 'you') {
+          marker.showAccuracy();
+        }
       },
     });
   }
@@ -387,27 +409,54 @@ class WorldMap extends View {
         elementCreator.createButton({
           text: 'Ping',
           func: () => {
-            const userName = storageManager.getUserName();
-            const position = {
-              coordinates: {
-                longitude: event.latLng.lng(),
-                latitude: event.latLng.lat(),
-                accuracy: 0,
+            const pingDialog = new DialogBox({
+              buttons: {
+                left: {
+                  text: 'Cancel',
+                  eventFunc: () => {
+                    pingDialog.removeView();
+                  },
+                },
+                right: {
+                  text: 'Ping',
+                  eventFunc: () => {
+                    const pingText = pingDialog.inputs.find(({ inputName }) => inputName === 'pingText').inputElement.value;
+
+                    const userName = storageManager.getUserName();
+                    const position = {
+                      coordinates: {
+                        longitude: event.latLng.lng(),
+                        latitude: event.latLng.lat(),
+                        accuracy: 0,
+                      },
+                      markerType: 'ping',
+                      positionName: `${userName}-ping`,
+                      isPublic: true,
+                      isStatic: true,
+                      description: [`${pingText.charAt(0).toUpperCase()}${pingText.slice(1)}`] || ['Unknown activity'],
+                    };
+
+                    socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+                      if (error) {
+                        return;
+                      }
+
+                      pingDialog.removeView();
+                      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+                    });
+                  },
+                },
               },
-              markerType: 'ping',
-              positionName: `${userName}-ping`,
-              isPublic: true,
-              isStatic: true,
-              description: ['Unknown activity'],
-            };
-
-            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-              if (error) {
-                return;
-              }
-
-              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+              inputs: [{
+                placeholder: 'Ping message. Optional',
+                inputName: 'pingText',
+                maxLength: 20,
+              }],
+              description: ['Send a map ping'],
+              extraDescription: ['Input the message that will be shown with the ping. Default message is "Unknown activity"'],
             });
+
+            pingDialog.appendTo(this.element.parentElement);
             this.hideMapClickMenu();
           },
         }),

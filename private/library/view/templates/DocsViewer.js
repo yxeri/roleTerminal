@@ -288,6 +288,8 @@ class DocsViewer extends StandardView {
       func: ({ changedUser }) => {
         if (changedUser) {
           this.viewer.innerHTML = '';
+          userDocs.replaceAllItems({ items: [] });
+          teamDocs.replaceAllItems({ items: [] });
         }
 
         socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {

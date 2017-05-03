@@ -73,10 +73,10 @@ class WorldMap extends View {
     this.movingMarker = null;
     this.maxUserAge = maxUserAge;
     this.maxPingAge = maxPingAge;
-    this.userList = new List({ title: 'Users', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
-    this.worldList = new List({ title: 'World', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
-    this.teamList = new List({ title: 'Team', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 1 });
-    this.otherList = new List({ title: 'Others', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.userList = new List({ title: 'USERS', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.worldList = new List({ title: 'WORLD', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.teamList = new List({ title: 'TEAM', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 1 });
+    this.otherList = new List({ title: 'OTHERS', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
 
     // TODO Ugly and duplicated
     this.userList.element.addEventListener('click', () => {
@@ -94,7 +94,7 @@ class WorldMap extends View {
 
     const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['mapMenu'] });
     const meButton = elementCreator.createSpan({
-      text: 'Me',
+      text: 'ME',
       classes: ['clickable'],
       func: () => {
         if (this.markers.I) {

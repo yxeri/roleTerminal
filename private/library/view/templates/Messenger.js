@@ -122,6 +122,7 @@ class Messenger extends StandardView {
     this.element.setAttribute('id', 'messenger');
     this.inputField = document.createElement('TEXTAREA');
     this.inputField.setAttribute('rows', '3');
+    this.inputField.setAttribute('placeholder', 'Input message. alt+enter to send');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
     this.selectedAliasItem = null;
@@ -291,19 +292,19 @@ class Messenger extends StandardView {
       minimumToShow: 2,
     });
     const followList = new List({
-      title: 'Following',
+      title: 'FOLLOWING',
       shouldSort: false,
     });
     const roomsList = new List({
-      title: 'Public',
+      title: 'PUBLIC',
       shouldSort: true,
     });
     const userList = new List({
-      title: 'Users',
+      title: 'USERS',
       shouldSort: true,
     });
     const privateList = new List({
-      title: 'Private',
+      title: 'PRIVATE',
       shouldSort: true,
     });
 
@@ -353,6 +354,7 @@ class Messenger extends StandardView {
             placeholder: 'Alias',
             inputName: 'alias',
             isRequired: true,
+            maxLength: 10,
           }],
           description: [
             textTools.createMixedString(60, false, true),
@@ -419,6 +421,7 @@ class Messenger extends StandardView {
             placeholder: 'Name of the room',
             inputName: 'roomName',
             isRequired: true,
+            maxLength: 10,
           }, {
             placeholder: 'Optional passowrd',
             inputName: 'password',
@@ -748,9 +751,17 @@ class Messenger extends StandardView {
   }
 
   createRoomButton({ roomName, whisperTo }) {
+    let buttonText = roomName;
+
+    if (whisperTo) {
+      buttonText = whisperTo;
+    } else if (/-team$/g.test(roomName)) {
+      buttonText = 'team';
+    }
+
     const button = elementCreator.createButton({
       data: roomName,
-      text: whisperTo ? `${whisperTo}` : roomName,
+      text: buttonText,
       func: () => {
         if (this.selectedItem) {
           this.selectedItem.classList.remove('selectedItem');
@@ -781,7 +792,7 @@ class Messenger extends StandardView {
                     }, ({ error: followError }) => {
                       if (followError) {
                         console.log(followError);
-                        followDialog.changeExtraDescription({ text: ['Incorrect password'] });
+                        followDialog.changeExtraDescription({ text: ['Failed to join the room'] });
 
                         return;
                       }

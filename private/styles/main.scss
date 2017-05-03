@@ -161,12 +161,12 @@ li {
     box-shadow: $bottom-box-shadow;
     margin: .8em 0 .5em 0;
 
-    span {
-      margin-left: .5em;
+    > span {
+      display: block;
     }
 
-    span:first-child {
-      margin: 0;
+    span {
+      margin-right: .5em;
     }
 
     button {
@@ -682,7 +682,7 @@ img {
 
 .dialogBox {
   @include borderOutline;
-  padding: $padding;
+  padding: .3em;
   max-width: 20em;
   word-wrap: break-word;
   z-index: 10;

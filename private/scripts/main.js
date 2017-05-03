@@ -21,7 +21,7 @@ const Messenger = require('../library/view/templates/Messenger');
 const Time = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const WorldMap = require('../library/view/worldMap/WorldMap');
-const DocsViewer = require('../library/view/templates/DocsViewer');
+const DirViewer = require('../library/view/templates/DirViewer');
 const Home = require('../library/view/templates/Home');
 const SoundElement = require('../library/audio/SoundElement');
 const TextAnimation = require('../library/view/templates/TextAnimation');
@@ -29,6 +29,8 @@ const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
 const Terminal = require('../library/view/templates/Terminal');
 const ButtonBox = require('../library/view/templates/ButtonBox');
+const TeamViewer = require('../library/view/templates/TeamViewer');
+const Tracker = require('../library/view/worldMap/Tracker');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -39,7 +41,6 @@ const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
 const soundLibrary = require('../library/audio/SoundLibrary');
 const elementCreator = require('../library/ElementCreator');
-const tracker = require('../library/view/worldMap/Tracker');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
@@ -91,10 +92,24 @@ boot.setQueue([
     params: {
       corruption: false,
       array: [
+        'Connecting to HQ...',
+        '...',
+        '...',
+        'Failed to connect to HQ',
+        'Rerouting...',
+      ],
+    },
+  },
+  {
+    func: boot.printLines,
+    params: {
+      corruption: false,
+      array: [
+        'Connected!',
         'Welcome to the Oracle, employee UNDEFINED.',
         'May you have a productive day!',
         '',
-        'Establishing uplink to relays',
+        'Establishing uplink to relays...',
       ],
     },
   },
@@ -104,8 +119,8 @@ boot.setQueue([
     params: {
       corruption: false,
       array: [
-        'Uplink established',
-        'Booting OOC 5.0',
+        'Uplink established!',
+        'Booting OOC 5.0...',
       ],
     },
   },
@@ -139,7 +154,7 @@ boot.setQueue([
     params: {
       corruption: false,
       array: [
-        'Organica approved device detected',
+        'Organica approved device detected!',
         'Rewriting firmware...',
         'Overriding lock...',
       ],
@@ -149,11 +164,9 @@ boot.setQueue([
   {
     func: boot.printLines,
     params: {
-      corruption: true,
-      corruptionAmount: 0.4,
+      corruption: false,
       array: [
         'Loading',
-        '...',
         '...',
         '...',
         '...',
@@ -164,7 +177,6 @@ boot.setQueue([
 ]);
 boot.appendTo(mainView);
 
-tracker.startTracker();
 soundLibrary.toggleSounds();
 
 if (storageManager.getDeviceId() === null) {
@@ -223,10 +235,41 @@ terminal.addCommand({
     });
   },
 });
+terminal.addCommand({
+  commandName: 'hackLantern',
+  accessLevel: 1,
+  startFunc: () => {
+    terminal.queueMessage({
+      message: {
+        text: [
+          'Razor proudly presents:',
+          'LANTERN Signal Manipulator (LSM)',
+          'Please wait ...',
+          'Intercepting command ...',
+          'Disabling Oracle defense ...',
+          'Overriding locks ...',
+          'Connecting to database ...',
+          'Welcome.',
+          'We will retrieve two memory dumps for you. Within these dumps you will find one to many passwords',
+          'You must find the true password within the dumps and use it together with a user name to get access to the LANTERN',
+          'The true password is repeated in both memory dumps',
+          'Our operatives have also gathered information about the users to help',
+          'You will be shown users with access to your chosen LANTERN',
+          'Each user will have information about its password attached to it, helping you figure out the true password',
+          'You will have to use this information to filter out the true password in the memory dumps',
+          'Finding the correct user name and password will give you access to a LANTERN',
+          'We take no responsibility for deaths due to accidental activitation of defense systems',
+        ],
+      },
+    });
+
+    socketManager.emitEvent();
+  },
+});
 
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
-const docsViewer = new DocsViewer({ isFullscreen: true });
+const dirViewer = new DirViewer({ isFullscreen: true });
 const wallet = new Wallet();
 const profile = new Profile();
 const map = new WorldMap({
@@ -294,6 +337,8 @@ const map = new WorldMap({
   },
   mapBackground: '#11000f',
 });
+const teamViewer = new TeamViewer({ worldMap: map });
+const tracker = new Tracker();
 
 soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
 soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button', volume: 0.7 }));
@@ -598,9 +643,9 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'docs',
-  startFunc: () => { docsViewer.appendTo(mainView); },
-  endFunc: () => { docsViewer.removeView(); },
+  linkName: 'dir',
+  startFunc: () => { dirViewer.appendTo(mainView); },
+  endFunc: () => { dirViewer.removeView(); },
   shortcut: true,
 });
 home.addLink({
@@ -615,6 +660,14 @@ home.addLink({
   linkName: 'terminal',
   startFunc: () => { terminal.appendTo(mainView); },
   endFunc: () => { terminal.removeView(); },
+  accessLevel: 1,
+  classes: ['hide'],
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'team',
+  startFunc: () => { teamViewer.appendTo(mainView); },
+  endFunc: () => { teamViewer.removeView(); },
   accessLevel: 1,
   classes: ['hide'],
   shortcut: true,
@@ -687,6 +740,7 @@ socketManager.addEvents([
         } else {
           storageManager.setAccessLevel(data.user.accessLevel);
           storageManager.setAliases(data.user.aliases);
+          storageManager.setTeam(data.user.team);
         }
 
         eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });
@@ -732,6 +786,16 @@ socketManager.addEvents([
     event: 'terminal',
     func: (params) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
+    },
+  }, {
+    event: 'follow',
+    func: ({ room }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room } });
+    },
+  }, {
+    event: 'unfollow',
+    func: ({ room }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room } });
     },
   },
   // {

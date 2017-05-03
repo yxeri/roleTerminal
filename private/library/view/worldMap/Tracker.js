@@ -48,6 +48,8 @@ class Tracker {
         this.latestPositions.push(position);
       },
     });
+
+    this.startTracker();
   }
 
   startTracker() {
@@ -126,6 +128,4 @@ class Tracker {
   }
 }
 
-const tracker = new Tracker();
-
-module.exports = tracker;
+module.exports = Tracker;

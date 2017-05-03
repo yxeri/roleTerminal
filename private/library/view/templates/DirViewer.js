@@ -47,7 +47,7 @@ class DocsViewer extends StandardView {
   constructor({ isFullscreen }) {
     super({ isFullscreen });
 
-    this.element.setAttribute('id', 'docsViewer');
+    this.element.setAttribute('id', 'dirViewer');
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
 
@@ -85,20 +85,66 @@ class DocsViewer extends StandardView {
         this.selectedItem = button.parentElement;
         this.selectedItem.classList.add('selectedItem');
 
-        socketManager.emitEvent('getDocFile', { docFileId: docFile.docFileId }, ({ docFileError, data: docFileData }) => {
-          if (docFileError) {
-            console.log(docFileError);
+        if (docFile.docFileId) {
+          socketManager.emitEvent('getDocFile', { docFileId: docFile.docFileId }, ({ docFileError, data: docFileData }) => {
+            if (docFileError) {
+              console.log(docFileError);
 
-            return;
-          } else if (!docFileData.docFile) {
-            const paragraph = elementCreator.createParagraph({ text: `${docFile.docFileId} - File not found` });
+              return;
+            } else if (!docFileData.docFile) {
+              const paragraph = elementCreator.createParagraph({ text: `${docFile.docFileId} - File not found` });
 
-            this.viewer.innerHTML = '';
-            this.viewer.appendChild(paragraph);
-          }
+              this.viewer.innerHTML = '';
+              this.viewer.appendChild(paragraph);
+            }
 
-          this.showDoc(docFileData.docFile);
-        });
+            this.showDoc(docFileData.docFile);
+          });
+        } else {
+          const deniedDialog = new DialogBox({
+            buttons: {
+              left: {
+                text: 'Crack',
+                eventFunc: () => {},
+              },
+              right: {
+                text: 'Unlock',
+                eventFunc: () => {
+                  if (deniedDialog.markEmptyFields()) {
+                    soundLibrary.playSound('fail');
+                    deniedDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                    return;
+                  }
+
+                  const docFileId = deniedDialog.inputs.find(({ inputName }) => inputName === 'docFileId').inputElement.value;
+
+                  socketManager.emitEvent('getDocFile', { docFileId }, ({ docFileError, data: docFileData }) => {
+                    if (docFileError) {
+                      console.log(docFileError);
+
+                      return;
+                    } else if (!docFileData.docFile) {
+                      deniedDialog.changeExtraDescription({ text: ['Incorrect code', 'Access denied'] });
+                    }
+
+                    deniedDialog.removeView();
+                    this.showDoc(docFileData.docFile);
+                  });
+                },
+              },
+            },
+            description: ['Access denied. File is locked'],
+            extraDescription: ['Please enter the file code to unlock it'],
+            inputs: [{
+              placeholder: 'File code',
+              inputName: 'docFileId',
+              isRequired: true,
+            }],
+          });
+
+          deniedDialog.appendTo(this.element.parentElement);
+        }
       },
     });
 
@@ -107,9 +153,15 @@ class DocsViewer extends StandardView {
 
   populateList() {
     const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
-    const userDocs = new List({ viewId: 'userDocuments', shouldSort: true, title: 'Yours' });
-    const teamDocs = new List({ viewId: 'teamDocuments', shouldSort: true, title: 'Team' });
-    const publicDocs = new List({ viewId: 'publicDocuments', shouldSort: true, title: 'Public' });
+    const dirList = new List({ viewId: 'dirList', shouldSort: true, title: 'DIRECTORY' });
+    const myFiles = new List({ viewId: 'myDir', shouldSort: true, title: 'My Files' });
+    const myTeamFiles = new List({ viewId: 'myTeamDir', shouldSort: true, title: 'My Team' });
+    const teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'TEAMS' });
+    const userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'USERS' });
+    // User name : List
+    const userLists = {};
+    // Team name : List
+    const teamLists = {};
 
     const searchButton = elementCreator.createButton({
       text: 'ID search',
@@ -174,18 +226,18 @@ class DocsViewer extends StandardView {
 
         const docFragment = document.createDocumentFragment();
         const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
-        const idInput = elementCreator.createInput({ placeholder: 'ID to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true });
+        const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true });
         const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
         const visibilitySet = elementCreator.createRadioSet({
-          title: 'Who should be able to view the document? Those with the correct document ID will always be able to view the document.',
+          title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
           optionName: 'visibility',
           options: [
             { optionId: 'visPublic', optionLabel: 'Everyone' },
-            { optionId: 'visPrivate', optionLabel: 'Only those with the correct ID' },
+            { optionId: 'visPrivate', optionLabel: 'Only those with the correct code' },
           ],
         });
         const teamSet = elementCreator.createRadioSet({
-          title: 'Should the document be added to the team directory?',
+          title: 'Should the document be added to the team directory? Your team will be able to see and access the document without any code',
           optionName: 'team',
           options: [
             { optionId: 'teamYes', optionLabel: 'Yes' },
@@ -211,7 +263,9 @@ class DocsViewer extends StandardView {
           text: 'Save',
           func: () => {
             if (!markEmptyFields([titleInput, bodyInput, idInput])) {
-              if (!textTools.isInternationalAllowed(idInput.value)) {
+              const docId = textTools.trimSpace(idInput.value);
+
+              if (!textTools.isInternationalAllowed(docId)) {
                 idInput.classList.add('markedInput');
                 idInput.setAttribute('placeholder', 'Has to be alphanumerical (a-z, 0-9)');
                 idInput.value = '';
@@ -219,13 +273,17 @@ class DocsViewer extends StandardView {
                 return;
               }
 
+              const teamYes = document.getElementById('teamYes');
               const docFile = {
                 title: titleInput.value,
-                docFileId: idInput.value,
+                docFileId: docId,
                 text: bodyInput.value.split('\n'),
                 isPublic: document.getElementById('visPublic').checked === true,
-                teamDir: storageManager.getTeam() && document.getElementById('teamYes').checked === true,
               };
+
+              if (teamYes && teamYes.checked === true) {
+                docFile.team = storageManager.getTeam();
+              }
 
               socketManager.emitEvent('createDocFile', docFile, ({ error: docFileError }) => {
                 if (docFileError) {
@@ -246,12 +304,14 @@ class DocsViewer extends StandardView {
         this.viewer.appendChild(docFragment);
       },
     });
+
     systemList.addItems({ items: [searchButton, createButton] });
+    dirList.addItems({ items: [teamFiles.element, userFiles.element] });
 
     this.itemList.appendChild(systemList.element);
-    this.itemList.appendChild(userDocs.element);
-    this.itemList.appendChild(teamDocs.element);
-    this.itemList.appendChild(publicDocs.element);
+    this.itemList.appendChild(myFiles.element);
+    this.itemList.appendChild(myTeamFiles.element);
+    this.itemList.appendChild(dirList.element);
 
     this.accessElements.push({
       element: createButton,
@@ -263,13 +323,45 @@ class DocsViewer extends StandardView {
       event: eventCentral.Events.DOCFILE,
       func: ({ docFile }) => {
         const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+        const creator = docFile.creator;
+        const docTeam = docFile.team;
 
-        if (docFile.creator === userName) {
-          userDocs.addItem({ item: this.createDocFileButton(docFile) });
-        } else if (docFile.team && docFile.team !== '') {
-          teamDocs.addItem({ item: this.createDocFileButton(docFile) });
-        } else if (docFile.isPublic) {
-          publicDocs.addItem({ item: this.createDocFileButton(docFile) });
+        if (creator === userName) {
+          myFiles.addItem({ item: this.createDocFileButton(docFile) });
+        } else if (docTeam && docTeam !== '') {
+          if (docTeam === storageManager.getTeam()) {
+            myTeamFiles.addItem({ item: this.createDocFileButton(docFile) });
+          } else {
+            const list = teamLists[docTeam];
+
+            if (!list) {
+              teamLists[docTeam] = new List({
+                elements: [this.createDocFileButton(docFile)],
+                title: docTeam,
+                shouldSort: true,
+                showTitle: true,
+                minimumToShow: 0,
+              });
+              userFiles.addItem({ item: teamLists[docTeam].element });
+            } else {
+              list.addItem({ item: this.createDocFileButton(docFile) });
+            }
+          }
+        } else {
+          const list = userLists[creator];
+
+          if (!list) {
+            userLists[creator] = new List({
+              elements: [this.createDocFileButton(docFile)],
+              title: creator,
+              shouldSort: true,
+              showTitle: true,
+              minimumToShow: 0,
+            });
+            userFiles.addItem({ item: userLists[creator].element });
+          } else {
+            list.addItem({ item: this.createDocFileButton(docFile) });
+          }
         }
       },
     });
@@ -278,7 +370,7 @@ class DocsViewer extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.CREATEDOCFILE,
       func: ({ docFile }) => {
-        userDocs.addItem({ item: this.createDocFileButton(docFile) });
+        myFiles.addItem({ item: this.createDocFileButton(docFile) });
       },
     });
 
@@ -288,8 +380,8 @@ class DocsViewer extends StandardView {
       func: ({ changedUser }) => {
         if (changedUser) {
           this.viewer.innerHTML = '';
-          userDocs.replaceAllItems({ items: [] });
-          teamDocs.replaceAllItems({ items: [] });
+          myFiles.replaceAllItems({ items: [] });
+          myTeamFiles.replaceAllItems({ items: [] });
         }
 
         socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {
@@ -299,11 +391,59 @@ class DocsViewer extends StandardView {
             return;
           }
 
-          const { userDocFiles = [], publicDocFiles = [], teamDocFiles = [] } = data;
+          const { myDocFiles = [], myTeamDocFiles = [], userDocFiles = [], teamDocFiles = [] } = data;
+          const groupedUserDocs = {};
+          const groupedTeamDocs = {};
 
-          userDocs.replaceAllItems({ items: userDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          teamDocs.replaceAllItems({ items: teamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          publicDocs.replaceAllItems({ items: publicDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          userDocFiles.forEach((docFile) => {
+            if (!groupedUserDocs[docFile.creator]) {
+              groupedUserDocs[docFile.creator] = [];
+            }
+
+            groupedUserDocs[docFile.creator].push(docFile);
+          });
+          teamDocFiles.forEach((docFile) => {
+            if (!groupedTeamDocs[docFile.team]) {
+              groupedTeamDocs[docFile.team] = [];
+            }
+
+            groupedTeamDocs[docFile.team].push(docFile);
+          });
+
+          myFiles.replaceAllItems({ items: myDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          myTeamFiles.replaceAllItems({ items: myTeamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          userFiles.replaceAllItems({
+            items: Object.keys(groupedUserDocs).map((userName) => {
+              const docs = groupedUserDocs[userName];
+              const list = new List({
+                items: docs.map(docFile => this.createDocFileButton(docFile)),
+                title: userName,
+                shouldSort: true,
+                showTitle: true,
+                minimumToShow: 0,
+              });
+
+              userLists[userName] = list;
+
+              return list.element;
+            }),
+          });
+          teamFiles.replaceAllItems({
+            items: Object.keys(groupedTeamDocs).map((teamName) => {
+              const docs = groupedTeamDocs[teamName];
+              const list = new List({
+                items: docs.map(docFile => this.createDocFileButton(docFile)),
+                title: teamName,
+                shouldSort: true,
+                showTitle: true,
+                minimumToShow: 0,
+              });
+
+              teamLists[teamName] = list;
+
+              return list.element;
+            }),
+          });
         });
       },
     });

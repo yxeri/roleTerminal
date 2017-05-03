@@ -26,16 +26,24 @@ const eventCentral = require('../../EventCentral');
  */
 function createHeader({ headerItems, printable, parentElement }) {
   const paragraph = document.createElement('P');
+  const spanUpper = document.createElement('SPAN');
+  const spanLower = document.createElement('SPAN');
   paragraph.classList.add('header');
 
-  headerItems.forEach(({ textLine, extraClass, clickFunc }) => {
-    const span = document.createElement('SPAN');
-    span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
+  headerItems.forEach(({ textLine, extraClass, clickFunc, placeLower }) => {
+    if (textLine) {
+      const span = document.createElement('SPAN');
+      span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
 
-    if (clickFunc) { span.addEventListener('click', clickFunc); }
-    if (extraClass) { span.classList.add(extraClass); }
+      if (clickFunc) { span.addEventListener('click', clickFunc); }
+      if (extraClass) { span.classList.add(extraClass); }
 
-    paragraph.appendChild(span);
+      if (placeLower) {
+        spanLower.appendChild(span);
+      } else {
+        spanUpper.appendChild(span);
+      }
+    }
   });
 
   if (printable) {
@@ -48,8 +56,11 @@ function createHeader({ headerItems, printable, parentElement }) {
       text: 'Print',
     });
 
-    paragraph.appendChild(button);
+    spanUpper.appendChild(button);
   }
+
+  paragraph.appendChild(spanUpper);
+  paragraph.appendChild(spanLower);
 
   return paragraph;
 }

@@ -25,7 +25,7 @@ class Terminal extends View {
     super({ isFullscreen: true, viewId: 'terminal' });
     this.element.classList.add('fullHeight');
 
-    this.terminalInput = elementCreator.createInput({ inputName: 'terminalInput', placeholder: 'Input command', classes: ['terminalInput'] });
+    this.terminalInput = elementCreator.createInput({ inputName: 'terminalInput', placeholder: 'Input. Enter to send/see avl. commands', classes: ['terminalInput'] });
     this.element.appendChild(elementCreator.createList({ elementId: 'terminalFeed' }));
     this.element.appendChild(this.terminalInput);
     this.queue = [];

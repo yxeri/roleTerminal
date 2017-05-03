@@ -24,7 +24,7 @@ class LoginBox extends DialogBox {
   constructor({ description, extraDescription, parentElement, closeFunc }) {
     const buttons = {
       left: {
-        text: 'Registrera',
+        text: 'Register',
         eventFunc: () => {
           const reenterPasswordInput = this.inputs.find(({ inputName }) => inputName === 'reenterPassword');
 
@@ -90,7 +90,7 @@ class LoginBox extends DialogBox {
         },
       },
       right: {
-        text: 'Logga in',
+        text: 'Login',
         eventFunc: () => {
           const emptyFields = this.markEmptyFields();
 

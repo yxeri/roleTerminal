@@ -43,6 +43,15 @@ class MapMarker {
     this.owner = owner;
     this.team = team;
     this.shouldCluster = shouldCluster;
+    this.accuracyCircle = new google.maps.Circle({
+      center: this.marker.getPosition(),
+      strokeColor: '#00ffcc',
+      strokeOpacity: 0.5,
+      strokeWeight: 2,
+      fillColor: '#00ffcc',
+      fillOpacity: 0.15,
+      radius: this.accuracy,
+    });
 
     google.maps.event.addListener(this.marker, 'click', (event) => {
       soundLibrary.playSound('button2');
@@ -65,8 +74,9 @@ class MapMarker {
           },
         });
         worldMap.movingMarker = null;
-      } else if (this.positionName) {
-        worldMap.showMarkerInfo({ position: this.getPosition(), positionName: this.positionName, description: this.description });
+      } else {
+        this.showDescription();
+        this.showAccuracy();
       }
     });
 
@@ -98,6 +108,18 @@ class MapMarker {
     }
   }
 
+  showDescription() {
+    if (this.positionName) {
+      this.worldMap.showMarkerInfo({ position: this.getPosition(), positionName: this.positionName, description: this.description });
+    }
+  }
+
+  showAccuracy() {
+    if (this.accuracy > 20) {
+      this.accuracyCircle.setMap(this.marker.getMap());
+    }
+  }
+
   setPosition({ coordinates, lastUpdated }) {
     this.setMap(this.map);
 
@@ -110,6 +132,10 @@ class MapMarker {
   }
 
   setMap(map) {
+    if (map === null) {
+      this.accuracyCircle.setMap(null);
+    }
+
     this.marker.setMap(map);
   }
 }

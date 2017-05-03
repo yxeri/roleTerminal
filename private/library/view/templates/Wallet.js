@@ -147,7 +147,7 @@ class Wallet extends StandardView {
       shouldSort: false,
     });
     const userList = new List({
-      title: 'Users',
+      title: 'USERS',
       shouldSort: true,
     });
 

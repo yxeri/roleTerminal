@@ -87,6 +87,7 @@ class StorageManager {
     this.setAccessLevel(0);
     this.removeLocalVal('aliases');
     this.removeLocalVal('selectedAlias');
+    this.removeLocalVal('team');
   }
 
   /**

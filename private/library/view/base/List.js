@@ -25,6 +25,7 @@ const elementCreator = require('../../ElementCreator');
  */
 function createSortedList(list, newItem) {
   const newList = elementCreator.createList({});
+  newList.classList = list.classList;
 
   if (newItem) { list.appendChild(newItem); }
 
@@ -49,7 +50,7 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, isCollapsable = true }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');

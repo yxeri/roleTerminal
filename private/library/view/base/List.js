@@ -50,7 +50,7 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, isCollapsable = true }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');

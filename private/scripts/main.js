@@ -69,8 +69,8 @@ boot.setQueue([
         '########                   ##       ########     ########',
         ' ######      Organica      ##       #      #############',
         '   ####     Oracle         ##       #      ##     ####',
-        '   ####     Operations     ##       #      ##    #####',
-        '   ####      Center        ##       #      ###########',
+        '   ####     Operating      ##       #      ##    #####',
+        '   ####      System        ##       #      ###########',
         '########                   ##       #########    ########',
         '########                   ##########      #    #########',
         ' ########                  ##      ##     ## ###########',
@@ -741,6 +741,7 @@ socketManager.addEvents([
           storageManager.setAccessLevel(data.user.accessLevel);
           storageManager.setAliases(data.user.aliases);
           storageManager.setTeam(data.user.team);
+          storageManager.setShortTeam(data.user.shortTeam);
         }
 
         eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });

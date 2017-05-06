@@ -43,7 +43,7 @@ function markEmptyFields(inputs) {
   return emptyFields;
 }
 
-class DocsViewer extends StandardView {
+class DirViewer extends StandardView {
   constructor({ isFullscreen }) {
     super({ isFullscreen });
 
@@ -74,7 +74,7 @@ class DocsViewer extends StandardView {
   }
 
   createDocFileButton(docFile) {
-    const title = `${docFile.title || docFile.docFileId}`;
+    const title = `${docFile.isLocked ? '*' : ''} ${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
       text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
@@ -237,7 +237,7 @@ class DocsViewer extends StandardView {
           ],
         });
         const teamSet = elementCreator.createRadioSet({
-          title: 'Should the document be added to the team directory? Your team will be able to see and access the document without any code',
+          title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code',
           optionName: 'team',
           options: [
             { optionId: 'teamYes', optionLabel: 'Yes' },
@@ -264,8 +264,9 @@ class DocsViewer extends StandardView {
           func: () => {
             if (!markEmptyFields([titleInput, bodyInput, idInput])) {
               const docId = textTools.trimSpace(idInput.value);
+              const docIdAllowed = textTools.isInternationalAllowed(docId);
 
-              if (!textTools.isInternationalAllowed(docId)) {
+              if (!docIdAllowed) {
                 idInput.classList.add('markedInput');
                 idInput.setAttribute('placeholder', 'Has to be alphanumerical (a-z, 0-9)');
                 idInput.value = '';
@@ -287,7 +288,11 @@ class DocsViewer extends StandardView {
 
               socketManager.emitEvent('createDocFile', docFile, ({ error: docFileError }) => {
                 if (docFileError) {
-                  console.log(docFileError);
+                  if (docFileError.type === 'already exists') {
+                    console.log('Already exists');
+                  } else {
+                    console.log(docFileError);
+                  }
 
                   return;
                 }
@@ -342,7 +347,7 @@ class DocsViewer extends StandardView {
                 showTitle: true,
                 minimumToShow: 0,
               });
-              userFiles.addItem({ item: teamLists[docTeam].element });
+              teamFiles.addItem({ item: teamLists[docTeam].element });
             } else {
               list.addItem({ item: this.createDocFileButton(docFile) });
             }
@@ -455,4 +460,4 @@ class DocsViewer extends StandardView {
   }
 }
 
-module.exports = DocsViewer;
+module.exports = DirViewer;

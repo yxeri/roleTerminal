@@ -88,6 +88,7 @@ class StorageManager {
     this.removeLocalVal('aliases');
     this.removeLocalVal('selectedAlias');
     this.removeLocalVal('team');
+    this.removeLocalVal('shortTeam');
   }
 
   /**
@@ -215,7 +216,15 @@ class StorageManager {
     }
   }
 
+  static setShortTeam(shortTeam) {
+    if (shortTeam) {
+      this.setLocalVal('shortTeam', shortTeam);
+    }
+  }
+
   static getTeam() { return this.getLocalVal('team'); }
+
+  static getShortTeam() { return this.getLocalVal('shortTeam'); }
 }
 
 module.exports = StorageManager;

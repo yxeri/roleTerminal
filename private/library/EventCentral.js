@@ -41,6 +41,7 @@ class EventCentral {
       NEWMEMBER: 'New team member',
       USERSTATUS: 'User sent status update',
       PINGMAP: 'Ping map',
+      TEAM: 'Joined team',
     };
     this.eventWatchers = {};
   }

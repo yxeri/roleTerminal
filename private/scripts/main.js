@@ -45,11 +45,13 @@ const elementCreator = require('../library/ElementCreator');
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
-
 const boot = new TextAnimation({ removeTime: 3000 });
+
 boot.setQueue([
-  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 } },
   {
+    func: boot.addCode,
+    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 },
+  }, {
     func: boot.printLines,
     params: {
       corruption: true,
@@ -86,8 +88,7 @@ boot.setQueue([
         '                          ####',
       ],
     },
-  },
-  {
+  }, {
     func: boot.printLines,
     params: {
       corruption: false,
@@ -99,10 +100,10 @@ boot.setQueue([
         'Rerouting...',
       ],
     },
-  },
-  {
+  }, {
     func: boot.printLines,
     params: {
+      waitTime: 2000,
       corruption: false,
       array: [
         'Connected!',
@@ -112,9 +113,10 @@ boot.setQueue([
         'Establishing uplink to relays...',
       ],
     },
-  },
-  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2, binary: true } },
-  {
+  }, {
+    func: boot.addCode,
+    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2, binary: true },
+  }, {
     func: boot.printLines,
     params: {
       corruption: false,
@@ -123,8 +125,7 @@ boot.setQueue([
         'Booting OOC 5.0...',
       ],
     },
-  },
-  {
+  }, {
     func: boot.printLines,
     params: {
       classes: ['logo'],
@@ -148,8 +149,7 @@ boot.setQueue([
         'ENJOY',
       ],
     },
-  },
-  {
+  }, {
     func: boot.printLines,
     params: {
       corruption: false,
@@ -159,9 +159,10 @@ boot.setQueue([
         'Overriding lock...',
       ],
     },
-  },
-  { func: boot.addCode, params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 1 } },
-  {
+  }, {
+    func: boot.addCode,
+    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 1 },
+  }, {
     func: boot.printLines,
     params: {
       corruption: false,
@@ -249,21 +250,35 @@ terminal.addCommand({
           'Disabling Oracle defense ...',
           'Overriding locks ...',
           'Connecting to database ...',
-          'Welcome.',
-          'We will retrieve two memory dumps for you. Within these dumps you will find one to many passwords',
-          'You must find the true password within the dumps and use it together with a user name to get access to the LANTERN',
-          'The true password is repeated in both memory dumps',
-          'Our operatives have also gathered information about the users to help',
+          'Connected',
+          'Found 2 memory dumps',
           'You will be shown users with access to your chosen LANTERN',
-          'Each user will have information about its password attached to it, helping you figure out the true password',
-          'You will have to use this information to filter out the true password in the memory dumps',
+          'Each user will have information about its password attached to it',
+          'You must find the password within the dumps and use it together with a user name to get access to the LANTERN',
+          'The password is repeated in both memory dumps',
           'Finding the correct user name and password will give you access to a LANTERN',
           'We take no responsibility for deaths due to accidental activitation of defense systems',
         ],
       },
     });
 
-    socketManager.emitEvent();
+    socketManager.emitEvent('', {}, () => {
+
+    });
+  },
+});
+terminal.addTrigger({
+  triggerName: 'calibrationMission',
+  trigger: ({ mission }) => {
+    if (mission.cancelled) {
+      terminal.queueMessage({
+        message: { text: ['CALIBRATION FAILED', 'Your calibration task was aborted', 'You will receive no payment'] },
+      });
+    } else {
+      terminal.queueMessage({
+        message: { text: ['CALIBRATION SUCCESSFUL', 'Your calibration task was successful', 'You have received your payment'] },
+      });
+    }
   },
 });
 
@@ -631,19 +646,19 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'coms',
+  linkName: 'chatter',
   startFunc: () => { messenger.appendTo(mainView); },
   endFunc: () => { messenger.removeView(); },
   shortcut: true,
 });
 home.addLink({
-  linkName: 'map',
+  linkName: 'maps',
   startFunc: () => { map.appendTo(mainView); },
   endFunc: () => { map.removeView(); },
   shortcut: true,
 });
 home.addLink({
-  linkName: 'dir',
+  linkName: 'storage',
   startFunc: () => { dirViewer.appendTo(mainView); },
   endFunc: () => { dirViewer.removeView(); },
   shortcut: true,

@@ -114,6 +114,8 @@ class TeamViewer extends StandardView {
 
                     verifyDialog.appendTo(this.element.parentElement);
                   } else {
+                    storageManager.setTeam(team.teamName);
+                    storageManager.setShortTeam(team.shortName);
                     eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team } });
                   }
                 });
@@ -141,7 +143,87 @@ class TeamViewer extends StandardView {
       text: 'Invite user',
       classes: ['hide'],
       func: () => {
+        const inviteDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => { inviteDialog.removeView(); },
+            },
+            right: {
+              text: 'Invite',
+              eventFunc: () => {
+                const user = {
+                  userName: inviteDialog.inputs.find(input => input.inputName === 'userName').inputElement.value.toLowerCase(),
+                };
 
+                if (inviteDialog.markEmptyFields()) {
+                  soundLibrary.playSound('fail');
+                  inviteDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                socketManager.emitEvent('inviteToTeam', { user }, ({ error }) => {
+                  if (error) {
+                    const dialog = new ButtonBox({
+                      buttons: [
+                        elementCreator.createButton({
+                          text: 'I understand',
+                          func: () => { dialog.removeView(); },
+                        }),
+                      ],
+                    });
+
+                    switch (error.type) {
+                      case 'not allowed': {
+                        dialog.changeDescription({ text: ['You do not have permission to add members to the team'] });
+
+                        break;
+                      }
+                      case 'already exists': {
+                        dialog.changeDescription({ text: [`${user.userName} has already been invited to the team`] });
+
+                        break;
+                      }
+                      default: {
+                        dialog.changeDescription({ text: [`Unable to invite ${user.userName} to the team`] });
+
+                        break;
+                      }
+                    }
+
+                    inviteDialog.removeView();
+                    dialog.appendTo(this.element.parentElement);
+
+                    return;
+                  }
+
+                  const dialog = new ButtonBox({
+                    description: [`An invitation has been sent to ${user.userName}`],
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'I understand',
+                        func: () => { dialog.removeView(); },
+                      }),
+                    ],
+                  });
+
+                  inviteDialog.removeView();
+                  dialog.appendTo(this.element.parentElement);
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'User name',
+            inputName: 'userName',
+            isRequired: true,
+          }],
+          description: ['Invite a user to your team'],
+          extraDescription: [''],
+        });
+
+        inviteDialog.appendTo(this.element.parentElement);
       },
     });
 
@@ -173,19 +255,16 @@ class TeamViewer extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.TEAM,
       func: ({ team }) => {
-        if (team) {
-          storageManager.setTeam(team.teamName);
-          storageManager.setShortTeam(team.shortName);
-
-          socketManager.emitEvent('getTeamMembers', {}, ({ error, data }) => {
+        if (team && team.teamName) {
+          socketManager.emitEvent('listUsers', { team: { teamName: team.teamName, shouldEqual: true } }, ({ error, data }) => {
             if (error) {
               console.log(error);
 
               return;
             }
 
-            const { users = [] } = data;
-            const userNames = users.map(user => user.userName);
+            const { onlineUsers, offlineUsers } = data;
+            const userNames = onlineUsers.concat(offlineUsers);
 
             userList.replaceAllItems({
               items: userNames.map((userName) => {

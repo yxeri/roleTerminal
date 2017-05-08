@@ -74,17 +74,10 @@ class DirViewer extends StandardView {
   }
 
   createDocFileButton(docFile) {
-    const title = `${docFile.isLocked ? '*' : ''} ${docFile.title || docFile.docFileId}`;
+    const title = `${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
       text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
       func: () => {
-        if (this.selectedItem) {
-          this.selectedItem.classList.remove('selectedItem');
-        }
-
-        this.selectedItem = button.parentElement;
-        this.selectedItem.classList.add('selectedItem');
-
         if (docFile.docFileId) {
           socketManager.emitEvent('getDocFile', { docFileId: docFile.docFileId }, ({ docFileError, data: docFileData }) => {
             if (docFileError) {
@@ -128,6 +121,13 @@ class DirViewer extends StandardView {
                       deniedDialog.changeExtraDescription({ text: ['Incorrect code', 'Access denied'] });
                     }
 
+                    if (this.selectedItem) {
+                      this.selectedItem.classList.remove('selectedItem');
+                    }
+
+                    this.selectedItem = button.parentElement;
+                    this.selectedItem.classList.add('selectedItem');
+
                     deniedDialog.removeView();
                     this.showDoc(docFileData.docFile);
                   });
@@ -147,6 +147,10 @@ class DirViewer extends StandardView {
         }
       },
     });
+
+    if (docFile.isLocked) {
+      button.classList.add('lockedButton');
+    }
 
     return button;
   }

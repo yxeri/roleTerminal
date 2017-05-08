@@ -25,7 +25,7 @@ class Terminal extends View {
     super({ isFullscreen: true, viewId: 'terminal' });
     this.element.classList.add('fullHeight');
 
-    this.terminalInput = elementCreator.createInput({ inputName: 'terminalInput', placeholder: 'Input. Enter to send/see avl. commands', classes: ['terminalInput'] });
+    this.terminalInput = elementCreator.createInput({ inputName: 'terminalInput', placeholder: 'Enter to run/see available programs', classes: ['terminalInput'] });
     this.element.appendChild(elementCreator.createList({ elementId: 'terminalFeed' }));
     this.element.appendChild(this.terminalInput);
     this.queue = [];
@@ -34,6 +34,7 @@ class Terminal extends View {
     this.timeout = 50;
     this.firstRun = true;
     this.commands = [];
+    this.triggers = {};
   }
 
   addCommand(command) {
@@ -93,7 +94,7 @@ class Terminal extends View {
     const inputValue = value || this.terminalInput.value;
 
     if (inputValue === '') {
-      this.queueMessage({ message: { text: ['$', 'Commands:'], elements: this.getClickableCommandNames() } });
+      this.queueMessage({ message: { text: ['$', 'Programs:'], elements: this.getClickableCommandNames() } });
     } else {
       const sentCommandName = textTools.trimSpace(inputValue.toLowerCase());
       const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
@@ -109,7 +110,7 @@ class Terminal extends View {
         });
         command.startFunc();
       } else {
-        this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`, 'Commands:'], elements: this.getClickableCommandNames() } });
+        this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`, 'Programs:'], elements: this.getClickableCommandNames() } });
       }
     }
 
@@ -185,24 +186,9 @@ class Terminal extends View {
         event: eventCentral.Events.TERMINAL,
         func: ({ mission }) => {
           if (mission) {
-            switch (mission.missionType) {
-              case 'calibrationMission': {
-                if (mission.cancelled) {
-                  this.queueMessage({
-                    message: { text: ['CALIBRATION FAILED', 'Your calibration task was aborted', 'You will receive no payment'] },
-                  });
-                } else {
-                  this.queueMessage({
-                    message: { text: ['CALIBRATION SUCCESSFUL', 'Your calibration task was successful', 'You have received your payment'] },
-                  });
-                }
+            const func = this.triggers[mission.missionType];
 
-                break;
-              }
-              default: {
-                break;
-              }
-            }
+            if (func) { func({ mission }); }
           }
         },
       });
@@ -228,6 +214,10 @@ class Terminal extends View {
         },
       });
     });
+  }
+
+  addTrigger({ trigger, triggerName }) {
+    this.triggers[triggerName] = trigger;
   }
 
   appendRow({ elements }) {
@@ -359,7 +349,7 @@ class Terminal extends View {
             'OSAT identity: C. Jenkins',
             'Your actions will be monitored',
             'Input or click on the command you want to run',
-            'Commands:',
+            'Programs:',
           ],
           elements: this.getClickableCommandNames(),
         },

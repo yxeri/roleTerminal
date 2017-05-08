@@ -433,7 +433,7 @@ class WorldMap extends View {
                       positionName: `${userName}-ping`,
                       isPublic: true,
                       isStatic: true,
-                      description: [`${pingText.charAt(0).toUpperCase()}${pingText.slice(1)}`] || ['Unknown activity'],
+                      description: pingText ? [`${pingText.charAt(0).toUpperCase()}${pingText.slice(1)}`] : ['Unknown activity'],
                     };
 
                     socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {

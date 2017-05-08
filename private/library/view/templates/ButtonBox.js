@@ -29,9 +29,9 @@ class ButtonBox extends View {
 
     if (description) {
       description.forEach(text => this.descriptionContainer.appendChild(elementCreator.createParagraph({ text })));
-      this.element.appendChild(this.descriptionContainer);
     }
 
+    this.element.appendChild(this.descriptionContainer);
     this.element.appendChild(this.buttonList);
   }
 

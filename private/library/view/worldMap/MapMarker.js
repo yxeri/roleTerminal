@@ -117,7 +117,15 @@ class MapMarker {
   showAccuracy() {
     if (this.accuracy > 20) {
       this.accuracyCircle.setMap(this.marker.getMap());
+
+      setTimeout(() => {
+        this.hideAccuracy();
+      }, 3000);
     }
+  }
+
+  hideAccuracy() {
+    this.accuracyCircle.setMap(null);
   }
 
   setPosition({ coordinates, lastUpdated }) {

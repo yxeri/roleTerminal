@@ -24,6 +24,14 @@ class StandardView extends View {
     this.viewer = elementCreator.createContainer({ classes: ['viewer'] });
     this.itemList = elementCreator.createContainer({ classes: ['list'] });
 
+    this.element.append(elementCreator.createButton({
+      text: 'Toggle menu',
+      classes: ['listButton'],
+      func: () => {
+        this.itemList.classList.toggle('show');
+        this.viewer.classList.toggle('buttonPadding');
+      },
+    }));
     this.element.append(this.itemList);
     this.element.append(this.viewer);
   }

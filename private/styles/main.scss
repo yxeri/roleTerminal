@@ -248,7 +248,7 @@ img {
     ul {
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
-      height: calc(100% - 6em);
+      height: calc(100% - 5.4em);
 
       li:first-child {
         margin-top: 1em;
@@ -767,7 +767,7 @@ img {
 }
 
 .inputArea {
-  height: 6em;
+  height: 5.4em;
 
   textarea {
     width: calc(100% - .6em);
@@ -808,13 +808,6 @@ img {
 
 .autoHeight {
   height: auto;
-}
-
-/*
- * Adds spacing for the status bar in iOS full screen mode
- */
-.appleMenuFix {
-  padding-top: .7em !important;
 }
 
 /*
@@ -869,6 +862,23 @@ img {
   white-space: pre;
 }
 
+.show {
+  display: block !important;
+}
+
+.listButton {
+  z-index: 2;
+  position: absolute;
+  left: .6em;
+  top: 2.5em;
+  width: 7.2em;
+}
+
+.toggledList {
+  padding-top: 0 !important;
+  height: calc(100% - .6em);
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $flash-color;
@@ -894,5 +904,34 @@ img {
     color: inherit;
     background-color: inherit;
     text-shadow: inherit;
+  }
+}
+
+@media (min-width: 480px) {
+  .list {
+    display: block;
+  }
+
+  .listButton {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .list {
+    display: none;
+    margin-top: 1.9em;
+    height: calc(100% - 2.1em);
+  }
+
+  .listButton {
+    display: block;
+  }
+
+  .viewer {
+    padding-top: 1.9em;
+    height: calc(100% - 2em);
+    max-width: 100%;
+    width: 100%;
   }
 }

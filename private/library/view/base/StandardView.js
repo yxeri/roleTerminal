@@ -29,7 +29,7 @@ class StandardView extends View {
       classes: ['listButton'],
       func: () => {
         this.itemList.classList.toggle('show');
-        this.viewer.classList.toggle('buttonPadding');
+        this.viewer.classList.toggle('toggledList');
       },
     }));
     this.element.append(this.itemList);

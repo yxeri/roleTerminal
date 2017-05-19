@@ -55,8 +55,8 @@ class Label {
     this.mapLabel.setMap(null);
   }
 
-  showLabel() {
-    this.mapLabel.setMap(this.map);
+  showLabel(map) {
+    this.mapLabel.setMap(map);
   }
 
   setPosition({ coordinates }) {

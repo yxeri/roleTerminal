@@ -35,6 +35,18 @@ class Terminal extends View {
     this.firstRun = true;
     this.commands = [];
     this.triggers = {};
+    this.nextFunc = null;
+  }
+
+  setNextFunc(func) {
+    this.nextFunc = func;
+  }
+
+  resetNextFunc() {
+    this.nextFunc = null;
+
+    this.clearInput();
+    this.queueMessage({ message: { text: ['[Process completed]', 'Programs:'], elements: this.getClickableCommandNames() } });
   }
 
   addCommand(command) {
@@ -91,7 +103,21 @@ class Terminal extends View {
   }
 
   triggerCommand(value) {
-    const inputValue = value || this.terminalInput.value;
+    const inputValue = (value || this.terminalInput.value).toString();
+
+    if (this.nextFunc) {
+      if (textTools.trimSpace(inputValue.toLowerCase()) === 'abort') {
+        this.clearInput();
+        this.queueMessage({ message: { text: ['You have aborted the running program'] } });
+        this.resetNextFunc();
+      } else {
+        this.queueMessage({ message: { text: [`$ ${inputValue}`] } });
+        this.nextFunc(inputValue);
+        this.clearInput();
+      }
+
+      return;
+    }
 
     if (inputValue === '') {
       this.queueMessage({ message: { text: ['$', 'Programs:'], elements: this.getClickableCommandNames() } });
@@ -100,14 +126,7 @@ class Terminal extends View {
       const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
 
       if (command) {
-        this.queueMessage({
-          message: {
-            text: [
-              `$ ${inputValue}`,
-              `Running command ${command.commandName}:`,
-            ],
-          },
-        });
+        this.queueMessage({ message: { text: [`$ ${inputValue}`, `Running command ${command.commandName}:`] } });
         command.startFunc();
       } else {
         this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`, 'Programs:'], elements: this.getClickableCommandNames() } });
@@ -122,15 +141,20 @@ class Terminal extends View {
 
     if (currentText && currentText.length > 0) {
       const text = currentText.shift();
-      const row = elementCreator.createListItem({ element: elementCreator.createSpan({ text, classes: message.classes }) });
+      const row = elementCreator.createListItem({ classes: message.classes, element: elementCreator.createSpan({ text }) });
 
       this.element.firstElementChild.appendChild(row);
       row.scrollIntoView();
       setTimeout(() => { this.addRow(message); }, this.timeout);
     } else {
       if (message.elements) {
-        this.appendRow({ elements: message.elements });
+        if (message.elementPerRow) {
+          message.elements.forEach(element => this.appendRow({ classes: message.classes, elements: [element] }));
+        } else {
+          this.appendRow({ classes: message.classes, elements: message.elements });
+        }
       }
+
       this.consumeShortQueue();
     }
   }
@@ -200,6 +224,10 @@ class Terminal extends View {
     super.removeView();
   }
 
+  getInput() {
+    return textTools.trimSpace(this.terminalInput.value);
+  }
+
   getCommandNames() {
     return this.commands.map(({ commandName }) => commandName);
   }
@@ -208,7 +236,7 @@ class Terminal extends View {
     return this.commands.map(({ commandName }) => {
       return elementCreator.createSpan({
         text: commandName,
-        classes: ['clickable'],
+        classes: ['clickable', 'linkLook'],
         func: () => {
           this.triggerCommand(commandName);
         },
@@ -220,13 +248,22 @@ class Terminal extends View {
     this.triggers[triggerName] = trigger;
   }
 
-  appendRow({ elements }) {
-    const listItem = elementCreator.createListItem({});
+  appendRow({ elements, classes }) {
+    const listItem = elementCreator.createListItem({ classes });
 
     elements.forEach(element => listItem.appendChild(element));
 
     this.element.firstElementChild.appendChild(listItem);
     listItem.scrollIntoView();
+  }
+
+  replaceLastRow({ text, classes }) {
+    const listItem = elementCreator.createListItem({
+      element: elementCreator.createSpan({ text }),
+      classes,
+    });
+
+    this.element.firstElementChild.replaceChild(listItem, this.element.firstElementChild.lastElementChild);
   }
 
   startBootSequence(parentElement) {

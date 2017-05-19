@@ -122,7 +122,7 @@ boot.setQueue([
       corruption: false,
       array: [
         'Uplink established!',
-        'Booting OOC 5.0...',
+        'Booting O3S 5.0...',
       ],
     },
   }, {
@@ -131,7 +131,7 @@ boot.setQueue([
       classes: ['logo'],
       corruption: true,
       array: [
-        'THIS RELEASE OF OOC WAS BROUGHT TO YOU BY',
+        'THIS RELEASE OF O3S WAS BROUGHT TO YOU BY',
         '   ####',
         '###############',
         ' #####  #########                                           ####',
@@ -181,7 +181,7 @@ boot.appendTo(mainView);
 soundLibrary.toggleSounds();
 
 if (storageManager.getDeviceId() === null) {
-  storageManager.setDeviceId(textTools.createAlphaNumbericalString(16, false));
+  storageManager.setDeviceId(textTools.createAlphaNumbericalString(16));
 }
 
 window.addEventListener('error', (event) => {
@@ -244,26 +244,212 @@ terminal.addCommand({
       message: {
         text: [
           'Razor proudly presents:',
-          'LANTERN Signal Manipulator (LSM)',
-          'Please wait ...',
-          'Intercepting command ...',
-          'Disabling Oracle defense ...',
+          'LANTERN Amplification Master Manipulator (LAMM)',
           'Overriding locks ...',
           'Connecting to database ...',
-          'Connected',
+          '----',
+          'LAMM',
+          '----',
           'Found 2 memory dumps',
           'You will be shown users with access to your chosen LANTERN',
           'Each user will have information about its password attached to it',
           'You must find the password within the dumps and use it together with a user name to get access to the LANTERN',
+          'Only one user and password combination is correct',
           'The password is repeated in both memory dumps',
-          'Finding the correct user name and password will give you access to a LANTERN',
           'We take no responsibility for deaths due to accidental activitation of defense systems',
         ],
       },
     });
 
-    socketManager.emitEvent('', {}, () => {
+    socketManager.emitEvent('getStations', {}, ({ error, data: { activeStations = [], inactiveStations = [] } }) => {
+      if (error) {
+        console.log(error);
 
+        return;
+      } else if (activeStations.length === 0) {
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'Satellites are not in position',
+              'Unable to target stations',
+              'Aborting LAMM',
+            ],
+          },
+        });
+
+        return;
+      } else if (activeStations.length < 1) {
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'There are no active stations',
+              'Aborting LAMM',
+            ],
+          },
+        });
+      }
+
+      terminal.queueMessage({
+        message: {
+          text: [
+            '-----------------',
+            'Choose a LANTERN:',
+            '-----------------',
+          ],
+          elementPerRow: true,
+          elements: activeStations.concat(inactiveStations).map((station) => {
+            if (station.active) {
+              const span = elementCreator.createSpan({});
+              const stationSpan = elementCreator.createSpan({
+                classes: ['clickable', 'linkLook'],
+                text: `[${station.id}] ${station.location}`,
+                func: () => {
+                  terminal.triggerCommand(station.id);
+                },
+              });
+              const ownerSpan = elementCreator.createSpan({
+                text: `Owner: ${station.owner || '-'}`,
+              });
+
+              span.appendChild(stationSpan);
+              span.appendChild(ownerSpan);
+
+              return span;
+            }
+
+            return elementCreator.createSpan({
+              text: `[INACTIVE] ${station.location}`,
+            });
+          }),
+        },
+      });
+
+      terminal.setNextFunc((stationIdValue) => {
+        const activeIds = activeStations.map(station => station.id);
+        const stationId = !isNaN(stationIdValue) ? parseInt(stationIdValue, 10) : '';
+
+        if (activeIds.indexOf(stationId) > -1) {
+          const actions = [{ id: 1, name: 'Amplify' }, { id: 2, name: 'Dampen' }];
+
+          terminal.queueMessage({
+            message: {
+              text: [
+                '-----------------',
+                'Choose an action:',
+                '-----------------',
+              ],
+              elementPerRow: true,
+              elements: actions.map((action) => {
+                const span = elementCreator.createSpan({});
+                const actionSpan = elementCreator.createSpan({
+                  classes: ['clickable', 'linkLook'],
+                  text: `[${action.id}] ${action.name}`,
+                  func: () => {
+                    terminal.triggerCommand(action.id);
+                  },
+                });
+
+                span.appendChild(actionSpan);
+
+                return span;
+              }),
+            },
+          });
+
+          terminal.setNextFunc((actionIdValue) => {
+            const actionIds = actions.map(action => action.id);
+            const actionId = !isNaN(actionIdValue) ? parseInt(actionIdValue, 10) : '';
+
+            if (actionIds.indexOf(actionId) > -1) {
+              terminal.queueMessage({
+                message: {
+                  text: [
+                    `Action ${actions.find(action => action.id === action).name} chosen`,
+                    `Accessing LANTERN ${actionId}...`,
+                  ],
+                },
+              });
+
+              socketManager.emitEvent('getLanternHack', { stationId }, ({ error: hackError, data: hackData }) => {
+                if (hackError) {
+                  terminal.queueMessage({ message: { text: ['Something went wrong. Failed to start hack'] } });
+                  terminal.resetNextFunc();
+
+                  return;
+                }
+
+                const shouldAmplify = actionId === 1;
+
+                terminal.queueMessage({
+                  message: {
+                    elementPerRow: true,
+                    elements: textTools.createMixedArray({
+                      rowAmount: 8,
+                      length: 30,
+                      requiredClickableStrings: hackData.passwords,
+                      requiredFunc: (value) => {
+                        terminal.triggerCommand(value);
+                      },
+                    }),
+                  },
+                });
+                terminal.queueMessage({ message: { text: [`${hackData.triesLeft} tries left`] } });
+
+                terminal.setNextFunc((password) => {
+                  socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), shouldAmplify }, ({ error: manipulateError, data: manipulateData }) => {
+                    if (manipulateError) {
+                      terminal.queueMessage({ message: { text: ['Something went wrong. Failed to manipulate the LANTERN'] } });
+                      terminal.resetNextFunc();
+
+                      return;
+                    }
+
+                    if (manipulateData.success) {
+                      terminal.queueMessage({
+                        message: {
+                          text: [
+                            'Correct password',
+                            `${manipulateData.amplified ? 'Amplified' : 'Dampened'} LANTERN ${manipulateData.stationId} signal`,
+                            'Thank you for using LAMM',
+                          ],
+                        },
+                      });
+                      terminal.resetNextFunc();
+                    } else if (hackData.triesLeft <= 0) {
+                      const beautifiedDate = textTools.generateTimeStamp({ date: manipulateData.lockoutTime });
+
+                      terminal.queueMessage({
+                        message: {
+                          text: [
+                            'Incorrect password',
+                            `You have been locked out of LANTERN ${manipulateData.stationId}`,
+                            'Starting lockdown crack',
+                            `The lockdown lasts until ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                            'Thank you for using LAMM',
+                          ],
+                        },
+                      });
+                      terminal.resetNextFunc();
+                    } else {
+                      terminal.queueMessage({ message: { text: [`Incorrect password. ${hackData.triesLeft} tries left`] } });
+                    }
+                  });
+                });
+              });
+            } else {
+              terminal.queueMessage({ message: { text: ['Incorrect action number'] } });
+            }
+          });
+        } else {
+          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
+        }
+      });
     });
   },
 });

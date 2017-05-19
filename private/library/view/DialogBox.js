@@ -73,17 +73,34 @@ class DialogBox extends View {
     this.element.appendChild(this.descriptionContainer);
 
     inputs.forEach((input) => {
-      const inputElement = elementCreator.createInput(input);
+      const type = input.type || '';
+      let inputElement;
 
-      if (input.maxLength) {
-        inputElement.setAttribute('maxlength', input.maxLength);
-      }
+      switch (type) {
+        case 'radioSet': {
+          inputElement = elementCreator.createRadioSet(input);
 
-      if (inputElement.type === 'textarea') {
-        inputElement.addEventListener('input', () => {
-          inputElement.style.height = 'auto';
-          inputElement.style.height = `${inputElement.scrollHeight}px`;
-        });
+          break;
+        }
+        case 'textarea': {
+          inputElement = elementCreator.createInput(input);
+
+          inputElement.addEventListener('input', () => {
+            inputElement.style.height = 'auto';
+            inputElement.style.height = `${inputElement.scrollHeight}px`;
+          });
+
+          break;
+        }
+        default: {
+          inputElement = elementCreator.createInput(input);
+
+          if (input.maxLength) {
+            inputElement.setAttribute('maxlength', input.maxLength);
+          }
+
+          break;
+        }
       }
 
       this.inputs.push({ inputName: input.inputName, inputElement });

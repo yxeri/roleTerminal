@@ -15,24 +15,26 @@
  */
 
 const storageManager = require('./StorageManager');
+const tools = require('./Tools');
+const elementcreator = require('./ElementCreator');
 
 /**
  * Characters used when generating random text
  * Removed l and i to decrease user errors when reading the random strings
  * @type {string}
  */
-const chars = 'abcdefghjkmnopqrstuvwxyz';
+const chars = 'abcdefghijklmnopqrstuvwxyz';
 /**
  * Numbers used when generating random text
  * Removed 1 to decrease user errors when reading the random string
  * @type {string}
  */
-const numbers = '023456789';
+const numbers = '0123456789';
 /**
  * Special characters used when generating random text
  * @type {string}
  */
-const specials = '/\\!;:#&*';
+const specials = '!;#&';
 /**
  * Used when generating random binary text
  * @type {string}
@@ -113,58 +115,13 @@ class TextTools {
   /**
    * Creates and returns a randomised string
    * @static
-   * @param {Object} params - Parameters
-   * @param {string} params.selection - Characters to randomise from
-   * @param {Number} params.length - Length of randomised string
-   * @param {boolean} [params.upperCase] - Should all characters be in upper case?
-   * @param {boolean} [params.codeMode] - Should there be extra {} and () inserted into the string?
-   * @returns {string} - Randomised string
-   */
-  static createRandString({ selection, length, upperCase, codeMode }) {
-    const randomLength = selection.length;
-    let result = '';
-
-    for (let i = 0; i < length; i += 1) {
-      const randomVal = Math.round(Math.random() * (randomLength - 1));
-      let val = Math.random() > 0.5 ? selection[randomVal].toUpperCase() : selection[randomVal];
-
-      if (codeMode) {
-        const rand = Math.random();
-
-        // If new value is a character or number
-        if (i < length - 2 && (chars + numbers).indexOf(val) > -1) {
-          if (rand > 0.95) {
-            val = `${val}{}`;
-            i += 2;
-          } else if (rand < 0.05) {
-            val = `${val}()`;
-            i += 2;
-          }
-        }
-      }
-
-      result += val;
-    }
-
-    if (upperCase) {
-      return result.toUpperCase();
-    }
-
-    return result;
-  }
-
-  /**
-   * Creates and returns a randomised string
-   * @static
    * @param {Number} length - Length of randomised string
-   * @param {boolean} upperCase - Should all characters be in upper case?
    * @returns {string} - Randomised string
    */
-  static createCharString(length, upperCase) {
+  static createCharString(length) {
     return this.createRandString({
       selection: chars,
       length,
-      upperCase,
     });
   }
 
@@ -172,14 +129,12 @@ class TextTools {
    * Creates and returns a alphanumerical randomised string
    * @static
    * @param {Number} length - Length of randomised string
-   * @param {boolean} upperCase - Should all characters be in upper case?
    * @returns {string} - Randomised string
    */
-  static createAlphaNumbericalString(length, upperCase) {
+  static createAlphaNumbericalString(length) {
     return this.createRandString({
       selection: numbers + chars,
       length,
-      upperCase,
     });
   }
 
@@ -200,70 +155,80 @@ class TextTools {
    * Creates and returns a randomised string, containing alphanumeric and special characters
    * @static
    * @param {Number} length - Length of randomised string
-   * @param {boolean} upperCase - Should all characters be in upper case?
-   * @param {boolean} codeMode - Should there be extra {} and () inserted into the string?
    * @returns {string} - Randomised string
    */
-  static createMixedString(length, upperCase, codeMode) {
+  static createMixedString(length) {
     return this.createRandString({
       selection: numbers + chars + specials,
       length,
-      upperCase,
-      codeMode,
     });
   }
 
-  /**
-   * Creates array with randomised strings.
-   * It will also insert substrings into the randomised strings, if requiredStrings is set
-   * @static
-   * @param {Object} params - Parameters
-   * @param {Number} params.amount - Number of randomised strings
-   * @param {Number} params.length - Length of randomised string
-   * @param {boolean} params.upperCase - Should all characters be in upper case?
-   * @param {boolean} params.codeMode - Should there be extra {} and () inserted into the string?
-   * @param {string[]} params.requiredStrings - Substrings to be added into the randomised strings
-   * @returns {string[]} - Randomised strings
-   */
-  static createMixedArray(params) {
-    const amount = params.amount;
-    const length = params.length;
-    const upperCase = params.upperCase;
-    const codeMode = params.codeMode;
-    const requiredStrings = params.requiredStrings || [];
-    const text = [];
-    const requiredIndexes = [];
+  static randomiseCase(string) {
+    return Array.from(string).map((char) => {
+      if (Math.random() > 0.5) {
+        return char.toUpperCase();
+      }
 
-    for (let i = 0; i < amount; i += 1) {
-      text.push(this.createMixedString(length, upperCase, codeMode));
+      return char;
+    }).join('');
+  }
+
+  static createRandString({ selection, length }) {
+    const randomLength = selection.length;
+    let result = '';
+
+    for (let i = 0; i < length; i += 1) {
+      const randomVal = Math.round(Math.random() * (randomLength - 1));
+
+      result += Math.random() > 0.5 ? selection[randomVal].toUpperCase() : selection[randomVal];
     }
 
-    for (let i = 0; i < requiredStrings.length; i += 1) {
-      const stringLength = requiredStrings[i].length;
-      const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
-      let randomArrayIndex = Math.floor(Math.random() * (amount - 2));
+    return result;
+  }
 
-      /**
-       * Max 1 required string per randomised string
-       * Stores the indexes of the ones who already had a substring added to them
-       * This rule will be ignored and multiple substrings can appear in a randomised string if the amount of required string is higher than the amount of strings to be generated
-       */
-      while (requiredIndexes.length < amount && requiredIndexes.indexOf(randomArrayIndex) > -1) {
-        randomArrayIndex = Math.floor(Math.random() * (amount - 2));
-      }
+  static createMixedArray({ rowAmount, length, requiredClickableStrings = [], requiredFunc = () => {} }) {
+    const selection = chars + numbers + specials;
+    const spans = [];
+    let indexes = [];
+
+    for (let i = 0; i < rowAmount; i += 1) {
+      spans.push(this.createRandString({ selection, length }));
+      indexes.push(i);
+    }
+
+    indexes = tools.shuffleArray(indexes);
+
+    for (let i = 0; i < requiredClickableStrings.length; i += 1) {
+      const stringLength = requiredClickableStrings[i].length;
+      const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
+      const randomIndex = indexes[i];
+      const randomString = spans[randomIndex];
+      const span = elementcreator.createSpan({});
 
       /**
        * Inserts required string and cuts away enough characters from the left and right of the random string to keep the length intact
        */
-      text[randomArrayIndex] = text[randomArrayIndex].slice(0, randomStringIndex) + requiredStrings[i] + text[randomArrayIndex].slice(randomStringIndex + stringLength);
-      requiredIndexes.push(randomArrayIndex);
+      span.appendChild(elementcreator.createSpan({
+        text: randomString.slice(0, randomStringIndex),
+      }));
+      span.appendChild(elementcreator.createSpan({
+        text: this.randomiseCase(requiredClickableStrings[i]),
+        classes: ['clickable'],
+        func: () => { requiredFunc(requiredClickableStrings[i]); },
+      }));
+      span.appendChild(elementcreator.createSpan({
+        text: randomString.slice(randomStringIndex + stringLength),
+      }));
+
+      spans[randomIndex] = span;
     }
 
-    return text;
+    return spans;
   }
 
   static replaceWhitespace(string) {
-    return Array.from(string).map(char => this.findOneReplace(char, ' ', this.createMixedString(1, false, true))).join('');
+    return Array.from(string).map(char => this.findOneReplace(char, ' ', this.createMixedString(1))).join('');
   }
 
   /**

@@ -17,9 +17,10 @@
 const soundLibrary = require('../../audio/SoundLibrary');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
+const Label = require('./Label');
 
 class MapMarker {
-  constructor({ icon = {}, description = [], shouldCluster = false, team = '', owner = '', lastUpdated = new Date(), coordinates: { longitude, latitude, accuracy = 0 }, markerType, positionName, map, worldMap }) {
+  constructor({ icon = {}, description = [], shouldCluster = false, team = '', owner = '', lastUpdated = new Date(), coordinates: { longitude, latitude, accuracy = 0 }, alwaysShowLabel = false, markerType, positionName, map, worldMap }) {
     this.marker = new google.maps.Marker({
       position: {
         lat: latitude,
@@ -52,6 +53,30 @@ class MapMarker {
       fillOpacity: 0.15,
       radius: this.accuracy,
     });
+    this.label = new Label({
+      labelText: positionName,
+      coordinates: { longitude, latitude },
+      positionName,
+    });
+    this.alwaysShowLabel = alwaysShowLabel;
+    this.mouseOver = false;
+
+    google.maps.event.addListener(this.marker, 'mouseover', () => {
+      this.mouseOver = true;
+
+      this.showAccuracy();
+      this.showLabel(this.map);
+    });
+
+    google.maps.event.addListener(this.marker, 'mouseout', () => {
+      this.mouseOver = false;
+
+      this.hideAccuracy();
+
+      if (!this.alwaysShowLabel) {
+        this.hideLabel();
+      }
+    });
 
     google.maps.event.addListener(this.marker, 'click', (event) => {
       soundLibrary.playSound('button2');
@@ -59,8 +84,11 @@ class MapMarker {
       if (worldMap.movingMarker !== null) {
         google.maps.event.clearListeners(this.map, 'mousemove');
         this.setPosition({
-          latitude: event.latLng.lat(),
-          longitude: event.latLng.lng(),
+          coordinates: {
+            latitude: event.latLng.lat(),
+            longitude: event.latLng.lng(),
+          },
+          map: this.map,
           lastUpdated: new Date(),
         });
         socketManager.emitEvent('updatePosition', {
@@ -83,7 +111,7 @@ class MapMarker {
     let longClick = false;
 
     google.maps.event.addListener(this.marker, 'rightclick', (event) => {
-      if (this.markerType === 'custom' && this.owner === storageManager.getUserName()) {
+      if (this.owner === storageManager.getUserName()) {
         worldMap.createMarkerClickMenu(event, this);
       }
     });
@@ -104,8 +132,26 @@ class MapMarker {
     });
 
     if (this.map) {
-      this.setMap(map);
+      this.setMap(this.map);
+
+      if (this.alwaysShowLabel) {
+        this.showLabel(this.map);
+      }
     }
+  }
+
+  showLabel() {
+    this.label.showLabel(this.map);
+
+    if (!this.alwaysShowLabel && !this.mouseOver) {
+      setTimeout(() => {
+        this.label.hideLabel(null);
+      }, 5000);
+    }
+  }
+
+  hideLabel() {
+    this.label.hideLabel(null);
   }
 
   showDescription() {
@@ -116,21 +162,21 @@ class MapMarker {
 
   showAccuracy() {
     if (this.accuracy > 20) {
-      this.accuracyCircle.setMap(this.marker.getMap());
-
-      setTimeout(() => {
-        this.hideAccuracy();
-      }, 3000);
+      this.accuracyCircle.setMap(this.map);
     }
+
+    setTimeout(() => {
+      this.hideAccuracy();
+    }, 5000);
   }
 
   hideAccuracy() {
     this.accuracyCircle.setMap(null);
   }
 
-  setPosition({ coordinates, lastUpdated }) {
-    this.setMap(this.map);
-
+  setPosition({ coordinates, lastUpdated, map }) {
+    this.setMap(map);
+    this.label.setPosition({ coordinates });
     this.marker.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
     this.lastUpdated = lastUpdated || new Date();
   }
@@ -142,9 +188,13 @@ class MapMarker {
   setMap(map) {
     if (map === null) {
       this.accuracyCircle.setMap(null);
+      this.hideLabel();
+    } else if (this.alwaysShowLabel) {
+      this.label.setMap(map);
     }
 
     this.marker.setMap(map);
+    this.map = map;
   }
 }
 

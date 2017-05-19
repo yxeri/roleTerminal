@@ -17,6 +17,7 @@
 $text-color: #00ffcc;
 $darker-text-color: #009170;
 $second-color: #ff02e5;
+$darker-second-color: #a50293;
 $flash-color: #ff02e5;
 $light-color: #9b9b9b;
 $back-color: #11000f;
@@ -507,6 +508,10 @@ img {
 
 #terminal {
   overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 
   #terminalFeed {
     padding-left: .4em;
@@ -519,9 +524,13 @@ img {
     li {
       margin: .3em 0;
 
-      .clickable {
-        text-decoration: underline;
+      .linkLook {
+        background-color: $darker-second-color;
         margin-right: .5em;
+      }
+
+      .clickable:hover, .clickable:active {
+        background-color: $darker-text-color;
       }
     }
   }
@@ -608,7 +617,6 @@ img {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
-
 }
 
 .textAnimation {

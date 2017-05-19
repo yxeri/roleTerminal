@@ -357,11 +357,11 @@ class Messenger extends StandardView {
             maxLength: 10,
           }],
           description: [
-            textTools.createMixedString(60, false, true),
+            textTools.createMixedString(60),
             'Alter Ego Creator 0.0.2',
             'Made available by Razor',
             'For your enjoyment',
-            textTools.createMixedString(63, false, true),
+            textTools.createMixedString(63),
           ],
           extraDescription: ['Enter your new alias'],
         });
@@ -554,8 +554,9 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SWITCHROOM,
-      func: ({ room: roomName }) => {
-        const listItem = findItem(followList, storageManager.getRoom());
+      func: () => {
+        const roomName = storageManager.getRoom();
+        const listItem = findItem(followList, roomName);
 
         if (listItem) {
           this.selectedItem = listItem;
@@ -564,7 +565,7 @@ class Messenger extends StandardView {
 
         this.messageList.element.classList.remove('flash');
 
-        if (storageManager.getRoom() !== '') {
+        if (roomName && roomName !== '') {
           setTimeout(() => {
             this.messageList.element.innerHTML = '';
             this.messageList.element.classList.add('flash');

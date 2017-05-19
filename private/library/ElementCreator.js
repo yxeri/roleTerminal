@@ -130,7 +130,9 @@ class ElementCreator {
   static createSpan({ text, classes = [], func }) {
     const span = document.createElement('SPAN');
 
-    span.appendChild(document.createTextNode(text));
+    if (text) {
+      span.appendChild(document.createTextNode(text));
+    }
 
     if (func) {
       span.addEventListener('click', () => {

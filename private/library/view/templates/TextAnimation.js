@@ -29,7 +29,7 @@ class TextAnimation extends View {
 
   addCode({ iteration, maxIteration, row, maxRows, binary, waitTime = 300 }) {
     const span = document.createElement('SPAN');
-    const text = document.createTextNode(!binary ? textTools.createMixedString(5, false, true) : textTools.createBinaryString(5));
+    const text = document.createTextNode(!binary ? textTools.createMixedString(5) : textTools.createBinaryString(5));
 
     span.appendChild(text);
     this.element.appendChild(span);

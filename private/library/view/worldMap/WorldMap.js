@@ -188,7 +188,7 @@ class WorldMap extends View {
                 this.createPing({ position });
               }
             } else if (this.markers[positionName]) {
-              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
+              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
 
               if (position.markerType && position.markerType === 'user') {
                 const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
@@ -288,6 +288,7 @@ class WorldMap extends View {
         this.realignMap([marker]);
         parentList.toggleList();
         marker.showDescription();
+        marker.showLabel();
 
         if (marker.markerType === 'user' || marker.markerType === 'you') {
           marker.showAccuracy();
@@ -330,8 +331,11 @@ class WorldMap extends View {
 
             google.maps.event.addListener(this.map, 'mousemove', (moveEvent) => {
               this.movingMarker.setPosition({
-                latitude: moveEvent.latLng.lat(),
-                longitude: moveEvent.latLng.lng(),
+                coordinates: {
+                  latitude: moveEvent.latLng.lat(),
+                  longitude: moveEvent.latLng.lng(),
+                },
+                map: this.map,
               });
             });
             this.hideMarkerClicKMenu();
@@ -398,6 +402,15 @@ class WorldMap extends View {
                 placeholder: 'Description',
                 inputName: 'description',
                 multiLine: true,
+              }, {
+                type: 'radioSet',
+                title: 'Who should the position be visible to?',
+                optionName: 'visibility',
+                options: [
+                  { optionId: 'visPublic', optionLabel: 'Everyone' },
+                  { optionId: 'visTeam', optionLabel: 'My team' },
+                  { optionId: 'visPrivate', optionLabel: 'Only me' },
+                ],
               }],
               description: ['Mark a position that offers the maximum amount of team synergy'],
               extraDescription: [''],
@@ -498,6 +511,7 @@ class WorldMap extends View {
       map: this.map,
       worldMap: this,
       description: ['You'],
+      alwaysShowLabel: true,
     });
   }
 
@@ -507,14 +521,20 @@ class WorldMap extends View {
    * @param {Object} position New position
    */
   setUserPosition({ position }) {
-    const beautifiedDate = textTools.generateTimeStamp({ date: position.lastUpdated });
+    if (!(typeof google === 'undefined' || typeof MarkerClusterer === 'undefined' || typeof MapLabel === 'undefined')) {
+      const beautifiedDate = textTools.generateTimeStamp({ date: position.lastUpdated });
 
-    if (this.markers.I) {
-      this.markers.I.setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated });
-      this.markers.I.description = [`Last updated: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
-      this.markers.I.setMap(this.map);
-    } else {
-      this.createThisUserMarker({ position });
+      if (this.markers.I) {
+        this.markers.I.setPosition({
+          coordinates: position.coordinates,
+          lastUpdated: position.lastUpdated,
+          map: this.map,
+        });
+        this.markers.I.description = [`Last updated: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`];
+        this.markers.I.setMap(this.map);
+      } else {
+        this.createThisUserMarker({ position });
+      }
     }
   }
 
@@ -809,7 +829,7 @@ class WorldMap extends View {
      * User position marker can be created before map exists. That's why we add it to the map here
      */
     if (this.markers.I) {
-      this.markers.I.marker.setMap(this.map);
+      this.markers.I.setMap(this.map);
     }
 
     this.retrievePositions({});
@@ -909,6 +929,7 @@ class WorldMap extends View {
             description: userDescription,
             map: this.map,
             worldMap: this,
+            alwaysShowLabel: true,
             markerType,
             positionName,
             owner,

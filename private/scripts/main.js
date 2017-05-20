@@ -411,6 +411,7 @@ terminal.addCommand({
                       rowAmount: 17,
                       length: 30,
                       requiredClickableStrings: hackData.passwords,
+                      charToLower: hackData.passwordHint.character,
                       requiredFunc: (value) => {
                         terminal.triggerCommand(value);
                       },

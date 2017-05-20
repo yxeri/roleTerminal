@@ -164,9 +164,11 @@ class TextTools {
     });
   }
 
-  static randomiseCase(string) {
+  static randomiseCase(string, charToLower) {
     return Array.from(string).map((char) => {
-      if (Math.random() > 0.5) {
+      if (char === charToLower) {
+        return char.toLowerCase();
+      } else if (Math.random() > 0.5) {
         return char.toUpperCase();
       }
 
@@ -187,7 +189,7 @@ class TextTools {
     return result;
   }
 
-  static createMixedArray({ rowAmount, length, requiredClickableStrings = [], requiredFunc = () => {} }) {
+  static createMixedArray({ rowAmount, length, charToLower, requiredClickableStrings = [], requiredFunc = () => {} }) {
     const selection = chars + numbers + specials;
     const spans = [];
     let indexes = [];
@@ -213,7 +215,7 @@ class TextTools {
         text: randomString.slice(0, randomStringIndex),
       }));
       span.appendChild(elementcreator.createSpan({
-        text: this.randomiseCase(requiredClickableStrings[i]),
+        text: this.randomiseCase(requiredClickableStrings[i], charToLower),
         classes: ['clickable'],
         func: () => { requiredFunc(requiredClickableStrings[i]); },
       }));

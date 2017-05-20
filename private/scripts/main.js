@@ -388,7 +388,7 @@ terminal.addCommand({
                 message: {
                   text: [
                     `Action ${actions.find(action => action.id === actionId).name} chosen`,
-                    `Accessing LANTERN ${actionId}...`,
+                    `Accessing LANTERN ${stationId}...`,
                   ],
                 },
               });
@@ -455,7 +455,7 @@ terminal.addCommand({
                         },
                       });
                       terminal.resetNextFunc();
-                    } else if (hackData.triesLeft <= 0) {
+                    } else if (manipulateData.triesLeft <= 0) {
                       const beautifiedDate = textTools.generateTimeStamp({ date: manipulateData.lockoutTime });
 
                       terminal.queueMessage({
@@ -471,7 +471,7 @@ terminal.addCommand({
                       });
                       terminal.resetNextFunc();
                     } else {
-                      terminal.queueMessage({ message: { text: [`Incorrect password. ${hackData.triesLeft} tries left`] } });
+                      terminal.queueMessage({ message: { text: [`Incorrect password. ${manipulateData.triesLeft} tries left`] } });
                     }
                   });
                 });

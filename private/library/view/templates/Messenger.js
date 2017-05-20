@@ -26,7 +26,6 @@ const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
-const textTools = require('../../TextTools');
 
 /**
  * Takes a list of user names and filters out current users user name and aliases

@@ -165,9 +165,11 @@ class MapMarker {
       this.accuracyCircle.setMap(this.map);
     }
 
-    setTimeout(() => {
-      this.hideAccuracy();
-    }, 5000);
+    if (!this.mouseOver) {
+      setTimeout(() => {
+        this.hideAccuracy();
+      }, 5000);
+    }
   }
 
   hideAccuracy() {

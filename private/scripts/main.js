@@ -30,6 +30,7 @@ const Wallet = require('../library/view/templates/Wallet');
 const Terminal = require('../library/view/templates/Terminal');
 const ButtonBox = require('../library/view/templates/ButtonBox');
 const TeamViewer = require('../library/view/templates/TeamViewer');
+const ToolsViewer = require('../library/view/templates/ToolsViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
 
 const keyHandler = require('../library/KeyHandler');
@@ -103,7 +104,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 2000,
+      waitTime: 1000,
       corruption: false,
       array: [
         'Connected!',
@@ -122,6 +123,23 @@ boot.setQueue([
       corruption: false,
       array: [
         'Uplink established!',
+        'Booting O3S 5.0...',
+      ],
+    },
+  }, {
+    func: boot.printLines,
+    params: {
+      waitTime: 4000,
+      corruption: false,
+      array: [
+        'Uplink established!',
+        'Downloading modules...',
+        'LAMM  - LANTERN Amplification Master Manipulator',
+        'OSAT  - Organica System Administrator Toolset',
+        'CHAT  - Communication Host-Agent Tracker',
+        'CREDS - Computer Registered Evaluative Decision System',
+        'PANIC - Pain-Assisted Neglect Information Collector',
+        'YOU   - YOU Object Unifier',
         'Booting O3S 5.0...',
       ],
     },
@@ -251,10 +269,9 @@ terminal.addCommand({
           'LAMM',
           '----',
           'Found 2 memory dumps',
-          'You will be shown users with access to your chosen LANTERN',
+          'You will be shown a user with access to your chosen LANTERN',
           'Each user will have information about its password attached to it',
-          'You must find the password within the dumps and use it together with a user name to get access to the LANTERN',
-          'Only one user and password combination is correct',
+          'You must find the user\'s password within the dumps to get access to the LANTERN',
           'The password is repeated in both memory dumps',
           'We take no responsibility for deaths due to accidental activitation of defense systems',
         ],
@@ -304,13 +321,13 @@ terminal.addCommand({
           ],
           elementPerRow: true,
           elements: activeStations.concat(inactiveStations).map((station) => {
-            if (station.active) {
+            if (station.isActive) {
               const span = elementCreator.createSpan({});
               const stationSpan = elementCreator.createSpan({
                 classes: ['clickable', 'linkLook'],
-                text: `[${station.id}] ${station.location}`,
+                text: `[${station.stationId}] ${station.stationName}`,
                 func: () => {
-                  terminal.triggerCommand(station.id);
+                  terminal.triggerCommand(station.stationId);
                 },
               });
               const ownerSpan = elementCreator.createSpan({
@@ -324,14 +341,14 @@ terminal.addCommand({
             }
 
             return elementCreator.createSpan({
-              text: `[INACTIVE] ${station.location}`,
+              text: `[INACTIVE] ${station.stationName}`,
             });
           }),
         },
       });
 
       terminal.setNextFunc((stationIdValue) => {
-        const activeIds = activeStations.map(station => station.id);
+        const activeIds = activeStations.map(station => station.stationId);
         const stationId = !isNaN(stationIdValue) ? parseInt(stationIdValue, 10) : '';
 
         if (activeIds.indexOf(stationId) > -1) {
@@ -370,7 +387,7 @@ terminal.addCommand({
               terminal.queueMessage({
                 message: {
                   text: [
-                    `Action ${actions.find(action => action.id === action).name} chosen`,
+                    `Action ${actions.find(action => action.id === actionId).name} chosen`,
                     `Accessing LANTERN ${actionId}...`,
                   ],
                 },
@@ -385,6 +402,7 @@ terminal.addCommand({
                 }
 
                 const shouldAmplify = actionId === 1;
+                const hintIndex = hackData.passwordHint.index + 1;
 
                 terminal.queueMessage({
                   message: {
@@ -399,7 +417,23 @@ terminal.addCommand({
                     }),
                   },
                 });
-                terminal.queueMessage({ message: { text: [`${hackData.triesLeft} tries left`] } });
+                terminal.queueMessage({
+                  message: {
+                    text: [
+                      '------------',
+                      `User name: ${hackData.userName}. Password: ${hackData.passwordType}`,
+                      `Password hint: ${textTools.appendNumberSuffix(hintIndex)} character is: ${hackData.passwordHint.character}`,
+                    ],
+                  },
+                });
+                terminal.queueMessage({
+                  message: {
+                    text: [
+                      `${hackData.triesLeft} tries left`,
+                      '------------',
+                    ],
+                  },
+                });
 
                 terminal.setNextFunc((password) => {
                   socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), shouldAmplify }, ({ error: manipulateError, data: manipulateData }) => {
@@ -468,6 +502,7 @@ terminal.addTrigger({
   },
 });
 
+const toolsViewer = new ToolsViewer({ isFullscreen: true });
 const home = new Home();
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const dirViewer = new DirViewer({ isFullscreen: true });
@@ -641,7 +676,7 @@ home.addLink({
   startFunc: () => {
     const panicBox = new ButtonBox({
       description: [
-        'Employee UNDEFINED. You have pressed the panic button. Remain calm to minimize blood leakage and increase your survivability',
+        'Employee UNDEFINED. You have activate the PANIC-Assisted Native Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability',
         'By proceeding, you agree to have your position retrieved and sent to those who can best help you',
         'Choose the option that best describes your current situation:',
         ' ',
@@ -674,6 +709,7 @@ home.addLink({
                   'The Organica corporation and the Panzerwolves have a written non-aggression pact',
                   'We recommend that you cite Agreement 233.75.1.12 to cease the murder process',
                   'A team of lawyers will be sent to your location',
+                  'Thank you for using PANIC',
                 ],
               });
               panicBox.replaceButtons({
@@ -715,6 +751,7 @@ home.addLink({
                   'You have been found in breach of your employment contract. Reason: {UNDEFINED}',
                   'Re-education is mandatory for low productivity and contract breaches',
                   'A second re-education team will be sent to your location to speed up the re-education process',
+                  'Thank you for using PANIC',
                 ],
               });
               panicBox.replaceButtons({
@@ -760,6 +797,7 @@ home.addLink({
                     'We have to remind you that allowing non-employees to take your assigned Organica equipment is a breech of your employment contract',
                     'We advice you to make certain that none of your equipment is stolen, before and after your death',
                     'Your location will be sent to your team',
+                    'Thank you for using PANIC',
                   ],
                 });
                 panicBox.replaceButtons({
@@ -780,6 +818,7 @@ home.addLink({
                   'Warning! We have no record of you being part of a team',
                   'Only employees with the rank "Productive Team Member" or higher may use this service',
                   'No notification will be sent',
+                  'Thank you for using PANIC',
                 ],
               });
               panicBox.replaceButtons({
@@ -800,7 +839,7 @@ home.addLink({
               text: [
                 'You have selected: "... Actually, I am fine"',
                 'Warning! You have wasted seconds of Organica-owned time',
-                'We will fine you 100 credits. NaN has been deducted from your wallet',
+                'We will fine you 100 credits. NaN has been deducted from your CREDS',
               ],
             });
             panicBox.replaceButtons({
@@ -824,7 +863,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'profile',
+  linkName: 'YOU',
   startFunc: () => { profile.appendTo(mainView); },
   endFunc: () => { profile.removeView(); },
   accessLevel: 1,
@@ -832,7 +871,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'chatter',
+  linkName: 'CHAT',
   startFunc: () => { messenger.appendTo(mainView); },
   endFunc: () => { messenger.removeView(); },
   shortcut: true,
@@ -850,7 +889,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'wallet',
+  linkName: 'CREDS',
   startFunc: () => { wallet.appendTo(mainView); },
   endFunc: () => { wallet.removeView(); },
   classes: ['hide'],
@@ -858,7 +897,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'terminal',
+  linkName: 'OSAT',
   startFunc: () => { terminal.appendTo(mainView); },
   endFunc: () => { terminal.removeView(); },
   accessLevel: 1,
@@ -889,6 +928,11 @@ home.addLink({
   keepHome: true,
   classes: ['hide'],
   shortcut: true,
+});
+home.addLink({
+  linkName: 'tools',
+  startFunc: () => { toolsViewer.appendTo(mainView); },
+  endFunc: () => { toolsViewer.removeView(); },
 });
 home.appendTo(mainView);
 
@@ -998,6 +1042,11 @@ socketManager.addEvents([
     event: 'unfollow',
     func: ({ room }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room } });
+    },
+  }, {
+    event: 'simpleMsg',
+    func: ({ simpleMsg }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.SIMPLEMSG, params: { simpleMsg } });
     },
   },
   // {

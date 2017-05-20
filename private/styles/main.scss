@@ -506,6 +506,34 @@ img {
   }
 }
 
+#toolsViewer {
+  .viewer {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+
+    li {
+      border-bottom: 1px solid $text-color;
+      padding: .5em 0 .5em .2em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    > p {
+      text-align: center;
+      border-bottom: 1px solid $text-color;
+      padding-top: .2em;
+      padding-bottom: .5em;
+    }
+  }
+
+  .viewer::-webkit-scrollbar {
+    width: 0 !important;
+  }
+}
+
 #terminal {
   overflow: hidden;
   -webkit-touch-callout: none;
@@ -592,6 +620,10 @@ img {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid $second-color;
+}
+
+.viewer::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 .list::-webkit-scrollbar {

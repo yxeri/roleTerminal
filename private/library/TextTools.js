@@ -242,6 +242,21 @@ class TextTools {
   static isInternationalAllowed(text) {
     return internationalRegex.test(text);
   }
+
+  static appendNumberSuffix(number) {
+    const modTen = number % 10;
+    const modHundred = number % 100;
+
+    if (modTen === 1 && modHundred !== 11) {
+      return `${number}st`;
+    } else if (modTen === 2 && modHundred !== 12) {
+      return `${number}nd`;
+    } else if (modTen === 3 && modHundred !== 13) {
+      return `${number}rd`;
+    }
+
+    return `${number}th`;
+  }
 }
 
 

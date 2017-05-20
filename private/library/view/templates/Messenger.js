@@ -308,66 +308,6 @@ class Messenger extends StandardView {
       shouldSort: true,
     });
 
-    const createAliasButton = elementCreator.createButton({
-      classes: ['hide'],
-      text: 'Create alias',
-      func: () => {
-        const createDialog = new DialogBox({
-          buttons: {
-            left: {
-              text: 'Cancel',
-              eventFunc: () => {
-                createDialog.removeView();
-              },
-            },
-            right: {
-              text: 'Create',
-              eventFunc: () => {
-                const emptyFields = createDialog.markEmptyFields();
-
-                if (emptyFields) {
-                  soundLibrary.playSound('fail');
-                  createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
-
-                  return;
-                }
-
-                const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
-
-                socketManager.emitEvent('addAlias', { alias }, ({ error: createError }) => {
-                  if (createError) {
-                    console.log(createError);
-
-                    return;
-                  }
-
-                  eventCentral.triggerEvent({
-                    event: eventCentral.Events.NEWALIAS,
-                    params: { alias },
-                  });
-                  createDialog.removeView();
-                });
-              },
-            },
-          },
-          inputs: [{
-            placeholder: 'Alias',
-            inputName: 'alias',
-            isRequired: true,
-            maxLength: 10,
-          }],
-          description: [
-            textTools.createMixedString(60),
-            'Alter Ego Creator 0.0.2',
-            'Made available by Razor',
-            'For your enjoyment',
-            textTools.createMixedString(63),
-          ],
-          extraDescription: ['Enter your new alias'],
-        });
-        createDialog.appendTo(this.element.parentElement);
-      },
-    });
     const createButton = elementCreator.createButton({
       classes: ['hide'],
       text: 'Create room',
@@ -433,7 +373,7 @@ class Messenger extends StandardView {
       },
     });
 
-    systemList.addItems({ items: [createButton, createAliasButton] });
+    systemList.addItems({ items: [createButton] });
 
     this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(aliasList.element);
@@ -452,10 +392,6 @@ class Messenger extends StandardView {
     });
     this.accessElements.push({
       element: createButton,
-      accessLevel: 1,
-    });
-    this.accessElements.push({
-      element: createAliasButton,
       accessLevel: 1,
     });
 

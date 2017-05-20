@@ -560,6 +560,10 @@ img {
       .clickable:hover, .clickable:active {
         background-color: $darker-text-color;
       }
+
+      .clickableRevealed {
+        background-color: $darker-text-color;
+      }
     }
   }
 
@@ -572,6 +576,7 @@ img {
     height: 1.5em;
   }
 }
+
 
 .list {
   width: 7.5em;
@@ -838,6 +843,10 @@ img {
   button:last-child {
     margin-right: -$padding;
   }
+}
+
+.moreSpace {
+  line-height: 1.5em;
 }
 
 .lockedButton {

@@ -189,7 +189,7 @@ class TextTools {
     return result;
   }
 
-  static createMixedArray({ rowAmount, length, charToLower, requiredClickableStrings = [], requiredFunc = () => {} }) {
+  static createMixedArray({ classes, rowAmount, length, charToLower, requiredClickableStrings = [], requiredFunc = () => {} }) {
     const selection = chars + numbers + specials;
     const spans = [];
     let indexes = [];
@@ -222,6 +222,10 @@ class TextTools {
       span.appendChild(elementcreator.createSpan({
         text: randomString.slice(randomStringIndex + stringLength),
       }));
+
+      if (classes) {
+        classes.forEach(cssClass => span.classList.add(cssClass));
+      }
 
       spans[randomIndex] = span;
     }

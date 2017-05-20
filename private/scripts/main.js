@@ -324,7 +324,7 @@ terminal.addCommand({
             if (station.isActive) {
               const span = elementCreator.createSpan({});
               const stationSpan = elementCreator.createSpan({
-                classes: ['clickable', 'linkLook'],
+                classes: ['clickable', 'linkLook', 'moreSpace'],
                 text: `[${station.stationId}] ${station.stationName}`,
                 func: () => {
                   terminal.triggerCommand(station.stationId);
@@ -365,7 +365,7 @@ terminal.addCommand({
               elements: actions.map((action) => {
                 const span = elementCreator.createSpan({});
                 const actionSpan = elementCreator.createSpan({
-                  classes: ['clickable', 'linkLook'],
+                  classes: ['clickable', 'linkLook', 'moreSpace'],
                   text: `[${action.id}] ${action.name}`,
                   func: () => {
                     terminal.triggerCommand(action.id);
@@ -404,18 +404,40 @@ terminal.addCommand({
                 const shouldAmplify = actionId === 1;
                 const hintIndex = hackData.passwordHint.index + 1;
 
+                const elements = textTools.createMixedArray({
+                  classes: ['moreSpace'],
+                  rowAmount: 15,
+                  length: 34,
+                  requiredClickableStrings: hackData.passwords,
+                  charToLower: hackData.passwordHint.character,
+                  requiredFunc: (value) => {
+                    terminal.triggerCommand(value);
+                  },
+                });
+
+                elements.forEach((element) => {
+                  let startTouchTime;
+
+                  element.addEventListener('touchstart', () => {
+                    startTouchTime = new Date();
+                  });
+
+                  element.addEventListener('touchend', () => {
+                    const endTouchTime = new Date();
+
+                    if (endTouchTime - startTouchTime >= 300) {
+                      const clickables = Array.from(element.getElementsByClassName('clickable'));
+
+                      elements.forEach(spanElement => Array.from(spanElement.children).forEach(child => child.classList.remove('clickableRevealed')));
+                      clickables.forEach(clickable => clickable.classList.add('clickableRevealed'));
+                    }
+                  });
+                });
+
                 terminal.queueMessage({
                   message: {
                     elementPerRow: true,
-                    elements: textTools.createMixedArray({
-                      rowAmount: 17,
-                      length: 30,
-                      requiredClickableStrings: hackData.passwords,
-                      charToLower: hackData.passwordHint.character,
-                      requiredFunc: (value) => {
-                        terminal.triggerCommand(value);
-                      },
-                    }),
+                    elements,
                   },
                 });
                 terminal.queueMessage({

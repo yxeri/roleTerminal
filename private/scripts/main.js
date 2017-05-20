@@ -408,7 +408,7 @@ terminal.addCommand({
                   message: {
                     elementPerRow: true,
                     elements: textTools.createMixedArray({
-                      rowAmount: 8,
+                      rowAmount: 17,
                       length: 30,
                       requiredClickableStrings: hackData.passwords,
                       requiredFunc: (value) => {
@@ -444,25 +444,27 @@ terminal.addCommand({
                       return;
                     }
 
-                    if (manipulateData.success) {
+                    const { success, triesLeft, matches, lockoutTime } = manipulateData;
+
+                    if (success) {
                       terminal.queueMessage({
                         message: {
                           text: [
                             'Correct password',
-                            `${manipulateData.amplified ? 'Amplified' : 'Dampened'} LANTERN ${manipulateData.stationId} signal`,
+                            `${manipulateData.amplified ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
                             'Thank you for using LAMM',
                           ],
                         },
                       });
                       terminal.resetNextFunc();
-                    } else if (manipulateData.triesLeft <= 0) {
-                      const beautifiedDate = textTools.generateTimeStamp({ date: manipulateData.lockoutTime });
+                    } else if (triesLeft <= 0) {
+                      const beautifiedDate = textTools.generateTimeStamp({ date: lockoutTime });
 
                       terminal.queueMessage({
                         message: {
                           text: [
                             'Incorrect password',
-                            `You have been locked out of LANTERN ${manipulateData.stationId}`,
+                            `You have been locked out of LANTERN ${stationId}`,
                             'Starting lockdown crack',
                             `The lockdown lasts until ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
                             'Thank you for using LAMM',
@@ -471,7 +473,7 @@ terminal.addCommand({
                       });
                       terminal.resetNextFunc();
                     } else {
-                      terminal.queueMessage({ message: { text: [`Incorrect password. ${manipulateData.triesLeft} tries left`] } });
+                      terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} matched. ${triesLeft} tries left`] } });
                     }
                   });
                 });

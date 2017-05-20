@@ -141,7 +141,7 @@ class Terminal extends View {
 
     if (currentText && currentText.length > 0) {
       const text = currentText.shift();
-      const row = elementCreator.createListItem({ classes: message.classes, element: elementCreator.createSpan({ text }) });
+      const row = elementCreator.createListItem({ elementId: message.elementId, classes: message.classes, element: elementCreator.createSpan({ text }) });
 
       this.element.firstElementChild.appendChild(row);
       row.scrollIntoView();

@@ -34,7 +34,7 @@ const numbers = '0123456789';
  * Special characters used when generating random text
  * @type {string}
  */
-const specials = '!;#&';
+const specials = '!;#&()[]';
 /**
  * Used when generating random binary text
  * @type {string}

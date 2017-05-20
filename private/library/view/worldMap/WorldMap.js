@@ -73,23 +73,27 @@ class WorldMap extends View {
     this.movingMarker = null;
     this.maxUserAge = maxUserAge;
     this.maxPingAge = maxPingAge;
-    this.userList = new List({ title: 'USERS', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.userList = new List({ title: 'USER', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.localList = new List({ title: 'LOCAL', viewId: 'mapLocalList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.worldList = new List({ title: 'WORLD', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.teamList = new List({ title: 'TEAM', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 1 });
-    this.otherList = new List({ title: 'OTHERS', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
+    this.otherList = new List({ title: 'OTHER', viewId: 'mapOtherList', shouldSort: true, minimumToShow: 0, showTitle: true });
 
     // TODO Ugly and duplicated
     this.userList.element.addEventListener('click', () => {
-      [this.worldList, this.otherList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.worldList, this.otherList, this.teamList, this.localList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
     this.worldList.element.addEventListener('click', () => {
-      [this.userList, this.otherList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.userList, this.otherList, this.teamList, this.localList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
     this.otherList.element.addEventListener('click', () => {
-      [this.userList, this.worldList, this.teamList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.userList, this.worldList, this.teamList, this.localList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
     this.teamList.element.addEventListener('click', () => {
-      [this.userList, this.worldList, this.otherList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+      [this.userList, this.worldList, this.otherList, this.localList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
+    });
+    this.localList.element.addEventListener('click', () => {
+      [this.worldList, this.otherList, this.teamList, this.userList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
 
     const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['mapMenu'] });
@@ -103,6 +107,7 @@ class WorldMap extends View {
       },
     });
 
+    mapMenu.appendChild(this.localList.element);
     mapMenu.appendChild(this.worldList.element);
     mapMenu.appendChild(this.userList.element);
     mapMenu.appendChild(this.teamList.element);
@@ -124,6 +129,7 @@ class WorldMap extends View {
         this.retrievePositions({ callback: () => {
           const team = storageManager.getTeam();
           const world = [];
+          const local = [];
           const teamUsers = [];
           const users = [];
           const others = Object.keys(this.markers).filter((positionName) => {
@@ -141,11 +147,14 @@ class WorldMap extends View {
               }
             } else if (marker.markerType === 'world') {
               world.push(positionName);
+            } else if (marker.markerType === 'local') {
+              local.push(positionName);
             }
 
             return false;
           });
 
+          this.replaceListItems(local, this.localList);
           this.replaceListItems(world, this.worldList);
           this.replaceListItems(users, this.userList);
           this.replaceListItems(teamUsers, this.teamList);

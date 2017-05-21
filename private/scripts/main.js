@@ -138,7 +138,7 @@ boot.setQueue([
         'OSAT  - Organica System Administrator Toolset',
         'CHAT  - Communication Host-Agent Tracker',
         'CREDS - Computer Registered Evaluative Decision System',
-        'PANIC - Pain-Assisted Neglect Information Collector',
+        'PANIC - PANIC-Assisted Neglect Information Collector',
         'YOU   - YOU Object Unifier',
         'Booting O3S 5.0...',
       ],
@@ -701,7 +701,7 @@ home.addLink({
   startFunc: () => {
     const panicBox = new ButtonBox({
       description: [
-        'Employee UNDEFINED. You have activate the PANIC-Assisted Native Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability',
+        'Employee UNDEFINED. You have activate the PANIC-Assisted Neglect Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability',
         'By proceeding, you agree to have your position retrieved and sent to those who can best help you',
         'Choose the option that best describes your current situation:',
         ' ',

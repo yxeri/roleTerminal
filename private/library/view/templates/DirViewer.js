@@ -50,6 +50,16 @@ class DirViewer extends StandardView {
     this.element.setAttribute('id', 'dirViewer');
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
+    this.systemList = new List({ shouldSort: false, title: 'SYSTEM' });
+    this.dirList = new List({ viewId: 'dirList', shouldSort: true, title: 'DIRECTORY' });
+    this.myFiles = new List({ viewId: 'myDir', shouldSort: true, title: 'My Files' });
+    this.myTeamFiles = new List({ viewId: 'myTeamDir', shouldSort: true, title: 'My Team' });
+    this.teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'TEAMS' });
+    this.userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'USERS' });
+    // User name : List
+    this.userLists = {};
+    // Team name : List
+    this.teamLists = {};
 
     this.populateList();
   }
@@ -76,10 +86,13 @@ class DirViewer extends StandardView {
   createDocFileButton(docFile) {
     const title = `${docFile.title || docFile.docFileId}`;
     const button = elementCreator.createButton({
-      text: title.length > 30 ? `${title.slice(0, 20)} ... ${title.slice(title.length - 5, title.length)}` : title,
+      data: docFile.docFileId,
+      text: title,
       func: () => {
-        if (docFile.docFileId) {
-          socketManager.emitEvent('getDocFile', { docFileId: docFile.docFileId }, ({ docFileError, data: docFileData }) => {
+        const docFileId = button.getAttribute('data');
+
+        if (docFileId) {
+          socketManager.emitEvent('getDocFile', { docFileId }, ({ docFileError, data: docFileData }) => {
             if (docFileError) {
               console.log(docFileError);
 
@@ -110,15 +123,29 @@ class DirViewer extends StandardView {
                     return;
                   }
 
-                  const docFileId = deniedDialog.inputs.find(({ inputName }) => inputName === 'docFileId').inputElement.value;
+                  const docFileIdValue = deniedDialog.inputs.find(({ inputName }) => inputName === 'docFileId').inputElement.value;
 
-                  socketManager.emitEvent('getDocFile', { docFileId }, ({ docFileError, data: docFileData }) => {
+                  socketManager.emitEvent('getDocFile', { docFileId: docFileIdValue }, ({ docFileError, data: docFileData }) => {
                     if (docFileError) {
                       console.log(docFileError);
 
                       return;
                     } else if (!docFileData.docFile) {
                       deniedDialog.changeExtraDescription({ text: ['Incorrect code', 'Access denied'] });
+                    }
+
+                    const { team, creator, docFileId: sentId, title: sentTitle } = docFileData.docFile;
+
+                    if (team) {
+                      const item = this.teamLists[team].getItem({ name: sentTitle });
+
+                      item.firstElementChild.setAttribute('data', sentId);
+                      item.firstElementChild.classList.remove('lockedButton');
+                    } else {
+                      const item = this.userLists[creator].getItem({ name: sentTitle });
+
+                      item.firstElementChild.setAttribute('data', sentId);
+                      item.firstElementChild.classList.remove('lockedButton');
                     }
 
                     if (this.selectedItem) {
@@ -156,17 +183,6 @@ class DirViewer extends StandardView {
   }
 
   populateList() {
-    const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
-    const dirList = new List({ viewId: 'dirList', shouldSort: true, title: 'DIRECTORY' });
-    const myFiles = new List({ viewId: 'myDir', shouldSort: true, title: 'My Files' });
-    const myTeamFiles = new List({ viewId: 'myTeamDir', shouldSort: true, title: 'My Team' });
-    const teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'TEAMS' });
-    const userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'USERS' });
-    // User name : List
-    const userLists = {};
-    // Team name : List
-    const teamLists = {};
-
     const searchButton = elementCreator.createButton({
       text: 'ID search',
       func: () => {
@@ -190,9 +206,9 @@ class DirViewer extends StandardView {
                   return;
                 }
 
-                const documentId = idDialog.inputs.find(({ inputName }) => inputName === 'documentId').inputElement.value.toLowerCase();
+                const docFileId = idDialog.inputs.find(({ inputName }) => inputName === 'docFileId').inputElement.value.toLowerCase();
 
-                socketManager.emitEvent('getDocFile', { docFileId: documentId }, ({ error: docError, data: { docFile } }) => {
+                socketManager.emitEvent('getDocFile', { docFileId }, ({ error: docError, data: { docFile } }) => {
                   if (docError) {
                     console.log(docError);
 
@@ -211,7 +227,7 @@ class DirViewer extends StandardView {
           },
           inputs: [{
             placeholder: 'Document ID',
-            inputName: 'documentId',
+            inputName: 'docFileId',
             isRequired: true,
           }],
           description: [
@@ -314,13 +330,13 @@ class DirViewer extends StandardView {
       },
     });
 
-    systemList.addItems({ items: [searchButton, createButton] });
-    dirList.addItems({ items: [teamFiles.element, userFiles.element] });
+    this.systemList.addItems({ items: [searchButton, createButton] });
+    this.dirList.addItems({ items: [this.teamFiles.element, this.userFiles.element] });
 
-    this.itemList.appendChild(systemList.element);
-    this.itemList.appendChild(myFiles.element);
-    this.itemList.appendChild(myTeamFiles.element);
-    this.itemList.appendChild(dirList.element);
+    this.itemList.appendChild(this.systemList.element);
+    this.itemList.appendChild(this.myFiles.element);
+    this.itemList.appendChild(this.myTeamFiles.element);
+    this.itemList.appendChild(this.dirList.element);
 
     this.accessElements.push({
       element: createButton,
@@ -336,38 +352,38 @@ class DirViewer extends StandardView {
         const docTeam = docFile.team;
 
         if (creator === userName) {
-          myFiles.addItem({ item: this.createDocFileButton(docFile) });
+          this.myFiles.addItem({ item: this.createDocFileButton(docFile) });
         } else if (docTeam && docTeam !== '') {
           if (docTeam === storageManager.getTeam()) {
-            myTeamFiles.addItem({ item: this.createDocFileButton(docFile) });
+            this.myTeamFiles.addItem({ item: this.createDocFileButton(docFile) });
           } else {
-            const list = teamLists[docTeam];
+            const list = this.teamLists[docTeam];
 
             if (!list) {
-              teamLists[docTeam] = new List({
+              this.teamLists[docTeam] = new List({
                 elements: [this.createDocFileButton(docFile)],
                 title: docTeam,
                 shouldSort: true,
                 showTitle: true,
                 minimumToShow: 0,
               });
-              teamFiles.addItem({ item: teamLists[docTeam].element });
+              this.teamFiles.addItem({ item: this.teamLists[docTeam].element });
             } else {
               list.addItem({ item: this.createDocFileButton(docFile) });
             }
           }
         } else {
-          const list = userLists[creator];
+          const list = this.userLists[creator];
 
           if (!list) {
-            userLists[creator] = new List({
+            this.userLists[creator] = new List({
               elements: [this.createDocFileButton(docFile)],
               title: creator,
               shouldSort: true,
               showTitle: true,
               minimumToShow: 0,
             });
-            userFiles.addItem({ item: userLists[creator].element });
+            this.userFiles.addItem({ item: this.userLists[creator].element });
           } else {
             list.addItem({ item: this.createDocFileButton(docFile) });
           }
@@ -379,7 +395,7 @@ class DirViewer extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.CREATEDOCFILE,
       func: ({ docFile }) => {
-        myFiles.addItem({ item: this.createDocFileButton(docFile) });
+        this.myFiles.addItem({ item: this.createDocFileButton(docFile) });
       },
     });
 
@@ -389,8 +405,8 @@ class DirViewer extends StandardView {
       func: ({ changedUser }) => {
         if (changedUser) {
           this.viewer.innerHTML = '';
-          myFiles.replaceAllItems({ items: [] });
-          myTeamFiles.replaceAllItems({ items: [] });
+          this.myFiles.replaceAllItems({ items: [] });
+          this.myTeamFiles.replaceAllItems({ items: [] });
         }
 
         socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {
@@ -419,9 +435,9 @@ class DirViewer extends StandardView {
             groupedTeamDocs[docFile.team].push(docFile);
           });
 
-          myFiles.replaceAllItems({ items: myDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          myTeamFiles.replaceAllItems({ items: myTeamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          userFiles.replaceAllItems({
+          this.myFiles.replaceAllItems({ items: myDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          this.myTeamFiles.replaceAllItems({ items: myTeamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
+          this.userFiles.replaceAllItems({
             items: Object.keys(groupedUserDocs).map((userName) => {
               const docs = groupedUserDocs[userName];
               const list = new List({
@@ -432,12 +448,12 @@ class DirViewer extends StandardView {
                 minimumToShow: 0,
               });
 
-              userLists[userName] = list;
+              this.userLists[userName] = list;
 
               return list.element;
             }),
           });
-          teamFiles.replaceAllItems({
+          this.teamFiles.replaceAllItems({
             items: Object.keys(groupedTeamDocs).map((teamName) => {
               const docs = groupedTeamDocs[teamName];
               const list = new List({
@@ -448,7 +464,7 @@ class DirViewer extends StandardView {
                 minimumToShow: 0,
               });
 
-              teamLists[teamName] = list;
+              this.teamLists[teamName] = list;
 
               return list.element;
             }),

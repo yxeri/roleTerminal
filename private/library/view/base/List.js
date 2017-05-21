@@ -122,6 +122,10 @@ class List extends View {
     this.element.replaceChild(newList, this.element.lastElementChild);
   }
 
+  getItem({ name }) {
+    return Array.from(this.element.lastElementChild.childNodes).find(element => element.firstElementChild.textContent.toLowerCase() === name.toLowerCase());
+  }
+
   replaceAllItems({ items }) {
     const list = this.shouldSort ? createSortedList(elementCreator.createList({ elements: items })) : elementCreator.createList({ elements: items });
 

@@ -178,9 +178,6 @@ boot.setQueue([
       ],
     },
   }, {
-    func: boot.addCode,
-    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 1 },
-  }, {
     func: boot.printLines,
     params: {
       corruption: false,
@@ -268,7 +265,6 @@ terminal.addCommand({
           '----',
           'LAMM',
           '----',
-          'Found 2 memory dumps',
           'You will be shown a user with access to your chosen LANTERN',
           'Each user will have information about its password attached to it',
           'You must find the user\'s password within the dumps to get access to the LANTERN',

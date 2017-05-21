@@ -1,24 +1,41 @@
-const StandardView = require('../base/StandardView');
+const View = require('../base/View');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
 
-class Profile extends StandardView {
+class Profile extends View {
   constructor() {
     super({ viewId: 'profile' });
+
+    this.element.appendChild(elementCreator.createContainer({}));
+    this.element.appendChild(elementCreator.createContainer({}));
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
-        this.element.innerHTML = '';
-
         const fragment = document.createDocumentFragment();
         fragment.appendChild(elementCreator.createParagraph({ text: `User: ${storageManager.getUserName() || '-'}` }));
         fragment.appendChild(elementCreator.createParagraph({ text: `Team: ${storageManager.getTeam() || '-'}` }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `Access level: ${storageManager.getAccessLevel()}` }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `DID: ${storageManager.getDeviceId()}` }));
-        this.element.appendChild(fragment);
+        fragment.appendChild(elementCreator.createParagraph({ text: `Device: ${storageManager.getDeviceId()}` }));
+
+        this.element.firstElementChild.innerHTML = '';
+        this.element.firstElementChild.appendChild(fragment);
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.GAMECODE,
+      func: ({ gameCode }) => {
+        const fragment = document.createDocumentFragment();
+
+        fragment.appendChild(elementCreator.createParagraph({ text: '----KEY---' }));
+        fragment.appendChild(elementCreator.createParagraph({ text: `| ${gameCode} |` }));
+        fragment.appendChild(elementCreator.createParagraph({ text: '----END---' }));
+
+        this.element.lastElementChild.innerHTML = '';
+        this.element.lastElementChild.appendChild(fragment);
       },
     });
   }

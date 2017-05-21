@@ -43,6 +43,7 @@ class EventCentral {
       PINGMAP: 'Ping map',
       TEAM: 'Joined team',
       SIMPLEMSG: 'Simple message received',
+      GAMECODE: 'New game code',
     };
     this.eventWatchers = {};
   }

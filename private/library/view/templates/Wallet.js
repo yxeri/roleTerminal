@@ -249,7 +249,7 @@ class Wallet extends StandardView {
   }
 
   addTransaction(transactionItem) {
-    this.viewer.lastElementChild.insertBefore(transactionItem, this.viewer.firstElementChild.firstElementChild);
+    this.viewer.lastElementChild.insertBefore(transactionItem, this.viewer.lastElementChild.firstElementChild);
   }
 }
 

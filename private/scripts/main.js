@@ -508,6 +508,51 @@ terminal.addCommand({
     });
   },
 });
+terminal.addCommand({
+  commandName: 'credsCracker',
+  accessLevel: 1,
+  startFunc: () => {
+    terminal.queueMessage({
+      message: {
+        text: [
+          'Running Intrusive CREDS Extractor (ICE)',
+          'Attempting connection to CRED server...',
+          'Connection accepted!',
+          'ICE activated',
+          'Input the secret key',
+        ],
+      },
+    });
+
+    terminal.setNextFunc((secretKeyValue) => {
+      socketManager.emitEvent('useGameCode', { gameCode: secretKeyValue }, ({ error }) => {
+        if (error) {
+          console.log(error);
+          terminal.resetNextFunc();
+
+          return;
+        }
+
+        terminal.queueMessage({
+          message: {
+            text: [
+              'Key is being process by ICE...',
+              'Key accepted',
+              'Creating transaction...',
+              'Transaction created',
+              'Generating new secret key for victim...',
+              'ICE run completed',
+              'Check your CREDS for transaction information',
+            ],
+          },
+        });
+        terminal.resetNextFunc();
+      });
+    });
+  },
+});
+
+
 terminal.addTrigger({
   triggerName: 'calibrationMission',
   trigger: ({ mission }) => {
@@ -1012,6 +1057,19 @@ socketManager.addEvents([
 
         eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });
         socketManager.setConnected();
+
+        socketManager.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
+          if (codeError) {
+            console.log(codeError);
+
+            return;
+          }
+
+          const { gameCode } = codeData;
+
+          storageManager.setGameCode(gameCode);
+          eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
+        });
       });
     },
   }, {

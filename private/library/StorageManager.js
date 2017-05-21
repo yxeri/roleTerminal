@@ -89,6 +89,7 @@ class StorageManager {
     this.removeLocalVal('selectedAlias');
     this.removeLocalVal('team');
     this.removeLocalVal('shortTeam');
+    this.removeLocalVal('gameCode');
   }
 
   /**
@@ -225,6 +226,12 @@ class StorageManager {
   static getTeam() { return this.getLocalVal('team'); }
 
   static getShortTeam() { return this.getLocalVal('shortTeam'); }
+
+  static setGameCode(gameCode) { this.setLocalVal('gameCode', gameCode); }
+
+  static getGameCode() { return parseInt(this.getLocalVal('gameCode'), 10); }
+
+  static removeGameCode() { this.removeLocalVal('gameCode'); }
 }
 
 module.exports = StorageManager;

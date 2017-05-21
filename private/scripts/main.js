@@ -1127,6 +1127,11 @@ socketManager.addEvents([
     func: ({ simpleMsg }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.SIMPLEMSG, params: { simpleMsg } });
     },
+  }, {
+    event: 'gameCode',
+    func: ({ gameCode }) => {
+      eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
+    },
   },
   // {
   //   event: 'roomFollower',

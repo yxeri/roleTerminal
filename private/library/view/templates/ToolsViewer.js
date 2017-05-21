@@ -17,6 +17,7 @@
 const List = require('../base/List');
 const StandardView = require('../base/StandardView');
 const DialogBox = require('../DialogBox');
+const ButtonBox = require('../templates/ButtonBox');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
@@ -31,8 +32,24 @@ class ToolsViewer extends StandardView {
     this.viewer.appendChild(elementCreator.createList({}));
     this.viewer.classList.add('selectedView');
 
+    this.codeList = new List({ shouldSort: false, title: 'CODES' });
+
     this.populateList();
     this.populateMessages();
+
+    this.itemList.appendChild(this.codeList.element);
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.GAMECODE,
+      func: ({ gameCode }) => {
+        if (gameCode.codeType !== 'loot') {
+          return;
+        }
+
+        this.codeList.addItem({ item: elementCreator.createSpan({ text: gameCode.code }) });
+      },
+    });
   }
 
   populateList() {
@@ -156,8 +173,63 @@ class ToolsViewer extends StandardView {
         createDialog.appendTo(this.element.parentElement);
       },
     });
+    const createGameCodeButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Create loot code',
+      func: () => {
+        const createDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                createDialog.removeView();
+              },
+            },
+            right: {
+              text: 'Create',
+              eventFunc: () => {
+                const emptyFields = createDialog.markEmptyFields();
 
-    systemList.addItems({ items: [createSimpleMsgButton, createAliasButton] });
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                socketManager.emitEvent('createGameCode', { codeType: 'loot' }, ({ error: createError, data }) => {
+                  if (createError) {
+                    console.log(createError);
+
+                    return;
+                  }
+
+                  eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode: data.gameCode } });
+                  createDialog.removeView();
+
+                  const gameCodeBox = new ButtonBox({
+                    description: [
+                      `Your new code is: ${data.gameCode.code}`,
+                      'All unused codes are also listed to the left, under CODES',
+                    ],
+                    buttons: [elementCreator.createButton({
+                      text: 'Noted',
+                      func: () => { gameCodeBox.removeView(); },
+                    })],
+                  });
+
+                  gameCodeBox.appendTo(this.element.parentElement);
+                });
+              },
+            },
+          },
+          description: ['Create a loot code. The loot code can be used by another player to steal some of your credits'],
+        });
+        createDialog.appendTo(this.element.parentElement);
+      },
+    });
+
+    systemList.addItems({ items: [createSimpleMsgButton, createGameCodeButton, createAliasButton] });
     this.itemList.appendChild(systemList.element);
 
     this.accessElements.push({
@@ -168,13 +240,33 @@ class ToolsViewer extends StandardView {
       element: createAliasButton,
       accessLevel: 1,
     });
+    this.accessElements.push({
+      element: createGameCodeButton,
+      accessLevel: 1,
+    });
   }
 
   populateMessages() {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: () => {
+      func: ({ changedUser }) => {
+        if (changedUser) {
+          this.codeList.replaceAllItems({ items: [] });
+        }
+
+        socketManager.emitEvent('getGameCodes', { codeType: 'loot' }, ({ error, data }) => {
+          if (error) {
+            console.log(error);
+
+            return;
+          }
+
+          const { gameCodes = [] } = data;
+
+          this.codeList.replaceAllItems({ items: gameCodes.map(gameCode => elementCreator.createSpan({ text: gameCode.code })) });
+        });
+
         socketManager.emitEvent('getSimpleMessages', {}, ({ error, data }) => {
           if (error) {
             console.log(error);

@@ -28,10 +28,14 @@ class Profile extends View {
       watcherParent: this,
       event: eventCentral.Events.GAMECODE,
       func: ({ gameCode }) => {
+        if (gameCode.codeType !== 'profile') {
+          return;
+        }
+
         const fragment = document.createDocumentFragment();
 
         fragment.appendChild(elementCreator.createParagraph({ text: '----KEY---' }));
-        fragment.appendChild(elementCreator.createParagraph({ text: `| ${gameCode} |` }));
+        fragment.appendChild(elementCreator.createParagraph({ text: `| ${gameCode.code} |` }));
         fragment.appendChild(elementCreator.createParagraph({ text: '----END---' }));
 
         this.element.lastElementChild.innerHTML = '';

@@ -19,7 +19,7 @@ const textTools = require('../../TextTools');
 const keyHandler = require('../../KeyHandler');
 
 class TextAnimation extends View {
-  constructor({ removeTime = 4000, lineTime = 50 }) {
+  constructor({ removeTime = 3000, lineTime = 50 }) {
     super({ isFullscreen: true });
     this.element.classList.add('textAnimation');
     this.queue = [];
@@ -67,7 +67,7 @@ class TextAnimation extends View {
         span.scrollIntoView();
         this.element.appendChild(document.createElement('BR'));
         this.printLines({ array, classes, corruption, corruptionAmount, waitTime });
-      }, 50);
+      }, this.lineTime);
     } else {
       setTimeout(() => {
         this.element.appendChild(document.createElement('BR'));

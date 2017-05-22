@@ -934,6 +934,23 @@ img {
   height: calc(100% - .6em) !important;
 }
 
+.devDiv {
+  margin-bottom: 1em;
+
+  a, a:visited, a:active {
+    text-decoration: none;
+    color: $text-color;
+    text-shadow: $text-shadow;
+    background-color: $darker-second-color;
+  }
+
+  a:hover {
+    color: $text-color;
+    text-shadow: $text-shadow;
+    background-color: $darker-text-color;
+  }
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $flash-color;

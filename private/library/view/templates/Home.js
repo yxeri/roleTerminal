@@ -17,6 +17,7 @@
 const View = require('../base/View');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
+const eventCentral = require('../../EventCentral');
 
 /**
  * Adds [] to show which character is used as the shortcut character
@@ -39,6 +40,45 @@ class Home extends View {
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';
+
+    const ttggFbLink = document.createElement('A');
+    ttggFbLink.appendChild(document.createTextNode('Facebook'));
+    ttggFbLink.setAttribute('href', 'https://www.facebook.com/thethirdgiftgames/');
+    ttggFbLink.setAttribute('target', '_blank');
+
+    const ttggPatreonLink = document.createElement('A');
+    ttggPatreonLink.appendChild(document.createTextNode('Patreon'));
+    ttggPatreonLink.setAttribute('href', 'http://patreon.com/yxeri');
+    ttggPatreonLink.setAttribute('target', '_blank');
+
+    const linkParagraph = elementCreator.createParagraph({ text: 'More info at: ' });
+    linkParagraph.appendChild(ttggFbLink.cloneNode(true));
+    linkParagraph.appendChild(document.createTextNode(' or '));
+    linkParagraph.appendChild(ttggPatreonLink.cloneNode(true));
+
+    const patreonParagraph = elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Help support the project at ' });
+    patreonParagraph.appendChild(ttggPatreonLink.cloneNode(true));
+    patreonParagraph.appendChild(document.createTextNode('. Any small amount helps!'));
+
+    this.devDiv = elementCreator.createContainer({ classes: ['hide', 'devDiv'] });
+    this.devDiv.appendChild(elementCreator.createParagraph({ text: 'Developed by: Aleksandar Jankovic' }));
+    this.devDiv.appendChild(linkParagraph);
+    this.devDiv.appendChild(patreonParagraph);
+    this.devDiv.appendChild(elementCreator.createParagraph({
+      text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
+    }));
+
+    this.element.appendChild(this.devDiv);
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.SERVERMODE,
+      func: ({ mode }) => {
+        if (mode === 'dev') {
+          this.devDiv.classList.remove('hide');
+        }
+      },
+    });
   }
 
   addLink({ linkName, startFunc, endFunc, accessLevel, maxAccessLevel, keepHome, classes, shortcut }) {

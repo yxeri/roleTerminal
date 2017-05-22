@@ -44,6 +44,7 @@ class EventCentral {
       TEAM: 'Joined team',
       SIMPLEMSG: 'Simple message received',
       GAMECODE: 'New game code',
+      SERVERMODE: 'Server mode',
     };
     this.eventWatchers = {};
   }

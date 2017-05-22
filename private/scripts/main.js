@@ -1020,13 +1020,15 @@ socketManager.addEvents([
     },
   }, {
     event: 'startup',
-    func: ({ yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel }) => {
+    func: ({ yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode }) => {
       storageManager.setYearModification(yearModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
       onlineStatus.setOnline();
+
+      eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
 
       if (!socketManager.hasConnected) {
         new Time(document.getElementById('time')).startClock();

@@ -952,7 +952,7 @@ class WorldMap extends View {
             longitude,
           },
           icon: {
-            url: 'images/mapiconcreated.png',
+            url: markerType === 'custom' ? 'images/mapiconcreated.png' : 'images/mapicon.png',
           },
           map: this.map,
           worldMap: this,

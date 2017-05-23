@@ -19,12 +19,13 @@ const textTools = require('../../TextTools');
 const keyHandler = require('../../KeyHandler');
 
 class TextAnimation extends View {
-  constructor({ removeTime = 3000, lineTime = 50 }) {
+  constructor({ removeTime = 3000, lineTime = 50, isPermanent = false }) {
     super({ isFullscreen: true });
     this.element.classList.add('textAnimation');
     this.queue = [];
     this.removeTime = removeTime;
     this.lineTime = lineTime;
+    this.isPermanent = isPermanent;
   }
 
   addCode({ iteration, maxIteration, row, maxRows, binary, waitTime = 300 }) {
@@ -86,15 +87,21 @@ class TextAnimation extends View {
 
     if (nextObj) {
       nextObj.func.call(this, nextObj.params);
-    } else {
+    } else if (!this.isPermanent) {
       setTimeout(() => {
-        this.removeView();
-        keyHandler.unpause();
-
-        if (this.endFunc) {
-          this.endFunc();
-        }
+        this.end();
       }, this.removeTime);
+    }
+  }
+
+  end() {
+    this.element.innerHTML = '';
+    this.removeView();
+    this.queue = [];
+    keyHandler.unpause();
+
+    if (this.endFunc) {
+      this.endFunc();
     }
   }
 

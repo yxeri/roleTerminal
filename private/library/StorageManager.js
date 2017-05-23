@@ -223,6 +223,16 @@ class StorageManager {
     }
   }
 
+  static setBlockedBy(isBlocked) {
+    if (isBlocked && isBlocked !== '') {
+      this.setLocalVal('blockedBy', isBlocked);
+    }
+  }
+
+  static getBlockedBy() { this.getLocalVal('blockedBy'); }
+
+  static removeBlockedBy() { return this.removeLocalVal('blockedBy'); }
+
   static getTeam() { return this.getLocalVal('team'); }
 
   static getShortTeam() { return this.getLocalVal('shortTeam'); }

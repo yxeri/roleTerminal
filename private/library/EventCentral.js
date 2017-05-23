@@ -45,6 +45,8 @@ class EventCentral {
       SIMPLEMSG: 'Simple message received',
       GAMECODE: 'New game code',
       SERVERMODE: 'Server mode',
+      SIGNALBLOCK: 'Signal block',
+      REMOVEPOSITIONS: 'Remove positions',
     };
     this.eventWatchers = {};
   }

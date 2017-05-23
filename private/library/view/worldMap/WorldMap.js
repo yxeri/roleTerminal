@@ -47,8 +47,8 @@ class WorldMap extends View {
     mapStyles = [],
     labelStyle = {},
     clusterStyle = {},
-    maxUserAge = (20 * 60 * 1000),
-    maxPingAge = (20 * 60 * 1000),
+    maxUserAge = (15 * 60 * 1000),
+    maxPingAge = (15 * 60 * 1000),
   }) {
     super({ isFullscreen, viewId: 'map' });
 
@@ -164,6 +164,21 @@ class WorldMap extends View {
     });
     eventCentral.addWatcher({
       watcherParent: this,
+      event: eventCentral.Events.REMOVEPOSITIONS,
+      func: ({ positions }) => {
+        positions.forEach((position) => {
+          if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
+            this.pings[position.positionName].circle.setMap(null);
+            this.pings[position.positionName] = null;
+          } else {
+            this.markers[position.positionName].setMap(null);
+            this.markers[position.positionName] = null;
+          }
+        });
+      },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
       event: eventCentral.Events.POSITIONS,
       /**
        * Add positions to lists
@@ -182,16 +197,16 @@ class WorldMap extends View {
           const positionName = position.positionName;
 
           if (positionName) {
-            if (position.markerType === 'ping') {
+            if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
               const pingObj = this.pings[positionName];
 
               if (pingObj) {
                 const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
 
-                pingObj.ping.setCenter(latLng);
+                pingObj.circle.setCenter(latLng);
                 pingObj.label.setText({ text: position.description[0] });
                 pingObj.label.setPosition({ coordinates: position.coordinates });
-                pingObj.ping.setMap(this.map);
+                pingObj.circle.setMap(this.map);
                 pingObj.label.setMap(this.map);
               } else {
                 this.createPing({ position });
@@ -248,8 +263,8 @@ class WorldMap extends View {
         const currentTime = new Date();
         const lastUpdated = new Date(pingObj.createdAt);
 
-        if (currentTime - lastUpdated > this.maxPingAge) {
-          pingObj.ping.setMap(null);
+        if (pingObj.markerType !== 'signalBlock' && currentTime - lastUpdated > this.maxPingAge) {
+          pingObj.circle.setMap(null);
           pingObj.label.setMap(null);
         }
       });
@@ -447,6 +462,7 @@ class WorldMap extends View {
                     const userName = storageManager.getUserName();
                     const position = {
                       coordinates: {
+                        radius: 90,
                         longitude: event.latLng.lng(),
                         latitude: event.latLng.lat(),
                         accuracy: 0,
@@ -844,30 +860,34 @@ class WorldMap extends View {
     this.retrievePositions({});
   }
 
+  createCircle({ coordinates }) {
+    return new google.maps.Circle({
+      center: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
+      radius: coordinates.radius,
+      strokeColor: '#00ffcc',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#ff02e5',
+      fillOpacity: 0.35,
+    });
+  }
+
   createPing({ position = {} }) {
     const currentTime = new Date();
     const lastUpdated = new Date(position.lastUpdated);
 
-    if (currentTime - lastUpdated < this.maxPingAge) {
-      const ping = new google.maps.Circle({
-        center: new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude),
-        strokeColor: '#00ffcc',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#ff02e5',
-        fillOpacity: 0.35,
-        radius: 120,
-      });
+    if (position.markerType === 'signalBlock' || (currentTime - lastUpdated < this.maxPingAge)) {
+      const circle = this.createCircle({ coordinates: position.coordinates });
       const label = new Label({
         positionName: position.positionName,
         coordinates: position.coordinates,
         labelText: position.description[0],
       });
 
-      this.pings[position.positionName] = { ping, label, createdAt: position.lastUpdated };
+      this.pings[position.positionName] = { circle, label, createdAt: position.lastUpdated };
 
       if (this.map) {
-        ping.setMap(this.map);
+        circle.setMap(this.map);
         label.setMap(this.map);
       }
     }
@@ -929,6 +949,7 @@ class WorldMap extends View {
           this.markers[positionName] = new MapMarker({
             lastUpdated: date,
             coordinates: {
+              accuracy: coordinates.accuracy,
               latitude,
               longitude,
             },

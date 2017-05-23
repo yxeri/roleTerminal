@@ -50,6 +50,7 @@ class Tracker {
     });
 
     this.startTracker();
+    this.startSendTimeout();
   }
 
   startTracker() {
@@ -65,9 +66,6 @@ class Tracker {
     }, (err) => {
       console.log(err);
     }, { enableHighAccuracy: true });
-
-    this.startSendTimeout();
-
     setTimeout(() => {
       navigator.geolocation.clearWatch(this.watchId);
 
@@ -90,7 +88,6 @@ class Tracker {
 
   getBestPosition() {
     const positions = Array.from(this.latestPositions);
-
     let bestPosition = null;
 
     if (positions.length > 0) {
@@ -116,7 +113,7 @@ class Tracker {
 
     if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
       return;
-    } else if (position.coordinates.accuracy > 240) {
+    } else if (position.coordinates.accuracy > 150) {
       return;
     }
 

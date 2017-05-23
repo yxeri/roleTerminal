@@ -23,7 +23,7 @@ const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const WorldMap = require('../library/view/worldMap/WorldMap');
 const DirViewer = require('../library/view/templates/DirViewer');
 const Home = require('../library/view/templates/Home');
-const SoundElement = require('../library/audio/SoundElement');
+// const SoundElement = require('../library/audio/SoundElement');
 const TextAnimation = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
@@ -47,6 +47,7 @@ const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const boot = new TextAnimation({ removeTime: 3000 });
+const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 
 boot.setQueue([
   {
@@ -206,6 +207,79 @@ window.addEventListener('error', (event) => {
 });
 
 const terminal = new Terminal();
+const toolsViewer = new ToolsViewer({ isFullscreen: true });
+const home = new Home();
+const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
+const dirViewer = new DirViewer({ isFullscreen: true });
+const wallet = new Wallet();
+const profile = new Profile();
+const map = new WorldMap({
+  mapView: WorldMap.MapViews.AREA,
+  clusterStyle: {
+    gridSize: 22,
+    maxZoom: 17,
+    zoomOnClick: false,
+    singleSize: true,
+    averageCenter: true,
+    styles: [{
+      width: 24,
+      height: 24,
+      iconAnchor: [12, 12],
+      textSize: 12,
+      url: 'images/mapcluster.png',
+      textColor: '00ffcc',
+      fontFamily: 'monospace',
+    }],
+  },
+  mapStyles: [
+    {
+      featureType: 'all',
+      elementType: 'all',
+      stylers: [
+        { color: '#11000f' },
+      ],
+    }, {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [
+        { color: '#00ffcc' },
+      ],
+    }, {
+      featureType: 'road',
+      elementType: 'labels',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'poi',
+      elementType: 'all',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'administrative',
+      elementType: 'all',
+      stylers: [
+        { visibility: 'off' },
+      ],
+    }, {
+      featureType: 'water',
+      elementType: 'all',
+      stylers: [
+        { color: '#ff02e5' },
+      ],
+    },
+  ],
+  labelStyle: {
+    fontFamily: 'monospace',
+    fontColor: '#00ffcc',
+    strokeColor: '#001e15',
+    fontSize: 12,
+  },
+  mapBackground: '#11000f',
+});
+const teamViewer = new TeamViewer({ worldMap: map });
+const tracker = new Tracker();
 
 terminal.addCommand({
   commandName: 'calibrationAdjustment',
@@ -551,7 +625,59 @@ terminal.addCommand({
     });
   },
 });
+terminal.addCommand({
+  commandName: 'signalNuker',
+  accessLevel: 1,
+  startFunc: () => {
+    const choices = [
+      { value: '1', text: '[1] Yes', proceed: true },
+      { value: '2', text: '[2] No', proceed: false },
+    ];
 
+    terminal.queueMessage({
+      message: {
+        text: [
+          'WARNING WARNING WARNING',
+          'This will jam the signal of all nearby devices, including yours',
+          'There is high risk of retaliation in the form of murder from nearby users',
+          'You are urged to leave the area after activation',
+          'Do you wish to proceed?',
+        ],
+        elementPerRow: true,
+        elements: choices.map((choice) => {
+          return elementCreator.createSpan({
+            classes: ['clickable', 'linkLook', 'moreSpace'],
+            text: choice.text,
+            func: () => {
+              terminal.triggerCommand(choice.value);
+            },
+          });
+        }),
+      },
+    });
+
+    terminal.setNextFunc((choiceValue) => {
+      const chosenChoice = choices.find(choice => choice.value === choiceValue);
+
+      if (chosenChoice) {
+        if (chosenChoice.proceed) {
+          socketManager.emitEvent('signalBlock', {}, ({ error }) => {
+            if (error) {
+              console.log(error);
+            }
+
+            terminal.resetNextFunc();
+          });
+        } else {
+          terminal.queueMessage({ message: { text: ['Aborting'] } });
+          terminal.resetNextFunc();
+        }
+      } else {
+        terminal.queueMessage({ message: { text: ['Incorrect choice'] } });
+      }
+    });
+  },
+});
 
 terminal.addTrigger({
   triggerName: 'calibrationMission',
@@ -568,86 +694,12 @@ terminal.addTrigger({
   },
 });
 
-const toolsViewer = new ToolsViewer({ isFullscreen: true });
-const home = new Home();
-const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
-const dirViewer = new DirViewer({ isFullscreen: true });
-const wallet = new Wallet();
-const profile = new Profile();
-const map = new WorldMap({
-  mapView: WorldMap.MapViews.AREA,
-  clusterStyle: {
-    gridSize: 22,
-    maxZoom: 17,
-    zoomOnClick: false,
-    singleSize: true,
-    averageCenter: true,
-    styles: [{
-      width: 24,
-      height: 24,
-      iconAnchor: [12, 12],
-      textSize: 12,
-      url: 'images/mapcluster.png',
-      textColor: '00ffcc',
-      fontFamily: 'monospace',
-    }],
-  },
-  mapStyles: [
-    {
-      featureType: 'all',
-      elementType: 'all',
-      stylers: [
-        { color: '#11000f' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'geometry',
-      stylers: [
-        { color: '#00ffcc' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'labels',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'poi',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'administrative',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'water',
-      elementType: 'all',
-      stylers: [
-        { color: '#ff02e5' },
-      ],
-    },
-  ],
-  labelStyle: {
-    fontFamily: 'monospace',
-    fontColor: '#00ffcc',
-    strokeColor: '#001e15',
-    fontSize: 12,
-  },
-  mapBackground: '#11000f',
-});
-const teamViewer = new TeamViewer({ worldMap: map });
-const tracker = new Tracker();
-
-soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button', volume: 0.7 }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/button2.wav', soundId: 'button2' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/fail.wav', soundId: 'fail' }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
-soundLibrary.addSound(new SoundElement({ path: '/sounds/topBar.wav', soundId: 'topBar' }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button', volume: 0.7 }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/button2.wav', soundId: 'button2' }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/fail.wav', soundId: 'fail' }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
+// soundLibrary.addSound(new SoundElement({ path: '/sounds/topBar.wav', soundId: 'topBar' }));
 
 mainView.addEventListener('contextmenu', (event) => {
   event.preventDefault();
@@ -760,6 +812,7 @@ home.addLink({
               isPublic: true,
               isStatic: true,
             };
+            position.coordinates.radius = 90;
 
             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
@@ -802,6 +855,7 @@ home.addLink({
               isPublic: true,
               isStatic: true,
             };
+            position.coordinates.radius = 90;
 
             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
@@ -845,6 +899,7 @@ home.addLink({
               isPublic: false,
               isStatic: true,
             };
+            position.coordinates.radius = 90;
 
             const team = storageManager.getTeam();
 
@@ -1006,6 +1061,112 @@ map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManage
 map.setCenterCoordinates(storageManager.getCenterCoordinates());
 map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 
+eventCentral.addWatcher({
+  watcherParent: this,
+  event: eventCentral.Events.SIGNALBLOCK,
+  func: ({ removeBlocker, hackerName }) => {
+    if (removeBlocker) {
+      signalBlockAnimation.end();
+
+      return;
+    }
+
+    const name = hackerName || storageManager.getBlockedBy();
+
+    signalBlockAnimation.setQueue([
+      {
+        func: signalBlockAnimation.addCode,
+        params: {
+          waitTime: 2000,
+          iteration: 0,
+          maxIteration: 12,
+          row: 0,
+          maxRows: 4,
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 4000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Lost signal',
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'Tracing jamming source...',
+            'Source found!',
+            `Source: user ${name}`,
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Lost signal',
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Unable to reconnect',
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Signal interrupted',
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Lost signal',
+            'Attempting to reconnect...',
+          ],
+        },
+      }, {
+        func: signalBlockAnimation.printLines,
+        params: {
+          waitTime: 8000,
+          corruption: false,
+          array: [
+            'ERROR',
+            'Signal interrupted',
+            'Attempting to reconnect...',
+          ],
+        },
+      },
+    ]);
+    signalBlockAnimation.appendTo(mainView);
+  },
+});
+
 socketManager.addEvents([
   {
     event: 'disconnect',
@@ -1050,11 +1211,20 @@ socketManager.addEvents([
         if ((userName && data.anonUser) || data.anonUser) {
           storageManager.removeUser();
           storageManager.setAccessLevel(0);
+          storageManager.removeBlockedBy();
         } else {
           storageManager.setAccessLevel(data.user.accessLevel);
           storageManager.setAliases(data.user.aliases);
           storageManager.setTeam(data.user.team);
           storageManager.setShortTeam(data.user.shortTeam);
+          storageManager.setBlockedBy(data.user.blockedBy);
+        }
+
+        if (data.user.blockedBy && data.user.blockedBy !== '') {
+          eventCentral.triggerEvent({
+            event: eventCentral.Events.SIGNALBLOCK,
+            params: { hackerName: data.user.blockedBy },
+          });
         }
 
         eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });
@@ -1106,8 +1276,12 @@ socketManager.addEvents([
     },
   }, {
     event: 'mapPositions',
-    func: ({ positions, currentTime }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions, currentTime } });
+    func: ({ positions, currentTime, shouldRemove }) => {
+      if (shouldRemove) {
+        eventCentral.triggerEvent({ event: eventCentral.Events.REMOVEPOSITIONS, params: { positions } });
+      } else {
+        eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions, currentTime } });
+      }
     },
   }, {
     event: 'terminal',
@@ -1133,6 +1307,15 @@ socketManager.addEvents([
     event: 'gameCode',
     func: ({ gameCode }) => {
       eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
+    },
+  }, {
+    event: 'signalBlock',
+    func: ({ position, removeBlocker, hackerName }) => {
+      storageManager.setBlockedBy(hackerName);
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SIGNALBLOCK,
+        params: { position, removeBlocker, hackerName },
+      });
     },
   },
   // {

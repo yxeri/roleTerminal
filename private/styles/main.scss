@@ -280,7 +280,7 @@ img {
   }
 }
 
-#docsViewer {
+#dirViewer {
   word-wrap: break-word;
 
   .viewer {
@@ -451,27 +451,24 @@ img {
 }
 
 #home {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: calc(100% - 2.4em);
   width: 22em;
-  overflow: hidden;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 1em;
-  display: -webkit-flex;
-  -webkit-flex-direction: row;
-  -webkit-flex-wrap: wrap;
-  -webkit-align-content: center;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: center;
+  margin-top: .5em;
 
   button {
-    -webkit-flex-grow: 1;
-    flex-grow: 1;
     width: calc(50% - 1em);
     max-width: calc(50% - 1em);
     margin: .1em .5em 1em .5em;
   }
+}
+
+#home::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 #toolsViewer {
@@ -753,6 +750,8 @@ img {
   margin: 0 auto;
   background-color: $back-color;
   position: absolute;
+  overflow-y: scroll;
+  max-height: calc(100% - 4.4em);
 
   input {
     width: calc(100% - .8em);
@@ -767,6 +766,10 @@ img {
     width: calc(100% - .8em);
     margin-left: $padding;
   }
+}
+
+.dialogBox::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 .buttonBox {

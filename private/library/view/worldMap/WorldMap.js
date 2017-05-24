@@ -33,6 +33,26 @@ const MapViews = {
   NONE: '',
 };
 
+/**
+ * Creates a circle
+ * @param {Object} params.coordinates Coordinates
+ * @param {number} params.coordinates.latitude Latitude
+ * @param {number} params.coordinates.longitude Longitude
+ * @param {number} params.coordinates.radius Radius
+ * @returns {google.maps.Circle} Circle
+ */
+function createCircle({ coordinates }) {
+  return new google.maps.Circle({
+    center: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
+    radius: coordinates.radius,
+    strokeColor: '#00ffcc',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#ff02e5',
+    fillOpacity: 0.35,
+  });
+}
+
 class WorldMap extends View {
   /** @namespace this.markers.I */
 
@@ -173,6 +193,10 @@ class WorldMap extends View {
           } else {
             this.markers[position.positionName].setMap(null);
             this.markers[position.positionName] = null;
+          }
+
+          if (this.labels[position.positionName]) {
+            this.labels[position.positionName].setMap(null);
           }
         });
       },
@@ -860,24 +884,12 @@ class WorldMap extends View {
     this.retrievePositions({});
   }
 
-  createCircle({ coordinates }) {
-    return new google.maps.Circle({
-      center: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
-      radius: coordinates.radius,
-      strokeColor: '#00ffcc',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#ff02e5',
-      fillOpacity: 0.35,
-    });
-  }
-
   createPing({ position = {} }) {
     const currentTime = new Date();
     const lastUpdated = new Date(position.lastUpdated);
 
     if (position.markerType === 'signalBlock' || (currentTime - lastUpdated < this.maxPingAge)) {
-      const circle = this.createCircle({ coordinates: position.coordinates });
+      const circle = createCircle({ coordinates: position.coordinates });
       const label = new Label({
         positionName: position.positionName,
         coordinates: position.coordinates,

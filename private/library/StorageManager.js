@@ -223,25 +223,39 @@ class StorageManager {
     }
   }
 
-  static setBlockedBy(isBlocked) {
-    if (isBlocked && isBlocked !== '') {
-      this.setLocalVal('blockedBy', isBlocked);
+  static setBlockedBy(blockedBy) {
+    if (blockedBy) {
+      this.setLocalVal('blockedBy', blockedBy);
     }
   }
 
-  static getBlockedBy() { this.getLocalVal('blockedBy'); }
+  static getBlockedBy() {
+    return this.getLocalVal('blockedBy');
+  }
 
-  static removeBlockedBy() { return this.removeLocalVal('blockedBy'); }
+  static removeBlockedBy() {
+    this.removeLocalVal('blockedBy');
+  }
 
-  static getTeam() { return this.getLocalVal('team'); }
+  static getTeam() {
+    return this.getLocalVal('team');
+  }
 
-  static getShortTeam() { return this.getLocalVal('shortTeam'); }
+  static getShortTeam() {
+    return this.getLocalVal('shortTeam');
+  }
 
-  static setGameCode(gameCode) { this.setLocalVal('gameCode', gameCode); }
+  static setGameCode(gameCode) {
+    this.setLocalVal('gameCode', gameCode);
+  }
 
-  static getGameCode() { return parseInt(this.getLocalVal('gameCode'), 10); }
+  static getGameCode() {
+    return parseInt(this.getLocalVal('gameCode'), 10);
+  }
 
-  static removeGameCode() { this.removeLocalVal('gameCode'); }
+  static removeGameCode() {
+    this.removeLocalVal('gameCode');
+  }
 }
 
 module.exports = StorageManager;

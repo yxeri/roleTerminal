@@ -78,7 +78,7 @@ class Tracker {
 
   startSendTimeout() {
     setTimeout(() => {
-      if (this.latestPositions.length > 0) {
+      if (this.latestPositions.length > 0 && !storageManager.getBlockedBy()) {
         this.sendBestPosition();
       }
 

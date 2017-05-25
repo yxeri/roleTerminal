@@ -96,12 +96,15 @@ class TextAnimation extends View {
 
   end() {
     this.element.innerHTML = '';
-    this.removeView();
     this.queue = [];
-    keyHandler.unpause();
 
-    if (this.endFunc) {
-      this.endFunc();
+    if (this.element.parentElement) {
+      this.removeView();
+      keyHandler.unpause();
+
+      if (this.endFunc) {
+        this.endFunc();
+      }
     }
   }
 

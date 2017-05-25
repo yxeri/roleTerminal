@@ -61,7 +61,7 @@ class Home extends View {
     patreonParagraph.appendChild(document.createTextNode('. Any small amount helps!'));
 
     this.devDiv = elementCreator.createContainer({ classes: ['hide', 'devDiv'] });
-    this.devDiv.appendChild(elementCreator.createParagraph({ text: 'Developed by: Aleksandar Jankovic' }));
+    this.devDiv.appendChild(elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }));
     this.devDiv.appendChild(linkParagraph);
     this.devDiv.appendChild(patreonParagraph);
     this.devDiv.appendChild(elementCreator.createParagraph({

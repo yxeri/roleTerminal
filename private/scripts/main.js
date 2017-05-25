@@ -626,7 +626,7 @@ terminal.addCommand({
   },
 });
 terminal.addCommand({
-  commandName: 'signalNuker',
+  commandName: 's1gn4lNuk3r',
   accessLevel: 1,
   startFunc: () => {
     const choices = [
@@ -641,6 +641,7 @@ terminal.addCommand({
           'This will jam the signal of all nearby devices, including yours',
           'There is high risk of retaliation in the form of murder from nearby users',
           'You are urged to leave the area after activation',
+          'The automated defense systems will track you',
           'Do you wish to proceed?',
         ],
         elementPerRow: true,
@@ -661,7 +662,7 @@ terminal.addCommand({
 
       if (chosenChoice) {
         if (chosenChoice.proceed) {
-          socketManager.emitEvent('signalBlock', {}, ({ error }) => {
+          socketManager.emitEvent('signalBlock', { description: ['|\\||_||<3|>_by_'] }, ({ error }) => {
             if (error) {
               console.log(error);
             }
@@ -1064,14 +1065,15 @@ map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 eventCentral.addWatcher({
   watcherParent: this,
   event: eventCentral.Events.SIGNALBLOCK,
-  func: ({ removeBlocker, hackerName }) => {
-    if (removeBlocker) {
+  func: ({ removeBlocker, blockedBy }) => {
+    if (removeBlocker || !blockedBy) {
+      storageManager.removeBlockedBy();
       signalBlockAnimation.end();
 
       return;
     }
 
-    const name = hackerName || storageManager.getBlockedBy();
+    storageManager.setBlockedBy(blockedBy);
 
     signalBlockAnimation.setQueue([
       {
@@ -1102,7 +1104,7 @@ eventCentral.addWatcher({
           array: [
             'Tracing jamming source...',
             'Source found!',
-            `Source: user ${name}`,
+            `Source: user ${blockedBy}`,
             'Attempting to reconnect...',
           ],
         },
@@ -1187,6 +1189,8 @@ socketManager.addEvents([
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
+
+      map.startMap();
       onlineStatus.setOnline();
 
       eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
@@ -1207,6 +1211,7 @@ socketManager.addEvents([
         }
 
         const userName = storageManager.getUserName();
+        const blockedBy = data.user ? data.user.blockedBy : null;
 
         if ((userName && data.anonUser) || data.anonUser) {
           storageManager.removeUser();
@@ -1217,17 +1222,20 @@ socketManager.addEvents([
           storageManager.setAliases(data.user.aliases);
           storageManager.setTeam(data.user.team);
           storageManager.setShortTeam(data.user.shortTeam);
-          storageManager.setBlockedBy(data.user.blockedBy);
         }
 
-        if (data.user.blockedBy && data.user.blockedBy !== '') {
-          eventCentral.triggerEvent({
-            event: eventCentral.Events.SIGNALBLOCK,
-            params: { hackerName: data.user.blockedBy },
-          });
-        }
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.SIGNALBLOCK,
+          params: { blockedBy },
+        });
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: data.anonUser || userName !== data.user.userName, firstConnection: !socketManager.hasConnected } });
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.USER,
+          params: {
+            changedUser: data.anonUser || userName !== data.user.userName,
+            firstConnection: !socketManager.hasConnected,
+          },
+        });
         socketManager.setConnected();
 
         socketManager.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
@@ -1310,11 +1318,10 @@ socketManager.addEvents([
     },
   }, {
     event: 'signalBlock',
-    func: ({ position, removeBlocker, hackerName }) => {
-      storageManager.setBlockedBy(hackerName);
+    func: ({ position, removeBlocker, blockedBy }) => {
       eventCentral.triggerEvent({
         event: eventCentral.Events.SIGNALBLOCK,
-        params: { position, removeBlocker, hackerName },
+        params: { position, removeBlocker, blockedBy },
       });
     },
   },

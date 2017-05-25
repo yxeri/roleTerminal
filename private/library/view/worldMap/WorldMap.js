@@ -68,13 +68,13 @@ class WorldMap extends View {
     labelStyle = {},
     clusterStyle = {},
     maxUserAge = (15 * 60 * 1000),
-    maxPingAge = (15 * 60 * 1000),
+    maxPingAge = (10 * 60 * 1000),
   }) {
     super({ isFullscreen, viewId: 'map' });
 
     this.mapView = mapView;
     this.markers = markers;
-    this.pings = {};
+    this.circles = {};
     this.labels = {};
     this.cornerCoordinates = cornerCoordinates;
     this.centerCoordinates = centerCoordinates;
@@ -187,16 +187,35 @@ class WorldMap extends View {
       event: eventCentral.Events.REMOVEPOSITIONS,
       func: ({ positions }) => {
         positions.forEach((position) => {
-          if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
-            this.pings[position.positionName].circle.setMap(null);
-            this.pings[position.positionName] = null;
-          } else {
-            this.markers[position.positionName].setMap(null);
-            this.markers[position.positionName] = null;
-          }
+          switch (position.markerType) {
+            case 'signalBlock': {
+              const markersInBounds = this.isWithinBounds({ source: this.circles[position.positionName].circle });
 
-          if (this.labels[position.positionName]) {
-            this.labels[position.positionName].setMap(null);
+              this.clusterer.addMarkers(markersInBounds.map(mapMarker => mapMarker.marker));
+              markersInBounds.forEach((marker) => {
+                marker.setMap(this.map);
+              });
+
+              this.circles[position.positionName].circle.setMap(null);
+              this.circles[position.positionName].label.setMap(null);
+              this.circles[position.positionName] = null;
+
+              break;
+            }
+            case 'ping': {
+              this.circles[position.positionName].circle.setMap(null);
+              this.circles[position.positionName].label.setMap(null);
+              this.circles[position.positionName] = null;
+
+              break;
+            }
+            default: {
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = null;
+
+              break;
+            }
           }
         });
       },
@@ -222,18 +241,18 @@ class WorldMap extends View {
 
           if (positionName) {
             if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
-              const pingObj = this.pings[positionName];
+              const circleObj = this.circles[positionName];
 
-              if (pingObj) {
+              if (circleObj) {
                 const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
 
-                pingObj.circle.setCenter(latLng);
-                pingObj.label.setText({ text: position.description[0] });
-                pingObj.label.setPosition({ coordinates: position.coordinates });
-                pingObj.circle.setMap(this.map);
-                pingObj.label.setMap(this.map);
+                circleObj.circle.setCenter(latLng);
+                circleObj.label.setText({ text: position.description[0] });
+                circleObj.label.setPosition({ coordinates: position.coordinates });
+                circleObj.circle.setMap(this.map);
+                circleObj.label.setMap(this.map);
               } else {
-                this.createPing({ position });
+                this.createCircleArea({ position });
               }
             } else if (this.markers[positionName]) {
               this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
@@ -271,6 +290,8 @@ class WorldMap extends View {
                   break;
                 }
               }
+
+              this.hideBlockedPositions(positionName);
             }
           }
         });
@@ -282,40 +303,45 @@ class WorldMap extends View {
 
   startAgeChecker() {
     setTimeout(() => {
-      Object.keys(this.pings).forEach((pingName) => {
-        const pingObj = this.pings[pingName];
-        const currentTime = new Date();
-        const lastUpdated = new Date(pingObj.createdAt);
+      Object.keys(this.circles).forEach((circleName) => {
+        const circle = this.circles[circleName];
 
-        if (pingObj.markerType !== 'signalBlock' && currentTime - lastUpdated > this.maxPingAge) {
-          pingObj.circle.setMap(null);
-          pingObj.label.setMap(null);
+        if (circle && circle.markerType !== 'signalBlock') {
+          const currentTime = new Date();
+          const lastUpdated = new Date(circle.createdAt);
+
+          if (currentTime - lastUpdated > this.maxPingAge) {
+            circle.circle.setMap(null);
+            circle.label.setMap(null);
+          }
         }
       });
 
       Object.keys(this.markers).forEach((positionName) => {
         const marker = this.markers[positionName];
 
-        switch (marker.markerType) {
-          case 'user': {
-            const currentTime = new Date();
-            const lastUpdated = new Date(marker.lastUpdated);
+        if (marker) {
+          switch (marker.markerType) {
+            case 'user': {
+              const currentTime = new Date();
+              const lastUpdated = new Date(marker.lastUpdated);
 
-            if (currentTime - lastUpdated > this.maxUserAge) {
-              marker.setMap(null);
-              this.userList.removeItem({ name: positionName });
+              if (currentTime - lastUpdated > this.maxUserAge) {
+                marker.setMap(null);
+                this.userList.removeItem({ name: positionName });
+              }
+
+              break;
             }
-
-            break;
-          }
-          default: {
-            break;
+            default: {
+              break;
+            }
           }
         }
       });
 
       this.startAgeChecker();
-    }, 30000);
+    }, 10000);
   }
 
   resetClusterer(markers = []) {
@@ -631,18 +657,6 @@ class WorldMap extends View {
   }
 
   /**
-   * Set map to current map on all objects in the collection
-   * @param {Object} collections - Collection of objects to be attached to the map
-   */
-  setMap(collections) {
-    collections.forEach((collection) => {
-      Object.keys(collection).forEach((name) => {
-        collection[name].setMap(this.map);
-      });
-    });
-  }
-
-  /**
    * Add listeners to map
    */
   attachMapListeners() {
@@ -739,11 +753,6 @@ class WorldMap extends View {
   }
 
   /**
-   * Reset view port, which recreates all clusters
-   */
-  resetClusters() { this.clusterer.resetViewport(); }
-
-  /**
    * @returns {google.maps.Map} - Map
    */
   getMap() { return this.map; }
@@ -752,7 +761,9 @@ class WorldMap extends View {
    * @param {{latitude: Number, longitude: Number}} position - Long and lat coordinates for the new map center
    */
   setMapCenter(position) {
-    if (this.map) { this.map.setCenter(new google.maps.LatLng(parseFloat(position.latitude), parseFloat(position.longitude))); }
+    if (this.map) {
+      this.map.setCenter(new google.maps.LatLng(parseFloat(position.latitude), parseFloat(position.longitude)));
+    }
   }
 
   /**
@@ -797,8 +808,23 @@ class WorldMap extends View {
     this.map.setZoom(this.map.getZoom() - 1);
   }
 
+  isWithinBounds({ source }) {
+    return Object.keys(this.markers).filter((markerName) => {
+      const marker = this.markers[markerName];
+
+      const accuracy = marker.accuracy;
+      // TODO Get from server instead of hardcoding
+      const accuracyAdjustment = accuracy > 40 ? 40 : accuracy;
+
+      console.log(markerName, google.maps.geometry.spherical.computeDistanceBetween(source.getCenter(), marker.getPosition()) - accuracyAdjustment);
+
+      return source.getBounds()
+          .contains(marker.getPosition()) || (google.maps.geometry.spherical.computeDistanceBetween(source.getCenter(), marker.getPosition()) - accuracyAdjustment) <= source.getRadius();
+    }).map(markerName => this.markers[markerName]);
+  }
+
   retrievePositions({ callback = () => {} }) {
-    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user', 'ping'] }, ({ error, data }) => {
+    socketManager.emitEvent('getMapPositions', { types: ['google', 'custom', 'user', 'ping', 'signalBlock'] }, ({ error, data }) => {
       if (error || !data) {
         return;
       }
@@ -807,15 +833,15 @@ class WorldMap extends View {
       const userName = storageManager.getUserName() || '';
 
       positions.forEach((position) => {
-        if (position.markerType === 'ping') {
-          this.createPing({ position });
+        if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
+          this.createCircleArea({ position });
         } else {
           this.createMarker({ position, userName, currentTime });
         }
       });
 
       if (this.map) {
-        this.resetClusterer(Object.keys(this.markers).filter(positionName => this.markers[positionName].shouldCluster).map(positionName => this.markers[positionName].marker));
+        this.resetClusterer(Object.keys(this.markers).filter(positionName => this.markers[positionName].shouldCluster && this.markers[positionName].map).map(positionName => this.markers[positionName].marker));
         this.realignMap();
       }
 
@@ -884,7 +910,7 @@ class WorldMap extends View {
     this.retrievePositions({});
   }
 
-  createPing({ position = {} }) {
+  createCircleArea({ position = {} }) {
     const currentTime = new Date();
     const lastUpdated = new Date(position.lastUpdated);
 
@@ -896,11 +922,20 @@ class WorldMap extends View {
         labelText: position.description[0],
       });
 
-      this.pings[position.positionName] = { circle, label, createdAt: position.lastUpdated };
+      this.circles[position.positionName] = {
+        createdAt: position.lastUpdated,
+        markerType: position.markerType,
+        circle,
+        label,
+      };
 
       if (this.map) {
         circle.setMap(this.map);
         label.setMap(this.map);
+
+        if (position.markerType === 'signalBlock') {
+          this.hideBlockedPositions();
+        }
       }
     }
   }
@@ -1000,6 +1035,28 @@ class WorldMap extends View {
     }
   }
 
+  hideBlockedPositions(positionName) {
+    const blockers = Object.keys(this.circles).filter(circleName => this.circles[circleName] && this.circles[circleName].markerType === 'signalBlock').map(circleName => this.circles[circleName].circle);
+
+    blockers.forEach((blocker) => {
+      const withinBounds = this.isWithinBounds({ source: blocker });
+
+      if (positionName) {
+        const names = withinBounds.map(mapMarker => mapMarker.positionName);
+
+        if (names.indexOf(positionName) > -1) {
+          this.clusterer.removeMarker(this.markers[positionName].marker);
+          this.markers[positionName].setMap(null);
+        }
+      } else {
+        withinBounds.forEach((mapMarker) => {
+          this.clusterer.removeMarker(mapMarker.marker);
+          mapMarker.setMap(null);
+        });
+      }
+    });
+  }
+
   appendTo(parentElement) {
     parentElement.classList.add('mapMain');
     super.appendTo(parentElement);
@@ -1009,6 +1066,8 @@ class WorldMap extends View {
     } else {
       google.maps.event.trigger(this.map, 'resize');
     }
+
+    this.hideBlockedPositions();
   }
 
   removeView() {

@@ -104,7 +104,7 @@ class Tracker {
   }
 
   sendBestPosition() {
-    if (!storageManager.getUserName()) {
+    if (!storageManager.getToken()) {
       return;
     }
 

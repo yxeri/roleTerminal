@@ -89,7 +89,8 @@ class StorageManager {
     this.removeLocalVal('selectedAlias');
     this.removeLocalVal('team');
     this.removeLocalVal('shortTeam');
-    this.removeLocalVal('gameCode');
+    this.removeGameCode();
+    this.removeToken();
   }
 
   /**
@@ -255,6 +256,18 @@ class StorageManager {
 
   static removeGameCode() {
     this.removeLocalVal('gameCode');
+  }
+
+  static setToken(token) {
+    this.setLocalVal('token', token);
+  }
+
+  static getToken() {
+    return this.getLocalVal('token');
+  }
+
+  static removeToken() {
+    this.removeLocalVal('token');
   }
 }
 

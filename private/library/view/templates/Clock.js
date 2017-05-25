@@ -14,14 +14,28 @@
  limitations under the License.
  */
 
-const Time = require('../base/Time');
 const textTools = require('../../TextTools');
 
-class Clock extends Time {
-  constructor(timeElement) {
-    super(timeElement);
+class Clock {
+  constructor(element) {
+    this.element = element;
 
     this.updateTime();
+
+    // TODO Time should be retrieved from server
+  }
+
+  /**
+   * Start time tracking and calls updateTime to update time in DOM
+   */
+  startClock() {
+    const now = new Date();
+    const waitTime = ((60 - now.getSeconds()) * 1000) - now.getMilliseconds();
+
+    setTimeout(() => {
+      this.updateTime();
+      this.startClock();
+    }, waitTime);
   }
 
   /**

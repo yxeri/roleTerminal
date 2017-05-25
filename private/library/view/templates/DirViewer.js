@@ -306,7 +306,7 @@ class DirViewer extends StandardView {
                 docFile.team = storageManager.getTeam();
               }
 
-              socketManager.emitEvent('createDocFile', docFile, ({ error: docFileError }) => {
+              socketManager.emitEvent('createDocFile', { docFile }, ({ error: docFileError }) => {
                 if (docFileError) {
                   if (docFileError.type === 'already exists') {
                     console.log('Already exists');

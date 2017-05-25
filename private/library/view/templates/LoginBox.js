@@ -131,11 +131,14 @@ class LoginBox extends DialogBox {
               return;
             }
 
-            storageManager.setUserName(data.user.userName);
-            storageManager.setAccessLevel(data.user.accessLevel);
-            storageManager.setTeam(data.user.team);
-            storageManager.setShortTeam(data.user.shortTeam);
-            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases: data.user.aliases } });
+            const { token, user: { accessLevel, team, shortTeam, aliases, userName } } = data;
+
+            storageManager.setToken(token);
+            storageManager.setUserName(userName);
+            storageManager.setAccessLevel(accessLevel);
+            storageManager.setTeam(team);
+            storageManager.setShortTeam(shortTeam);
+            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases } });
             eventCentral.triggerEvent({ event: eventCentral.Events.LOGIN });
             this.removeView();
           });

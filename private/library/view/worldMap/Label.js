@@ -35,14 +35,14 @@ class Label {
     this.positionName = positionName.toLowerCase();
     this.map = map;
     this.mapLabel = new MapLabel({
-      text: labelText,
-      position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
       align,
       fontFamily,
       fontColor,
       strokeColor,
       fontSize,
       map,
+      text: labelText,
+      position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
     });
   }
 

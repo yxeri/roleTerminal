@@ -708,59 +708,67 @@ class Messenger extends StandardView {
         socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error, data: { allowed, room } }) => {
           if (error) {
             console.log(error);
-          } else if (!allowed) {
-            const followDialog = new DialogBox({
-              buttons: {
-                left: {
-                  text: 'Cancel',
-                  eventFunc: () => { followDialog.removeView(); },
-                },
-                right: {
-                  text: 'Follow',
-                  eventFunc: () => {
-                    const passwordInput = followDialog.inputs.find(({ inputName }) => inputName === 'password');
 
-                    socketManager.emitEvent('follow', {
-                      room: {
-                        password: passwordInput ? passwordInput.inputElement.value : '',
-                        roomName,
-                      },
-                    }, ({ error: followError }) => {
-                      if (followError) {
-                        console.log(followError);
-                        followDialog.changeExtraDescription({ text: ['Failed to join the room'] });
+            return;
+          }
 
-                        return;
-                      }
+          if (allowed) {
+            storageManager.setRoom(roomName);
 
-                      button.parentElement.remove();
-                      eventCentral.triggerEvent({
-                        event: eventCentral.Events.FOLLOWROOM,
-                        params: { room: { roomName } },
-                      });
-                      storageManager.setRoom(roomName);
-                      followDialog.removeView();
-                    });
-                  },
+            return;
+          }
+
+          const followDialog = new DialogBox({
+            buttons: {
+              left: {
+                text: 'Cancel',
+                eventFunc: () => {
+                  followDialog.removeView();
                 },
               },
-              description: ['Do you wish to enter the room? The members of the room will be informed of you entering it'],
+              right: {
+                text: 'Follow',
+                eventFunc: () => {
+                  const passwordInput = followDialog.inputs.find(({ inputName }) => inputName === 'password');
+
+                  socketManager.emitEvent('follow', {
+                    room: {
+                      password: passwordInput ? passwordInput.inputElement.value : '',
+                      roomName,
+                    },
+                  }, ({ error: followError }) => {
+                    if (followError) {
+                      console.log(followError);
+                      followDialog.changeExtraDescription({ text: ['Failed to join the room'] });
+
+                      return;
+                    }
+
+                    button.parentElement.remove();
+                    eventCentral.triggerEvent({
+                      event: eventCentral.Events.FOLLOWROOM,
+                      params: { room: { roomName } },
+                    });
+                    storageManager.setRoom(roomName);
+                    followDialog.removeView();
+                  });
+                },
+              },
+            },
+            description: ['Do you wish to enter the room? The members of the room will be informed of you entering it'],
+          });
+
+          if (room.password) {
+            followDialog.addInput({
+              placeholder: 'Password',
+              inputName: 'password',
+              type: 'password',
+              isRequired: true,
             });
-
-            if (room.password) {
-              followDialog.addInput({
-                placeholder: 'Password',
-                inputName: 'password',
-                type: 'password',
-                isRequired: true,
-              });
-              followDialog.changeExtraDescription({ text: ['The room is password protected. Enter the correct password'] });
-            }
-
-            followDialog.appendTo(this.element.parentElement);
-          } else {
-            storageManager.setRoom(roomName);
+            followDialog.changeExtraDescription({ text: ['The room is password protected. Enter the correct password'] });
           }
+
+          followDialog.appendTo(this.element.parentElement);
         });
       },
     });

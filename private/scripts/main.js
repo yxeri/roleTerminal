@@ -18,7 +18,7 @@ require('../library/polyfills');
 
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
-const Time = require('../library/view/templates/Clock');
+const Clock = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const WorldMap = require('../library/view/worldMap/WorldMap');
 const DirViewer = require('../library/view/templates/DirViewer');
@@ -767,7 +767,7 @@ window.addEventListener('click', () => {
   viewTools.goFullScreen();
 });
 
-if (!storageManager.getUserName()) {
+if (!storageManager.getToken()) {
   eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
 }
 
@@ -1196,61 +1196,13 @@ socketManager.addEvents([
       eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
 
       if (!socketManager.hasConnected) {
-        new Time(document.getElementById('time')).startClock();
+        new Clock(document.getElementById('time')).startClock();
         map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
         map.setCenterCoordinates(storageManager.getCenterCoordinates());
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
 
-      socketManager.emitEvent('updateId', {
-        user: { userName: storageManager.getUserName() },
-        device: { deviceId: storageManager.getDeviceId() },
-      }, ({ error, data = {} }) => {
-        if (error) {
-          return;
-        }
-
-        const userName = storageManager.getUserName();
-        const blockedBy = data.user ? data.user.blockedBy : null;
-
-        if ((userName && data.anonUser) || data.anonUser) {
-          storageManager.removeUser();
-          storageManager.setAccessLevel(0);
-          storageManager.removeBlockedBy();
-        } else {
-          storageManager.setAccessLevel(data.user.accessLevel);
-          storageManager.setAliases(data.user.aliases);
-          storageManager.setTeam(data.user.team);
-          storageManager.setShortTeam(data.user.shortTeam);
-        }
-
-        eventCentral.triggerEvent({
-          event: eventCentral.Events.SIGNALBLOCK,
-          params: { blockedBy },
-        });
-
-        eventCentral.triggerEvent({
-          event: eventCentral.Events.USER,
-          params: {
-            changedUser: data.anonUser || userName !== data.user.userName,
-            firstConnection: !socketManager.hasConnected,
-          },
-        });
-        socketManager.setConnected();
-
-        socketManager.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
-          if (codeError) {
-            console.log(codeError);
-
-            return;
-          }
-
-          const { gameCode } = codeData;
-
-          storageManager.setGameCode(gameCode);
-          eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
-        });
-      });
+      socketManager.updateId();
     },
   }, {
     event: 'message',

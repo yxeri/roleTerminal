@@ -14,7 +14,8 @@
  limitations under the License.
  */
 
-const storage = require('./StorageManager');
+const storageManager = require('./StorageManager');
+const eventCentral = require('./EventCentral');
 
 class SocketManager {
   constructor() {
@@ -55,6 +56,63 @@ class SocketManager {
     events.forEach(event => this.addEvent(event.event, event.func));
   }
 
+  updateId() {
+    this.emitEvent('updateId', {
+      device: {
+        deviceId: storageManager.getDeviceId(),
+      },
+    }, ({ error, data }) => {
+      if (error) {
+        return;
+      }
+
+      if (error) {
+        storageManager.removeUser();
+        storageManager.setAccessLevel(0);
+        storageManager.removeBlockedBy();
+
+        return;
+      }
+
+      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam } } = data;
+
+      storageManager.setUserName(userName);
+      storageManager.setAccessLevel(accessLevel);
+      storageManager.setAliases(aliases);
+      storageManager.setTeam(team);
+      storageManager.setShortTeam(shortTeam);
+      this.setConnected();
+
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SIGNALBLOCK,
+        params: { blockedBy },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.USER,
+        params: {
+          changedUser: userName,
+          firstConnection: !this.hasConnected,
+        },
+      });
+
+      this.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
+        if (codeError) {
+          console.log(codeError);
+
+          return;
+        }
+
+        const { gameCode } = codeData;
+
+        storageManager.setGameCode(gameCode);
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.GAMECODE,
+          params: { gameCode },
+        });
+      });
+    });
+  }
+
   /**
    * Reconnect to socket.io
    */
@@ -63,29 +121,7 @@ class SocketManager {
       this.reconnecting = true;
       this.socket.disconnect();
       this.socket.connect({ forceNew: true });
-      this.socket.emit('updateId', {
-        user: {
-          userName: storage.getUserName(),
-        },
-        device: {
-          deviceId: storage.getDeviceId(),
-        },
-      }, ({ error, data }) => {
-        if (error) {
-          return;
-        }
-
-        // TODO Duplicate code
-        const userName = storage.getUserName();
-
-        if (userName && data.anonUser) {
-          console.log('User does not exist. Logging you out');
-        } else if (data.anonUser) {
-          console.log('Anonymous!');
-        } else {
-          console.log('I remember you');
-        }
-      });
+      this.updateId();
     }
   }
 
@@ -96,6 +132,8 @@ class SocketManager {
    * @param {Function} [callback] - Callback
    */
   emitEvent(event, params, callback) {
+    params.token = storageManager.getToken() || '';
+
     if (!callback) {
       this.socket.emit(event, params);
     } else {

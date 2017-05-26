@@ -1190,9 +1190,6 @@ socketManager.addEvents([
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
 
-      map.startMap();
-      onlineStatus.setOnline();
-
       eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
 
       if (!socketManager.hasConnected) {
@@ -1202,6 +1199,8 @@ socketManager.addEvents([
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
 
+      onlineStatus.setOnline();
+      map.startMap();
       socketManager.updateId();
     },
   }, {

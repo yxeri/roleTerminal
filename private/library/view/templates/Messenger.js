@@ -213,9 +213,9 @@ class Messenger extends StandardView {
 
       const chatMsgData = {
         message: {
+          roomName,
           text: this.inputField.value.split('\n'),
           userName: storageManager.getSelectedAlias() || storageManager.getUserName(),
-          roomName,
         },
       };
 

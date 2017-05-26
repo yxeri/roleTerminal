@@ -86,9 +86,9 @@ class Home extends View {
 
     const text = linkName.toUpperCase();
     const button = elementCreator.createButton({
-      func: () => { this.triggerLink(linkName, keepHome); },
       text,
       classes,
+      func: () => { this.triggerLink(linkName, keepHome); },
     });
 
     if (shortcut) {
@@ -111,9 +111,9 @@ class Home extends View {
 
     if (!isNaN(accessLevel)) {
       this.accessElements.push({
-        element: button,
         accessLevel,
         maxAccessLevel,
+        element: button,
       });
     }
 

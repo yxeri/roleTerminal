@@ -63,10 +63,6 @@ class SocketManager {
       },
     }, ({ error, data }) => {
       if (error) {
-        return;
-      }
-
-      if (error) {
         storageManager.removeUser();
         storageManager.setAccessLevel(0);
         storageManager.removeBlockedBy();

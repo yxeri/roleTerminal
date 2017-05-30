@@ -198,21 +198,21 @@ class WorldMap extends View {
 
               this.circles[position.positionName].circle.setMap(null);
               this.circles[position.positionName].label.setMap(null);
-              this.circles[position.positionName] = null;
+              this.circles[position.positionName] = undefined;
 
               break;
             }
             case 'ping': {
               this.circles[position.positionName].circle.setMap(null);
               this.circles[position.positionName].label.setMap(null);
-              this.circles[position.positionName] = null;
+              this.circles[position.positionName] = undefined;
 
               break;
             }
             default: {
               this.clusterer.removeMarker(this.markers[position.positionName].marker);
               this.markers[position.positionName].setMap(null);
-              this.markers[position.positionName] = null;
+              this.markers[position.positionName] = undefined;
 
               break;
             }
@@ -668,9 +668,11 @@ class WorldMap extends View {
 
       soundLibrary.playSound('button2');
 
-      markers.forEach(marker => bounds.extend(marker.getPosition()));
+      if (markers) {
+        markers.forEach(marker => bounds.extend(marker.getPosition()));
 
-      this.realignMap(markers);
+        this.realignMap(markers);
+      }
     });
 
     google.maps.event.addListener(this.map, 'dragstart', () => {

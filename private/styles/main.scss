@@ -954,6 +954,10 @@ img {
   }
 }
 
+.emptyParagraph {
+  margin-top: 1em;
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $flash-color;

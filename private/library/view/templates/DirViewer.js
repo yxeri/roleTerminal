@@ -66,12 +66,32 @@ class DirViewer extends StandardView {
 
   showDoc(docFile) {
     const docFragment = document.createDocumentFragment();
+    const system = elementCreator.createContainer({});
+    system.appendChild(elementCreator.createButton({
+      text: 'Edit doc',
+      func: () => {
+        this.editDocFile(docFile);
+      },
+    }));
+
+    if (docFile.creator === storageManager.getUserName()) {
+      docFragment.appendChild(system);
+    }
+
     docFragment.appendChild(elementCreator.createParagraph({ text: `${docFile.title}`, classes: ['title'] }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `ID: ${docFile.docFileId.toUpperCase()}` }));
     docFragment.appendChild(elementCreator.createParagraph({ text: `Public: ${docFile.isPublic ? 'Yes' : 'No'}` }));
     docFragment.appendChild(elementCreator.createParagraph({ text: '------' }));
 
-    docFile.text.forEach(line => docFragment.appendChild(elementCreator.createParagraph({ text: line })));
+    docFile.text.forEach((line) => {
+      const classes = [];
+
+      if (line === '') {
+        classes.push('emptyParagraph');
+      }
+
+      docFragment.appendChild(elementCreator.createParagraph({ text: line, classes }));
+    });
 
     this.viewer.classList.remove('flash');
 
@@ -182,6 +202,127 @@ class DirViewer extends StandardView {
     return button;
   }
 
+  editDocFile(docFile) {
+    this.viewer.innerHTML = '';
+
+    const docFragment = document.createDocumentFragment();
+    const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
+    const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true });
+    const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
+    const visibilitySet = elementCreator.createRadioSet({
+      title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
+      optionName: 'visibility',
+      options: [
+        { optionId: 'visPublic', optionLabel: 'Everyone' },
+        { optionId: 'visPrivate', optionLabel: 'Only those with the correct code' },
+      ],
+    });
+    const teamSet = elementCreator.createRadioSet({
+      title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code',
+      optionName: 'team',
+      options: [
+        { optionId: 'teamYes', optionLabel: 'Yes' },
+        { optionId: 'teamNo', optionLabel: 'No' },
+      ],
+    });
+    const buttons = elementCreator.createContainer({ classes: ['buttons'] });
+
+    // TODO Duplicate code in Messenger
+    bodyInput.addEventListener('input', () => {
+      bodyInput.style.height = 'auto';
+      bodyInput.style.height = `${bodyInput.scrollHeight}px`;
+    });
+
+    docFragment.appendChild(titleInput);
+    docFragment.appendChild(idInput);
+    docFragment.appendChild(bodyInput);
+    docFragment.appendChild(visibilitySet);
+
+    if (storageManager.getTeam()) {
+      docFragment.appendChild(teamSet);
+    }
+
+    if (docFile) {
+      titleInput.value = docFile.title;
+      idInput.value = docFile.docFileId;
+      idInput.setAttribute('disabled', 'true');
+
+      if (docFile.isPublic) {
+        console.log(docFragment.getElementById('visPublic'));
+        docFragment.getElementById('visPublic').setAttribute('checked', 'true');
+      } else {
+        docFragment.getElementById('visPrivate').setAttribute('checked', 'true');
+      }
+
+      if (storageManager.getTeam()) {
+        if (docFile.team) {
+          docFragment.getElementById('teamYes').setAttribute('checked', 'true');
+        } else {
+          docFragment.getElementById('teamNo').setAttribute('checked', 'true');
+        }
+      }
+
+      bodyInput.innerHTML = '';
+      bodyInput.value = docFile.text.join('\n');
+    }
+
+    buttons.appendChild(elementCreator.createButton({
+      text: 'Save',
+      func: () => {
+        console.log(titleInput, bodyInput, idInput);
+        if (!markEmptyFields([titleInput, bodyInput, idInput])) {
+          const docId = textTools.trimSpace(idInput.value);
+          const docIdAllowed = textTools.isInternationalAllowed(docId);
+
+          if (!docIdAllowed) {
+            idInput.classList.add('markedInput');
+            idInput.setAttribute('placeholder', 'Has to be alphanumerical (a-z, 0-9)');
+            idInput.value = '';
+
+            return;
+          }
+
+          const teamYes = document.getElementById('teamYes');
+          const newDocFile = {
+            title: titleInput.value,
+            docFileId: docId,
+            text: bodyInput.value.split('\n'),
+            isPublic: document.getElementById('visPublic').checked === true,
+          };
+          const updateExisting = typeof docFile !== 'undefined';
+
+          if (teamYes && teamYes.checked === true) {
+            newDocFile.team = storageManager.getTeam();
+          }
+
+          socketManager.emitEvent('createDocFile', { docFile: newDocFile, updateExisting }, ({ error: docFileError }) => {
+            if (docFileError) {
+              if (docFileError.type === 'already exists') {
+                console.log('Already exists');
+              } else {
+                console.log(docFileError);
+              }
+
+              return;
+            }
+
+            this.viewer.innerHTML = '';
+            this.viewer.appendChild(document.createTextNode('Document has been saved'));
+
+            if (!updateExisting) {
+              eventCentral.triggerEvent({ event: eventCentral.Events.CREATEDOCFILE, params: { docFile: newDocFile } });
+            }
+          });
+        }
+      },
+    }));
+    docFragment.appendChild(buttons);
+
+    this.viewer.appendChild(docFragment);
+    // Trigger resize to fit text, if editing an existing doc
+    bodyInput.dispatchEvent(new Event('input'));
+  }
+
   populateList() {
     const searchButton = elementCreator.createButton({
       text: 'ID search',
@@ -242,91 +383,7 @@ class DirViewer extends StandardView {
       classes: ['hide'],
       text: 'Create doc',
       func: () => {
-        this.viewer.innerHTML = '';
-
-        const docFragment = document.createDocumentFragment();
-        const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true });
-        const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true });
-        const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true });
-        const visibilitySet = elementCreator.createRadioSet({
-          title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
-          optionName: 'visibility',
-          options: [
-            { optionId: 'visPublic', optionLabel: 'Everyone' },
-            { optionId: 'visPrivate', optionLabel: 'Only those with the correct code' },
-          ],
-        });
-        const teamSet = elementCreator.createRadioSet({
-          title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code',
-          optionName: 'team',
-          options: [
-            { optionId: 'teamYes', optionLabel: 'Yes' },
-            { optionId: 'teamNo', optionLabel: 'No' },
-          ],
-        });
-        const buttons = elementCreator.createContainer({ classes: ['buttons'] });
-
-        // TODO Duplicate code in Messenger
-        bodyInput.addEventListener('input', () => {
-          bodyInput.style.height = 'auto';
-          bodyInput.style.height = `${bodyInput.scrollHeight}px`;
-        });
-
-        docFragment.appendChild(titleInput);
-        docFragment.appendChild(idInput);
-        docFragment.appendChild(bodyInput);
-        docFragment.appendChild(visibilitySet);
-
-        if (storageManager.getTeam()) { docFragment.appendChild(teamSet); }
-
-        buttons.appendChild(elementCreator.createButton({
-          text: 'Save',
-          func: () => {
-            if (!markEmptyFields([titleInput, bodyInput, idInput])) {
-              const docId = textTools.trimSpace(idInput.value);
-              const docIdAllowed = textTools.isInternationalAllowed(docId);
-
-              if (!docIdAllowed) {
-                idInput.classList.add('markedInput');
-                idInput.setAttribute('placeholder', 'Has to be alphanumerical (a-z, 0-9)');
-                idInput.value = '';
-
-                return;
-              }
-
-              const teamYes = document.getElementById('teamYes');
-              const docFile = {
-                title: titleInput.value,
-                docFileId: docId,
-                text: bodyInput.value.split('\n'),
-                isPublic: document.getElementById('visPublic').checked === true,
-              };
-
-              if (teamYes && teamYes.checked === true) {
-                docFile.team = storageManager.getTeam();
-              }
-
-              socketManager.emitEvent('createDocFile', { docFile }, ({ error: docFileError }) => {
-                if (docFileError) {
-                  if (docFileError.type === 'already exists') {
-                    console.log('Already exists');
-                  } else {
-                    console.log(docFileError);
-                  }
-
-                  return;
-                }
-
-                this.viewer.innerHTML = '';
-                this.viewer.appendChild(document.createTextNode('Document has been saved'));
-                eventCentral.triggerEvent({ event: eventCentral.Events.CREATEDOCFILE, params: { docFile } });
-              });
-            }
-          },
-        }));
-        docFragment.appendChild(buttons);
-
-        this.viewer.appendChild(docFragment);
+        this.editDocFile();
       },
     });
 

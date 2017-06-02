@@ -40,8 +40,8 @@ const specials = '!;#&()[]';
  * @type {string}
  */
 const binary = '01';
-const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/g;
-const internationalRegex = /^[\w\d]+$/g;
+const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
+const internationalRegex = /^[\w\d]+$/;
 
 class TextTools {
   /**

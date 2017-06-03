@@ -36,7 +36,6 @@ function toggleSystemButtons({ createButton, inviteButton, leaveButton }) {
     createButton.classList.add('hide');
     inviteButton.classList.remove('hide');
     leaveButton.classList.remove('hide');
-
   } else {
     createButton.classList.remove('hide');
     inviteButton.classList.add('hide');
@@ -244,7 +243,7 @@ class TeamViewer extends StandardView {
           const description = [];
 
           if (team.owner === storageManager.getUserName()) {
-            description.push('WARNING', 'You are the owner of the team. The whole team will be DELETED if you leave it', 'Are you sure that you want to proceed?')
+            description.push('WARNING', 'You are the owner of the team. The whole team will be DELETED if you leave it', 'Are you sure that you want to proceed?');
           } else {
             description.push('You are trying to leave the team', 'Are you sure that you want to proceed?');
           }

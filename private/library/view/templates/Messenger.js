@@ -691,7 +691,7 @@ class Messenger extends StandardView {
 
     if (whisperTo) {
       buttonText = whisperTo;
-    } else if (/-team$/g.test(roomName)) {
+    } else if (/-team$/.test(roomName)) {
       buttonText = 'team';
     }
 

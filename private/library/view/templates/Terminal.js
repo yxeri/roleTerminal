@@ -126,7 +126,24 @@ class Terminal extends View {
       const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
 
       if (command) {
-        this.queueMessage({ message: { text: [`$ ${inputValue}`, `Running command ${command.commandName}:`] } });
+        this.queueMessage({
+          message: {
+            text: [
+              `$ ${inputValue}`,
+              `Running command ${command.commandName}:`,
+            ],
+            elements: [
+              elementCreator.createSpan({ text: 'Type abort or click to ' }),
+              elementCreator.createSpan({
+                classes: ['clickable', 'linkLook'],
+                text: 'abort command',
+                func: () => {
+                  this.triggerCommand('abort');
+                },
+              }),
+            ],
+          },
+        });
         command.startFunc();
       } else {
         this.queueMessage({ message: { text: [`$ ${inputValue}: command not found`, 'Programs:'], elements: this.getClickableCommandNames() } });

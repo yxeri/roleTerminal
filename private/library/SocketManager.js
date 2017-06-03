@@ -64,8 +64,6 @@ class SocketManager {
     }, ({ error, data }) => {
       if (error) {
         storageManager.removeUser();
-        storageManager.setAccessLevel(0);
-        storageManager.removeBlockedBy();
 
         return;
       }
@@ -75,8 +73,7 @@ class SocketManager {
       storageManager.setUserName(userName);
       storageManager.setAccessLevel(accessLevel);
       storageManager.setAliases(aliases);
-      storageManager.setTeam(team);
-      storageManager.setShortTeam(shortTeam);
+      storageManager.setTeam(team, shortTeam);
       this.setConnected();
 
       eventCentral.triggerEvent({

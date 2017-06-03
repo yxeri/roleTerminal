@@ -59,7 +59,7 @@ class StorageManager {
    * @static
    * @param {number} accessLevel - Access level
    */
-  static setAccessLevel(accessLevel) {
+  static setAccessLevel(accessLevel = 0) {
     this.setLocalVal('accessLevel', accessLevel);
     eventCentral.triggerEvent({ event: eventCentral.Events.ACCESS, params: { accessLevel } });
   }
@@ -76,7 +76,9 @@ class StorageManager {
    * @static
    * @param {string} userName - User name
    */
-  static setUserName(userName) { this.setLocalVal('userName', userName); }
+  static setUserName(userName) {
+    this.setLocalVal('userName', userName);
+  }
 
   /**
    * Remove user name and set access level to 0
@@ -86,11 +88,11 @@ class StorageManager {
     this.removeLocalVal('userName');
     this.setAccessLevel(0);
     this.removeLocalVal('aliases');
-    this.removeLocalVal('selectedAlias');
-    this.removeLocalVal('team');
-    this.removeLocalVal('shortTeam');
+    this.removeSelectedAlias();
+    this.removeTeam();
     this.removeGameCode();
     this.removeToken();
+    this.removeBlockedBy();
   }
 
   /**
@@ -212,16 +214,18 @@ class StorageManager {
 
   static getRoom() { return this.getLocalVal('room'); }
 
-  static setTeam(team) {
-    if (team) {
+  static setTeam(team, shortTeam) {
+    if (team && shortTeam) {
       this.setLocalVal('team', team);
+      this.setLocalVal('shortTeam', shortTeam);
+    } else {
+      this.removeTeam();
     }
   }
 
-  static setShortTeam(shortTeam) {
-    if (shortTeam) {
-      this.setLocalVal('shortTeam', shortTeam);
-    }
+  static removeTeam() {
+    this.removeLocalVal('shortTeam');
+    this.removeLocalVal('team');
   }
 
   static setBlockedBy(blockedBy) {

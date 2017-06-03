@@ -47,6 +47,7 @@ class EventCentral {
       SERVERMODE: 'Server mode',
       SIGNALBLOCK: 'Signal block',
       REMOVEPOSITIONS: 'Remove positions',
+      LEAVETEAM: 'Leave team',
     };
     this.eventWatchers = {};
   }

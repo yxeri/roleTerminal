@@ -524,6 +524,26 @@ class Messenger extends StandardView {
     });
 
     eventCentral.addWatcher({
+      watcherParent: followList,
+      event: eventCentral.Events.UNFOLLOWROOM,
+      func: ({ room }) => {
+        const currentRoom = storageManager.getRoom();
+
+        if (currentRoom === room.roomName) {
+          storageManager.setRoom('public');
+          eventCentral.triggerEvent({
+            event: eventCentral.Events.SWITCHROOM,
+            params: { room: { roomName: 'public' } },
+          });
+        }
+
+        followList.removeItem({
+          name: room.roomName.indexOf('-team') > -1 ? 'team' : room.roomName,
+        });
+      },
+    });
+
+    eventCentral.addWatcher({
       watcherParent: roomsList,
       event: eventCentral.Events.NEWROOM,
       func: ({ room: { roomName } }) => {

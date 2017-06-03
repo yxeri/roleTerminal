@@ -192,7 +192,7 @@ boot.setQueue([
     },
   },
 ]);
-boot.appendTo(mainView);
+// boot.appendTo(mainView);
 
 soundLibrary.toggleSounds();
 
@@ -764,7 +764,7 @@ eventCentral.triggerEvent({
 keyHandler.addKey(112, viewTools.goFullScreen);
 
 window.addEventListener('click', () => {
-  viewTools.goFullScreen();
+  // viewTools.goFullScreen();
 });
 
 if (!storageManager.getToken()) {
@@ -1056,6 +1056,7 @@ home.addLink({
   startFunc: () => { toolsViewer.appendTo(mainView); },
   endFunc: () => { toolsViewer.removeView(); },
 });
+
 home.appendTo(mainView);
 
 map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());

@@ -52,18 +52,41 @@ class LoginBox extends DialogBox {
           }
 
           if (reenterPasswordInput.inputElement.value === this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
+            const userNameInput = this.inputs.find(({ inputName }) => inputName === 'userName').inputElement;
+
             socketManager.emitEvent('register', {
               user: {
-                userName: this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.value,
+                userName: userNameInput.value,
                 password: reenterPasswordInput.inputElement.value,
                 registerDevice: storageManager.getDeviceId(),
               },
             }, ({ error, data }) => {
               if (error) {
                 soundLibrary.playSound('fail');
-                this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
-                return;
+                switch (error.type) {
+                  case 'already exists': {
+                    this.changeExtraDescription({ text: ['A user with that user name already exists', 'Unable to register user'] });
+
+                    return;
+                  }
+                  case 'invalid characters': {
+                    this.changeExtraDescription({ text: ['The user name contains invalid characters', 'Allowed: a-z 0-9'] });
+                    this.clearInput('userName');
+
+                    return;
+                  }
+                  case 'not allowed': {
+                    this.changeExtraDescription({ text: ['User registration has been disabled', 'Unable to register user'] });
+
+                    return;
+                  }
+                  default: {
+                    this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
+
+                    return;
+                  }
+                }
               }
 
               const text = [];
@@ -71,7 +94,7 @@ class LoginBox extends DialogBox {
               if (data.requiresVerification) {
                 text.push('Your user has been registered, but your account is not yet active. You need to contact an administrator to get your account verified!');
               } else {
-                text.push('Your user has been registered! You may now access O3C');
+                text.push('Your user has been registered! You may now access O3C with your new user');
               }
 
               this.changeExtraDescription({ text });
@@ -136,8 +159,7 @@ class LoginBox extends DialogBox {
             storageManager.setToken(token);
             storageManager.setUserName(userName);
             storageManager.setAccessLevel(accessLevel);
-            storageManager.setTeam(team);
-            storageManager.setShortTeam(shortTeam);
+            storageManager.setTeam(team, shortTeam);
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases } });
             eventCentral.triggerEvent({ event: eventCentral.Events.LOGIN });
             this.removeView();

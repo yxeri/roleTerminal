@@ -29,14 +29,18 @@ const soundLibrary = require('../../audio/SoundLibrary');
  * Hides/shows button depending on if the user is in a team
  * @param {HTMLElement} params.createButton Team create button
  * @param {HTMLElement} params.inviteButton Invite to team button
+ * @param {HTMLElement} params.leaveButton Leave team button
  */
-function toggleSystemButtons({ createButton, inviteButton }) {
+function toggleSystemButtons({ createButton, inviteButton, leaveButton }) {
   if (storageManager.getTeam()) {
     createButton.classList.add('hide');
     inviteButton.classList.remove('hide');
+    leaveButton.classList.remove('hide');
+
   } else {
     createButton.classList.remove('hide');
     inviteButton.classList.add('hide');
+    leaveButton.classList.add('hide');
   }
 }
 
@@ -114,8 +118,7 @@ class TeamViewer extends StandardView {
 
                     verifyDialog.appendTo(this.element.parentElement);
                   } else {
-                    storageManager.setTeam(team.teamName);
-                    storageManager.setShortTeam(team.shortName);
+                    storageManager.setTeam(team.teamName, team.shortName);
                     eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team } });
                   }
                 });
@@ -226,8 +229,60 @@ class TeamViewer extends StandardView {
         inviteDialog.appendTo(this.element.parentElement);
       },
     });
+    const leaveButton = elementCreator.createButton({
+      text: 'Leave team',
+      classes: ['hide'],
+      func: () => {
+        socketManager.emitEvent('getTeam', {}, ({ error, data }) => {
+          if (error) {
+            console.log(error);
 
-    systemList.addItems({ items: [createButton, inviteButton] });
+            return;
+          }
+
+          const { team } = data;
+          const description = [];
+
+          if (team.owner === storageManager.getUserName()) {
+            description.push('WARNING', 'You are the owner of the team. The whole team will be DELETED if you leave it', 'Are you sure that you want to proceed?')
+          } else {
+            description.push('You are trying to leave the team', 'Are you sure that you want to proceed?');
+          }
+
+          const leaveDialog = new DialogBox({
+            description,
+            buttons: {
+              left: {
+                text: 'Cancel',
+                eventFunc: () => {
+                  leaveDialog.removeView();
+                },
+              },
+              right: {
+                text: 'Leave',
+                eventFunc: () => {
+                  socketManager.emitEvent('leaveTeam', {}, ({ error: leaveError, data: leaveData }) => {
+                    if (leaveError) {
+                      leaveDialog.changeExtraDescription({ text: ['Something went wrong', 'Failed to leave the team'] });
+
+                      return;
+                    }
+
+                    leaveDialog.removeView();
+                    eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room: leaveData.room } });
+                    eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: {} });
+                  });
+                },
+              },
+            },
+          });
+
+          leaveDialog.appendTo(this.element.parentElement);
+        });
+      },
+    });
+
+    systemList.addItems({ items: [createButton, inviteButton, leaveButton] });
 
     this.viewer.appendChild(userViewerList.element);
     this.itemList.appendChild(systemList.element);
@@ -246,7 +301,7 @@ class TeamViewer extends StandardView {
           userViewerList.replaceAllItems({ items: [] });
         }
 
-        toggleSystemButtons({ createButton, inviteButton });
+        toggleSystemButtons({ createButton, inviteButton, leaveButton });
         eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: { teamName, shortName: shortTeam } } });
       },
     });
@@ -292,9 +347,13 @@ class TeamViewer extends StandardView {
               userViewerList.replaceAllItems({ items: listItems });
             }
           });
+        } else {
+          storageManager.removeTeam();
+          userList.replaceAllItems({ items: [] });
+          userViewerList.replaceAllItems({ items: [] });
         }
 
-        toggleSystemButtons({ createButton, inviteButton });
+        toggleSystemButtons({ createButton, inviteButton, leaveButton });
       },
     });
   }

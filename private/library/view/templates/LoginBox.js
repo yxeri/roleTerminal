@@ -177,6 +177,7 @@ class LoginBox extends DialogBox {
       inputName: 'password',
       type: 'password',
       isRequired: true,
+      maxLength: 200,
     }];
 
     super({

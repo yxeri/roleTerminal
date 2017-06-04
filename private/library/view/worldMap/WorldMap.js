@@ -472,10 +472,12 @@ class WorldMap extends View {
                 placeholder: 'Name of the position',
                 inputName: 'markerName',
                 isRequired: true,
+                maxLength: 100,
               }, {
                 placeholder: 'Description',
                 inputName: 'description',
                 multiLine: true,
+                maxLength: 8000,
               }, {
                 type: 'radioSet',
                 title: 'Who should the position be visible to?',

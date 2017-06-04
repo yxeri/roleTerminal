@@ -68,9 +68,9 @@ class Wallet extends StandardView {
     this.viewer.appendChild(elementCreator.createList({}));
     this.viewer.classList.add('selectedView');
     this.walletAmount = 0;
+    this.teamWalletAmount = 0;
 
     this.populateList();
-    this.populateHistory();
   }
 
   createTransactionButton({ receiverName, readableName }) {
@@ -182,6 +182,18 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
+        socketManager.emitEvent('listTeams', {}, ({ error, data }) => {
+          if (error) {
+            console.log(error);
+
+            return;
+          }
+
+          const { teams } = data;
+
+          teamList.replaceAllItems({ items: teams.map(team => this.createTransactionButton({ receiverName: `${team.teamName}-team`, readableName: team.teamName })) });
+        });
+
         socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
           if (error) {
             console.log(error);
@@ -194,34 +206,23 @@ class Wallet extends StandardView {
 
           userList.replaceAllItems({ items: allUsers.map(receiverName => this.createTransactionButton({ receiverName })) });
         });
-      },
-    });
 
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.TEAM,
-      func: () => {
-        socketManager.emitEvent('listTeams', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
+        if (storageManager.getAccessLevel() > 0) {
+          const teamName = storageManager.getTeam();
 
-            return;
+          if (teamName) {
+            socketManager.emitEvent('getWallet', { isTeam: true }, ({ error, data }) => {
+              if (error) {
+                console.log(error);
+
+                return;
+              }
+
+              this.teamWalletAmount = data.wallet.amount;
+              this.changeWalletAmount({ amount: 0, from: '', to: '' });
+            });
           }
 
-          const { teams } = data;
-
-          teamList.replaceAllItems({ items: teams.map(team => this.createTransactionButton({ receiverName: `${team.teamName}-team`, readableName: team.teamName })) });
-        });
-      },
-    });
-  }
-
-  populateHistory() {
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.USER,
-      func: () => {
-        if (storageManager.getAccessLevel() > 0) {
           socketManager.emitEvent('getWallet', {}, ({ error, data }) => {
             if (error) {
               console.log(error);
@@ -230,7 +231,7 @@ class Wallet extends StandardView {
             }
 
             this.walletAmount = data.wallet.amount;
-            this.changeWalletAmount({ amount: 0, from: '' });
+            this.changeWalletAmount({ amount: 0, from: '', to: '' });
           });
 
           socketManager.emitEvent('getAllTransactions', {}, ({ error, data }) => {
@@ -240,28 +241,51 @@ class Wallet extends StandardView {
               return;
             }
 
-            const { toTransactions, fromTransactions } = data;
-            const allTransactions = toTransactions.concat(fromTransactions);
+            const callback = ({ toTransactions, fromTransactions }) => {
+              const allTransactions = toTransactions.concat(fromTransactions);
 
-            allTransactions.sort((a, b) => {
-              const aValue = a.time;
-              const bValue = b.time;
+              allTransactions.sort((a, b) => {
+                const aValue = a.time;
+                const bValue = b.time;
 
-              if (aValue < bValue) {
-                return 1;
-              } else if (aValue > bValue) {
-                return -1;
-              }
+                if (aValue < bValue) {
+                  return 1;
+                } else if (aValue > bValue) {
+                  return -1;
+                }
 
-              return 0;
-            });
+                return 0;
+              });
 
-            const fragment = document.createDocumentFragment();
-            allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
+              const fragment = document.createDocumentFragment();
+              allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
 
-            this.viewer.lastElementChild.innerHTML = '';
-            this.viewer.lastElementChild.appendChild(fragment);
+              this.viewer.lastElementChild.innerHTML = '';
+              this.viewer.lastElementChild.appendChild(fragment);
+            };
+
+            if (teamName) {
+              socketManager.emitEvent('getAllTransactions', { isTeam: true }, ({ error: errTeam, data: teamData }) => {
+                if (errTeam) {
+                  console.log(errTeam);
+
+                  return;
+                }
+
+                const fromTransactions = teamData.fromTransactions.concat(data.fromTransactions);
+                const toTransactions = teamData.fromTransactions.concat(data.toTransactions);
+
+                callback({ fromTransactions, toTransactions });
+              });
+            } else {
+              callback(data);
+            }
           });
+        } else {
+          this.teamWalletAmount = 0;
+          this.walletAmount = 0;
+          this.changeWalletAmount({ amount: 0, from: '', to: '' });
+          this.viewer.lastElementChild.innerHTML = '';
         }
       },
     });
@@ -271,23 +295,42 @@ class Wallet extends StandardView {
       event: eventCentral.Events.TRANSACTION,
       func: ({ transaction }) => {
         this.addTransaction(createTransactionItem({ transaction }));
-        this.changeWalletAmount({ amount: transaction.amount, from: transaction.from });
+        this.changeWalletAmount({ amount: transaction.amount, from: transaction.from, to: transaction.to });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.NEWTEAM,
+      func: ({ team: { teamName } }) => {
+        teamList.addItem({ item: this.createTransactionButton({ receiverName: `${teamName}-team`, readableName: teamName }) });
       },
     });
   }
 
-  changeWalletAmount({ amount, from }) {
+  changeWalletAmount({ amount, from, to }) {
+    const teamName = storageManager.getTeam();
     const aliases = storageManager.getAliases();
     aliases.push(storageManager.getUserName());
 
+    if (teamName) {
+      if (from === `${teamName}-team`) {
+        this.teamWalletAmount -= amount;
+      } else if (to === `${teamName}-team`) {
+        this.teamWalletAmount += amount;
+      }
+    }
+
     if (aliases.indexOf(from) > -1) {
       this.walletAmount -= amount;
-    } else {
+    } else if (aliases.indexOf(to) > -1) {
       this.walletAmount += amount;
     }
 
+    const amountString = document.createTextNode(`WALLET AMOUNT: ${this.walletAmount}. TEAM WALLET AMOUNT: ${this.teamWalletAmount}`);
+
     this.viewer.firstElementChild.innerHTML = '';
-    this.viewer.firstElementChild.appendChild(document.createTextNode(`WALLET AMOUNT: ${this.walletAmount}`));
+    this.viewer.firstElementChild.appendChild(amountString);
   }
 
   addTransaction(transactionItem) {

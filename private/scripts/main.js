@@ -1284,6 +1284,14 @@ socketManager.addEvents([
         params: { room, isProtected },
       });
     },
+  }, {
+    event: 'team',
+    func: ({ team }) => {
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.NEWTEAM,
+        params: { team },
+      });
+    },
   },
   // {
   //   event: 'roomFollower',

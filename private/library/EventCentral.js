@@ -41,6 +41,7 @@ class EventCentral {
       USERSTATUS: 'User sent status update',
       PINGMAP: 'Ping map',
       TEAM: 'Joined team',
+      NEWTEAM: 'New team',
       SIMPLEMSG: 'Simple message received',
       GAMECODE: 'New game code',
       SERVERMODE: 'Server mode',

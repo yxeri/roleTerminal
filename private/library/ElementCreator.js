@@ -15,6 +15,8 @@
  */
 
 const soundLibrary = require('./audio/SoundLibrary');
+const eventCentral = require('./EventCentral');
+const storageManager = require('./StorageManager');
 
 class ElementCreator {
   static createContainer({ classes = [], elementId }) {
@@ -97,6 +99,24 @@ class ElementCreator {
 
       if (option.default) {
         input.setAttribute('checked', 'true');
+      }
+
+      if (option.requiresTeam) {
+        if (!storageManager.getTeam()) {
+          inputLabel.classList.add('hide');
+        }
+
+        eventCentral.addWatcher({
+          watcherParent: option,
+          event: eventCentral.Events.TEAM,
+          func: ({ team }) => {
+            if (team) {
+              inputLabel.classList.remove('hide');
+            } else {
+              inputLabel.classList.add('hide');
+            }
+          },
+        });
       }
 
       inputLabel.appendChild(input);

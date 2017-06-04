@@ -80,6 +80,7 @@ class Wallet extends StandardView {
       optionName: 'visibility',
       options: [
         { optionId: 'myWallet', optionLabel: 'Mine', default: true },
+        { optionId: 'teamWallet', optionLabel: 'Team', requiresTeam: true },
       ],
     };
     const inputs = [{
@@ -91,10 +92,6 @@ class Wallet extends StandardView {
       inputName: 'note',
 
     }, radioSet];
-
-    if (storageManager.getTeam()) {
-      radioSet.options.push({ optionId: 'teamWallet', optionLabel: 'Team' });
-    }
 
     const button = elementCreator.createButton({
       inputs,

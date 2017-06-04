@@ -111,7 +111,7 @@ class ElementCreator {
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'text');
 
-    if (maxLength) { input.setAttribute('maxlength', maxLength) }
+    if (maxLength) { input.setAttribute('maxlength', maxLength); }
     if (type) { input.setAttribute('type', type); }
 
     if (isRequired) {

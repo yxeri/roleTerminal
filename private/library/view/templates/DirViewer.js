@@ -369,6 +369,7 @@ class DirViewer extends StandardView {
             placeholder: 'Document ID',
             inputName: 'docFileId',
             isRequired: true,
+            maxLength: 20,
           }],
           description: [
             'Retrieve a document from the archives',

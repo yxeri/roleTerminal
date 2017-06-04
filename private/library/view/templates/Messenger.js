@@ -608,7 +608,7 @@ class Messenger extends StandardView {
             return;
           }
 
-          const { rooms = [], followedRooms = [], whisperRooms = [] } = data;
+          const { rooms = [], followedRooms = [], whisperRooms = [], protectedRooms = [] } = data;
 
           followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room })) });
           followList.addItems({
@@ -623,7 +623,7 @@ class Messenger extends StandardView {
             followList.toggleList(true);
           }
 
-          roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton({ roomName: room })) });
+          roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton({ roomName: room, isProtected: protectedRooms.indexOf(room) > -1 })) });
 
           const listItem = findItem(followList, storageManager.getRoom());
 
@@ -706,7 +706,8 @@ class Messenger extends StandardView {
     return button;
   }
 
-  createRoomButton({ roomName, whisperTo }) {
+  createRoomButton({ roomName, whisperTo, isProtected }) {
+    const classes = [];
     let buttonText = roomName;
 
     if (whisperTo) {
@@ -715,7 +716,12 @@ class Messenger extends StandardView {
       buttonText = 'team';
     }
 
+    if (isProtected) {
+      classes.push('lockedButton');
+    }
+
     const button = elementCreator.createButton({
+      classes,
       data: roomName,
       text: buttonText,
       func: () => {

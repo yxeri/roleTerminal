@@ -104,13 +104,14 @@ class ElementCreator {
     return fieldset;
   }
 
-  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine }) {
+  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine, maxLength }) {
     const input = multiLine ? document.createElement('TEXTAREA') : document.createElement('INPUT');
 
     input.setAttribute('placeholder', placeholder);
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'text');
 
+    if (maxLength) { input.setAttribute('maxlength', maxLength) }
     if (type) { input.setAttribute('type', type); }
 
     if (isRequired) {

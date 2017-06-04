@@ -688,10 +688,6 @@ img {
     width: calc(100% - .2em);
   }
 
-  input[type=radio] {
-    width: auto;
-  }
-
   input:first-child {
     margin-top: 0;
   }
@@ -704,6 +700,10 @@ img {
 
   legend {
     margin: .3em 0;
+  }
+
+  input[type=radio] {
+    width: auto;
   }
 
   label {
@@ -764,6 +764,29 @@ img {
   textarea {
     width: calc(100% - .8em);
     margin-left: $padding;
+  }
+
+  legend {
+    margin: .3em 0;
+  }
+
+  input[type=radio] {
+    width: auto;
+  }
+
+  label {
+    display: block;
+    margin-bottom: .3em;
+
+    span {
+      @include borderOutline;
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+      cursor: pointer;
+      margin-right: .3em;
+    }
   }
 }
 

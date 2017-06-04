@@ -248,7 +248,6 @@ class DirViewer extends StandardView {
       idInput.setAttribute('disabled', 'true');
 
       if (docFile.isPublic) {
-        console.log(docFragment.getElementById('visPublic'));
         docFragment.getElementById('visPublic').setAttribute('checked', 'true');
       } else {
         docFragment.getElementById('visPrivate').setAttribute('checked', 'true');

@@ -95,6 +95,10 @@ class ElementCreator {
       input.setAttribute('id', option.optionId);
       input.setAttribute('name', optionName);
 
+      if (option.default) {
+        input.setAttribute('checked', 'true');
+      }
+
       inputLabel.appendChild(input);
       inputLabel.appendChild(document.createElement('SPAN'));
       inputLabel.appendChild(document.createTextNode(option.optionLabel));

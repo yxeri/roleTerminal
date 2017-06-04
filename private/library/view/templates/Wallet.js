@@ -73,12 +73,36 @@ class Wallet extends StandardView {
     this.populateHistory();
   }
 
-  createTransactionButton({ userName }) {
+  createTransactionButton({ receiverName, readableName }) {
+    const radioSet = {
+      type: 'radioSet',
+      title: 'Which wallet do you want to use?',
+      optionName: 'visibility',
+      options: [
+        { optionId: 'myWallet', optionLabel: 'Mine', default: true },
+      ],
+    };
+    const inputs = [{
+      placeholder: 'Amount',
+      inputName: 'amount',
+      isRequired: true,
+    }, {
+      placeholder: 'Message to receiver',
+      inputName: 'note',
+
+    }, radioSet];
+
+    if (storageManager.getTeam()) {
+      radioSet.options.push({ optionId: 'teamWallet', optionLabel: 'Team' });
+    }
+
     const button = elementCreator.createButton({
-      data: userName,
-      text: userName,
+      inputs,
+      data: receiverName,
+      text: readableName || receiverName,
       func: () => {
         const transDialog = new DialogBox({
+          inputs,
           buttons: {
             left: {
               text: 'Cancel',
@@ -90,6 +114,9 @@ class Wallet extends StandardView {
               text: 'Create',
               eventFunc: () => {
                 const emptyFields = transDialog.markEmptyFields();
+                const teamOption = document.getElementById('teamWallet');
+
+                console.log(teamOption);
 
                 if (emptyFields) {
                   soundLibrary.playSound('fail');
@@ -99,13 +126,16 @@ class Wallet extends StandardView {
                 }
 
                 const transaction = {
-                  to: userName,
+                  to: receiverName,
                   amount: transDialog.inputs.find(({ inputName }) => inputName === 'amount').inputElement.value,
                   note: transDialog.inputs.find(({ inputName }) => inputName === 'note').inputElement.value,
-                  coordinates: tracker.latestBestPosition.coordinates,
                 };
 
-                socketManager.emitEvent('createTransaction', { transaction }, ({ error: createError, data }) => {
+                if (tracker.latestBestPosition) {
+                  transaction.coordinates = tracker.latestBestPosition.coordinates;
+                }
+
+                socketManager.emitEvent('createTransaction', { transaction, fromTeam: teamOption && teamOption.checked }, ({ error: createError, data }) => {
                   if (createError) {
                     console.log(createError);
 
@@ -121,18 +151,10 @@ class Wallet extends StandardView {
               },
             },
           },
-          inputs: [{
-            placeholder: 'Amount',
-            inputName: 'amount',
-            isRequired: true,
-          }, {
-            placeholder: 'Message to receiver',
-            inputName: 'note',
-          }],
           description: [
             'Dogecoin transfer tool',
           ],
-          extraDescription: [`How much do you want to transfer to ${userName}?`],
+          extraDescription: [`How much do you want to transfer to ${receiverName}?`],
         });
         transDialog.appendTo(this.element.parentElement);
       },
@@ -146,12 +168,17 @@ class Wallet extends StandardView {
       title: 'SYSTEM',
       shouldSort: false,
     });
+    const teamList = new List({
+      title: 'TEAMS',
+      shouldSort: true,
+    });
     const userList = new List({
       title: 'USERS',
       shouldSort: true,
     });
 
     this.itemList.appendChild(systemList.element);
+    this.itemList.appendChild(teamList.element);
     this.itemList.appendChild(userList.element);
 
     eventCentral.addWatcher({
@@ -168,7 +195,25 @@ class Wallet extends StandardView {
           const { onlineUsers, offlineUsers } = data;
           const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
 
-          userList.replaceAllItems({ items: allUsers.map(userName => this.createTransactionButton({ userName })) });
+          userList.replaceAllItems({ items: allUsers.map(receiverName => this.createTransactionButton({ receiverName })) });
+        });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.TEAM,
+      func: () => {
+        socketManager.emitEvent('listTeams', {}, ({ error, data }) => {
+          if (error) {
+            console.log(error);
+
+            return;
+          }
+
+          const { teams } = data;
+
+          teamList.replaceAllItems({ items: teams.map(team => this.createTransactionButton({ receiverName: `${team.teamName}-team`, readableName: team.teamName })) });
         });
       },
     });

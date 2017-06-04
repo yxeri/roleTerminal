@@ -344,10 +344,6 @@ class Messenger extends StandardView {
                   }
 
                   eventCentral.triggerEvent({
-                    event: eventCentral.Events.CREATEROOM,
-                    params: { room: { roomName: createdRoom.roomName } },
-                  });
-                  eventCentral.triggerEvent({
                     event: eventCentral.Events.FOLLOWROOM,
                     params: { room: { roomName: createdRoom.roomName } },
                   });
@@ -546,8 +542,8 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: roomsList,
       event: eventCentral.Events.NEWROOM,
-      func: ({ room: { roomName } }) => {
-        roomsList.addItem({ item: this.createRoomButton({ roomName }) });
+      func: ({ room: { roomName }, isProtected }) => {
+        roomsList.addItem({ item: this.createRoomButton({ roomName, isProtected }) });
       },
     });
 

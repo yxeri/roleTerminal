@@ -1276,6 +1276,14 @@ socketManager.addEvents([
         params: { position, removeBlocker, blockedBy },
       });
     },
+  }, {
+    event: 'room',
+    func: ({ room, isProtected }) => {
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.NEWROOM,
+        params: { room, isProtected },
+      });
+    },
   },
   // {
   //   event: 'roomFollower',

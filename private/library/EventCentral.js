@@ -27,7 +27,6 @@ class EventCentral {
       FOLLOWROOM: 'Followed room',
       UNFOLLOWROOM: 'Unfollowed room',
       NEWROOM: 'New room',
-      CREATEROOM: 'Created room',
       USER: 'Switched user',
       LOGOUT: 'Logged out',
       LOGIN: 'Logged in',

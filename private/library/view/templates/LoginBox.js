@@ -19,6 +19,7 @@ const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const soundLibrary = require('../../audio/SoundLibrary');
+const textTool = require('../../TextTools');
 
 class LoginBox extends DialogBox {
   constructor({ description, extraDescription, parentElement, closeFunc }) {
@@ -51,9 +52,21 @@ class LoginBox extends DialogBox {
             return;
           }
 
-          if (reenterPasswordInput.inputElement.value === this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
-            const userNameInput = this.inputs.find(({ inputName }) => inputName === 'userName').inputElement;
+          const userNameInput = this.inputs.find(({ inputName }) => inputName === 'userName').inputElement;
 
+          if (textTool.isInternationalAllowed(userNameInput.value)) {
+            this.changeExtraDescription({
+              text: [
+                'User name contains invalid characters',
+                'Allowed characters are: a-z 0-9',
+                'Unable to register user',
+              ],
+            });
+
+            return;
+          }
+
+          if (reenterPasswordInput.inputElement.value === this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
             socketManager.emitEvent('register', {
               user: {
                 userName: userNameInput.value,

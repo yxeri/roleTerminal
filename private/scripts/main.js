@@ -776,7 +776,7 @@ home.addLink({
   startFunc: () => {
     new LoginBox({
       description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-      extraDescription: ['Input your user name and password'],
+      extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
       parentElement: mainView,
       socketManager,
       keyHandler,

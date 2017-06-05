@@ -26,6 +26,7 @@ const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
+const textTools = require('../../TextTools');
 
 /**
  * Takes a list of user names and filters out current users user name and aliases
@@ -336,6 +337,17 @@ class Messenger extends StandardView {
                   password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
                 };
 
+                if (!textTools.isInternationalAllowed()) {
+                  createDialog.clearInput('roomName');
+                  createDialog.changeExtraDescription({
+                    text: [
+                      'Invalid characters in room name',
+                      'Valid characters are a-z 0-9',
+                      'Unable to create the room',
+                    ],
+                  });
+                }
+
                 socketManager.emitEvent('createRoom', { room }, ({ error: createError, data: { room: createdRoom } }) => {
                   if (createError) {
                     console.log(createError);
@@ -362,7 +374,7 @@ class Messenger extends StandardView {
             inputName: 'password',
           }],
           description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
-          extraDescription: ['Enter a name and optional password for the room'],
+          extraDescription: ['Enter a name and optional password for the room', 'Allowed characters in the name: a-z 0-9'],
         });
         createDialog.appendTo(this.element.parentElement);
       },

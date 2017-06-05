@@ -85,6 +85,10 @@ class DialogBox extends View {
         case 'textarea': {
           inputElement = elementCreator.createInput(input);
 
+          if (input.defaultValue && input.defaultValue !== '') {
+            inputElement.value = input.defaultValue;
+          }
+
           inputElement.addEventListener('input', () => {
             inputElement.style.height = 'auto';
             inputElement.style.height = `${inputElement.scrollHeight}px`;
@@ -94,6 +98,10 @@ class DialogBox extends View {
         }
         default: {
           inputElement = elementCreator.createInput(input);
+
+          if (input.defaultValue && input.defaultValue !== '') {
+            inputElement.value = input.defaultValue;
+          }
 
           if (input.maxLength) {
             inputElement.setAttribute('maxlength', input.maxLength);

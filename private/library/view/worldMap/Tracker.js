@@ -54,21 +54,34 @@ class Tracker {
   }
 
   startTracker() {
-    this.watchId = navigator.geolocation.watchPosition((position) => {
-      if (position) {
-        this.isTracking = true;
+    const staticPosition = storageManager.getStaticPosition();
 
-        eventCentral.triggerEvent({
-          event: eventCentral.Events.MYPOSITION,
-          params: { position: convertPosition(position) },
-        });
-      }
-    }, (err) => {
-      console.log(err);
-    }, { enableHighAccuracy: true });
+    if (staticPosition) {
+      staticPosition.lastUpdated = new Date();
+
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.MYPOSITION,
+        params: { position: staticPosition },
+      });
+    } else {
+      this.watchId = navigator.geolocation.watchPosition((position) => {
+        if (position) {
+          this.isTracking = true;
+
+          eventCentral.triggerEvent({
+            event: eventCentral.Events.MYPOSITION,
+            params: { position: convertPosition(position) },
+          });
+        }
+      }, (err) => {
+        console.log(err);
+      }, { enableHighAccuracy: true });
+    }
+
     setTimeout(() => {
-      navigator.geolocation.clearWatch(this.watchId);
-
+      if (this.watchId) {
+        navigator.geolocation.clearWatch(this.watchId);
+      }
       setTimeout(() => {
         this.latestPositions = [];
         this.startTracker();
@@ -108,16 +121,16 @@ class Tracker {
       return;
     }
 
-    const position = this.getBestPosition();
-    this.latestBestPosition = position;
+    const bestPosition = this.getBestPosition();
+    this.latestBestPosition = bestPosition;
 
-    if (!position || !position.coordinates || !position.coordinates.latitude || !position.coordinates.longitude || !position.coordinates.accuracy) {
+    if (!bestPosition || !bestPosition.coordinates || !bestPosition.coordinates.latitude || !bestPosition.coordinates.longitude || !bestPosition.coordinates.accuracy) {
       return;
-    } else if (position.coordinates.accuracy > 150) {
+    } else if (bestPosition.coordinates.accuracy > 150) {
       return;
     }
 
-    socketManager.emitEvent('updateUserPosition', { position }, (err) => {
+    socketManager.emitEvent('updateUserPosition', { position: bestPosition }, (err) => {
       if (err) {
         console.log(err);
       }

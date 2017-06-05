@@ -23,6 +23,7 @@ const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
 const soundLibrary = require('../../audio/SoundLibrary');
+const storagemanager = require('../../StorageManager');
 
 class ToolsViewer extends StandardView {
   constructor({ isFullscreen }) {
@@ -416,8 +417,58 @@ class ToolsViewer extends StandardView {
         createDialog.appendTo(this.element.parentElement);
       },
     });
+    const setCoordinatesButton = elementCreator.createButton({
+      text: 'Set static coordinates',
+      func: () => {
+        const staticPosition = storagemanager.getStaticPosition();
 
-    systemList.addItems({ items: [createSimpleMsgButton, createGameCodeButton, createAliasButton] });
+        const setDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                setDialog.removeView();
+              },
+            },
+            right: {
+              text: 'Set',
+              eventFunc: () => {
+                const latitude = setDialog.inputs.find(({ inputName }) => inputName === 'latitude').inputElement.value;
+                const longitude = setDialog.inputs.find(({ inputName }) => inputName === 'longitude').inputElement.value;
+
+                if (latitude === '' && longitude === '') {
+                  storagemanager.removeStaticPosition();
+                  setDialog.removeView();
+                } else if (latitude !== '' && longitude !== '' && !isNaN(latitude) && !isNaN(longitude)) {
+                  storagemanager.setStaticPosition({ latitude, longitude, accuracy: 30 });
+                  setDialog.removeView();
+                } else {
+                  setDialog.clearInput('latitude');
+                  setDialog.clearInput('longitude');
+                  setDialog.focusInput('latitude');
+                  setDialog.changeExtraDescription({ text: ['Latitude and Longitude has to be numbers. Leave them empty if you want to remove your static position'] });
+                }
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Latitude',
+            inputName: 'latitude',
+            maxLength: 30,
+            defaultValue: staticPosition ? staticPosition.coordinates.latitude : '',
+          }, {
+            placeholder: 'Longitude',
+            inputName: 'longitude',
+            maxLength: 30,
+            defaultValue: staticPosition ? staticPosition.coordinates.longitude : '',
+          }],
+          description: ['Set static GPS coordinates. Leave both fields empty if you want to remove the static coordinates'],
+        });
+        setDialog.appendTo(this.element.parentElement);
+      },
+    });
+
+    systemList.addItems({ items: [createSimpleMsgButton, createGameCodeButton, createAliasButton, setCoordinatesButton] });
     this.itemList.appendChild(systemList.element);
 
     this.accessElements.push({

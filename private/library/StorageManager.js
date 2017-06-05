@@ -273,6 +273,18 @@ class StorageManager {
   static removeToken() {
     this.removeLocalVal('token');
   }
+
+  static setStaticPosition(coordinates) {
+    this.setLocalVal('staticPosition', converters.stringifyObject({ coordinates }));
+  }
+
+  static getStaticPosition() {
+    return converters.convertToObject(this.getLocalVal('staticPosition'));
+  }
+
+  static removeStaticPosition() {
+    this.removeLocalVal('staticPosition');
+  }
 }
 
 module.exports = StorageManager;

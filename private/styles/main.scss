@@ -309,64 +309,6 @@ img {
     user-select: none;
   }
 
-  .mapMenu {
-    box-shadow: $box-shadow $second-color;
-    outline: $outline solid $text-color;
-    background-color: $back-color;
-    position: absolute;
-    display: flex;
-    top: -.3em;
-    left: calc(50% - 10.5em);
-    width: $menu-width;
-    height: 1.7em;
-    padding-bottom: .3em;
-    z-index: 2;
-    margin-top: .1em;
-
-    > span {
-      display: inline-block;
-      align-self: flex-end;
-      margin-left: .3em;
-      margin-right: .5em;
-    }
-
-    .menuList {
-      display: inline-block;
-      align-self: flex-end;
-      margin-right: .5em;
-
-      ul {
-        position: absolute;
-        border: 1px solid;
-        border-top: 0;
-        background-color: $back-color;
-        padding: .3em .3em .3em 0;
-        margin-top: .3em;
-        left: 0;
-        width: calc(100% - .5em);
-        max-height: 80vh;
-        overflow-y: scroll;
-
-        li {
-          margin-left: .3em;
-          margin-bottom: .3em;
-
-          button {
-            width: 100%;
-          }
-        }
-      }
-
-      ul::-webkit-scrollbar {
-        width: 0 !important;
-      }
-
-      .listTitle {
-        margin-left: .2em;
-      }
-    }
-  }
-
   a {
     display: none !important;
   }
@@ -978,6 +920,64 @@ img {
 
 .emptyParagraph {
   margin-top: 1em;
+}
+
+.innerMenu {
+  box-shadow: $box-shadow $second-color;
+  outline: $outline solid $text-color;
+  background-color: $back-color;
+  position: absolute;
+  display: flex;
+  top: -.3em;
+  left: calc(50% - 10.5em);
+  width: $menu-width;
+  height: 1.7em;
+  padding-bottom: .3em;
+  z-index: 2;
+  margin-top: .1em;
+
+  > span {
+    display: inline-block;
+    align-self: flex-end;
+    margin-left: .3em;
+    margin-right: .5em;
+  }
+
+  .menuList {
+    display: inline-block;
+    align-self: flex-end;
+    margin-right: .5em;
+
+    ul {
+      position: absolute;
+      border: 1px solid;
+      border-top: 0;
+      background-color: $back-color;
+      padding: .3em .3em .3em 0;
+      margin-top: .3em;
+      left: 0;
+      width: calc(100% - .5em);
+      max-height: 80vh;
+      overflow-y: scroll;
+
+      li {
+        margin-left: .3em;
+        margin-bottom: .3em;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+
+    ul::-webkit-scrollbar {
+      width: 0 !important;
+    }
+
+    .listTitle {
+      margin-left: .2em;
+    }
+  }
 }
 
 @-webkit-keyframes flash {

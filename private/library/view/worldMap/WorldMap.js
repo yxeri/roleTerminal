@@ -116,7 +116,7 @@ class WorldMap extends View {
       [this.worldList, this.otherList, this.teamList, this.userList].forEach((list) => { if (list.showingList) { list.toggleList(); } });
     });
 
-    const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['mapMenu'] });
+    const mapMenu = elementCreator.createContainer({ elementId: 'mapMenu', classes: ['innerMenu'] });
     const meButton = elementCreator.createSpan({
       text: 'ME',
       classes: ['clickable'],

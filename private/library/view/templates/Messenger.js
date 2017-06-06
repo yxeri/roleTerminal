@@ -725,7 +725,7 @@ class Messenger extends StandardView {
     }
 
     if (isProtected) {
-      classes.push('lockedButton');
+      classes.push('locked');
     }
 
     const button = elementCreator.createButton({

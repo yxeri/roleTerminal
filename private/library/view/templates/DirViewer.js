@@ -160,12 +160,12 @@ class DirViewer extends StandardView {
                       const item = this.teamLists[team].getItem({ name: sentTitle });
 
                       item.firstElementChild.setAttribute('data', sentId);
-                      item.firstElementChild.classList.remove('lockedButton');
+                      item.firstElementChild.classList.remove('locked');
                     } else {
                       const item = this.userLists[creator].getItem({ name: sentTitle });
 
                       item.firstElementChild.setAttribute('data', sentId);
-                      item.firstElementChild.classList.remove('lockedButton');
+                      item.firstElementChild.classList.remove('locked');
                     }
 
                     if (this.selectedItem) {
@@ -196,7 +196,7 @@ class DirViewer extends StandardView {
     });
 
     if (docFile.isLocked) {
-      button.classList.add('lockedButton');
+      button.classList.add('locked');
     }
 
     return button;
@@ -246,6 +246,7 @@ class DirViewer extends StandardView {
       titleInput.value = docFile.title;
       idInput.value = docFile.docFileId;
       idInput.setAttribute('disabled', 'true');
+      idInput.classList.add('locked');
 
       if (docFile.isPublic) {
         docFragment.getElementById('visPublic').setAttribute('checked', 'true');

@@ -23,6 +23,7 @@ $light-color: #9b9b9b;
 $back-color: #11000f;
 $back-button: #1b0019;
 $back-input: #1b0019;
+$hoverInput: #00372d;
 $note-color: #cd02b7;
 $padding: .2em;
 $outline: .1em;
@@ -107,6 +108,7 @@ button {
 
 button:focus, button:hover, textarea:focus, textarea:hover, input:focus, input:hover {
   @include selectedBorderOutline;
+  background-color: $hoverInput;
 }
 
 ::-webkit-input-placeholder {
@@ -119,7 +121,7 @@ input {
   background-color: $back-input;
   display: inline-block;
   cursor: pointer;
-  color: $darker-text-color;
+  color: $text-color;
   font-family: monospace;
   font-size: $font-size;
   -webkit-text-size-adjust: 100%;
@@ -822,7 +824,7 @@ img {
   line-height: 1.5em;
 }
 
-.lockedButton {
+.locked {
   @include lockedBorderOutline;
   color: $light-color;
   text-shadow: none;

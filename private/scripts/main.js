@@ -192,7 +192,7 @@ boot.setQueue([
     },
   },
 ]);
-// boot.appendTo(mainView);
+boot.appendTo(mainView);
 
 soundLibrary.toggleSounds();
 

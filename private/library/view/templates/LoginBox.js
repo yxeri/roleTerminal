@@ -54,7 +54,7 @@ class LoginBox extends DialogBox {
 
           const userNameInput = this.inputs.find(({ inputName }) => inputName === 'userName').inputElement;
 
-          if (textTool.isInternationalAllowed(userNameInput.value)) {
+          if (!textTool.isInternationalAllowed(userNameInput.value)) {
             this.changeExtraDescription({
               text: [
                 'User name contains invalid characters',

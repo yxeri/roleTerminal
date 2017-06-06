@@ -761,10 +761,11 @@ eventCentral.triggerEvent({
   params: { room: storageManager.getRoom() },
 });
 
+// F1
 keyHandler.addKey(112, viewTools.goFullScreen);
 
 window.addEventListener('click', () => {
-  // viewTools.goFullScreen();
+  viewTools.goFullScreen();
 });
 
 if (!storageManager.getToken()) {

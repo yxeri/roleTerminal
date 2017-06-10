@@ -471,7 +471,7 @@ terminal.addCommand({
                   return;
                 }
 
-                const shouldAmplify = actionId === 1;
+                const boostingSignal = actionId === 1;
                 const hintIndex = hackData.passwordHint.index + 1;
 
                 const elements = textTools.createMixedArray({
@@ -529,7 +529,7 @@ terminal.addCommand({
                 });
 
                 terminal.setNextFunc((password) => {
-                  socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), shouldAmplify }, ({ error: manipulateError, data: manipulateData }) => {
+                  socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
                     if (manipulateError) {
                       terminal.queueMessage({ message: { text: ['Something went wrong. Failed to manipulate the LANTERN'] } });
                       terminal.resetNextFunc();
@@ -599,7 +599,7 @@ terminal.addCommand({
     });
 
     terminal.setNextFunc((secretKeyValue) => {
-      socketManager.emitEvent('useGameCode', { gameCode: secretKeyValue }, ({ error }) => {
+      socketManager.emitEvent('useGameCode', { code: secretKeyValue }, ({ error }) => {
         if (error) {
           console.log(error);
           terminal.resetNextFunc();
@@ -737,7 +737,6 @@ eventCentral.addWatcher({
   func: () => {
     storageManager.removeUser();
     eventCentral.triggerEvent({ event: eventCentral.Events.USER, params: { changedUser: true } });
-    storageManager.setRoom('public');
     eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room: { roomName: 'public' } } });
   },
 });
@@ -756,21 +755,12 @@ eventCentral.addWatcher({
   func: () => { soundLibrary.playSound('msgReceived'); },
 });
 
-eventCentral.triggerEvent({
-  event: eventCentral.Events.SWITCHROOM,
-  params: { room: storageManager.getRoom() },
-});
-
 // F1
 keyHandler.addKey(112, viewTools.goFullScreen);
 
 window.addEventListener('click', () => {
   viewTools.goFullScreen();
 });
-
-if (!storageManager.getToken()) {
-  eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
-}
 
 home.addLink({
   linkName: 'login',
@@ -1192,14 +1182,14 @@ socketManager.addEvents([
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
 
-      eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
-
       if (!socketManager.hasConnected) {
         new Clock(document.getElementById('time')).startClock();
         map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
         map.setCenterCoordinates(storageManager.getCenterCoordinates());
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
+
+      eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
 
       onlineStatus.setOnline();
       map.startMap();
@@ -1251,8 +1241,12 @@ socketManager.addEvents([
     },
   }, {
     event: 'follow',
-    func: ({ room }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room } });
+    func: ({ room, whisper, data, whisperTo }) => {
+      if (whisperTo) {
+        room.roomname = data.replace('-whisper-', '<->');
+      }
+
+      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room, whisper, data } });
     },
   }, {
     event: 'unfollow',

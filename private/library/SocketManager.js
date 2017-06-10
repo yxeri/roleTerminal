@@ -63,7 +63,10 @@ class SocketManager {
       },
     }, ({ error, data }) => {
       if (error) {
-        storageManager.removeUser();
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.LOGOUT,
+          params: {},
+        });
 
         return;
       }
@@ -76,6 +79,9 @@ class SocketManager {
       storageManager.setTeam(team, shortTeam);
       this.setConnected();
 
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SWITCHROOM,
+        params: { room: storageManager.getRoom() } });
       eventCentral.triggerEvent({
         event: eventCentral.Events.SIGNALBLOCK,
         params: { blockedBy },

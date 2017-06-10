@@ -1,0 +1,72 @@
+
+body {
+  font-family: monospace;
+  font-size: 1em;
+  color: black;
+  text-shadow: 0 0 2px white;
+  margin: 0;
+  padding: 0;
+}
+
+.top {
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: black;
+  color: white;
+  font-size: 1.2em;
+  padding: .1em 0 .1em .3em;
+  margin-bottom: .2em;
+}
+
+.buttonContainer {
+  margin-top: .2em;
+
+  button {
+    margin-left: 1em;
+    display: inline-block;
+  }
+
+  button:first-child {
+    margin-left: 0;
+  }
+}
+
+.hide {
+  display: none;
+}
+
+.list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  span {
+    display: block;
+  }
+
+  li {
+    margin-top: .2em;
+    margin-bottom: .2em;
+    border: .1em solid black;
+    padding-left: .3em;
+    padding-top: .1em;
+    padding-bottom: .2em;
+  }
+}
+
+.unverified {
+  background-color: #696900;
+  color: white;
+  text-shadow: 0 0 2px black;
+}
+
+.banned {
+  background-color: #690000;
+  color: white;
+  text-shadow: 0 0 2px black;
+}

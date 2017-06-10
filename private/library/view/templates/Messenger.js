@@ -37,7 +37,7 @@ function filterUserAliases(users) {
   const aliases = storageManager.getAliases();
   aliases.push(storageManager.getUserName());
 
-  return users.filter(user => aliases.indexOf(user) === -1);
+  return users.filter(user => aliases.indexOf(user.userName) === -1);
 }
 
 /**
@@ -60,17 +60,18 @@ function convertWhisperRoomName(sentRoomName) {
 
 /**
  * Retrieve history and trigger CHATMSG event
- * @param {string} roomName - Name of the room to retrieve history from
- * @param {number} lines - Number of lines to retrieve
- * @param {boolean} infiniteScroll Did infinite scroll trigger the history retrieval?
+ * @param {string} params.roomName Name of the room to retrieve history from
+ * @param {boolean} params.infiniteScroll Did infinite scroll trigger the history retrieval?
+ * @param {Function} params.callback Callback
  */
-function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = () => {} }) {
+function getHistory({ roomName, infiniteScroll = false, callback = () => {} }) {
   const { whisperTo, userName } = convertWhisperRoomName(roomName);
+
   if (whisperTo) {
     roomName = userName;
   }
 
-  socketManager.emitEvent('getHistory', { room: { roomName }, lines, whisperTo }, ({ data: historyData, error: historyError }) => {
+  socketManager.emitEvent('getHistory', { room: { roomName }, whisperTo }, ({ data: historyData, error: historyError }) => {
     if (historyError) {
       console.log(historyError);
       callback({ error: historyError });
@@ -87,13 +88,13 @@ function getHistory({ roomName, lines = 50, infiniteScroll = false, callback = (
     eventCentral.triggerEvent({
       event: eventCentral.Events.CHATMSG,
       params: {
+        infiniteScroll,
+        room,
         messages: historyData.messages,
         options: { printable: false },
         shouldScroll: !infiniteScroll,
         isHistory: true,
-        infiniteScroll,
         following: historyData.following,
-        room,
       },
     });
   });
@@ -244,9 +245,18 @@ class Messenger extends StandardView {
           return;
         }
 
-        eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { whisper: data.whisper, room: { roomName }, messages: data.messages, options: { printable: false }, shouldScroll: true } });
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.CHATMSG,
+          params: {
+            whisper: data.whisper,
+            room: { roomName },
+            messages: data.messages,
+            options: { printable: false },
+            shouldScroll: true },
+        });
         this.clearInputField();
       });
+
       this.focusInput();
     }
   }
@@ -368,7 +378,7 @@ class Messenger extends StandardView {
             placeholder: 'Name of the room',
             inputName: 'roomName',
             isRequired: true,
-            maxLength: 10,
+            maxLength: 20,
           }, {
             placeholder: 'Optional passowrd',
             inputName: 'password',
@@ -446,7 +456,9 @@ class Messenger extends StandardView {
           };
 
           if (isHistory) {
-            if (following) {
+            this.messageList.element.innerHTML = '';
+
+            if (following && storageManager.getAccessLevel() > 0) {
               this.inputArea.classList.remove('hide');
               this.messageList.element.classList.remove('fullHeight');
             } else {
@@ -510,7 +522,6 @@ class Messenger extends StandardView {
 
         if (roomName && roomName !== '') {
           setTimeout(() => {
-            this.messageList.element.innerHTML = '';
             this.messageList.element.classList.add('flash');
 
             getHistory({ roomName, switchedRoom: true });
@@ -539,10 +550,6 @@ class Messenger extends StandardView {
 
         if (currentRoom === room.roomName) {
           storageManager.setRoom('public');
-          eventCentral.triggerEvent({
-            event: eventCentral.Events.SWITCHROOM,
-            params: { room: { roomName: 'public' } },
-          });
         }
 
         followList.removeItem({
@@ -602,7 +609,7 @@ class Messenger extends StandardView {
             const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
             const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-            userList.replaceAllItems({ items: allUsers.map(listUserName => this.createWhisperButton({ roomName: userName, whisperTo: listUserName })) });
+            userList.replaceAllItems({ items: allUsers.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
           });
         } else {
           aliasList.replaceAllItems({ items: [] });
@@ -618,12 +625,12 @@ class Messenger extends StandardView {
 
           const { rooms = [], followedRooms = [], whisperRooms = [], protectedRooms = [] } = data;
 
-          followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room })) });
+          followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room.roomName })) });
           followList.addItems({
             items: whisperRooms.map((room) => {
-              const { whisperTo, userName } = convertWhisperRoomName(room);
+              const { whisperTo, userName } = convertWhisperRoomName(room.roomName);
 
-              return this.createWhisperButton({ roomName: `${userName} <-> ${whisperTo}`, data: room });
+              return this.createWhisperButton({ roomName: `${userName} <-> ${whisperTo}`, data: room.roomName });
             }),
           });
 
@@ -631,18 +638,18 @@ class Messenger extends StandardView {
             followList.toggleList(true);
           }
 
-          roomsList.replaceAllItems({ items: rooms.map(room => this.createRoomButton({ roomName: room, isProtected: protectedRooms.indexOf(room) > -1 })) });
+          roomsList.replaceAllItems({
+            items: rooms.map(room => this.createRoomButton({
+              roomName: room.roomName,
+              isProtected: protectedRooms.map(protectedRoom => protectedRoom.roomName).indexOf(room.roomName) > -1,
+            })),
+          });
 
           const listItem = findItem(followList, storageManager.getRoom());
 
           if (listItem) {
             this.selectedItem = listItem;
             this.selectedItem.classList.add('selectedItem');
-          }
-
-          if (changedUser) {
-            this.messageList.element.innerHTML = '';
-            getHistory({ roomName: storageManager.getRoom() });
           }
         });
       },
@@ -694,7 +701,7 @@ class Messenger extends StandardView {
           const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
           const whisperRoomName = `${userName}-whisper-${whisperTo}`;
 
-          socketManager.emitEvent('followWhisper', { room: { roomName: whisperRoomName } }, ({ error }) => {
+          socketManager.emitEvent('followWhisper', { whisperTo, room: { roomName: whisperRoomName } }, ({ error }) => {
             if (error) {
               console.log(error);
 
@@ -783,6 +790,7 @@ class Messenger extends StandardView {
                       event: eventCentral.Events.FOLLOWROOM,
                       params: { room: { roomName } },
                     });
+
                     storageManager.setRoom(roomName);
                     followDialog.removeView();
                   });

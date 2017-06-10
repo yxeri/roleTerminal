@@ -318,12 +318,12 @@ class TeamViewer extends StandardView {
             }
 
             const { onlineUsers, offlineUsers } = data;
-            const userNames = onlineUsers.concat(offlineUsers);
+            const users = onlineUsers.concat(offlineUsers);
 
             userList.replaceAllItems({
-              items: userNames.map((userName) => {
+              items: users.map((user) => {
                 return elementCreator.createButton({
-                  text: userName,
+                  text: user.userName,
                   func: () => {
                     // Dialog with options to kick, promote (maybe?)
                   },

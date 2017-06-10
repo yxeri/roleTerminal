@@ -54,9 +54,9 @@ class MapMarker {
       radius: this.accuracy,
     });
     this.label = new Label({
+      positionName,
       labelText: positionName,
       coordinates: { longitude, latitude },
-      positionName,
     });
     this.alwaysShowLabel = alwaysShowLabel;
     this.mouseOver = false;

@@ -477,7 +477,7 @@ class WorldMap extends View {
                 placeholder: 'Description',
                 inputName: 'description',
                 multiLine: true,
-                maxLength: 8000,
+                maxLength: 6000,
               }, {
                 type: 'radioSet',
                 title: 'Who should the position be visible to?',
@@ -588,7 +588,6 @@ class WorldMap extends View {
       map: this.map,
       worldMap: this,
       description: ['You'],
-      alwaysShowLabel: true,
     });
   }
 
@@ -820,8 +819,6 @@ class WorldMap extends View {
       // TODO Get from server instead of hardcoding
       const accuracyAdjustment = accuracy > 40 ? 40 : accuracy;
 
-      console.log(markerName, google.maps.geometry.spherical.computeDistanceBetween(source.getCenter(), marker.getPosition()) - accuracyAdjustment);
-
       return source.getBounds()
           .contains(marker.getPosition()) || (google.maps.geometry.spherical.computeDistanceBetween(source.getCenter(), marker.getPosition()) - accuracyAdjustment) <= source.getRadius();
     }).map(markerName => this.markers[markerName]);
@@ -983,6 +980,8 @@ class WorldMap extends View {
             owner,
             team,
           });
+
+          this.clusterer.addMarkers([this.markers[positionName].marker]);
         }
       } else if (markerType === 'user' && lastUpdated) {
         const date = new Date(lastUpdated);
@@ -1010,7 +1009,6 @@ class WorldMap extends View {
             description: userDescription,
             map: this.map,
             worldMap: this,
-            alwaysShowLabel: true,
             markerType,
             positionName,
             owner,
@@ -1035,6 +1033,8 @@ class WorldMap extends View {
           owner,
           team,
         });
+
+        this.clusterer.addMarkers([this.markers[positionName].marker]);
       }
     }
   }

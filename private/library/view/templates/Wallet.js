@@ -57,7 +57,7 @@ function filterUserAliases(users) {
   const aliases = storageManager.getAliases();
   aliases.push(storageManager.getUserName());
 
-  return users.filter(user => aliases.indexOf(user) === -1);
+  return users.filter(user => aliases.indexOf(user.userName) === -1);
 }
 
 class Wallet extends StandardView {
@@ -112,8 +112,6 @@ class Wallet extends StandardView {
               eventFunc: () => {
                 const emptyFields = transDialog.markEmptyFields();
                 const teamOption = document.getElementById('teamWallet');
-
-                console.log(teamOption);
 
                 if (emptyFields) {
                   soundLibrary.playSound('fail');
@@ -204,7 +202,7 @@ class Wallet extends StandardView {
           const { onlineUsers, offlineUsers } = data;
           const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
 
-          userList.replaceAllItems({ items: allUsers.map(receiverName => this.createTransactionButton({ receiverName })) });
+          userList.replaceAllItems({ items: allUsers.map(user => this.createTransactionButton({ receiverName: user.userName })) });
         });
 
         if (storageManager.getAccessLevel() > 0) {

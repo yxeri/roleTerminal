@@ -23,7 +23,7 @@ const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
 const soundLibrary = require('../../audio/SoundLibrary');
-const storagemanager = require('../../StorageManager');
+const storageManager = require('../../StorageManager');
 
 class ToolsViewer extends StandardView {
   constructor({ isFullscreen }) {
@@ -50,18 +50,6 @@ class ToolsViewer extends StandardView {
           this.codeList.replaceAllItems({ items: [] });
         }
 
-        socketManager.emitEvent('getGameCodes', { codeType: 'loot' }, ({ error, data }) => {
-          if (error) {
-            console.log(error);
-
-            return;
-          }
-
-          const { gameCodes = [] } = data;
-
-          this.codeList.replaceAllItems({ items: gameCodes.map(gameCode => elementCreator.createSpan({ text: gameCode.code })) });
-        });
-
         socketManager.emitEvent('getSimpleMessages', {}, ({ error, data }) => {
           if (error) {
             console.log(error);
@@ -80,6 +68,20 @@ class ToolsViewer extends StandardView {
           this.viewer.lastElementChild.innerHTML = '';
           this.viewer.lastElementChild.appendChild(fragment);
         });
+
+        if (storageManager.getToken()) {
+          socketManager.emitEvent('getGameCodes', { codeType: 'loot' }, ({ error, data }) => {
+            if (error) {
+              console.log(error);
+
+              return;
+            }
+
+            const { gameCodes = [] } = data;
+
+            this.codeList.replaceAllItems({ items: gameCodes.map(gameCode => elementCreator.createSpan({ text: gameCode.code })) });
+          });
+        }
       },
     });
 
@@ -420,7 +422,7 @@ class ToolsViewer extends StandardView {
     const setCoordinatesButton = elementCreator.createButton({
       text: 'Set static coordinates',
       func: () => {
-        const staticPosition = storagemanager.getStaticPosition();
+        const staticPosition = storageManager.getStaticPosition();
 
         const setDialog = new DialogBox({
           buttons: {
@@ -437,10 +439,10 @@ class ToolsViewer extends StandardView {
                 const longitude = setDialog.inputs.find(({ inputName }) => inputName === 'longitude').inputElement.value;
 
                 if (latitude === '' && longitude === '') {
-                  storagemanager.removeStaticPosition();
+                  storageManager.removeStaticPosition();
                   setDialog.removeView();
                 } else if (latitude !== '' && longitude !== '' && !isNaN(latitude) && !isNaN(longitude)) {
-                  storagemanager.setStaticPosition({ latitude, longitude, accuracy: 30 });
+                  storageManager.setStaticPosition({ latitude, longitude, accuracy: 30 });
                   setDialog.removeView();
                 } else {
                   setDialog.clearInput('latitude');

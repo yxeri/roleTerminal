@@ -558,9 +558,9 @@ img {
   display: inline-block;
   margin-left: .3em;
   margin-right: .3em;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 5px solid $second-color;
+  border-top: .4em solid transparent;
+  border-bottom: .4em solid transparent;
+  border-left: .4em solid $second-color;
 }
 
 .expandedIcon {
@@ -568,9 +568,9 @@ img {
   height: 0;
   display: inline-block;
   margin-right: .2em;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid $second-color;
+  border-left: .4em solid transparent;
+  border-right: .4em solid transparent;
+  border-top: .4em solid $second-color;
 }
 
 .viewer::-webkit-scrollbar {
@@ -850,6 +850,12 @@ img {
 
 .listTitle {
   text-align: center;
+
+  span {
+    width: calc(100% - 1em);
+    display: inline-block;
+    word-break: break-all;
+  }
 }
 
 .flash {

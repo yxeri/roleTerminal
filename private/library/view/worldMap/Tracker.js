@@ -117,10 +117,6 @@ class Tracker {
   }
 
   sendBestPosition() {
-    if (!storageManager.getToken()) {
-      return;
-    }
-
     const bestPosition = this.getBestPosition();
     this.latestBestPosition = bestPosition;
 
@@ -130,7 +126,17 @@ class Tracker {
       return;
     }
 
-    socketManager.emitEvent('updateUserPosition', { position: bestPosition }, (err) => {
+    bestPosition.deviceId = storageManager.getDeviceId();
+
+    if (storageManager.getToken()) {
+      socketManager.emitEvent('updateUserPosition', { position: bestPosition }, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+
+    socketManager.emitEvent('updateDevicePosition', { position: bestPosition }, (err) => {
       if (err) {
         console.log(err);
       }

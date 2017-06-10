@@ -79,7 +79,7 @@ class List extends View {
       }
 
       titleElement.appendChild(this.toggleElement);
-      titleElement.appendChild(document.createTextNode(title));
+      titleElement.appendChild(elementCreator.createSpan({ text: title }));
       this.element.appendChild(titleElement);
     } else {
       this.showingList = true;

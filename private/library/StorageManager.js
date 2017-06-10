@@ -85,6 +85,7 @@ class StorageManager {
    * @static
    */
   static removeUser() {
+    this.setRoom('public');
     this.removeLocalVal('userName');
     this.setAccessLevel(0);
     this.removeLocalVal('aliases');

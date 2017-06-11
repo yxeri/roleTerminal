@@ -27,19 +27,23 @@ const tracker = require('../worldMap/Tracker');
 
 /**
  * Create a transaction list item
- * @param {string} to - Receiver
- * @param {string} from - Sender
- * @param {number} amount - Amount
- * @param {Date} time - Time stamp
+ * @param {string} params.to Receiver
+ * @param {string} params.from Sender
+ * @param {number} params.amount Amount
+ * @param {Date} params.time Time stamp
  * @returns {HTMLLIElement} List item
  */
-function createTransactionItem({ transaction: { to, from, amount, time, note } }) {
+function createTransactionItem({ transaction: { to, from, amount, time, note, coordinates } }) {
   const listItem = document.createElement('LI');
   const date = textTools.generateTimeStamp({ date: time });
 
   listItem.appendChild(elementCreator.createParagraph({ text: `${date.fullTime} ${date.fullDate}` }));
   listItem.appendChild(elementCreator.createParagraph({ text: `${from} -> ${to}` }));
   listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount}d` }));
+
+  if (coordinates) {
+    listItem.appendChild(elementCreator.createParagraph({ text: `Lat: ${coordinates.latitude}. Long: ${coordinates.longitude}. Accuracy: ${coordinates.accuracy}m` }));
+  }
 
   if (note) {
     listItem.appendChild(elementCreator.createParagraph({ text: `${note}` }));
@@ -132,7 +136,7 @@ class Wallet extends StandardView {
 
                 socketManager.emitEvent('createTransaction', { transaction, fromTeam: teamOption && teamOption.checked }, ({ error: createError, data }) => {
                   if (createError) {
-                    console.log(createError);
+                    transDialog.changeExtraDescription({ text: ['Something went wrong', 'Failed to transfer credits'] });
 
                     return;
                   }
@@ -232,52 +236,34 @@ class Wallet extends StandardView {
             this.changeWalletAmount({ amount: 0, from: '', to: '' });
           });
 
-          socketManager.emitEvent('getAllTransactions', {}, ({ error, data }) => {
+          socketManager.emitEvent('getAllTransactions', { isTeam: teamName }, ({ error, data }) => {
             if (error) {
               console.log(error);
 
               return;
             }
 
-            const callback = ({ toTransactions, fromTransactions }) => {
-              const allTransactions = toTransactions.concat(fromTransactions);
+            const { toTransactions, fromTransactions } = data;
+            const allTransactions = toTransactions.concat(fromTransactions);
 
-              allTransactions.sort((a, b) => {
-                const aValue = a.time;
-                const bValue = b.time;
+            allTransactions.sort((a, b) => {
+              const aValue = a.time;
+              const bValue = b.time;
 
-                if (aValue < bValue) {
-                  return 1;
-                } else if (aValue > bValue) {
-                  return -1;
-                }
+              if (aValue < bValue) {
+                return 1;
+              } else if (aValue > bValue) {
+                return -1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 
-              const fragment = document.createDocumentFragment();
-              allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
+            const fragment = document.createDocumentFragment();
+            allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
 
-              this.viewer.lastElementChild.innerHTML = '';
-              this.viewer.lastElementChild.appendChild(fragment);
-            };
-
-            if (teamName) {
-              socketManager.emitEvent('getAllTransactions', { isTeam: true }, ({ error: errTeam, data: teamData }) => {
-                if (errTeam) {
-                  console.log(errTeam);
-
-                  return;
-                }
-
-                const fromTransactions = teamData.fromTransactions.concat(data.fromTransactions);
-                const toTransactions = teamData.fromTransactions.concat(data.toTransactions);
-
-                callback({ fromTransactions, toTransactions });
-              });
-            } else {
-              callback(data);
-            }
+            this.viewer.lastElementChild.innerHTML = '';
+            this.viewer.lastElementChild.appendChild(fragment);
           });
         } else {
           this.teamWalletAmount = 0;

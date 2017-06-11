@@ -441,8 +441,8 @@ class ToolsViewer extends StandardView {
                 if (latitude === '' && longitude === '') {
                   storageManager.removeStaticPosition();
                   setDialog.removeView();
-                } else if (latitude !== '' && longitude !== '' && !isNaN(latitude) && !isNaN(longitude)) {
-                  storageManager.setStaticPosition({ latitude, longitude, accuracy: 30 });
+                } else if (!isNaN(latitude) && !isNaN(longitude)) {
+                  storageManager.setStaticPosition({ latitude: parseFloat(latitude), longitude: parseFloat(longitude), accuracy: 30 });
                   setDialog.removeView();
                 } else {
                   setDialog.clearInput('latitude');

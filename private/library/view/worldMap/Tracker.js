@@ -24,6 +24,13 @@ const storageManager = require('../../StorageManager');
  * @returns {Object} Converted position
  */
 function convertPosition(position) {
+  if (position.coordinates) {
+    return {
+      coordinates: position.coordinates,
+      lastUpdated: new Date(),
+    };
+  }
+
   return {
     coordinates: {
       longitude: position.coords.longitude,
@@ -57,12 +64,14 @@ class Tracker {
     const staticPosition = storageManager.getStaticPosition();
 
     if (staticPosition) {
-      staticPosition.lastUpdated = new Date();
+      const triggerMyPosition = () => {
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.MYPOSITION,
+          params: { position: convertPosition(staticPosition) },
+        });
+      };
 
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.MYPOSITION,
-        params: { position: staticPosition },
-      });
+      setTimeout(triggerMyPosition, 3000);
     } else {
       this.watchId = navigator.geolocation.watchPosition((position) => {
         if (position) {
@@ -82,11 +91,12 @@ class Tracker {
       if (this.watchId) {
         navigator.geolocation.clearWatch(this.watchId);
       }
+
       setTimeout(() => {
         this.latestPositions = [];
         this.startTracker();
       }, 15000);
-    }, 20000);
+    }, 10000);
   }
 
   startSendTimeout() {
@@ -129,16 +139,16 @@ class Tracker {
     bestPosition.deviceId = storageManager.getDeviceId();
 
     if (storageManager.getToken()) {
-      socketManager.emitEvent('updateUserPosition', { position: bestPosition }, (err) => {
-        if (err) {
-          console.log(err);
+      socketManager.emitEvent('updateUserPosition', { position: bestPosition }, ({ error }) => {
+        if (error) {
+          console.log(error);
         }
       });
     }
 
-    socketManager.emitEvent('updateDevicePosition', { position: bestPosition }, (err) => {
-      if (err) {
-        console.log(err);
+    socketManager.emitEvent('updateDevicePosition', { position: bestPosition }, ({ error }) => {
+      if (error) {
+        console.log(error);
       }
     });
   }

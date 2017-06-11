@@ -449,6 +449,7 @@ class WorldMap extends View {
                       coordinates: {
                         longitude: event.latLng.lng(),
                         latitude: event.latLng.lat(),
+                        accuracy: 30,
                       },
                       positionName: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
                       description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
@@ -900,13 +901,6 @@ class WorldMap extends View {
     this.element.appendChild(this.mapClickMenu);
     this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
-
-    /**
-     * User position marker can be created before map exists. That's why we add it to the map here
-     */
-    if (this.markers.I) {
-      this.markers.I.setMap(this.map);
-    }
 
     this.retrievePositions({});
   }

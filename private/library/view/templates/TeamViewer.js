@@ -335,7 +335,7 @@ class TeamViewer extends StandardView {
               const teamPings = Object.keys(this.worldMap.markers).filter((positionName) => {
                 const marker = this.worldMap.markers[positionName];
 
-                return marker.markerType === 'ping' && userNames.indexOf(marker.owner) > -1;
+                return marker.markerType === 'ping' && users.map(user => user.userName).indexOf(marker.owner) > -1;
               });
               const listItems = teamPings.map((ping) => {
                 const beautifiedDate = textTools.generateTimeStamp({ date: ping.lastUpdated });

@@ -94,6 +94,7 @@ class MapMarker {
         socketManager.emitEvent('updatePosition', {
           position: {
             coordinates: {
+              accuracy: 30,
               longitude: event.latLng.lng(),
               latitude: event.latLng.lat(),
             },

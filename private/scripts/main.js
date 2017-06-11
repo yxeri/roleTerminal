@@ -51,9 +51,6 @@ const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 
 boot.setQueue([
   {
-    func: boot.addCode,
-    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2 },
-  }, {
     func: boot.printLines,
     params: {
       corruption: true,
@@ -105,7 +102,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 1000,
+      waitTime: 900,
       corruption: false,
       array: [
         'Connected!',
@@ -130,7 +127,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 3500,
+      waitTime: 3000,
       corruption: false,
       array: [
         'Uplink established!',
@@ -664,10 +661,16 @@ terminal.addCommand({
         if (chosenChoice.proceed) {
           socketManager.emitEvent('signalBlock', { description: ['|\\||_||<3|>_by_'] }, ({ error }) => {
             if (error) {
-              console.log(error);
-            }
+              if (error.type === 'insufficient') {
+                terminal.queueMessage({ message: { text: ['Unable to pinpoint your location', 'Unable to nuke the area'] } });
+                terminal.resetNextFunc();
 
-            terminal.resetNextFunc();
+                return;
+              }
+
+              terminal.queueMessage({ message: { text: ['Something went wrong', 'Unable to nuke the area'] } });
+              terminal.resetNextFunc();
+            }
           });
         } else {
           terminal.queueMessage({ message: { text: ['Aborting'] } });
@@ -808,7 +811,25 @@ home.addLink({
 
             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
-                console.log(error);
+                if (error.type === 'insufficient') {
+                  panicBox.changeDescription({
+                    text: [
+                      'Unable to pinpoint your position',
+                      'Thank you for using PANIC',
+                    ],
+                  });
+
+                  panicBox.replaceButtons({
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'Oh no...',
+                        func: () => { panicBox.removeView(); },
+                      }),
+                    ],
+                  });
+                  return;
+                }
+
                 panicBox.removeView();
 
                 return;
@@ -851,7 +872,25 @@ home.addLink({
 
             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
-                console.log(error);
+                if (error.type === 'insufficient') {
+                  panicBox.changeDescription({
+                    text: [
+                      'Unable to pinpoint your position',
+                      'Thank you for using PANIC',
+                    ],
+                  });
+
+                  panicBox.replaceButtons({
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'Oh no...',
+                        func: () => { panicBox.removeView(); },
+                      }),
+                    ],
+                  });
+                  return;
+                }
+
                 panicBox.removeView();
 
                 return;
@@ -898,7 +937,25 @@ home.addLink({
             if (team) {
               socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
                 if (error) {
-                  console.log(error);
+                  if (error.type === 'insufficient') {
+                    panicBox.changeDescription({
+                      text: [
+                        'Unable to pinpoint your position',
+                        'Thank you for using PANIC',
+                      ],
+                    });
+
+                    panicBox.replaceButtons({
+                      buttons: [
+                        elementCreator.createButton({
+                          text: 'Oh no...',
+                          func: () => { panicBox.removeView(); },
+                        }),
+                      ],
+                    });
+                    return;
+                  }
+
                   panicBox.removeView();
 
                   return;

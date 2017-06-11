@@ -7,11 +7,11 @@ class Profile extends View {
   constructor() {
     super({ viewId: 'profile' });
 
-    const profileCoordinates = elementCreator.createContainer({ elementId: 'profileCoordinates' });
-    profileCoordinates.appendChild(elementCreator.createParagraph({ text: 'Coordinates: -' }));
+    const coordinatesElement = elementCreator.createContainer({ elementId: 'profileCoordinates' });
+    coordinatesElement.appendChild(elementCreator.createParagraph({ text: 'Coordinates: -' }));
 
     this.element.appendChild(elementCreator.createContainer({}));
-    this.element.appendChild(profileCoordinates);
+    this.element.appendChild(coordinatesElement);
     this.element.appendChild(elementCreator.createContainer({}));
 
     eventCentral.addWatcher({
@@ -40,7 +40,7 @@ class Profile extends View {
             text: `Coordinates: Latitude: ${latitude}. Longitude ${longitude}. Accuracy: ${accuracy}m`, elementId: 'coordinatesSpan',
           }), profileCoordinates.firstChild);
         }
-      }
+      },
     });
 
     eventCentral.addWatcher({

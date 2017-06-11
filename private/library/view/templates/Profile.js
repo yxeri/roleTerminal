@@ -7,7 +7,11 @@ class Profile extends View {
   constructor() {
     super({ viewId: 'profile' });
 
+    const profileCoordinates = elementCreator.createContainer({ elementId: 'profileCoordinates' });
+    profileCoordinates.appendChild(elementCreator.createParagraph({ text: 'Coordinates: -' }));
+
     this.element.appendChild(elementCreator.createContainer({}));
+    this.element.appendChild(profileCoordinates);
     this.element.appendChild(elementCreator.createContainer({}));
 
     eventCentral.addWatcher({
@@ -22,6 +26,21 @@ class Profile extends View {
         this.element.firstElementChild.innerHTML = '';
         this.element.firstElementChild.appendChild(fragment);
       },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.MYPOSITION,
+      func: ({ position }) => {
+        const profileCoordinates = document.getElementById('profileCoordinates');
+        const { coordinates: { latitude, longitude, accuracy } } = position;
+
+        if (profileCoordinates) {
+          profileCoordinates.replaceChild(elementCreator.createParagraph({
+            text: `Coordinates: Latitude: ${latitude}. Longitude ${longitude}. Accuracy: ${accuracy}`, elementId: 'coordinatesSpan',
+          }), profileCoordinates.firstChild);
+        }
+      }
     });
 
     eventCentral.addWatcher({

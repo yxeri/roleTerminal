@@ -37,7 +37,7 @@ class Profile extends View {
 
         if (profileCoordinates) {
           profileCoordinates.replaceChild(elementCreator.createParagraph({
-            text: `Coordinates: Latitude: ${latitude}. Longitude ${longitude}. Accuracy: ${accuracy}`, elementId: 'coordinatesSpan',
+            text: `Coordinates: Latitude: ${latitude}. Longitude ${longitude}. Accuracy: ${accuracy}m`, elementId: 'coordinatesSpan',
           }), profileCoordinates.firstChild);
         }
       }

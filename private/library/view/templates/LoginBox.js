@@ -176,6 +176,22 @@ class LoginBox extends DialogBox {
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases } });
             eventCentral.triggerEvent({ event: eventCentral.Events.LOGIN });
             this.removeView();
+
+            socketManager.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
+              if (codeError) {
+                console.log(codeError);
+
+                return;
+              }
+
+              const { gameCode } = codeData;
+
+              storageManager.setGameCode(gameCode);
+              eventCentral.triggerEvent({
+                event: eventCentral.Events.GAMECODE,
+                params: { gameCode },
+              });
+            });
           });
         },
       },

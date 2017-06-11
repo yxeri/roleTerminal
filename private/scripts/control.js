@@ -145,6 +145,21 @@ function createUserRow({ user }) {
 }
 
 /**
+ * Create room row
+ * @param {Object} params.room Room
+ * @returns {Element} List item
+ */
+function createRoomRow({ room }) {
+  const listItem = document.createElement('LI');
+  const roomNameSpan = document.createElement('SPAN');
+
+  roomNameSpan.appendChild(document.createTextNode(room.roomName));
+  listItem.appendChild(roomNameSpan);
+
+  return listItem;
+}
+
+/**
  * Populate all lists
  */
 function populateAll() {
@@ -196,21 +211,6 @@ function populateAll() {
 
     roomsList.appendChild(fragment);
   });
-}
-
-/**
- * Create room row
- * @param {Object} params.room Room
- * @returns {Element} List item
- */
-function createRoomRow({ room }) {
-  const listItem = document.createElement('LI');
-  const roomNameSpan = document.createElement('SPAN');
-
-  roomNameSpan.appendChild(document.createTextNode(room.roomName));
-  listItem.appendChild(roomNameSpan);
-
-  return listItem;
 }
 
 /**

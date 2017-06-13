@@ -73,9 +73,9 @@ class TeamViewer extends StandardView {
             description.push('Unable to join project group');
 
             return;
-          } else {
-            description.push(`You have accepted the invitation to join project group ${invitation.itemName}`);
           }
+
+          description.push(`You have accepted the invitation to join project group ${invitation.itemName}`);
 
           const acceptBox = new ButtonBox({
             description,

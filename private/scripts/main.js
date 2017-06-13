@@ -1137,6 +1137,32 @@ eventCentral.addWatcher({
 
     signalBlockAnimation.setQueue([
       {
+        func: signalBlockAnimation.printLines,
+        params: {
+          array: [
+            '                            ..  .........',
+            '                    `````..  ..        `````',
+            '               .:.```````                  `.--`',
+            '             ./:.--``..  ``                  `.:-',
+            '            .-....---:--  ``       .`      ``..---`',
+            '           `:://:/+/:-.  -.`               ``.-:/--',
+            '            :::+oosso-  ``                ```.-:+/:`',
+            '           `::oyhysso  ``               `  ```.:/+/-',
+            '            --:/+/:..  ``                 `.  `.:/:`',
+            '             ...```           ` `              ...',
+            '                `````````.-`  +sh+.++.....``````',
+            '                         .-...-//.::.',
+            '                         -o+o::/o++-:',
+            '         `````````````  .:://:::++o+/:`      ```````````..`',
+            '     ..-::/osssyhy+o/..-/+oooosso+sso+::-...-/sys/:--:+oohh-.',
+            '`.-/+ossyhhhmmMMMmysoosshhhdhhdNmhyhyssh++:-/+++:/+yssmNNmhyyy/',
+            '`/+++++oyhyyhddhyoo///::////////::/++oo++os++oo+oosssssyhhhyyss:',
+          ],
+          waitTime: 3000,
+          lineTime: 500,
+          pre: true,
+        },
+      }, {
         func: signalBlockAnimation.addCode,
         params: {
           waitTime: 2000,
@@ -1159,69 +1185,35 @@ eventCentral.addWatcher({
       }, {
         func: signalBlockAnimation.printLines,
         params: {
-          waitTime: 8000,
+          waitTime: 4000,
           corruption: false,
           array: [
             'Tracing jamming source...',
-            'Source found!',
-            `Source: user ${blockedBy}`,
+            'Tracking....',
             'Attempting to reconnect...',
           ],
         },
       }, {
         func: signalBlockAnimation.printLines,
         params: {
-          waitTime: 8000,
+          waitTime: 4000,
           corruption: false,
           array: [
-            'ERROR',
-            'Lost signal',
-            'Attempting to reconnect...',
+            'Source found!',
+            `Source: user ${blockedBy}`,
           ],
         },
       }, {
         func: signalBlockAnimation.printLines,
         params: {
-          waitTime: 8000,
+          waitTime: 6000,
           corruption: false,
           array: [
             'ERROR',
             'Unable to reconnect',
             'Attempting to reconnect...',
           ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 8000,
-          corruption: false,
-          array: [
-            'ERROR',
-            'Signal interrupted',
-            'Attempting to reconnect...',
-          ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 8000,
-          corruption: false,
-          array: [
-            'ERROR',
-            'Lost signal',
-            'Attempting to reconnect...',
-          ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 8000,
-          corruption: false,
-          array: [
-            'ERROR',
-            'Signal interrupted',
-            'Attempting to reconnect...',
-          ],
+          repeatAmount: 16,
         },
       },
     ]);
@@ -1353,6 +1345,15 @@ socketManager.addEvents([
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWTEAM,
         params: { team },
+      });
+    },
+  }, {
+    event: 'invitation',
+    func: ({ invitation }) => {
+      console.log('invitation', invitation);
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.INVITATION,
+        params: { invitation },
       });
     },
   },

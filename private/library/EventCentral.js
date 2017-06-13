@@ -48,6 +48,7 @@ class EventCentral {
       SIGNALBLOCK: 'Signal block',
       REMOVEPOSITIONS: 'Remove positions',
       LEAVETEAM: 'Leave team',
+      INVITATION: 'New invitation',
     };
     this.eventWatchers = {};
   }

@@ -627,30 +627,37 @@ terminal.addCommand({
   accessLevel: 1,
   startFunc: () => {
     const choices = [
-      { value: '1', text: '[1] Yes', proceed: true },
-      { value: '2', text: '[2] No', proceed: false },
+      { value: '1', proceed: true },
+      { value: '2', proceed: false },
     ];
 
     terminal.queueMessage({
       message: {
         text: [
           'WARNING WARNING WARNING',
-          'This will jam the signal of all nearby devices, including yours',
-          'There is high risk of retaliation in the form of murder from nearby users',
-          'You are urged to leave the area after activation',
-          'The automated defense systems will track you',
+          'This will jam the signal of all nearby devices, including yours.',
+          'There is high risk of retaliation in the form of murder from nearby users.',
+          'You are urged to leave the area after activation.',
+          'The automated defense systems will track you.',
           'Do you wish to proceed?',
         ],
         elementPerRow: true,
-        elements: choices.map((choice) => {
-          return elementCreator.createSpan({
-            classes: ['clickable', 'linkLook', 'moreSpace'],
-            text: choice.text,
+        elements: [
+          elementCreator.createSpan({
+            classes: ['clickable', 'redButton'],
+            text: '[1] LAUNCH',
             func: () => {
-              terminal.triggerCommand(choice.value);
+              terminal.triggerCommand('1');
             },
-          });
-        }),
+          }),
+          elementCreator.createSpan({
+            classes: ['clickable', 'linkLook', 'moreSpace'],
+            text: '[2] No',
+            func: () => {
+              terminal.triggerCommand('2');
+            },
+          }),
+        ],
       },
     });
 
@@ -670,7 +677,11 @@ terminal.addCommand({
 
               terminal.queueMessage({ message: { text: ['Something went wrong', 'Unable to nuke the area'] } });
               terminal.resetNextFunc();
+
+              return;
             }
+
+            terminal.resetNextFunc();
           });
         } else {
           terminal.queueMessage({ message: { text: ['Aborting'] } });

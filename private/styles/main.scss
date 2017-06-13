@@ -196,6 +196,10 @@ img {
   width: auto;
 }
 
+pre {
+  line-height: .5em;
+}
+
 #background {
   @include borderOutline;
   width: $inner-container-width;
@@ -615,6 +619,7 @@ img {
   left: 0;
   z-index: 10;
   overflow: hidden;
+  cursor: none;
 }
 
 .viewer {
@@ -663,6 +668,10 @@ img {
       cursor: pointer;
       margin-right: .3em;
     }
+  }
+
+  .listTitle {
+    text-align: left;
   }
 }
 
@@ -818,6 +827,14 @@ img {
   button:last-child {
     margin-right: -$padding;
   }
+}
+
+.redButton {
+  @include borderOutline;
+  padding: 3em;
+  margin: 3em 0;
+  line-height: 7em;
+  background-color: #550000;
 }
 
 .moreSpace {
@@ -985,6 +1002,22 @@ img {
     .listTitle {
       margin-left: .2em;
     }
+  }
+}
+
+.invitationItem {
+  p {
+    padding-left: 1em;
+    padding-bottom: 1em
+  }
+
+  span {
+    vertical-align: middle;
+  }
+
+  button {
+    margin-right: 1em;
+    padding: .1em;
   }
 }
 

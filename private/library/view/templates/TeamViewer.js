@@ -54,10 +54,85 @@ class TeamViewer extends StandardView {
     this.populateList();
   }
 
+  /**
+   * Create invitation paragraph, with accept/deny buttons
+   * @param {Object} invitation Invitation
+   * @returns {Element} Invitation paragraph
+   */
+  createInvitationParagraph({ invitation }) {
+    const paragraph = document.createElement('P');
+    paragraph.classList.add('invitationItem');
+    paragraph.appendChild(elementCreator.createButton({
+      text: 'Accept',
+      func: () => {
+        socketManager.emitEvent('acceptInvitation', { invitation }, (acceptData) => {
+          const description = [];
+
+          if (acceptData.error) {
+            description.push('Something went wrong');
+            description.push('Unable to join project group');
+
+            return;
+          } else {
+            description.push(`You have accepted the invitation to join project group ${invitation.itemName}`);
+          }
+
+          const acceptBox = new ButtonBox({
+            description,
+            buttons: [
+              elementCreator.createButton({
+                text: 'Confirmed',
+                func: () => {
+                  acceptBox.removeView();
+                },
+              }),
+            ],
+          });
+
+          acceptBox.appendTo(this.element.parentElement);
+        });
+      },
+    }));
+    paragraph.appendChild(elementCreator.createButton({
+      text: 'Decline',
+      func: () => {
+        socketManager.emitEvent('removeInvitation', { invitation }, ({ error }) => {
+          if (error) {
+            return;
+          }
+
+          const declineBox = new ButtonBox({
+            description: [`You have declined the invitation to join project group ${invitation.itemName}`],
+            buttons: [
+              elementCreator.createButton({
+                text: 'Confirmed',
+                func: () => {
+                  paragraph.remove();
+                  declineBox.removeView();
+                },
+              }),
+            ],
+          });
+
+          declineBox.appendTo(this.element.parentElement);
+        });
+      },
+    }));
+    paragraph.appendChild(elementCreator.createSpan({ text: `Invitation to ${invitation.itemName} from ${invitation.sender}` }));
+
+    return paragraph;
+  }
+
   populateList() {
     const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
     const userList = new List({ viewId: 'teamUsers', shouldSort: true, title: 'Members' });
     const userViewerList = new List({ viewId: 'teamViewerUsers', shouldSort: false, title: 'Members' });
+    const invitationList = new List({
+      viewId: 'teamInvitations',
+      shouldSort: false,
+      title: 'Invitations',
+      showingList: true,
+    });
 
     const createButton = elementCreator.createButton({
       text: 'Create team',
@@ -283,6 +358,7 @@ class TeamViewer extends StandardView {
 
     systemList.addItems({ items: [createButton, inviteButton, leaveButton] });
 
+    this.viewer.appendChild(invitationList.element);
     this.viewer.appendChild(userViewerList.element);
     this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(userList.element);
@@ -295,13 +371,33 @@ class TeamViewer extends StandardView {
         const shortTeam = storageManager.getShortTeam();
 
         if (changedUser) {
-          this.viewer.innerHTML = '';
+          invitationList.replaceAllItems({ items: [] });
           userList.replaceAllItems({ items: [] });
           userViewerList.replaceAllItems({ items: [] });
         }
 
+        socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
+          if (error) {
+            return;
+          }
+
+          invitationList.replaceAllItems({ items: data.invitations.map(invitation => this.createInvitationParagraph({ invitation })) });
+        });
+
         toggleSystemButtons({ createButton, inviteButton, leaveButton });
         eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: { teamName, shortName: shortTeam } } });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.INVITATION,
+      func: ({ invitation }) => {
+        if (invitation.invitationType !== 'team') {
+          return;
+        }
+
+        invitationList.addItem({ item: this.createInvitationParagraph({ invitation }) });
       },
     });
 

@@ -52,7 +52,11 @@ class TextAnimation extends View {
     }
   }
 
-  printLines({ array, classes, corruption = false, corruptionAmount = 0.2, waitTime = 300 }) {
+  printLines({ array, classes, corruption = false, corruptionAmount = 0.2, waitTime = 300, repeatAmount = 0, lineTime, pre, arrayClone }) {
+    if (repeatAmount > 0 && !arrayClone) {
+      arrayClone = JSON.parse(JSON.stringify(array));
+    }
+
     const line = array.shift();
 
     if (line) {
@@ -63,12 +67,27 @@ class TextAnimation extends View {
         if (classes) {
           classes.forEach(cssClass => span.classList.add(cssClass));
         }
+
         span.appendChild(document.createTextNode(text));
-        this.element.appendChild(span);
+
+        if (pre) {
+          const preElement = document.createElement('PRE');
+
+          preElement.appendChild(span);
+          this.element.appendChild(preElement);
+        } else {
+          this.element.appendChild(span);
+          this.element.appendChild(document.createElement('BR'));
+        }
+
         span.scrollIntoView();
+        this.printLines({ array, classes, corruption, corruptionAmount, waitTime, lineTime, pre, repeatAmount, arrayClone });
+      }, lineTime || this.lineTime);
+    } else if (repeatAmount > 0) {
+      setTimeout(() => {
         this.element.appendChild(document.createElement('BR'));
-        this.printLines({ array, classes, corruption, corruptionAmount, waitTime });
-      }, this.lineTime);
+        this.printLines({ array: arrayClone, classes, corruption, corruptionAmount, waitTime, repeatAmount: repeatAmount -= 1, lineTime, pre });
+      }, waitTime);
     } else {
       setTimeout(() => {
         this.element.appendChild(document.createElement('BR'));

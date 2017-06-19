@@ -354,7 +354,7 @@ class Messenger extends StandardView {
                   });
                 }
 
-                socketManager.emitEvent('createRoom', { room }, ({ error: createError, data: { room: createdRoom } }) => {
+                socketManager.emitEvent('createRoom', { room }, ({ error: createError, data }) => {
                   if (createError) {
                     console.log(createError);
 
@@ -363,7 +363,7 @@ class Messenger extends StandardView {
 
                   eventCentral.triggerEvent({
                     event: eventCentral.Events.FOLLOWROOM,
-                    params: { room: { roomName: createdRoom.roomName } },
+                    params: { room: data.room },
                   });
                   createDialog.removeView();
                 });

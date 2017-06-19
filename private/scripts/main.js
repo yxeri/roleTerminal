@@ -194,7 +194,7 @@ window.addEventListener('error', (event) => {
 const terminal = new Terminal();
 const toolsViewer = new ToolsViewer({ isFullscreen: true });
 const home = new Home({
-  introText: [
+  introDevText: [
     elementCreator.createParagraph({
       text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
     }),

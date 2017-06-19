@@ -34,28 +34,28 @@ function wrapChar(text, index) {
 }
 
 class Home extends View {
-  constructor({ introText = [] }) {
+  constructor({ introText = [], introDevText = [] }) {
     super({ isFullscreen: false, viewId: 'home' });
 
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';
-    this.introText = introText;
-    this.introDiv = elementCreator.createContainer({
-      elementId: 'introText',
-    });
+    this.introDiv = elementCreator.createContainer({ elementId: 'introText' });
     this.element.appendChild(this.introDiv);
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SERVERMODE,
       func: ({ mode }) => {
-        if (mode === 'dev') {
-          const fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
 
-          this.introText.forEach((element) => { fragment.appendChild(element); });
-          this.introDiv.appendChild(fragment);
+        if (mode === 'dev') {
+          introDevText.forEach((element) => { fragment.appendChild(element); });
+        } else {
+          introText.forEach((element) => { fragment.appendChild(element); });
         }
+
+        this.introDiv.appendChild(fragment);
       },
     });
   }

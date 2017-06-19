@@ -27,7 +27,7 @@ $hoverInput: #00372d;
 $note-color: #cd02b7;
 $padding: .2em;
 $outline: .1em;
-$font-size: 1em;
+$font-size: 1.1em;
 $text-shadow: 1px 1px 3px #ff02e5;
 $view-width: 65em;
 $menu-width: 21em;
@@ -83,7 +83,6 @@ html {
 }
 
 body {
-  line-height: 1;
   background-color: $back-color;
   color: $text-color;
   font-family: monospace;
@@ -104,6 +103,10 @@ button {
   text-shadow: $text-shadow;
   vertical-align: top;
   text-overflow: ellipsis;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 button:focus, button:hover, textarea:focus, textarea:hover, input:focus, input:hover {
@@ -222,7 +225,6 @@ pre {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
-  height: 1.2em;
 
   div {
     margin-top: .2em;
@@ -254,7 +256,7 @@ pre {
     ul {
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
-      height: calc(100% - 5.4em);
+      height: calc(100% - 6em);
 
       li:first-child {
         margin-top: 1em;
@@ -276,7 +278,7 @@ pre {
     }
 
     .buttons {
-      margin-bottom: .4em;
+      margin-bottom: .2em;
     }
 
     textarea {
@@ -402,7 +404,7 @@ pre {
   overflow-x: hidden;
   overflow-y: scroll;
   height: calc(100% - 2.4em);
-  width: 22em;
+  width: 21em;
   margin-left: auto;
   margin-right: auto;
   margin-top: .5em;
@@ -529,8 +531,8 @@ pre {
 
 
 .list {
-  width: 7.5em;
-  min-width: 7.5em;
+  width: 9em;
+  min-width: 9em;
   padding: $padding 0 $padding $padding;
   z-index: 1;
   overflow-x: hidden;
@@ -551,7 +553,7 @@ pre {
 
   button {
     margin-left: .1em;
-    width: calc(100% - .2em);
+    width: calc(100% - .3em);
     margin-bottom: .4em;
   }
 }
@@ -620,13 +622,16 @@ pre {
   z-index: 10;
   overflow: hidden;
   cursor: none;
+
+  span {
+    display: block;
+  }
 }
 
 .viewer {
-  max-width: $view-width - $short-list-width - 1em;
-  width: calc(100% - #{$short-list-width} + .6em);
   height: calc(100% - .6em);
   padding: $padding;
+  width: 100%;
 
   li:last-child {
     margin-bottom: .6em;
@@ -643,7 +648,6 @@ pre {
 
   textarea {
     margin-top: $padding;
-    margin-bottom: $padding;
     width: calc(100% - .2em);
   }
 
@@ -783,7 +787,7 @@ pre {
   padding: .2em;
   margin: 0;
   line-height: .8em;
-  font-size: .8em;
+  font-size: ($font-size - .2em);
   text-shadow: none;
 }
 
@@ -861,7 +865,7 @@ pre {
 }
 
 .title {
-  font-size: 1.2em;
+  font-size: ($font-size + .3em);
   text-decoration: underline;
 }
 
@@ -905,8 +909,9 @@ pre {
 }
 
 .logo {
-  font-size: .9em;
+  font-size: ($font-size - .1em);
   white-space: pre;
+  display: block;
 }
 
 .show {
@@ -916,9 +921,9 @@ pre {
 .listButton {
   z-index: 2;
   position: absolute;
-  left: .6em;
+  left: .5em;
   top: 2.5em;
-  width: 7.2em;
+  width: 8.6em;
 }
 
 .toggledList {
@@ -1062,7 +1067,7 @@ pre {
 @media (max-width: 479px) {
   .list {
     display: none;
-    margin-top: 1.9em;
+    padding-top: 1.9em;
     height: calc(100% - 2.1em);
   }
 
@@ -1073,7 +1078,5 @@ pre {
   .viewer {
     margin-top: 1.9em;
     height: calc(100% - 2.5em);
-    max-width: 100%;
-    width: 100%;
   }
 }

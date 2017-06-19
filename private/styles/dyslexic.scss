@@ -1,0 +1,67 @@
+@font-face {
+  font-family: dyslexic;
+  src: local("dyslexic"), url("../fonts/dyslexic.ttf") format("truetype");
+}
+
+$font-size: .9em;
+$font-family: dyslexic;
+
+body {
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+button {
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+input {
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+h1, h2, h3, h4, h5 {
+  font-size: $font-size;
+}
+
+#top {
+  font-size: .8em !important;
+}
+
+#messenger {
+  .viewer {
+    ul {
+      height: calc(100% - 5.8em);
+    }
+  }
+}
+
+.closeButton {
+  font-size: .8em !important;
+}
+
+.title {
+  font-size: 1em !important;
+}
+
+.logo {
+  font-family: monospace;
+}
+
+.listButton {
+  left: .5em;
+  top: 2.6em;
+  width: 9.8em;
+  padding: 0.05em;
+}
+
+.innerMenu {
+  .menuList {
+    font-size: .9em;
+  }
+
+  span {
+    font-size: .9em;
+  }
+}

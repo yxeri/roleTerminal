@@ -145,12 +145,6 @@ class Tracker {
         }
       });
     }
-
-    socketManager.emitEvent('updateDevicePosition', { position: bestPosition }, ({ error }) => {
-      if (error) {
-        console.log(error);
-      }
-    });
   }
 }
 

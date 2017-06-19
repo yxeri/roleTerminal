@@ -113,18 +113,6 @@ boot.setQueue([
       ],
     },
   }, {
-    func: boot.addCode,
-    params: { iteration: 0, maxIteration: 12, row: 0, maxRows: 2, binary: true },
-  }, {
-    func: boot.printLines,
-    params: {
-      corruption: false,
-      array: [
-        'Uplink established!',
-        'Booting O3S 5.0...',
-      ],
-    },
-  }, {
     func: boot.printLines,
     params: {
       waitTime: 3000,
@@ -1096,7 +1084,7 @@ home.addLink({
 home.addLink({
   linkName: 'logout',
   startFunc: () => {
-    socketManager.emitEvent('logout', {}, (error) => {
+    socketManager.emitEvent('logout', { device: { deviceId: storageManager.getDeviceId() } }, (error) => {
       if (error) {
         console.log(error);
       }
@@ -1161,15 +1149,6 @@ eventCentral.addWatcher({
           waitTime: 3000,
           lineTime: 500,
           pre: true,
-        },
-      }, {
-        func: signalBlockAnimation.addCode,
-        params: {
-          waitTime: 2000,
-          iteration: 0,
-          maxIteration: 12,
-          row: 0,
-          maxRows: 4,
         },
       }, {
         func: signalBlockAnimation.printLines,

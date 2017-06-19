@@ -116,7 +116,7 @@ class List extends View {
 
   removeItem({ name }) {
     const newList = elementCreator.createList({
-      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => element.textContent.toLowerCase() !== name.toLowerCase()),
+      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => element.getAttribute('data') !== name),
     });
 
     this.element.replaceChild(newList, this.element.lastElementChild);

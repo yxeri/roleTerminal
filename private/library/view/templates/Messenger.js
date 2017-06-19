@@ -30,7 +30,7 @@ const textTools = require('../../TextTools');
 
 /**
  * Takes a list of user names and filters out current users user name and aliases
- * @param {string[]} users - List of users
+ * @param {string[]} users List of users
  * @returns {string[]} List of users, excluding current user name and aliases
  */
 function filterUserAliases(users) {
@@ -102,8 +102,8 @@ function getHistory({ roomName, infiniteScroll = false, callback = () => {} }) {
 
 /**
  * Finds and returns the list item that contains the button with sent text
- * @param {Object} list - List item
- * @param {string} text - Text to compare to
+ * @param {Object} list List item
+ * @param {string} text Text to compare to
  * @returns {HTMLLIElement} List item element
  */
 function findItem(list, text) {
@@ -127,7 +127,29 @@ class Messenger extends StandardView {
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
     this.selectedAliasItem = null;
+
     this.messageList = new MessageList({ isTopDown });
+    this.systemList = new List({
+      title: 'SYSTEM',
+      shouldSort: false,
+    });
+    this.aliasList = new List({
+      title: 'ALIASES',
+      shouldSort: true,
+      minimumToShow: 2,
+    });
+    this.followList = new List({
+      title: 'FOLLOWING',
+      shouldSort: false,
+    });
+    this.roomsList = new List({
+      title: 'PUBLIC',
+      shouldSort: true,
+    });
+    this.userList = new List({
+      title: 'USERS',
+      shouldSort: true,
+    });
 
     this.imagePreview = new Image();
     this.imagePreview.classList.add('hide');
@@ -292,32 +314,6 @@ class Messenger extends StandardView {
   }
 
   populate() {
-    const systemList = new List({
-      title: 'SYSTEM',
-      shouldSort: false,
-    });
-    const aliasList = new List({
-      title: 'ALIASES',
-      shouldSort: true,
-      minimumToShow: 2,
-    });
-    const followList = new List({
-      title: 'FOLLOWING',
-      shouldSort: false,
-    });
-    const roomsList = new List({
-      title: 'PUBLIC',
-      shouldSort: true,
-    });
-    const userList = new List({
-      title: 'USERS',
-      shouldSort: true,
-    });
-    const privateList = new List({
-      title: 'PRIVATE',
-      shouldSort: true,
-    });
-
     const createButton = elementCreator.createButton({
       classes: ['hide'],
       text: 'Create room',
@@ -390,21 +386,20 @@ class Messenger extends StandardView {
       },
     });
 
-    systemList.addItems({ items: [createButton] });
+    this.systemList.addItems({ items: [createButton] });
 
-    this.itemList.appendChild(systemList.element);
-    this.itemList.appendChild(aliasList.element);
-    this.itemList.appendChild(followList.element);
-    this.itemList.appendChild(roomsList.element);
-    this.itemList.appendChild(userList.element);
-    this.itemList.appendChild(privateList.element);
+    this.itemList.appendChild(this.systemList.element);
+    this.itemList.appendChild(this.aliasList.element);
+    this.itemList.appendChild(this.followList.element);
+    this.itemList.appendChild(this.roomsList.element);
+    this.itemList.appendChild(this.userList.element);
 
     this.accessElements.push({
-      element: systemList.element,
+      element: this.systemList.element,
       accessLevel: 1,
     });
     this.accessElements.push({
-      element: aliasList.element,
+      element: this.aliasList.element,
       accessLevel: 1,
     });
     this.accessElements.push({
@@ -416,7 +411,7 @@ class Messenger extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.ALIAS,
       func: ({ alias }) => {
-        const aliasItem = findItem(aliasList, alias);
+        const aliasItem = findItem(this.aliasList, alias);
 
         if (aliasItem) {
           this.selectedAliasItem = aliasItem;
@@ -429,7 +424,7 @@ class Messenger extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.NEWALIAS,
       func: ({ alias }) => {
-        aliasList.addItem({ item: this.createAliasButton({ alias }) });
+        this.aliasList.addItem({ item: this.createAliasButton({ alias }) });
       },
     });
 
@@ -469,7 +464,7 @@ class Messenger extends StandardView {
 
           this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
         } else {
-          const listItem = findItem(followList, roomName);
+          const listItem = findItem(this.followList, roomName);
 
           if (listItem) {
             listItem.firstElementChild.classList.add('selected');
@@ -511,7 +506,7 @@ class Messenger extends StandardView {
       event: eventCentral.Events.SWITCHROOM,
       func: () => {
         const roomName = storageManager.getRoom();
-        const listItem = findItem(followList, roomName);
+        const listItem = findItem(this.followList, roomName);
 
         if (listItem) {
           this.selectedItem = listItem;
@@ -531,19 +526,19 @@ class Messenger extends StandardView {
     });
 
     eventCentral.addWatcher({
-      watcherParent: followList,
+      watcherParent: this.followList,
       event: eventCentral.Events.FOLLOWROOM,
       func: ({ room: { roomName }, whisperTo, data, whisper }) => {
         if (!whisper) {
-          followList.addItem({ item: this.createRoomButton({ roomName, whisperTo, data: data || roomName }) });
+          this.followList.addItem({ item: this.createRoomButton({ roomName, data: data || roomName }) });
         } else {
-          followList.addItem({ item: this.createWhisperButton({ roomName, whisperTo, data: data || roomName }) });
+          this.followList.addItem({ item: this.createWhisperButton({ roomName, whisperTo, data: data || roomName }) });
         }
       },
     });
 
     eventCentral.addWatcher({
-      watcherParent: followList,
+      watcherParent: this.followList,
       event: eventCentral.Events.UNFOLLOWROOM,
       func: ({ room }) => {
         const currentRoom = storageManager.getRoom();
@@ -552,17 +547,19 @@ class Messenger extends StandardView {
           storageManager.setRoom('public');
         }
 
-        followList.removeItem({
+        this.followList.removeItem({
           name: room.roomName.indexOf('-team') > -1 ? 'team' : room.roomName,
         });
+
+        // TODO Has to re-add to unfollowed list
       },
     });
 
     eventCentral.addWatcher({
-      watcherParent: roomsList,
+      watcherParent: this.roomsList,
       event: eventCentral.Events.NEWROOM,
       func: ({ room: { roomName }, isProtected }) => {
-        roomsList.addItem({ item: this.createRoomButton({ roomName, isProtected }) });
+        this.roomsList.addItem({ item: this.createRoomButton({ roomName, isProtected }) });
       },
     });
 
@@ -576,21 +573,21 @@ class Messenger extends StandardView {
           if (aliases.length > 0) {
             const selectedAlias = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-            aliasList.replaceAllItems({ items: aliases.map(alias => this.createAliasButton({ alias })) });
-            aliasList.addItem({ item: this.createAliasButton({ alias: storageManager.getUserName() }) });
+            this.aliasList.replaceAllItems({ items: aliases.map(alias => this.createAliasButton({ alias })) });
+            this.aliasList.addItem({ item: this.createAliasButton({ alias: storageManager.getUserName() }) });
 
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
 
             if (firstConnection || changedUser) {
-              aliasList.toggleList(true);
+              this.aliasList.toggleList(true);
             }
           } else {
             const userName = storageManager.getUserName();
 
-            aliasList.replaceAllItems({ items: [] });
-            aliasList.addItem({ item: this.createAliasButton({ alias: userName }) });
+            this.aliasList.replaceAllItems({ items: [] });
+            this.aliasList.addItem({ item: this.createAliasButton({ alias: userName }) });
 
-            const listItem = findItem(aliasList, userName);
+            const listItem = findItem(this.aliasList, userName);
 
             if (listItem) {
               this.selectedItem = listItem;
@@ -609,11 +606,11 @@ class Messenger extends StandardView {
             const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
             const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-            userList.replaceAllItems({ items: allUsers.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
+            this.userList.replaceAllItems({ items: allUsers.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
           });
         } else {
-          aliasList.replaceAllItems({ items: [] });
-          userList.replaceAllItems({ items: [] });
+          this.aliasList.replaceAllItems({ items: [] });
+          this.userList.replaceAllItems({ items: [] });
         }
 
         socketManager.emitEvent('listRooms', {}, ({ error, data }) => {
@@ -625,8 +622,8 @@ class Messenger extends StandardView {
 
           const { rooms = [], followedRooms = [], whisperRooms = [], protectedRooms = [] } = data;
 
-          followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room.roomName })) });
-          followList.addItems({
+          this.followList.replaceAllItems({ items: followedRooms.map(room => this.createRoomButton({ roomName: room.roomName })) });
+          this.followList.addItems({
             items: whisperRooms.map((room) => {
               const { whisperTo, userName } = convertWhisperRoomName(room.roomName);
 
@@ -635,17 +632,17 @@ class Messenger extends StandardView {
           });
 
           if (followedRooms.length > 0 && (firstConnection || changedUser)) {
-            followList.toggleList(true);
+            this.followList.toggleList(true);
           }
 
-          roomsList.replaceAllItems({
+          this.roomsList.replaceAllItems({
             items: rooms.map(room => this.createRoomButton({
               roomName: room.roomName,
               isProtected: protectedRooms.map(protectedRoom => protectedRoom.roomName).indexOf(room.roomName) > -1,
             })),
           });
 
-          const listItem = findItem(followList, storageManager.getRoom());
+          const listItem = findItem(this.followList, storageManager.getRoom());
 
           if (listItem) {
             this.selectedItem = listItem;
@@ -679,6 +676,31 @@ class Messenger extends StandardView {
 
         eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias } });
       },
+    });
+  }
+
+  leaveRoom({ roomName }) {
+    const isWhisperRoom = roomName.indexOf('-whisper-') > -1;
+
+    socketManager.emitEvent('unfollow', { isWhisperRoom, room: { roomName } }, ({ error }) => {
+      if (error) {
+        console.log(error);
+
+        return;
+      }
+
+      this.followList.removeItem({ name: roomName });
+
+      if (isWhisperRoom) {
+        this.userList.addItem({
+          item: this.createWhisperButton({
+            roomName: storageManager.getUserName(),
+            whisperTo: roomName.split('-whisper-')[1],
+          }),
+        });
+      } else {
+        this.roomsList.addItem({ item: this.createRoomButton({ roomName }) });
+      }
     });
   }
 
@@ -721,13 +743,11 @@ class Messenger extends StandardView {
     return button;
   }
 
-  createRoomButton({ roomName, whisperTo, isProtected }) {
+  createRoomButton({ roomName, isProtected }) {
     const classes = [];
     let buttonText = roomName;
 
-    if (whisperTo) {
-      buttonText = whisperTo;
-    } else if (/-team$/.test(roomName)) {
+    if (/-team$/.test(roomName)) {
       buttonText = 'team';
     }
 

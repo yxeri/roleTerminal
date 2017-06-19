@@ -43,18 +43,36 @@ class ElementCreator {
     return listItem;
   }
 
-  static createButton({ func = () => {}, text, classes = [], data }) {
+  static createButton({ func = () => {}, rightFunc = () => {}, text, data, classes = [] }) {
     const button = document.createElement('BUTTON');
+    let longClick = false;
     button.appendChild(document.createTextNode(text));
     this.setClasses(button, classes);
 
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event) => {
       soundLibrary.playSound('button');
-      func();
+      func(event);
+    });
+    button.addEventListener('contextmenu', (event) => {
+      soundLibrary.playSound('button');
+      rightFunc(event);
+    });
+    button.addEventListener('mousedown', (event) => {
+      setTimeout(() => {
+        if (longClick) {
+          soundLibrary.playSound('button');
+          rightFunc(event);
+        }
+      }, 500);
+    });
+    button.addEventListener('mouseup', () => {
+      longClick = false;
     });
 
     if (data) {
       button.setAttribute('data', data);
+    } else {
+      button.setAttribute('data', text);
     }
 
     return button;

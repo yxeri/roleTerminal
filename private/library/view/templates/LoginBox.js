@@ -142,6 +142,9 @@ class LoginBox extends DialogBox {
               userName: this.inputs.find(({ inputName }) => inputName === 'userName').inputElement.value,
               password: this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
             },
+            device: {
+              deviceId: storageManager.getDeviceId(),
+            },
           }, ({ error, data }) => {
             if (error) {
               soundLibrary.playSound('fail');

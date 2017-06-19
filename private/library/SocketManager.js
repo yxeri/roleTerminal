@@ -57,6 +57,10 @@ class SocketManager {
   }
 
   updateId() {
+    this.emitEvent('updateDevice', {
+      device: { deviceId: storageManager.getDeviceId() },
+      callback: () => {},
+    });
     this.emitEvent('updateId', {
       device: {
         deviceId: storageManager.getDeviceId(),

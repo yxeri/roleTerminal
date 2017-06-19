@@ -28,30 +28,6 @@ class TextAnimation extends View {
     this.isPermanent = isPermanent;
   }
 
-  addCode({ iteration, maxIteration, row, maxRows, binary, waitTime = 300 }) {
-    const span = document.createElement('SPAN');
-    const text = document.createTextNode(!binary ? textTools.createMixedString(5) : textTools.createBinaryString(5));
-
-    span.appendChild(text);
-    this.element.appendChild(span);
-
-    if (iteration === 0) {
-      span.scrollIntoView();
-    }
-
-    if (iteration < maxIteration) {
-      setTimeout(() => { this.addCode({ iteration: iteration + 1, row, maxRows, maxIteration, binary, waitTime }); }, this.lineTime);
-    } else if (row < maxRows) {
-      this.element.appendChild(document.createElement('BR'));
-      setTimeout(() => { this.addCode({ iteration: 0, maxIteration, row: row + 1, maxRows, binary, waitTime }); }, this.lineTime);
-    } else {
-      setTimeout(() => {
-        this.element.appendChild(document.createElement('BR'));
-        this.next();
-      }, waitTime);
-    }
-  }
-
   printLines({ array, classes, corruption = false, corruptionAmount = 0.2, waitTime = 300, repeatAmount = 0, lineTime, pre, arrayClone }) {
     if (repeatAmount > 0 && !arrayClone) {
       arrayClone = JSON.parse(JSON.stringify(array));
@@ -77,7 +53,6 @@ class TextAnimation extends View {
           this.element.appendChild(preElement);
         } else {
           this.element.appendChild(span);
-          this.element.appendChild(document.createElement('BR'));
         }
 
         span.scrollIntoView();
@@ -85,12 +60,10 @@ class TextAnimation extends View {
       }, lineTime || this.lineTime);
     } else if (repeatAmount > 0) {
       setTimeout(() => {
-        this.element.appendChild(document.createElement('BR'));
         this.printLines({ array: arrayClone, classes, corruption, corruptionAmount, waitTime, repeatAmount: repeatAmount -= 1, lineTime, pre });
       }, waitTime);
     } else {
       setTimeout(() => {
-        this.element.appendChild(document.createElement('BR'));
         this.next();
       }, waitTime);
     }

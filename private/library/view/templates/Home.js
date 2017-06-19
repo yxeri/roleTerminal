@@ -34,58 +34,27 @@ function wrapChar(text, index) {
 }
 
 class Home extends View {
-  constructor() {
+  constructor({ introText = [] }) {
     super({ isFullscreen: false, viewId: 'home' });
 
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';
-
-    const devServer = elementCreator.createParagraph({
-      text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
+    this.introText = introText;
+    this.introDiv = elementCreator.createContainer({
+      elementId: 'introText',
     });
-    const mapLink = document.createElement('A');
-    mapLink.appendChild(document.createTextNode('Join the cartographer group to add points to the world map'));
-    mapLink.setAttribute('href', 'https://www.facebook.com/groups/585709954945167/');
-    mapLink.setAttribute('target', '_blank');
-
-    const ttggFbLink = document.createElement('A');
-    ttggFbLink.appendChild(document.createTextNode('Facebook'));
-    ttggFbLink.setAttribute('href', 'https://www.facebook.com/thethirdgiftgames/');
-    ttggFbLink.setAttribute('target', '_blank');
-
-    const ttggPatreonLink = document.createElement('A');
-    ttggPatreonLink.appendChild(document.createTextNode('Patreon'));
-    ttggPatreonLink.setAttribute('href', 'http://patreon.com/yxeri');
-    ttggPatreonLink.setAttribute('target', '_blank');
-
-    const linkParagraph = elementCreator.createParagraph({ text: 'More info at: ' });
-    linkParagraph.appendChild(ttggFbLink.cloneNode(true));
-    linkParagraph.appendChild(document.createTextNode(' or '));
-    linkParagraph.appendChild(ttggPatreonLink.cloneNode(true));
-
-    const patreonParagraph = elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Help support the project at ' });
-    patreonParagraph.appendChild(ttggPatreonLink.cloneNode(true));
-    patreonParagraph.appendChild(document.createTextNode('. Any small amount helps!'));
-
-    this.devDiv = elementCreator.createContainer({ classes: ['hide', 'devDiv'] });
-    this.devDiv.appendChild(elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }));
-    this.devDiv.appendChild(linkParagraph);
-    this.devDiv.appendChild(patreonParagraph);
-    this.devDiv.appendChild(elementCreator.createParagraph({
-      text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
-    }));
-    this.devDiv.appendChild(devServer);
-    this.devDiv.appendChild(mapLink);
-
-    this.element.appendChild(this.devDiv);
+    this.element.appendChild(this.introDiv);
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SERVERMODE,
       func: ({ mode }) => {
         if (mode === 'dev') {
-          this.devDiv.classList.remove('hide');
+          const fragment = document.createDocumentFragment();
+
+          this.introText.forEach((element) => { fragment.appendChild(element); });
+          this.introDiv.appendChild(fragment);
         }
       },
     });

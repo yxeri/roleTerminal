@@ -193,7 +193,40 @@ window.addEventListener('error', (event) => {
 
 const terminal = new Terminal();
 const toolsViewer = new ToolsViewer({ isFullscreen: true });
-const home = new Home();
+const home = new Home({
+  introText: [
+    elementCreator.createParagraph({
+      text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
+    }),
+    elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
+    elementCreator.createParagraph({ text: 'More info at:' }),
+    elementCreator.createLink({
+      text: 'Patreon',
+      href: 'http://patreon.com/yxeri',
+      target: '_blank',
+    }),
+    elementCreator.createLink({
+      text: 'Facebook',
+      href: 'https://www.facebook.com/thethirdgiftgames/',
+      target: '_blank',
+    }),
+    elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Any small amount helps! Help support the project at ' }),
+    elementCreator.createLink({
+      text: 'Patreon',
+      href: 'http://patreon.com/yxeri',
+      target: '_blank',
+    }),
+    elementCreator.createParagraph({ text: 'Do you want to expand the world of BBR?' }),
+    elementCreator.createLink({
+      text: 'Join the cartographer group',
+      href: 'https://www.facebook.com/groups/585709954945167/',
+      target: '_blank',
+    }),
+    elementCreator.createParagraph({
+      text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
+    }),
+  ],
+});
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const dirViewer = new DirViewer({ isFullscreen: true });
 const wallet = new Wallet();

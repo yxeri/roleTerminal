@@ -189,6 +189,18 @@ class ElementCreator {
     return span;
   }
 
+  static createLink({ text, href, target }) {
+    const link = document.createElement('A');
+    link.appendChild(document.createTextNode(text));
+    link.setAttribute('href', href);
+
+    if (target) {
+      link.setAttribute('target', target);
+    }
+
+    return link;
+  }
+
   static setElementId(element, id) {
     if (id) { element.setAttribute('id', id); }
   }

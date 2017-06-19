@@ -931,7 +931,7 @@ pre {
   height: calc(100% - .6em) !important;
 }
 
-.devDiv {
+#introText {
   margin-bottom: 1em;
 
   a, a:visited, a:active {
@@ -939,6 +939,7 @@ pre {
     color: $text-color;
     text-shadow: $text-shadow;
     background-color: $darker-second-color;
+    margin-right: 1em;
   }
 
   a:hover {

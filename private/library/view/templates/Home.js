@@ -41,6 +41,14 @@ class Home extends View {
     this.previousLink = '';
     this.activeLink = '';
 
+    const devServer = elementCreator.createParagraph({
+      text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
+    });
+    const mapLink = document.createElement('A');
+    mapLink.appendChild(document.createTextNode('Join the cartographer group to add points to the world map'));
+    mapLink.setAttribute('href', 'https://www.facebook.com/groups/585709954945167/');
+    mapLink.setAttribute('target', '_blank');
+
     const ttggFbLink = document.createElement('A');
     ttggFbLink.appendChild(document.createTextNode('Facebook'));
     ttggFbLink.setAttribute('href', 'https://www.facebook.com/thethirdgiftgames/');
@@ -67,6 +75,8 @@ class Home extends View {
     this.devDiv.appendChild(elementCreator.createParagraph({
       text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
     }));
+    this.devDiv.appendChild(devServer);
+    this.devDiv.appendChild(mapLink);
 
     this.element.appendChild(this.devDiv);
 

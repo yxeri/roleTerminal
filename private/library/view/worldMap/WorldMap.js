@@ -234,65 +234,62 @@ class WorldMap extends View {
        * @param {Date} params.currentTime Current time, sent from server
        */
       func: ({ positions, currentTime }) => {
-        const userName = storageManager.getUserName() || '';
-
         positions.forEach((position) => {
+          const thisUser = storageManager.getUserName();
           const positionName = position.positionName;
 
-          if (positionName) {
-            if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
-              const circleObj = this.circles[positionName];
+          if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
+            const circleObj = this.circles[positionName];
 
-              if (circleObj) {
-                const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
+            if (circleObj) {
+              const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
 
-                circleObj.circle.setCenter(latLng);
-                circleObj.label.setText({ text: position.description[0] });
-                circleObj.label.setPosition({ coordinates: position.coordinates });
-                circleObj.circle.setMap(this.map);
-                circleObj.label.setMap(this.map);
-              } else {
-                this.createCircleArea({ position });
-              }
-            } else if (this.markers[positionName]) {
-              this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
-
-              if (position.markerType && position.markerType === 'user') {
-                const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
-
-                // TODO Duplicate code
-                this.markers[positionName].description = [
-                  `Team: ${position.team || '-'}`,
-                  `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
-                  `Accuracy: ${position.coordinates.accuracy} meters`,
-                ];
-              }
+              circleObj.circle.setCenter(latLng);
+              circleObj.label.setText({ text: position.description[0] });
+              circleObj.label.setPosition({ coordinates: position.coordinates });
+              circleObj.circle.setMap(this.map);
+              circleObj.label.setMap(this.map);
             } else {
-              this.createMarker({ position, userName, currentTime });
-
-              switch (position.markerType) {
-                case 'world': {
-                  this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
-
-                  break;
-                }
-                case 'user': {
-                  this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
-
-                  break;
-                }
-                case 'custom': {
-                  this.otherList.addItem({ item: this.createListButton(positionName, this.otherList) });
-
-                  break;
-                }
-                default: {
-                  break;
-                }
-              }
-
-              this.hideBlockedPositions(positionName);
+              this.createCircleArea({ position });
             }
+          } else if (this.markers[positionName]) {
+            this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
+
+            if (position.markerType && (position.markerType === 'user' || position.markerType === 'device')) {
+              const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
+
+              // TODO Duplicate code
+              this.markers[positionName].description = [
+                `Team: ${position.team || '-'}`,
+                `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                `Accuracy: ${position.coordinates.accuracy} meters`,
+              ];
+            }
+          } else if (positionName !== thisUser) {
+            this.createMarker({ position, currentTime });
+
+            switch (position.markerType) {
+              case 'world': {
+                this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
+
+                break;
+              }
+              case 'user': {
+                this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
+
+                break;
+              }
+              case 'custom': {
+                this.otherList.addItem({ item: this.createListButton(positionName, this.otherList) });
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+
+            this.hideBlockedPositions(positionName);
           }
         });
       },
@@ -832,13 +829,12 @@ class WorldMap extends View {
       }
 
       const { positions, currentTime } = data;
-      const userName = storageManager.getUserName() || '';
 
       positions.forEach((position) => {
         if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
           this.createCircleArea({ position });
         } else {
-          this.createMarker({ position, userName, currentTime });
+          this.createMarker({ position, currentTime });
         }
       });
 
@@ -948,13 +944,18 @@ class WorldMap extends View {
    * @param {string} params.position.markerType Marker type
    * @param {Date} params.position.lastUpdated Date for when the position was last updated
    * @param {string} params.position.owner User name of the owner
-   * @param {string} params.userName user name of the current user
    * @param {Date} params.currentTime Current time sent from server
    * @param {string[]} [params.position.description] Position description
    * @param {string} [params.position.team] Name of the team that the position is part of
    */
-  createMarker({ position: { positionName, coordinates, geometry, markerType, description, lastUpdated, team, owner }, userName, currentTime }) {
-    if (positionName && positionName.toLowerCase() !== userName) {
+  createMarker({ position: { positionName, coordinates, geometry, markerType, description, lastUpdated, team, owner }, currentTime }) {
+    if (typeof positionName !== 'string') {
+      return;
+    }
+
+    const thisUser = storageManager.getUserName();
+
+    if (positionName && positionName.toLowerCase() !== thisUser) {
       const latitude = parseFloat(coordinates.latitude);
       const longitude = parseFloat(coordinates.longitude);
 

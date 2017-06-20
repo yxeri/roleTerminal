@@ -1369,10 +1369,10 @@ socketManager.addEvents([
     },
   }, {
     event: 'user',
-    func: ({ user }) => {
+    func: ({ users }) => {
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWUSER,
-        params: { user },
+        params: { users },
       });
     },
   }, {

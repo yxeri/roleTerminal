@@ -580,12 +580,14 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.NEWUSER,
-      func: ({ user }) => {
-        this.userList.addItem({
-          item: this.createWhisperButton({
-            roomName: storageManager.getUserName(),
-            whisperTo: user.userName,
-          }),
+      func: ({ users }) => {
+        users.forEach((user) => {
+          this.userList.addItem({
+            item: this.createWhisperButton({
+              roomName: storageManager.getUserName(),
+              whisperTo: user.userName,
+            }),
+          });
         });
       },
     });

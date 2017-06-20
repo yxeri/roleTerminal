@@ -588,7 +588,7 @@ class Messenger extends StandardView {
           }),
         });
       },
-    })
+    });
 
     eventCentral.addWatcher({
       watcherParent: this,

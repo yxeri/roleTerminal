@@ -386,6 +386,7 @@ class Messenger extends StandardView {
           }, {
             placeholder: 'Optional passowrd',
             inputName: 'password',
+            type: 'password',
           }],
           description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
           extraDescription: ['Enter a name and optional password for the room', 'Allowed characters in the name: a-z 0-9'],

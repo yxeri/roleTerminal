@@ -1383,7 +1383,7 @@ socketManager.addEvents([
         params: { user },
       });
     },
-  }
+  },
   // {
   //   event: 'roomFollower',
   //   func: ({ userName, roomName, isFollowing }) => {

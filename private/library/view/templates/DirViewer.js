@@ -111,8 +111,8 @@ class DirViewer extends StandardView {
       func: () => {
         const docFileId = button.getAttribute('data');
 
-        if (docFileId) {
-          socketManager.emitEvent('getDocFile', { docFileId }, ({ docFileError, data: docFileData }) => {
+        if (docFileId || docFile.team === storageManager.getTeam()) {
+          socketManager.emitEvent('getDocFile', { docFile: { docFileId, title: docFile.title } }, ({ error: docFileError, data: docFileData }) => {
             if (docFileError) {
               console.log(docFileError);
 
@@ -195,7 +195,7 @@ class DirViewer extends StandardView {
       },
     });
 
-    if (docFile.isLocked) {
+    if ((docFile.isLocked || !docFile.docFileId) && docFile.team !== storageManager.getTeam()) {
       button.classList.add('locked');
     }
 
@@ -418,12 +418,12 @@ class DirViewer extends StandardView {
 
             if (!list) {
               this.teamLists[docTeam] = new List({
-                elements: [this.createDocFileButton(docFile)],
                 title: docTeam,
                 shouldSort: true,
                 showTitle: true,
                 minimumToShow: 0,
               });
+              this.teamLists[docTeam].addItem({ item: this.createDocFileButton(docFile) });
               this.teamFiles.addItem({ item: this.teamLists[docTeam].element });
             } else {
               list.addItem({ item: this.createDocFileButton(docFile) });
@@ -434,12 +434,12 @@ class DirViewer extends StandardView {
 
           if (!list) {
             this.userLists[creator] = new List({
-              elements: [this.createDocFileButton(docFile)],
               title: creator,
               shouldSort: true,
               showTitle: true,
               minimumToShow: 0,
             });
+            this.userLists[creator].addItem({ item: this.createDocFileButton(docFile) });
             this.userFiles.addItem({ item: this.userLists[creator].element });
           } else {
             list.addItem({ item: this.createDocFileButton(docFile) });

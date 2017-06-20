@@ -116,14 +116,14 @@ class List extends View {
 
   removeItem({ name }) {
     const newList = elementCreator.createList({
-      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => element.getAttribute('data') !== name),
+      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => (element.getAttribute('data') || element.textContent.toLowerCase()) !== name),
     });
 
     this.element.replaceChild(newList, this.element.lastElementChild);
   }
 
   getItem({ name }) {
-    return Array.from(this.element.lastElementChild.childNodes).find(element => element.firstElementChild.textContent.toLowerCase() === name.toLowerCase());
+    return Array.from(this.element.lastElementChild.childNodes).find(element => (element.firstElementChild.getAttribute('data') || element.firstElementChild.textContent) === name);
   }
 
   replaceAllItems({ items }) {

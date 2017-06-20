@@ -184,33 +184,33 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
-        socketManager.emitEvent('listTeams', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
-
-            return;
-          }
-
-          const { teams } = data;
-
-          teamList.replaceAllItems({ items: teams.map(team => this.createTransactionButton({ receiverName: `${team.teamName}-team`, readableName: team.teamName })) });
-        });
-
-        socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
-
-            return;
-          }
-
-          const { onlineUsers, offlineUsers } = data;
-          const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
-
-          userList.replaceAllItems({ items: allUsers.map(user => this.createTransactionButton({ receiverName: user.userName })) });
-        });
-
-        if (storageManager.getAccessLevel() > 0) {
+        if (storageManager.getToken()) {
           const teamName = storageManager.getTeam();
+
+          socketManager.emitEvent('listTeams', {}, ({ error, data }) => {
+            if (error) {
+              console.log(error);
+
+              return;
+            }
+
+            const { teams } = data;
+
+            teamList.replaceAllItems({ items: teams.map(team => this.createTransactionButton({ receiverName: `${team.teamName}-team`, readableName: team.teamName })) });
+          });
+
+          socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
+            if (error) {
+              console.log(error);
+
+              return;
+            }
+
+            const { onlineUsers, offlineUsers } = data;
+            const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
+
+            userList.replaceAllItems({ items: allUsers.map(user => this.createTransactionButton({ receiverName: user.userName })) });
+          });
 
           if (teamName) {
             socketManager.emitEvent('getWallet', { isTeam: true }, ({ error, data }) => {

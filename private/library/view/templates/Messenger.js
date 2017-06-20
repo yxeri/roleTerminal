@@ -113,7 +113,7 @@ function findItem(list, text) {
 
   const listItems = Array.from(list.element.lastElementChild.getElementsByTagName('LI'));
 
-  return listItems.find(item => (item.firstElementChild.getAttribute('data') || '') === text);
+  return listItems.find(item => (item.firstElementChild.getAttribute('data') || item.firstElementChild.innerText) === text);
 }
 
 class Messenger extends StandardView {
@@ -127,6 +127,14 @@ class Messenger extends StandardView {
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
     this.selectedAliasItem = null;
+
+    this.optionsDiv = elementCreator.createContainer({
+      classes: ['options', 'hide'],
+    });
+    this.element.appendChild(this.optionsDiv);
+    this.element.addEventListener('click', () => {
+      this.optionsDiv.classList.add('hide');
+    });
 
     this.messageList = new MessageList({ isTopDown });
     this.systemList = new List({
@@ -232,14 +240,14 @@ class Messenger extends StandardView {
 
   sendMessage() {
     if (this.inputField.value.trim() !== '') {
-      const { whisperTo } = convertWhisperRoomName(storageManager.getRoom());
+      const { whisperTo, userName } = convertWhisperRoomName(storageManager.getRoom());
       const roomName = whisperTo || storageManager.getRoom();
 
       const chatMsgData = {
         message: {
           roomName,
           text: this.inputField.value.split('\n'),
-          userName: storageManager.getSelectedAlias() || storageManager.getUserName(),
+          userName: whisperTo ? userName : storageManager.getSelectedAlias() || storageManager.getUserName(),
         },
       };
 
@@ -432,14 +440,20 @@ class Messenger extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.CHATMSG,
       func: ({ messages, options, shouldScroll, isHistory, following, room, whisper }) => {
-        const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+        const userNames = storageManager.getAliases();
+        const userName = storageManager.getUserName();
+
+        if (userName) {
+          userNames.push(userName);
+        }
+
         let { roomName } = room;
 
         if (whisper) {
-          if (messages[0].userName === userName) {
+          if (userNames.indexOf(messages[0].userName) > -1) {
             roomName = `${messages[0].userName}-whisper-${roomName}`;
           } else {
-            roomName += `-${messages[0].userName}`;
+            roomName = `${roomName}-${messages[0].userName}`;
           }
         }
 
@@ -562,6 +576,19 @@ class Messenger extends StandardView {
         this.roomsList.addItem({ item: this.createRoomButton({ roomName, isProtected }) });
       },
     });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.NEWUSER,
+      func: ({ user }) => {
+        this.userList.addItem({
+          item: this.createWhisperButton({
+            roomName: storageManager.getUserName(),
+            whisperTo: user.userName,
+          }),
+        });
+      },
+    })
 
     eventCentral.addWatcher({
       watcherParent: this,
@@ -711,6 +738,9 @@ class Messenger extends StandardView {
       data: data || roomName,
       text: whisperTo ? `${whisperTo}` : roomName,
       func: () => {
+        const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+        const whisperRoomName = `${userName}-whisper-${whisperTo}`;
+
         if (this.selectedItem) {
           this.selectedItem.classList.remove('selectedItem');
         }
@@ -719,11 +749,8 @@ class Messenger extends StandardView {
 
         if (retrievedWhisperTo) {
           storageManager.setRoom(data || roomName);
-        } else {
-          const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
-          const whisperRoomName = `${userName}-whisper-${whisperTo}`;
-
-          socketManager.emitEvent('followWhisper', { whisperTo, room: { roomName: whisperRoomName } }, ({ error }) => {
+        } else if (!this.followList.getItem({ name: whisperRoomName })) {
+          socketManager.emitEvent('followWhisper', { whisperTo, user: { userName }, room: { roomName: whisperRoomName } }, ({ error }) => {
             if (error) {
               console.log(error);
 
@@ -737,6 +764,24 @@ class Messenger extends StandardView {
             storageManager.setRoom(whisperRoomName);
           });
         }
+      },
+      rightFunc: (event) => {
+        const fragment = document.createDocumentFragment();
+        this.optionsDiv.innerHTML = '';
+
+        fragment.appendChild(elementCreator.createButton({
+          text: `Unfollow "${roomName}"`,
+          data: roomName,
+          func: () => {
+            this.leaveRoom({ roomName: data });
+          },
+        }));
+
+        this.optionsDiv.appendChild(fragment);
+
+        this.optionsDiv.style.top = `${event.pageY}px`;
+        this.optionsDiv.style.left = `${event.pageX}px`;
+        this.optionsDiv.classList.remove('hide');
       },
     });
 
@@ -832,6 +877,31 @@ class Messenger extends StandardView {
 
           followDialog.appendTo(this.element.parentElement);
         });
+      },
+      rightFunc: (event) => {
+        const fragment = document.createDocumentFragment();
+        this.optionsDiv.innerHTML = '';
+
+        fragment.appendChild(elementCreator.createButton({
+          text: `Unfollow "${roomName}"`,
+          data: roomName,
+          func: () => {
+            this.leaveRoom({ roomName });
+          },
+        }));
+        // fragment.appendChild(elementCreator.createButton({
+        //   text: `Remove "${roomName}"`,
+        //   data: roomName,
+        //   func: () => {
+        //     this.leaveRoom({ roomName });
+        //   },
+        // }));
+
+        this.optionsDiv.appendChild(fragment);
+
+        this.optionsDiv.style.top = `${event.pageY}px`;
+        this.optionsDiv.style.left = `${event.pageX}px`;
+        this.optionsDiv.classList.remove('hide');
       },
     });
 

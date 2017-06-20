@@ -285,6 +285,14 @@ pre {
       width: calc(100% - .3em);
     }
   }
+
+  .options {
+    @include borderOutline;
+    background-color: $back-color;
+    padding: .4em;
+    position: absolute;
+    z-index: 2;
+  }
 }
 
 #dirViewer {

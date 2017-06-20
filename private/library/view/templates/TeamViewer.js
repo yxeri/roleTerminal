@@ -376,13 +376,15 @@ class TeamViewer extends StandardView {
           userViewerList.replaceAllItems({ items: [] });
         }
 
-        socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
-          if (error) {
-            return;
-          }
+        if (storageManager.getToken()) {
+          socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
+            if (error) {
+              return;
+            }
 
-          invitationList.replaceAllItems({ items: data.invitations.map(invitation => this.createInvitationParagraph({ invitation })) });
-        });
+            invitationList.replaceAllItems({ items: data.invitations.map(invitation => this.createInvitationParagraph({ invitation })) });
+          });
+        }
 
         toggleSystemButtons({ createButton, inviteButton, leaveButton });
         eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: { teamName, shortName: shortTeam } } });

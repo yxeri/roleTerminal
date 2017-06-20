@@ -1315,7 +1315,7 @@ socketManager.addEvents([
     event: 'follow',
     func: ({ room, whisper, data, whisperTo }) => {
       if (whisperTo) {
-        room.roomname = data.replace('-whisper-', '<->');
+        room.roomName = data.replace('-whisper-', ' <-> ');
       }
 
       eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room, whisper, data } });
@@ -1362,10 +1362,17 @@ socketManager.addEvents([
   }, {
     event: 'invitation',
     func: ({ invitation }) => {
-      console.log('invitation', invitation);
       eventCentral.triggerEvent({
         event: eventCentral.Events.INVITATION,
         params: { invitation },
+      });
+    },
+  }, {
+    event: 'user',
+    func: ({ user }) => {
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.NEWUSER,
+        params: { user },
       });
     },
   },

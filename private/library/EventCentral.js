@@ -28,6 +28,7 @@ class EventCentral {
       UNFOLLOWROOM: 'Unfollowed room',
       NEWROOM: 'New room',
       USER: 'Switched user',
+      NEWUSER: 'New user',
       LOGOUT: 'Logged out',
       LOGIN: 'Logged in',
       CREATEDOCFILE: 'Created docFile',

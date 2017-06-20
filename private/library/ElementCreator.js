@@ -71,8 +71,6 @@ class ElementCreator {
 
     if (data) {
       button.setAttribute('data', data);
-    } else {
-      button.setAttribute('data', text);
     }
 
     return button;

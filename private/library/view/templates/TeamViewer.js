@@ -51,6 +51,27 @@ class TeamViewer extends StandardView {
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
 
+    this.systemList = new List({
+      shouldSort: false,
+      title: 'SYSTEM',
+    });
+    this.userList = new List({
+      viewId: 'teamUsers',
+      shouldSort: true,
+      title: 'Members',
+    });
+    this.userViewerList = new List({
+      viewId: 'teamViewerUsers',
+      shouldSort: false,
+      title: 'Members',
+    });
+    this.invitationList = new List({
+      viewId: 'teamInvitations',
+      shouldSort: false,
+      title: 'Invitations',
+      showingList: true,
+    });
+
     this.populateList();
   }
 
@@ -74,6 +95,19 @@ class TeamViewer extends StandardView {
 
             return;
           }
+
+          const { teamName, shortName } = acceptData.data.team;
+
+          storageManager.setTeam(teamName, shortName);
+          eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: acceptData.data.team } });
+
+          socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
+            if (error) {
+              return;
+            }
+
+            this.invitationList.replaceAllItems({ items: data.invitations.map(inv => this.createInvitationParagraph({ invitation: inv })) });
+          });
 
           description.push(`You have accepted the invitation to join project group ${invitation.itemName}`);
 
@@ -123,17 +157,16 @@ class TeamViewer extends StandardView {
     return paragraph;
   }
 
-  populateList() {
-    const systemList = new List({ shouldSort: false, title: 'SYSTEM' });
-    const userList = new List({ viewId: 'teamUsers', shouldSort: true, title: 'Members' });
-    const userViewerList = new List({ viewId: 'teamViewerUsers', shouldSort: false, title: 'Members' });
-    const invitationList = new List({
-      viewId: 'teamInvitations',
-      shouldSort: false,
-      title: 'Invitations',
-      showingList: true,
+  createMemberButton({ user }) {
+    return elementCreator.createButton({
+      text: user.userName,
+      func: () => {
+        console.log(this.selectedItem);
+      },
     });
+  }
 
+  populateList() {
     const createButton = elementCreator.createButton({
       text: 'Create team',
       classes: ['hide'],
@@ -356,12 +389,12 @@ class TeamViewer extends StandardView {
       },
     });
 
-    systemList.addItems({ items: [createButton, inviteButton, leaveButton] });
+    this.systemList.addItems({ items: [createButton, inviteButton, leaveButton] });
 
-    this.viewer.appendChild(invitationList.element);
-    this.viewer.appendChild(userViewerList.element);
-    this.itemList.appendChild(systemList.element);
-    this.itemList.appendChild(userList.element);
+    this.viewer.appendChild(this.invitationList.element);
+    this.viewer.appendChild(this.userViewerList.element);
+    this.itemList.appendChild(this.systemList.element);
+    this.itemList.appendChild(this.userList.element);
 
     eventCentral.addWatcher({
       watcherParent: this,
@@ -371,9 +404,9 @@ class TeamViewer extends StandardView {
         const shortTeam = storageManager.getShortTeam();
 
         if (changedUser) {
-          invitationList.replaceAllItems({ items: [] });
-          userList.replaceAllItems({ items: [] });
-          userViewerList.replaceAllItems({ items: [] });
+          this.invitationList.replaceAllItems({ items: [] });
+          this.userList.replaceAllItems({ items: [] });
+          this.userViewerList.replaceAllItems({ items: [] });
         }
 
         if (storageManager.getToken()) {
@@ -382,7 +415,7 @@ class TeamViewer extends StandardView {
               return;
             }
 
-            invitationList.replaceAllItems({ items: data.invitations.map(invitation => this.createInvitationParagraph({ invitation })) });
+            this.invitationList.replaceAllItems({ items: data.invitations.map(invitation => this.createInvitationParagraph({ invitation })) });
           });
         }
 
@@ -399,7 +432,15 @@ class TeamViewer extends StandardView {
           return;
         }
 
-        invitationList.addItem({ item: this.createInvitationParagraph({ invitation }) });
+        this.invitationList.addItem({ item: this.createInvitationParagraph({ invitation }) });
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.NEWMEMBER,
+      func: ({ user }) => {
+        this.userList.addItem({ item: this.createMemberButton({ user }) });
       },
     });
 
@@ -418,15 +459,8 @@ class TeamViewer extends StandardView {
             const { onlineUsers, offlineUsers } = data;
             const users = onlineUsers.concat(offlineUsers);
 
-            userList.replaceAllItems({
-              items: users.map((user) => {
-                return elementCreator.createButton({
-                  text: user.userName,
-                  func: () => {
-                    // Dialog with options to kick, promote (maybe?)
-                  },
-                });
-              }),
+            this.userList.replaceAllItems({
+              items: users.map(user => this.createMemberButton({ user })),
             });
 
             if (this.worldMap) {
@@ -441,13 +475,13 @@ class TeamViewer extends StandardView {
                 return elementCreator.createSpan({ text: `${beautifiedDate.fullDate} ${beautifiedDate.fullTime} ${ping.positionName}` });
               });
 
-              userViewerList.replaceAllItems({ items: listItems });
+              this.userViewerList.replaceAllItems({ items: listItems });
             }
           });
         } else {
           storageManager.removeTeam();
-          userList.replaceAllItems({ items: [] });
-          userViewerList.replaceAllItems({ items: [] });
+          this.userList.replaceAllItems({ items: [] });
+          this.userViewerList.replaceAllItems({ items: [] });
         }
 
         toggleSystemButtons({ createButton, inviteButton, leaveButton });

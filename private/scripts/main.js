@@ -1375,7 +1375,15 @@ socketManager.addEvents([
         params: { user },
       });
     },
-  },
+  }, {
+    event: 'teamMember',
+    func: ({ user }) => {
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.NEWMEMBER,
+        params: { user },
+      });
+    },
+  }
   // {
   //   event: 'roomFollower',
   //   func: ({ userName, roomName, isFollowing }) => {

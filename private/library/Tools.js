@@ -31,6 +31,24 @@ class Tools {
 
     return shuffledArray;
   }
+
+  static getQueryParameters() {
+    const query = window.location.search;
+
+    if (query) {
+      const params = {};
+
+      query.split('?')[1].split('&').forEach((combo) => {
+        const split = combo.split('=');
+
+        params[split[0]] = split[1];
+      });
+
+      return params;
+    }
+
+    return false;
+  }
 }
 
 module.exports = Tools;

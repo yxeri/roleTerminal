@@ -232,7 +232,7 @@ pre {
   }
 
   span {
-    margin: 0 .25em;
+    margin-left: .5em;
   }
 
   span:first-child {
@@ -722,10 +722,6 @@ pre {
     max-width: 20em;
   }
 
-  .buttons {
-    margin: $padding .6em $padding 0;
-  }
-
   textarea {
     width: calc(100% - .8em);
     margin-left: $padding;
@@ -752,6 +748,18 @@ pre {
       cursor: pointer;
       margin-right: .3em;
     }
+  }
+
+  .buttons {
+    margin: $padding .6em $padding 0;
+  }
+
+  .clickable:hover {
+    background-color: $darker-second-color;
+  }
+
+  .clickable {
+    float: right;
   }
 }
 
@@ -1033,6 +1041,10 @@ pre {
     margin-right: 1em;
     padding: .1em;
   }
+}
+
+.smaller {
+  font-size: .9em;
 }
 
 @-webkit-keyframes flash {

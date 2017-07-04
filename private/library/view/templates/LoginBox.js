@@ -15,11 +15,13 @@
  */
 
 const DialogBox = require('../DialogBox');
+const ButtonBox = require('./ButtonBox');
 const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const soundLibrary = require('../../audio/SoundLibrary');
 const textTool = require('../../TextTools');
+const elementCreator = require('../../ElementCreator');
 
 class LoginBox extends DialogBox {
   constructor({ description, extraDescription, parentElement, closeFunc }) {
@@ -37,8 +39,22 @@ class LoginBox extends DialogBox {
               required: true,
               extraClass: 'markedInput',
             });
-            this.markEmptyFields();
+            this.addInput({
+              placeholder: 'Wasteland cybermail',
+              inputName: 'email',
+              type: 'email',
+              isRequired: true,
+              maxLength: 254,
+            });
+            this.addInput({
+              placeholder: 'Re-enter your cybermail',
+              inputName: 'reenterEmail',
+              type: 'email',
+              isRequired: true,
+              maxLength: 254,
+            });
             this.focusInput('reenterPassword');
+            this.markEmptyFields();
 
             return;
           }
@@ -64,65 +80,76 @@ class LoginBox extends DialogBox {
             });
 
             return;
-          }
-
-          if (reenterPasswordInput.inputElement.value === this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
-            socketManager.emitEvent('register', {
-              user: {
-                userName: userNameInput.value,
-                password: reenterPasswordInput.inputElement.value,
-                registerDevice: storageManager.getDeviceId(),
-              },
-            }, ({ error, data }) => {
-              if (error) {
-                soundLibrary.playSound('fail');
-
-                switch (error.type) {
-                  case 'already exists': {
-                    this.changeExtraDescription({ text: ['A user with that user name already exists', 'Unable to register user'] });
-
-                    return;
-                  }
-                  case 'invalid characters': {
-                    this.changeExtraDescription({ text: ['The user name contains invalid characters', 'Allowed: a-z 0-9'] });
-                    this.clearInput('userName');
-
-                    return;
-                  }
-                  case 'not allowed': {
-                    this.changeExtraDescription({ text: ['User registration has been disabled', 'Unable to register user'] });
-
-                    return;
-                  }
-                  default: {
-                    this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
-
-                    return;
-                  }
-                }
-              }
-
-              const text = [];
-
-              if (data.requiresVerification) {
-                text.push('Your user has been registered, but your account is not yet active. You need to contact an administrator to get your account verified!');
-              } else {
-                text.push('Your user has been registered! You may now access O3C with your new user');
-              }
-
-              this.changeExtraDescription({ text });
-              this.clearInput('userName');
-              this.clearInput('password');
-              this.removeInput('reenterPassword');
-              this.focusInput('userName');
-            });
-          } else {
+          } else if (reenterPasswordInput.inputElement.value !== this.inputs.find(({ inputName }) => inputName === 'password').inputElement.value) {
             soundLibrary.playSound('fail');
             this.changeExtraDescription({ text: ['Passwords do not match. Try again'] });
             this.clearInput('password');
             this.clearInput('reenterPassword');
             this.focusInput('password');
+
+            return;
+          } else if (this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value !== this.inputs.find(({ inputName }) => inputName === 'reenterEmail').inputElement.value) {
+            soundLibrary.playSound('fail');
+            this.changeExtraDescription({ text: ['Cybermail do not match. Try again'] });
+            this.clearInput('email');
+            this.clearInput('reenterEmail');
+            this.focusInput('email');
+
+            return;
           }
+
+          socketManager.emitEvent('register', {
+            user: {
+              userName: userNameInput.value,
+              password: reenterPasswordInput.inputElement.value,
+              registerDevice: storageManager.getDeviceId(),
+              mail: this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value,
+            },
+          }, ({ error }) => {
+            if (error) {
+              soundLibrary.playSound('fail');
+
+              switch (error.type) {
+                case 'already exists': {
+                  this.changeExtraDescription({ text: ['A user with that user name already exists', 'Unable to register user'] });
+
+                  return;
+                }
+                case 'invalid characters': {
+                  this.changeExtraDescription({ text: ['The user name contains invalid characters', 'Allowed: a-z 0-9'] });
+                  this.clearInput('userName');
+
+                  return;
+                }
+                case 'not allowed': {
+                  this.changeExtraDescription({ text: ['User registration has been disabled', 'Unable to register user'] });
+
+                  return;
+                }
+                case 'invalid data': {
+                  this.changeExtraDescription({ text: ['Cybermail is invalid.', 'Please try again'] });
+                  this.clearInput('email');
+                  this.clearInput('reenterEmail');
+
+                  return;
+                }
+                default: {
+                  this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
+
+                  return;
+                }
+              }
+            }
+
+            this.changeExtraDescription({ text: ['Your user has been registered, but your account is not yet active. You should receive a cybermail soon with further instructions'] });
+            this.clearInput('userName');
+            this.clearInput('password');
+            this.clearInput('email');
+            this.removeInput('reenterPassword');
+            this.removeInput('email');
+            this.removeInput('reenterEmail');
+            this.focusInput('userName');
+          });
         },
       },
       right: {
@@ -219,6 +246,82 @@ class LoginBox extends DialogBox {
       parentElement,
       inputs,
       closeFunc,
+    });
+
+    this.addLinkToExtraDescription({
+      linkText: 'Forgot your password?',
+      classes: ['clickable', 'smaller'],
+      func: () => {
+        const forgotDialog = new DialogBox({
+          description: ['Enter the Wasteland Cybermail connected to your user to reset the password'],
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                forgotDialog.removeView();
+                this.element.classList.remove('hide');
+              },
+            },
+            right: {
+              text: 'Send',
+              eventFunc: () => {
+                const emptyFields = forgotDialog.markEmptyFields();
+                const mailField = forgotDialog.inputs.find(({ inputName }) => inputName === 'email').inputElement;
+
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                socketManager.emitEvent('sendPasswordReset', { mail: mailField.value }, ({ error }) => {
+                  if (error) {
+                    if (error.type === 'does not exist') {
+                      forgotDialog.changeExtraDescription({ text: ['No user with that cybermail exists', 'Unable to reset password'] });
+
+                      return;
+                    }
+
+                    forgotDialog.changeExtraDescription({ text: ['Something went wrong', 'Unable to reset password'] });
+
+                    return;
+                  }
+
+                  forgotDialog.removeView();
+
+                  const confirmBox = new ButtonBox({
+                    description: [
+                      'A cybermail has been sent with instructions. It may take a while for it to arrive. Be patient',
+                      'HQ has been contacted with a report of your negligence. Your Good Employee Affirmation Rank (GEAR) will be lowered',
+                    ],
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'Confirmed',
+                        func: () => {
+                          confirmBox.removeView();
+                          this.element.classList.remove('hide');
+                        },
+                      }),
+                    ],
+                  });
+
+                  confirmBox.appendTo(parentElement);
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Wasteland cybermail',
+            inputName: 'email',
+            isRequired: true,
+            maxLength: 254,
+          }],
+        });
+
+        this.element.classList.add('hide');
+        forgotDialog.appendTo(parentElement);
+      },
     });
   }
 

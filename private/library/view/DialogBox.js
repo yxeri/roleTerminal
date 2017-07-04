@@ -207,6 +207,16 @@ class DialogBox extends View {
     this.extraDescription.innerHTML = ' ';
     this.extraDescription.appendChild(fragment);
   }
+
+  addLinkToExtraDescription({ linkText, func, classes }) {
+    const span = elementCreator.createSpan({
+      func,
+      classes,
+      text: linkText,
+    });
+
+    this.extraDescription.appendChild(span);
+  }
 }
 
 module.exports = DialogBox;

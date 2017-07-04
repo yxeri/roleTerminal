@@ -32,6 +32,7 @@ const ButtonBox = require('../library/view/templates/ButtonBox');
 const TeamViewer = require('../library/view/templates/TeamViewer');
 const ToolsViewer = require('../library/view/templates/ToolsViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
+const DialogBox = require('../library/view/DialogBox');
 
 const keyHandler = require('../library/KeyHandler');
 const deviceChecker = require('../library/DeviceChecker');
@@ -42,12 +43,14 @@ const viewTools = require('../library/ViewTools');
 const eventCentral = require('../library/EventCentral');
 const soundLibrary = require('../library/audio/SoundLibrary');
 const elementCreator = require('../library/ElementCreator');
+const tools = require('../library/Tools');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const boot = new TextAnimation({ removeTime: 3000 });
 const signalBlockAnimation = new TextAnimation({ isPermanent: true });
+const queryParameters = tools.getQueryParameters();
 
 boot.setQueue([
   {
@@ -177,7 +180,10 @@ boot.setQueue([
     },
   },
 ]);
-boot.appendTo(mainView);
+
+if (!queryParameters) {
+  boot.appendTo(mainView);
+}
 
 soundLibrary.toggleSounds();
 
@@ -1255,7 +1261,7 @@ socketManager.addEvents([
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
 
       if (!socketManager.hasConnected) {
-        new Clock(document.getElementById('time')).startClock();
+        new Clock(document.getElementById('time')).start();
         map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
         map.setCenterCoordinates(storageManager.getCenterCoordinates());
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
@@ -1266,6 +1272,157 @@ socketManager.addEvents([
       onlineStatus.setOnline();
       map.startMap();
       socketManager.updateId();
+
+      if (queryParameters) {
+        const mailEvent = queryParameters.mailEvent;
+        const key = queryParameters.key;
+
+        if (mailEvent && key) {
+          if (mailEvent === 'userVerify') {
+            const verifyBox = new ButtonBox({
+              description: [''],
+              buttons: [
+                elementCreator.createButton({
+                  text: 'Confirmed',
+                  func: () => {
+                    window.location.replace(location.pathname);
+                  },
+                }),
+              ],
+            });
+
+            socketManager.emitEvent('verifyUser', { key }, ({ error, data }) => {
+              if (error) {
+                if (error.type === 'expired') {
+                  verifyBox.changeDescription({
+                    text: [
+                      'Your verification request has expired.',
+                      'You will need to re-register your user.',
+                    ],
+                  });
+                } else {
+                  verifyBox.changeDescription({
+                    text: ['Something went wrong.', 'Unable to verify user.'],
+                  });
+                }
+
+                verifyBox.appendTo(mainView);
+
+                return;
+              }
+
+              verifyBox.changeDescription({
+                text: [
+                  'Your user has been verified.',
+                  `Welcome to the Organica Oracle Operating System (O3C), employee ${data.userName}.`,
+                  'Your Good Employee Affirmation Rank (GEAR) is 0.',
+                  'May you have a productive day.',
+                ],
+              });
+              verifyBox.appendTo(mainView);
+            });
+          } else if (mailEvent === 'passwordReset') {
+            const passwordDialog = new DialogBox({
+              description: [
+                'Password reset request confirmed.',
+                'Enter your new password.',
+              ],
+              buttons: {
+                left: {
+                  text: 'Cancel',
+                  eventFunc: () => { passwordDialog.removeView(); },
+                },
+                right: {
+                  text: 'Change',
+                  eventFunc: () => {
+                    const emptyFields = passwordDialog.markEmptyFields();
+                    const reenterPasswordInput = passwordDialog.inputs.find(({ inputName }) => inputName === 'reenterPassword').inputElement;
+                    const passwordInput = passwordDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement;
+
+                    if (emptyFields) {
+                      soundLibrary.playSound('fail');
+                      passwordDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                      return;
+                    } else if (reenterPasswordInput.value !== passwordInput.value) {
+                      soundLibrary.playSound('fail');
+                      passwordDialog.changeExtraDescription({ text: ['Passwords do not match. Try again.'] });
+                      passwordDialog.clearInput('password');
+                      passwordDialog.clearInput('reenterPassword');
+                      passwordDialog.focusInput('password');
+
+                      return;
+                    }
+
+                    socketManager.emitEvent('changePassword', { key, password: passwordInput.value }, ({ error }) => {
+                      if (error) {
+                        if (error.type === 'expired') {
+                          passwordDialog.removeView();
+
+                          const confirmBox = new ButtonBox({
+                            description: ['Your password reset request has expired. You will have to make a new request.'],
+                            buttons: [
+                              elementCreator.createButton({
+                                text: 'Confirmed',
+                                func: () => {
+                                  window.location.replace(location.pathname);
+                                },
+                              }),
+                            ],
+                          });
+
+                          confirmBox.appendTo(mainView);
+
+                          return;
+                        }
+
+                        passwordDialog.changeExtraDescription({
+                          text: [
+                            'Something went wrong.',
+                            'Failed to change the password.',
+                          ],
+                        });
+
+                        return;
+                      }
+
+                      passwordDialog.removeView();
+
+                      const confirmBox = new ButtonBox({
+                        description: ['Your password has been successfully changed.'],
+                        buttons: [
+                          elementCreator.createButton({
+                            text: 'Confirmed',
+                            func: () => {
+                              confirmBox.removeView();
+                            },
+                          }),
+                        ],
+                      });
+
+                      confirmBox.appendTo(mainView);
+                    });
+                  },
+                },
+              },
+              inputs: [{
+                placeholder: 'Password',
+                inputName: 'password',
+                type: 'password',
+                isRequired: true,
+                maxLength: 100,
+              }, {
+                placeholder: 'Re-enter your password',
+                inputName: 'reenterPassword',
+                type: 'password',
+                isRequired: true,
+                maxLength: 100,
+              }],
+            });
+            passwordDialog.appendTo(mainView);
+          }
+        }
+      }
     },
   }, {
     event: 'message',

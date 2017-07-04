@@ -65,7 +65,6 @@ function createUserRow({ user }) {
   const userSpan = document.createElement('SPAN');
   const fullSpan = document.createElement('SPAN');
   const banButton = document.createElement('BUTTON');
-  const verifyButton = document.createElement('BUTTON');
   const buttonContainer = document.createElement('DIV');
 
   buttonContainer.classList.add('buttonContainer');
@@ -74,15 +73,6 @@ function createUserRow({ user }) {
   fullSpan.appendChild(document.createTextNode(user.fullName));
 
   buttonContainer.appendChild(banButton);
-
-  if (!user.verified) {
-    verifyButton.appendChild(document.createTextNode('Verify'));
-    buttonContainer.appendChild(verifyButton);
-
-    if (!user.banned) {
-      listItem.classList.add('unverified');
-    }
-  }
 
   if (user.banned) {
     banButton.appendChild(document.createTextNode('Unban'));
@@ -115,20 +105,6 @@ function createUserRow({ user }) {
         user.banned = true;
         listItem.classList.add('banned');
         banButton.innerText = 'Unban';
-      });
-    }
-  });
-  verifyButton.addEventListener('click', () => {
-    if (!user.verified) {
-      socketManager.emitEvent('verifyUser', { user }, (verifyData) => {
-        if (verifyData.error) {
-          console.log('Verify user', verifyData.error);
-
-          return;
-        }
-
-        verifyButton.remove();
-        listItem.classList.remove('unverified');
       });
     }
   });

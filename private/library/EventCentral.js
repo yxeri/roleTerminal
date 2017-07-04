@@ -50,6 +50,10 @@ class EventCentral {
       REMOVEPOSITIONS: 'Remove positions',
       LEAVETEAM: 'Leave team',
       INVITATION: 'New invitation',
+      LANTERNSTATIONS: 'Updated stations',
+      LANTERNROUND: 'Updated lantern round',
+      VERIFIED: 'User verified',
+      CHANGEPASSWORD: 'Change password',
     };
     this.eventWatchers = {};
   }

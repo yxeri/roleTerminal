@@ -15,6 +15,7 @@
  */
 
 const textTools = require('../../TextTools');
+const elementCreator = require('../../ElementCreator');
 
 class Clock {
   constructor(element) {
@@ -28,13 +29,13 @@ class Clock {
   /**
    * Start time tracking and calls updateTime to update time in DOM
    */
-  startClock() {
+  start() {
     const now = new Date();
     const waitTime = ((60 - now.getSeconds()) * 1000) - now.getMilliseconds();
 
     setTimeout(() => {
       this.updateTime();
-      this.startClock();
+      this.start();
     }, waitTime);
   }
 
@@ -49,10 +50,14 @@ class Clock {
     }
 
     const beautifulDate = textTools.generateTimeStamp({ date });
-    const span = document.createElement('SPAN');
-    span.appendChild(document.createTextNode(`${beautifulDate.halfTime} ${beautifulDate.fullDate}`));
-
-    this.element.replaceChild(span, this.element.firstChild);
+    const timeSpan = elementCreator.createSpan({
+      text: `${beautifulDate.halfTime}`,
+    });
+    const dateSpan = elementCreator.createSpan({
+      text: `${beautifulDate.fullDate}`,
+    });
+    this.element.replaceChild(timeSpan, this.element.firstChild);
+    this.element.replaceChild(dateSpan, this.element.lastElementChild);
   }
 }
 

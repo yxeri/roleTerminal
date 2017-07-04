@@ -1330,7 +1330,9 @@ socketManager.addEvents([
               buttons: {
                 left: {
                   text: 'Cancel',
-                  eventFunc: () => { passwordDialog.removeView(); },
+                  eventFunc: () => {
+                    window.location.replace(location.pathname);
+                  },
                 },
                 right: {
                   text: 'Change',
@@ -1354,52 +1356,39 @@ socketManager.addEvents([
                       return;
                     }
 
+                    const confirmBox = new ButtonBox({
+                      description: [''],
+                      buttons: [
+                        elementCreator.createButton({
+                          text: 'Confirmed',
+                          func: () => {
+                            window.location.replace(location.pathname);
+                          },
+                        }),
+                      ],
+                    });
+
                     socketManager.emitEvent('changePassword', { key, password: passwordInput.value }, ({ error }) => {
                       if (error) {
                         if (error.type === 'expired') {
-                          passwordDialog.removeView();
-
-                          const confirmBox = new ButtonBox({
-                            description: ['Your password reset request has expired. You will have to make a new request.'],
-                            buttons: [
-                              elementCreator.createButton({
-                                text: 'Confirmed',
-                                func: () => {
-                                  window.location.replace(location.pathname);
-                                },
-                              }),
+                          confirmBox.changeDescription({ text: ['Your password reset request has expired. You will have to make a new request.'] });
+                        } else {
+                          confirmBox.changeDescription({
+                            text: [
+                              'Something went wrong.',
+                              'Failed to change the password.',
                             ],
                           });
-
-                          confirmBox.appendTo(mainView);
-
-                          return;
                         }
 
-                        passwordDialog.changeExtraDescription({
-                          text: [
-                            'Something went wrong.',
-                            'Failed to change the password.',
-                          ],
-                        });
+                        passwordDialog.removeView();
+                        confirmBox.appendTo(mainView);
 
                         return;
                       }
 
+                      confirmBox.changeDescription({ text: ['Your password has been successfully changed.'] });
                       passwordDialog.removeView();
-
-                      const confirmBox = new ButtonBox({
-                        description: ['Your password has been successfully changed.'],
-                        buttons: [
-                          elementCreator.createButton({
-                            text: 'Confirmed',
-                            func: () => {
-                              confirmBox.removeView();
-                            },
-                          }),
-                        ],
-                      });
-
                       confirmBox.appendTo(mainView);
                     });
                   },

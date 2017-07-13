@@ -5,7 +5,6 @@
   "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
   "private": true,
   "scripts": {
-    "start": "node ./app.js",
     "test": "DEBUG=eslint:cli-engine eslint ./",
     "start": "node app",
     "nsp": "nsp check"

@@ -7,4 +7,3 @@ COPY . /usr/src/app
 RUN npm prune && npm install
 
 RUN /usr/src/app/node_modules/roleHaven/start.sh
-RUN npm start

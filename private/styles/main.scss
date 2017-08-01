@@ -25,6 +25,7 @@ $back-button: #1b0019;
 $back-input: #1b0019;
 $hoverInput: #00372d;
 $note-color: #cd02b7;
+$red-button-color: #550000;
 $padding: .2em;
 $outline: .1em;
 $font-size: 1.1em;
@@ -238,6 +239,16 @@ pre {
   span:first-child {
     margin: 0;
   }
+
+  #wrecking {
+    margin: -.3em -.7em -.5em .7em;
+    padding: .3em .7em .4em .7em;
+    color: $text-color;
+    text-shadow: $text-shadow;
+    background-color: $darker-second-color;
+    border-left: 1px solid $text-color;
+    border-right: 1px solid $text-color;
+  }
 }
 
 #main {
@@ -245,6 +256,11 @@ pre {
   background: url(/images/logo.png) no-repeat 50% 50%;
   background-size: contain;
   height: 100%;
+}
+
+#nodeHacking {
+  width: 100vw;
+  height: 100vh;
 }
 
 #messenger {
@@ -854,7 +870,7 @@ pre {
   padding: 3em;
   margin: 3em 0;
   line-height: 7em;
-  background-color: #550000;
+  background-color: $red-button-color;
 }
 
 .moreSpace {

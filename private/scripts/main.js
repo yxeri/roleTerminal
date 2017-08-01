@@ -181,7 +181,7 @@ boot.setQueue([
   },
 ]);
 
-if (!queryParameters) {
+if (!queryParameters.key && !queryParameters.mailEvent && !queryParameters.noBoot) {
   boot.appendTo(mainView);
 }
 
@@ -235,7 +235,7 @@ const home = new Home({
 });
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const dirViewer = new DirViewer({ isFullscreen: true });
-const wallet = new Wallet();
+const walletViewer = new Wallet();
 const profile = new Profile();
 const map = new WorldMap({
   mapView: WorldMap.MapViews.AREA,
@@ -796,12 +796,14 @@ eventCentral.addWatcher({
   func: () => { soundLibrary.playSound('msgReceived'); },
 });
 
-// F1
-keyHandler.addKey(112, viewTools.goFullScreen);
+if (!queryParameters.noFullscreen) {
+  // F1
+  keyHandler.addKey(112, viewTools.goFullScreen);
 
-window.addEventListener('click', () => {
-  viewTools.goFullScreen();
-});
+  window.addEventListener('click', () => {
+    viewTools.goFullScreen();
+  });
+}
 
 home.addLink({
   linkName: 'login',
@@ -1098,8 +1100,8 @@ home.addLink({
 });
 home.addLink({
   linkName: 'CREDS',
-  startFunc: () => { wallet.appendTo(mainView); },
-  endFunc: () => { wallet.removeView(); },
+  startFunc: () => { walletViewer.appendTo(mainView); },
+  endFunc: () => { walletViewer.removeView(); },
   classes: ['hide'],
   accessLevel: 1,
   shortcut: true,
@@ -1253,7 +1255,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'startup',
-    func: ({ yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode }) => {
+    func: ({ data }) => {
+      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode } = data;
       storageManager.setYearModification(yearModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
@@ -1291,7 +1294,7 @@ socketManager.addEvents([
               ],
             });
 
-            socketManager.emitEvent('verifyUser', { key }, ({ error, data }) => {
+            socketManager.emitEvent('verifyUser', { key }, ({ error, data: verifyData }) => {
               if (error) {
                 if (error.type === 'expired') {
                   verifyBox.changeDescription({
@@ -1314,7 +1317,7 @@ socketManager.addEvents([
               verifyBox.changeDescription({
                 text: [
                   'Your user has been verified.',
-                  `Welcome to the Organica Oracle Operating System (O3C), employee ${data.userName}.`,
+                  `Welcome to the Organica Oracle Operating System (O3C), employee ${verifyData.userName}.`,
                   'Your Good Employee Affirmation Rank (GEAR) is 0.',
                   'May you have a productive day.',
                 ],
@@ -1415,17 +1418,27 @@ socketManager.addEvents([
     },
   }, {
     event: 'message',
-    func: ({ message }) => {
+    func: ({ data }) => {
+      const { message } = data;
       console.log(message);
     },
   }, {
-    event: 'chatMsgs',
-    func: ({ messages, room, whisper }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { whisper, room, messages, options: { printable: false } } });
+    event: 'history',
+    func: ({ data }) => {
+      const { roomName, messages, timeZoneOffset, anonymous, isWhisper } = data.history;
+      eventCentral.triggerEvent({ event: eventCentral.Events.HISTORY, params: { roomName, messages, timeZoneOffset, anonymous, isWhisper, options: { printable: false } } });
+    },
+  }, {
+    event: 'chatMsg',
+    func: ({ data }) => {
+      console.log('whisper', data);
+      const { message, timeZoneOffset, isWhisper, roomName } = data;
+      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { roomName, message, isWhisper, timeZoneOffset, options: { printable: false } } });
     },
   }, {
     event: 'docFile',
-    func: ({ docFile }) => {
+    func: ({ data }) => {
+      const { docFile } = data;
       eventCentral.triggerEvent({ event: eventCentral.Events.DOCFILE, params: { docFile } });
     },
   }, {
@@ -1435,17 +1448,21 @@ socketManager.addEvents([
     },
   }, {
     event: 'bcastMsg',
-    func: ({ message }) => {
+    func: ({ data }) => {
+      const { message } = data;
       eventCentral.triggerEvent({ event: eventCentral.Events.BCASTMSG, params: { message } });
     },
   }, {
     event: 'transaction',
-    func: ({ transaction }) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.TRANSACTION, params: { transaction } });
+    func: ({ data }) => {
+      const { transaction, wallet } = data;
+      eventCentral.triggerEvent({ event: eventCentral.Events.TRANSACTION, params: { transaction, wallet } });
     },
   }, {
     event: 'mapPositions',
-    func: ({ positions, currentTime, shouldRemove }) => {
+    func: ({ data }) => {
+      const { positions, currentTime, shouldRemove } = data;
+
       if (shouldRemove) {
         eventCentral.triggerEvent({ event: eventCentral.Events.REMOVEPOSITIONS, params: { positions } });
       } else {
@@ -1453,37 +1470,52 @@ socketManager.addEvents([
       }
     },
   }, {
+    event: 'mapLabels',
+    func: () => {
+
+    },
+  }, {
+    event: 'mapEvents',
+    func: () => {},
+  }, {
     event: 'terminal',
-    func: (params) => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params });
+    func: (data) => {
+      const { mission } = data;
+      eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params: { mission } });
     },
   }, {
     event: 'follow',
-    func: ({ room, whisper, data, whisperTo }) => {
+    func: ({ data }) => {
+      const { whisperTo, whisper, room, data: followData } = data;
+
       if (whisperTo) {
-        room.roomName = data.replace('-whisper-', ' <-> ');
+        room.roomName = followData.replace('-whisper-', ' <-> ');
       }
 
-      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room, whisper, data } });
+      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room, whisper, data: followData } });
     },
   }, {
     event: 'unfollow',
-    func: ({ room }) => {
+    func: ({ data }) => {
+      const { room } = data;
       eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room } });
     },
   }, {
     event: 'simpleMsg',
-    func: ({ simpleMsg }) => {
+    func: ({ data }) => {
+      const { simpleMsg } = data;
       eventCentral.triggerEvent({ event: eventCentral.Events.SIMPLEMSG, params: { simpleMsg } });
     },
   }, {
     event: 'gameCode',
-    func: ({ gameCode }) => {
+    func: ({ data }) => {
+      const { gameCode } = data;
       eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
     },
   }, {
     event: 'signalBlock',
-    func: ({ position, removeBlocker, blockedBy }) => {
+    func: ({ data }) => {
+      const { position, removeBlocker, blockedBy } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.SIGNALBLOCK,
         params: { position, removeBlocker, blockedBy },
@@ -1491,7 +1523,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'room',
-    func: ({ room, isProtected }) => {
+    func: ({ data }) => {
+      const { room, isProtected } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWROOM,
         params: { room, isProtected },
@@ -1499,7 +1532,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'team',
-    func: ({ team }) => {
+    func: ({ data }) => {
+      const { team } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWTEAM,
         params: { team },
@@ -1507,7 +1541,8 @@ socketManager.addEvents([
     },
   }, {
     event: 'invitation',
-    func: ({ invitation }) => {
+    func: ({ data }) => {
+      const { invitation } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.INVITATION,
         params: { invitation },
@@ -1515,18 +1550,38 @@ socketManager.addEvents([
     },
   }, {
     event: 'user',
-    func: ({ users }) => {
+    func: ({ data }) => {
+      const { user } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWUSER,
-        params: { users },
+        params: { user },
       });
     },
   }, {
     event: 'teamMember',
-    func: ({ user }) => {
+    func: ({ data }) => {
+      const { user } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWMEMBER,
         params: { user },
+      });
+    },
+  }, {
+    event: 'lanternStations',
+    func: ({ data }) => {
+      const { stations } = data;
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNSTATIONS,
+        params: { stations },
+      });
+    },
+  }, {
+    event: 'lanternRound',
+    func: ({ data }) => {
+      const { round } = data;
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNROUND,
+        params: { round },
       });
     },
   },

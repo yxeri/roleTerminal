@@ -85,7 +85,7 @@ class SocketManager {
 
       eventCentral.triggerEvent({
         event: eventCentral.Events.SWITCHROOM,
-        params: { room: storageManager.getRoom() } });
+        params: { roomName: storageManager.getRoom() } });
       eventCentral.triggerEvent({
         event: eventCentral.Events.SIGNALBLOCK,
         params: { blockedBy },
@@ -98,7 +98,7 @@ class SocketManager {
         },
       });
 
-      this.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
+      this.emitEvent('getProfileGameCode', { owner: storageManager.getUserName() }, ({ error: codeError, data: codeData }) => {
         if (codeError) {
           console.log(codeError);
 

@@ -153,9 +153,9 @@ function populateAll() {
         return;
       }
 
-      const { onlineUsers, offlineUsers } = usersData.data;
+      const users = usersData.data.users;
       const { aliases } = aliasesData.data;
-      const allUsers = onlineUsers.concat(offlineUsers).filter(user => aliases.indexOf(user.userName) === -1).sort();
+      const allUsers = users.filter(user => aliases.indexOf(user.userName) === -1).sort();
 
       const fragment = document.createDocumentFragment();
 
@@ -168,7 +168,7 @@ function populateAll() {
     });
   });
 
-  socketManager.emitEvent('listRooms', {}, (roomsData) => {
+  socketManager.emitEvent('getRooms', {}, (roomsData) => {
     if (roomsData.error) {
       console.log('listRooms error', roomsData.error);
 

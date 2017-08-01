@@ -208,9 +208,9 @@ class StorageManager {
 
   static getYearModification() { return converters.convertToInt(this.getLocalVal('yearModification')); }
 
-  static setRoom(room) {
-    this.setLocalVal('room', room);
-    eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { room } });
+  static setRoom(roomName) {
+    this.setLocalVal('room', roomName);
+    eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { roomName } });
   }
 
   static getRoom() { return this.getLocalVal('room'); }

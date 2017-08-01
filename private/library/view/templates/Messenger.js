@@ -71,26 +71,25 @@ function getHistory({ roomName, infiniteScroll = false, callback = () => {} }) {
     roomName = userName;
   }
 
-  socketManager.emitEvent('getHistory', { room: { roomName }, whisperTo }, ({ data: historyData, error: historyError }) => {
+  socketManager.emitEvent('getHistory', { roomName, whisperTo }, ({ data: historyData, error: historyError }) => {
     if (historyError) {
-      console.log(historyError);
       callback({ error: historyError });
 
       return;
     }
 
-    const room = { roomName };
+    const messages = historyData.history.messages;
 
     if (whisperTo) {
-      room.roomName = `${userName}-whisper-${whisperTo}`;
+      roomName = `${userName}-whisper-${whisperTo}`;
     }
 
     eventCentral.triggerEvent({
-      event: eventCentral.Events.CHATMSG,
+      event: eventCentral.Events.HISTORY,
       params: {
         infiniteScroll,
-        room,
-        messages: historyData.messages,
+        roomName,
+        messages,
         options: { printable: false },
         shouldScroll: !infiniteScroll,
         isHistory: true,
@@ -275,14 +274,17 @@ class Messenger extends StandardView {
           return;
         }
 
+        console.log('sending message', data);
+
         eventCentral.triggerEvent({
           event: eventCentral.Events.CHATMSG,
           params: {
-            whisper: data.whisper,
-            room: { roomName },
-            messages: data.messages,
+            roomName,
+            isWhisper: data.isWhisper,
+            message: data.message,
             options: { printable: false },
-            shouldScroll: true },
+            shouldScroll: true,
+          },
         });
         this.clearInputField();
       });
@@ -439,8 +441,63 @@ class Messenger extends StandardView {
 
     eventCentral.addWatcher({
       watcherParent: this,
+      event: eventCentral.Events.HISTORY,
+      func: ({ roomName, messages, isWhisper, options }) => {
+        const userNames = storageManager.getAliases();
+        const userName = storageManager.getUserName();
+
+
+        if (messages.length === 0) {
+          this.messageList.element.innerHTML = '';
+
+          return;
+        }
+
+        if (userName) {
+          userNames.push(userName);
+        }
+
+        let fullRoomName = roomName;
+
+        if (isWhisper) {
+          if (userNames.indexOf(messages[0].userName) > -1) {
+            fullRoomName = `${messages[0].userName}-whisper-${roomName}`;
+          } else {
+            fullRoomName = `${roomName}-${messages[0].userName}`;
+          }
+        }
+
+        if (roomName === storageManager.getRoom()) {
+          const itemsOptions = {
+            animation: 'flash',
+            isHistory: true,
+          };
+
+          this.messageList.element.innerHTML = '';
+
+          if (storageManager.getAccessLevel() > 0) {
+            this.inputArea.classList.remove('hide');
+            this.messageList.element.classList.remove('fullHeight');
+          } else {
+            this.inputArea.classList.add('hide');
+            this.messageList.element.classList.add('fullHeight');
+          }
+
+          this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
+        } else {
+          const listItem = findItem(this.followList, fullRoomName);
+
+          if (listItem) {
+            listItem.firstElementChild.classList.add('selected');
+          }
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
+      watcherParent: this,
       event: eventCentral.Events.CHATMSG,
-      func: ({ messages, options, shouldScroll, isHistory, following, room, whisper }) => {
+      func: ({ message, roomName, isWhisper, options }) => {
         const userNames = storageManager.getAliases();
         const userName = storageManager.getUserName();
 
@@ -448,42 +505,33 @@ class Messenger extends StandardView {
           userNames.push(userName);
         }
 
-        let { roomName } = room;
+        let fullRoomName = roomName;
 
-        if (whisper) {
-          if (userNames.indexOf(messages[0].userName) > -1) {
-            roomName = `${messages[0].userName}-whisper-${roomName}`;
+        if (isWhisper) {
+          if (userNames.indexOf(message.userName) > -1) {
+            fullRoomName = `${message.userName}-whisper-${roomName}`;
           } else {
-            roomName = `${roomName}-${messages[0].userName}`;
+            fullRoomName = `${roomName}-${message.userName}`;
           }
         }
 
-        if (roomName === storageManager.getRoom()) {
+        console.log('whisper', isWhisper, fullRoomName, roomName, message);
+
+        if (fullRoomName === storageManager.getRoom()) {
           const itemsOptions = {
             animation: 'flash',
-            shouldScroll,
-            isHistory,
+            shouldScroll: true,
           };
 
-          if (isHistory) {
-            this.messageList.element.innerHTML = '';
+          this.messageList.addItems([message].map(currentMessage => new Message(currentMessage, options)), itemsOptions);
 
-            if (following && storageManager.getAccessLevel() > 0) {
-              this.inputArea.classList.remove('hide');
-              this.messageList.element.classList.remove('fullHeight');
-            } else {
-              this.inputArea.classList.add('hide');
-              this.messageList.element.classList.add('fullHeight');
-            }
-          }
+          return;
+        }
 
-          this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
-        } else {
-          const listItem = findItem(this.followList, roomName);
+        const listItem = findItem(this.followList, fullRoomName);
 
-          if (listItem) {
-            listItem.firstElementChild.classList.add('selected');
-          }
+        if (listItem) {
+          listItem.firstElementChild.classList.add('selected');
         }
       },
     });
@@ -632,18 +680,17 @@ class Messenger extends StandardView {
               return;
             }
 
-            const { onlineUsers, offlineUsers } = data;
-            const allUsers = filterUserAliases(onlineUsers.concat(offlineUsers));
+            const users = filterUserAliases(data.users);
             const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-            this.userList.replaceAllItems({ items: allUsers.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
+            this.userList.replaceAllItems({ items: users.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
           });
         } else {
           this.aliasList.replaceAllItems({ items: [] });
           this.userList.replaceAllItems({ items: [] });
         }
 
-        socketManager.emitEvent('listRooms', {}, ({ error, data }) => {
+        socketManager.emitEvent('getRooms', {}, ({ error, data }) => {
           if (error) {
             console.log(error);
 
@@ -753,7 +800,7 @@ class Messenger extends StandardView {
         if (retrievedWhisperTo) {
           storageManager.setRoom(data || roomName);
         } else if (!this.followList.getItem({ name: whisperRoomName })) {
-          socketManager.emitEvent('followWhisper', { whisperTo, user: { userName }, room: { roomName: whisperRoomName } }, ({ error }) => {
+          socketManager.emitEvent('followWhisperRoom', { whisperTo, sender: { userName }, room: { roomName: whisperRoomName } }, ({ error }) => {
             if (error) {
               console.log(error);
 
@@ -814,20 +861,23 @@ class Messenger extends StandardView {
 
         button.classList.remove('selected');
 
-        socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error, data: { allowed, room } }) => {
+        socketManager.emitEvent('authUserToRoom', { room: { roomName } }, ({ error, data }) => {
           if (error) {
             console.log(error);
 
             return;
           }
 
-          if (allowed) {
-            storageManager.setRoom(roomName);
+          const { isFollowing, room } = data;
+
+          if (isFollowing) {
+            storageManager.setRoom(room.roomName);
 
             return;
           }
 
           const followDialog = new DialogBox({
+            description: ['Do you wish to enter the room? The members of the room will be informed of you entering it'],
             buttons: {
               left: {
                 text: 'Cancel',
@@ -841,9 +891,12 @@ class Messenger extends StandardView {
                   const passwordInput = followDialog.inputs.find(({ inputName }) => inputName === 'password');
 
                   socketManager.emitEvent('follow', {
+                    user: {
+                      userName: storageManager.getUserName(),
+                    },
                     room: {
+                      roomName: room.roomName,
                       password: passwordInput ? passwordInput.inputElement.value : '',
-                      roomName,
                     },
                   }, ({ error: followError }) => {
                     if (followError) {
@@ -856,7 +909,7 @@ class Messenger extends StandardView {
                     button.parentElement.remove();
                     eventCentral.triggerEvent({
                       event: eventCentral.Events.FOLLOWROOM,
-                      params: { room: { roomName } },
+                      params: { room },
                     });
 
                     storageManager.setRoom(roomName);
@@ -865,7 +918,6 @@ class Messenger extends StandardView {
                 },
               },
             },
-            description: ['Do you wish to enter the room? The members of the room will be informed of you entering it'],
           });
 
           if (room.password) {

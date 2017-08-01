@@ -86,28 +86,24 @@ class TeamViewer extends StandardView {
     paragraph.appendChild(elementCreator.createButton({
       text: 'Accept',
       func: () => {
-        socketManager.emitEvent('acceptInvitation', { invitation }, (acceptData) => {
+        socketManager.emitEvent('acceptTeamInvitation', { invitation }, ({ error, data }) => {
           const description = [];
 
-          if (acceptData.error) {
+          if (error) {
             description.push('Something went wrong');
             description.push('Unable to join project group');
 
             return;
           }
 
-          const { teamName, shortName } = acceptData.data.team;
+          const { teamName, shortName } = data.team;
 
           storageManager.setTeam(teamName, shortName);
-          eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: acceptData.data.team } });
 
-          socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
-            if (error) {
-              return;
-            }
+          eventCentral.triggerEvent({ event: eventCentral.Events.TEAM, params: { team: data.team } });
+          eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room: data.room } });
 
-            this.invitationList.replaceAllItems({ items: data.invitations.map(inv => this.createInvitationParagraph({ invitation: inv })) });
-          });
+          this.invitationList.replaceAllItems({ items: [] });
 
           description.push(`You have accepted the invitation to join project group ${invitation.itemName}`);
 
@@ -130,7 +126,7 @@ class TeamViewer extends StandardView {
     paragraph.appendChild(elementCreator.createButton({
       text: 'Decline',
       func: () => {
-        socketManager.emitEvent('removeInvitation', { invitation }, ({ error }) => {
+        socketManager.emitEvent('declineTeamInvitation', { invitation }, ({ error }) => {
           if (error) {
             return;
           }
@@ -262,9 +258,7 @@ class TeamViewer extends StandardView {
             right: {
               text: 'Invite',
               eventFunc: () => {
-                const user = {
-                  userName: inviteDialog.inputs.find(input => input.inputName === 'userName').inputElement.value.toLowerCase(),
-                };
+                const to = inviteDialog.inputs.find(input => input.inputName === 'userName').inputElement.value.toLowerCase();
 
                 if (inviteDialog.markEmptyFields()) {
                   soundLibrary.playSound('fail');
@@ -273,7 +267,7 @@ class TeamViewer extends StandardView {
                   return;
                 }
 
-                socketManager.emitEvent('inviteToTeam', { user }, ({ error }) => {
+                socketManager.emitEvent('inviteToTeam', { to }, ({ error }) => {
                   if (error) {
                     const dialog = new ButtonBox({
                       buttons: [
@@ -291,12 +285,12 @@ class TeamViewer extends StandardView {
                         break;
                       }
                       case 'already exists': {
-                        dialog.changeDescription({ text: [`${user.userName} has already been invited to the team`] });
+                        dialog.changeDescription({ text: [`${to} has already been invited to the team`] });
 
                         break;
                       }
                       default: {
-                        dialog.changeDescription({ text: [`Unable to invite ${user.userName} to the team`] });
+                        dialog.changeDescription({ text: [`Unable to invite ${to} to the team`] });
 
                         break;
                       }
@@ -309,7 +303,7 @@ class TeamViewer extends StandardView {
                   }
 
                   const dialog = new ButtonBox({
-                    description: [`An invitation has been sent to ${user.userName}`],
+                    description: [`An invitation has been sent to ${to}`],
                     buttons: [
                       elementCreator.createButton({
                         text: 'I understand',
@@ -410,7 +404,7 @@ class TeamViewer extends StandardView {
         }
 
         if (storageManager.getToken()) {
-          socketManager.emitEvent('getInvitations', {}, ({ error, data }) => {
+          socketManager.emitEvent('getTeamInvitations', {}, ({ error, data }) => {
             if (error) {
               return;
             }
@@ -456,8 +450,7 @@ class TeamViewer extends StandardView {
               return;
             }
 
-            const { onlineUsers, offlineUsers } = data;
-            const users = onlineUsers.concat(offlineUsers);
+            const users = data.users;
 
             this.userList.replaceAllItems({
               items: users.map(user => this.createMemberButton({ user })),

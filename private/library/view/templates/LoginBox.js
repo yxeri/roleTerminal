@@ -207,7 +207,7 @@ class LoginBox extends DialogBox {
             eventCentral.triggerEvent({ event: eventCentral.Events.LOGIN });
             this.removeView();
 
-            socketManager.emitEvent('getGameCode', { codeType: 'profile' }, ({ error: codeError, data: codeData }) => {
+            socketManager.emitEvent('getProfileGameCode', { owner: storageManager.getUserName() }, ({ error: codeError, data: codeData }) => {
               if (codeError) {
                 console.log(codeError);
 

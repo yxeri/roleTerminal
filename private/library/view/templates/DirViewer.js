@@ -112,7 +112,7 @@ class DirViewer extends StandardView {
         const docFileId = button.getAttribute('data');
 
         if (docFileId || docFile.team === storageManager.getTeam()) {
-          socketManager.emitEvent('getDocFile', { docFile: { docFileId, title: docFile.title } }, ({ error: docFileError, data: docFileData }) => {
+          socketManager.emitEvent('getDocFile', { docFileId, title: docFileId.title }, ({ error: docFileError, data: docFileData }) => {
             if (docFileError) {
               console.log(docFileError);
 
@@ -145,13 +145,17 @@ class DirViewer extends StandardView {
 
                   const docFileIdValue = deniedDialog.inputs.find(({ inputName }) => inputName === 'docFileId').inputElement.value;
 
-                  socketManager.emitEvent('getDocFile', { docFileId: docFileIdValue }, ({ docFileError, data: docFileData }) => {
+                  socketManager.emitEvent('getDocFile', { docFileId: docFileIdValue }, ({ error: docFileError, data: docFileData }) => {
                     if (docFileError) {
-                      console.log(docFileError);
+                      if (docFileError.type === 'does not exist') {
+                        deniedDialog.changeExtraDescription({ text: ['Incorrect code', 'Access denied'] });
+
+                        return;
+                      }
+
+                      deniedDialog.changeExtraDescription({ text: ['Soemthing went wrong', 'Unable to retrieve document'] });
 
                       return;
-                    } else if (!docFileData.docFile) {
-                      deniedDialog.changeExtraDescription({ text: ['Incorrect code', 'Access denied'] });
                     }
 
                     const { team, creator, docFileId: sentId, title: sentTitle } = docFileData.docFile;
@@ -294,13 +298,11 @@ class DirViewer extends StandardView {
             newDocFile.team = storageManager.getTeam();
           }
 
-          socketManager.emitEvent('createDocFile', { docFile: newDocFile, updateExisting }, ({ error: docFileError }) => {
+          const eventName = updateExisting ? 'updateDocFile' : 'createDocFile';
+
+          socketManager.emitEvent(eventName, { docFile: newDocFile, updateExisting }, ({ error: docFileError }) => {
             if (docFileError) {
-              if (docFileError.type === 'already exists') {
-                console.log('Already exists');
-              } else {
-                console.log(docFileError);
-              }
+              console.log(docFileError);
 
               return;
             }
@@ -466,7 +468,7 @@ class DirViewer extends StandardView {
           this.myTeamFiles.replaceAllItems({ items: [] });
         }
 
-        socketManager.emitEvent('getDocFilesList', {}, ({ error, data }) => {
+        socketManager.emitEvent('getDocFiles', {}, ({ error, data }) => {
           if (error) {
             console.log(error);
 

@@ -17,6 +17,7 @@
 class EventCentral {
   constructor() {
     this.Events = {
+      HISTORY: 'Chat history retrieved',
       CHATMSG: 'Chat message retrieved',
       NEWALIAS: 'New alias',
       ALIAS: 'Aliases changed',

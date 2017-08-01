@@ -360,21 +360,38 @@ terminal.addCommand({
           'LANTERN Amplification Master Manipulator (LAMM)',
           'Overriding locks ...',
           'Connecting to database ...',
-          '----',
-          'LAMM',
-          '----',
-          'You will be shown a user with access to your chosen LANTERN',
-          'Each user will have information about its password attached to it',
-          'You must find the user\'s password within the dumps to get access to the LANTERN',
-          'The password is repeated in both memory dumps',
-          'We take no responsibility for deaths due to accidental activitation of defense systems',
         ],
       },
     });
 
-    socketManager.emitEvent('getStations', {}, ({ error, data: { activeStations = [], inactiveStations = [] } }) => {
+    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { round, activeStations, inactiveStations } }) => {
       if (error) {
         console.log(error);
+
+        terminal.resetNextFunc();
+
+        return;
+      } else if (!round.isActive) {
+        const startTime = round.startTime ? new Date(round.startTime) : 0;
+        const now = new Date();
+        const timeLeft = startTime > now ? `${textTools.getMinutesBetween({ startDate: now, endDate: startTime })} minutes` : 'unable to calculate';
+
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'No signal received',
+              'Satellites are not in position',
+              'Unable to target stations',
+              `Next window opens in: ${timeLeft}`,
+              'Aborting LAMM',
+            ],
+          },
+        });
+
+        terminal.resetNextFunc();
 
         return;
       } else if (activeStations.length === 0) {
@@ -384,31 +401,30 @@ terminal.addCommand({
               '-----',
               'ERROR',
               '-----',
-              'Satellites are not in position',
-              'Unable to target stations',
+              'Unable to connect to stations',
+              'No active stations found',
+              'Unable to proceed',
               'Aborting LAMM',
             ],
           },
         });
 
+        terminal.resetNextFunc();
+
         return;
-      } else if (activeStations.length < 1) {
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'There are no active stations',
-              'Aborting LAMM',
-            ],
-          },
-        });
       }
 
       terminal.queueMessage({
         message: {
           text: [
+            '----',
+            'LAMM',
+            '----',
+            'You will be shown a user with access to your chosen LANTERN',
+            'Each user will have information about its password attached to it',
+            'You must find the user\'s password within the dumps to get access to the LANTERN',
+            'The password is repeated in both memory dumps',
+            'We take no responsibility for deaths due to accidental activitation of defense systems',
             '-----------------',
             'Choose a LANTERN:',
             '-----------------',

@@ -111,7 +111,7 @@ class LoginBox extends DialogBox {
 
               switch (error.type) {
                 case 'already exists': {
-                  this.changeExtraDescription({ text: ['A user with that user name already exists', 'Unable to register user'] });
+                  this.changeExtraDescription({ text: ['A user with that Wasteland cybermail or user name already exists', 'Unable to register user'] });
 
                   return;
                 }

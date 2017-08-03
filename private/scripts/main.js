@@ -320,7 +320,52 @@ terminal.addCommand({
 
     socketManager.emitEvent('getCalibrationMission', {}, ({ error, data }) => {
       if (error) {
-        console.log(error);
+        if (error.type === 'does not exist') {
+          terminal.queueMessage({
+            message: {
+              text: [
+                '-----',
+                'ERROR',
+                '-----',
+                'No stations are in need of adjustments',
+                'Aborting',
+              ],
+            },
+          });
+          terminal.resetNextFunc();
+
+          return;
+        } if (error.type === 'external') {
+          terminal.queueMessage({
+            message: {
+              text: [
+                '-----',
+                'ERROR',
+                '-----',
+                'LANTERN activity is blocking calibration data',
+                'Calibration adjustments are blocked',
+              ],
+            },
+          });
+          terminal.resetNextFunc();
+
+          return;
+        }
+
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'Something went wrong',
+              'Unable to check for signal strength',
+            ],
+          },
+        });
+        terminal.resetNextFunc();
+
+        return;
       }
 
       const { mission, isNew } = data;
@@ -346,6 +391,8 @@ terminal.addCommand({
           ],
         },
       });
+
+      terminal.resetNextFunc();
     });
   },
 });
@@ -364,18 +411,23 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { round, activeStations, inactiveStations } }) => {
+    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, timeLeft } }) => {
       if (error) {
-        console.log(error);
-
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'Something went wrong',
+              'Unable to access LAMM',
+            ],
+          },
+        });
         terminal.resetNextFunc();
 
         return;
       } else if (!round.isActive) {
-        const startTime = round.startTime ? new Date(round.startTime) : 0;
-        const now = new Date();
-        const timeLeft = startTime > now ? `${textTools.getMinutesBetween({ startDate: now, endDate: startTime })} minutes` : 'unable to calculate';
-
         terminal.queueMessage({
           message: {
             text: [
@@ -385,7 +437,7 @@ terminal.addCommand({
               'No signal received',
               'Satellites are not in position',
               'Unable to target stations',
-              `Next window opens in: ${timeLeft}`,
+              `Next window opens in: ${timeLeft >= 0 ? timeLeft : 'UNKNOWN'}`,
               'Aborting LAMM',
             ],
           },
@@ -425,6 +477,7 @@ terminal.addCommand({
             'You must find the user\'s password within the dumps to get access to the LANTERN',
             'The password is repeated in both memory dumps',
             'We take no responsibility for deaths due to accidental activitation of defense systems',
+            `Window closes in ${timeLeft >= 0 ? timeLeft : 'UNKNOWN'}`,
             '-----------------',
             'Choose a LANTERN:',
             '-----------------',
@@ -441,7 +494,7 @@ terminal.addCommand({
                 },
               });
               const ownerSpan = elementCreator.createSpan({
-                text: `Owner: ${station.owner || '-'}`,
+                text: `Owner: ${teams.find(team => team.teamId === station.owner) || '-'}`,
               });
 
               span.appendChild(stationSpan);
@@ -554,8 +607,8 @@ terminal.addCommand({
                   message: {
                     text: [
                       '------------',
-                      `User name: ${hackData.userName}. Password: ${hackData.passwordType}`,
-                      `Password hint: ${textTools.appendNumberSuffix(hintIndex)} character is: ${hackData.passwordHint.character}`,
+                      `User name: ${hackData.userName}`,
+                      `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}`,
                     ],
                   },
                 });
@@ -584,7 +637,7 @@ terminal.addCommand({
                         message: {
                           text: [
                             'Correct password',
-                            `${manipulateData.amplified ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
+                            `${boostingSignal ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
                             'Thank you for using LAMM',
                           ],
                         },
@@ -841,6 +894,48 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
+  linkName: 'chat',
+  startFunc: () => { messenger.appendTo(mainView); },
+  endFunc: () => { messenger.removeView(); },
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'tools',
+  startFunc: () => { terminal.appendTo(mainView); },
+  endFunc: () => { terminal.removeView(); },
+  accessLevel: 1,
+  classes: ['hide'],
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'docs',
+  startFunc: () => { dirViewer.appendTo(mainView); },
+  endFunc: () => { dirViewer.removeView(); },
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'maps',
+  startFunc: () => { map.appendTo(mainView); },
+  endFunc: () => { map.removeView(); },
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'wallet',
+  startFunc: () => { walletViewer.appendTo(mainView); },
+  endFunc: () => { walletViewer.removeView(); },
+  classes: ['hide'],
+  accessLevel: 1,
+  shortcut: true,
+});
+home.addLink({
+  linkName: 'team',
+  startFunc: () => { teamViewer.appendTo(mainView); },
+  endFunc: () => { teamViewer.removeView(); },
+  accessLevel: 1,
+  classes: ['hide'],
+  shortcut: true,
+});
+home.addLink({
   linkName: 'panic',
   startFunc: () => {
     const panicBox = new ButtonBox({
@@ -1065,7 +1160,7 @@ home.addLink({
               text: [
                 'You have selected: "... Actually, I am fine"',
                 'Warning! You have wasted seconds of Organica-owned time',
-                'We will fine you 100 credits. NaN has been deducted from your CREDS',
+                'Your Good Employee Affirmation Rank (GEAR) has been reset to 0',
               ],
             });
             panicBox.replaceButtons({
@@ -1089,7 +1184,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'YOU',
+  linkName: 'profile',
   startFunc: () => { profile.appendTo(mainView); },
   endFunc: () => { profile.removeView(); },
   accessLevel: 1,
@@ -1097,46 +1192,9 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'CHAT',
-  startFunc: () => { messenger.appendTo(mainView); },
-  endFunc: () => { messenger.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'maps',
-  startFunc: () => { map.appendTo(mainView); },
-  endFunc: () => { map.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'storage',
-  startFunc: () => { dirViewer.appendTo(mainView); },
-  endFunc: () => { dirViewer.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'CREDS',
-  startFunc: () => { walletViewer.appendTo(mainView); },
-  endFunc: () => { walletViewer.removeView(); },
-  classes: ['hide'],
-  accessLevel: 1,
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'OSAT',
-  startFunc: () => { terminal.appendTo(mainView); },
-  endFunc: () => { terminal.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'team',
-  startFunc: () => { teamViewer.appendTo(mainView); },
-  endFunc: () => { teamViewer.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
+  linkName: 'support',
+  startFunc: () => { toolsViewer.appendTo(mainView); },
+  endFunc: () => { toolsViewer.removeView(); },
 });
 home.addLink({
   linkName: 'logout',
@@ -1154,11 +1212,6 @@ home.addLink({
   keepHome: true,
   classes: ['hide'],
   shortcut: true,
-});
-home.addLink({
-  linkName: 'tools',
-  startFunc: () => { toolsViewer.appendTo(mainView); },
-  endFunc: () => { toolsViewer.removeView(); },
 });
 
 home.appendTo(mainView);

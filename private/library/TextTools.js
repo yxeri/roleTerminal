@@ -44,12 +44,6 @@ const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
 const internationalRegex = /^[\w\d]+$/;
 
 class TextTools {
-  static getMinutesBetween({ startDate, endDate }) {
-    const difference = endDate - startDate;
-
-    return Math.floor((difference / 1000) / 60);
-  }
-
   /**
    * Beautifies number by adding a 0 before the number if it is lower than 10
    * @static

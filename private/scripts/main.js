@@ -22,6 +22,7 @@ const Clock = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 const WorldMap = require('../library/view/worldMap/WorldMap');
 const DirViewer = require('../library/view/templates/DirViewer');
+const WreckingStatus = require('../library/view/templates/WreckingStatus');
 const Home = require('../library/view/templates/Home');
 // const SoundElement = require('../library/audio/SoundElement');
 const TextAnimation = require('../library/view/templates/TextAnimation');
@@ -437,7 +438,7 @@ terminal.addCommand({
               'No signal received',
               'Satellites are not in position',
               'Unable to target stations',
-              `Next window opens in: ${timeLeft >= 0 ? timeLeft : 'UNKNOWN'}`,
+              `Next window opens in: ${timeLeft}`,
               'Aborting LAMM',
             ],
           },
@@ -718,77 +719,77 @@ terminal.addCommand({
     });
   },
 });
-terminal.addCommand({
-  commandName: 's1gn4lNuk3r',
-  accessLevel: 1,
-  startFunc: () => {
-    const choices = [
-      { value: '1', proceed: true },
-      { value: '2', proceed: false },
-    ];
-
-    terminal.queueMessage({
-      message: {
-        text: [
-          'WARNING WARNING WARNING',
-          'This will jam the signal of all nearby devices, including yours.',
-          'There is high risk of retaliation in the form of murder from nearby users.',
-          'You are urged to leave the area after activation.',
-          'The automated defense systems will track you.',
-          'Do you wish to proceed?',
-        ],
-        elementPerRow: true,
-        elements: [
-          elementCreator.createSpan({
-            classes: ['clickable', 'redButton'],
-            text: '[1] LAUNCH',
-            func: () => {
-              terminal.triggerCommand('1');
-            },
-          }),
-          elementCreator.createSpan({
-            classes: ['clickable', 'linkLook', 'moreSpace'],
-            text: '[2] No',
-            func: () => {
-              terminal.triggerCommand('2');
-            },
-          }),
-        ],
-      },
-    });
-
-    terminal.setNextFunc((choiceValue) => {
-      const chosenChoice = choices.find(choice => choice.value === choiceValue);
-
-      if (chosenChoice) {
-        if (chosenChoice.proceed) {
-          socketManager.emitEvent('signalBlock', { description: ['|\\||_||<3|>_by_'] }, ({ error }) => {
-            if (error) {
-              if (error.type === 'insufficient') {
-                terminal.queueMessage({ message: { text: ['Unable to pinpoint your location', 'Unable to nuke the area'] } });
-                terminal.resetNextFunc();
-
-                return;
-              }
-
-              terminal.queueMessage({ message: { text: ['Something went wrong', 'Unable to nuke the area'] } });
-              terminal.resetNextFunc();
-
-              return;
-            }
-
-            terminal.resetNextFunc();
-          });
-        } else {
-          terminal.queueMessage({ message: { text: ['Aborting'] } });
-          terminal.resetNextFunc();
-        }
-      } else {
-        terminal.queueMessage({ message: { text: ['Incorrect choice'] } });
-      }
-    });
-  },
-});
+// terminal.addCommand({
+//   commandName: 's1gn4lNuk3r',
+//   accessLevel: 1,
+//   startFunc: () => {
+//     const choices = [
+//       { value: '1', proceed: true },
+//       { value: '2', proceed: false },
+//     ];
+//
+//     terminal.queueMessage({
+//       message: {
+//         text: [
+//           'WARNING WARNING WARNING',
+//           'This will jam the signal of all nearby devices, including yours.',
+//           'There is high risk of retaliation in the form of murder from nearby users.',
+//           'You are urged to leave the area after activation.',
+//           'The automated defense systems will track you.',
+//           'Do you wish to proceed?',
+//         ],
+//         elementPerRow: true,
+//         elements: [
+//           elementCreator.createSpan({
+//             classes: ['clickable', 'redButton'],
+//             text: '[1] LAUNCH',
+//             func: () => {
+//               terminal.triggerCommand('1');
+//             },
+//           }),
+//           elementCreator.createSpan({
+//             classes: ['clickable', 'linkLook', 'moreSpace'],
+//             text: '[2] No',
+//             func: () => {
+//               terminal.triggerCommand('2');
+//             },
+//           }),
+//         ],
+//       },
+//     });
+//
+//     terminal.setNextFunc((choiceValue) => {
+//       const chosenChoice = choices.find(choice => choice.value === choiceValue);
+//
+//       if (chosenChoice) {
+//         if (chosenChoice.proceed) {
+//           socketManager.emitEvent('signalBlock', { description: ['|\\||_||<3|>_by_'] }, ({ error }) => {
+//             if (error) {
+//               if (error.type === 'insufficient') {
+//                 terminal.queueMessage({ message: { text: ['Unable to pinpoint your location', 'Unable to nuke the area'] } });
+//                 terminal.resetNextFunc();
+//
+//                 return;
+//               }
+//
+//               terminal.queueMessage({ message: { text: ['Something went wrong', 'Unable to nuke the area'] } });
+//               terminal.resetNextFunc();
+//
+//               return;
+//             }
+//
+//             terminal.resetNextFunc();
+//           });
+//         } else {
+//           terminal.queueMessage({ message: { text: ['Aborting'] } });
+//           terminal.resetNextFunc();
+//         }
+//       } else {
+//         terminal.queueMessage({ message: { text: ['Incorrect choice'] } });
+//       }
+//     });
+//   },
+// });
 
 terminal.addTrigger({
   triggerName: 'calibrationMission',
@@ -1220,95 +1221,95 @@ map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManage
 map.setCenterCoordinates(storageManager.getCenterCoordinates());
 map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 
-eventCentral.addWatcher({
-  watcherParent: this,
-  event: eventCentral.Events.SIGNALBLOCK,
-  func: ({ removeBlocker, blockedBy }) => {
-    if (removeBlocker || !blockedBy) {
-      storageManager.removeBlockedBy();
-      signalBlockAnimation.end();
-
-      return;
-    }
-
-    storageManager.setBlockedBy(blockedBy);
-
-    signalBlockAnimation.setQueue([
-      {
-        func: signalBlockAnimation.printLines,
-        params: {
-          array: [
-            '                            ..  .........',
-            '                    `````..  ..        `````',
-            '               .:.```````                  `.--`',
-            '             ./:.--``..  ``                  `.:-',
-            '            .-....---:--  ``       .`      ``..---`',
-            '           `:://:/+/:-.  -.`               ``.-:/--',
-            '            :::+oosso-  ``                ```.-:+/:`',
-            '           `::oyhysso  ``               `  ```.:/+/-',
-            '            --:/+/:..  ``                 `.  `.:/:`',
-            '             ...```           ` `              ...',
-            '                `````````.-`  +sh+.++.....``````',
-            '                         .-...-//.::.',
-            '                         -o+o::/o++-:',
-            '         `````````````  .:://:::++o+/:`      ```````````..`',
-            '     ..-::/osssyhy+o/..-/+oooosso+sso+::-...-/sys/:--:+oohh-.',
-            '`.-/+ossyhhhmmMMMmysoosshhhdhhdNmhyhyssh++:-/+++:/+yssmNNmhyyy/',
-            '`/+++++oyhyyhddhyoo///::////////::/++oo++os++oo+oosssssyhhhyyss:',
-          ],
-          waitTime: 3000,
-          lineTime: 500,
-          pre: true,
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 4000,
-          corruption: false,
-          array: [
-            'ERROR',
-            'Lost signal',
-            'Attempting to reconnect...',
-          ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 4000,
-          corruption: false,
-          array: [
-            'Tracing jamming source...',
-            'Tracking....',
-            'Attempting to reconnect...',
-          ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 4000,
-          corruption: false,
-          array: [
-            'Source found!',
-            `Source: user ${blockedBy}`,
-          ],
-        },
-      }, {
-        func: signalBlockAnimation.printLines,
-        params: {
-          waitTime: 6000,
-          corruption: false,
-          array: [
-            'ERROR',
-            'Unable to reconnect',
-            'Attempting to reconnect...',
-          ],
-          repeatAmount: 16,
-        },
-      },
-    ]);
-    signalBlockAnimation.appendTo(mainView);
-  },
-});
+// eventCentral.addWatcher({
+//   watcherParent: this,
+//   event: eventCentral.Events.SIGNALBLOCK,
+//   func: ({ removeBlocker, blockedBy }) => {
+//     if (removeBlocker || !blockedBy) {
+//       storageManager.removeBlockedBy();
+//       signalBlockAnimation.end();
+//
+//       return;
+//     }
+//
+//     storageManager.setBlockedBy(blockedBy);
+//
+//     signalBlockAnimation.setQueue([
+//       {
+//         func: signalBlockAnimation.printLines,
+//         params: {
+//           array: [
+//             '                            ..  .........',
+//             '                    `````..  ..        `````',
+//             '               .:.```````                  `.--`',
+//             '             ./:.--``..  ``                  `.:-',
+//             '            .-....---:--  ``       .`      ``..---`',
+//             '           `:://:/+/:-.  -.`               ``.-:/--',
+//             '            :::+oosso-  ``                ```.-:+/:`',
+//             '           `::oyhysso  ``               `  ```.:/+/-',
+//             '            --:/+/:..  ``                 `.  `.:/:`',
+//             '             ...```           ` `              ...',
+//             '                `````````.-`  +sh+.++.....``````',
+//             '                         .-...-//.::.',
+//             '                         -o+o::/o++-:',
+//             '         `````````````  .:://:::++o+/:`      ```````````..`',
+//             '     ..-::/osssyhy+o/..-/+oooosso+sso+::-...-/sys/:--:+oohh-.',
+//             '`.-/+ossyhhhmmMMMmysoosshhhdhhdNmhyhyssh++:-/+++:/+yssmNNmhyyy/',
+//             '`/+++++oyhyyhddhyoo///::////////::/++oo++os++oo+oosssssyhhhyyss:',
+//           ],
+//           waitTime: 3000,
+//           lineTime: 500,
+//           pre: true,
+//         },
+//       }, {
+//         func: signalBlockAnimation.printLines,
+//         params: {
+//           waitTime: 4000,
+//           corruption: false,
+//           array: [
+//             'ERROR',
+//             'Lost signal',
+//             'Attempting to reconnect...',
+//           ],
+//         },
+//       }, {
+//         func: signalBlockAnimation.printLines,
+//         params: {
+//           waitTime: 4000,
+//           corruption: false,
+//           array: [
+//             'Tracing jamming source...',
+//             'Tracking....',
+//             'Attempting to reconnect...',
+//           ],
+//         },
+//       }, {
+//         func: signalBlockAnimation.printLines,
+//         params: {
+//           waitTime: 4000,
+//           corruption: false,
+//           array: [
+//             'Source found!',
+//             `Source: user ${blockedBy}`,
+//           ],
+//         },
+//       }, {
+//         func: signalBlockAnimation.printLines,
+//         params: {
+//           waitTime: 6000,
+//           corruption: false,
+//           array: [
+//             'ERROR',
+//             'Unable to reconnect',
+//             'Attempting to reconnect...',
+//           ],
+//           repeatAmount: 16,
+//         },
+//       },
+//     ]);
+//     signalBlockAnimation.appendTo(mainView);
+//   },
+// });
 
 socketManager.addEvents([
   {
@@ -1334,6 +1335,7 @@ socketManager.addEvents([
 
       if (!socketManager.hasConnected) {
         new Clock(document.getElementById('time')).start();
+        new WreckingStatus({ element: document.getElementById('wrecking') }).start();
         map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
         map.setCenterCoordinates(storageManager.getCenterCoordinates());
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
@@ -1633,6 +1635,15 @@ socketManager.addEvents([
       eventCentral.triggerEvent({
         event: eventCentral.Events.NEWMEMBER,
         params: { user },
+      });
+    },
+  }, {
+    event: 'lanternTeams',
+    func: ({ data }) => {
+      const { stations } = data;
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNSTATIONS,
+        params: { stations },
       });
     },
   }, {

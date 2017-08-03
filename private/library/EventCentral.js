@@ -53,6 +53,7 @@ class EventCentral {
       INVITATION: 'New invitation',
       LANTERNSTATIONS: 'Updated stations',
       LANTERNROUND: 'Updated lantern round',
+      LANTERNTEAMS: 'Updated lantern teams',
       VERIFIED: 'User verified',
       CHANGEPASSWORD: 'Change password',
     };

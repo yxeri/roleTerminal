@@ -50,7 +50,7 @@ const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const boot = new TextAnimation({ removeTime: 3000 });
-const signalBlockAnimation = new TextAnimation({ isPermanent: true });
+// const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
 boot.setQueue([

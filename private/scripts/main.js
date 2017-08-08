@@ -49,7 +49,7 @@ const tools = require('../library/Tools');
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
-const boot = new TextAnimation({ removeTime: 3000 });
+const boot = new TextAnimation({ removeTime: 700 });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
@@ -106,7 +106,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 900,
+      waitTime: 700,
       corruption: false,
       array: [
         'Connected!',
@@ -119,7 +119,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 3000,
+      waitTime: 700,
       corruption: false,
       array: [
         'Uplink established!',
@@ -188,7 +188,11 @@ if (!queryParameters.key && !queryParameters.mailEvent && !queryParameters.noBoo
 
 soundLibrary.toggleSounds();
 
-if (storageManager.getDeviceId() === null) {
+if (!storageManager.getRoom()) {
+  storageManager.setRoom('public');
+}
+
+if (!storageManager.getDeviceId()) {
   storageManager.setDeviceId(textTools.createAlphaNumbericalString(16));
 }
 
@@ -963,7 +967,7 @@ home.addLink({
 
             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
               if (error) {
-                if (error.type === 'insufficient') {
+                if (error.type === 'insufficient' || error.type === 'invalid data') {
                   panicBox.changeDescription({
                     text: [
                       'Unable to pinpoint your position',

@@ -284,7 +284,7 @@ class Terminal extends View {
   }
 
   startBootSequence(parentElement) {
-    const boot = new TextAnimation({ removeTime: 3000 });
+    const boot = new TextAnimation({ removeTime: 700 });
 
     boot.setQueue([
       {
@@ -329,7 +329,7 @@ class Terminal extends View {
         func: boot.printLines,
         params: {
           corruption: false,
-          waitTime: 3000,
+          waitTime: 700,
           array: [
             'Oracle System Administrator Toolset',
             'OSAT ACCESS AUTHENTICATION',
@@ -346,7 +346,7 @@ class Terminal extends View {
         func: boot.printLines,
         params: {
           corruption: false,
-          waitTime: 2000,
+          waitTime: 1200,
           array: [
             'ACCESS GRANTED',
             'Welcome, administrator Charlotte Jenkins',
@@ -359,7 +359,7 @@ class Terminal extends View {
         func: boot.printLines,
         params: {
           classes: ['logo'],
-          waitTime: 2000,
+          waitTime: 700,
           array: [
             'THIS RELEASE OF OSAT WAS BROUGHT TO YOU BY',
             '   ####',

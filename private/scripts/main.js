@@ -1644,16 +1644,17 @@ socketManager.addEvents([
   }, {
     event: 'lanternTeams',
     func: ({ data }) => {
-      const { stations } = data;
+      const { teams } = data;
       eventCentral.triggerEvent({
-        event: eventCentral.Events.LANTERNSTATIONS,
-        params: { stations },
+        event: eventCentral.Events.LANTERNTEAMS,
+        params: { teams },
       });
     },
   }, {
     event: 'lanternStations',
     func: ({ data }) => {
       const { stations } = data;
+      console.log('lantern', data);
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNSTATIONS,
         params: { stations },

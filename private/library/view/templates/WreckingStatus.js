@@ -29,6 +29,7 @@ class WreckingStatus {
 
     this.stationStats = elementCreator.createList({});
     this.teamStats = elementCreator.createList({});
+    this.teamStats = elementCreator.createList({});
 
     this.element.appendChild(this.stationStats);
     this.element.appendChild(this.teamStats);
@@ -43,6 +44,12 @@ class WreckingStatus {
       watcherParent: this.stationStats,
       event: eventCentral.Events.LANTERNSTATIONS,
       func: ({ stations }) => {
+        if (!stations) {
+          console.log('no lantern stations');
+
+          return;
+        }
+
         stations.forEach((station) => {
           const foundStation = this.stations.find(storedStation => storedStation.stationId === station.stationId);
 
@@ -57,7 +64,7 @@ class WreckingStatus {
           }
         });
 
-        console.log(this.stations, stations);
+        console.log(this.stations);
       },
     });
 
@@ -65,6 +72,12 @@ class WreckingStatus {
       watcherParent: this.teamStats,
       event: eventCentral.Events.LANTERNTEAMS,
       func: ({ teams }) => {
+        if (!teams) {
+          console.log('no lantern teams');
+
+          return;
+        }
+
         teams.forEach((team) => {
           const foundTeam = this.teams.find(storedTeam => storedTeam.teamId === team.teamId);
 
@@ -87,6 +100,12 @@ class WreckingStatus {
       watcherParent: this.element,
       event: eventCentral.Events.LANTERNROUND,
       func: ({ round }) => {
+        if (!round) {
+          console.log('no round');
+
+          return;
+        }
+
         if (this.isActive !== round.isActive) {
           if (!round.isActive) {
             this.end();

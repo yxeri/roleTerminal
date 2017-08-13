@@ -75,7 +75,10 @@ class SocketManager {
         return;
       }
 
-      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam } } = data;
+      console.log('id updated', data);
+
+      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam }, lanternStats } = data;
+      const { teams, stations, round } = lanternStats;
 
       storageManager.setUserName(userName);
       storageManager.setAccessLevel(accessLevel);
@@ -96,6 +99,18 @@ class SocketManager {
           changedUser: userName,
           firstConnection: !this.hasConnected,
         },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNTEAMS,
+        params: { teams },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNROUND,
+        params: { round },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNSTATIONS,
+        params: { stations },
       });
 
       this.emitEvent('getProfileGameCode', { owner: storageManager.getUserName() }, ({ error: codeError, data: codeData }) => {

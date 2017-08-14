@@ -40,6 +40,8 @@ class WreckingStatus {
     this.isActive = false;
 
     this.element.addEventListener('click', (event) => {
+      container.classList.toggle('hide');
+
       event.stopPropagation();
     });
 

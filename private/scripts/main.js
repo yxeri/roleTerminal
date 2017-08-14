@@ -1339,7 +1339,7 @@ socketManager.addEvents([
 
       if (!socketManager.hasConnected) {
         new Clock(document.getElementById('time')).start();
-        new WreckingStatus({ element: document.getElementById('wrecking') });
+        new WreckingStatus({ element: document.getElementById('wrecking') }); // eslint-disable-line
         map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
         map.setCenterCoordinates(storageManager.getCenterCoordinates());
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());

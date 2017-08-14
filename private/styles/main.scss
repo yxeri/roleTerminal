@@ -264,12 +264,15 @@ pre {
     border-right: .05em solid $text-color;
 
     > div {
+      z-index: 4;
+      right: 1em;
       margin-top: .3em;
       background-color: $back-color;
       margin-left: -.2em;
       position: absolute;
       display: flex;
-      max-height: calc(100% - 3.5em);
+      max-height: calc(100% - 2.5em);
+      max-width: calc(100% - 1em);
     }
   }
 
@@ -305,7 +308,7 @@ pre {
   }
 
   .teamStats {
-    width: 9em;
+    width: 8em;
     padding-top: .2em;
     padding-left: .2em;
     padding-right: .2em;
@@ -1182,6 +1185,14 @@ pre {
 }
 
 @media (max-width: 479px) {
+  #top {
+    #wrecking {
+      > div {
+        right: .2em;
+      }
+    }
+  }
+
   .list {
     display: none;
     padding-top: 1.9em;

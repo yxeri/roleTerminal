@@ -27,20 +27,19 @@ class WreckingStatus {
     this.teams = {};
     this.timeLeft = 0;
 
-    const container = elementCreator.createContainer({ classes: ['hide'] });
-
     this.homeSpan = document.getElementById('homeLink');
     this.stationStats = elementCreator.createList({ classes: ['stationStats'] });
     this.teamStats = elementCreator.createList({ classes: ['teamStats'] });
 
-    container.appendChild(this.stationStats);
-    container.appendChild(this.teamStats);
-    this.element.appendChild(container);
+    this.container = elementCreator.createContainer({ classes: ['hide'] });
+    this.container.appendChild(this.stationStats);
+    this.container.appendChild(this.teamStats);
+    this.element.appendChild(this.container);
 
     this.isActive = false;
 
     this.element.addEventListener('click', (event) => {
-      container.classList.toggle('hide');
+      this.container.classList.toggle('hide');
 
       event.stopPropagation();
     });
@@ -162,6 +161,7 @@ class WreckingStatus {
   }
 
   end() {
+    this.container.classList.add('hide');
     this.homeSpan.classList.remove('hide');
     this.homeSpan.classList.add('flash');
     this.isActive = false;

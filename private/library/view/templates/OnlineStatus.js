@@ -19,8 +19,8 @@ class OnlineStatus {
     this.element = statusElement;
   }
 
-  setOffline() { this.setStatus('OFFLINE'); }
-  setOnline() { this.setStatus('ONLINE'); }
+  setOffline() { this.setStatus('OFF'); }
+  setOnline() { this.setStatus('ON'); }
   setStatus(status) {
     const span = document.createElement('SPAN');
     span.appendChild(document.createTextNode(status.toUpperCase()));

@@ -36,11 +36,12 @@
 <body>
 <div id="background">
   <div id="main">
-    <div id="top"><div><span id="homeLink">&lt; &lt; HOME</span><span id="wrecking">Wrecking</span><span id="onlineStatus">------</span><span id="time"><span>-------</span><span>---------</span></span></div></div>
+    <div id="top">
+      <div><span id="homeLink">&lt; &lt; HOME</span><div id="wrecking" class="hide"><span>WRECKING</span></div><span id="time"><span>-------</span><span>---------</span></span><span id="onlineStatus">------</span></div>
+    </div>
   </div>
 </div>
 <script src={{socketPath}} defer></script>
-<!--<script src="scripts/svg.js" defer></script>-->
 <script src="{{mainJs}}" defer></script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}&libraries=geometry" defer></script>
 <script src="scripts/maplabel.js" defer></script>

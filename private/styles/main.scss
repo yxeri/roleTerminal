@@ -54,6 +54,13 @@ $inner-container-height: calc(100% - .4em);
   outline: $outline solid $light-color;
 }
 
+@mixin flashAnimation {
+  -webkit-animation-name: flash;
+  -webkit-animation-timing-function: ease-in-out;
+  animation: flash;
+  animation-timing-function: ease-in-out;
+}
+
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
   padding: 0;
@@ -216,9 +223,6 @@ pre {
 
 #top {
   text-align: center;
-  margin-bottom: $padding;
-  padding-top: $padding;
-  padding-bottom: $padding * 2;
   border-bottom: .1em solid $text-color;
   box-shadow: $bottom-box-shadow $second-color;
   cursor: pointer;
@@ -227,27 +231,96 @@ pre {
   -moz-user-select: none;
   user-select: none;
 
-  div {
-    margin-top: .2em;
-    width: $inner-container-width;
+  > div {
+    > span {
+      margin-left: .4em;
+      padding-top: .2em;
+      padding-bottom: .2em;
+      display: inline-block;
+    }
+
+    > span:first-child {
+      margin-left: 0;
+    }
+
+    > span:last-child {
+      padding-right: .15em;
+    }
   }
 
-  span {
-    margin-left: .5em;
-  }
-
-  span:first-child {
-    margin: 0;
+  #homeLink {
+    padding-left: .15em;
+    padding-right: .15em;
   }
 
   #wrecking {
-    margin: -.3em -.7em -.5em .7em;
-    padding: .3em .7em .4em .7em;
+    text-align: left;
+    padding: .2em .1em;
+    display: inline-block;
     color: $text-color;
     text-shadow: $text-shadow;
     background-color: $darker-second-color;
-    border-left: 1px solid $text-color;
-    border-right: 1px solid $text-color;
+    border-left: .05em solid $text-color;
+    border-right: .05em solid $text-color;
+
+    > div {
+      margin-top: .3em;
+      background-color: $back-color;
+      margin-left: -.2em;
+      position: absolute;
+      display: flex;
+      max-height: calc(100% - 3.5em);
+    }
+  }
+
+  #time {
+    span:last-child {
+      margin-left: .4em;
+    }
+  }
+
+  .stationInfo {
+    border-bottom: .05em solid;
+    padding-bottom: .2em;
+  }
+
+  .stationInfo:last-child {
+    border-bottom: none;
+  }
+
+  .stationStats {
+    width: 9em;
+    padding-top: .2em;
+    padding-left: .2em;
+    padding-right: .2em;
+    border-left: .05em solid $text-color;
+    border-right: .05em solid $text-color;
+    border-bottom: .05em solid $text-color;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .stationStats::-webkit-scrollbar {
+    width: 0 !important;
+  }
+
+  .teamStats {
+    width: 9em;
+    padding-top: .2em;
+    padding-left: .2em;
+    padding-right: .2em;
+    border-right: .05em solid $text-color;
+    border-bottom: .05em solid $text-color;
+
+    li {
+      padding-top: .2em;
+      padding-bottom: .2em;
+      border-bottom: .05em solid $text-color;
+    }
+
+    li:first-child {
+      padding-top: 0;
+    }
   }
 }
 
@@ -912,14 +985,21 @@ pre {
 }
 
 .flash {
-  -webkit-animation-name: flash;
+  @include flashAnimation;
   -webkit-animation-duration: .4s;
   -webkit-animation-iteration-count: 1;
-  -webkit-animation-timing-function: ease-in-out;
-  animation: flash;
-  animation-duration: .4s;
   animation-iteration-count: 1;
-  animation-timing-function: ease-in-out;
+  animation-duration: .4s;
+}
+
+.pulse {
+  @include flashAnimation;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
 
 .selectedItem {

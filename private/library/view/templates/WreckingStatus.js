@@ -23,16 +23,19 @@ class WreckingStatus {
     this.element = element;
     this.element.classList.add('clickable');
 
-    this.stations = [];
-    this.teams = [];
+    this.stations = {};
+    this.teams = {};
     this.timeLeft = 0;
 
-    this.stationStats = elementCreator.createList({});
-    this.teamStats = elementCreator.createList({});
-    this.teamStats = elementCreator.createList({});
+    const container = elementCreator.createContainer({ classes: ['hide'] });
 
-    this.element.appendChild(this.stationStats);
-    this.element.appendChild(this.teamStats);
+    this.homeSpan = document.getElementById('homeLink');
+    this.stationStats = elementCreator.createList({ classes: ['stationStats'] });
+    this.teamStats = elementCreator.createList({ classes: ['teamStats'] });
+
+    container.appendChild(this.stationStats);
+    container.appendChild(this.teamStats);
+    this.element.appendChild(container);
 
     this.isActive = false;
 
@@ -50,21 +53,39 @@ class WreckingStatus {
           return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         stations.forEach((station) => {
-          const foundStation = this.stations.find(storedStation => storedStation.stationId === station.stationId);
+          this.stations[station.stationId] = station;
+        });
 
-          if (!foundStation) {
-            this.stations.push(station);
-          } else if (!station.isActive) {
-            const index = this.stations.findIndex(storedStation => storedStation.stationId === station.stationId);
+        Object.keys(this.stations).forEach((stationId) => {
+          const station = this.stations[stationId];
 
-            if (index > -1) {
-              this.stations.splice(index, 1);
+          if (station) {
+            const foundTeamId = station.owner ? Object.keys(this.teams).find(teamId => teamId === station.owner.toString()) : undefined;
+            const ownerName = foundTeamId ? this.teams[foundTeamId].shortName.toUpperCase() : '-----';
+            const classes = ['stationInfo'];
+
+            if (station.isUnderAttack) {
+              classes.push('pulse');
             }
+
+            const list = elementCreator.createList({
+              classes,
+              elements: [
+                elementCreator.createSpan({ text: `${station.stationName || station.stationId}` }),
+                elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }),
+                elementCreator.createSpan({ text: `Owner: ${ownerName}` }),
+              ],
+            });
+
+            fragment.appendChild(list);
           }
         });
 
-        console.log(this.stations);
+        this.stationStats.innerHTML = '';
+        this.stationStats.appendChild(fragment);
       },
     });
 
@@ -78,21 +99,25 @@ class WreckingStatus {
           return;
         }
 
+        const fragment = document.createDocumentFragment();
+        fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: 'WRECKERS' }) }));
+
         teams.forEach((team) => {
-          const foundTeam = this.teams.find(storedTeam => storedTeam.teamId === team.teamId);
+          this.teams[team.teamId] = team;
+        });
 
-          if (!foundTeam) {
-            this.teams.push(team);
-          } else if (!team.isActive) {
-            const index = this.teams.findIndex(storedTeam => storedTeam.teamId === team.teamId);
+        Object.keys(this.teams).forEach((teamId) => {
+          const team = this.teams[teamId];
 
-            if (index > -1) {
-              this.teams.splice(index, 1);
-            }
+          if (team) {
+            const listItem = elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) });
+
+            fragment.appendChild(listItem);
           }
         });
 
-        console.log(this.teams, teams);
+        this.teamStats.innerHTML = '';
+        this.teamStats.appendChild(fragment);
       },
     });
 
@@ -123,18 +148,20 @@ class WreckingStatus {
 
           this.timeLeft = data.timeLeft;
         });
-
-        console.log(round);
       },
     });
   }
 
   start() {
+    this.homeSpan.classList.add('hide');
     this.isActive = true;
     this.element.classList.remove('hide');
+    this.element.classList.add('flash');
   }
 
   end() {
+    this.homeSpan.classList.remove('hide');
+    this.homeSpan.classList.add('flash');
     this.isActive = false;
     this.element.classList.add('hide');
   }

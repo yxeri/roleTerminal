@@ -27,19 +27,20 @@ const tracker = require('../worldMap/Tracker');
 
 /**
  * Create a transaction list item
+ * @param {string} params.suffix Suffix added to transaction amount
  * @param {string} params.to Receiver
  * @param {string} params.from Sender
  * @param {number} params.amount Amount
  * @param {Date} params.time Time stamp
  * @returns {HTMLLIElement} List item
  */
-function createTransactionItem({ transaction: { to, from, amount, time, note, coordinates } }) {
+function createTransactionItem({ suffix, transaction: { to, from, amount, time, note, coordinates } }) {
   const listItem = document.createElement('LI');
   const date = textTools.generateTimeStamp({ date: time });
 
   listItem.appendChild(elementCreator.createParagraph({ text: `${date.fullTime} ${date.fullDate}` }));
   listItem.appendChild(elementCreator.createParagraph({ text: `${from} -> ${to}` }));
-  listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount}d` }));
+  listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount} ${suffix}` }));
 
   if (coordinates) {
     listItem.appendChild(elementCreator.createParagraph({ text: `Lat: ${coordinates.latitude}. Long: ${coordinates.longitude}. Accuracy: ${coordinates.accuracy}m` }));
@@ -65,7 +66,7 @@ function filterUserAliases(users) {
 }
 
 class Wallet extends StandardView {
-  constructor() {
+  constructor({ suffix = '' }) {
     super({ viewId: 'wallet' });
 
     this.viewer.appendChild(elementCreator.createParagraph({ text: '' }));
@@ -73,6 +74,7 @@ class Wallet extends StandardView {
     this.viewer.classList.add('selectedView');
     this.walletAmount = 0;
     this.teamWalletAmount = 0;
+    this.suffix = suffix;
 
     this.populateList();
   }
@@ -229,7 +231,7 @@ class Wallet extends StandardView {
       });
 
       const fragment = document.createDocumentFragment();
-      allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ transaction })));
+      allTransactions.forEach(transaction => fragment.appendChild(createTransactionItem({ suffix: this.suffix, transaction })));
 
       this.viewer.lastElementChild.innerHTML = '';
       this.viewer.lastElementChild.appendChild(fragment);
@@ -271,8 +273,7 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.TRANSACTION,
       func: ({ transaction, wallet, toWallet }) => {
-        console.log('trans', wallet);
-        this.addTransaction(createTransactionItem({ transaction }));
+        this.addTransaction(createTransactionItem({ suffix: this.suffix, transaction }));
         this.changeWalletAmount({ wallet });
 
         if (toWallet) {
@@ -306,10 +307,10 @@ class Wallet extends StandardView {
 
   setWalletSpan({ userAmount, teamAmount }) {
     const teamName = storageManager.getTeam();
-    let amountString = `WALLET AMOUNT: ${userAmount || this.walletAmount}`;
+    let amountString = `WALLET: ${userAmount || this.walletAmount} ${this.suffix}`;
 
     if (teamName) {
-      amountString += `. TEAM WALLET AMOUNT: ${teamAmount || this.teamWalletAmount}`;
+      amountString += `. TEAM WALLET: ${teamAmount || this.teamWalletAmount} ${this.suffix}`;
     }
 
     this.viewer.firstElementChild.innerHTML = '';
@@ -322,10 +323,8 @@ class Wallet extends StandardView {
     aliases.push(storageManager.getUserName());
 
     if (aliases.indexOf(wallet.owner) > -1) {
-      console.log('user');
       this.walletAmount = wallet.amount;
     } else if (teamName && teamName === wallet.team) {
-      console.log('team');
       this.teamWalletAmount = wallet.amount;
     }
 

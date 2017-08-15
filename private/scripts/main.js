@@ -202,7 +202,7 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
-const terminal = new Terminal();
+const terminal = new Terminal({ skipAnimation: queryParameters.noBoot });
 const toolsViewer = new ToolsViewer({ isFullscreen: true });
 const home = new Home({
   introDevText: [
@@ -240,7 +240,7 @@ const home = new Home({
 });
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const dirViewer = new DirViewer({ isFullscreen: true });
-const walletViewer = new Wallet();
+const walletViewer = new Wallet({ suffix: 'vcaps' });
 const profile = new Profile();
 const map = new WorldMap({
   mapView: WorldMap.MapViews.AREA,
@@ -323,40 +323,8 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getCalibrationMission', {}, ({ error, data }) => {
-      if (error) {
-        if (error.type === 'does not exist') {
-          terminal.queueMessage({
-            message: {
-              text: [
-                '-----',
-                'ERROR',
-                '-----',
-                'No stations are in need of adjustments',
-                'Aborting',
-              ],
-            },
-          });
-          terminal.resetNextFunc();
-
-          return;
-        } if (error.type === 'external') {
-          terminal.queueMessage({
-            message: {
-              text: [
-                '-----',
-                'ERROR',
-                '-----',
-                'LANTERN activity is blocking calibration data',
-                'Calibration adjustments are blocked',
-              ],
-            },
-          });
-          terminal.resetNextFunc();
-
-          return;
-        }
-
+    socketManager.emitEvent('getValidCalibrationStations', {}, ({ error: stationError, data: stationData }) => {
+      if (stationError) {
         terminal.queueMessage({
           message: {
             text: [
@@ -368,36 +336,157 @@ terminal.addCommand({
             ],
           },
         });
+
+        terminal.resetNextFunc();
+
+        return;
+      } else if (stationData.mission) {
+        terminal.queueMessage({
+          message: {
+            text: [
+              `You have been assigned to calibrate station ${stationData.mission.stationId}`,
+              `Proceed to station ${stationData.mission.stationId} and start the calibration process`,
+              `Your assigned verification code is: ${stationData.mission.code}`,
+              'END OF MESSAGE',
+            ],
+          },
+        });
+
+        terminal.resetNextFunc();
+
+        return;
+      } else if (!stationData.stations || stationData.stations.length < 1) {
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----',
+              'ERROR',
+              '-----',
+              'No stations are in need of adjustments',
+              'Aborting',
+            ],
+          },
+        });
+
         terminal.resetNextFunc();
 
         return;
       }
 
-      const { mission, isNew } = data;
-
-      if (isNew) {
-        terminal.queueMessage({
-          message: {
-            text: [
-              'Signal strength is low!',
-              'Station is in need of manual calibration',
-            ],
-          },
-        });
-      }
+      const stations = stationData.stations;
 
       terminal.queueMessage({
         message: {
           text: [
-            `You have been assigned to calibrate station ${mission.stationId}`,
-            `Proceed to station ${mission.stationId} and start the calibration process`,
-            `Your assigned verification code is: ${mission.code}`,
-            'END OF MESSAGE',
+            '----------------',
+            'Enter station ID',
+            '----------------',
           ],
+          elementPerRow: true,
+          elements: stations.map((station) => {
+            const span = elementCreator.createSpan({});
+            const stationSpan = elementCreator.createSpan({
+              classes: ['clickable', 'linkLook', 'moreSpace'],
+              text: `[${station.stationId}] ${station.stationName}`,
+              func: () => {
+                terminal.triggerCommand(station.stationId);
+              },
+            });
+
+            span.appendChild(stationSpan);
+
+            return span;
+          }),
         },
       });
 
-      terminal.resetNextFunc();
+      terminal.setNextFunc((stationId) => {
+        const stationIds = stations.map(station => station.stationId);
+        const chosenStationId = !isNaN(stationId) ? parseInt(stationId, 10) : '';
+
+        if (stationIds.indexOf(chosenStationId) < 0) {
+          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
+
+          return;
+        }
+
+        socketManager.emitEvent('getCalibrationMission', { stationId: chosenStationId }, ({ error, data }) => {
+          if (error) {
+            if (error.type === 'does not exist') {
+              terminal.queueMessage({
+                message: {
+                  text: [
+                    '-----',
+                    'ERROR',
+                    '-----',
+                    'No stations are in need of adjustments',
+                    'Aborting',
+                  ],
+                },
+              });
+              terminal.resetNextFunc();
+
+              return;
+            } if (error.type === 'external') {
+              terminal.queueMessage({
+                message: {
+                  text: [
+                    '-----',
+                    'ERROR',
+                    '-----',
+                    'LANTERN activity is blocking calibration data',
+                    'Calibration adjustments are blocked',
+                  ],
+                },
+              });
+              terminal.resetNextFunc();
+
+              return;
+            }
+
+            terminal.queueMessage({
+              message: {
+                text: [
+                  '-----',
+                  'ERROR',
+                  '-----',
+                  'Something went wrong',
+                  'Unable to check for signal strength',
+                ],
+              },
+            });
+            terminal.resetNextFunc();
+
+            return;
+          }
+
+          const { mission, isNew } = data;
+
+          if (isNew) {
+            terminal.queueMessage({
+              message: {
+                text: [
+                  'Signal strength is low!',
+                  'Station is in need of manual calibration',
+                ],
+              },
+            });
+          }
+
+          terminal.queueMessage({
+            message: {
+              text: [
+                `You have been assigned to calibrate station ${mission.stationId}`,
+                `Proceed to station ${mission.stationId} and start the calibration process`,
+                `Your assigned verification code is: ${mission.code}`,
+                'END OF MESSAGE',
+              ],
+            },
+          });
+
+          terminal.resetNextFunc();
+        });
+      });
     });
   },
 });
@@ -519,163 +608,165 @@ terminal.addCommand({
         const activeIds = activeStations.map(station => station.stationId);
         const stationId = !isNaN(stationIdValue) ? parseInt(stationIdValue, 10) : '';
 
-        if (activeIds.indexOf(stationId) > -1) {
-          const actions = [{ id: 1, name: 'Amplify' }, { id: 2, name: 'Dampen' }];
+        if (activeIds.indexOf(stationId) < 0) {
+          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
 
-          terminal.queueMessage({
-            message: {
-              text: [
-                '-----------------',
-                'Choose an action:',
-                '-----------------',
-              ],
-              elementPerRow: true,
-              elements: actions.map((action) => {
-                const span = elementCreator.createSpan({});
-                const actionSpan = elementCreator.createSpan({
-                  classes: ['clickable', 'linkLook', 'moreSpace'],
-                  text: `[${action.id}] ${action.name}`,
-                  func: () => {
-                    terminal.triggerCommand(action.id);
-                  },
+          return;
+        }
+
+        const actions = [{ id: 1, name: 'Amplify' }, { id: 2, name: 'Dampen' }];
+
+        terminal.queueMessage({
+          message: {
+            text: [
+              '-----------------',
+              'Choose an action:',
+              '-----------------',
+            ],
+            elementPerRow: true,
+            elements: actions.map((action) => {
+              const span = elementCreator.createSpan({});
+              const actionSpan = elementCreator.createSpan({
+                classes: ['clickable', 'linkLook', 'moreSpace'],
+                text: `[${action.id}] ${action.name}`,
+                func: () => {
+                  terminal.triggerCommand(action.id);
+                },
+              });
+
+              span.appendChild(actionSpan);
+
+              return span;
+            }),
+          },
+        });
+
+        terminal.setNextFunc((actionIdValue) => {
+          const actionIds = actions.map(action => action.id);
+          const actionId = !isNaN(actionIdValue) ? parseInt(actionIdValue, 10) : '';
+
+          if (actionIds.indexOf(actionId) > -1) {
+            terminal.queueMessage({
+              message: {
+                text: [
+                  `Action ${actions.find(action => action.id === actionId).name} chosen`,
+                  `Accessing LANTERN ${stationId}...`,
+                ],
+              },
+            });
+
+            socketManager.emitEvent('getLanternHack', { stationId }, ({ error: hackError, data: hackData }) => {
+              if (hackError) {
+                terminal.queueMessage({ message: { text: ['Something went wrong. Failed to start hack'] } });
+                terminal.resetNextFunc();
+
+                return;
+              }
+
+              const boostingSignal = actionId === 1;
+              const hintIndex = hackData.passwordHint.index + 1;
+
+              const elements = textTools.createMixedArray({
+                classes: ['moreSpace'],
+                rowAmount: 15,
+                length: 34,
+                requiredClickableStrings: hackData.passwords,
+                charToLower: hackData.passwordHint.character,
+                requiredFunc: (value) => {
+                  terminal.triggerCommand(value);
+                },
+              });
+
+              elements.forEach((element) => {
+                let startTouchTime;
+
+                element.addEventListener('touchstart', () => {
+                  startTouchTime = new Date();
                 });
 
-                span.appendChild(actionSpan);
+                element.addEventListener('touchend', () => {
+                  const endTouchTime = new Date();
 
-                return span;
-              }),
-            },
-          });
+                  if (endTouchTime - startTouchTime >= 300) {
+                    const clickables = Array.from(element.getElementsByClassName('clickable'));
 
-          terminal.setNextFunc((actionIdValue) => {
-            const actionIds = actions.map(action => action.id);
-            const actionId = !isNaN(actionIdValue) ? parseInt(actionIdValue, 10) : '';
+                    elements.forEach(spanElement => Array.from(spanElement.children).forEach(child => child.classList.remove('clickableRevealed')));
+                    clickables.forEach(clickable => clickable.classList.add('clickableRevealed'));
+                  }
+                });
+              });
 
-            if (actionIds.indexOf(actionId) > -1) {
+              terminal.queueMessage({
+                message: {
+                  elementPerRow: true,
+                  elements,
+                },
+              });
               terminal.queueMessage({
                 message: {
                   text: [
-                    `Action ${actions.find(action => action.id === actionId).name} chosen`,
-                    `Accessing LANTERN ${stationId}...`,
+                    '------------',
+                    `User name: ${hackData.userName}`,
+                    `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}`,
+                  ],
+                },
+              });
+              terminal.queueMessage({
+                message: {
+                  text: [
+                    `${hackData.triesLeft} tries left`,
+                    '------------',
                   ],
                 },
               });
 
-              socketManager.emitEvent('getLanternHack', { stationId }, ({ error: hackError, data: hackData }) => {
-                if (hackError) {
-                  terminal.queueMessage({ message: { text: ['Something went wrong. Failed to start hack'] } });
-                  terminal.resetNextFunc();
+              terminal.setNextFunc((password) => {
+                socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
+                  if (manipulateError) {
+                    terminal.queueMessage({ message: { text: ['Something went wrong. Failed to manipulate the LANTERN'] } });
+                    terminal.resetNextFunc();
 
-                  return;
-                }
+                    return;
+                  }
 
-                const boostingSignal = actionId === 1;
-                const hintIndex = hackData.passwordHint.index + 1;
+                  const { success, triesLeft, matches, lockoutTime } = manipulateData;
 
-                const elements = textTools.createMixedArray({
-                  classes: ['moreSpace'],
-                  rowAmount: 15,
-                  length: 34,
-                  requiredClickableStrings: hackData.passwords,
-                  charToLower: hackData.passwordHint.character,
-                  requiredFunc: (value) => {
-                    terminal.triggerCommand(value);
-                  },
-                });
+                  if (success) {
+                    terminal.queueMessage({
+                      message: {
+                        text: [
+                          'Correct password',
+                          `${boostingSignal ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
+                          'Thank you for using LAMM',
+                        ],
+                      },
+                    });
+                    terminal.resetNextFunc();
+                  } else if (triesLeft <= 0) {
+                    const beautifiedDate = textTools.generateTimeStamp({ date: lockoutTime });
 
-                elements.forEach((element) => {
-                  let startTouchTime;
-
-                  element.addEventListener('touchstart', () => {
-                    startTouchTime = new Date();
-                  });
-
-                  element.addEventListener('touchend', () => {
-                    const endTouchTime = new Date();
-
-                    if (endTouchTime - startTouchTime >= 300) {
-                      const clickables = Array.from(element.getElementsByClassName('clickable'));
-
-                      elements.forEach(spanElement => Array.from(spanElement.children).forEach(child => child.classList.remove('clickableRevealed')));
-                      clickables.forEach(clickable => clickable.classList.add('clickableRevealed'));
-                    }
-                  });
-                });
-
-                terminal.queueMessage({
-                  message: {
-                    elementPerRow: true,
-                    elements,
-                  },
-                });
-                terminal.queueMessage({
-                  message: {
-                    text: [
-                      '------------',
-                      `User name: ${hackData.userName}`,
-                      `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}`,
-                    ],
-                  },
-                });
-                terminal.queueMessage({
-                  message: {
-                    text: [
-                      `${hackData.triesLeft} tries left`,
-                      '------------',
-                    ],
-                  },
-                });
-
-                terminal.setNextFunc((password) => {
-                  socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
-                    if (manipulateError) {
-                      terminal.queueMessage({ message: { text: ['Something went wrong. Failed to manipulate the LANTERN'] } });
-                      terminal.resetNextFunc();
-
-                      return;
-                    }
-
-                    const { success, triesLeft, matches, lockoutTime } = manipulateData;
-
-                    if (success) {
-                      terminal.queueMessage({
-                        message: {
-                          text: [
-                            'Correct password',
-                            `${boostingSignal ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
-                            'Thank you for using LAMM',
-                          ],
-                        },
-                      });
-                      terminal.resetNextFunc();
-                    } else if (triesLeft <= 0) {
-                      const beautifiedDate = textTools.generateTimeStamp({ date: lockoutTime });
-
-                      terminal.queueMessage({
-                        message: {
-                          text: [
-                            'Incorrect password',
-                            `You have been locked out of LANTERN ${stationId}`,
-                            'Starting lockdown crack',
-                            `The lockdown lasts until ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
-                            'Thank you for using LAMM',
-                          ],
-                        },
-                      });
-                      terminal.resetNextFunc();
-                    } else {
-                      terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} matched. ${triesLeft} tries left`] } });
-                    }
-                  });
+                    terminal.queueMessage({
+                      message: {
+                        text: [
+                          'Incorrect password',
+                          `You have been locked out of LANTERN ${stationId}`,
+                          'Starting lockdown crack',
+                          `The lockdown lasts until ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                          'Thank you for using LAMM',
+                        ],
+                      },
+                    });
+                    terminal.resetNextFunc();
+                  } else {
+                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} matched. ${triesLeft} tries left`] } });
+                  }
                 });
               });
-            } else {
-              terminal.queueMessage({ message: { text: ['Incorrect action number'] } });
-            }
-          });
-        } else {
-          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
-        }
+            });
+          } else {
+            terminal.queueMessage({ message: { text: ['Incorrect action number'] } });
+          }
+        });
       });
     });
   },

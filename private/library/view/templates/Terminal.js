@@ -21,10 +21,11 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
 class Terminal extends View {
-  constructor() {
+  constructor({ skipAnimation }) {
     super({ isFullscreen: true, viewId: 'terminal' });
     this.element.classList.add('fullHeight');
 
+    this.skipAnimation = skipAnimation;
     this.terminalInput = elementCreator.createInput({ inputName: 'terminalInput', placeholder: 'Enter to run/see available programs', classes: ['terminalInput'] });
     this.element.appendChild(elementCreator.createList({ elementId: 'terminalFeed' }));
     this.element.appendChild(this.terminalInput);
@@ -284,6 +285,28 @@ class Terminal extends View {
   }
 
   startBootSequence(parentElement) {
+    const endFunc = () => {
+      this.firstRun = false;
+      this.appendTo(parentElement);
+      this.queueMessage({
+        message: {
+          text: [
+            'OSAT identity: C. Jenkins',
+            'Your actions will be monitored',
+            'Input or click on the command you want to run',
+            'Programs:',
+          ],
+          elements: this.getClickableCommandNames(),
+        },
+      });
+    };
+
+    if (this.skipAnimation) {
+      endFunc();
+
+      return;
+    }
+
     const boot = new TextAnimation({ removeTime: 700 });
 
     boot.setQueue([
@@ -394,21 +417,7 @@ class Terminal extends View {
         },
       },
     ]);
-    boot.setEndFunc(() => {
-      this.firstRun = false;
-      this.appendTo(parentElement);
-      this.queueMessage({
-        message: {
-          text: [
-            'OSAT identity: C. Jenkins',
-            'Your actions will be monitored',
-            'Input or click on the command you want to run',
-            'Programs:',
-          ],
-          elements: this.getClickableCommandNames(),
-        },
-      });
-    });
+    boot.setEndFunc(endFunc);
     boot.appendTo(parentElement);
   }
 }

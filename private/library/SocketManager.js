@@ -75,8 +75,6 @@ class SocketManager {
         return;
       }
 
-      console.log('id updated', data);
-
       const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam }, lanternStats } = data;
       const { teams, stations, round } = lanternStats;
 

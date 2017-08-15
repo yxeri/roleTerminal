@@ -133,6 +133,25 @@ class LoginBox extends DialogBox {
 
                   return;
                 }
+                case 'external': {
+                  this.changeExtraDescription({
+                    text: [
+                      'Your user has been registered, but your account is not yet active.',
+                      'ERROR! The user verification cybermail was not sent. Try clicking on "Resend verification?" to resend it',
+                      'Contact your local IT support if this does not solve your problem',
+                    ],
+                  });
+
+                  this.clearInput('userName');
+                  this.clearInput('password');
+                  this.clearInput('email');
+                  this.removeInput('reenterPassword');
+                  this.removeInput('email');
+                  this.removeInput('reenterEmail');
+                  this.focusInput('userName');
+
+                  return;
+                }
                 default: {
                   this.changeExtraDescription({ text: ['Something went wrong. Failed to register user'] });
 
@@ -141,7 +160,12 @@ class LoginBox extends DialogBox {
               }
             }
 
-            this.changeExtraDescription({ text: ['Your user has been registered, but your account is not yet active. You should receive a cybermail soon with further instructions'] });
+            this.changeExtraDescription({
+              text: [
+                'Your user has been registered, but your account is not yet active.',
+                'You should receive a cybermail soon with further instructions. It may take a while for it to arrive. Be patient.',
+              ],
+            });
             this.clearInput('userName');
             this.clearInput('password');
             this.clearInput('email');
@@ -248,7 +272,82 @@ class LoginBox extends DialogBox {
       closeFunc,
     });
 
-    this.addLinkToExtraDescription({
+    this.addLinkToExtra({
+      linkText: 'Resend verification?',
+      classes: ['clickable', 'smaller'],
+      func: () => {
+        const forgotDialog = new DialogBox({
+          description: ['Enter the Wasteland Cybermail connected to your user to resend verification cybermail'],
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                forgotDialog.removeView();
+                this.element.classList.remove('hide');
+              },
+            },
+            right: {
+              text: 'Send',
+              eventFunc: () => {
+                const emptyFields = forgotDialog.markEmptyFields();
+                const mailField = forgotDialog.inputs.find(({ inputName }) => inputName === 'email').inputElement;
+
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  this.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                socketManager.emitEvent('sendVerification', { mail: mailField.value }, ({ error }) => {
+                  if (error) {
+                    if (error.type === 'does not exist') {
+                      forgotDialog.changeExtraDescription({ text: ['No user with that cybermail exists', 'Unable to resend verification cybermail'] });
+
+                      return;
+                    }
+
+                    forgotDialog.changeExtraDescription({ text: ['Something went wrong', 'Unable to resend verification cybermail'] });
+
+                    return;
+                  }
+
+                  forgotDialog.removeView();
+
+                  const confirmBox = new ButtonBox({
+                    description: [
+                      'A cybermail has been sent with instructions. It may take a while for it to arrive. Be patient',
+                      'HQ has been contacted with a report of your negligence. Your Good Employee Affirmation Rank (GEAR) will be lowered',
+                    ],
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'Confirmed',
+                        func: () => {
+                          confirmBox.removeView();
+                          this.element.classList.remove('hide');
+                        },
+                      }),
+                    ],
+                  });
+
+                  confirmBox.appendTo(parentElement);
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Wasteland cybermail',
+            inputName: 'email',
+            isRequired: true,
+            maxLength: 254,
+          }],
+        });
+
+        this.element.classList.add('hide');
+        forgotDialog.appendTo(parentElement);
+      },
+    });
+    this.addLinkToExtra({
       linkText: 'Forgot your password?',
       classes: ['clickable', 'smaller'],
       func: () => {

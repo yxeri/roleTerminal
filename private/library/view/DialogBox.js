@@ -39,7 +39,10 @@ class DialogBox extends View {
     this.extraDescription = document.createElement('DIV');
     extraDescription.forEach(text => this.extraDescription.appendChild(elementCreator.createParagraph({ text })));
 
+    this.extraLinks = document.createElement('DIV');
+
     this.descriptionContainer.appendChild(this.extraDescription);
+    this.descriptionContainer.appendChild(this.extraLinks);
 
     const closeButton = elementCreator.createButton({
       text: 'X',
@@ -208,14 +211,14 @@ class DialogBox extends View {
     this.extraDescription.appendChild(fragment);
   }
 
-  addLinkToExtraDescription({ linkText, func, classes }) {
+  addLinkToExtra({ linkText, func, classes }) {
     const span = elementCreator.createSpan({
       func,
       classes,
       text: linkText,
     });
 
-    this.extraDescription.appendChild(span);
+    this.extraLinks.appendChild(span);
   }
 }
 

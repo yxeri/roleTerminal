@@ -182,6 +182,12 @@ class MapMarker {
     this.label.setPosition({ coordinates });
     this.marker.setPosition(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
     this.lastUpdated = lastUpdated || new Date();
+    this.accuracyCircle.center = this.marker.getPosition();
+
+    if (coordinates.accuracy) {
+      this.accuracy = coordinates.accuracy;
+      this.accuracyCircle.radius = this.accuracy;
+    }
   }
 
   getPosition() {

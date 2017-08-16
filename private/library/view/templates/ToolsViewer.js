@@ -101,6 +101,10 @@ class ToolsViewer extends StandardView {
       func: ({ gameCode }) => {
         if (gameCode.codeType !== 'loot') {
           return;
+        } else if (gameCode.used) {
+          this.codeList.removeItem({ name: gameCode.code });
+
+          return;
         }
 
         this.codeList.addItem({ item: elementCreator.createSpan({ text: gameCode.code }) });
@@ -387,7 +391,7 @@ class ToolsViewer extends StandardView {
                   return;
                 }
 
-                socketManager.emitEvent('createGameCode', { codeType: 'loot' }, ({ error: createError, data }) => {
+                socketManager.emitEvent('createGameCode', { codeType: 'loot', owner: storageManager.getUserName() }, ({ error: createError, data }) => {
                   if (createError) {
                     console.log(createError);
 

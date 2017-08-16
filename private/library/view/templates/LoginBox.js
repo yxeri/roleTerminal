@@ -126,13 +126,6 @@ class LoginBox extends DialogBox {
 
                   return;
                 }
-                case 'invalid data': {
-                  this.changeExtraDescription({ text: ['Cybermail is invalid.', 'Please try again'] });
-                  this.clearInput('email');
-                  this.clearInput('reenterEmail');
-
-                  return;
-                }
                 case 'external': {
                   this.changeExtraDescription({
                     text: [
@@ -149,6 +142,13 @@ class LoginBox extends DialogBox {
                   this.removeInput('email');
                   this.removeInput('reenterEmail');
                   this.focusInput('userName');
+
+                  return;
+                }
+                case 'invalid mail': {
+                  this.changeExtraDescription({ text: ['Cybermail is invalid.', 'Please try again'] });
+                  this.clearInput('email');
+                  this.clearInput('reenterEmail');
 
                   return;
                 }
@@ -305,6 +305,10 @@ class LoginBox extends DialogBox {
                       forgotDialog.changeExtraDescription({ text: ['No user with that cybermail exists', 'Unable to resend verification cybermail'] });
 
                       return;
+                    } else if (error.type === 'invalid mail') {
+                      forgotDialog.changeExtraDescription({ text: ['Invalid address'] });
+
+                      return;
                     }
 
                     forgotDialog.changeExtraDescription({ text: ['Something went wrong', 'Unable to resend verification cybermail'] });
@@ -378,6 +382,10 @@ class LoginBox extends DialogBox {
                   if (error) {
                     if (error.type === 'does not exist') {
                       forgotDialog.changeExtraDescription({ text: ['No user with that cybermail exists', 'Unable to reset password'] });
+
+                      return;
+                    } else if (error.type === 'invalid mail') {
+                      forgotDialog.changeExtraDescription({ text: ['Invalid address'] });
 
                       return;
                     }

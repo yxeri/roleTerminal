@@ -389,7 +389,7 @@ terminal.addCommand({
             const span = elementCreator.createSpan({});
             const stationSpan = elementCreator.createSpan({
               classes: ['clickable', 'linkLook', 'moreSpace'],
-              text: `[${station.stationId}] ${station.stationName}`,
+              text: `[${station.stationId}] ${station.stationName} - ${station.calibrationReward}vcaps`,
               func: () => {
                 terminal.triggerCommand(station.stationId);
               },
@@ -783,8 +783,8 @@ terminal.addCommand({
           'Running Intrusive CREDS Extractor (ICE)',
           'Attempting connection to CRED server...',
           'Connection accepted!',
-          'ICE activated',
-          'Input the secret key',
+          'ICE is online.',
+          'Input the secret key.',
         ],
       },
     });
@@ -792,7 +792,16 @@ terminal.addCommand({
     terminal.setNextFunc((secretKeyValue) => {
       socketManager.emitEvent('useGameCode', { code: secretKeyValue }, ({ error }) => {
         if (error) {
-          console.log(error);
+          terminal.queueMessage({
+            message: {
+              text: [
+                'Unable to crack key,',
+                'The key does not exist or has already been used.',
+                'Dropping connection...',
+              ],
+            },
+          });
+
           terminal.resetNextFunc();
 
           return;
@@ -801,13 +810,12 @@ terminal.addCommand({
         terminal.queueMessage({
           message: {
             text: [
-              'Key is being process by ICE...',
-              'Key accepted',
+              'Key is being processed through ICE...',
+              'Key accepted.',
               'Creating transaction...',
-              'Transaction created',
-              'Generating new secret key for victim...',
-              'ICE run completed',
-              'Check your CREDS for transaction information',
+              'Transaction created.',
+              'ICE run completed.',
+              'Check your WALLET for transaction information.',
             ],
           },
         });
@@ -998,7 +1006,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'tools',
+  linkName: 'programs',
   startFunc: () => { terminal.appendTo(mainView); },
   endFunc: () => { terminal.removeView(); },
   accessLevel: 1,
@@ -1006,7 +1014,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'docs',
+  linkName: 'files',
   startFunc: () => { dirViewer.appendTo(mainView); },
   endFunc: () => { dirViewer.removeView(); },
   shortcut: true,
@@ -1282,7 +1290,7 @@ home.addLink({
   shortcut: true,
 });
 home.addLink({
-  linkName: 'profile',
+  linkName: 'you',
   startFunc: () => { profile.appendTo(mainView); },
   endFunc: () => { profile.removeView(); },
   accessLevel: 1,

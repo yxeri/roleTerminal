@@ -325,6 +325,24 @@ terminal.addCommand({
 
     socketManager.emitEvent('getValidCalibrationStations', {}, ({ error: stationError, data: stationData }) => {
       if (stationError) {
+        if (stationError.type === 'does not exist') {
+          terminal.queueMessage({
+            message: {
+              text: [
+                '-----',
+                'ERROR',
+                '-----',
+                'No stations are in need of adjustments',
+                'Aborting',
+              ],
+            },
+          });
+
+          terminal.resetNextFunc();
+
+          return;
+        }
+
         terminal.queueMessage({
           message: {
             text: [
@@ -348,22 +366,6 @@ terminal.addCommand({
               `Proceed to station ${stationData.mission.stationId} and start the calibration process`,
               `Your assigned verification code is: ${stationData.mission.code}`,
               'END OF MESSAGE',
-            ],
-          },
-        });
-
-        terminal.resetNextFunc();
-
-        return;
-      } else if (!stationData.stations || stationData.stations.length < 1) {
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'No stations are in need of adjustments',
-              'Aborting',
             ],
           },
         });

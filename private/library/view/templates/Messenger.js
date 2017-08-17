@@ -759,7 +759,7 @@ class Messenger extends StandardView {
   leaveRoom({ roomName }) {
     const isWhisperRoom = roomName.indexOf('-whisper-') > -1;
 
-    socketManager.emitEvent('unfollow', { isWhisperRoom, room: { roomName } }, ({ error }) => {
+    socketManager.emitEvent('unfollow', { isWhisperRoom, user: { userName: storageManager.getUserName() }, room: { roomName } }, ({ error }) => {
       if (error) {
         console.log(error);
 
@@ -778,6 +778,8 @@ class Messenger extends StandardView {
       } else {
         this.roomsList.addItem({ item: this.createRoomButton({ roomName }) });
       }
+
+      eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room: { roomName } } });
     });
   }
 

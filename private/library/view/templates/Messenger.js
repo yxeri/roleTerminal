@@ -386,7 +386,7 @@ class Messenger extends StandardView {
             isRequired: true,
             maxLength: 20,
           }, {
-            placeholder: 'Optional passowrd',
+            placeholder: 'Optional password',
             inputName: 'password',
             type: 'password',
           }],

@@ -1176,7 +1176,7 @@ home.addLink({
           },
         }),
         elementCreator.createButton({
-          text: 'Mugger with a gun and/or knife',
+          text: 'Mugger with a gun and/or knife that hates my team',
           func: () => {
             const userName = storageManager.getUserName();
             const position = {

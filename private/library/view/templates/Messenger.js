@@ -645,7 +645,7 @@ class Messenger extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: ({ changedUser, firstConnection }) => {
-        if (storageManager.getAccessLevel() > 0) {
+        if (storageManager.getToken()) {
           const aliases = storageManager.getAliases();
 
           if (aliases.length > 0) {
@@ -688,6 +688,8 @@ class Messenger extends StandardView {
         } else {
           this.aliasList.replaceAllItems({ items: [] });
           this.userList.replaceAllItems({ items: [] });
+          this.followList.replaceAllItems({ items: [] });
+          this.roomsList.replaceAllItems({ items: [] });
         }
 
         socketManager.emitEvent('getRooms', {}, ({ error, data }) => {

@@ -1602,37 +1602,54 @@ socketManager.addEvents([
     event: 'history',
     func: ({ data }) => {
       const { roomName, messages, timeZoneOffset, anonymous, isWhisper } = data.history;
-      eventCentral.triggerEvent({ event: eventCentral.Events.HISTORY, params: { roomName, messages, timeZoneOffset, anonymous, isWhisper, options: { printable: false } } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.HISTORY,
+        params: { roomName, messages, timeZoneOffset, anonymous, isWhisper, options: { printable: false } },
+      });
     },
   }, {
     event: 'chatMsg',
     func: ({ data }) => {
       console.log('whisper', data);
       const { message, timeZoneOffset, isWhisper, roomName } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.CHATMSG, params: { roomName, message, isWhisper, timeZoneOffset, options: { printable: false } } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.CHATMSG,
+        params: { roomName, message, isWhisper, timeZoneOffset, options: { printable: false } },
+      });
     },
   }, {
     event: 'docFile',
     func: ({ data }) => {
       const { docFile } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.DOCFILE, params: { docFile } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.DOCFILE,
+        params: { docFile },
+      });
     },
   }, {
     event: 'logout',
     func: () => {
-      eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LOGOUT,
+      });
     },
   }, {
     event: 'bcastMsg',
     func: ({ data }) => {
       const { message } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.BCASTMSG, params: { message } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.BCASTMSG,
+        params: { message },
+      });
     },
   }, {
     event: 'transaction',
     func: ({ data }) => {
       const { transaction, wallet } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.TRANSACTION, params: { transaction, wallet } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.TRANSACTION,
+        params: { transaction, wallet },
+      });
     },
   }, {
     event: 'mapPositions',
@@ -1640,9 +1657,15 @@ socketManager.addEvents([
       const { positions, currentTime, shouldRemove } = data;
 
       if (shouldRemove) {
-        eventCentral.triggerEvent({ event: eventCentral.Events.REMOVEPOSITIONS, params: { positions } });
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.REMOVEPOSITIONS,
+          params: { positions },
+        });
       } else {
-        eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions, currentTime } });
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.POSITIONS,
+          params: { positions, currentTime },
+        });
       }
     },
   }, {
@@ -1657,7 +1680,10 @@ socketManager.addEvents([
     event: 'terminal',
     func: (data) => {
       const { mission } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.TERMINAL, params: { mission } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.TERMINAL,
+        params: { mission },
+      });
     },
   }, {
     event: 'follow',
@@ -1668,25 +1694,37 @@ socketManager.addEvents([
         room.roomName = followData.replace('-whisper-', ' <-> ');
       }
 
-      eventCentral.triggerEvent({ event: eventCentral.Events.FOLLOWROOM, params: { room, whisper, data: followData } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.FOLLOWROOM,
+        params: { room, whisper, data: followData },
+      });
     },
   }, {
     event: 'unfollow',
     func: ({ data }) => {
       const { room } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.UNFOLLOWROOM, params: { room } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.UNFOLLOWROOM,
+        params: { room },
+      });
     },
   }, {
     event: 'simpleMsg',
     func: ({ data }) => {
       const { simpleMsg } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.SIMPLEMSG, params: { simpleMsg } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SIMPLEMSG,
+        params: { simpleMsg },
+      });
     },
   }, {
     event: 'gameCode',
     func: ({ data }) => {
       const { gameCode } = data;
-      eventCentral.triggerEvent({ event: eventCentral.Events.GAMECODE, params: { gameCode } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.GAMECODE,
+        params: { gameCode },
+      });
     },
   }, {
     event: 'signalBlock',
@@ -1770,14 +1808,18 @@ socketManager.addEvents([
         params: { round },
       });
     },
+  }, {
+    event: 'ban',
+    func: () => {
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LOGOUT,
+        params: {},
+      });
+    },
   },
   // {
   //   event: 'roomFollower',
   //   func: ({ userName, roomName, isFollowing }) => {
   //
   //   },
-  // }, {
-  //   event: 'ban',
-  //   func: () => {},
-  // },
 ]);

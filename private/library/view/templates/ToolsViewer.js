@@ -278,7 +278,7 @@ class ToolsViewer extends StandardView {
 
                 const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
 
-                socketManager.emitEvent('addAlias', { alias }, ({ error: createError }) => {
+                socketManager.emitEvent('createAlias', { alias, user: { userName: storageManager.getUserName() } }, ({ error: createError }) => {
                   if (createError) {
                     console.log(createError);
 

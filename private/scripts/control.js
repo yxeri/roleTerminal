@@ -19,6 +19,7 @@ require('../library/polyfills');
 const socketManager = require('../library/SocketManager');
 const storageManager = require('../library/StorageManager');
 const eventCentral = require('../library/EventCentral');
+const elementCreator = require('../library/ElementCreator');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
 
 const mainView = document.getElementById('main');
@@ -62,15 +63,10 @@ function resetView() {
  */
 function createUserRow({ user }) {
   const listItem = document.createElement('LI');
-  const userSpan = document.createElement('SPAN');
-  const fullSpan = document.createElement('SPAN');
   const banButton = document.createElement('BUTTON');
   const buttonContainer = document.createElement('DIV');
 
   buttonContainer.classList.add('buttonContainer');
-
-  userSpan.appendChild(document.createTextNode(user.userName));
-  fullSpan.appendChild(document.createTextNode(user.fullName));
 
   buttonContainer.appendChild(banButton);
 
@@ -83,7 +79,7 @@ function createUserRow({ user }) {
 
   banButton.addEventListener('click', () => {
     if (user.banned) {
-      socketManager.emitEvent('ban', { user, shouldBan: false }, (banData) => {
+      socketManager.emitEvent('unban', { user }, (banData) => {
         if (banData.error) {
           console.log('Unban user', banData.error);
 
@@ -109,11 +105,12 @@ function createUserRow({ user }) {
     }
   });
 
-  listItem.appendChild(userSpan);
+  listItem.appendChild(elementCreator.createSpan({ text: user.userName }));
+  listItem.appendChild(elementCreator.createSpan({ text: user.mail }));
+  listItem.appendChild(elementCreator.createSpan({ text: `Aliases: ${user.aliases ? user.aliases.join(', ') : '-'}` }));
+  listItem.appendChild(elementCreator.createSpan({ text: `Warnings: ${user.warnings || 0}` }));
 
-  if (user.fullName !== user.userName) {
-    listItem.appendChild(fullSpan);
-  }
+  if (user.team) { listItem.appendChild(elementCreator.createSpan({ text: `Team: ${user.team || '-'}` })); }
 
   listItem.appendChild(buttonContainer);
 
@@ -175,15 +172,14 @@ function populateAll() {
       return;
     }
 
-    const { rooms = [], followedRooms = [], ownedRooms = [], protectedRooms = [] } = roomsData.data;
-    const allRooms = rooms.concat(followedRooms, ownedRooms, protectedRooms);
+    const { rooms = [] } = roomsData.data;
 
     const fragment = document.createDocumentFragment();
 
     roomsList.classList.add('hide');
     roomsList.innerHTML = '';
 
-    allRooms.map(room => createRoomRow({ room })).forEach(row => fragment.appendChild(row));
+    rooms.filter(room => room.roomName.indexOf('-team') === -1 && room.roomName.indexOf('-whisper') === -1).map(room => createRoomRow({ room })).forEach(row => fragment.appendChild(row));
 
     roomsList.appendChild(fragment);
   });

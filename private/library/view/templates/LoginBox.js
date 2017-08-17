@@ -202,17 +202,22 @@ class LoginBox extends DialogBox {
 
               switch (error.type) {
                 case 'needs verification': {
-                  this.changeExtraDescription({ text: ['Your account may need to be verified. Please contact an administrator.', 'Unable to login'] });
+                  this.changeExtraDescription({ text: ['Your account needs to be verified. You should have received a cybermail with further instructions.'] });
 
                   break;
                 }
                 case 'does not exist': {
-                  this.changeExtraDescription({ text: ['Incorrect user name and/or password'] });
+                  this.changeExtraDescription({ text: ['Incorrect user name and/or password.'] });
+
+                  break;
+                }
+                case 'banned': {
+                  this.changeExtraDescription({ text: ['Your account has been banned.'] });
 
                   break;
                 }
                 default: {
-                  this.changeExtraDescription({ text: ['Something went wrong. Failed to log in'] });
+                  this.changeExtraDescription({ text: ['Something went wrong. Failed to log in.'] });
 
                   break;
                 }

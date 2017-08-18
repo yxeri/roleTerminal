@@ -25,7 +25,7 @@ $back-button: #1b0019;
 $back-input: #1b0019;
 $hoverInput: #00372d;
 $note-color: #cd02b7;
-$red-button-color: #550000;
+$red-button-color: #910040;
 $padding: .2em;
 $outline: .1em;
 $font-size: 1.1em;
@@ -284,7 +284,7 @@ pre {
 
   .stationInfo {
     border-bottom: .05em solid;
-    padding-bottom: .2em;
+    padding: .2em .2em .4em .2em;
   }
 
   .stationInfo:last-child {
@@ -293,9 +293,6 @@ pre {
 
   .stationStats {
     width: 9em;
-    padding-top: .2em;
-    padding-left: .2em;
-    padding-right: .2em;
     border-left: .05em solid $text-color;
     border-right: .05em solid $text-color;
     border-bottom: .05em solid $text-color;
@@ -305,6 +302,10 @@ pre {
 
   .stationStats::-webkit-scrollbar {
     width: 0 !important;
+  }
+
+  .underAttack {
+    background-color: $red-button-color;
   }
 
   .teamStats {
@@ -992,16 +993,6 @@ pre {
   -webkit-animation-iteration-count: 1;
   animation-iteration-count: 1;
   animation-duration: .4s;
-}
-
-.pulse {
-  @include flashAnimation;
-  -webkit-animation-duration: 1s;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-direction: alternate;
-  animation-direction: alternate;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
 }
 
 .selectedItem {

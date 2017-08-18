@@ -69,7 +69,7 @@ class WreckingStatus {
             const classes = ['stationInfo'];
 
             if (station.isUnderAttack) {
-              classes.push('pulse');
+              classes.push('underAttack');
             }
 
             const list = elementCreator.createList({

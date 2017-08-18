@@ -1803,6 +1803,7 @@ socketManager.addEvents([
     event: 'lanternRound',
     func: ({ data }) => {
       const { round } = data;
+      console.log('lantern round', round);
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNROUND,
         params: { round },

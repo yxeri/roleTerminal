@@ -24,7 +24,10 @@ class OnlineStatus {
   setStatus(status) {
     const span = document.createElement('SPAN');
     span.appendChild(document.createTextNode(status.toUpperCase()));
-    span.classList.add('flash');
+
+    if (status === 'OFF') {
+      span.classList.add('flash', 'warning');
+    }
 
     this.element.replaceChild(span, this.element.firstChild);
   }

@@ -25,7 +25,7 @@ $back-button: #1b0019;
 $back-input: #1b0019;
 $hoverInput: #00372d;
 $note-color: #cd02b7;
-$red-button-color: #910040;
+$red-button-color: #a50044;
 $padding: .2em;
 $outline: .1em;
 $font-size: 1.1em;
@@ -302,10 +302,6 @@ pre {
 
   .stationStats::-webkit-scrollbar {
     width: 0 !important;
-  }
-
-  .underAttack {
-    background-color: $red-button-color;
   }
 
   .teamStats {
@@ -1134,6 +1130,10 @@ pre {
 
 .smaller {
   font-size: .9em;
+}
+
+.warning {
+  background-color: $red-button-color;
 }
 
 @-webkit-keyframes flash {

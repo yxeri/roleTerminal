@@ -69,7 +69,7 @@ class WreckingStatus {
             const classes = ['stationInfo'];
 
             if (station.isUnderAttack) {
-              classes.push('underAttack');
+              classes.push('warning');
             }
 
             const list = elementCreator.createList({
@@ -126,6 +126,7 @@ class WreckingStatus {
       watcherParent: this.element,
       event: eventCentral.Events.LANTERNROUND,
       func: ({ round }) => {
+        console.log('lantern round watcher', round);
         if (!round) {
           console.log('no round');
 

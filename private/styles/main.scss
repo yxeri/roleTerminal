@@ -25,7 +25,6 @@ $back-button: #1b0019;
 $back-input: #1b0019;
 $hoverInput: #00372d;
 $note-color: #cd02b7;
-$red-button-color: #a50044;
 $padding: .2em;
 $outline: .1em;
 $font-size: 1.1em;
@@ -937,14 +936,6 @@ pre {
   }
 }
 
-.redButton {
-  @include borderOutline;
-  padding: 3em;
-  margin: 3em 0;
-  line-height: 7em;
-  background-color: $red-button-color;
-}
-
 .moreSpace {
   line-height: 1.5em;
 }
@@ -1133,7 +1124,7 @@ pre {
 }
 
 .warning {
-  background-color: $red-button-color;
+  background-color: $darker-second-color;
 }
 
 @-webkit-keyframes flash {

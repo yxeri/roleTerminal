@@ -84,7 +84,9 @@ class MessageList {
     items.forEach((item) => {
       const listItemOptions = {};
 
-      listItemOptions.skipHeader = item.headerItems[0].textLine === this.lastItem.headerItems[0].textLine;
+      listItemOptions.skipHeader =
+        item.headerItems[0].textLine === this.lastItem.headerItems[0].textLine
+        && (item.headerItems[1].textLine !== '' && item.headerItems[1].textLine === this.lastItem.headerItems[1].textLine);
 
       if (!isHistory) { listItemOptions.animation = animation; }
 

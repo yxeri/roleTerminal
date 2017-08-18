@@ -27,7 +27,7 @@ class Message {
         console.log(userName);
       },
     }, {
-      textLine: shortTeam,
+      textLine: shortTeam ? `[${shortTeam.toUpperCase()}]` : '',
     }, {
       textLine: timeStamp.halfTime,
       placeLower: true,

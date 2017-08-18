@@ -274,8 +274,6 @@ class Messenger extends StandardView {
           return;
         }
 
-        console.log('sending message', data);
-
         eventCentral.triggerEvent({
           event: eventCentral.Events.CHATMSG,
           params: {
@@ -514,8 +512,6 @@ class Messenger extends StandardView {
             fullRoomName = `${roomName}-${message.userName}`;
           }
         }
-
-        console.log('whisper', isWhisper, fullRoomName, roomName, message);
 
         if (fullRoomName === storageManager.getRoom()) {
           const itemsOptions = {

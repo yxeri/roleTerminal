@@ -1610,7 +1610,6 @@ socketManager.addEvents([
   }, {
     event: 'chatMsg',
     func: ({ data }) => {
-      console.log('whisper', data);
       const { message, timeZoneOffset, isWhisper, roomName } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.CHATMSG,
@@ -1793,7 +1792,6 @@ socketManager.addEvents([
     event: 'lanternStations',
     func: ({ data }) => {
       const { stations } = data;
-      console.log('lantern', data);
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNSTATIONS,
         params: { stations },
@@ -1803,7 +1801,6 @@ socketManager.addEvents([
     event: 'lanternRound',
     func: ({ data }) => {
       const { round } = data;
-      console.log('lantern round', round);
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNROUND,
         params: { round },

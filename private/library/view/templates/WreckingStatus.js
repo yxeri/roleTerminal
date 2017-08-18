@@ -126,7 +126,6 @@ class WreckingStatus {
       watcherParent: this.element,
       event: eventCentral.Events.LANTERNROUND,
       func: ({ round }) => {
-        console.log('lantern round watcher', round);
         if (!round) {
           console.log('no round');
 

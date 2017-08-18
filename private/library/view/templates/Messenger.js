@@ -548,10 +548,10 @@ class Messenger extends StandardView {
           '-------------------------------',
         ];
         const extro = [
-          '-------------------------------',
+          '-------------------',
           'END OF MESSAGE',
           'RETURN TO YOUR DUTY',
-          '-------------------------------',
+          '-------------------',
         ];
 
         message.text = intro.concat(message.text).concat(extro);

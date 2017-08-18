@@ -164,7 +164,7 @@ class TeamViewer extends StandardView {
 
   populateList() {
     const createButton = elementCreator.createButton({
-      text: 'Create team',
+      text: 'Create a project team',
       classes: ['hide'],
       func: () => {
         const createDialog = new DialogBox({
@@ -208,7 +208,7 @@ class TeamViewer extends StandardView {
                   if (data.requiresVerify) {
                     const verifyDialog = new ButtonBox({
                       description: [
-                        'Your team needs to be verified before you can access it',
+                        'Your project team needs to be verified before you can access it',
                         'Contact an administrator',
                       ],
                       buttons: [
@@ -229,7 +229,7 @@ class TeamViewer extends StandardView {
             },
           },
           inputs: [{
-            placeholder: 'Team name',
+            placeholder: 'Project team name',
             inputName: 'teamName',
             isRequired: true,
             maxLength: 30,
@@ -239,8 +239,8 @@ class TeamViewer extends StandardView {
             isRequired: true,
             maxLength: 5,
           }],
-          description: ['Create a team'],
-          extraDescription: ['Input full and short name. Short name will be capitalized'],
+          description: ['Create a project team team'],
+          extraDescription: ['Input full and short name. Short name will be automatically capitalized'],
         });
         createDialog.appendTo(this.element.parentElement);
       },

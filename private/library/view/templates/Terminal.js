@@ -291,6 +291,9 @@ class Terminal extends View {
       this.queueMessage({
         message: {
           text: [
+            '------------------------------',
+            'Welcome to OSAT, administrator',
+            '------------------------------',
             'OSAT identity: C. Jenkins',
             'Your actions will be monitored',
             'Input or click on the command you want to run',

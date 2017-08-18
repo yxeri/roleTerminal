@@ -119,7 +119,7 @@ boot.setQueue([
   }, {
     func: boot.printLines,
     params: {
-      waitTime: 700,
+      waitTime: 1200,
       corruption: false,
       array: [
         'Uplink established!',

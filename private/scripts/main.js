@@ -507,7 +507,7 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, timeLeft } }) => {
+    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, dateToNext } }) => {
       if (error) {
         terminal.queueMessage({
           message: {
@@ -533,7 +533,7 @@ terminal.addCommand({
               'No signal received',
               'Satellites are not in position',
               'Unable to target stations',
-              `Next window opens in: ${timeLeft}`,
+              `Next window opens in: ${dateTonext ? dateToNext - new Date() : '---'}`,
               'Aborting LAMM',
             ],
           },
@@ -573,7 +573,7 @@ terminal.addCommand({
             'You must find the user\'s password within the dumps to get access to the LANTERN',
             'The password is repeated in both memory dumps',
             'We take no responsibility for deaths due to accidental activitation of defense systems',
-            `Window closes in ${timeLeft >= 0 ? timeLeft : 'UNKNOWN'}`,
+            `Window closes in ${dateToNext ? dateToNext - new Date() : '---'}`,
             '-----------------',
             'Choose a LANTERN:',
             '-----------------',
@@ -589,8 +589,9 @@ terminal.addCommand({
                   terminal.triggerCommand(station.stationId);
                 },
               });
+              const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
               const ownerSpan = elementCreator.createSpan({
-                text: `Owner: ${teams.find(team => team.teamId === station.owner) || '-'}`,
+                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack ? '-UNDER ATTACK-' : ''}`,
               });
 
               span.appendChild(stationSpan);

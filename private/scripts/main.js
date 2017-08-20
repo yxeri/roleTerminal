@@ -507,7 +507,7 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, dateToNext } }) => {
+    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, nowDate, dateToNext } }) => {
       if (error) {
         terminal.queueMessage({
           message: {
@@ -524,6 +524,9 @@ terminal.addCommand({
 
         return;
       } else if (!round.isActive) {
+        const time = textTools.calculateMinuteDifference({ nowDate, futureDate: dateToNext });
+        const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
+
         terminal.queueMessage({
           message: {
             text: [
@@ -533,7 +536,7 @@ terminal.addCommand({
               'No signal received',
               'Satellites are not in position',
               'Unable to target stations',
-              `Next window opens in: ${dateTonext ? dateToNext - new Date() : '---'}`,
+              `Next window opens in: ${timeString}`,
               'Aborting LAMM',
             ],
           },
@@ -562,6 +565,9 @@ terminal.addCommand({
         return;
       }
 
+      const time = textTools.calculateMinuteDifference({ nowDate, futureDate: dateToNext });
+      const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
+
       terminal.queueMessage({
         message: {
           text: [
@@ -573,7 +579,7 @@ terminal.addCommand({
             'You must find the user\'s password within the dumps to get access to the LANTERN',
             'The password is repeated in both memory dumps',
             'We take no responsibility for deaths due to accidental activitation of defense systems',
-            `Window closes in ${dateToNext ? dateToNext - new Date() : '---'}`,
+            `Window closes in ${timeString}`,
             '-----------------',
             'Choose a LANTERN:',
             '-----------------',
@@ -591,7 +597,7 @@ terminal.addCommand({
               });
               const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
               const ownerSpan = elementCreator.createSpan({
-                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack ? '-UNDER ATTACK-' : ''}`,
+                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack && team ? ' - WARNING. UNDER ATTACK -' : ''}`,
               });
 
               span.appendChild(stationSpan);

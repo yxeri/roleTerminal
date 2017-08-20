@@ -55,12 +55,24 @@ class TextTools {
   }
 
   /**
+   * Returns minutes between now and future date
+   * @param {Date} params.now Date now
+   * @param {Date} params.futureDate Future date
+   * @returns {number} Minutes
+   */
+  static calculateMinuteDifference({ nowDate, futureDate }) {
+    const now = new Date(nowDate);
+    const future = new Date(futureDate);
+
+    return Math.floor(((future - now) / 1000) / 60);
+  }
+
+  /**
    * Takes date and returns shorter human-readable time
    * @static
-   * @param {Object} params - Parameters
-   * @param {Date|number} params.date - Date
-   * @param {Number} [params.offset] - Should hours be modified from the final time?
-   * @param {boolean} [params.lockYear] - Should the year stay unmodified?
+   * @param {Date|number} params.date Date
+   * @param {Number} [params.offset] Should hours be modified from the final time?
+   * @param {boolean} [params.lockYear] Should the year stay unmodified?
    * @returns {Object} Human-readable time and date
    */
   static generateTimeStamp({ date, offset, lockDate }) {

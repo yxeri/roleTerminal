@@ -63,7 +63,7 @@ class WreckingStatus {
         Object.keys(this.stations).forEach((stationId) => {
           const station = this.stations[stationId];
 
-          if (station) {
+          if (station && station.isActive) {
             const foundTeamId = station.owner ? Object.keys(this.teams).find(teamId => teamId === station.owner.toString()) : undefined;
             const ownerName = foundTeamId ? this.teams[foundTeamId].shortName.toUpperCase() : '-----';
             const classes = ['stationInfo'];
@@ -110,7 +110,7 @@ class WreckingStatus {
         Object.keys(this.teams).forEach((teamId) => {
           const team = this.teams[teamId];
 
-          if (team) {
+          if (team && team.isActive) {
             const listItem = elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) });
 
             fragment.appendChild(listItem);

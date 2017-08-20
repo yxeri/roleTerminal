@@ -671,7 +671,7 @@ terminal.addCommand({
 
               const elements = textTools.createMixedArray({
                 classes: ['moreSpace'],
-                rowAmount: 15,
+                rowAmount: hackData.passwords.length,
                 length: 34,
                 requiredClickableStrings: hackData.passwords,
                 charToLower: hackData.passwordHint.character,

@@ -33,7 +33,7 @@ function createHeader({ headerItems, printable, parentElement }) {
   headerItems.forEach(({ textLine, extraClass, clickFunc, placeLower }) => {
     if (textLine) {
       const span = document.createElement('SPAN');
-      span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)}`));
+      span.appendChild(document.createTextNode(`${textLine.charAt(0).toUpperCase()}${textLine.slice(1)} `));
 
       if (clickFunc) { span.addEventListener('click', clickFunc); }
       if (extraClass) { span.classList.add(extraClass); }

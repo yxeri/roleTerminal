@@ -17,22 +17,17 @@
 const textTools = require('../../TextTools');
 
 class Message {
-  constructor({ time: date, text, userName, image, shortTeam }, { printable, lockDate }) { // roomName, extraClass, customSender, morseCode
+  constructor({ time: date, text, userName, image, shortTeam = '' }, { printable, lockDate }) { // roomName, extraClass, customSender, morseCode
     const timeStamp = textTools.generateTimeStamp({ date, lockDate });
 
     this.printable = printable;
     this.headerItems = [{
-      textLine: userName,
+      textLine: `${userName} ${shortTeam.toUpperCase()}`,
       clickFunc: () => {
         console.log(userName);
       },
     }, {
-      textLine: shortTeam ? `[${shortTeam.toUpperCase()}]` : '',
-    }, {
-      textLine: timeStamp.halfTime,
-      placeLower: true,
-    }, {
-      textLine: timeStamp.fullDate,
+      textLine: `${timeStamp.halfTime}-${timeStamp.fullDate}`,
       placeLower: true,
     }];
     this.text = text;

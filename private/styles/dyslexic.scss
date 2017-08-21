@@ -51,6 +51,10 @@ h1, h2, h3, h4, h5 {
   }
 }
 
+.header {
+  font-size: $font-size !important;
+}
+
 .closeButton {
   font-size: .8em !important;
 }
@@ -72,10 +76,10 @@ h1, h2, h3, h4, h5 {
 
 .innerMenu {
   .menuList {
-    font-size: .9em;
+    font-size: $font-size;
   }
 
   span {
-    font-size: .9em;
+    font-size: $font-size;
   }
 }

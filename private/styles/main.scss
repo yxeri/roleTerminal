@@ -33,6 +33,7 @@ $view-width: 65em;
 $menu-width: 21em;
 $short-list-width: 8em;
 $box-shadow: inset 0 0 8px;
+$top-box-shadow: 0 -2px 1px -1px;
 $bottom-box-shadow: 0 2px 1px -1px;
 $inner-container-width: calc(100% - .4em);
 $inner-container-height: calc(100% - .4em);
@@ -170,17 +171,9 @@ li {
   }
 
   .header {
-    border-bottom: $outline solid $text-color;
-    box-shadow: $bottom-box-shadow $second-color;
-    margin: .8em 0 .5em 0;
-
-    > span {
-      display: block;
-    }
-
-    span {
-      margin-right: .5em;
-    }
+    border-top: $outline solid $text-color;
+    box-shadow: $top-box-shadow $second-color;
+    margin: .8em 0 .1em 0;
 
     button {
       padding: 0;
@@ -962,6 +955,10 @@ pre {
 .title {
   font-size: ($font-size + .3em);
   text-decoration: underline;
+}
+
+.center {
+  text-align: center;
 }
 
 .listTitle {

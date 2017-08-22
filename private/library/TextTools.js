@@ -55,19 +55,6 @@ class TextTools {
   }
 
   /**
-   * Returns minutes between now and future date
-   * @param {Date} params.now Date now
-   * @param {Date} params.futureDate Future date
-   * @returns {number} Minutes
-   */
-  static calculateMinuteDifference({ nowDate, futureDate }) {
-    const now = new Date(nowDate);
-    const future = new Date(futureDate);
-
-    return Math.floor(((future - now) / 1000) / 60);
-  }
-
-  /**
    * Takes date and returns shorter human-readable time
    * @static
    * @param {Date|number} params.date Date

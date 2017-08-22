@@ -240,9 +240,8 @@ pre {
     }
   }
 
-  #homeLink {
-    padding-left: .15em;
-    padding-right: .15em;
+  .isActive {
+    background-color: $darker-second-color;
   }
 
   #wrecking {
@@ -251,7 +250,6 @@ pre {
     display: inline-block;
     color: $text-color;
     text-shadow: $text-shadow;
-    background-color: $darker-second-color;
     border-left: .05em solid $text-color;
     border-right: .05em solid $text-color;
 
@@ -644,6 +642,10 @@ pre {
     margin-left: .1em;
     width: calc(100% - .3em);
     margin-bottom: .4em;
+  }
+
+  button:first-letter {
+    text-transform: capitalize;
   }
 }
 

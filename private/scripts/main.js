@@ -205,6 +205,14 @@ window.addEventListener('error', (event) => {
 const terminal = new Terminal({ skipAnimation: queryParameters.noBoot });
 const toolsViewer = new ToolsViewer({ isFullscreen: true });
 const home = new Home({
+  introText: [
+    elementCreator.createParagraph({
+      text: 'Organica Oracle Operating System (O3C) 5.0 Razor Edition',
+    }),
+    elementCreator.createParagraph({
+      text: 'Welcome, employee. This is your cyberhome. You can always find your way to your cyberhome by clicking on the top menu. May you have a productive day!',
+    }),
+  ],
   introDevText: [
     elementCreator.createParagraph({
       text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
@@ -507,7 +515,7 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, nowDate, dateToNext } }) => {
+    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, timeLeft } }) => {
       if (error) {
         terminal.queueMessage({
           message: {
@@ -524,7 +532,7 @@ terminal.addCommand({
 
         return;
       } else if (!round.isActive) {
-        const time = textTools.calculateMinuteDifference({ nowDate, futureDate: dateToNext });
+        const time = 0;
         const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
 
         terminal.queueMessage({
@@ -565,7 +573,7 @@ terminal.addCommand({
         return;
       }
 
-      const time = textTools.calculateMinuteDifference({ nowDate, futureDate: dateToNext });
+      const time = timeLeft;
       const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
 
       terminal.queueMessage({
@@ -1053,8 +1061,8 @@ home.addLink({
   startFunc: () => {
     const panicBox = new ButtonBox({
       description: [
-        'Employee UNDEFINED. You have activate the PANIC-Assisted Neglect Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability',
-        'By proceeding, you agree to have your position retrieved and sent to those who can best help you',
+        'Employee UNDEFINED. You have activated the PANIC-Assisted Neglect Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability.',
+        'By proceeding, you agree to have your position retrieved and sent to those who can best help you.',
         'Choose the option that best describes your current situation:',
         ' ',
         '"I\'m being murdered by a "',
@@ -1063,8 +1071,31 @@ home.addLink({
         elementCreator.createButton({
           text: 'Group of Panzerwolves',
           func: () => {
+            const bestPosition = tracker.getBestPosition();
+
+            if (!bestPosition) {
+              console.log(bestPosition);
+
+              panicBox.changeDescription({
+                text: [
+                  'Unable to pinpoint your position.',
+                  'Thank you for using PANIC!',
+                ],
+              });
+
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Oh no...',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+              return;
+            }
+
             const position = {
-              coordinates: tracker.getBestPosition().coordinates,
+              coordinates: bestPosition.coordinates,
               description: ['Panzerwolf raid'],
               markerType: 'ping',
               positionName: `${storageManager.getUserName()}-panic-ping`,
@@ -1078,8 +1109,8 @@ home.addLink({
                 if (error.type === 'insufficient' || error.type === 'invalid data') {
                   panicBox.changeDescription({
                     text: [
-                      'Unable to pinpoint your position',
-                      'Thank you for using PANIC',
+                      'Unable to pinpoint your position.',
+                      'Thank you for using PANIC!',
                     ],
                   });
 
@@ -1101,11 +1132,11 @@ home.addLink({
 
               panicBox.changeDescription({
                 text: [
-                  'You have selected: "I\'m being murdered by a group of Panzerwolves"',
-                  'The Organica corporation and the Panzerwolves have a written non-aggression pact',
-                  'We recommend that you cite Agreement 233.75.1.12 to cease the murder process',
-                  'A team of lawyers will be sent to your location',
-                  'Thank you for using PANIC',
+                  'You have selected: "I\'m being murdered by a group of Panzerwolves."',
+                  'The Organica corporation and the Panzerwolves have a written non-aggression pact.',
+                  'We recommend that you cite Agreement 233.75.1.12 to cease the murder process.',
+                  'A team of lawyers will be sent to your location.',
+                  'Thank you for using PANIC!',
                 ],
               });
               panicBox.replaceButtons({
@@ -1124,8 +1155,31 @@ home.addLink({
         elementCreator.createButton({
           text: 'Organica re-education team',
           func: () => {
+            const bestPosition = tracker.getBestPosition();
+
+            if (!bestPosition) {
+              console.log(bestPosition);
+
+              panicBox.changeDescription({
+                text: [
+                  'Unable to pinpoint your position.',
+                  'Thank you for using PANIC!',
+                ],
+              });
+
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Oh no...',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+              return;
+            }
+
             const position = {
-              coordinates: tracker.getBestPosition().coordinates,
+              coordinates: bestPosition.coordinates,
               description: ['Organica företagsfest'],
               markerType: 'ping',
               positionName: `${storageManager.getUserName()}-panic-ping`,
@@ -1162,11 +1216,11 @@ home.addLink({
 
               panicBox.changeDescription({
                 text: [
-                  'You have selected: "I\'m being murdered by a Organica re-education"',
-                  'You have been found in breach of your employment contract. Reason: {UNDEFINED}',
-                  'Re-education is mandatory for low productivity and contract breaches',
-                  'A second re-education team will be sent to your location to speed up the re-education process',
-                  'Thank you for using PANIC',
+                  'You have selected: "I\'m being murdered by a Organica re-education."',
+                  'You have been found in breach of your employment contract. Reason: {UNDEFINED}.',
+                  'Re-education is mandatory for low productivity and contract breaches.',
+                  'A second re-education team will be sent to your location to speed up the re-education process.',
+                  'Thank you for using PANIC!',
                 ],
               });
               panicBox.replaceButtons({
@@ -1183,11 +1237,34 @@ home.addLink({
           },
         }),
         elementCreator.createButton({
-          text: 'Mugger with a gun and/or knife that hates my team',
+          text: 'Mugger with a gun and/or knife that hates me and my team',
           func: () => {
+            const bestPosition = tracker.getBestPosition();
+
+            if (!bestPosition) {
+              console.log(bestPosition);
+
+              panicBox.changeDescription({
+                text: [
+                  'Unable to pinpoint your position.',
+                  'Thank you for using PANIC!',
+                ],
+              });
+
+              panicBox.replaceButtons({
+                buttons: [
+                  elementCreator.createButton({
+                    text: 'Oh no...',
+                    func: () => { panicBox.removeView(); },
+                  }),
+                ],
+              });
+              return;
+            }
+
             const userName = storageManager.getUserName();
             const position = {
-              coordinates: tracker.getBestPosition().coordinates,
+              coordinates: bestPosition.coordinates,
               description: [`${userName} under attack`],
               markerType: 'ping',
               positionName: `${storageManager.getUserName()}-panic-team-ping`,
@@ -1807,10 +1884,10 @@ socketManager.addEvents([
   }, {
     event: 'lanternRound',
     func: ({ data }) => {
-      const { round } = data;
+      const { round, timeLeft } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNROUND,
-        params: { round },
+        params: { round, timeLeft },
       });
     },
   }, {

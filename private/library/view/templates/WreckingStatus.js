@@ -16,7 +16,6 @@
 
 const elementCreator = require('../../ElementCreator');
 const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
 
 class WreckingStatus {
   constructor({ element }) {
@@ -25,13 +24,12 @@ class WreckingStatus {
 
     this.stations = {};
     this.teams = {};
-    this.timeLeft = 0;
 
-    this.homeSpan = document.getElementById('homeLink');
     this.stationStats = elementCreator.createList({ classes: ['stationStats'] });
     this.teamStats = elementCreator.createList({ classes: ['teamStats'] });
 
     this.container = elementCreator.createContainer({ classes: ['hide'] });
+
     this.container.appendChild(this.stationStats);
     this.container.appendChild(this.teamStats);
     this.element.appendChild(this.container);
@@ -63,22 +61,32 @@ class WreckingStatus {
         Object.keys(this.stations).forEach((stationId) => {
           const station = this.stations[stationId];
 
-          if (station && station.isActive) {
+          if (station) {
             const foundTeamId = station.owner ? Object.keys(this.teams).find(teamId => teamId === station.owner.toString()) : undefined;
             const ownerName = foundTeamId ? this.teams[foundTeamId].shortName.toUpperCase() : '-----';
             const classes = ['stationInfo'];
+            const elements = [];
 
-            if (station.isUnderAttack) {
+            if (station.isUnderAttack && this.isActive) {
               classes.push('warning');
+            }
+
+            elements.push(elementCreator.createSpan({ text: `${station.stationName || station.stationId}` }));
+
+            if (!this.isActive) {
+              elements.push(elementCreator.createSpan({ text: 'REQUIRES' }));
+              elements.push(elementCreator.createSpan({ text: 'CALIBRATION' }));
+            } else if (station.isActive) {
+              elements.push(elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }));
+              elements.push(elementCreator.createSpan({ text: `Owner: ${ownerName}` }));
+            } else {
+              elements.push(elementCreator.createSpan({ text: 'NO SIGNAL' }));
+              elements.push(elementCreator.createSpan({ text: 'INACTIVE' }));
             }
 
             const list = elementCreator.createList({
               classes,
-              elements: [
-                elementCreator.createSpan({ text: `${station.stationName || station.stationId}` }),
-                elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }),
-                elementCreator.createSpan({ text: `Owner: ${ownerName}` }),
-              ],
+              elements,
             });
 
             fragment.appendChild(list);
@@ -101,19 +109,22 @@ class WreckingStatus {
         }
 
         const fragment = document.createDocumentFragment();
-        fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: 'WRECKERS' }) }));
 
         teams.forEach((team) => {
           this.teams[team.teamId] = team;
         });
 
+        fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: 'WRECKERS' }), classes: ['center'] }));
+
         Object.keys(this.teams).forEach((teamId) => {
           const team = this.teams[teamId];
 
-          if (team && team.isActive) {
-            const listItem = elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) });
-
-            fragment.appendChild(listItem);
+          if (team) {
+            if (team.isActive) {
+              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) }));
+            } else {
+              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ---` }) }));
+            }
           }
         });
 
@@ -125,47 +136,39 @@ class WreckingStatus {
     eventCentral.addWatcher({
       watcherParent: this.element,
       event: eventCentral.Events.LANTERNROUND,
-      func: ({ round }) => {
+      func: ({ round, timeLeft }) => {
         if (!round) {
           console.log('no round');
 
           return;
         }
 
-        if (this.isActive !== round.isActive) {
-          if (!round.isActive) {
-            this.end();
-          } else {
-            this.start();
-          }
+        if (!round.isActive) {
+          this.end();
+        } else {
+          this.start();
         }
-
-        socketManager.emitEvent('getLanternInfo', {}, ({ error, data }) => {
-          if (error) {
-            console.log(error);
-
-            return;
-          }
-
-          this.timeLeft = data.timeLeft;
-        });
       },
     });
   }
 
   start() {
-    this.homeSpan.classList.add('hide');
     this.isActive = true;
-    this.element.classList.remove('hide');
-    this.element.classList.add('flash');
+    this.element.classList.add('flash', 'isActive');
   }
 
   end() {
-    this.container.classList.add('hide');
-    this.homeSpan.classList.remove('hide');
-    this.homeSpan.classList.add('flash');
     this.isActive = false;
-    this.element.classList.add('hide');
+    this.element.classList.remove('flash', 'isActive');
+
+    eventCentral.triggerEvent({
+      event: eventCentral.Events.LANTERNTEAMS,
+      params: { teams: Object.keys(this.teams).map(teamId => this.teams[teamId]) },
+    });
+    eventCentral.triggerEvent({
+      event: eventCentral.Events.LANTERNSTATIONS,
+      params: { stations: Object.keys(this.stations).map(stationId => this.stations[stationId]) },
+    });
   }
 }
 

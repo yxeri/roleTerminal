@@ -76,7 +76,7 @@ class SocketManager {
       }
 
       const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam }, lanternStats } = data;
-      const { teams, stations, round } = lanternStats;
+      const { teams, stations, round, timeLeft } = lanternStats;
 
       storageManager.setUserName(userName);
       storageManager.setAccessLevel(accessLevel);
@@ -104,7 +104,7 @@ class SocketManager {
       });
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNROUND,
-        params: { round },
+        params: { round, timeLeft },
       });
       eventCentral.triggerEvent({
         event: eventCentral.Events.LANTERNSTATIONS,

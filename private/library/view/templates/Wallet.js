@@ -153,7 +153,7 @@ class Wallet extends StandardView {
             },
           },
           description: [
-            'Dogecoin transfer tool',
+            'Virtual Caps Transfer Tool',
           ],
           extraDescription: [`How much do you want to transfer to ${receiverName}?`],
         });
@@ -207,7 +207,7 @@ class Wallet extends StandardView {
       });
     });
 
-    socketManager.emitEvent('getTransactions', { owner: storageManager.getUserName(), isTeam: teamName }, ({ error, data }) => {
+    socketManager.emitEvent('getTransactions', { owner: storageManager.getUserName() }, ({ error, data }) => {
       if (error) {
         console.log(error);
 

@@ -319,19 +319,19 @@ const teamViewer = new TeamViewer({ worldMap: map });
 const tracker = new Tracker();
 
 terminal.addCommand({
-  commandName: 'calibrationAdjustment',
+  commandName: 'lanternMaintenance',
   accessLevel: 1,
   startFunc: () => {
     terminal.queueMessage({
       message: {
         text: [
-          'Checking signal strength ...',
-          'Retrieving station data ...',
+          'Artemisia needs your help to verify LANTERN operational status.',
+          'Downloading list of available LANTERNs ...',
         ],
       },
     });
 
-    socketManager.emitEvent('getValidCalibrationStations', {}, ({ error: stationError, data: stationData }) => {
+    socketManager.emitEvent('getValidCalibrationStations', {}, ({ error: stationError, data: stationData, extraData = {} }) => {
       if (stationError) {
         if (stationError.type === 'does not exist') {
           terminal.queueMessage({
@@ -340,8 +340,28 @@ terminal.addCommand({
                 '-----',
                 'ERROR',
                 '-----',
-                'No stations are in need of adjustments',
-                'Aborting',
+                'No LANTERNs are in need of maintenance',
+                'Aborting...',
+              ],
+            },
+          });
+
+          terminal.resetNextFunc();
+
+          return;
+        } else if (stationError.type === 'too frequent') {
+          const timeText = extraData.timeLeft ? `${Math.abs(Math.ceil(extraData.timeLeft / 60000))}m` : 'UNKNOWN';
+
+          terminal.queueMessage({
+            message: {
+              text: [
+                '-----',
+                'ERROR',
+                '-----',
+                'Data incomplete.',
+                'Data transfer is in progress.',
+                `Expected completion in: ${timeText}.`,
+                'Aborting...',
               ],
             },
           });
@@ -358,7 +378,7 @@ terminal.addCommand({
               'ERROR',
               '-----',
               'Something went wrong',
-              'Unable to check for signal strength',
+              'Unable to check LANTERN status.',
             ],
           },
         });
@@ -367,12 +387,15 @@ terminal.addCommand({
 
         return;
       } else if (stationData.mission) {
+        const mission = stationData.mission;
+
         terminal.queueMessage({
           message: {
             text: [
-              `You have been assigned to calibrate station ${stationData.mission.stationId}`,
-              `Proceed to station ${stationData.mission.stationId} and start the calibration process`,
-              `Your assigned verification code is: ${stationData.mission.code}`,
+              `You have been assigned LANTERN ${mission.stationId}`,
+              `Your assigned personal verification code is: ${mission.code}`,
+              `Proceed to LANTERN ${mission.stationId} and use the code`,
+              'Artemisia wishes you a nice day!',
               'END OF MESSAGE',
             ],
           },
@@ -389,7 +412,7 @@ terminal.addCommand({
         message: {
           text: [
             '----------------',
-            'Enter station ID',
+            'Please select LANTERN to verify',
             '----------------',
           ],
           elementPerRow: true,
@@ -415,7 +438,7 @@ terminal.addCommand({
         const chosenStationId = !isNaN(stationId) ? parseInt(stationId, 10) : '';
 
         if (stationIds.indexOf(chosenStationId) < 0) {
-          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
+          terminal.queueMessage({ message: { text: ['Incorrect LANTERN ID'] } });
 
           return;
         }
@@ -429,8 +452,8 @@ terminal.addCommand({
                     '-----',
                     'ERROR',
                     '-----',
-                    'No stations are in need of adjustments',
-                    'Aborting',
+                    'No LANTERN are in need of maintenanc.e',
+                    'Aborting...',
                   ],
                 },
               });
@@ -444,8 +467,9 @@ terminal.addCommand({
                     '-----',
                     'ERROR',
                     '-----',
-                    'LANTERN activity is blocking calibration data',
-                    'Calibration adjustments are blocked',
+                    'LANTERN activity is blocking status data.',
+                    'Maintenance is blocked.',
+                    'Aborting...',
                   ],
                 },
               });
@@ -460,8 +484,8 @@ terminal.addCommand({
                   '-----',
                   'ERROR',
                   '-----',
-                  'Something went wrong',
-                  'Unable to check for signal strength',
+                  'Something went wrong.',
+                  'Unable to check for LANTERN status.',
                 ],
               },
             });
@@ -476,8 +500,7 @@ terminal.addCommand({
             terminal.queueMessage({
               message: {
                 text: [
-                  'Signal strength is low!',
-                  'Station is in need of manual calibration',
+                  'LANTERN is need of maintenance!',
                 ],
               },
             });
@@ -486,9 +509,10 @@ terminal.addCommand({
           terminal.queueMessage({
             message: {
               text: [
-                `You have been assigned to calibrate station ${mission.stationId}`,
-                `Proceed to station ${mission.stationId} and start the calibration process`,
-                `Your assigned verification code is: ${mission.code}`,
+                `You have been assigned LANTERN ${mission.stationId}`,
+                `Your assigned personal verification code is: ${mission.code}`,
+                `Proceed to LANTERN ${mission.stationId} and use the code`,
+                'Artemisia wishes you a nice day!',
                 'END OF MESSAGE',
               ],
             },
@@ -541,11 +565,11 @@ terminal.addCommand({
               '-----',
               'ERROR',
               '-----',
-              'No signal received',
-              'Satellites are not in position',
-              'Unable to target stations',
+              'No signal received.',
+              'Satellites are not in position.',
+              'Unable to target LANTERNs',
               `Next window opens in: ${timeString}`,
-              'Aborting LAMM',
+              'Aborting LAMM...',
             ],
           },
         });
@@ -560,10 +584,10 @@ terminal.addCommand({
               '-----',
               'ERROR',
               '-----',
-              'Unable to connect to stations',
-              'No active stations found',
-              'Unable to proceed',
-              'Aborting LAMM',
+              'Unable to connect to LANTERNs.',
+              'No active LANTERN found.',
+              'Unable to proceed.',
+              'Aborting LAMM...',
             ],
           },
         });
@@ -582,12 +606,12 @@ terminal.addCommand({
             '----',
             'LAMM',
             '----',
-            'You will be shown a user with access to your chosen LANTERN',
-            'Each user will have information about its password attached to it',
-            'You must find the user\'s password within the dumps to get access to the LANTERN',
-            'The password is repeated in both memory dumps',
-            'We take no responsibility for deaths due to accidental activitation of defense systems',
-            `Window closes in ${timeString}`,
+            'You will be shown a user with access to your chosen LANTERN.',
+            'Each user will have information about its password attached to it.',
+            'You must find the user\'s password within the dumps to get access to the LANTERN.',
+            'The password is repeated in both memory dumps.',
+            'We take no responsibility for deaths due to accidental activitation of defense systems.',
+            `Window closes in ${timeString}.`,
             '-----------------',
             'Choose a LANTERN:',
             '-----------------',
@@ -605,7 +629,7 @@ terminal.addCommand({
               });
               const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
               const ownerSpan = elementCreator.createSpan({
-                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack && team ? ' - WARNING. UNDER ATTACK -' : ''}`,
+                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack && team ? ' - UNDER ATTACK' : ''}`,
               });
 
               span.appendChild(stationSpan);
@@ -626,7 +650,7 @@ terminal.addCommand({
         const stationId = !isNaN(stationIdValue) ? parseInt(stationIdValue, 10) : '';
 
         if (activeIds.indexOf(stationId) < 0) {
-          terminal.queueMessage({ message: { text: ['Incorrect station number'] } });
+          terminal.queueMessage({ message: { text: ['Incorrect LANTERN number'] } });
 
           return;
         }
@@ -666,7 +690,7 @@ terminal.addCommand({
             terminal.queueMessage({
               message: {
                 text: [
-                  `Action ${actions.find(action => action.id === actionId).name} chosen`,
+                  `Action ${actions.find(action => action.id === actionId).name} chosen.`,
                   `Accessing LANTERN ${stationId}...`,
                 ],
               },
@@ -723,8 +747,8 @@ terminal.addCommand({
                 message: {
                   text: [
                     '------------',
-                    `User name: ${hackData.userName}`,
-                    `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}`,
+                    `User name: ${hackData.userName}.`,
+                    `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}.`,
                   ],
                 },
               });
@@ -754,21 +778,18 @@ terminal.addCommand({
                         text: [
                           'Correct password',
                           `${boostingSignal ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
-                          'Thank you for using LAMM',
+                          'Thank you for using LAMM.',
                         ],
                       },
                     });
                     terminal.resetNextFunc();
                   } else if (triesLeft <= 0) {
-                    const beautifiedDate = textTools.generateTimeStamp({ date: lockoutTime });
-
                     terminal.queueMessage({
                       message: {
                         text: [
-                          'Incorrect password',
-                          `You have been locked out of LANTERN ${stationId}`,
-                          'Starting lockdown crack',
-                          `The lockdown lasts until ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                          'Incorrect password.',
+                          'Unable to trigger action.',
+                          'Better luck next time!',
                           'Thank you for using LAMM',
                         ],
                       },

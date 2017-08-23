@@ -16,6 +16,7 @@
 
 const elementCreator = require('../../ElementCreator');
 const eventCentral = require('../../EventCentral');
+const textTools = require('../../TextTools');
 
 class WreckingStatus {
   constructor({ element }) {
@@ -35,6 +36,10 @@ class WreckingStatus {
     this.element.appendChild(this.container);
 
     this.isActive = false;
+    this.timeSpan = elementCreator.createSpan({ text: '----' });
+    this.timeLeft = new Date();
+
+    this.startTime();
 
     this.element.addEventListener('click', (event) => {
       this.container.classList.toggle('hide');
@@ -75,7 +80,7 @@ class WreckingStatus {
 
             if (!this.isActive) {
               elements.push(elementCreator.createSpan({ text: 'REQUIRES' }));
-              elements.push(elementCreator.createSpan({ text: 'CALIBRATION' }));
+              elements.push(elementCreator.createSpan({ text: 'MAINTENANCE' }));
             } else if (station.isActive) {
               elements.push(elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }));
               elements.push(elementCreator.createSpan({ text: `Owner: ${ownerName}` }));
@@ -110,11 +115,11 @@ class WreckingStatus {
 
         const fragment = document.createDocumentFragment();
 
+        fragment.appendChild(elementCreator.createListItem({ element: this.timeSpan }));
+
         teams.forEach((team) => {
           this.teams[team.teamId] = team;
         });
-
-        fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: 'WRECKERS' }), classes: ['center'] }));
 
         Object.keys(this.teams).forEach((teamId) => {
           const team = this.teams[teamId];
@@ -148,8 +153,43 @@ class WreckingStatus {
         } else {
           this.start();
         }
+
+        const convertedTimeLeft = new Date(timeLeft);
+
+        this.timeLeft = convertedTimeLeft > 0 ? Math.floor(((convertedTimeLeft) / 1000) / 60) : -1;
+        this.updateTime();
       },
     });
+  }
+
+  startTime() {
+    const now = new Date();
+    const waitTime = ((60 - now.getSeconds()) * 1000) - now.getMilliseconds();
+
+    setTimeout(() => {
+      this.updateTime();
+      this.startTime();
+    }, waitTime);
+  }
+
+  displayTime() {
+    const text = this.isActive ? 'Active for' : 'Next in';
+    console.log('timeleft', this.timeLeft > 0);
+    const timeLeft = this.timeLeft > 0 ? textTools.getHoursAndMinutes(this.timeLeft) : undefined;
+    const timeText = timeLeft ? `${text}: ${timeLeft.hours}h${timeLeft.minutes}m` : `${text}: UNKNOWN`;
+
+    this.timeSpan.innerHTML = '';
+    this.timeSpan.appendChild(document.createTextNode(timeText));
+  }
+
+  updateTime() {
+    const date = new Date();
+
+    if (date.getSeconds() > 59 || date.getSeconds() === 0) {
+      this.timeLeft -= 1;
+    }
+
+    this.displayTime();
   }
 
   start() {

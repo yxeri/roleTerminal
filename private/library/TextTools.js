@@ -54,6 +54,13 @@ class TextTools {
     return number > 9 ? number : `0${number}`;
   }
 
+  static getHoursAndMinutes(time) {
+    const hours = TextTools.beautifyNumber(Math.trunc(time / 60));
+    const minutes = TextTools.beautifyNumber(time % 60);
+
+    return { hours, minutes };
+  }
+
   /**
    * Takes date and returns shorter human-readable time
    * @static

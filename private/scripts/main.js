@@ -770,7 +770,7 @@ terminal.addCommand({
                     return;
                   }
 
-                  const { success, triesLeft, matches, lockoutTime } = manipulateData;
+                  const { success, triesLeft, matches } = manipulateData;
 
                   if (success) {
                     terminal.queueMessage({

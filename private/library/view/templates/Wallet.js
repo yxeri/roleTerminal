@@ -165,8 +165,6 @@ class Wallet extends StandardView {
   }
 
   getTransactions({ teamList, userList }) {
-    const teamName = storageManager.getTeam();
-
     socketManager.emitEvent('getTeams', {}, ({ error, data }) => {
       if (error) {
         console.log(error);

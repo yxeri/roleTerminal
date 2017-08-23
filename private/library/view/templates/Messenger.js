@@ -528,6 +528,11 @@ class Messenger extends StandardView {
 
         if (listItem) {
           listItem.firstElementChild.classList.add('selected');
+        } else if (isWhisper) {
+          eventCentral.triggerEvent({
+            event: eventCentral.Events.FOLLOWROOM,
+            params: { isSelected: true, room: { roomName: `${userName} <-> ${message.userName}` }, data: fullRoomName, whisper: true },
+          });
         }
       },
     });
@@ -587,11 +592,11 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this.followList,
       event: eventCentral.Events.FOLLOWROOM,
-      func: ({ room: { roomName }, whisperTo, data, whisper }) => {
+      func: ({ isSelected, room: { roomName }, whisperTo, data, whisper }) => {
         if (!whisper) {
           this.followList.addItem({ item: this.createRoomButton({ roomName, data: data || roomName }) });
         } else {
-          this.followList.addItem({ item: this.createWhisperButton({ roomName, whisperTo, data: data || roomName }) });
+          this.followList.addItem({ item: this.createWhisperButton({ isSelected, roomName, whisperTo, data: data || roomName }) });
         }
       },
     });
@@ -781,12 +786,18 @@ class Messenger extends StandardView {
     });
   }
 
-  createWhisperButton({ roomName, whisperTo, data }) {
+  createWhisperButton({ roomName, whisperTo, data, isSelected }) {
     const { whisperTo: retrievedWhisperTo } = convertWhisperRoomName(data || roomName);
+    const buttonClasses = [];
+
+    if (isSelected) {
+      buttonClasses.push('selected');
+    }
 
     const button = elementCreator.createButton({
       data: data || roomName,
       text: whisperTo ? `${whisperTo}` : roomName,
+      classes: buttonClasses,
       func: () => {
         const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
         const whisperRoomName = `${userName}-whisper-${whisperTo}`;
@@ -900,6 +911,13 @@ class Messenger extends StandardView {
                     },
                   }, ({ error: followError }) => {
                     if (followError) {
+                      if (followError.type === 'not allowed') {
+                        console.log(followError);
+                        followDialog.changeExtraDescription({ text: ['Access denied', 'Incorrect password or access level'] });
+
+                        return;
+                      }
+
                       console.log(followError);
                       followDialog.changeExtraDescription({ text: ['Failed to join the room'] });
 
@@ -920,15 +938,13 @@ class Messenger extends StandardView {
             },
           });
 
-          if (room.password) {
-            followDialog.addInput({
-              placeholder: 'Password',
-              inputName: 'password',
-              type: 'password',
-              isRequired: true,
-            });
-            followDialog.changeExtraDescription({ text: ['The room is password protected. Enter the correct password'] });
-          }
+          followDialog.addInput({
+            placeholder: 'Password',
+            inputName: 'password',
+            type: 'password',
+            isRequired: false,
+          });
+          followDialog.changeExtraDescription({ text: ['The room is protected. Enter the correct password'] });
 
           followDialog.appendTo(this.element.parentElement);
         });

@@ -486,7 +486,7 @@ class WorldMap extends View {
                   { optionId: 'visPrivate', optionLabel: 'Only me' },
                 ],
               }],
-              description: ['Mark a position that offers the maximum amount of team synergy'],
+              description: ['Mark a position that offers the maximum amount of project team synergy'],
               extraDescription: [''],
             });
             markerDialog.appendTo(this.element.parentElement);

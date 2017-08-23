@@ -331,7 +331,7 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getValidCalibrationStations', {}, ({ error: stationError, data: stationData, extraData = {} }) => {
+    socketManager.emitEvent('getValidCalibrationStations', { userName: storageManager.getUserName() }, ({ error: stationError, data: stationData, extraData = {} }) => {
       if (stationError) {
         if (stationError.type === 'does not exist') {
           terminal.queueMessage({
@@ -443,7 +443,7 @@ terminal.addCommand({
           return;
         }
 
-        socketManager.emitEvent('getCalibrationMission', { stationId: chosenStationId }, ({ error, data }) => {
+        socketManager.emitEvent('getCalibrationMission', { userName: storageManager.getUserName(), stationId: chosenStationId }, ({ error, data }) => {
           if (error) {
             if (error.type === 'does not exist') {
               terminal.queueMessage({

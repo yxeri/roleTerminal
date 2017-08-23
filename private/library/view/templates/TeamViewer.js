@@ -323,7 +323,7 @@ class TeamViewer extends StandardView {
             inputName: 'userName',
             isRequired: true,
           }],
-          description: ['Invite a user to your team'],
+          description: ['Invite a user to your project team'],
           extraDescription: [''],
         });
 
@@ -331,7 +331,7 @@ class TeamViewer extends StandardView {
       },
     });
     const leaveButton = elementCreator.createButton({
-      text: 'Leave team',
+      text: 'Leave project team',
       classes: ['hide'],
       func: () => {
         socketManager.emitEvent('getTeam', {}, ({ error, data }) => {
@@ -345,7 +345,7 @@ class TeamViewer extends StandardView {
           const description = [];
 
           if (team.owner === storageManager.getUserName()) {
-            description.push('WARNING', 'You are the owner of the team. The whole team will be DELETED if you leave it', 'Are you sure that you want to proceed?');
+            description.push('WARNING', 'You are the owner of the project team. The whole team will be DELETED if you leave it', 'Are you sure that you want to proceed?');
           } else {
             description.push('You are trying to leave the team', 'Are you sure that you want to proceed?');
           }

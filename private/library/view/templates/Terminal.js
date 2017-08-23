@@ -19,6 +19,7 @@ const TextAnimation = require('./TextAnimation');
 const textTools = require('../../TextTools');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
+const storageManager = require('../../StorageManager');
 
 class Terminal extends View {
   constructor({ skipAnimation }) {
@@ -37,6 +38,29 @@ class Terminal extends View {
     this.commands = [];
     this.triggers = {};
     this.nextFunc = null;
+
+    eventCentral.addWatcher({
+      watcherParent: this.element,
+      event: eventCentral.Events.USER,
+      func: ({ changedUser, firstConnection }) => {
+        if (changedUser !== storageManager.getUserName() && !firstConnection) {
+          this.element.firstElementChild.innerHTML = '';
+          this.queue = [];
+          this.queueMessage({
+            message: {
+              text: [
+                'Welcome to OSAT, administrator C. Jenkins',
+                '-----------------',
+                'Your actions will be monitored',
+                'Input or click on the command you want to run',
+                'Programs:',
+              ],
+              elements: this.getClickableCommandNames(),
+            },
+          });
+        }
+      },
+    });
   }
 
   setNextFunc(func) {

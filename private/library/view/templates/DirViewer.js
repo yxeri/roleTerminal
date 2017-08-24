@@ -380,7 +380,7 @@ class DirViewer extends StandardView {
                     idInput.setAttribute('placeholder', 'ID already exists');
                     idInput.value = '';
                     idInput.classList.add('markedInput');
-                    }
+                  }
                 } else {
                   idInput.setAttribute('placeholder', 'ID already exists');
                   idInput.value = '';

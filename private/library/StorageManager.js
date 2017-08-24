@@ -118,6 +118,36 @@ class StorageManager {
   static getAliases() { return converters.convertToObject(this.getLocalVal('aliases')) || []; }
 
   /**
+   * Get creator aliases
+   * @static
+   * @returns {string[]} Creator aliases
+   */
+  static getCreatorAliases() { return converters.convertToObject(this.getLocalVal('creatorAliases')) || []; }
+
+  /**
+   * Set creator aliases
+   * @static
+   * @param {string[]} aliases Creator aliases
+   */
+  static setCreatorAliases(aliases = []) {
+    const sortedAliases = aliases.sort();
+
+    this.setLocalVal('creatorAliases', converters.stringifyObject(sortedAliases));
+  }
+
+  /**
+   * Add a user alias
+   * @static
+   * @param {string} alias - User alias
+   */
+  static addCreatorAlias(alias) {
+    const aliases = this.getCreatorAliases();
+    aliases.push(alias.toLowerCase());
+
+    this.setCreatorAliases(aliases);
+  }
+
+  /**
    * Set user aliases
    * @static
    * @param {string[]} aliases - User aliases

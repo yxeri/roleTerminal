@@ -630,14 +630,12 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.NEWUSER,
-      func: ({ users }) => {
-        users.forEach((user) => {
-          this.userList.addItem({
-            item: this.createWhisperButton({
-              roomName: storageManager.getUserName(),
-              whisperTo: user.userName,
-            }),
-          });
+      func: ({ user }) => {
+        this.userList.addItem({
+          item: this.createWhisperButton({
+            roomName: storageManager.getUserName(),
+            whisperTo: user.userName,
+          }),
         });
       },
     });
@@ -907,7 +905,7 @@ class Messenger extends StandardView {
                     },
                     room: {
                       roomName: room.roomName,
-                      password: passwordInput ? passwordInput.inputElement.value : '',
+                      password: passwordInput ? passwordInput.inputElement.value : undefined,
                     },
                   }, ({ error: followError }) => {
                     if (followError) {
@@ -938,13 +936,15 @@ class Messenger extends StandardView {
             },
           });
 
-          followDialog.addInput({
-            placeholder: 'Password',
-            inputName: 'password',
-            type: 'password',
-            isRequired: false,
-          });
-          followDialog.changeExtraDescription({ text: ['The room is protected. Enter the correct password'] });
+          if (isProtected) {
+            followDialog.addInput({
+              placeholder: 'Password',
+              inputName: 'password',
+              type: 'password',
+              isRequired: false,
+            });
+            followDialog.changeExtraDescription({ text: ['The room is protected. Enter the correct password'] });
+          }
 
           followDialog.appendTo(this.element.parentElement);
         });

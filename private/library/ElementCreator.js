@@ -144,7 +144,7 @@ class ElementCreator {
     return fieldset;
   }
 
-  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine, maxLength }) {
+  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine, maxLength, inputId }) {
     const input = multiLine ? document.createElement('TEXTAREA') : document.createElement('INPUT');
 
     input.setAttribute('placeholder', placeholder);
@@ -153,6 +153,7 @@ class ElementCreator {
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
     if (type) { input.setAttribute('type', type); }
+    if (inputId) { input.setAttribute('id', inputId); }
 
     if (isRequired) {
       input.addEventListener('blur', () => {

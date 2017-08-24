@@ -331,7 +331,7 @@ terminal.addCommand({
       },
     });
 
-    socketManager.emitEvent('getValidCalibrationStations', { userName: storageManager.getUserName() }, ({ error: stationError, data: stationData, extraData = {} }) => {
+    socketManager.emitEvent('getValidCalibrationStations', { userName: storageManager.getUserName() }, ({ error: stationError, data: stationData }) => {
       if (stationError) {
         if (stationError.type === 'does not exist') {
           terminal.queueMessage({
@@ -350,7 +350,7 @@ terminal.addCommand({
 
           return;
         } else if (stationError.type === 'too frequent') {
-          const timeText = extraData.timeLeft ? `${Math.abs(Math.ceil(extraData.timeLeft / 60000))}m` : 'UNKNOWN';
+          const timeText = stationError.extraData && typeof stationError.extraData.timeLeft === 'number' ? `${Math.abs(Math.ceil(stationError.extraData.timeLeft / 60000))}m` : 'UNKNOWN';
 
           terminal.queueMessage({
             message: {

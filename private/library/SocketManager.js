@@ -75,12 +75,13 @@ class SocketManager {
         return;
       }
 
-      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam }, lanternStats } = data;
+      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam, creatorAliases }, lanternStats } = data;
       const { teams, stations, round, timeLeft } = lanternStats;
 
       storageManager.setUserName(userName);
       storageManager.setAccessLevel(accessLevel);
       storageManager.setAliases(aliases);
+      storageManager.setCreatorAliases(creatorAliases);
       storageManager.setTeam(team, shortTeam);
       this.setConnected();
 

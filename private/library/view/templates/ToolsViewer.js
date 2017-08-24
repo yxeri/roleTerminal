@@ -302,9 +302,71 @@ class ToolsViewer extends StandardView {
           }],
           description: [
             textTools.createMixedString(60),
-            'Alter Ego Creator 0.0.2',
-            'Made available by Razor',
-            'Your new alias will be available in CHAT',
+            'Your new alias will be available in CHAT and FILES',
+            'NOTE! No one else will be able to create or use this alias',
+            'Create a FILES alias if you instead want all your team members to have access to it',
+          ],
+          extraDescription: ['Enter your new alias'],
+        });
+        createDialog.appendTo(this.element.parentElement);
+      },
+    });
+    const createCreatorAliasButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Create FILES alias',
+      func: () => {
+        const createDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                createDialog.removeView();
+              },
+            },
+            right: {
+              text: 'Create',
+              eventFunc: () => {
+                const emptyFields = createDialog.markEmptyFields();
+
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
+
+                socketManager.emitEvent('addCreatorAlias', { alias, userName: storageManager.getUserName() }, ({ error: createError }) => {
+                  if (createError) {
+                    console.log(createError);
+
+                    createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+
+                    return;
+                  }
+
+                  storageManager.addCreatorAlias(alias);
+
+                  eventCentral.triggerEvent({
+                    event: eventCentral.Events.NEWCREATORALIAS,
+                    params: { alias },
+                  });
+                  createDialog.removeView();
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Alias',
+            inputName: 'alias',
+            isRequired: true,
+            maxLength: 10,
+          }],
+          description: [
+            'Your new alias will be available in FILES.',
+            'All your team members can create and use the same alias',
+            'This alias cannot be used in the CHAT',
           ],
           extraDescription: ['Enter your new alias'],
         });
@@ -474,7 +536,7 @@ class ToolsViewer extends StandardView {
       },
     });
 
-    systemList.addItems({ items: [createSimpleMsgButton, createGameCodeButton, createAliasButton, setCoordinatesButton] });
+    systemList.addItems({ items: [createSimpleMsgButton, createGameCodeButton, createAliasButton, createCreatorAliasButton, setCoordinatesButton] });
     this.itemList.appendChild(systemList.element);
 
     this.accessElements.push({
@@ -483,6 +545,10 @@ class ToolsViewer extends StandardView {
     });
     this.accessElements.push({
       element: createAliasButton,
+      accessLevel: 1,
+    });
+    this.accessElements.push({
+      element: createCreatorAliasButton,
       accessLevel: 1,
     });
     this.accessElements.push({

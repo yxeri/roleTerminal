@@ -56,6 +56,7 @@ class EventCentral {
       LANTERNTEAMS: 'Updated lantern teams',
       VERIFIED: 'User verified',
       CHANGEPASSWORD: 'Change password',
+      NEWCREATORALIAS: 'new creator alias',
     };
     this.eventWatchers = {};
   }

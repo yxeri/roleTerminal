@@ -150,7 +150,7 @@ class DirViewer extends StandardView {
         const docFileId = button.getAttribute('data');
 
         if (docFileId || docFile.team === storageManager.getTeam()) {
-          socketManager.emitEvent('getDocFile', { docFileId, title: docFileId.title }, ({ error: docFileError, data: docFileData }) => {
+          socketManager.emitEvent('getDocFile', { docFileId, title: docFile.title }, ({ error: docFileError, data: docFileData }) => {
             if (docFileError) {
               console.log(docFileError);
 
@@ -168,8 +168,10 @@ class DirViewer extends StandardView {
           const deniedDialog = new DialogBox({
             buttons: {
               left: {
-                text: 'Crack',
-                eventFunc: () => {},
+                text: 'Cancel',
+                eventFunc: () => {
+                  deniedDialog.removeView();
+                },
               },
               right: {
                 text: 'Unlock',
@@ -262,7 +264,7 @@ class DirViewer extends StandardView {
       ],
     });
     const teamSet = elementCreator.createRadioSet({
-      title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code',
+      title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code.',
       optionName: 'team',
       options: [
         { optionId: 'teamYes', optionLabel: 'Yes' },
@@ -342,12 +344,9 @@ class DirViewer extends StandardView {
             isPublic: document.getElementById('visPublic').checked === true,
           };
           const updateExisting = typeof docFile !== 'undefined';
-
-          if (teamYes && teamYes.checked === true) {
-            newDocFile.team = storageManager.getTeam();
-          }
-
           const eventName = updateExisting ? 'updateDocFile' : 'createDocFile';
+
+          newDocFile.team = teamYes && teamYes.checked === true;
 
           socketManager.emitEvent(eventName, { docFile: newDocFile, userName: storageManager.getUserName() }, ({ error: docFileError }) => {
             if (docFileError) {
@@ -397,9 +396,11 @@ class DirViewer extends StandardView {
             this.viewer.innerHTML = '';
             this.viewer.appendChild(document.createTextNode('Document has been saved'));
 
-            if (!updateExisting) {
-              eventCentral.triggerEvent({ event: eventCentral.Events.CREATEDOCFILE, params: { docFile: newDocFile } });
+            if (updateExisting) {
+              this.myFiles.removeItem({ name: docFile.docFileId });
             }
+
+            eventCentral.triggerEvent({ event: eventCentral.Events.CREATEDOCFILE, params: { docFile: newDocFile } });
           });
         }
       },
@@ -493,17 +494,41 @@ class DirViewer extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.DOCFILE,
-      func: ({ docFile, updating }) => {
-        console.log(updating, docFile);
+      func: ({ docFile, updating, oldTitle, oldTeam }) => {
         const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
         const creator = docFile.customCreator || docFile.creator;
         const docTeam = docFile.team;
+        let previous;
+
+        if (updating && ((!oldTeam && docFile.team) || (oldTeam && !docFile.team))) {
+          const userTeam = storageManager.getTeam();
+
+          if (!oldTeam && docFile.team) {
+            const list = this.userLists[creator];
+
+            if (list) {
+              previous = list.getItem({ name: oldTitle });
+              list.removeItem({ name: oldTitle });
+            }
+          } else if (oldTeam && !docFile.team) {
+            if (userTeam && userTeam === oldTeam) {
+              this.myTeamFiles.removeItem({ name: oldTitle });
+            } else {
+              const list = this.teamLists[oldTeam];
+
+              if (list) {
+                previous = list.getItem({ name: oldTitle });
+                list.removeItem({ name: oldTitle });
+              }
+            }
+          }
+        }
 
         if (creator === userName) {
-          this.myFiles.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating });
+          this.myFiles.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
         } else if (docTeam && docTeam !== '') {
           if (docTeam === storageManager.getTeam()) {
-            this.myTeamFiles.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating });
+            this.myTeamFiles.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
           } else {
             const list = this.teamLists[docTeam];
 
@@ -514,10 +539,16 @@ class DirViewer extends StandardView {
                 showTitle: true,
                 minimumToShow: 0,
               });
-              this.teamLists[docTeam].addItem({ item: this.createDocFileButton(docFile) });
-              this.teamFiles.addItem({ item: this.teamLists[docTeam].element, shouldReplace: updating });
+              this.teamLists[docTeam].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
+              this.teamFiles.addItem({ item: this.teamLists[docTeam].element });
             } else {
-              list.addItem({ item: this.createDocFileButton(docFile) });
+              previous = previous || list.getItem({ name: oldTitle });
+
+              if (updating && previous && !docFile.docFileId) {
+                docFile.docFileId = previous.getAttribute('data');
+              }
+
+              list.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
             }
           }
         } else {
@@ -530,10 +561,16 @@ class DirViewer extends StandardView {
               showTitle: true,
               minimumToShow: 0,
             });
-            this.userLists[creator].addItem({ item: this.createDocFileButton(docFile) });
-            this.userFiles.addItem({ item: this.userLists[creator].element, shouldReplace: updating });
+            this.userLists[creator].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
+            this.userFiles.addItem({ item: this.userLists[creator].element });
           } else {
-            list.addItem({ item: this.createDocFileButton(docFile) });
+            previous = previous || list.getItem({ name: oldTitle });
+
+            if (updating && previous && !docFile.docFileId) {
+              docFile.docFileId = previous.getAttribute('data');
+            }
+
+            list.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
           }
         }
       },
@@ -558,8 +595,8 @@ class DirViewer extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.CREATEDOCFILE,
-      func: ({ docFile }) => {
-        this.myFiles.addItem({ item: this.createDocFileButton(docFile) });
+      func: ({ docFile, updating }) => {
+        this.myFiles.addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating });
       },
     });
 

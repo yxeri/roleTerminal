@@ -94,9 +94,15 @@ class List extends View {
     this.element.appendChild(list);
   }
 
-  addItem({ item, shouldReplace }) {
-    if (shouldReplace) {
-      this.removeItem({ name: item.lastChild.data || item.lastChild.textContent });
+  addItem({ item, shouldReplace, oldTitle }) {
+    if (shouldReplace && oldTitle) {
+      const oldButton = this.getItem({ name: oldTitle });
+
+      if (oldButton && oldButton.getAttribute('data')) {
+        item.setAttribute('data', oldButton.getAttribute('data'));
+      }
+
+      this.removeItem({ name: oldTitle });
     }
 
     if (this.shouldSort) {
@@ -122,7 +128,7 @@ class List extends View {
     const lowerName = name.toLowerCase();
 
     const newList = elementCreator.createList({
-      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => (element.getAttribute('data') || element.textContent.toLowerCase()) !== lowerName),
+      elements: Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).filter(element => (!element.getAttribute('data') || element.getAttribute('data') !== lowerName) && element.textContent.toLowerCase() !== lowerName),
     });
 
     this.element.replaceChild(newList, this.element.lastElementChild);
@@ -131,7 +137,7 @@ class List extends View {
   getItem({ name }) {
     const lowerName = name.toLowerCase();
 
-    return Array.from(this.element.lastElementChild.childNodes).find(element => (element.firstElementChild.getAttribute('data') || element.firstElementChild.textContent).toLowerCase() === lowerName);
+    return Array.from(this.element.lastElementChild.childNodes).map(element => element.firstElementChild).find(element => element.getAttribute('data') === lowerName || element.textContent.toLowerCase() === lowerName);
   }
 
   replaceAllItems({ items }) {

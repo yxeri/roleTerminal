@@ -1724,10 +1724,10 @@ socketManager.addEvents([
   }, {
     event: 'docFile',
     func: ({ data }) => {
-      const { docFile } = data;
+      const { docFile, updating, oldTitle, oldTeam } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.DOCFILE,
-        params: { docFile },
+        params: { docFile, updating, oldTitle, oldTeam },
       });
     },
   }, {

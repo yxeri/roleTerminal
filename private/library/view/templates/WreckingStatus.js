@@ -174,7 +174,6 @@ class WreckingStatus {
 
   displayTime() {
     const text = this.isActive ? 'Active for' : 'Next in';
-    console.log('timeleft', this.timeLeft > 0);
     const timeLeft = this.timeLeft > 0 ? textTools.getHoursAndMinutes(this.timeLeft) : undefined;
     const timeText = timeLeft ? `${text}: ${timeLeft.hours}h${timeLeft.minutes}m` : `${text}: UNKNOWN`;
 

@@ -138,6 +138,12 @@ class Wallet extends StandardView {
 
                 socketManager.emitEvent('createTransaction', { transaction, fromTeam: teamOption && teamOption.checked }, ({ error: createError, data }) => {
                   if (createError) {
+                    if (createError.type === 'insufficient') {
+                      transDialog.changeExtraDescription({ text: ['Not enough vcaps', 'Unable to transfer credits'] });
+
+                      return;
+                    }
+
                     transDialog.changeExtraDescription({ text: ['Something went wrong', 'Failed to transfer credits'] });
 
                     return;

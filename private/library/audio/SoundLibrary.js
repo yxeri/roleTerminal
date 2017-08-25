@@ -14,26 +14,56 @@
  limitations under the License.
  */
 
+const SoundElement = require('./SoundElement');
+
 class SoundLibrary {
   constructor() {
-    this.sounds = new Map();
+    this.sounds = {};
+    this.isEnabled = false;
   }
 
   addSound(sound) {
-    this.sounds.set(sound.soundId, sound);
+    this.sounds[sound.soundId] = sound;
   }
 
-  getSound(soundId) {
-    return this.sounds.get(soundId);
+  getSound(sentSoundId) {
+    if (this.sounds[sentSoundId]) {
+      return this.sounds[sentSoundId];
+    }
+
+    return null;
   }
 
-  removeSound(soundId) {
-    this.sounds.delete(soundId);
+  playSound(soundId, params = {}) {
+    if (this.isEnabled) {
+      const sound = this.sounds[soundId];
+
+      if (sound) {
+        if (!sound.multi) {
+          sound.playAudio(params);
+        } else {
+          const newSound = {
+            path: sound.audio.src,
+            volume: sound.audio.volume,
+            soundId: sound.soundId,
+            multi: sound.multi,
+          };
+
+          new SoundElement(newSound).playAudio({});
+        }
+      }
+    }
   }
 
-  getAllSounds() {
-    return this.sounds.values;
+  toggleSounds() {
+    this.isEnabled = !this.isEnabled;
+  }
+
+  removeSound(sentSoundId) {
+    this.sounds[sentSoundId] = null;
   }
 }
 
-module.exports = SoundLibrary;
+const soundLibrary = new SoundLibrary();
+
+module.exports = soundLibrary;

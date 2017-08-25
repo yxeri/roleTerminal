@@ -14,82 +14,211 @@
  limitations under the License.
  */
 
-const View = require('./View');
-
-/**
- * Create and return input element
- * @param {Object} input - Input
- * @returns {HTMLElement} - Input element
- */
-function createInput(input) {
-  const inputElement = document.createElement('INPUT');
-
-  inputElement.setAttribute('placeholder', input.placeholder);
-  inputElement.setAttribute('name', input.inputName);
-
-  if (input.inputType) {
-    inputElement.setAttribute('type', input.inputType);
-  }
-
-  return inputElement;
-}
-
-/**
- * Create and return a button element
- * @param {string} text - Text in the button
- * @param {Function} eventFunc - Callback when button is clicked
- * @returns {Element} Button element
- */
-function createButton({ text, eventFunc }) {
-  const buttonElement = document.createElement('BUTTON');
-
-  buttonElement.appendChild(document.createTextNode(text));
-  buttonElement.addEventListener('click', eventFunc);
-
-  return buttonElement;
-}
+const View = require('./base/View');
+const keyHandler = require('../KeyHandler');
+const elementCreator = require('../ElementCreator');
 
 class DialogBox extends View {
-  constructor({ buttons, descriptionText, parentElement, inputs = [] }) {
-    super({ isFullscreen: false });
+  constructor({ buttons, description = [], extraDescription = [], inputs = [], closeFunc }) {
+    super({ isFullscreen: false, closeFunc });
 
-    const descriptionContainer = document.createElement('DIV');
-    descriptionContainer.classList.add('description');
-    descriptionContainer.appendChild(document.createTextNode(descriptionText));
+    const leftCharCode = buttons.left.text.toUpperCase().charCodeAt(0);
+    let rightCharCode = buttons.right.text.toUpperCase().charCodeAt(0);
 
-    this.leftButton = createButton({
-      text: `[${buttons.left.text.charAt(0).toUpperCase()}]${buttons.left.text.slice(1)}`,
-      eventFunc: buttons.left.eventFunc,
+    if (leftCharCode === rightCharCode) { rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1); }
+
+    this.addKeyTrigger({ charCode: leftCharCode, func: buttons.left.eventFunc });
+    this.addKeyTrigger({ charCode: rightCharCode, func: buttons.right.eventFunc });
+
+    this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
+
+    this.descriptionContainer = document.createElement('DIV');
+    this.descriptionContainer.classList.add('description');
+    description.forEach(text => this.descriptionContainer.appendChild(elementCreator.createParagraph({ text })));
+
+    this.extraDescription = document.createElement('DIV');
+    extraDescription.forEach(text => this.extraDescription.appendChild(elementCreator.createParagraph({ text })));
+
+    this.extraLinks = document.createElement('DIV');
+
+    this.descriptionContainer.appendChild(this.extraDescription);
+    this.descriptionContainer.appendChild(this.extraLinks);
+
+    const closeButton = elementCreator.createButton({
+      text: 'X',
+      func: () => { this.removeView(); },
+      classes: ['closeButton'],
     });
-    this.rightButton = createButton({
-      text: `[${buttons.right.text.charAt(0).toUpperCase()}]${buttons.right.text.slice(1)}`,
-      eventFunc: buttons.right.eventFunc,
-    });
+
+    const leftButtonChar = buttons.left.text.charAt(0);
+    let rightButtonChar = buttons.right.text.charAt(0);
+    let rightButtonText = `[${rightButtonChar.toUpperCase()}]${buttons.right.text.slice(1)}`;
+
+    if (leftButtonChar.toLowerCase() === rightButtonChar.toLowerCase()) {
+      rightButtonChar = buttons.right.text.charAt(1);
+      rightButtonText = `${buttons.right.text.charAt(0).toUpperCase()}[${buttons.right.text.charAt(1)}]${buttons.right.text.slice(2)}`;
+    }
+
+    this.buttonsContainer = document.createElement('DIV');
+    this.buttonsContainer.classList.add('buttons');
+    this.buttonsContainer.appendChild(elementCreator.createButton({
+      text: `[${leftButtonChar.toUpperCase()}]${buttons.left.text.slice(1)}`,
+      func: buttons.left.eventFunc,
+    }));
+    this.buttonsContainer.appendChild(elementCreator.createButton({
+      text: rightButtonText,
+      func: buttons.right.eventFunc,
+    }));
+
     this.inputs = [];
 
-    this.element.appendChild(descriptionContainer);
+    this.element.appendChild(closeButton);
+    this.element.appendChild(this.descriptionContainer);
 
-    for (const input of inputs) {
-      const inputElement = createInput(input);
+    inputs.forEach((input) => {
+      const type = input.type || '';
+      let inputElement;
 
-      this.inputs.push(inputElement);
+      switch (type) {
+        case 'radioSet': {
+          inputElement = elementCreator.createRadioSet(input);
+
+          break;
+        }
+        case 'textarea': {
+          inputElement = elementCreator.createInput(input);
+
+          if (input.defaultValue && input.defaultValue !== '') {
+            inputElement.value = input.defaultValue;
+          }
+
+          inputElement.addEventListener('input', () => {
+            inputElement.style.height = 'auto';
+            inputElement.style.height = `${inputElement.scrollHeight}px`;
+          });
+
+          break;
+        }
+        default: {
+          inputElement = elementCreator.createInput(input);
+
+          if (input.defaultValue && input.defaultValue !== '') {
+            inputElement.value = input.defaultValue;
+          }
+
+          if (input.maxLength) {
+            inputElement.setAttribute('maxlength', input.maxLength);
+          }
+
+          break;
+        }
+      }
+
+      this.inputs.push({ inputName: input.inputName, inputElement });
       this.element.appendChild(inputElement);
-    }
+    });
 
-    this.element.appendChild(this.leftButton);
-    this.element.appendChild(this.rightButton);
+    this.element.appendChild(this.buttonsContainer);
     this.element.classList.add('dialogBox');
 
-    if (parentElement) {
-      this.appendTo(parentElement);
+    this.cover = document.createElement('DIV');
+    this.cover.setAttribute('id', 'cover');
+  }
+
+  /**
+   * Marks fields that are empty. Returns true if any of the fields were empty
+   * @returns {boolean} Are any of the fields empty?
+   */
+  markEmptyFields() {
+    const requiredFields = this.inputs.filter(({ inputElement }) => inputElement.getAttribute('required') === 'true');
+    let emptyFields = false;
+
+    requiredFields.forEach(({ inputElement: input }) => {
+      if (input.value === '') {
+        emptyFields = true;
+        this.markInput(input.getAttribute('name'));
+      }
+    });
+
+    return emptyFields;
+  }
+
+  appendTo(parentElement) {
+    parentElement.appendChild(this.cover);
+    super.appendTo(parentElement);
+
+    if (this.inputs[0]) {
+      this.inputs[0].inputElement.focus();
     }
+  }
+
+  removeView() {
+    this.element.parentNode.removeChild(this.cover);
+    this.disableKeyTriggers();
+    super.removeView();
   }
 
   addInput(input) {
-    const inputElement = createInput(input);
+    const inputElement = elementCreator.createInput(input);
 
-    this.inputs.push(inputElement);
-    this.element.appendChild(inputElement);
+    this.inputs.push({ inputName: input.inputName, inputElement });
+    this.element.insertBefore(inputElement, this.buttonsContainer);
+  }
+
+  findInput(sentInputName) {
+    return this.inputs.find(({ inputName }) => sentInputName === inputName);
+  }
+
+  removeInput(sentInputName) {
+    const inputIndex = this.inputs.findIndex(({ inputName }) => sentInputName === inputName);
+
+    if (inputIndex > -1) {
+      this.element.removeChild(this.inputs[inputIndex].inputElement);
+      this.inputs.splice(inputIndex, 1);
+    }
+  }
+
+  clearInput(sentInputName) {
+    const input = this.findInput(sentInputName);
+
+    if (input) { input.inputElement.value = ''; }
+  }
+
+  focusInput(sentInputName) {
+    const input = this.findInput(sentInputName);
+
+    if (input) { input.inputElement.focus(); }
+  }
+
+  markInput(sentInputName) {
+    const input = this.findInput(sentInputName);
+
+    if (input) { input.inputElement.classList.add('markedInput'); }
+  }
+
+  changeExtraDescription({ text = [] }) {
+    const fragment = document.createDocumentFragment();
+
+    text.forEach((line) => {
+      const paragraph = document.createElement('P');
+
+      paragraph.classList.add('flash');
+      paragraph.appendChild(document.createTextNode(line));
+      fragment.appendChild(paragraph);
+    });
+
+    this.extraDescription.innerHTML = ' ';
+    this.extraDescription.appendChild(fragment);
+  }
+
+  addLinkToExtra({ linkText, func, classes }) {
+    const span = elementCreator.createSpan({
+      func,
+      classes,
+      text: linkText,
+    });
+
+    this.extraLinks.appendChild(span);
   }
 }
 

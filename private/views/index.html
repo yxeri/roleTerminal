@@ -18,56 +18,33 @@
 <html lang="en" id="html">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="stylesheet" type="text/css" href="styles/main.css"/>
+  <meta name="format-detection" content = "telephone=no">
+  <meta property="og:title" content="The Oracle" />
+  <meta property="og:description" content="Tools and games for all your roleplaying needs" />
+  <meta property="og:image" content="https://thethirdgift.com/images/facebookImage.png" />
+  <link rel="stylesheet" type="text/css" href="{{mainCss}}"/>
+  <link rel="stylesheet" type="text/css" media="print" href="styles/print.css"/>
+  {{#if dyslexic}}
+    <link rel="stylesheet" type="text/css" href="styles/dyslexic.css"/>
+  {{/if}}
   <title>{{title}}</title>
 </head>
 <body>
 <div id="background">
-  <div id="logo"><h1>[ rOS ]</h1></div>
   <div id="main">
-    <div id="menu">
-      <div id="sysItems">
-        <span><h2>[C]oms</h2></span>
-        <span><h2>[M]ap</h2></span>
-        <span><h2>[J]obs</h2></span>
-        <span><h2>[T]ools</h2></span>
-      </div>
+    <div id="top">
+      <div><div id="wrecking"><span>WRECKING</span></div><span id="time"><span>-------</span><span>---------</span></span><span id="onlineStatus">------</span></div>
     </div>
   </div>
 </div>
-<script>
-  if (!Array.prototype.find) {
-    Array.prototype.find = function (predicate) {
-      'use strict';
-      if (this == null) {
-        throw new TypeError('Array.prototype.find called on null or undefined');
-      }
-      if (typeof predicate !== 'function') {
-        throw new TypeError('predicate must be a function');
-      }
-      var list = Object(this);
-      var length = list.length >>> 0;
-      var thisArg = arguments[1];
-      var value;
-
-      for (var i = 0; i < length; i++) {
-        value = list[i];
-        if (predicate.call(thisArg, value, i, list)) {
-          return value;
-        }
-      }
-      return undefined;
-    };
-  }
-</script>
 <script src={{socketPath}} defer></script>
 <script src="{{mainJs}}" defer></script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}" defer></script>
-<script src="https://yxeri.github.io/js-map-label/minified/maplabel.js" defer></script>
-<script src="https://yxeri.github.io/js-marker-clusterer/minified/markerclusterer.js" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}&libraries=geometry" defer></script>
+<script src="scripts/maplabel.js" defer></script>
+<script src="scripts/markerclusterer.js" defer></script>
 </body>
 </html>

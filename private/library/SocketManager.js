@@ -14,40 +14,143 @@
  limitations under the License.
  */
 
+const storageManager = require('./StorageManager');
+const eventCentral = require('./EventCentral');
+
 class SocketManager {
-  constructor({ socket, events }) {
-    const eventKeys = Object.keys(events);
-    this.socket = socket;
+  constructor() {
+    this.socket = io(); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
+    this.reconnecting = false;
+    this.hasConnected = false;
 
-    for (let i = 0; i < eventKeys.length; i += 1) {
-      const event = eventKeys[i];
+    /**
+     * Checks if the screen has been unresponsive for some time.
+     * Some devices disable Javascript when screen is off (iOS)
+     * They also fail to notice that they have been disconnected
+     * We check the time between heartbeats and if the time i
+     * over 10 seconds (example: when screen is turned off and then on)
+     * we force them to reconnect
+     */
+    const timeoutFunc = () => {
+      const now = (new Date()).getTime();
+      const diff = now - this.lastAlive;
+      const offBy = diff - 1000;
+      this.lastAlive = now;
 
-      this.socket.on(event, events[event]);
-    }
+      if (offBy > 10000) {
+        this.reconnect();
+      }
 
-    this.autoReconnect();
+      setTimeout(timeoutFunc, 1000);
+    };
+
+    timeoutFunc();
+  }
+
+  addEvent(event, callback) {
+    this.socket.on(event, callback);
+  }
+
+  addEvents(events) {
+    events.forEach(event => this.addEvent(event.event, event.func));
+  }
+
+  updateId() {
+    this.emitEvent('updateDevice', {
+      device: { deviceId: storageManager.getDeviceId() },
+      callback: () => {},
+    });
+    this.emitEvent('updateId', {
+      device: {
+        deviceId: storageManager.getDeviceId(),
+      },
+    }, ({ error, data }) => {
+      if (error) {
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.LOGOUT,
+          params: {},
+        });
+
+        return;
+      }
+
+      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam, creatorAliases }, lanternStats } = data;
+      const { teams, stations, round, timeLeft } = lanternStats;
+
+      storageManager.setUserName(userName);
+      storageManager.setAccessLevel(accessLevel);
+      storageManager.setAliases(aliases);
+      storageManager.setCreatorAliases(creatorAliases);
+      storageManager.setTeam(team, shortTeam);
+      this.setConnected();
+
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SWITCHROOM,
+        params: { roomName: storageManager.getRoom() } });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.SIGNALBLOCK,
+        params: { blockedBy },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.USER,
+        params: {
+          changedUser: userName,
+          firstConnection: !this.hasConnected,
+        },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNTEAMS,
+        params: { teams },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNROUND,
+        params: { round, timeLeft },
+      });
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.LANTERNSTATIONS,
+        params: { stations },
+      });
+
+      this.emitEvent('getProfileGameCode', { owner: storageManager.getUserName() }, ({ error: codeError, data: codeData }) => {
+        if (codeError) {
+          console.log(codeError);
+
+          return;
+        }
+
+        const { gameCode } = codeData;
+
+        storageManager.setGameCode(gameCode);
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.GAMECODE,
+          params: { gameCode },
+        });
+      });
+    });
   }
 
   /**
    * Reconnect to socket.io
    */
   reconnect() {
-    this.socket.disconnect();
-    this.socket.connect({ forceNew: true });
-    this.socket.emit('updateId', {}, () => {
-      // TODO User and device should be sent to server
-      console.log('reconnected');
-    });
+    if (!this.reconnecting) {
+      this.reconnecting = true;
+      this.socket.disconnect();
+      this.socket.connect({ forceNew: true });
+      this.updateId();
+    }
   }
 
   /**
    * Emit event through socket.io
-   * @param {string} event - Event to emit
-   * @param {Object} [params] - Parameters to send in the emit
-   * @param {Function} [callback] - Callback
+   * @param {string} event Event to emit
+   * @param {Object} [params] Parameters to send in the emit
+   * @param {Function} [callback] Callback
    */
   emitEvent(event, params, callback) {
+    params.token = storageManager.getToken() || '';
+
     if (!callback) {
       this.socket.emit(event, params);
     } else {
@@ -55,26 +158,11 @@ class SocketManager {
     }
   }
 
-  /**
-   * Checks if the screen has been unresponsive for some time.
-   * Some devices disable Javascript when screen is off (iOS)
-   * They also fail to notice that they have been disconnected
-   * We check the time between heartbeats and if the time i
-   * over 10 seconds (example: when screen is turned off and then on)
-   * we force them to reconnect
-   */
-  autoReconnect() {
-    const now = (new Date()).getTime();
-    const diff = now - this.lastAlive;
-    const offBy = diff - 1000;
-    this.lastAlive = now;
+  reconnectDone() { this.reconnecting = false; }
 
-    if (offBy > 10000) {
-      this.reconnect();
-    }
-
-    setTimeout(this.autoReconnect, 1000);
-  }
+  setConnected() { this.hasConnected = true; }
 }
 
-module.exports = SocketManager;
+const socketManager = new SocketManager();
+
+module.exports = socketManager;

@@ -473,14 +473,6 @@ class Messenger extends StandardView {
 
           this.messageList.element.innerHTML = '';
 
-          if (storageManager.getAccessLevel() > 0) {
-            this.inputArea.classList.remove('hide');
-            this.messageList.element.classList.remove('fullHeight');
-          } else {
-            this.inputArea.classList.add('hide');
-            this.messageList.element.classList.add('fullHeight');
-          }
-
           this.messageList.addItems(messages.map(message => new Message(message, options)), itemsOptions);
         } else {
           const listItem = findItem(this.followList, fullRoomName);
@@ -670,6 +662,9 @@ class Messenger extends StandardView {
               this.selectedItem = listItem;
               this.selectedItem.classList.add('selectedItem');
             }
+
+            this.inputArea.classList.remove('hide');
+            this.messageList.element.classList.remove('fullHeight');
           }
 
           socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
@@ -689,6 +684,9 @@ class Messenger extends StandardView {
           this.userList.replaceAllItems({ items: [] });
           this.followList.replaceAllItems({ items: [] });
           this.roomsList.replaceAllItems({ items: [] });
+
+          this.inputArea.classList.add('hide');
+          this.messageList.element.classList.add('fullHeight');
         }
 
         socketManager.emitEvent('getRooms', {}, ({ error, data }) => {

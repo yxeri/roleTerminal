@@ -88,7 +88,8 @@ class StorageManager {
     this.setRoom('public');
     this.removeLocalVal('userName');
     this.setAccessLevel(0);
-    this.removeLocalVal('aliases');
+    this.setCreatorAliases([]);
+    this.setAliases([]);
     this.removeSelectedAlias();
     this.removeTeam();
     this.removeGameCode();

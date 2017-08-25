@@ -226,13 +226,14 @@ class LoginBox extends DialogBox {
               return;
             }
 
-            const { token, user: { accessLevel, team, shortTeam, aliases, userName } } = data;
+            const { token, user: { accessLevel, team, shortTeam, aliases, userName, creatorAliases } } = data;
 
             storageManager.setToken(token);
             storageManager.setUserName(userName);
             storageManager.setAccessLevel(accessLevel);
             storageManager.setTeam(team, shortTeam);
-            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { aliases } });
+            storageManager.setAliases(aliases);
+            storageManager.setCreatorAliases(creatorAliases);
             eventCentral.triggerEvent({ event: eventCentral.Events.LOGIN });
             this.removeView();
 

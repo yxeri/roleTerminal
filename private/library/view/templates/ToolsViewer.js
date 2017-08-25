@@ -282,6 +282,14 @@ class ToolsViewer extends StandardView {
                   if (createError) {
                     console.log(createError);
 
+                    if (createError.type === 'already exists') {
+                      createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+
+                      return;
+                    }
+
+                    createDialog.changeExtraDescription({ text: ['Something went wrong.', 'Unable to create alias'] });
+
                     return;
                   }
 
@@ -341,7 +349,13 @@ class ToolsViewer extends StandardView {
                   if (createError) {
                     console.log(createError);
 
-                    createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+                    if (createError.type === 'already exists') {
+                      createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+
+                      return;
+                    }
+
+                    createDialog.changeExtraDescription({ text: ['Something went wrong.', 'Unable to create alias'] });
 
                     return;
                   }

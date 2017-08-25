@@ -149,14 +149,19 @@ class DirViewer extends StandardView {
       func: () => {
         const docFileId = button.getAttribute('data');
 
-        if (docFileId || docFile.team === storageManager.getTeam()) {
+        if (docFileId || docFile.team === storageManager.getTeam() || (docFile.customCreator && storageManager.getCreatorAliases().indexOf(docFile.customCreator) > -1)) {
           socketManager.emitEvent('getDocFile', { docFileId, title: docFile.title }, ({ error: docFileError, data: docFileData }) => {
             if (docFileError) {
               console.log(docFileError);
 
+              const paragraph = elementCreator.createParagraph({ text: 'Something went wrong. Unable to get file' });
+
+              this.viewer.innerHTML = '';
+              this.viewer.appendChild(paragraph);
+
               return;
             } else if (!docFileData.docFile) {
-              const paragraph = elementCreator.createParagraph({ text: `${docFile.docFileId} - File not found` });
+              const paragraph = elementCreator.createParagraph({ text: 'File not found' });
 
               this.viewer.innerHTML = '';
               this.viewer.appendChild(paragraph);
@@ -240,7 +245,7 @@ class DirViewer extends StandardView {
       },
     });
 
-    if ((docFile.isLocked || !docFile.docFileId) && docFile.team !== storageManager.getTeam()) {
+    if ((docFile.isLocked || !docFile.docFileId) && docFile.team !== storageManager.getTeam() && (!docFile.customCreator || storageManager.getCreatorAliases().indexOf(docFile.customCreator) === -1)) {
       button.classList.add('locked');
     }
 
@@ -500,7 +505,7 @@ class DirViewer extends StandardView {
         const docTeam = docFile.team;
         let previous;
 
-        if (updating && ((!oldTeam && docFile.team) || (oldTeam && !docFile.team))) {
+        if (oldTitle && updating && ((!oldTeam && docFile.team) || (oldTeam && !docFile.team))) {
           const userTeam = storageManager.getTeam();
 
           if (!oldTeam && docFile.team) {
@@ -542,7 +547,7 @@ class DirViewer extends StandardView {
               this.teamLists[docTeam].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
               this.teamFiles.addItem({ item: this.teamLists[docTeam].element });
             } else {
-              previous = previous || list.getItem({ name: oldTitle });
+              previous = previous || oldTitle ? list.getItem({ name: oldTitle }) : undefined;
 
               if (updating && previous && !docFile.docFileId) {
                 docFile.docFileId = previous.getAttribute('data');
@@ -564,7 +569,7 @@ class DirViewer extends StandardView {
             this.userLists[creator].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
             this.userFiles.addItem({ item: this.userLists[creator].element });
           } else {
-            previous = previous || list.getItem({ name: oldTitle });
+            previous = previous || oldTitle ? list.getItem({ name: oldTitle }) : undefined;
 
             if (updating && previous && !docFile.docFileId) {
               docFile.docFileId = previous.getAttribute('data');

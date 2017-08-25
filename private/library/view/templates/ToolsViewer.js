@@ -310,10 +310,11 @@ class ToolsViewer extends StandardView {
             maxLength: 10,
           }],
           description: [
-            textTools.createMixedString(60),
-            'Your new alias will be available in CHAT and FILES',
-            'NOTE! No one else will be able to create or use this alias',
-            'Create a FILES alias if you instead want all your team members to have access to it',
+            'Alter Ego Creator 0.1.2 Razor Edition',
+            textTools.createMixedString(25),
+            'You created alias will be available in CHAT and FILES.',
+            'NOTE! No one, except you, will be able to create or use this alias.',
+            'Create a FILES alias if you want all your team members to be able to create and use aliases with the same name',
           ],
           extraDescription: ['Enter your new alias'],
         });
@@ -378,7 +379,9 @@ class ToolsViewer extends StandardView {
             maxLength: 10,
           }],
           description: [
-            'Your new alias will be available in FILES.',
+            'File Custom Creator 0.0.2 Razor Edition',
+            textTools.createMixedString(25),
+            'Your created alias will be available in FILES.',
             'All your team members can create and use the same alias',
             'This alias cannot be used in the CHAT',
           ],
@@ -437,7 +440,12 @@ class ToolsViewer extends StandardView {
             isRequired: true,
             multiLine: true,
           }],
-          description: ['Create a rumour that is visible for all other players'],
+          description: [
+            'Dassrykten IoT Edition',
+            textTools.createMixedString(25),
+            'Create a rumour that is visible for all other players',
+            'It will be shown in the view to the right',
+          ],
           extraDescription: ['Enter the message'],
         });
         createDialog.appendTo(this.element.parentElement);
@@ -544,7 +552,11 @@ class ToolsViewer extends StandardView {
             maxLength: 30,
             defaultValue: staticPosition ? staticPosition.coordinates.longitude : '',
           }],
-          description: ['Set static GPS coordinates. Leave both fields empty if you want to remove the static coordinates'],
+          description: [
+            'Coordinates Spoofer 5.1.1 Razor Edition',
+            textTools.createMixedString(25),
+            'Set static GPS coordinates. Leave both fields empty if you want to remove the static coordinates',
+          ],
         });
         setDialog.appendTo(this.element.parentElement);
       },

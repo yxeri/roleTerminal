@@ -293,6 +293,7 @@ class ToolsViewer extends StandardView {
                     return;
                   }
 
+                  storageManager.addAlias(alias);
                   eventCentral.triggerEvent({
                     event: eventCentral.Events.NEWALIAS,
                     params: { alias },
@@ -361,7 +362,6 @@ class ToolsViewer extends StandardView {
                   }
 
                   storageManager.addCreatorAlias(alias);
-
                   eventCentral.triggerEvent({
                     event: eventCentral.Events.NEWCREATORALIAS,
                     params: { alias },

@@ -48,6 +48,7 @@ const tools = require('../library/Tools');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
+const toggleButton = document.getElementById('toggleButton');
 const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
 const boot = new TextAnimation({ removeTime: 700 });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
@@ -972,13 +973,16 @@ keyHandler.addKey(32, () => { home.appendTo(mainView); });
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
   if (!viewTools.isLandscape()) {
     top.classList.add('appleMenuFix');
+    toggleButton.classList.add('appleListButtonFix');
   }
 
   window.addEventListener('orientationchange', () => {
     if (viewTools.isLandscape()) {
       top.classList.remove('appleMenuFix');
+      toggleButton.classList.remove('appleListButtonFix');
     } else {
       top.classList.add('appleMenuFix');
+      toggleButton.classList.add('appleListButtonFix');
     }
   });
 }

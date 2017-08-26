@@ -43,7 +43,7 @@ class ElementCreator {
     return listItem;
   }
 
-  static createButton({ func = () => {}, rightFunc = () => {}, text, data, classes = [] }) {
+  static createButton({ func = () => {}, rightFunc = () => {}, text, data, classes = [], elementId }) {
     const button = document.createElement('BUTTON');
     let longClick = false;
     button.appendChild(document.createTextNode(text));
@@ -71,6 +71,10 @@ class ElementCreator {
 
     if (data) {
       button.setAttribute('data', data);
+    }
+
+    if (elementId) {
+      button.setAttribute('id', elementId);
     }
 
     return button;

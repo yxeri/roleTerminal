@@ -26,6 +26,7 @@ class StandardView extends View {
 
     this.element.append(elementCreator.createButton({
       text: 'Toggle menu',
+      elementId: 'toggleButton',
       classes: ['listButton'],
       func: () => {
         this.itemList.classList.toggle('show');

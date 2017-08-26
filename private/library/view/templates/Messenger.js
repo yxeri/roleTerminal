@@ -538,17 +538,11 @@ class Messenger extends StandardView {
           shouldScroll: true,
         };
 
-        const intro = [
-          '-------------------------------',
-          'THIS IS A PUBLIC ANNOUNCEMENT',
-          'EMPLOYEE. STAND AT ATTENTION',
-          '-------------------------------',
+        const intro = message.intro || [
+          'THIS IS A PUBLIC ANNOUNCEMENT. EMPLOYEE. STAND AT ATTENTION.',
         ];
-        const extro = [
-          '-------------------',
-          'END OF MESSAGE',
-          'RETURN TO YOUR DUTY',
-          '-------------------',
+        const extro = message.extro || [
+          'END OF MESSAGE. RETURN TO YOUR DUTY.',
         ];
 
         message.text = intro.concat(message.text).concat(extro);

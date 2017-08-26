@@ -30,14 +30,14 @@ const textTools = require('../../TextTools');
 
 /**
  * Takes a list of user names and filters out current users user name and aliases
- * @param {string[]} users List of users
+ * @param {string[]} userNames List of users
  * @returns {string[]} List of users, excluding current user name and aliases
  */
-function filterUserAliases(users) {
+function filterUserAliases(userNames) {
   const aliases = storageManager.getAliases();
   aliases.push(storageManager.getUserName());
 
-  return users.filter(user => aliases.indexOf(user.userName) === -1);
+  return userNames.filter(userName => aliases.indexOf(userName) === -1);
 }
 
 /**
@@ -668,10 +668,19 @@ class Messenger extends StandardView {
               return;
             }
 
-            const users = filterUserAliases(data.users);
-            const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+            socketManager.emitEvent('listAliases', {}, ({ error: aliasError, data: aliasData }) => {
+              if (aliasError) {
+                console.log(aliasError);
 
-            this.userList.replaceAllItems({ items: users.map(user => this.createWhisperButton({ roomName: userName, whisperTo: user.userName })) });
+                return;
+              }
+
+              const users = filterUserAliases(data.users.map(user => user.userName));
+              const retrievedAliases = filterUserAliases(aliasData.aliases);
+              const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
+
+              this.userList.replaceAllItems({ items: users.concat(retrievedAliases).map(thisUserName => this.createWhisperButton({ roomName: userName, whisperTo: thisUserName })) });
+            });
           });
         } else {
           this.aliasList.replaceAllItems({ items: [] });

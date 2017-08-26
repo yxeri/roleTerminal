@@ -292,14 +292,14 @@ class WorldMap extends View {
 
             switch (position.markerType) {
               case 'local': {
-                if (!this.localList.getItem({ name: positionName})) {
+                if (!this.localList.getItem({ name: positionName })) {
                   this.localList.addItem({ item: this.createListButton(positionName, this.localList) });
                 }
 
                 break;
               }
               case 'world': {
-                if (!this.worldList.getItem({ name: positionName})) {
+                if (!this.worldList.getItem({ name: positionName })) {
                   this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
                 }
 

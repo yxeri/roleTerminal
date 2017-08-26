@@ -134,7 +134,6 @@ input {
   cursor: pointer;
   color: $text-color;
   font-family: monospace;
-  font-size: $font-size;
   -webkit-text-size-adjust: 100%;
   border-radius: 0;
   padding: .1em .1em .1em .3em;
@@ -640,7 +639,7 @@ pre {
 
   button {
     margin-left: .1em;
-    width: calc(100% - .3em);
+    width: calc(100% - .4em);
     margin-bottom: .4em;
   }
 
@@ -730,7 +729,7 @@ pre {
 
   input {
     margin-left: 0;
-    width: calc(100% - .2em);
+    width: calc(100% - .4em);
   }
 
   input:first-child {
@@ -739,7 +738,7 @@ pre {
 
   textarea {
     margin-top: $padding;
-    width: calc(100% - .2em);
+    width: calc(100% - .4em);
   }
 
   legend {
@@ -916,7 +915,7 @@ pre {
   -webkit-justify-content: flex-end;
   display: flex;
   justify-content: flex-end;
-  margin-right: .1em;
+  margin-right: .2em;
 
   div {
     margin-right: $padding * 2;
@@ -969,7 +968,6 @@ pre {
   span {
     width: calc(100% - 1em);
     display: inline-block;
-    word-break: break-all;
   }
 }
 
@@ -1013,13 +1011,13 @@ pre {
   z-index: 2;
   position: absolute;
   left: .5em;
-  top: 2.5em;
+  top: 2.2em;
   width: 8.6em;
 }
 
 .toggledList {
   margin-top: 0 !important;
-  height: calc(100% - .6em) !important;
+  height: 100% !important;
 }
 
 #introText {
@@ -1162,15 +1160,25 @@ pre {
   .listButton {
     display: none;
   }
+
+  .appleMenuFix {
+    padding-top: 0em;
+  }
 }
 
 @media (max-width: 479px) {
   #top {
     #wrecking {
+      padding: .2em .1em .1em .1em;
+
       > div {
         right: .2em;
       }
     }
+  }
+
+  .container {
+    height: calc(100% - 3em);
   }
 
   .list {
@@ -1180,11 +1188,16 @@ pre {
   }
 
   .listButton {
+    top: 3em;
     display: block;
   }
 
   .viewer {
-    margin-top: 1.9em;
-    height: calc(100% - 2.5em);
+    margin-top: 2.1em;
+    height: calc(100% - 2.1em);
+  }
+
+  .appleMenuFix {
+    padding-top: 1em;
   }
 }

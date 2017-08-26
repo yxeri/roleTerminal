@@ -259,7 +259,7 @@ class DirViewer extends StandardView {
     const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true, maxLength: 100 });
     const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true, maxLength: 20 });
     const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true, maxLength: 6000 });
-    const aliasInput = elementCreator.createInput({ placeholder: 'Set creator to alias instead of your user name', inputName: 'creatorAlias', inputId: 'creatorAlias', maxLength: 20 });
+    const aliasInput = elementCreator.createInput({ placeholder: 'Set alias as creator', inputName: 'creatorAlias', inputId: 'creatorAlias', maxLength: 20 });
     const visibilitySet = elementCreator.createRadioSet({
       title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
       optionName: 'visibility',

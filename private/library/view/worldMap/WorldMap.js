@@ -15,7 +15,7 @@
  */
 
 const View = require('../base/View');
-const DialogBox = require('../DialogBox');
+// const DialogBox = require('../DialogBox');
 const MapMarker = require('./MapMarker');
 const Label = require('./Label');
 const List = require('../base/List');

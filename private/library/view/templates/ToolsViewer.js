@@ -70,7 +70,7 @@ class ToolsViewer extends StandardView {
         });
 
         if (storageManager.getToken()) {
-          socketManager.emitEvent('getGameCodes', { codeType: 'loot' }, ({ error, data }) => {
+          socketManager.emitEvent('getGameCodes', { codeType: 'loot', userName: storageManager.getUserName() }, ({ error, data }) => {
             if (error) {
               console.log(error);
 

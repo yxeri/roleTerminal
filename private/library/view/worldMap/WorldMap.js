@@ -146,8 +146,7 @@ class WorldMap extends View {
           const world = [];
           const local = [];
           const teamUsers = [];
-          const users = [];
-          const others = Object.keys(this.markers).filter((positionName) => {
+          const users = Object.keys(this.markers).filter((positionName) => {
             const marker = this.markers[positionName];
 
             if (marker.markerType === 'custom') {

@@ -96,7 +96,7 @@ class WorldMap extends View {
     this.userList = new List({ title: 'USER', viewId: 'mapUserList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.localList = new List({ title: 'LOCAL', viewId: 'mapLocalList', shouldSort: true, minimumToShow: 0, showTitle: true });
     this.worldList = new List({ title: 'WORLD', viewId: 'mapWorldList', shouldSort: true, minimumToShow: 0, showTitle: true });
-    this.teamList = new List({ title: 'TEAM', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 1 });
+    this.teamList = new List({ title: 'TEAM', viewId: 'mapTeamList', shouldSort: true, minimumToShow: 0, showTitle: true });
 
     // TODO Ugly and duplicated
     this.userList.element.addEventListener('click', () => {
@@ -149,15 +149,11 @@ class WorldMap extends View {
           const users = Object.keys(this.markers).filter((positionName) => {
             const marker = this.markers[positionName];
 
-            if (marker.markerType === 'custom') {
-              return true;
-            }
-
             if (marker.markerType === 'user') {
               if (team && marker.team && team === marker.team) {
                 teamUsers.push(positionName);
               } else {
-                users.push(positionName);
+                return true;
               }
             } else if (marker.markerType === 'world') {
               world.push(positionName);
@@ -202,6 +198,38 @@ class WorldMap extends View {
 
               break;
             }
+            case 'local': {
+              this.localList.removeItem({ name: position.positionName });
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+            case 'world': {
+              this.worldList.removeItem({ name: position.positionName });
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+            case 'user': {
+              const marker = this.markers[position.positionName];
+              const team = storageManager.getTeam();
+
+              if (team && team === marker.team) {
+                this.teamList.removeItem({ name: position.positionName });
+              } else {
+                this.userList.removeItem({ name: position.positionName });
+              }
+
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
             default: {
               this.clusterer.removeMarker(this.markers[position.positionName].marker);
               this.markers[position.positionName].setMap(null);
@@ -229,6 +257,7 @@ class WorldMap extends View {
       func: ({ positions, currentTime }) => {
         positions.forEach((position) => {
           const thisUser = storageManager.getUserName();
+          const thisTeam = storageManager.getTeam();
           const positionName = position.positionName;
 
           if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
@@ -262,13 +291,28 @@ class WorldMap extends View {
             this.createMarker({ position, currentTime });
 
             switch (position.markerType) {
+              case 'local': {
+                if (!this.localList.getItem({ name: positionName })) {
+                  this.localList.addItem({ item: this.createListButton(positionName, this.localList) });
+                }
+
+                break;
+              }
               case 'world': {
-                this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
+                if (!this.worldList.getItem({ name: positionName })) {
+                  this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
+                }
 
                 break;
               }
               case 'user': {
-                this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
+                if (!this.userList.getItem({ name: positionName })) {
+                  if (positionName.team && thisTeam && positionName.team === thisTeam) {
+                    this.teamList.addItem({ item: this.createListButton(positionName, this.userList) });
+                  } else {
+                    this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
+                  }
+                }
 
                 break;
               }
@@ -312,8 +356,10 @@ class WorldMap extends View {
               const lastUpdated = new Date(marker.lastUpdated);
 
               if (currentTime - lastUpdated > this.maxUserAge) {
-                marker.setMap(null);
-                this.userList.removeItem({ name: positionName });
+                eventCentral.triggerEvent({
+                  event: eventCentral.Events.REMOVEPOSITIONS,
+                  params: { positions: [marker] },
+                });
               }
 
               break;
@@ -885,8 +931,6 @@ class WorldMap extends View {
     this.element.appendChild(this.mapClickMenu);
     this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
-
-    this.retrievePositions({});
   }
 
   createCircleArea({ position = {} }) {
@@ -980,12 +1024,12 @@ class WorldMap extends View {
           ];
 
           this.markers[positionName] = new MapMarker({
-            lastUpdated: date,
             coordinates: {
               accuracy: coordinates.accuracy,
               latitude,
               longitude,
             },
+            lastUpdated: date,
             icon: {
               url: team && team === (storageManager.getTeam() || '') ? 'images/mapiconteam.png' : 'images/mapiconuser.png',
             },
@@ -996,6 +1040,16 @@ class WorldMap extends View {
             positionName,
             owner,
             team,
+          });
+
+          this.markers[positionName].setPosition({
+            coordinates: {
+              accuracy: coordinates.accuracy,
+              latitude,
+              longitude,
+            },
+            lastUpdated: date,
+            map: this.map,
           });
         }
       } else if (markerType) {

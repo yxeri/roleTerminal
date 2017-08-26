@@ -1188,13 +1188,16 @@ pre {
   }
 
   .listButton {
-    top: 3em;
     display: block;
   }
 
   .viewer {
     margin-top: 2.1em;
     height: calc(100% - 2.1em);
+  }
+
+  .appleListButtonFix {
+    top: 3em;
   }
 
   .appleMenuFix {

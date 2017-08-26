@@ -462,126 +462,126 @@ class WorldMap extends View {
 
     const list = elementCreator.createList({
       elements: [
-        elementCreator.createButton({
-          text: 'Create marker',
-          func: () => {
-            const markerDialog = new DialogBox({
-              buttons: {
-                left: {
-                  text: 'Cancel',
-                  eventFunc: () => {
-                    markerDialog.removeView();
-                  },
-                },
-                right: {
-                  text: 'Create',
-                  eventFunc: () => {
-                    const position = {
-                      coordinates: {
-                        longitude: event.latLng.lng(),
-                        latitude: event.latLng.lat(),
-                        accuracy: 30,
-                      },
-                      positionName: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
-                      description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
-                      markerType: 'custom',
-                    };
-
-                    socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-                      if (error) {
-                        console.log(error);
-
-                        return;
-                      }
-
-                      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
-                      markerDialog.removeView();
-                    });
-                  },
-                },
-              },
-              inputs: [{
-                placeholder: 'Name of the position',
-                inputName: 'markerName',
-                isRequired: true,
-                maxLength: 100,
-              }, {
-                placeholder: 'Description',
-                inputName: 'description',
-                multiLine: true,
-                maxLength: 6000,
-              }, {
-                type: 'radioSet',
-                title: 'Who should the position be visible to?',
-                optionName: 'visibility',
-                options: [
-                  { optionId: 'visPublic', optionLabel: 'Everyone' },
-                  { optionId: 'visTeam', optionLabel: 'My team' },
-                  { optionId: 'visPrivate', optionLabel: 'Only me' },
-                ],
-              }],
-              description: ['Mark a position that offers the maximum amount of project team synergy'],
-              extraDescription: [''],
-            });
-            markerDialog.appendTo(this.element.parentElement);
-            this.hideMapClickMenu();
-          },
-        }),
-        elementCreator.createButton({
-          text: 'Ping',
-          func: () => {
-            const pingDialog = new DialogBox({
-              buttons: {
-                left: {
-                  text: 'Cancel',
-                  eventFunc: () => {
-                    pingDialog.removeView();
-                  },
-                },
-                right: {
-                  text: 'Ping',
-                  eventFunc: () => {
-                    const pingText = pingDialog.inputs.find(({ inputName }) => inputName === 'pingText').inputElement.value;
-
-                    const userName = storageManager.getUserName();
-                    const position = {
-                      coordinates: {
-                        radius: 90,
-                        longitude: event.latLng.lng(),
-                        latitude: event.latLng.lat(),
-                        accuracy: 0,
-                      },
-                      markerType: 'ping',
-                      positionName: `${userName}-ping`,
-                      isPublic: true,
-                      isStatic: true,
-                      description: pingText ? [`${pingText.charAt(0).toUpperCase()}${pingText.slice(1)}`] : ['Unknown activity'],
-                    };
-
-                    socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-                      if (error) {
-                        return;
-                      }
-
-                      pingDialog.removeView();
-                      eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
-                    });
-                  },
-                },
-              },
-              inputs: [{
-                placeholder: 'Ping message. Optional',
-                inputName: 'pingText',
-                maxLength: 20,
-              }],
-              description: ['Send a map ping'],
-              extraDescription: ['Input the message that will be shown with the ping. Default message is "Unknown activity"'],
-            });
-
-            pingDialog.appendTo(this.element.parentElement);
-            this.hideMapClickMenu();
-          },
-        }),
+        // elementCreator.createButton({
+        //   text: 'Create marker',
+        //   func: () => {
+        //     const markerDialog = new DialogBox({
+        //       buttons: {
+        //         left: {
+        //           text: 'Cancel',
+        //           eventFunc: () => {
+        //             markerDialog.removeView();
+        //           },
+        //         },
+        //         right: {
+        //           text: 'Create',
+        //           eventFunc: () => {
+        //             const position = {
+        //               coordinates: {
+        //                 longitude: event.latLng.lng(),
+        //                 latitude: event.latLng.lat(),
+        //                 accuracy: 30,
+        //               },
+        //               positionName: markerDialog.inputs.find(input => input.inputName === 'markerName').inputElement.value,
+        //               description: markerDialog.inputs.find(input => input.inputName === 'description').inputElement.value.split('\n'),
+        //               markerType: 'custom',
+        //             };
+        //
+        //             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+        //               if (error) {
+        //                 console.log(error);
+        //
+        //                 return;
+        //               }
+        //
+        //               eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+        //               markerDialog.removeView();
+        //             });
+        //           },
+        //         },
+        //       },
+        //       inputs: [{
+        //         placeholder: 'Name of the position',
+        //         inputName: 'markerName',
+        //         isRequired: true,
+        //         maxLength: 100,
+        //       }, {
+        //         placeholder: 'Description',
+        //         inputName: 'description',
+        //         multiLine: true,
+        //         maxLength: 6000,
+        //       }, {
+        //         type: 'radioSet',
+        //         title: 'Who should the position be visible to?',
+        //         optionName: 'visibility',
+        //         options: [
+        //           { optionId: 'visPublic', optionLabel: 'Everyone' },
+        //           { optionId: 'visTeam', optionLabel: 'My team' },
+        //           { optionId: 'visPrivate', optionLabel: 'Only me' },
+        //         ],
+        //       }],
+        //       description: ['Mark a position that offers the maximum amount of project team synergy'],
+        //       extraDescription: [''],
+        //     });
+        //     markerDialog.appendTo(this.element.parentElement);
+        //     this.hideMapClickMenu();
+        //   },
+        // }),
+        // elementCreator.createButton({
+        //   text: 'Ping',
+        //   func: () => {
+        //     const pingDialog = new DialogBox({
+        //       buttons: {
+        //         left: {
+        //           text: 'Cancel',
+        //           eventFunc: () => {
+        //             pingDialog.removeView();
+        //           },
+        //         },
+        //         right: {
+        //           text: 'Ping',
+        //           eventFunc: () => {
+        //             const pingText = pingDialog.inputs.find(({ inputName }) => inputName === 'pingText').inputElement.value;
+        //
+        //             const userName = storageManager.getUserName();
+        //             const position = {
+        //               coordinates: {
+        //                 radius: 90,
+        //                 longitude: event.latLng.lng(),
+        //                 latitude: event.latLng.lat(),
+        //                 accuracy: 0,
+        //               },
+        //               markerType: 'ping',
+        //               positionName: `${userName}-ping`,
+        //               isPublic: true,
+        //               isStatic: true,
+        //               description: pingText ? [`${pingText.charAt(0).toUpperCase()}${pingText.slice(1)}`] : ['Unknown activity'],
+        //             };
+        //
+        //             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+        //               if (error) {
+        //                 return;
+        //               }
+        //
+        //               pingDialog.removeView();
+        //               eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+        //             });
+        //           },
+        //         },
+        //       },
+        //       inputs: [{
+        //         placeholder: 'Ping message. Optional',
+        //         inputName: 'pingText',
+        //         maxLength: 20,
+        //       }],
+        //       description: ['Send a map ping'],
+        //       extraDescription: ['Input the message that will be shown with the ping. Default message is "Unknown activity"'],
+        //     });
+        //
+        //     pingDialog.appendTo(this.element.parentElement);
+        //     this.hideMapClickMenu();
+        //   },
+        // }),
       ],
     });
 

@@ -1146,7 +1146,22 @@ home.addLink({
                   return;
                 }
 
-                panicBox.removeView();
+                panicBox.changeDescription({
+                  text: [
+                    'Something went wrong.',
+                    'Unable to send ping.',
+                    'Thank you for using PANIC',
+                  ],
+                });
+
+                panicBox.replaceButtons({
+                  buttons: [
+                    elementCreator.createButton({
+                      text: 'Oh no...',
+                      func: () => { panicBox.removeView(); },
+                    }),
+                  ],
+                });
 
                 return;
               }
@@ -1230,7 +1245,22 @@ home.addLink({
                   return;
                 }
 
-                panicBox.removeView();
+                panicBox.changeDescription({
+                  text: [
+                    'Something went wrong.',
+                    'Unable to send ping.',
+                    'Thank you for using PANIC',
+                  ],
+                });
+
+                panicBox.replaceButtons({
+                  buttons: [
+                    elementCreator.createButton({
+                      text: 'Oh no...',
+                      func: () => { panicBox.removeView(); },
+                    }),
+                  ],
+                });
 
                 return;
               }
@@ -1280,6 +1310,7 @@ home.addLink({
                   }),
                 ],
               });
+
               return;
             }
 
@@ -1318,7 +1349,22 @@ home.addLink({
                     return;
                   }
 
-                  panicBox.removeView();
+                  panicBox.changeDescription({
+                    text: [
+                      'Something went wrong.',
+                      'Unable to send ping.',
+                      'Thank you for using PANIC',
+                    ],
+                  });
+
+                  panicBox.replaceButtons({
+                    buttons: [
+                      elementCreator.createButton({
+                        text: 'Oh no...',
+                        func: () => { panicBox.removeView(); },
+                      }),
+                    ],
+                  });
 
                   return;
                 }

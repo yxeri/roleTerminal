@@ -130,117 +130,132 @@ class ToolsViewer extends StandardView {
   }
 
   populateInstructions() {
-    const views = new List({
-      title: 'Views',
+    const topics = new List({
+      title: 'Topics',
       showTitle: true,
       shouldSort: true,
       items: [
-        this.createInstructionButton('CHAT', [
-          'CHAT allows you to receive/write messages to chat rooms or private messages to other users',
-          'To the left you\'ll find: System, Following, Public, Users',
-          'In System you can create new chat rooms. It will ask you for a name and an optional password. Leave the password field empty if you want the room to be public',
-          'Following shows you all the rooms you are following. Clicking on any of them will switch you to that room.',
-          'Public contains all rooms that you can join. Clicking on any of them will allow you to choose to start following it. Some may require you to type in a password',
-          'User is a full list of all users. Click on one of them to start a private message chat with that user',
+        this.createInstructionButton('Dyslexia?', [
+          'There is an option to switch to a font that has been created specifically for those with dyslexia. All you have to do is to add /?dyslexic=true to the site address. Example: https://bbrterminal.thethirdgift.com/?dyslexic=true.',
+          'NOTE! Don\'t mess around with the address on public terminals.',
         ]),
-        this.createInstructionButton('CREDS', [
-          'CREDS handles the digital currency. On top you\'ll find your total amount of digital currency. Your transaction history will be shown below',
-          'USERS contain all users. Clicking on any of them will allow you to send money to them',
+        this.createInstructionButton('Moving between views', [
+          'You can always click on the top row (with the time and wrecking buttons) to go back to HOME. You can also use the keyboard shortcut alt+space.',
+          'HOME is the main view you go to. This current view is called SUPPORT.',
         ]),
-        this.createInstructionButton('LOGIN', [
-          'LOGIN will give you the option to either login or register a new user',
-          'You will be asked to repeat your password if you choose register',
+        this.createInstructionButton('Registering and logging in', [
+          'LOGIN will give you the option to register a new user and/or login.',
+          'Fill in your user name and password. Clicking on Register will show three new fields. The first one asks you to repeat your password. The two last ones asks you to input a valid e-mail address',
+          'The e-mail is used to send you a verification mail, so that you can activate your account. It is also used when you want to reset your password',
+          'Already got a registered and verified user? Just fill in the user name, password and click on login. Tada! You are now a terminal user.',
         ]),
-        this.createInstructionButton('LOGOUT', [
-          'LOGOUT will log you out',
+        this.createInstructionButton('Logging out', [
+          'LOGOUT will log you out. It is IMPORTANT that you remember to do so on public terminals',
         ]),
-        this.createInstructionButton('MAPS', [
-          'MAPS show you a map of the world',
-          'There are 4 types of map markers (all based on circles):',
-          'a circle represents a static location (example: ApoCalypso), a vertical line represents you, a "T" represents a team member, two vertical lines represent another user and a cross is everything else',
-          'Holding the mouse over a marker will show its name. Clicking on it will show its description',
-          'The menu contains LOCAL, WORLD, USER, OTHER, ME.',
-          'LOCAL are all the markers inside of the game area. WORLD are the markers outside of the game area. USER are all the users being tracked. OTHER are all other markers. ME is you',
-          'Right clicking (or hold down your finger, if you are using a touch device) to get reveal a menu. The menu allows you to create a new marker or send a ping',
-          'A ping is a bigger circle with one line of text. It can be used to indicate that something is happening in that area. Creating a new marker will add it to the map',
-        ]),
-        this.createInstructionButton('OSAT', [
-          'OSAT is the text-based terminal. It contains ways to run missions and earn digital currency, hack LANTERNs and other stuff',
-          'You will be shown programs that can be run by you',
-          'You can either input the correct program name on the bottom or you can click on the program names',
-          'Anything that has pink background can be clicked',
-          'You will find more in-depth instructions for the programs under OSAT in this help menu',
-        ]),
-        this.createInstructionButton('PANIC', [
-          'PANIC allows you to send a ping to the map, to notify others that you are under attack or that you found a threat',
-          'A map ping is a bigger circle with one line of text, showing others that something is going in the area',
-          'You will be given the option to choice Panzerwolves, Organica and Muggers. The only different between Panzerwolves and Organica is what will be shown with the ping on the map',
-          'The mugger choice will only work if you are part of a team. That map ping will only be visible to the rest of your team',
-        ]),
-        this.createInstructionButton('YOU', [
+        this.createInstructionButton('Your information', [
           'YOU show you information about your user',
           'It contains your user name, the team you are part of and your device\'s ID (mostly used by game masters)',
           'There is also a key (6 numbers). This key is "lootable." It can be used by other players to steal some of your digital currency',
         ]),
-        this.createInstructionButton('STORAGE', [
-          'STORAGE contains documents written by players and/or organisers',
-          'A document can be public or locked. To unlock a document you will need its ID',
-          'Under SYSTEM you will find the option to create a document or get a document by its ID',
-          'When you create a document, you will get the option to decide who will be able to access it',
-          'DIRECTORY show you all public documents. Some documents (most from game masters) are not visible here and can only be access through "ID Search" in SYSTEM',
-          'The DIRECTORY is sorted by teams and users. A greyed out button indicates that the document is locked. You will either need to enter its ID or crack it',
+        this.createInstructionButton('Sending messages', [
+          'CHAT allows you to receive/write messages to chat rooms or private messages to other users',
+          'On the bottom is the field where you can enter your message. Enter adds line breaks. To send a message you have to either click send or keyboard shortcut alt+enter.',
+          'The default room that appears when you go to CHAT is PUBLIC. PUBLIC is open and followed by all users',
         ]),
-        this.createInstructionButton('TEAM', [
-          'TEAM show you information about your team. It also allows you create a team, if you are not already in one',
-          'You will find the team creator under SYSTEM. If you are already in a team you will instead get the option to invite others to your team',
-          'Members shows a list of all members of your team (only visible if you are in a team)',
+        this.createInstructionButton('Joining rooms', [
+          'To the left in CHAT you will find FOLLOWING and PUBLIC. The list under FOLLOWING shows you all the rooms you are in. They will change background color if a message is sent to them by another user.',
+          'PUBLIC contains all the rooms that in the system. You can click on any of them to join the room. The ones with greyed out buttons are protected with a password. You will have to find it somehow, maybe through lots of torturing?',
+          'You can unfollow any room by right-clicking or holding down your finger on the room you want to leave.',
         ]),
-        this.createInstructionButton('TOOLS', [
-          'TOOLS is the off-gamey area. There are instructions for all parts of the Oracle, "dassrykten" (rumours), lootable codes and aliases',
-          'Rumours can be whatever you as a player feels is cool to share with others to create fun play',
-          'Lootable codes are 6-digit and can be used by other players to steal some of your digital currency. You can generate them and write them down on whatever to allow others to loot it',
-          'Aliases are your alter egos. You can switch between aliases in CHAT. That allows you to send messages from different user names',
+        this.createInstructionButton('Sending private messages', [
+          'To the left in CHAT you will find USERS. Clicking on any of them will create a separate room containing your and their name (example: "you <-> they"), where you can send private messages to that user',
+        ]),
+        this.createInstructionButton('Sending virtual caps', [
+          'WALLET handles the digital currency. On top you\'ll find your total amount of digital currency. Your transaction history will be shown below',
+          'USERS contain all users and TEAMS all teams. Clicking on any of them will allow you to send money to them.',
+        ]),
+        this.createInstructionButton('Using the map', [
+          'MAPS show you a map of the world',
+          'There are 4 types of map markers (all based on circles):',
+          'a circle represents a static location (example: ApoCalypso), a vertical line represents you, a "T" represents a team member, two vertical lines represent another user and a cross is everything else',
+          'Holding the mouse over a marker will show its name. Clicking on it will show its description',
+          'The menu contains LOCAL, WORLD, USER, ME.',
+          'LOCAL are all the markers inside of the game area. WORLD are the markers outside of the game area. USER are all the users being tracked. ME is you',
+          'A ping is a bigger circle with one line of text. It can be used to indicate that something is happening in that area. Creating a new marker will add it to the map',
+        ]),
+        this.createInstructionButton('PANIC!', [
+          'PANIC allows you to send a ping to the map, indicating an panzerwolf/Organica threat. You can notify others that you are being mordered or that you are already bleeding out on the ground',
+          'Those who are part of a team can use the last option to send a ping that is only visible to other team members.',
+        ]),
+        this.createInstructionButton('Wrecking info', [
+          'In the top row is a button called WRECKING. Clicking on it will show you current information on the LANTERNs, wreckers and time left/time until the next round',
+          'Each LANTERN has a name, owner and signal value. The signal value is the amount of points the owner gets each tick and can be affected by hacking the LANTERN.',
+          'A LANTERN will change background color if it is under attack and is in the progress of changing owner.',
+        ]),
+        this.createInstructionButton('Hacking LANTERN', [
+          'In TOOLS you will find a command called "hackLantern" Clicking on it will start you on your way to hacking a lantern',
+          'The first thing you will be asked is to choose a LANTERN. The owner of each LANTERN is showed to the right. It will also show "UNDER ATTACK" if the LANTERN is currently in the progress of changing owner.',
+          'After choosing a LANTERN you will be asked if you want to Amplify or Dampen it. Amplifying the signal means that the amount of points given to the owner of the LANTERN increases per tick.',
+          'Next step is you looking through a dump of text. The text contains one correct password and several incorrect ones. On the bottom. you will find a password hint, that tells you a correct character in a correct position',
+          'You have to use this hint and try to find the password. You have up to three tries. Each incorrect try will show you how many characters were in the correct position from the word you chose. It gives further hints to the correct password.',
+          'You will also notice a user name. You can write this down together with the password to sell off to others or make your own hacking attempts easier in the future (just have to resuse what you wrote down!). NOTE! Users can have more than one password, so always keep an eye on the password hint.',
+          'Done! Your affect on the LANTERN should be visible in the LANTERN info window.',
+        ]),
+        this.createInstructionButton('Unlocking and documents', [
+          'You may find strange codes in the wasteland. In FILES you will find ways to both create and read documents. Under SYSTEM, you will find ID SEARCH. You can use that to insert a code you found and unlock a document!',
+          'You will also notice that there is a list called DIRECTORY. The DIRECTORY contains all other documents sorted by either team or user name. Clicking on any will open it up. The ones that are greyed out require the correct ID/code to unlock. The rest are open to the public, including you!',
+        ]),
+        this.createInstructionButton('Creating documents', [
+          'You can create your own documents in FILES, under SYSTEM.',
+          'A document consists of a title (that has to be unique), an ID/code (that has to be unique) and text. Every document created will be shown to everyone in the lists to the left.',
+          'You will also be asked if you want it to be open to the public or only those with the correct ID/code. Making it locked means that it will only be able to be opened by those with the correct ID.',
+          'A second option is unlocked if you are in a team. You will asked if the document should be added to the team area. Doing so will make the document be sorted under the team\'s name for other users.',
+        ]),
+        this.createInstructionButton('Creating and joining a team', [
+          'Being part of a team unlocks new features only available to its members',
+          'TEAM show you information about your team. It also allows you create a team, if you are not already in one.',
+          'You will find the team creator under SYSTEM. If you are already in a team you will instead get the option to invite others to your team.',
+          'You can also invite other users to your team. They will find their invitation in the TEAM view, where they can choose to accept or decline it.',
+          'Every member of a team has a unique icon on the map (circle with a T) to make it easier to find other members. They are also listed under TEAM in the map. A team also has a shared WALLET that they can use to accept or send virtual caps from. A team also has a common chat room and messages sent will show their team name to others.',
+        ]),
+        this.createInstructionButton('Earning viritual caps', [
+          'You can choose to do maintenance on a LANTERN. Go to PROGRAMS and "lanternMaintenance" to start it up. You will be first be asked to choose a LANTERN. The payout amount in virtual caps is shown to the right of each option.',
+          'The next part is where you are given a code. This is the code that you have to input into the LANTERN that you chose to complete the mission. You will see a transaction in WALLET when you have completed the mission.',
+        ]),
+        this.createInstructionButton('Using and creating loot codes', [
+          'You will find the option in this view, to the left under SYSTEM, to craete them. This is a code that you can write down on a piece of paper and allow others to loot.',
+          'Codes are used in credsCracker in PROGRAMS. It is the command you use to input a loot code and steal some virtual caps. A transaction will be shown in your WALLET.',
+          'Each code can only be used once.',
+        ]),
+        this.createInstructionButton('Setting coordinates on devices without GPS', [
+          'You will find the option to do so in this view, to the left under SYSTEM.',
+        ]),
+        this.createInstructionButton('Creating and reading rumours/dassrykten', [
+          'You will find them in this view, to the right. You can create new ones under SYSTEM. The rumours are meant to be fun bits that other players can use to create play.',
+        ]),
+        this.createInstructionButton('Creating and using a unique alias', [
+          'An alias is an alternative character/user name. You can use them to act as if you were another character without having to create separate accounts',
+          'NOTE! This alias is unique and will only be available through your account. Want a shared alias for document creation? Open up the topic below this one.',
+          'This alias can be used to make it look like documents were created or messages sent by this name instead of your default user name',
+          'You create them to the left in this view. Your created alias will be shown in FILES and CHAT under ALIASES.',
+          'In CHAT: click on the alias you want to be used when sending a message.',
+          'In FILES: click on CREATE DOC and then the alias you want to use. This will be the name shown as the creator of the document and will also be sorted under that name under DIRECTORY.',
+        ]),
+        this.createInstructionButton('Creating and using a shared file alias', [
+          'An alias is an alternative character/user name. You can use them to act as if you were another character without having to create separate accounts',
+          'The different between a files alias and the other one is that this one can only be used in the creation of documents. It can also be shared by all your team members (if you are in a team). All they have to do is create the same alias.',
+          'Your new alias will be available to the left in FILES under ALIASES. Start by clicking on CREATE DOC and then choose the alias you want to be shown as the creator.',
         ]),
       ],
     });
-    const osat = new List({
-      title: 'OSAT',
-      showTitle: true,
-      shouldSort: true,
-      items: [
-        this.createInstructionButton('calibration Adjustment', [
-          'calibrationAdjustment is an automated mission that you can run to gain some digital currency',
-          'You will be assigned a verification code (8 digits) and a LANTERN. You will have to go to that LANTERN, enter your code and do whatever it says. You will be rewarded on completion',
-        ]),
-        this.createInstructionButton('hack Lantern', [
-          'hackLantern allows you to increase or lower the amount of points a specific LANTERN gives to its owner',
-          'You will be asked to choice which LANTERN you want to hack and if you want to boost (increase) or dampen (decrease) the amount of points',
-          'You will be tasked with finding the correct password for a user. It will show you the name of the user, which password it is and a password hint',
-          'You can either click on the passwords in the text dump or type it on the bottom. Holding the mouse over a word (or holding down a finger on the row for touch users) will highlight it',
-          'Choosing an incorrect password will show you how many characters were in the correct position',
-          '(Example: if the correct password is "game" and you choose "bane", it will show you that 2 characters were correct)',
-          'You have a limited amount of tries. Failing a hack will lock you out of the chosen LANTERN for a while. You can still hack other LANTERNs',
-        ]),
-        this.createInstructionButton('creds Cracker', [
-          'credsCracker is the program you use together with lootable codes',
-          'It will ask you for a 6-digit code. Typing a correct one will steal digital currency from another player and add to your wallet',
-        ]),
-      ],
-    });
-
     const items = [
       this.createInstructionButton('Start here', [
-        'The first view you see is called "Home"',
-        'If you click on any button in Home you\'ll switch to a new view',
-        'To get back to Home you can either click on the top row or press alt+space',
-        'The top row shows you if you are online/offline and current time',
-        'Characters within [] indicates that you can press alt + that character instead of clicking the button (example: [P]ANIC. alt+P will open that view)',
-        'Most views have a menu on the left side. The rows with an arrow indicated that you can click on them to expand/collapse them',
-        'You will need to login to gain access to most features',
+        'The first view you see is called HOME. The view you are in now is SUPPORT.',
+        'If you click on any button in Home you\'ll switch to a new view, like you did when you got here.',
+        'To get back to HOME you can either click on the top row or use the keyboard shortcut alt+space.',
+        'Characters within [] indicate that the button can be used through a keyboard shortcut. Example: [L]OGIN can be triggered with alt+L.',
       ]),
-      this.createInstructionButton('Home', ['']),
-      views.element,
-      osat.element,
+      topics.element,
     ];
 
     this.instructions.addItems({ items });

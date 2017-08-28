@@ -125,11 +125,7 @@ class WreckingStatus {
           const team = this.teams[teamId];
 
           if (team) {
-            if (team.isActive) {
-              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) }));
-            } else {
-              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ---` }) }));
-            }
+            fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) }));
           }
         });
 

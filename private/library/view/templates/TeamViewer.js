@@ -198,6 +198,22 @@ class TeamViewer extends StandardView {
 
                 socketManager.emitEvent('createTeam', { team }, ({ error, data }) => {
                   if (error) {
+                    if (error.type === 'already exists') {
+                      createDialog.changeExtraDescription({ text: ['Project team already exists.'] });
+
+                      return;
+                    } else if (error.type === 'invalid data') {
+                      createDialog.changeExtraDescription({
+                        text: [
+                          'Invalid project team information.',
+                          'Names have to be alphanumerical (a-z, 0-9).',
+                          'Team name cannot be longer than 20 characters. Acronym cannot be longer than 6 characters.',
+                        ],
+                      });
+
+                      return;
+                    }
+
                     console.log(error);
 
                     return;
@@ -229,12 +245,12 @@ class TeamViewer extends StandardView {
             },
           },
           inputs: [{
-            placeholder: 'Project team name',
+            placeholder: 'Project team name (max 20 characters)',
             inputName: 'teamName',
             isRequired: true,
             maxLength: 20,
           }, {
-            placeholder: 'Short name/Acronym',
+            placeholder: 'Short name/Acronym (max 6 characters)',
             inputName: 'shortName',
             isRequired: true,
             maxLength: 6,

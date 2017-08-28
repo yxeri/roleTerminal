@@ -641,6 +641,7 @@ pre {
     margin-left: .1em;
     width: calc(100% - .4em);
     margin-bottom: .4em;
+    word-wrap: break-word;
   }
 
   button:first-letter {

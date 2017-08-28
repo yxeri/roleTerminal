@@ -27,6 +27,8 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const soundLibrary = require('../../audio/SoundLibrary');
 const textTools = require('../../TextTools');
+const deviceChecker = require('../../DeviceChecker');
+const viewTools = require('../../ViewTools');
 
 /**
  * Takes a list of user names and filters out current users user name and aliases
@@ -131,9 +133,6 @@ class Messenger extends StandardView {
       classes: ['options', 'hide'],
     });
     this.element.appendChild(this.optionsDiv);
-    this.element.addEventListener('click', () => {
-      this.optionsDiv.classList.add('hide');
-    });
 
     this.messageList = new MessageList({ isTopDown });
     this.systemList = new List({
@@ -225,6 +224,26 @@ class Messenger extends StandardView {
       this.viewer.appendChild(this.messageList.element);
       this.viewer.appendChild(this.inputArea);
     }
+
+    this.inputField.addEventListener('focus', () => {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
+        if (viewTools.isLandscape()) {
+          this.element.classList.add('androidLandscapeKeyboardFix');
+        } else {
+          this.element.classList.add('androidPortraitKeyboardFix');
+        }
+
+        this.messageList.scroll();
+      }
+    });
+
+    this.viewer.firstElementChild.addEventListener('click', () => {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
+        this.element.classList.remove('androidLandscapeKeyboardFix', 'androidPortraitKeyboardFix');
+        this.inputField.value = 'android';
+        this.messageList.scroll();
+      }
+    });
 
     this.viewer.addEventListener('mousewheel', () => {
       if (this.viewer.firstElementChild) {

@@ -140,7 +140,7 @@ class ToolsViewer extends StandardView {
           'NOTE! Don\'t mess around with the address on public terminals.',
         ]),
         this.createInstructionButton('Moving between views', [
-          'You can always click on the top row (with the time and wrecking buttons) to go back to HOME. You can also use the keyboard shortcut alt+space.',
+          'You can always click on the top row (with the time and wrecking buttons) to go back to HOME',
           'HOME is the main view you go to. This current view is called SUPPORT.',
         ]),
         this.createInstructionButton('Registering and logging in', [
@@ -252,7 +252,7 @@ class ToolsViewer extends StandardView {
       this.createInstructionButton('Start here', [
         'The first view you see is called HOME. The view you are in now is SUPPORT.',
         'If you click on any button in Home you\'ll switch to a new view, like you did when you got here.',
-        'To get back to HOME you can either click on the top row or use the keyboard shortcut alt+space.',
+        'To get back to HOME you can click on the top row.',
         'Characters within [] indicate that the button can be used through a keyboard shortcut. Example: [L]OGIN can be triggered with alt+L.',
       ]),
       topics.element,

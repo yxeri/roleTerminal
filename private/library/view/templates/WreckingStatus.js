@@ -125,11 +125,7 @@ class WreckingStatus {
           const team = this.teams[teamId];
 
           if (team) {
-            if (team.isActive) {
-              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) }));
-            } else {
-              fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ---` }) }));
-            }
+            fragment.appendChild(elementCreator.createListItem({ element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }) }));
           }
         });
 
@@ -154,9 +150,7 @@ class WreckingStatus {
           this.start();
         }
 
-        const convertedTimeLeft = new Date(timeLeft);
-
-        this.timeLeft = convertedTimeLeft > 0 ? Math.floor(((convertedTimeLeft) / 1000) / 60) : -1;
+        this.timeLeft = Math.ceil(((new Date(timeLeft)) / 1000) / 60);
         this.updateTime();
       },
     });
@@ -174,7 +168,7 @@ class WreckingStatus {
 
   displayTime() {
     const text = this.isActive ? 'Active for' : 'Next in';
-    const timeLeft = this.timeLeft > 0 ? textTools.getHoursAndMinutes(this.timeLeft) : undefined;
+    const timeLeft = this.timeLeft >= 0 ? textTools.getHoursAndMinutes(this.timeLeft) : undefined;
     const timeText = timeLeft ? `${text}: ${timeLeft.hours}h${timeLeft.minutes}m` : `${text}: UNKNOWN`;
 
     this.timeSpan.innerHTML = '';

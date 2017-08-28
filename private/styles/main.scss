@@ -1124,6 +1124,14 @@ pre {
   background-color: $darker-second-color;
 }
 
+.androidPortraitKeyboardFix {
+  height: 50vh !important;
+}
+
+.androidLandscapeKeyboardFix {
+  height: 35vh !important;
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $flash-color;

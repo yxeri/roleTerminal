@@ -20,6 +20,8 @@ const textTools = require('../../TextTools');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
+const deviceChecker = require('../../DeviceChecker');
+const viewTools = require('../../ViewTools');
 
 class Terminal extends View {
   constructor({ skipAnimation }) {
@@ -60,6 +62,26 @@ class Terminal extends View {
           });
         }
       },
+    });
+
+    this.terminalInput.addEventListener('focus', () => {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
+        if (viewTools.isLandscape()) {
+          this.element.classList.add('androidLandscapeKeyboardFix');
+        } else {
+          this.element.classList.add('androidPortraitKeyboardFix');
+        }
+
+        this.element.firstElementChild.lastElementChild.scrollIntoView();
+      }
+    });
+
+    this.element.firstElementChild.addEventListener('click', () => {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
+        this.element.classList.remove('androidLandscapeKeyboardFix', 'androidPortraitKeyboardFix');
+        this.inputField.value = 'android';
+        this.element.firstElementChild.lastElementChild.scrollIntoView();
+      }
     });
   }
 

@@ -48,7 +48,7 @@ const tools = require('../library/Tools');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
-const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
+const onlineStatus = new OnlineStatus(top);
 const boot = new TextAnimation({ removeTime: 700 });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();

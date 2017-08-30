@@ -244,6 +244,7 @@ pre {
   }
 
   #wrecking {
+    margin-left: .4em;
     text-align: left;
     padding: .2em .1em;
     display: inline-block;
@@ -1123,6 +1124,10 @@ pre {
 
 .warning {
   background-color: $darker-second-color;
+}
+
+.redWarning {
+  background-color: #A50047;
 }
 
 .androidPortraitKeyboardFix {

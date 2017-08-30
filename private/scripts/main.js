@@ -215,7 +215,8 @@ const home = new Home({
   ],
   introDevText: [
     elementCreator.createParagraph({
-      text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
+      classes: ['redBack'],
+      text: 'THIS IS A EXPERIMENTAL SERVER. This will NOT be used during the event. You can play around as much as you want. Stuff might be broken. Data might be lost. Save a copy of everything of importance.',
     }),
     elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
     elementCreator.createParagraph({ text: 'More info at:' }),

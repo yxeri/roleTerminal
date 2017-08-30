@@ -49,7 +49,7 @@ const tools = require('../library/Tools');
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(top);
-const boot = new TextAnimation({ removeTime: 700 });
+const boot = new TextAnimation({ removeTime: 700, triggerValue: 'firstBoot' });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
@@ -183,7 +183,12 @@ boot.setQueue([
 ]);
 
 if (!queryParameters.key && !queryParameters.mailEvent && !queryParameters.noBoot) {
-  boot.appendTo(mainView);
+  const firstBoot = storageManager.getLocalVal('firstBoot');
+
+  if (typeof firstBoot === 'undefined' || firstBoot !== 'true') {
+    boot.appendTo(mainView);
+    storageManager.setLocalVal('firstBoot', 'true');
+  }
 }
 
 soundLibrary.toggleSounds();
@@ -1472,6 +1477,7 @@ home.addLink({
         console.log(error);
       }
 
+      boot.appendTo(mainView);
       eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
       home.endLink('logout');
     });

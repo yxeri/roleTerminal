@@ -244,6 +244,7 @@ pre {
   }
 
   #wrecking {
+    margin-left: .4em;
     text-align: left;
     padding: .2em .1em;
     display: inline-block;
@@ -1125,12 +1126,20 @@ pre {
   background-color: $darker-second-color;
 }
 
+.redWarning {
+  background-color: #A50047;
+}
+
 .androidPortraitKeyboardFix {
   height: 50vh !important;
 }
 
 .androidLandscapeKeyboardFix {
   height: 35vh !important;
+}
+
+.redBack {
+  background-color: red;
 }
 
 @-webkit-keyframes flash {

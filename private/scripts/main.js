@@ -48,8 +48,8 @@ const tools = require('../library/Tools');
 
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
-const onlineStatus = new OnlineStatus(document.getElementById('onlineStatus'));
-const boot = new TextAnimation({ removeTime: 700 });
+const onlineStatus = new OnlineStatus(top);
+const boot = new TextAnimation({ removeTime: 700, triggerValue: 'firstBoot' });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
@@ -183,7 +183,12 @@ boot.setQueue([
 ]);
 
 if (!queryParameters.key && !queryParameters.mailEvent && !queryParameters.noBoot) {
-  boot.appendTo(mainView);
+  const firstBoot = storageManager.getLocalVal('firstBoot');
+
+  if (typeof firstBoot === 'undefined' || firstBoot !== 'true') {
+    boot.appendTo(mainView);
+    storageManager.setLocalVal('firstBoot', 'true');
+  }
 }
 
 soundLibrary.toggleSounds();
@@ -215,7 +220,8 @@ const home = new Home({
   ],
   introDevText: [
     elementCreator.createParagraph({
-      text: 'THIS IS A DEVELOPMENT/EXPERIMENTAL SERVER. Stuff might be broken. Data might be lost. Save a copy of everything of importance',
+      classes: ['redBack'],
+      text: 'THIS IS A EXPERIMENTAL SERVER. This will NOT be used during the event. You can play around as much as you want. Stuff might be broken. Data might be lost. Save a copy of everything of importance.',
     }),
     elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
     elementCreator.createParagraph({ text: 'More info at:' }),
@@ -1471,6 +1477,7 @@ home.addLink({
         console.log(error);
       }
 
+      boot.appendTo(mainView);
       eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
       home.endLink('logout');
     });

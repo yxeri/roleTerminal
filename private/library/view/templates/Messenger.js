@@ -19,6 +19,7 @@ const MessageList = require('../elements/MessageList');
 const Message = require('../elements/Message');
 const List = require('../base/List');
 const DialogBox = require('../DialogBox');
+const ButtonBox = require('../templates/ButtonBox');
 
 const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
@@ -782,6 +783,26 @@ class Messenger extends StandardView {
 
     socketManager.emitEvent('unfollow', { isWhisperRoom, user: { userName: storageManager.getUserName() }, room: { roomName } }, ({ error }) => {
       if (error) {
+        if (error.type === 'not allowed') {
+          const unfollowBox = new ButtonBox({
+            description: [
+              'This is a system protected room. You may not unfollow it',
+            ],
+            buttons: [
+              elementCreator.createButton({
+                text: 'Understood',
+                func: () => {
+                  unfollowBox.removeView();
+                },
+              }),
+            ],
+          });
+
+          unfollowBox.appendTo(this.element.parentElement);
+
+          return;
+        }
+
         console.log(error);
 
         return;
@@ -853,6 +874,7 @@ class Messenger extends StandardView {
           data: roomName,
           func: () => {
             this.leaveRoom({ roomName: data });
+            this.optionsDiv.classList.add('hide');
           },
         }));
 
@@ -978,6 +1000,7 @@ class Messenger extends StandardView {
           data: roomName,
           func: () => {
             this.leaveRoom({ roomName });
+            this.optionsDiv.classList.add('hide');
           },
         }));
         // fragment.appendChild(elementCreator.createButton({

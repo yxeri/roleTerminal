@@ -226,6 +226,14 @@ class Messenger extends StandardView {
       this.viewer.appendChild(this.inputArea);
     }
 
+    this.viewer.addEventListener('click', () => {
+      this.optionsDiv.classList.add('hide');
+    });
+
+    this.inputArea.addEventListener('click', () => {
+      this.optionsDiv.classList.add('hide');
+    });
+
     this.inputField.addEventListener('focus', () => {
       if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
         if (viewTools.isLandscape()) {

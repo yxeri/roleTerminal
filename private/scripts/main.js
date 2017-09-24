@@ -1599,12 +1599,13 @@ socketManager.addEvents([
   }, {
     event: 'startup',
     func: ({ data }) => {
-      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode } = data;
+      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode, requiresVerification } = data;
       storageManager.setYearModification(yearModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
+      storageManager.setRequiresVerification(requiresVerification);
 
       if (!socketManager.hasConnected) {
         new Clock(document.getElementById('time')).start();

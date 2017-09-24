@@ -29,6 +29,7 @@ class LoginBox extends DialogBox {
       left: {
         text: 'Register',
         eventFunc: () => {
+          const requiresVerification = storageManager.getRequiresVerification();
           const reenterPasswordInput = this.inputs.find(({ inputName }) => inputName === 'reenterPassword');
 
           if (!reenterPasswordInput) {
@@ -39,20 +40,24 @@ class LoginBox extends DialogBox {
               required: true,
               extraClass: 'markedInput',
             });
-            this.addInput({
-              placeholder: 'Wasteland cybermail',
-              inputName: 'email',
-              type: 'email',
-              isRequired: true,
-              maxLength: 254,
-            });
-            this.addInput({
-              placeholder: 'Re-enter your cybermail',
-              inputName: 'reenterEmail',
-              type: 'email',
-              isRequired: true,
-              maxLength: 254,
-            });
+
+            if (requiresVerification) {
+              this.addInput({
+                placeholder: 'Wasteland cybermail',
+                inputName: 'email',
+                type: 'email',
+                isRequired: true,
+                maxLength: 254,
+              });
+              this.addInput({
+                placeholder: 'Re-enter your cybermail',
+                inputName: 'reenterEmail',
+                type: 'email',
+                isRequired: true,
+                maxLength: 254,
+              });
+            }
+
             this.focusInput('reenterPassword');
             this.markEmptyFields();
 
@@ -88,7 +93,7 @@ class LoginBox extends DialogBox {
             this.focusInput('password');
 
             return;
-          } else if (this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value !== this.inputs.find(({ inputName }) => inputName === 'reenterEmail').inputElement.value) {
+          } else if (requiresVerification && this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value !== this.inputs.find(({ inputName }) => inputName === 'reenterEmail').inputElement.value) {
             soundLibrary.playSound('fail');
             this.changeExtraDescription({ text: ['Cybermail do not match. Try again'] });
             this.clearInput('email');
@@ -103,7 +108,7 @@ class LoginBox extends DialogBox {
               userName: userNameInput.value,
               password: reenterPasswordInput.inputElement.value,
               registerDevice: storageManager.getDeviceId(),
-              mail: this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value,
+              mail: requiresVerification ? this.inputs.find(({ inputName }) => inputName === 'email').inputElement.value : '',
             },
           }, ({ error }) => {
             if (error) {
@@ -160,12 +165,21 @@ class LoginBox extends DialogBox {
               }
             }
 
-            this.changeExtraDescription({
-              text: [
-                'Your user has been registered, but your account is not yet active.',
-                'You should receive a cybermail soon with further instructions. It may take a while for it to arrive. Be patient.',
-              ],
-            });
+            if (requiresVerification) {
+              this.changeExtraDescription({
+                text: [
+                  'Your user has been registered, but your account is not yet active.',
+                  'You should receive a cybermail soon with further instructions. It may take a while for it to arrive. Be patient.',
+                ],
+              });
+            } else {
+              this.changeExtraDescription({
+                text: [
+                  'Your user has been registered. You may now login. Welcome to the Oracle, employee.',
+                ],
+              });
+            }
+
             this.clearInput('userName');
             this.clearInput('password');
             this.clearInput('email');

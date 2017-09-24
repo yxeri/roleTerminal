@@ -1599,7 +1599,7 @@ socketManager.addEvents([
   }, {
     event: 'startup',
     func: ({ data }) => {
-      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode, requiresVerification } = data;
+      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode, showDevInfo, requiresVerification } = data;
       storageManager.setYearModification(yearModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
@@ -1615,7 +1615,7 @@ socketManager.addEvents([
         map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
 
-      eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode } });
+      eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode, showDevInfo } });
 
       onlineStatus.setOnline();
       map.startMap();

@@ -46,10 +46,10 @@ class Home extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.SERVERMODE,
-      func: ({ mode }) => {
+      func: ({ mode, showDevInfo }) => {
         const fragment = document.createDocumentFragment();
 
-        if (mode === 'dev') {
+        if (mode === 'dev' || showDevInfo) {
           introDevText.forEach((element) => { fragment.appendChild(element); });
         } else {
           introText.forEach((element) => { fragment.appendChild(element); });

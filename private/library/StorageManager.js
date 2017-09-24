@@ -317,6 +317,14 @@ class StorageManager {
   static removeStaticPosition() {
     this.removeLocalVal('staticPosition');
   }
+
+  static setRequiresVerification(requiresVerification) {
+    this.setLocalVal('requiresVerification', requiresVerification);
+  }
+
+  static getRequiresVerification() {
+    return this.getLocalVal('requiresVerification') === 'true';
+  }
 }
 
 module.exports = StorageManager;

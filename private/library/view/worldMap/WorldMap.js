@@ -130,203 +130,6 @@ class WorldMap extends View {
     mapMenu.appendChild(meButton);
     this.element.appendChild(mapMenu);
 
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.MYPOSITION,
-      func: ({ position }) => {
-        this.setUserPosition({ position });
-      },
-    });
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.USER,
-      func: () => {
-        this.retrievePositions({ callback: () => {
-          const team = storageManager.getTeam();
-          const world = [];
-          const local = [];
-          const teamUsers = [];
-          const users = Object.keys(this.markers).filter((positionName) => {
-            const marker = this.markers[positionName];
-
-            if (marker.markerType === 'user') {
-              if (team && marker.team && team === marker.team) {
-                teamUsers.push(positionName);
-              } else {
-                return true;
-              }
-            } else if (marker.markerType === 'world') {
-              world.push(positionName);
-            } else if (marker.markerType === 'local') {
-              local.push(positionName);
-            }
-
-            return false;
-          });
-
-          this.replaceListItems(local, this.localList);
-          this.replaceListItems(world, this.worldList);
-          this.replaceListItems(users, this.userList);
-          this.replaceListItems(teamUsers, this.teamList);
-        } });
-      },
-    });
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.REMOVEPOSITIONS,
-      func: ({ positions }) => {
-        positions.forEach((position) => {
-          switch (position.markerType) {
-            case 'signalBlock': {
-              const markersInBounds = this.isWithinBounds({ source: this.circles[position.positionName].circle });
-
-              this.clusterer.addMarkers(markersInBounds.map(mapMarker => mapMarker.marker));
-              markersInBounds.forEach((marker) => {
-                marker.setMap(this.map);
-              });
-
-              this.circles[position.positionName].circle.setMap(null);
-              this.circles[position.positionName].label.setMap(null);
-              this.circles[position.positionName] = undefined;
-
-              break;
-            }
-            case 'ping': {
-              this.circles[position.positionName].circle.setMap(null);
-              this.circles[position.positionName].label.setMap(null);
-              this.circles[position.positionName] = undefined;
-
-              break;
-            }
-            case 'local': {
-              this.localList.removeItem({ name: position.positionName });
-              this.clusterer.removeMarker(this.markers[position.positionName].marker);
-              this.markers[position.positionName].setMap(null);
-              this.markers[position.positionName] = undefined;
-
-              break;
-            }
-            case 'world': {
-              this.worldList.removeItem({ name: position.positionName });
-              this.clusterer.removeMarker(this.markers[position.positionName].marker);
-              this.markers[position.positionName].setMap(null);
-              this.markers[position.positionName] = undefined;
-
-              break;
-            }
-            case 'user': {
-              const marker = this.markers[position.positionName];
-              const team = storageManager.getTeam();
-
-              if (team && team === marker.team) {
-                this.teamList.removeItem({ name: position.positionName });
-              } else {
-                this.userList.removeItem({ name: position.positionName });
-              }
-
-              this.clusterer.removeMarker(this.markers[position.positionName].marker);
-              this.markers[position.positionName].setMap(null);
-              this.markers[position.positionName] = undefined;
-
-              break;
-            }
-            default: {
-              this.clusterer.removeMarker(this.markers[position.positionName].marker);
-              this.markers[position.positionName].setMap(null);
-              this.markers[position.positionName] = undefined;
-
-              break;
-            }
-          }
-        });
-      },
-    });
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.POSITIONS,
-      /**
-       * Add positions to lists
-       * @param {Object[]} params.positions Positions
-       * @param {string} params.positions[].positionName Name of the position
-       * @param {Object} params.positions[].coordinates GPS coordinates
-       * @param {string} params.positions[].markerType Type of marker
-       * @param {string} params.positions[].team Team name
-       * @param {Date} params.positions[].lastUpdated Last position change
-       * @param {Date} params.currentTime Current time, sent from server
-       */
-      func: ({ positions, currentTime }) => {
-        positions.forEach((position) => {
-          const thisUser = storageManager.getUserName();
-          const thisTeam = storageManager.getTeam();
-          const positionName = position.positionName;
-
-          if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
-            const circleObj = this.circles[positionName];
-
-            if (circleObj) {
-              const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
-
-              circleObj.circle.setCenter(latLng);
-              circleObj.label.setText({ text: position.description[0] });
-              circleObj.label.setPosition({ coordinates: position.coordinates });
-              circleObj.circle.setMap(this.map);
-              circleObj.label.setMap(this.map);
-            } else {
-              this.createCircleArea({ position });
-            }
-          } else if (this.markers[positionName]) {
-            this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
-
-            if (position.markerType && (position.markerType === 'user' || position.markerType === 'device')) {
-              const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
-
-              // TODO Duplicate code
-              this.markers[positionName].description = [
-                `Team: ${position.team || '-'}`,
-                `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
-                `Accuracy: ${position.coordinates.accuracy} meters`,
-              ];
-            }
-          } else if (positionName !== thisUser) {
-            this.createMarker({ position, currentTime });
-
-            switch (position.markerType) {
-              case 'local': {
-                if (!this.localList.getItem({ name: positionName })) {
-                  this.localList.addItem({ item: this.createListButton(positionName, this.localList) });
-                }
-
-                break;
-              }
-              case 'world': {
-                if (!this.worldList.getItem({ name: positionName })) {
-                  this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
-                }
-
-                break;
-              }
-              case 'user': {
-                if (!this.userList.getItem({ name: positionName })) {
-                  if (positionName.team && thisTeam && positionName.team === thisTeam) {
-                    this.teamList.addItem({ item: this.createListButton(positionName, this.userList) });
-                  } else {
-                    this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
-                  }
-                }
-
-                break;
-              }
-              default: {
-                break;
-              }
-            }
-
-            this.hideBlockedPositions(positionName);
-          }
-        });
-      },
-    });
-
     this.startAgeChecker();
   }
 
@@ -931,6 +734,232 @@ class WorldMap extends View {
     this.element.appendChild(this.mapClickMenu);
     this.element.appendChild(this.markerClickMenu);
     this.attachMapListeners();
+
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.MYPOSITION,
+      func: ({ position }) => {
+        this.setUserPosition({ position });
+      },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.USER,
+      func: () => {
+        this.retrievePositions({ callback: () => {
+          const team = storageManager.getTeam();
+          const world = [];
+          const local = [];
+          const teamUsers = [];
+          const users = Object.keys(this.markers).filter((positionName) => {
+            const marker = this.markers[positionName];
+
+            if (marker.markerType === 'user') {
+              if (team && marker.team && team === marker.team) {
+                teamUsers.push(positionName);
+              } else {
+                return true;
+              }
+            } else if (marker.markerType === 'world') {
+              world.push(positionName);
+            } else if (marker.markerType === 'local') {
+              local.push(positionName);
+            }
+
+            return false;
+          });
+
+          this.replaceListItems(local, this.localList);
+          this.replaceListItems(world, this.worldList);
+          this.replaceListItems(users, this.userList);
+          this.replaceListItems(teamUsers, this.teamList);
+        } });
+      },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.REMOVEPOSITIONS,
+      func: ({ positions }) => {
+        positions.forEach((position) => {
+          switch (position.markerType) {
+            case 'signalBlock': {
+              const markersInBounds = this.isWithinBounds({ source: this.circles[position.positionName].circle });
+
+              this.clusterer.addMarkers(markersInBounds.map(mapMarker => mapMarker.marker));
+              markersInBounds.forEach((marker) => {
+                marker.setMap(this.map);
+              });
+
+              this.circles[position.positionName].circle.setMap(null);
+              this.circles[position.positionName].label.setMap(null);
+              this.circles[position.positionName] = undefined;
+
+              break;
+            }
+            case 'ping': {
+              this.circles[position.positionName].circle.setMap(null);
+              this.circles[position.positionName].label.setMap(null);
+              this.circles[position.positionName] = undefined;
+
+              break;
+            }
+            case 'local': {
+              this.localList.removeItem({ name: position.positionName });
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+            case 'world': {
+              this.worldList.removeItem({ name: position.positionName });
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+            case 'user': {
+              const marker = this.markers[position.positionName];
+              const team = storageManager.getTeam();
+
+              if (team && team === marker.team) {
+                this.teamList.removeItem({ name: position.positionName });
+              } else {
+                this.userList.removeItem({ name: position.positionName });
+              }
+
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+            default: {
+              this.clusterer.removeMarker(this.markers[position.positionName].marker);
+              this.markers[position.positionName].setMap(null);
+              this.markers[position.positionName] = undefined;
+
+              break;
+            }
+          }
+        });
+      },
+    });
+    eventCentral.addWatcher({
+      watcherParent: this,
+      event: eventCentral.Events.POSITIONS,
+      /**
+       * Add positions to lists
+       * @param {Object[]} params.positions Positions
+       * @param {string} params.positions[].positionName Name of the position
+       * @param {Object} params.positions[].coordinates GPS coordinates
+       * @param {string} params.positions[].markerType Type of marker
+       * @param {string} params.positions[].team Team name
+       * @param {Date} params.positions[].lastUpdated Last position change
+       * @param {Date} params.currentTime Current time, sent from server
+       */
+      func: ({ positions, currentTime }) => {
+        positions.forEach((position) => {
+          const thisUser = storageManager.getUserName();
+          const thisTeam = storageManager.getTeam();
+          const positionName = position.positionName;
+
+          if (position.markerType === 'ping' || position.markerType === 'signalBlock') {
+            const circleObj = this.circles[positionName];
+
+            if (circleObj) {
+              const latLng = new google.maps.LatLng(position.coordinates.latitude, position.coordinates.longitude);
+
+              circleObj.circle.setCenter(latLng);
+              circleObj.label.setText({ text: position.description[0] });
+              circleObj.label.setPosition({ coordinates: position.coordinates });
+              circleObj.circle.setMap(this.map);
+              circleObj.label.setMap(this.map);
+            } else {
+              this.createCircleArea({ position });
+            }
+          } else if (this.markers[positionName]) {
+            this.markers[positionName].setPosition({ coordinates: position.coordinates, lastUpdated: position.lastUpdated, map: this.map });
+
+            if (position.markerType && (position.markerType === 'user' || position.markerType === 'device')) {
+              const beautifiedDate = textTools.generateTimeStamp({ date: new Date(position.lastUpdated) });
+
+              // TODO Duplicate code
+              this.markers[positionName].description = [
+                `Team: ${position.team || '-'}`,
+                `Last seen: ${beautifiedDate.fullTime} ${beautifiedDate.fullDate}`,
+                `Accuracy: ${position.coordinates.accuracy} meters`,
+              ];
+            }
+          } else if (positionName !== thisUser) {
+            this.createMarker({ position, currentTime });
+
+            switch (position.markerType) {
+              case 'local': {
+                if (!this.localList.getItem({ name: positionName })) {
+                  this.localList.addItem({ item: this.createListButton(positionName, this.localList) });
+                }
+
+                break;
+              }
+              case 'world': {
+                if (!this.worldList.getItem({ name: positionName })) {
+                  this.worldList.addItem({ item: this.createListButton(positionName, this.worldList) });
+                }
+
+                break;
+              }
+              case 'user': {
+                if (!this.userList.getItem({ name: positionName })) {
+                  if (positionName.team && thisTeam && positionName.team === thisTeam) {
+                    this.teamList.addItem({ item: this.createListButton(positionName, this.userList) });
+                  } else {
+                    this.userList.addItem({ item: this.createListButton(positionName, this.userList) });
+                  }
+                }
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+
+            this.hideBlockedPositions(positionName);
+          }
+        });
+      },
+    });
+
+    this.retrievePositions({ callback: () => {
+      const team = storageManager.getTeam();
+      const world = [];
+      const local = [];
+      const teamUsers = [];
+      const users = Object.keys(this.markers).filter((positionName) => {
+        const marker = this.markers[positionName];
+
+        if (marker.markerType === 'user') {
+          if (team && marker.team && team === marker.team) {
+            teamUsers.push(positionName);
+          } else {
+            return true;
+          }
+        } else if (marker.markerType === 'world') {
+          world.push(positionName);
+        } else if (marker.markerType === 'local') {
+          local.push(positionName);
+        }
+
+        return false;
+      });
+
+      this.replaceListItems(local, this.localList);
+      this.replaceListItems(world, this.worldList);
+      this.replaceListItems(users, this.userList);
+      this.replaceListItems(teamUsers, this.teamList);
+    } });
   }
 
   createCircleArea({ position = {} }) {

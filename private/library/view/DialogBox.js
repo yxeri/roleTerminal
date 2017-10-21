@@ -30,13 +30,13 @@ class DialogBox extends View {
     this.addKeyTrigger({ charCode: leftCharCode, func: buttons.left.eventFunc });
     this.addKeyTrigger({ charCode: rightCharCode, func: buttons.right.eventFunc });
 
-    this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
+    // this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');
     description.forEach(text => this.descriptionContainer.appendChild(elementCreator.createParagraph({ text })));
 
-    this.extraDescription = document.createElement('DIV');
+    this.extraDescription = elementCreator.createContainer({ classes: ['extraDescription'] });
     extraDescription.forEach(text => this.extraDescription.appendChild(elementCreator.createParagraph({ text })));
 
     this.extraLinks = document.createElement('DIV');
@@ -44,11 +44,11 @@ class DialogBox extends View {
     this.descriptionContainer.appendChild(this.extraDescription);
     this.descriptionContainer.appendChild(this.extraLinks);
 
-    const closeButton = elementCreator.createButton({
-      text: 'X',
+    const closeButton = elementCreator.createContainer({
+      classes: ['button', 'closeButton'],
       func: () => { this.removeView(); },
-      classes: ['closeButton'],
     });
+    closeButton.appendChild(elementCreator.createSpan({ text: 'X' }));
 
     const leftButtonChar = buttons.left.text.charAt(0);
     let rightButtonChar = buttons.right.text.charAt(0);
@@ -61,14 +61,25 @@ class DialogBox extends View {
 
     this.buttonsContainer = document.createElement('DIV');
     this.buttonsContainer.classList.add('buttons');
-    this.buttonsContainer.appendChild(elementCreator.createButton({
+
+    const leftButton = elementCreator.createContainer({
+      classes: ['button'],
+    });
+    leftButton.appendChild(elementCreator.createSpan({
       text: `[${leftButtonChar.toUpperCase()}]${buttons.left.text.slice(1)}`,
       func: buttons.left.eventFunc,
     }));
-    this.buttonsContainer.appendChild(elementCreator.createButton({
+
+    const rightButton = elementCreator.createContainer({
+      classes: ['button'],
+    });
+    rightButton.appendChild(elementCreator.createSpan({
       text: rightButtonText,
       func: buttons.right.eventFunc,
     }));
+
+    this.buttonsContainer.appendChild(leftButton);
+    this.buttonsContainer.appendChild(rightButton);
 
     this.inputs = [];
 

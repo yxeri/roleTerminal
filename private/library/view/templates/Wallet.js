@@ -38,9 +38,13 @@ function createTransactionItem({ suffix, transaction: { to, from, amount, time, 
   const listItem = document.createElement('LI');
   const date = textTools.generateTimeStamp({ date: time });
 
+  listItem.appendChild(elementCreator.createContainer({ classes: ['leftCorner'] }));
+  listItem.appendChild(elementCreator.createContainer({ classes: ['rightCorner'] }));
+  listItem.appendChild(elementCreator.createContainer({ classes: ['upperRightCorner'] }));
+
   listItem.appendChild(elementCreator.createParagraph({ text: `${date.fullTime} ${date.fullDate}` }));
   listItem.appendChild(elementCreator.createParagraph({ text: `${from} -> ${to}` }));
-  listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount} ${suffix}` }));
+  listItem.appendChild(elementCreator.createParagraph({ text: `Amount: ${amount}${suffix}` }));
 
   if (coordinates) {
     listItem.appendChild(elementCreator.createParagraph({ text: `Lat: ${coordinates.latitude}. Long: ${coordinates.longitude}. Accuracy: ${coordinates.accuracy}m` }));
@@ -67,7 +71,7 @@ function filterUserAliases(users) {
 
 class Wallet extends StandardView {
   constructor({ suffix = '' }) {
-    super({ viewId: 'wallet' });
+    super({ isFullscreen: true, viewId: 'wallet' });
 
     this.viewer.appendChild(elementCreator.createParagraph({ text: '' }));
     this.viewer.appendChild(elementCreator.createList({}));
@@ -80,15 +84,15 @@ class Wallet extends StandardView {
   }
 
   createTransactionButton({ receiverName, readableName }) {
-    const radioSet = {
-      type: 'radioSet',
-      title: 'Which wallet do you want to use?',
-      optionName: 'visibility',
-      options: [
-        { optionId: 'myWallet', optionLabel: 'Mine', default: true },
-        { optionId: 'teamWallet', optionLabel: 'Team', requiresTeam: true },
-      ],
-    };
+    // const radioSet = {
+    //   type: 'radioSet',
+    //   title: 'Which wallet do you want to use?',
+    //   optionName: 'visibility',
+    //   options: [
+    //     { optionId: 'myWallet', optionLabel: 'Mine', default: true },
+    //     { optionId: 'teamWallet', optionLabel: 'Team', requiresTeam: true },
+    //   ],
+    // };
     const inputs = [{
       placeholder: 'Amount',
       inputName: 'amount',
@@ -97,13 +101,15 @@ class Wallet extends StandardView {
       placeholder: 'Message to receiver',
       inputName: 'note',
 
-    }, radioSet];
+    }];
 
     const button = elementCreator.createButton({
       inputs,
       data: receiverName,
       text: readableName || receiverName,
       func: () => {
+        this.userList.toggleList(false);
+
         const transDialog = new DialogBox({
           inputs,
           buttons: {
@@ -117,7 +123,6 @@ class Wallet extends StandardView {
               text: 'Create',
               eventFunc: () => {
                 const emptyFields = transDialog.markEmptyFields();
-                const teamOption = document.getElementById('teamWallet');
 
                 if (emptyFields) {
                   soundLibrary.playSound('fail');
@@ -136,7 +141,7 @@ class Wallet extends StandardView {
                   transaction.coordinates = tracker.latestBestPosition.coordinates;
                 }
 
-                socketManager.emitEvent('createTransaction', { transaction, fromTeam: teamOption && teamOption.checked }, ({ error: createError, data }) => {
+                socketManager.emitEvent('createTransaction', { transaction }, ({ error: createError, data }) => {
                   if (createError) {
                     if (createError.type === 'insufficient') {
                       transDialog.changeExtraDescription({ text: ['Not enough vcaps', 'Unable to transfer credits'] });
@@ -159,7 +164,7 @@ class Wallet extends StandardView {
             },
           },
           description: [
-            'Virtual Caps Transfer Tool',
+            'Nyuen Transfer Tool',
           ],
           extraDescription: [`How much do you want to transfer to ${receiverName}?`],
         });
@@ -170,7 +175,7 @@ class Wallet extends StandardView {
     return button;
   }
 
-  getTransactions({ teamList, userList }) {
+  getTransactions({ teamList }) {
     socketManager.emitEvent('getTeams', {}, ({ error, data }) => {
       if (error) {
         console.log(error);
@@ -190,7 +195,7 @@ class Wallet extends StandardView {
 
       const users = filterUserAliases(data.users);
 
-      userList.replaceAllItems({ items: users.map(user => this.createTransactionButton({ receiverName: user.userName })) });
+      this.userList.replaceAllItems({ items: users.map(user => this.createTransactionButton({ receiverName: user.userName })) });
     });
 
     socketManager.emitEvent('getWallets', { userName: storageManager.getUserName() }, ({ error, data }) => {
@@ -205,6 +210,9 @@ class Wallet extends StandardView {
           this.teamWalletAmount = wallet.amount;
           this.setWalletSpan({ teamAmount: wallet.amount });
         } else {
+          const walletTop = document.getElementById('walletTop');
+          walletTop.replaceChild(elementCreator.createSpan({ text: `${wallet.amount}${this.suffix}` }), walletTop.firstElementChild);
+
           this.walletAmount = wallet.amount;
           this.setWalletSpan({ userAmount: wallet.amount });
         }
@@ -251,21 +259,21 @@ class Wallet extends StandardView {
       title: 'TEAMS',
       shouldSort: true,
     });
-    const userList = new List({
-      title: 'USERS',
+    this.userList = new List({
+      title: 'transfer_to',
       shouldSort: true,
     });
 
     this.itemList.appendChild(systemList.element);
     this.itemList.appendChild(teamList.element);
-    this.itemList.appendChild(userList.element);
+    this.itemList.appendChild(this.userList.element);
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
         if (storageManager.getToken()) {
-          this.getTransactions({ teamList, userList });
+          this.getTransactions({ teamList });
         } else {
           this.resetWallets();
           this.viewer.lastElementChild.innerHTML = '';
@@ -298,7 +306,7 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.TEAM,
       func: () => {
-        this.getTransactions({ teamList, userList });
+        this.getTransactions({ teamList });
       },
     });
   }
@@ -311,13 +319,14 @@ class Wallet extends StandardView {
 
   setWalletSpan({ userAmount, teamAmount }) {
     const teamName = storageManager.getTeam();
-    let amountString = `WALLET: ${userAmount || this.walletAmount} ${this.suffix}`;
+    let amountString = `WALLET: ${userAmount || this.walletAmount}${this.suffix}`;
 
     if (teamName) {
-      amountString += `. TEAM WALLET: ${teamAmount || this.teamWalletAmount} ${this.suffix}`;
+      amountString += `. TEAM WALLET: ${teamAmount || this.teamWalletAmount}${this.suffix}`;
     }
 
     this.viewer.firstElementChild.innerHTML = '';
+    this.viewer.firstElementChild.classList.add('hide');
     this.viewer.firstElementChild.appendChild(document.createTextNode(amountString));
   }
 
@@ -327,6 +336,9 @@ class Wallet extends StandardView {
     aliases.push(storageManager.getUserName());
 
     if (aliases.indexOf(wallet.owner) > -1) {
+      const walletTop = document.getElementById('walletTop');
+      walletTop.replaceChild(elementCreator.createSpan({ text: `${wallet.amount}${this.suffix}` }), walletTop.firstElementChild);
+
       this.walletAmount = wallet.amount;
     } else if (teamName && teamName === wallet.team) {
       this.teamWalletAmount = wallet.amount;

@@ -50,14 +50,14 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, titleCallback = () => {} }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.shouldSort = shouldSort;
     this.showingList = showingList;
     this.minimumToShow = minimumToShow;
-    this.toggleElement = elementCreator.createContainer({ });
+    this.toggleElement = elementCreator.createContainer({});
 
     if (!showTitle) {
       this.element.classList.add('hide');
@@ -69,7 +69,7 @@ class List extends View {
       titleElement.classList.add('clickable');
 
       titleElement.addEventListener('click', () => {
-        this.toggleList();
+
       });
 
       if (!this.showingList) {
@@ -78,9 +78,18 @@ class List extends View {
         this.toggleElement.classList.add('expandedIcon');
       }
 
-      titleElement.appendChild(this.toggleElement);
-      titleElement.appendChild(elementCreator.createSpan({ text: title }));
-      this.element.appendChild(titleElement);
+      const titleContainer = elementCreator.createContainer({
+        classes: ['button'],
+        func: () => {
+          titleCallback();
+          this.toggleList();
+        },
+      });
+      titleContainer.appendChild(elementCreator.createContainer({ classes: ['buttonLeftCorner'] }));
+      titleContainer.appendChild(elementCreator.createContainer({ classes: ['buttonUpperRightCorner'] }));
+      titleContainer.appendChild(elementCreator.createSpan({ text: title }));
+
+      this.element.appendChild(titleContainer);
     } else {
       this.showingList = true;
     }
@@ -107,6 +116,7 @@ class List extends View {
 
     if (this.shouldSort) {
       const list = createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item }));
+      list.classList.add('userList');
 
       this.element.replaceChild(list, this.element.lastElementChild);
     } else {
@@ -121,6 +131,7 @@ class List extends View {
 
     items.forEach(item => fragment.appendChild(elementCreator.createListItem({ element: item })));
     this.element.lastElementChild.appendChild(fragment);
+    this.element.lastElementChild.classList.add('userList');
     this.toggleView();
   }
 
@@ -147,6 +158,8 @@ class List extends View {
       list.classList.add('hide');
     }
 
+    list.classList.add('userList');
+
     this.element.replaceChild(list, this.element.lastElementChild);
     this.toggleView();
   }
@@ -157,6 +170,11 @@ class List extends View {
     } else {
       this.element.classList.add('hide');
     }
+  }
+
+  hideList() {
+    this.showingList = false;
+    this.element.lastElementChild.classList.add('hide');
   }
 
   toggleList(show) {

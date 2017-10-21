@@ -18,25 +18,21 @@ require('../library/polyfills');
 
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
-const Clock = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const WorldMap = require('../library/view/worldMap/WorldMap');
 const DirViewer = require('../library/view/templates/DirViewer');
-const WreckingStatus = require('../library/view/templates/WreckingStatus');
-const Home = require('../library/view/templates/Home');
+// const Home = require('../library/view/templates/Home');
 // const SoundElement = require('../library/audio/SoundElement');
 const TextAnimation = require('../library/view/templates/TextAnimation');
 const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
-const Terminal = require('../library/view/templates/Terminal');
 const ButtonBox = require('../library/view/templates/ButtonBox');
 const TeamViewer = require('../library/view/templates/TeamViewer');
 const ToolsViewer = require('../library/view/templates/ToolsViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
 const DialogBox = require('../library/view/DialogBox');
+const Forum = require('../library/view/templates/Forum');
 
 const keyHandler = require('../library/KeyHandler');
-const deviceChecker = require('../library/DeviceChecker');
 const socketManager = require('../library/SocketManager');
 const storageManager = require('../library/StorageManager');
 const textTools = require('../library/TextTools');
@@ -49,6 +45,297 @@ const tools = require('../library/Tools');
 const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(top);
+
+const toolsViewer = new ToolsViewer({ isFullscreen: true });
+// const home = new Home({
+//   introText: [
+//     elementCreator.createParagraph({
+//       text: 'Organica Oracle Operating System (O3C) 5.0 Razor Edition',
+//     }),
+//     elementCreator.createParagraph({
+//       text: 'Welcome, employee. This is your cyberhome. You can always find your way to your cyberhome by clicking on the top menu. May you have a productive day!',
+//     }),
+//   ],
+//   introDevText: [
+//     elementCreator.createParagraph({
+//       classes: ['redBack'],
+//       text: 'THIS IS A EXPERIMENTAL SERVER. This will NOT be used during the event. You can play around as much as you want. Stuff might be broken. Data might be lost. Save a copy of everything of importance.',
+//     }),
+//     elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
+//     elementCreator.createParagraph({ text: 'More info at:' }),
+//     elementCreator.createLink({
+//       text: 'Patreon',
+//       href: 'http://patreon.com/yxeri',
+//       target: '_blank',
+//     }),
+//     elementCreator.createLink({
+//       text: 'Facebook',
+//       href: 'https://www.facebook.com/thethirdgiftgames/',
+//       target: '_blank',
+//     }),
+//     elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Any small amount helps! Help support the project at ' }),
+//     elementCreator.createLink({
+//       text: 'Patreon',
+//       href: 'http://patreon.com/yxeri',
+//       target: '_blank',
+//     }),
+//     elementCreator.createParagraph({ text: 'Do you want to expand the world of BBR?' }),
+//     elementCreator.createLink({
+//       text: 'Join the cartographer group',
+//       href: 'https://www.facebook.com/groups/585709954945167/',
+//       target: '_blank',
+//     }),
+//     elementCreator.createParagraph({
+//       text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
+//     }),
+//   ],
+// });
+const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
+const dirViewer = new DirViewer({ isFullscreen: true });
+const forum = new Forum({});
+const walletViewer = new Wallet({ suffix: '¥' });
+const profile = new Profile();
+const teamViewer = new TeamViewer({});
+const tracker = new Tracker();
+
+let currentView = forum;
+forum.appendTo(mainView);
+
+let isClosed = false;
+const logIn = elementCreator.createContainer({
+  func: () => {
+    if (isClosed) {
+      isClosed = false;
+
+      return;
+    }
+
+    if (storageManager.getToken()) {
+      const aliases = storageManager.getAliases().concat([storageManager.getUserName()]);
+      const aliasElements = aliases.map((alias) => {
+        return elementCreator.createListItem({
+          element: elementCreator.createSpan({ text: alias }),
+          func: (event) => {
+            const aliasElement = elementCreator.createSpan({
+              text: alias,
+            });
+
+            if (alias !== storageManager.getUserName()) {
+              storageManager.setSelectedAlias(alias);
+
+              return;
+            }
+
+            storageManager.removeSelectedAlias();
+
+            logIn.removeChild(logIn.lastElementChild);
+            logIn.replaceChild(aliasElement, logIn.firstElementChild);
+
+            event.stopPropagation();
+            event.preventDefault();
+          },
+        });
+      });
+
+      const logoutElement = elementCreator.createListItem({
+        element: elementCreator.createSpan({ text: 'log_off' }),
+        classes: ['logout'],
+        func: (event) => {
+          logIn.removeChild(logIn.lastElementChild);
+          logIn.replaceChild(elementCreator.createSpan({ text: 'login' }), logIn.firstElementChild);
+
+          eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+
+          event.stopPropagation();
+          event.preventDefault();
+        },
+      });
+      const newAliasElement = elementCreator.createListItem({
+        element: elementCreator.createSpan({ text: 'new_handle' }),
+        func: () => {
+          const createDialog = new DialogBox({
+            buttons: {
+              left: {
+                text: 'cancel',
+                eventFunc: () => {
+                  createDialog.removeView();
+                },
+              },
+              right: {
+                text: 'create',
+                eventFunc: () => {
+                  const emptyFields = createDialog.markEmptyFields();
+
+                  if (emptyFields) {
+                    soundLibrary.playSound('fail');
+                    createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                    return;
+                  }
+
+                  const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
+
+                  socketManager.emitEvent('createAlias', { alias, user: { userName: storageManager.getUserName() } }, ({ error: createError }) => {
+                    if (createError) {
+                      console.log(createError);
+
+                      if (createError.type === 'already exists') {
+                        createDialog.changeExtraDescription({ text: ['Handle already exists'] });
+
+                        return;
+                      }
+
+                      createDialog.changeExtraDescription({ text: ['Something went wrong.', 'Unable to create handle'] });
+
+                      return;
+                    }
+
+                    storageManager.addAlias(alias);
+                    eventCentral.triggerEvent({
+                      event: eventCentral.Events.NEWALIAS,
+                      params: { alias },
+                    });
+                    createDialog.removeView();
+                  });
+                },
+              },
+            },
+            inputs: [{
+              placeholder: 'Handle',
+              inputName: 'alias',
+              isRequired: true,
+              maxLength: 20,
+            }],
+            description: [
+              'You can never have too many burner handles',
+            ],
+            extraDescription: ['Enter your new handle'],
+          });
+
+          createDialog.appendTo(mainView);
+        },
+      });
+      const spacerElement = elementCreator.createListItem({ element: elementCreator.createSpan({ text: '_system' }), classes: ['systemSpacer'] });
+
+      const userElement = elementCreator.createSpan({
+        text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+        func: () => {
+          if (logIn.childElementCount > 1) {
+            isClosed = true;
+            logIn.removeChild(logIn.lastElementChild);
+          }
+        },
+      });
+
+      const fragment = document.createDocumentFragment();
+      const systemItems = [spacerElement, newAliasElement, logoutElement];
+
+      fragment.appendChild(userElement);
+      fragment.appendChild(elementCreator.createList({
+        elements: aliasElements.concat(systemItems),
+        classes: ['userList'],
+      }));
+
+      logIn.innerHTML = '';
+      logIn.appendChild(fragment);
+
+      return;
+    }
+
+    const loginBox = new LoginBox({
+      socketManager,
+      keyHandler,
+      description: ['Welcome to the Shadowland'],
+      extraDescription: ['Input your main handle and password'],
+      parentElement: mainView,
+    });
+
+    loginBox.appendTo(mainView);
+  },
+});
+
+const bbsTop = elementCreator.createContainer({
+  func: () => {
+    if (currentView !== forum) {
+      if (logIn.childElementCount > 1) {
+        logIn.removeChild(logIn.lastElementChild);
+      }
+
+      currentView.removeView();
+      currentView = forum;
+      forum.appendTo(mainView);
+    }
+  },
+});
+
+const msgTop = elementCreator.createContainer({
+  func: () => {
+    if (currentView !== messenger) {
+      if (logIn.childElementCount > 1) {
+        logIn.removeChild(logIn.lastElementChild);
+      }
+
+      currentView.removeView();
+      currentView = messenger;
+      messenger.appendTo(mainView);
+    }
+  },
+});
+
+const walletTop = elementCreator.createContainer({
+  elementId: 'walletTop',
+  func: () => {
+    if (currentView !== walletViewer) {
+      if (logIn.childElementCount > 1) {
+        logIn.removeChild(logIn.lastElementChild);
+      }
+
+      currentView.removeView();
+      currentView = walletViewer;
+      walletViewer.appendTo(mainView);
+    }
+  },
+});
+
+if (storageManager.getToken()) {
+  logIn.appendChild(elementCreator.createSpan({
+    text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+  }));
+} else {
+  logIn.appendChild(elementCreator.createSpan({ text: 'login' }));
+}
+
+walletTop.appendChild(elementCreator.createSpan({
+  text: '0¥',
+}));
+msgTop.appendChild(elementCreator.createSpan({
+  text: 'msg',
+}));
+
+bbsTop.appendChild(elementCreator.createSpan({ text: 'bbs' }));
+
+top.appendChild(elementCreator.createContainer({ classes: ['menuRightCorner'] }));
+top.appendChild(logIn);
+top.appendChild(bbsTop);
+top.appendChild(msgTop);
+top.appendChild(walletTop);
+
+eventCentral.addWatcher({
+  watcherParent: this,
+  event: eventCentral.Events.USER,
+  func: () => {
+    logIn.innerHTML = '';
+
+    if (storageManager.getToken()) {
+      logIn.appendChild(elementCreator.createSpan({
+        text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+      }));
+    } else {
+      logIn.appendChild(elementCreator.createSpan({ text: 'login' }));
+    }
+  },
+});
+
 const boot = new TextAnimation({ removeTime: 700, triggerValue: 'firstBoot' });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
@@ -207,765 +494,8 @@ window.addEventListener('error', (event) => {
   return false;
 });
 
-const terminal = new Terminal({ skipAnimation: queryParameters.noBoot });
-const toolsViewer = new ToolsViewer({ isFullscreen: true });
-const home = new Home({
-  introText: [
-    elementCreator.createParagraph({
-      text: 'Organica Oracle Operating System (O3C) 5.0 Razor Edition',
-    }),
-    elementCreator.createParagraph({
-      text: 'Welcome, employee. This is your cyberhome. You can always find your way to your cyberhome by clicking on the top menu. May you have a productive day!',
-    }),
-  ],
-  introDevText: [
-    elementCreator.createParagraph({
-      classes: ['redBack'],
-      text: 'THIS IS A EXPERIMENTAL SERVER. This will NOT be used during the event. You can play around as much as you want. Stuff might be broken. Data might be lost. Save a copy of everything of importance.',
-    }),
-    elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
-    elementCreator.createParagraph({ text: 'More info at:' }),
-    elementCreator.createLink({
-      text: 'Patreon',
-      href: 'http://patreon.com/yxeri',
-      target: '_blank',
-    }),
-    elementCreator.createLink({
-      text: 'Facebook',
-      href: 'https://www.facebook.com/thethirdgiftgames/',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Any small amount helps! Help support the project at ' }),
-    elementCreator.createLink({
-      text: 'Patreon',
-      href: 'http://patreon.com/yxeri',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({ text: 'Do you want to expand the world of BBR?' }),
-    elementCreator.createLink({
-      text: 'Join the cartographer group',
-      href: 'https://www.facebook.com/groups/585709954945167/',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({
-      text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
-    }),
-  ],
-});
-const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
-const dirViewer = new DirViewer({ isFullscreen: true });
-const walletViewer = new Wallet({ suffix: 'vcaps' });
-const profile = new Profile();
-const map = new WorldMap({
-  mapView: WorldMap.MapViews.AREA,
-  clusterStyle: {
-    gridSize: 22,
-    maxZoom: 17,
-    zoomOnClick: false,
-    singleSize: true,
-    averageCenter: true,
-    styles: [{
-      width: 24,
-      height: 24,
-      iconAnchor: [12, 12],
-      textSize: 12,
-      url: 'images/mapcluster.png',
-      textColor: '00ffcc',
-      fontFamily: 'monospace',
-    }],
-  },
-  mapStyles: [
-    {
-      featureType: 'all',
-      elementType: 'all',
-      stylers: [
-        { color: '#11000f' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'geometry',
-      stylers: [
-        { color: '#00ffcc' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'labels',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'poi',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'administrative',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'water',
-      elementType: 'all',
-      stylers: [
-        { color: '#ff02e5' },
-      ],
-    },
-  ],
-  labelStyle: {
-    fontFamily: 'monospace',
-    fontColor: '#00ffcc',
-    strokeColor: '#001e15',
-    fontSize: 12,
-  },
-  mapBackground: '#11000f',
-});
-const teamViewer = new TeamViewer({ worldMap: map });
-const tracker = new Tracker();
-
-terminal.addCommand({
-  commandName: 'lanternMaintenance',
-  accessLevel: 1,
-  startFunc: () => {
-    terminal.queueMessage({
-      message: {
-        text: [
-          'Artemisia needs your help to verify LANTERN operational status.',
-          'Downloading list of available LANTERNs ...',
-        ],
-      },
-    });
-
-    socketManager.emitEvent('getValidCalibrationStations', { userName: storageManager.getUserName() }, ({ error: stationError, data: stationData }) => {
-      if (stationError) {
-        if (stationError.type === 'does not exist') {
-          terminal.queueMessage({
-            message: {
-              text: [
-                '-----',
-                'ERROR',
-                '-----',
-                'No LANTERNs are in need of maintenance',
-                'Aborting...',
-              ],
-            },
-          });
-
-          terminal.resetNextFunc();
-
-          return;
-        } else if (stationError.type === 'too frequent') {
-          const timeText = stationError.extraData && typeof stationError.extraData.timeLeft === 'number' ? `${Math.abs(Math.ceil(stationError.extraData.timeLeft / 60000))}m` : 'UNKNOWN';
-
-          terminal.queueMessage({
-            message: {
-              text: [
-                '-----',
-                'ERROR',
-                '-----',
-                'Data incomplete.',
-                'Data transfer is in progress.',
-                `Expected completion in: ${timeText}.`,
-                'Aborting...',
-              ],
-            },
-          });
-
-          terminal.resetNextFunc();
-
-          return;
-        }
-
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'Something went wrong',
-              'Unable to check LANTERN status.',
-            ],
-          },
-        });
-
-        terminal.resetNextFunc();
-
-        return;
-      } else if (stationData.mission) {
-        const mission = stationData.mission;
-
-        terminal.queueMessage({
-          message: {
-            text: [
-              `You have been assigned LANTERN ${mission.stationId}`,
-              `Your assigned personal verification code is: ${mission.code}`,
-              `Proceed to LANTERN ${mission.stationId} and use the code`,
-              'Artemisia wishes you a nice day!',
-              'END OF MESSAGE',
-            ],
-          },
-        });
-
-        terminal.resetNextFunc();
-
-        return;
-      }
-
-      const stations = stationData.stations;
-
-      terminal.queueMessage({
-        message: {
-          text: [
-            '----------------',
-            'Please select LANTERN to verify',
-            '----------------',
-          ],
-          elementPerRow: true,
-          elements: stations.map((station) => {
-            const span = elementCreator.createSpan({});
-            const stationSpan = elementCreator.createSpan({
-              classes: ['clickable', 'linkLook', 'moreSpace'],
-              text: `[${station.stationId}] ${station.stationName} - ${station.calibrationReward}vcaps`,
-              func: () => {
-                terminal.triggerCommand(station.stationId);
-              },
-            });
-
-            span.appendChild(stationSpan);
-
-            return span;
-          }),
-        },
-      });
-
-      terminal.setNextFunc((stationId) => {
-        const stationIds = stations.map(station => station.stationId);
-        const chosenStationId = !isNaN(stationId) ? parseInt(stationId, 10) : '';
-
-        if (stationIds.indexOf(chosenStationId) < 0) {
-          terminal.queueMessage({ message: { text: ['Incorrect LANTERN ID'] } });
-
-          return;
-        }
-
-        socketManager.emitEvent('getCalibrationMission', { userName: storageManager.getUserName(), stationId: chosenStationId }, ({ error, data }) => {
-          if (error) {
-            if (error.type === 'does not exist') {
-              terminal.queueMessage({
-                message: {
-                  text: [
-                    '-----',
-                    'ERROR',
-                    '-----',
-                    'No LANTERN are in need of maintenanc.e',
-                    'Aborting...',
-                  ],
-                },
-              });
-              terminal.resetNextFunc();
-
-              return;
-            } if (error.type === 'external') {
-              terminal.queueMessage({
-                message: {
-                  text: [
-                    '-----',
-                    'ERROR',
-                    '-----',
-                    'LANTERN activity is blocking status data.',
-                    'Maintenance is blocked.',
-                    'Aborting...',
-                  ],
-                },
-              });
-              terminal.resetNextFunc();
-
-              return;
-            }
-
-            terminal.queueMessage({
-              message: {
-                text: [
-                  '-----',
-                  'ERROR',
-                  '-----',
-                  'Something went wrong.',
-                  'Unable to check for LANTERN status.',
-                ],
-              },
-            });
-            terminal.resetNextFunc();
-
-            return;
-          }
-
-          const { mission, isNew } = data;
-
-          if (isNew) {
-            terminal.queueMessage({
-              message: {
-                text: [
-                  'LANTERN is need of maintenance!',
-                ],
-              },
-            });
-          }
-
-          terminal.queueMessage({
-            message: {
-              text: [
-                `You have been assigned LANTERN ${mission.stationId}`,
-                `Your assigned personal verification code is: ${mission.code}`,
-                `Proceed to LANTERN ${mission.stationId} and use the code`,
-                'Artemisia wishes you a nice day!',
-                'END OF MESSAGE',
-              ],
-            },
-          });
-
-          terminal.resetNextFunc();
-        });
-      });
-    });
-  },
-});
-terminal.addCommand({
-  commandName: 'hackLantern',
-  accessLevel: 1,
-  startFunc: () => {
-    terminal.queueMessage({
-      message: {
-        text: [
-          'Razor proudly presents:',
-          'LANTERN Amplification Master Manipulator (LAMM)',
-          'Overriding locks ...',
-          'Connecting to database ...',
-        ],
-      },
-    });
-
-    socketManager.emitEvent('getLanternInfo', {}, ({ error, data: { teams, round, activeStations, inactiveStations, timeLeft } }) => {
-      if (error) {
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'Something went wrong',
-              'Unable to access LAMM',
-            ],
-          },
-        });
-        terminal.resetNextFunc();
-
-        return;
-      } else if (!round.isActive) {
-        const time = 0;
-        const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
-
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'No signal received.',
-              'Satellites are not in position.',
-              'Unable to target LANTERNs',
-              `Next window opens in: ${timeString}`,
-              'Aborting LAMM...',
-            ],
-          },
-        });
-
-        terminal.resetNextFunc();
-
-        return;
-      } else if (activeStations.length === 0) {
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----',
-              'ERROR',
-              '-----',
-              'Unable to connect to LANTERNs.',
-              'No active LANTERN found.',
-              'Unable to proceed.',
-              'Aborting LAMM...',
-            ],
-          },
-        });
-
-        terminal.resetNextFunc();
-
-        return;
-      }
-
-      const time = timeLeft;
-      const timeString = time > 0 ? `${time} minutes` : 'UNKNOWN';
-
-      terminal.queueMessage({
-        message: {
-          text: [
-            '----',
-            'LAMM',
-            '----',
-            'You will be shown a user with access to your chosen LANTERN and a text dump.',
-            'Each user will have information about its password attached to it. Use it as a hint and try to find the correct password.',
-            'Each user might have more than one password, so don\'t blindly start clicking around. Check if the information corresponds to the password you are about to choose',
-            'You must find the user\'s password within the dumps to get access to the LANTERN. You will have 3 tries until the automated defense system shuts down the connection.',
-            'We take no responsibility for deaths due to accidental activitation of defense systems.',
-            `Window closes in ${timeString}.`,
-            '-----------------',
-            'Choose a LANTERN:',
-            '-----------------',
-          ],
-          elementPerRow: true,
-          elements: activeStations.concat(inactiveStations).map((station) => {
-            if (station.isActive) {
-              const span = elementCreator.createSpan({});
-              const stationSpan = elementCreator.createSpan({
-                classes: ['clickable', 'linkLook', 'moreSpace'],
-                text: `[${station.stationId}] ${station.stationName}`,
-                func: () => {
-                  terminal.triggerCommand(station.stationId);
-                },
-              });
-              const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
-              const ownerSpan = elementCreator.createSpan({
-                text: `Owner: ${team ? team.teamName : '---'} ${station.isUnderAttack && team ? ' - UNDER ATTACK' : ''}`,
-              });
-
-              span.appendChild(stationSpan);
-              span.appendChild(ownerSpan);
-
-              return span;
-            }
-
-            return elementCreator.createSpan({
-              text: `[INACTIVE] ${station.stationName}`,
-            });
-          }),
-        },
-      });
-
-      terminal.setNextFunc((stationIdValue) => {
-        const activeIds = activeStations.map(station => station.stationId);
-        const stationId = !isNaN(stationIdValue) ? parseInt(stationIdValue, 10) : '';
-
-        if (activeIds.indexOf(stationId) < 0) {
-          terminal.queueMessage({ message: { text: ['Incorrect LANTERN number'] } });
-
-          return;
-        }
-
-        const actions = [{ id: 1, name: 'Amplify' }, { id: 2, name: 'Dampen' }];
-
-        terminal.queueMessage({
-          message: {
-            text: [
-              '-----------------',
-              'Choose an action:',
-              '-----------------',
-            ],
-            elementPerRow: true,
-            elements: actions.map((action) => {
-              const span = elementCreator.createSpan({});
-              const actionSpan = elementCreator.createSpan({
-                classes: ['clickable', 'linkLook', 'moreSpace'],
-                text: `[${action.id}] ${action.name}`,
-                func: () => {
-                  terminal.triggerCommand(action.id);
-                },
-              });
-
-              span.appendChild(actionSpan);
-
-              return span;
-            }),
-          },
-        });
-
-        terminal.setNextFunc((actionIdValue) => {
-          const actionIds = actions.map(action => action.id);
-          const actionId = !isNaN(actionIdValue) ? parseInt(actionIdValue, 10) : '';
-
-          if (actionIds.indexOf(actionId) > -1) {
-            terminal.queueMessage({
-              message: {
-                text: [
-                  `Action ${actions.find(action => action.id === actionId).name} chosen.`,
-                  `Accessing LANTERN ${stationId}...`,
-                ],
-              },
-            });
-
-            socketManager.emitEvent('getLanternHack', { stationId }, ({ error: hackError, data: hackData }) => {
-              if (hackError) {
-                terminal.queueMessage({ message: { text: ['Something went wrong. Failed to start hack'] } });
-                terminal.resetNextFunc();
-
-                return;
-              }
-
-              const boostingSignal = actionId === 1;
-              const hintIndex = hackData.passwordHint.index + 1;
-
-              const elements = textTools.createMixedArray({
-                classes: ['moreSpace'],
-                rowAmount: hackData.passwords.length,
-                length: 34,
-                requiredClickableStrings: hackData.passwords,
-                charToLower: hackData.passwordHint.character,
-                requiredFunc: (value) => {
-                  terminal.triggerCommand(value);
-                },
-              });
-
-              elements.forEach((element) => {
-                let startTouchTime;
-
-                element.addEventListener('touchstart', () => {
-                  startTouchTime = new Date();
-                });
-
-                element.addEventListener('touchend', () => {
-                  const endTouchTime = new Date();
-
-                  if (endTouchTime - startTouchTime >= 300) {
-                    const clickables = Array.from(element.getElementsByClassName('clickable'));
-
-                    elements.forEach(spanElement => Array.from(spanElement.children).forEach(child => child.classList.remove('clickableRevealed')));
-                    clickables.forEach(clickable => clickable.classList.add('clickableRevealed'));
-                  }
-                });
-              });
-
-              terminal.queueMessage({
-                message: {
-                  elementPerRow: true,
-                  elements,
-                },
-              });
-              terminal.queueMessage({
-                message: {
-                  text: [
-                    '------------',
-                    `User name: ${hackData.userName}.`,
-                    `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}.`,
-                  ],
-                },
-              });
-              terminal.queueMessage({
-                message: {
-                  text: [
-                    `${hackData.triesLeft} tries left`,
-                    '------------',
-                  ],
-                },
-              });
-
-              terminal.setNextFunc((password) => {
-                socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
-                  if (manipulateError) {
-                    terminal.queueMessage({ message: { text: ['Something went wrong. Failed to manipulate the LANTERN'] } });
-                    terminal.resetNextFunc();
-
-                    return;
-                  }
-
-                  const { success, triesLeft, matches } = manipulateData;
-
-                  if (success) {
-                    terminal.queueMessage({
-                      message: {
-                        text: [
-                          'Correct password',
-                          `${boostingSignal ? 'Amplified' : 'Dampened'} LANTERN ${stationId} signal`,
-                          'Thank you for using LAMM.',
-                        ],
-                      },
-                    });
-                    terminal.resetNextFunc();
-                  } else if (triesLeft <= 0) {
-                    terminal.queueMessage({
-                      message: {
-                        text: [
-                          'Incorrect password.',
-                          'Unable to trigger action.',
-                          'Better luck next time!',
-                          'Thank you for using LAMM',
-                        ],
-                      },
-                    });
-                    terminal.resetNextFunc();
-                  } else {
-                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} matched. ${triesLeft} tries left`] } });
-                  }
-                });
-              });
-            });
-          } else {
-            terminal.queueMessage({ message: { text: ['Incorrect action number'] } });
-          }
-        });
-      });
-    });
-  },
-});
-terminal.addCommand({
-  commandName: 'credsCracker',
-  accessLevel: 1,
-  startFunc: () => {
-    terminal.queueMessage({
-      message: {
-        text: [
-          'Running Intrusive CREDS Extractor (ICE)',
-          'Attempting connection to CRED server...',
-          'Connection accepted!',
-          'ICE is online.',
-          'Input the secret key.',
-        ],
-      },
-    });
-
-    terminal.setNextFunc((secretKeyValue) => {
-      socketManager.emitEvent('useGameCode', { code: secretKeyValue }, ({ error }) => {
-        if (error) {
-          terminal.queueMessage({
-            message: {
-              text: [
-                'Unable to crack key,',
-                'The key does not exist or has already been used.',
-                'Dropping connection...',
-              ],
-            },
-          });
-
-          terminal.resetNextFunc();
-
-          return;
-        }
-
-        terminal.queueMessage({
-          message: {
-            text: [
-              'Key is being processed through ICE...',
-              'Key accepted.',
-              'Creating transaction...',
-              'Transaction created.',
-              'ICE run completed.',
-              'Check your WALLET for transaction information.',
-            ],
-          },
-        });
-        terminal.resetNextFunc();
-      });
-    });
-  },
-});
-// terminal.addCommand({
-//   commandName: 's1gn4lNuk3r',
-//   accessLevel: 1,
-//   startFunc: () => {
-//     const choices = [
-//       { value: '1', proceed: true },
-//       { value: '2', proceed: false },
-//     ];
-//
-//     terminal.queueMessage({
-//       message: {
-//         text: [
-//           'WARNING WARNING WARNING',
-//           'This will jam the signal of all nearby devices, including yours.',
-//           'There is high risk of retaliation in the form of murder from nearby users.',
-//           'You are urged to leave the area after activation.',
-//           'The automated defense systems will track you.',
-//           'Do you wish to proceed?',
-//         ],
-//         elementPerRow: true,
-//         elements: [
-//           elementCreator.createSpan({
-//             classes: ['clickable', 'redButton'],
-//             text: '[1] LAUNCH',
-//             func: () => {
-//               terminal.triggerCommand('1');
-//             },
-//           }),
-//           elementCreator.createSpan({
-//             classes: ['clickable', 'linkLook', 'moreSpace'],
-//             text: '[2] No',
-//             func: () => {
-//               terminal.triggerCommand('2');
-//             },
-//           }),
-//         ],
-//       },
-//     });
-//
-//     terminal.setNextFunc((choiceValue) => {
-//       const chosenChoice = choices.find(choice => choice.value === choiceValue);
-//
-//       if (chosenChoice) {
-//         if (chosenChoice.proceed) {
-//           socketManager.emitEvent('signalBlock', { description: ['|\\||_||<3|>_by_'] }, ({ error }) => {
-//             if (error) {
-//               if (error.type === 'insufficient') {
-//                 terminal.queueMessage({ message: { text: ['Unable to pinpoint your location', 'Unable to nuke the area'] } });
-//                 terminal.resetNextFunc();
-//
-//                 return;
-//               }
-//
-//               terminal.queueMessage({ message: { text: ['Something went wrong', 'Unable to nuke the area'] } });
-//               terminal.resetNextFunc();
-//
-//               return;
-//             }
-//
-//             terminal.resetNextFunc();
-//           });
-//         } else {
-//           terminal.queueMessage({ message: { text: ['Aborting'] } });
-//           terminal.resetNextFunc();
-//         }
-//       } else {
-//         terminal.queueMessage({ message: { text: ['Incorrect choice'] } });
-//       }
-//     });
-//   },
-// });
-
-terminal.addTrigger({
-  triggerName: 'calibrationMission',
-  trigger: ({ mission }) => {
-    if (mission.cancelled) {
-      terminal.queueMessage({
-        message: { text: ['CALIBRATION FAILED', 'Your calibration task was aborted', 'You will receive no payment'] },
-      });
-    } else {
-      terminal.queueMessage({
-        message: { text: ['CALIBRATION SUCCESSFUL', 'Your calibration task was successful', 'You have received your payment'] },
-      });
-    }
-  },
-});
-
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/msgReceived.wav', soundId: 'msgReceived' }));
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/button.wav', soundId: 'button', volume: 0.7 }));
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/button2.wav', soundId: 'button2' }));
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/fail.wav', soundId: 'fail' }));
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/keyInput.wav', soundId: 'keyInput', multi: true }));
-// soundLibrary.addSound(new SoundElement({ path: '/sounds/topBar.wav', soundId: 'topBar' }));
-
 mainView.addEventListener('contextmenu', (event) => {
   event.preventDefault();
-});
-
-top.addEventListener('click', () => {
-  home.appendTo(mainView);
 });
 
 keyHandler.setTriggerKey(18); // Alt
@@ -973,31 +503,7 @@ keyHandler.addIgnoredKey(17); // Ctrl
 keyHandler.addIgnoredKey(27); // Esc
 keyHandler.addIgnoredKey(91); // Win/Cmd
 keyHandler.addIgnoredKey(93); // Win/Cmd
-keyHandler.addKey(32, () => { home.appendTo(mainView); });
-
-if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
-  if (!viewTools.isLandscape()) {
-    top.classList.add('appleMenuFix');
-  }
-
-  window.addEventListener('orientationchange', () => {
-    const toggleButton = document.getElementById('toggleButton');
-
-    if (viewTools.isLandscape()) {
-      top.classList.remove('appleMenuFix');
-
-      if (toggleButton) {
-        toggleButton.classList.remove('appleListButtonFix');
-      }
-    } else {
-      top.classList.add('appleMenuFix');
-
-      if (toggleButton) {
-        toggleButton.classList.add('appleListButtonFix');
-      }
-    }
-  });
-}
+// keyHandler.addKey(32, () => { home.appendTo(mainView); });
 
 eventCentral.addWatcher({
   watcherParent: this,
@@ -1032,467 +538,457 @@ if (!queryParameters.noFullscreen) {
   });
 }
 
-home.addLink({
-  linkName: 'login',
-  startFunc: () => {
-    new LoginBox({
-      description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
-      extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
-      parentElement: mainView,
-      socketManager,
-      keyHandler,
-      closeFunc: () => { home.endLink('login'); },
-    }).appendTo(mainView);
-  },
-  endFunc: () => {},
-  accessLevel: 0,
-  maxAccessLevel: 0,
-  keepHome: true,
-  classes: ['hide'],
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'chat',
-  startFunc: () => { messenger.appendTo(mainView); },
-  endFunc: () => { messenger.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'programs',
-  startFunc: () => { terminal.appendTo(mainView); },
-  endFunc: () => { terminal.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'files',
-  startFunc: () => { dirViewer.appendTo(mainView); },
-  endFunc: () => { dirViewer.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'maps',
-  startFunc: () => { map.appendTo(mainView); },
-  endFunc: () => { map.removeView(); },
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'wallet',
-  startFunc: () => { walletViewer.appendTo(mainView); },
-  endFunc: () => { walletViewer.removeView(); },
-  classes: ['hide'],
-  accessLevel: 1,
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'team',
-  startFunc: () => { teamViewer.appendTo(mainView); },
-  endFunc: () => { teamViewer.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'panic',
-  startFunc: () => {
-    const panicBox = new ButtonBox({
-      description: [
-        'Employee UNDEFINED. You have activated the PANIC-Assisted Neglect Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability.',
-        'By proceeding, you agree to have your position retrieved and sent to those who can best help you.',
-        'Choose the option that best describes your current situation:',
-        ' ',
-        '"I\'m being murdered by a "',
-      ],
-      buttons: [
-        elementCreator.createButton({
-          text: 'Group of Panzerwolves',
-          func: () => {
-            const bestPosition = tracker.getBestPosition();
+// home.addLink({
+//   linkName: 'login',
+//   startFunc: () => {
+//     new LoginBox({
+//       description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+//       extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
+//       parentElement: mainView,
+//       socketManager,
+//       keyHandler,
+//       closeFunc: () => { home.endLink('login'); },
+//     }).appendTo(mainView);
+//   },
+//   endFunc: () => {},
+//   accessLevel: 0,
+//   maxAccessLevel: 0,
+//   keepHome: true,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'chat',
+//   startFunc: () => { messenger.appendTo(mainView); },
+//   endFunc: () => { messenger.removeView(); },
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'files',
+//   startFunc: () => { dirViewer.appendTo(mainView); },
+//   endFunc: () => { dirViewer.removeView(); },
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'wallet',
+//   startFunc: () => { walletViewer.appendTo(mainView); },
+//   endFunc: () => { walletViewer.removeView(); },
+//   classes: ['hide'],
+//   accessLevel: 1,
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'team',
+//   startFunc: () => { teamViewer.appendTo(mainView); },
+//   endFunc: () => { teamViewer.removeView(); },
+//   accessLevel: 1,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'panic',
+//   startFunc: () => {
+//     const panicBox = new ButtonBox({
+//       description: [
+//         'Employee UNDEFINED. You have activated the PANIC-Assisted Neglect Information Collector (PANIC). Remain calm to minimize blood leakage and increase your survivability.',
+//         'By proceeding, you agree to have your position retrieved and sent to those who can best help you.',
+//         'Choose the option that best describes your current situation:',
+//         ' ',
+//         '"I\'m being murdered by a "',
+//       ],
+//       buttons: [
+//         elementCreator.createButton({
+//           text: 'Group of Panzerwolves',
+//           func: () => {
+//             const bestPosition = tracker.getBestPosition();
+//
+//             if (!bestPosition) {
+//               console.log(bestPosition);
+//
+//               panicBox.changeDescription({
+//                 text: [
+//                   'Unable to pinpoint your position.',
+//                   'Thank you for using PANIC!',
+//                 ],
+//               });
+//
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Oh no...',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//               return;
+//             }
+//
+//             const position = {
+//               coordinates: bestPosition.coordinates,
+//               description: ['Panzerwolf raid'],
+//               markerType: 'ping',
+//               positionName: `${storageManager.getUserName()}-panic-ping`,
+//               isPublic: true,
+//               isStatic: true,
+//             };
+//             position.coordinates.radius = 90;
+//
+//             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+//               if (error) {
+//                 if (error.type === 'insufficient' || error.type === 'invalid data') {
+//                   panicBox.changeDescription({
+//                     text: [
+//                       'Unable to pinpoint your position.',
+//                       'Thank you for using PANIC!',
+//                     ],
+//                   });
+//
+//                   panicBox.replaceButtons({
+//                     buttons: [
+//                       elementCreator.createButton({
+//                         text: 'Oh no...',
+//                         func: () => { panicBox.removeView(); },
+//                       }),
+//                     ],
+//                   });
+//                   return;
+//                 }
+//
+//                 panicBox.changeDescription({
+//                   text: [
+//                     'Something went wrong.',
+//                     'Unable to send ping.',
+//                     'Thank you for using PANIC',
+//                   ],
+//                 });
+//
+//                 panicBox.replaceButtons({
+//                   buttons: [
+//                     elementCreator.createButton({
+//                       text: 'Oh no...',
+//                       func: () => { panicBox.removeView(); },
+//                     }),
+//                   ],
+//                 });
+//
+//                 return;
+//               }
+//
+//               panicBox.changeDescription({
+//                 text: [
+//                   'You have selected: "I\'m being murdered by a group of Panzerwolves."',
+//                   'The Organica corporation and the Panzerwolves have a written non-aggression pact.',
+//                   'We recommend that you cite Agreement 233.75.1.12 to cease the murder process.',
+//                   'A team of lawyers will be sent to your location.',
+//                   'Thank you for using PANIC!',
+//                 ],
+//               });
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Thank you!',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//
+//               eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+//             });
+//           },
+//         }),
+//         elementCreator.createButton({
+//           text: 'Organica re-education team',
+//           func: () => {
+//             const bestPosition = tracker.getBestPosition();
+//
+//             if (!bestPosition) {
+//               console.log(bestPosition);
+//
+//               panicBox.changeDescription({
+//                 text: [
+//                   'Unable to pinpoint your position.',
+//                   'Thank you for using PANIC!',
+//                 ],
+//               });
+//
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Oh no...',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//               return;
+//             }
+//
+//             const position = {
+//               coordinates: bestPosition.coordinates,
+//               description: ['Organica företagsfest'],
+//               markerType: 'ping',
+//               positionName: `${storageManager.getUserName()}-panic-ping`,
+//               isPublic: true,
+//               isStatic: true,
+//             };
+//             position.coordinates.radius = 90;
+//
+//             socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+//               if (error) {
+//                 if (error.type === 'insufficient') {
+//                   panicBox.changeDescription({
+//                     text: [
+//                       'Unable to pinpoint your position',
+//                       'Thank you for using PANIC',
+//                     ],
+//                   });
+//
+//                   panicBox.replaceButtons({
+//                     buttons: [
+//                       elementCreator.createButton({
+//                         text: 'Oh no...',
+//                         func: () => { panicBox.removeView(); },
+//                       }),
+//                     ],
+//                   });
+//                   return;
+//                 }
+//
+//                 panicBox.changeDescription({
+//                   text: [
+//                     'Something went wrong.',
+//                     'Unable to send ping.',
+//                     'Thank you for using PANIC',
+//                   ],
+//                 });
+//
+//                 panicBox.replaceButtons({
+//                   buttons: [
+//                     elementCreator.createButton({
+//                       text: 'Oh no...',
+//                       func: () => { panicBox.removeView(); },
+//                     }),
+//                   ],
+//                 });
+//
+//                 return;
+//               }
+//
+//               panicBox.changeDescription({
+//                 text: [
+//                   'You have selected: "I\'m being murdered by a Organica re-education."',
+//                   'You have been found in breach of your employment contract. Reason: {UNDEFINED}.',
+//                   'Re-education is mandatory for low productivity and contract breaches.',
+//                   'A second re-education team will be sent to your location to speed up the re-education process.',
+//                   'Thank you for using PANIC!',
+//                 ],
+//               });
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Thank you!',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//
+//               eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+//             });
+//           },
+//         }),
+//         elementCreator.createButton({
+//           text: 'Mugger with a gun and/or knife that hates me and my team',
+//           func: () => {
+//             const bestPosition = tracker.getBestPosition();
+//
+//             if (!bestPosition) {
+//               console.log(bestPosition);
+//
+//               panicBox.changeDescription({
+//                 text: [
+//                   'Unable to pinpoint your position.',
+//                   'Thank you for using PANIC!',
+//                 ],
+//               });
+//
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Oh no...',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//
+//               return;
+//             }
+//
+//             const userName = storageManager.getUserName();
+//             const position = {
+//               coordinates: bestPosition.coordinates,
+//               description: [`${userName} under attack`],
+//               markerType: 'ping',
+//               positionName: `${storageManager.getUserName()}-panic-team-ping`,
+//               isPublic: false,
+//               isStatic: true,
+//             };
+//             position.coordinates.radius = 90;
+//
+//             const team = storageManager.getTeam();
+//
+//             if (team) {
+//               socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
+//                 if (error) {
+//                   if (error.type === 'insufficient') {
+//                     panicBox.changeDescription({
+//                       text: [
+//                         'Unable to pinpoint your position',
+//                         'Thank you for using PANIC',
+//                       ],
+//                     });
+//
+//                     panicBox.replaceButtons({
+//                       buttons: [
+//                         elementCreator.createButton({
+//                           text: 'Oh no...',
+//                           func: () => { panicBox.removeView(); },
+//                         }),
+//                       ],
+//                     });
+//                     return;
+//                   }
+//
+//                   panicBox.changeDescription({
+//                     text: [
+//                       'Something went wrong.',
+//                       'Unable to send ping.',
+//                       'Thank you for using PANIC',
+//                     ],
+//                   });
+//
+//                   panicBox.replaceButtons({
+//                     buttons: [
+//                       elementCreator.createButton({
+//                         text: 'Oh no...',
+//                         func: () => { panicBox.removeView(); },
+//                       }),
+//                     ],
+//                   });
+//
+//                   return;
+//                 }
+//
+//                 panicBox.changeDescription({
+//                   text: [
+//                     'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
+//                     'We have to remind you that allowing non-employees to take your assigned Organica equipment is a breech of your employment contract',
+//                     'We advice you to make certain that none of your equipment is stolen, before and after your death',
+//                     'Your location will be sent to your team',
+//                     'Thank you for using PANIC',
+//                   ],
+//                 });
+//                 panicBox.replaceButtons({
+//                   buttons: [
+//                     elementCreator.createButton({
+//                       text: 'Thank you!',
+//                       func: () => { panicBox.removeView(); },
+//                     }),
+//                   ],
+//                 });
+//
+//                 eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
+//               });
+//             } else {
+//               panicBox.changeDescription({
+//                 text: [
+//                   'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
+//                   'Warning! We have no record of you being part of a team',
+//                   'Only employees with the rank "Productive Team Member" or higher may use this service',
+//                   'No notification will be sent',
+//                   'Thank you for using PANIC',
+//                 ],
+//               });
+//               panicBox.replaceButtons({
+//                 buttons: [
+//                   elementCreator.createButton({
+//                     text: 'Oh no...',
+//                     func: () => { panicBox.removeView(); },
+//                   }),
+//                 ],
+//               });
+//             }
+//           },
+//         }),
+//         elementCreator.createButton({
+//           text: '... Actually, I am fine',
+//           func: () => {
+//             panicBox.changeDescription({
+//               text: [
+//                 'You have selected: "... Actually, I am fine"',
+//                 'Warning! You have wasted seconds of Organica-owned time',
+//                 'Your Good Employee Affirmation Rank (GEAR) has been reset to 0',
+//               ],
+//             });
+//             panicBox.replaceButtons({
+//               buttons: [
+//                 elementCreator.createButton({
+//                   text: 'I will immediately sign up for voluntary re-education',
+//                   func: () => { panicBox.removeView(); },
+//                 }),
+//               ],
+//             });
+//           },
+//         }),
+//       ],
+//     });
+//     panicBox.appendTo(mainView);
+//   },
+//   endFunc: () => {},
+//   accessLevel: 1,
+//   classes: ['hide'],
+//   keepHome: true,
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'you',
+//   startFunc: () => { profile.appendTo(mainView); },
+//   endFunc: () => { profile.removeView(); },
+//   accessLevel: 1,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'support',
+//   startFunc: () => { toolsViewer.appendTo(mainView); },
+//   endFunc: () => { toolsViewer.removeView(); },
+// });
+// home.addLink({
+//   linkName: 'logout',
+//   startFunc: () => {
+//     socketManager.emitEvent('logout', { device: { deviceId: storageManager.getDeviceId() } }, (error) => {
+//       if (error) {
+//         console.log(error);
+//       }
+//
+//       boot.appendTo(mainView);
+//       eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+//       home.endLink('logout');
+//     });
+//   },
+//   accessLevel: 1,
+//   keepHome: true,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
+// home.addLink({
+//   linkName: 'forum',
+//   startFunc: () => { forum.appendTo(mainView); },
+//   endFunc: () => { forum.removeView(); },
+//   accessLevel: 0,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
 
-            if (!bestPosition) {
-              console.log(bestPosition);
-
-              panicBox.changeDescription({
-                text: [
-                  'Unable to pinpoint your position.',
-                  'Thank you for using PANIC!',
-                ],
-              });
-
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Oh no...',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-              return;
-            }
-
-            const position = {
-              coordinates: bestPosition.coordinates,
-              description: ['Panzerwolf raid'],
-              markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-panic-ping`,
-              isPublic: true,
-              isStatic: true,
-            };
-            position.coordinates.radius = 90;
-
-            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-              if (error) {
-                if (error.type === 'insufficient' || error.type === 'invalid data') {
-                  panicBox.changeDescription({
-                    text: [
-                      'Unable to pinpoint your position.',
-                      'Thank you for using PANIC!',
-                    ],
-                  });
-
-                  panicBox.replaceButtons({
-                    buttons: [
-                      elementCreator.createButton({
-                        text: 'Oh no...',
-                        func: () => { panicBox.removeView(); },
-                      }),
-                    ],
-                  });
-                  return;
-                }
-
-                panicBox.changeDescription({
-                  text: [
-                    'Something went wrong.',
-                    'Unable to send ping.',
-                    'Thank you for using PANIC',
-                  ],
-                });
-
-                panicBox.replaceButtons({
-                  buttons: [
-                    elementCreator.createButton({
-                      text: 'Oh no...',
-                      func: () => { panicBox.removeView(); },
-                    }),
-                  ],
-                });
-
-                return;
-              }
-
-              panicBox.changeDescription({
-                text: [
-                  'You have selected: "I\'m being murdered by a group of Panzerwolves."',
-                  'The Organica corporation and the Panzerwolves have a written non-aggression pact.',
-                  'We recommend that you cite Agreement 233.75.1.12 to cease the murder process.',
-                  'A team of lawyers will be sent to your location.',
-                  'Thank you for using PANIC!',
-                ],
-              });
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Thank you!',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-
-              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
-            });
-          },
-        }),
-        elementCreator.createButton({
-          text: 'Organica re-education team',
-          func: () => {
-            const bestPosition = tracker.getBestPosition();
-
-            if (!bestPosition) {
-              console.log(bestPosition);
-
-              panicBox.changeDescription({
-                text: [
-                  'Unable to pinpoint your position.',
-                  'Thank you for using PANIC!',
-                ],
-              });
-
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Oh no...',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-              return;
-            }
-
-            const position = {
-              coordinates: bestPosition.coordinates,
-              description: ['Organica företagsfest'],
-              markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-panic-ping`,
-              isPublic: true,
-              isStatic: true,
-            };
-            position.coordinates.radius = 90;
-
-            socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-              if (error) {
-                if (error.type === 'insufficient') {
-                  panicBox.changeDescription({
-                    text: [
-                      'Unable to pinpoint your position',
-                      'Thank you for using PANIC',
-                    ],
-                  });
-
-                  panicBox.replaceButtons({
-                    buttons: [
-                      elementCreator.createButton({
-                        text: 'Oh no...',
-                        func: () => { panicBox.removeView(); },
-                      }),
-                    ],
-                  });
-                  return;
-                }
-
-                panicBox.changeDescription({
-                  text: [
-                    'Something went wrong.',
-                    'Unable to send ping.',
-                    'Thank you for using PANIC',
-                  ],
-                });
-
-                panicBox.replaceButtons({
-                  buttons: [
-                    elementCreator.createButton({
-                      text: 'Oh no...',
-                      func: () => { panicBox.removeView(); },
-                    }),
-                  ],
-                });
-
-                return;
-              }
-
-              panicBox.changeDescription({
-                text: [
-                  'You have selected: "I\'m being murdered by a Organica re-education."',
-                  'You have been found in breach of your employment contract. Reason: {UNDEFINED}.',
-                  'Re-education is mandatory for low productivity and contract breaches.',
-                  'A second re-education team will be sent to your location to speed up the re-education process.',
-                  'Thank you for using PANIC!',
-                ],
-              });
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Thank you!',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-
-              eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
-            });
-          },
-        }),
-        elementCreator.createButton({
-          text: 'Mugger with a gun and/or knife that hates me and my team',
-          func: () => {
-            const bestPosition = tracker.getBestPosition();
-
-            if (!bestPosition) {
-              console.log(bestPosition);
-
-              panicBox.changeDescription({
-                text: [
-                  'Unable to pinpoint your position.',
-                  'Thank you for using PANIC!',
-                ],
-              });
-
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Oh no...',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-
-              return;
-            }
-
-            const userName = storageManager.getUserName();
-            const position = {
-              coordinates: bestPosition.coordinates,
-              description: [`${userName} under attack`],
-              markerType: 'ping',
-              positionName: `${storageManager.getUserName()}-panic-team-ping`,
-              isPublic: false,
-              isStatic: true,
-            };
-            position.coordinates.radius = 90;
-
-            const team = storageManager.getTeam();
-
-            if (team) {
-              socketManager.emitEvent('updatePosition', { position }, ({ error, data }) => {
-                if (error) {
-                  if (error.type === 'insufficient') {
-                    panicBox.changeDescription({
-                      text: [
-                        'Unable to pinpoint your position',
-                        'Thank you for using PANIC',
-                      ],
-                    });
-
-                    panicBox.replaceButtons({
-                      buttons: [
-                        elementCreator.createButton({
-                          text: 'Oh no...',
-                          func: () => { panicBox.removeView(); },
-                        }),
-                      ],
-                    });
-                    return;
-                  }
-
-                  panicBox.changeDescription({
-                    text: [
-                      'Something went wrong.',
-                      'Unable to send ping.',
-                      'Thank you for using PANIC',
-                    ],
-                  });
-
-                  panicBox.replaceButtons({
-                    buttons: [
-                      elementCreator.createButton({
-                        text: 'Oh no...',
-                        func: () => { panicBox.removeView(); },
-                      }),
-                    ],
-                  });
-
-                  return;
-                }
-
-                panicBox.changeDescription({
-                  text: [
-                    'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
-                    'We have to remind you that allowing non-employees to take your assigned Organica equipment is a breech of your employment contract',
-                    'We advice you to make certain that none of your equipment is stolen, before and after your death',
-                    'Your location will be sent to your team',
-                    'Thank you for using PANIC',
-                  ],
-                });
-                panicBox.replaceButtons({
-                  buttons: [
-                    elementCreator.createButton({
-                      text: 'Thank you!',
-                      func: () => { panicBox.removeView(); },
-                    }),
-                  ],
-                });
-
-                eventCentral.triggerEvent({ event: eventCentral.Events.POSITIONS, params: { positions: [data.position] } });
-              });
-            } else {
-              panicBox.changeDescription({
-                text: [
-                  'You have selected: "I\'m being murdered by a mugger with a gun and/or knife"',
-                  'Warning! We have no record of you being part of a team',
-                  'Only employees with the rank "Productive Team Member" or higher may use this service',
-                  'No notification will be sent',
-                  'Thank you for using PANIC',
-                ],
-              });
-              panicBox.replaceButtons({
-                buttons: [
-                  elementCreator.createButton({
-                    text: 'Oh no...',
-                    func: () => { panicBox.removeView(); },
-                  }),
-                ],
-              });
-            }
-          },
-        }),
-        elementCreator.createButton({
-          text: '... Actually, I am fine',
-          func: () => {
-            panicBox.changeDescription({
-              text: [
-                'You have selected: "... Actually, I am fine"',
-                'Warning! You have wasted seconds of Organica-owned time',
-                'Your Good Employee Affirmation Rank (GEAR) has been reset to 0',
-              ],
-            });
-            panicBox.replaceButtons({
-              buttons: [
-                elementCreator.createButton({
-                  text: 'I will immediately sign up for voluntary re-education',
-                  func: () => { panicBox.removeView(); },
-                }),
-              ],
-            });
-          },
-        }),
-      ],
-    });
-    panicBox.appendTo(mainView);
-  },
-  endFunc: () => {},
-  accessLevel: 1,
-  classes: ['hide'],
-  keepHome: true,
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'you',
-  startFunc: () => { profile.appendTo(mainView); },
-  endFunc: () => { profile.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
-});
-home.addLink({
-  linkName: 'support',
-  startFunc: () => { toolsViewer.appendTo(mainView); },
-  endFunc: () => { toolsViewer.removeView(); },
-});
-home.addLink({
-  linkName: 'logout',
-  startFunc: () => {
-    socketManager.emitEvent('logout', { device: { deviceId: storageManager.getDeviceId() } }, (error) => {
-      if (error) {
-        console.log(error);
-      }
-
-      boot.appendTo(mainView);
-      eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
-      home.endLink('logout');
-    });
-  },
-  accessLevel: 1,
-  keepHome: true,
-  classes: ['hide'],
-  shortcut: true,
-});
-
-home.appendTo(mainView);
-
-map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-map.setCenterCoordinates(storageManager.getCenterCoordinates());
-map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
+// home.appendTo(mainView);
 
 // eventCentral.addWatcher({
 //   watcherParent: this,
@@ -1607,18 +1103,9 @@ socketManager.addEvents([
       storageManager.setDefaultZoomLevel(defaultZoomLevel);
       storageManager.setRequiresVerification(requiresVerification);
 
-      if (!socketManager.hasConnected) {
-        new Clock(document.getElementById('time')).start();
-        new WreckingStatus({ element: document.getElementById('wrecking') }); // eslint-disable-line
-        map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-        map.setCenterCoordinates(storageManager.getCenterCoordinates());
-        map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
-      }
-
       eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode, showDevInfo } });
 
       onlineStatus.setOnline();
-      map.startMap();
       socketManager.updateId();
 
       if (queryParameters) {
@@ -1797,6 +1284,9 @@ socketManager.addEvents([
   }, {
     event: 'logout',
     func: () => {
+      logIn.innerHTML = '';
+      logIn.appendChild(elementCreator.createSpan({ text: 'login' }));
+
       eventCentral.triggerEvent({
         event: eventCentral.Events.LOGOUT,
       });
@@ -1981,6 +1471,24 @@ socketManager.addEvents([
       eventCentral.triggerEvent({
         event: eventCentral.Events.LOGOUT,
         params: {},
+      });
+    },
+  }, {
+    event: 'forumPosts',
+    func: ({ data }) => {
+      const { forumPosts } = data;
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.FORUMPOSTS,
+        params: { forumPosts },
+      });
+    },
+  }, {
+    event: 'forumThreads',
+    func: ({ data }) => {
+      const { forumThreads } = data;
+      eventCentral.triggerEvent({
+        event: eventCentral.Events.FORUMTHREADS,
+        params: { forumThreads },
       });
     },
   },

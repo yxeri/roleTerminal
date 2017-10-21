@@ -119,8 +119,8 @@ function findItem(list, text) {
 }
 
 class Messenger extends StandardView {
-  constructor({ isFullscreen, sendButtonText, isTopDown }) {
-    super({ isFullscreen });
+  constructor({ sendButtonText, isTopDown }) {
+    super({ isFullscreen: true });
 
     this.element.setAttribute('id', 'messenger');
     this.inputField = document.createElement('TEXTAREA');
@@ -128,7 +128,6 @@ class Messenger extends StandardView {
     this.inputField.setAttribute('placeholder', 'Input message. alt+enter to send');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
-    this.selectedAliasItem = null;
 
     this.optionsDiv = elementCreator.createContainer({
       classes: ['options', 'hide'],
@@ -137,26 +136,55 @@ class Messenger extends StandardView {
 
     this.messageList = new MessageList({ isTopDown });
     this.systemList = new List({
-      title: 'SYSTEM',
+      title: 'system',
       shouldSort: false,
-    });
-    this.aliasList = new List({
-      title: 'ALIASES',
-      shouldSort: true,
-      minimumToShow: 2,
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.systemList !== list) {
+            list.hideList();
+          }
+        });
+      },
     });
     this.followList = new List({
-      title: 'FOLLOWING',
+      title: 'following',
       shouldSort: false,
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.followList !== list) {
+            list.hideList();
+          }
+        });
+      },
     });
     this.roomsList = new List({
-      title: 'PUBLIC',
+      title: 'rooms',
       shouldSort: true,
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.roomsList !== list) {
+            list.hideList();
+          }
+        });
+      },
     });
     this.userList = new List({
-      title: 'USERS',
+      title: 'users',
       shouldSort: true,
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.userList !== list) {
+            list.hideList();
+          }
+        });
+      },
     });
+    this.lists = [
+      this.systemList,
+      this.followList,
+      this.roomsList,
+      this.userList,
+    ];
 
     this.imagePreview = new Image();
     this.imagePreview.classList.add('hide');
@@ -180,11 +208,16 @@ class Messenger extends StandardView {
       reader.readAsDataURL(file);
     });
 
-    const sendButton = elementCreator.createButton({
-      func: () => { this.sendMessage(); },
-      text: sendButtonText,
+    const sendButton = elementCreator.createContainer({
+      classes: ['button'],
+      func: () => {
+        this.sendMessage();
+      },
     });
 
+    sendButton.appendChild(elementCreator.createContainer({ classes: ['buttonLeftCorner'] }));
+    sendButton.appendChild(elementCreator.createContainer({ classes: ['buttonUpperRightCorner'] }));
+    sendButton.appendChild(elementCreator.createSpan({ text: sendButtonText }));
 
     const imageButton = elementCreator.createButton({
       func: () => { imageInput.click(); },
@@ -331,6 +364,9 @@ class Messenger extends StandardView {
   }
 
   removeView() {
+    const main = document.getElementById('main');
+    main.classList.remove('multiMenu');
+
     keyHandler.removeKey(13);
     this.element.parentNode.classList.remove('messengerMain');
     super.removeView();
@@ -354,6 +390,8 @@ class Messenger extends StandardView {
       classes: ['hide'],
       text: 'Create room',
       func: () => {
+        this.lists.forEach(list => list.hideList());
+
         const createDialog = new DialogBox({
           buttons: {
             left: {
@@ -426,43 +464,18 @@ class Messenger extends StandardView {
     this.systemList.addItems({ items: [createButton] });
 
     this.itemList.appendChild(this.systemList.element);
-    this.itemList.appendChild(this.aliasList.element);
     this.itemList.appendChild(this.followList.element);
     this.itemList.appendChild(this.roomsList.element);
     this.itemList.appendChild(this.userList.element);
+    this.itemList.appendChild(elementCreator.createContainer({ classes: ['menuRightCorner'] }));
 
     this.accessElements.push({
       element: this.systemList.element,
       accessLevel: 1,
     });
     this.accessElements.push({
-      element: this.aliasList.element,
-      accessLevel: 1,
-    });
-    this.accessElements.push({
       element: createButton,
       accessLevel: 1,
-    });
-
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.ALIAS,
-      func: ({ alias }) => {
-        const aliasItem = findItem(this.aliasList, alias);
-
-        if (aliasItem) {
-          this.selectedAliasItem = aliasItem;
-          this.selectedAliasItem.classList.add('selectedItem');
-        }
-      },
-    });
-
-    eventCentral.addWatcher({
-      watcherParent: this,
-      event: eventCentral.Events.NEWALIAS,
-      func: ({ alias }) => {
-        this.aliasList.addItem({ item: this.createAliasButton({ alias }) });
-      },
     });
 
     eventCentral.addWatcher({
@@ -659,35 +672,8 @@ class Messenger extends StandardView {
       event: eventCentral.Events.USER,
       func: ({ changedUser, firstConnection }) => {
         if (storageManager.getToken()) {
-          const aliases = storageManager.getAliases();
-
-          if (aliases.length > 0) {
-            const selectedAlias = storageManager.getSelectedAlias() || storageManager.getUserName();
-
-            this.aliasList.replaceAllItems({ items: aliases.map(alias => this.createAliasButton({ alias })) });
-            this.aliasList.addItem({ item: this.createAliasButton({ alias: storageManager.getUserName() }) });
-
-            eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
-
-            if (firstConnection || changedUser) {
-              this.aliasList.toggleList(true);
-            }
-          } else {
-            const userName = storageManager.getUserName();
-
-            this.aliasList.replaceAllItems({ items: [] });
-            this.aliasList.addItem({ item: this.createAliasButton({ alias: userName }) });
-
-            const listItem = findItem(this.aliasList, userName);
-
-            if (listItem) {
-              this.selectedItem = listItem;
-              this.selectedItem.classList.add('selectedItem');
-            }
-
-            this.inputArea.classList.remove('hide');
-            this.messageList.element.classList.remove('fullHeight');
-          }
+          this.inputArea.classList.remove('hide');
+          this.messageList.element.classList.remove('fullHeight');
 
           socketManager.emitEvent('listUsers', {}, ({ error, data }) => {
             if (error) {
@@ -711,7 +697,6 @@ class Messenger extends StandardView {
             });
           });
         } else {
-          this.aliasList.replaceAllItems({ items: [] });
           this.userList.replaceAllItems({ items: [] });
           this.followList.replaceAllItems({ items: [] });
           this.roomsList.replaceAllItems({ items: [] });
@@ -738,10 +723,6 @@ class Messenger extends StandardView {
             }),
           });
 
-          if (followedRooms.length > 0 && (firstConnection || changedUser)) {
-            this.followList.toggleList(true);
-          }
-
           this.roomsList.replaceAllItems({
             items: rooms.map(room => this.createRoomButton({
               roomName: room.roomName,
@@ -761,29 +742,12 @@ class Messenger extends StandardView {
   }
 
   appendTo(parentElement) {
+    const main = document.getElementById('main');
+    main.classList.add('multiMenu');
+
     keyHandler.addKey(13, () => { this.sendMessage(); });
     super.appendTo(parentElement);
     this.messageList.scroll();
-  }
-
-  createAliasButton({ alias }) {
-    return elementCreator.createButton({
-      data: alias,
-      text: alias,
-      func: () => {
-        if (this.selectedAliasItem) {
-          this.selectedAliasItem.classList.remove('selectedItem');
-        }
-
-        if (alias !== storageManager.getUserName()) {
-          storageManager.setSelectedAlias(alias);
-        } else {
-          storageManager.removeSelectedAlias();
-        }
-
-        eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias } });
-      },
-    });
   }
 
   leaveRoom({ roomName }) {
@@ -846,6 +810,8 @@ class Messenger extends StandardView {
       text: whisperTo ? `${whisperTo}` : roomName,
       classes: buttonClasses,
       func: () => {
+        this.lists.forEach(list => list.hideList());
+
         const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
         const whisperRoomName = `${userName}-whisper-${whisperTo}`;
 
@@ -881,6 +847,8 @@ class Messenger extends StandardView {
           text: `Unfollow "${roomName}"`,
           data: roomName,
           func: () => {
+            this.lists.forEach(list => list.hideList());
+
             this.leaveRoom({ roomName: data });
             this.optionsDiv.classList.add('hide');
           },
@@ -914,6 +882,8 @@ class Messenger extends StandardView {
       data: roomName,
       text: buttonText,
       func: () => {
+        this.lists.forEach(list => list.hideList());
+
         if (this.selectedItem) {
           this.selectedItem.classList.remove('selectedItem');
         }
@@ -1007,6 +977,8 @@ class Messenger extends StandardView {
           text: `Unfollow "${roomName}"`,
           data: roomName,
           func: () => {
+            this.lists.forEach(list => list.hideList());
+
             this.leaveRoom({ roomName });
             this.optionsDiv.classList.add('hide');
           },

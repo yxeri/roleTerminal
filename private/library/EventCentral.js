@@ -57,6 +57,9 @@ class EventCentral {
       VERIFIED: 'User verified',
       CHANGEPASSWORD: 'Change password',
       NEWCREATORALIAS: 'new creator alias',
+      FORUM: 'forum',
+      FORUMPOSTS: 'forum posts',
+      FORUMTHREADS: 'forum threads',
     };
     this.eventWatchers = {};
   }

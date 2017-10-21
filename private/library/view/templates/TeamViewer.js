@@ -44,10 +44,9 @@ function toggleSystemButtons({ createButton, inviteButton, leaveButton }) {
 }
 
 class TeamViewer extends StandardView {
-  constructor({ isFullscreen, worldMap }) {
+  constructor({ isFullscreen }) {
     super({ isFullscreen, viewId: 'teamViewer' });
 
-    this.worldMap = worldMap;
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
 
@@ -471,21 +470,6 @@ class TeamViewer extends StandardView {
             this.userList.replaceAllItems({
               items: users.map(user => this.createMemberButton({ user })),
             });
-
-            if (this.worldMap) {
-              const teamPings = Object.keys(this.worldMap.markers).filter((positionName) => {
-                const marker = this.worldMap.markers[positionName];
-
-                return marker.markerType === 'ping' && users.map(user => user.userName).indexOf(marker.owner) > -1;
-              });
-              const listItems = teamPings.map((ping) => {
-                const beautifiedDate = textTools.generateTimeStamp({ date: ping.lastUpdated });
-
-                return elementCreator.createSpan({ text: `${beautifiedDate.fullDate} ${beautifiedDate.fullTime} ${ping.positionName}` });
-              });
-
-              this.userViewerList.replaceAllItems({ items: listItems });
-            }
           });
         } else {
           storageManager.removeTeam();

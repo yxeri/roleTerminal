@@ -19,7 +19,7 @@ const keyHandler = require('../../KeyHandler');
 const storageManager = require('../../StorageManager');
 
 class View {
-  constructor({ isFullscreen, viewId, elementType, closeFunc }) {
+  constructor({ viewId, elementType, closeFunc, isFullscreen }) {
     const element = document.createElement(elementType || 'DIV');
 
     if (isFullscreen) { element.classList.add('fullscreen'); }
@@ -29,6 +29,7 @@ class View {
     this.accessElements = [];
     this.keyTriggers = [];
     this.closeFunc = closeFunc;
+
 
     eventCentral.addWatcher({
       watcherParent: this,

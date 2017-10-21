@@ -16,8 +16,8 @@
 
 const View = require('./View');
 const elementCreator = require('../../ElementCreator');
-const deviceChecker = require('../../../library/DeviceChecker');
-const viewTools = require('../../../library/ViewTools');
+// const deviceChecker = require('../../../library/DeviceChecker');
+// const viewTools = require('../../../library/ViewTools');
 
 class StandardView extends View {
   constructor({ isFullscreen, viewId }) {
@@ -26,23 +26,23 @@ class StandardView extends View {
     this.viewer = elementCreator.createContainer({ classes: ['viewer'] });
     this.itemList = elementCreator.createContainer({ classes: ['list'] });
 
-    const toggleClasses = ['listButton'];
+    // const toggleClasses = ['listButton'];
 
-    if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
-      if (!viewTools.isLandscape()) {
-        toggleClasses.push('appleListButtonFix');
-      }
-    }
+    // if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
+    //   if (!viewTools.isLandscape()) {
+    //     toggleClasses.push('appleListButtonFix');
+    //   }
+    // }
 
-    this.element.append(elementCreator.createButton({
-      text: 'Toggle menu',
-      elementId: 'toggleButton',
-      classes: toggleClasses,
-      func: () => {
-        this.itemList.classList.toggle('show');
-        this.viewer.classList.toggle('toggledList');
-      },
-    }));
+    // this.element.append(elementCreator.createButton({
+    //   text: 'Toggle menu',
+    //   elementId: 'toggleButton',
+    //   classes: toggleClasses,
+    //   func: () => {
+    //     this.itemList.classList.toggle('show');
+    //     this.viewer.classList.toggle('toggledList');
+    //   },
+    // }));
     this.element.append(this.itemList);
     this.element.append(this.viewer);
   }

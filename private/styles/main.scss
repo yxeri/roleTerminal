@@ -14,52 +14,34 @@
  limitations under the License.
  */
 
-$text-color: #00ffcc;
-$darker-text-color: #009170;
-$second-color: #ff02e5;
-$darker-second-color: #a50293;
-$flash-color: #ff02e5;
-$light-color: #9b9b9b;
-$back-color: #11000f;
-$back-button: #1b0019;
-$back-input: #1b0019;
-$hoverInput: #00372d;
-$note-color: #cd02b7;
-$padding: .2em;
-$outline: .1em;
-$font-size: 1.1em;
-$text-shadow: 1px 1px 3px #ff02e5;
-$view-width: 65em;
-$menu-width: 21em;
-$short-list-width: 8em;
-$box-shadow: inset 0 0 8px;
-$top-box-shadow: 0 -2px 1px -1px;
-$bottom-box-shadow: 0 2px 1px -1px;
-$inner-container-width: calc(100% - .4em);
-$inner-container-height: calc(100% - .4em);
 
-@mixin borderOutline {
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
+@font-face {
+  font-family: deck;
+  src: local("deck"), url("../fonts/deck.ttf") format("truetype");
 }
 
-@mixin selectedBorderOutline {
-  box-shadow: $box-shadow $text-color;
-  outline: $outline solid $text-color;
-  color: $text-color;
-}
+$text-color: #00ffd7;
+$light-color: #7cffe4;
+$border-color: #00b99e;
+$post-back-color: #012924;
+$back-color: #000000;
+$font-size: 1em;
+$font-family: deck;
+$corner-size: .9em;
+$border-size: .05em;
 
-@mixin lockedBorderOutline {
-  box-shadow: $box-shadow $light-color;
-  outline: $outline solid $light-color;
-}
+$button-text-color: #ffc200;
+$button-border-color: #b98b00;
+$button-second-border-color: #ffc200;
+$button-hover-color: #ffd865;
+$button-marked: #4b3e00;
+$button-background: #291f00;
+$button-notify-background: #7d5e00;
 
-@mixin flashAnimation {
-  -webkit-animation-name: flash;
-  -webkit-animation-timing-function: ease-in-out;
-  animation: flash;
-  animation-timing-function: ease-in-out;
-}
+$red-warning: #5f1200;
+
+$post-alt-back-color: #00ffd7;
+$text-alt-color: #012924;
 
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
@@ -81,83 +63,55 @@ h1, h2, h3, h4, h5 {
 }
 
 html, body {
-  overflow: hidden;
+  overflow-x: hidden;
   height: 100%;
   width: 100%;
-}
-
-html {
-  background-color: $back-color;
-}
-
-body {
-  background-color: $back-color;
-  color: $text-color;
-  font-family: monospace;
+  font-family: $font-family;
   font-size: $font-size;
-  -webkit-text-size-adjust: 100%;
-  text-shadow: $text-shadow;
-}
-
-button {
-  @include borderOutline;
-  padding: $padding;
-  background-color: $back-button;
   color: $text-color;
-  display: inline-block;
-  cursor: pointer;
-  font-family: monospace;
   -webkit-text-size-adjust: 100%;
-  text-shadow: $text-shadow;
-  vertical-align: top;
-  text-overflow: ellipsis;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-
-button:focus, button:hover, textarea:focus, textarea:hover, input:focus, input:hover {
-  @include selectedBorderOutline;
-  background-color: $hoverInput;
-}
-
-::-webkit-input-placeholder {
-  color: $light-color;
+  background-color: $back-color;
+  -webkit-overflow-scrolling: touch;
 }
 
 input {
-  @include borderOutline;
-  margin: $padding;
-  background-color: $back-input;
-  display: inline-block;
+  background-color: $button-background;
+  border-top: $border-size solid $button-border-color;
+  border-bottom: $border-size solid $button-border-color;
+  color: $button-text-color;
+}
+
+input:hover, input:focus {
+  outline: none;
+  box-shadow:none;
   cursor: pointer;
-  color: $text-color;
-  font-family: monospace;
-  -webkit-text-size-adjust: 100%;
-  border-radius: 0;
-  padding: .1em .1em .1em .3em;
+  color: $button-hover-color;
+  border-top: $border-size solid $button-text-color;
+  border-bottom: $border-size solid $button-text-color;
 }
 
-input[type=radio] {
-  display: none;
-}
-
-input[type="radio"]:checked + span {
-  background-color: $darker-text-color;
+input:focus {
+  background-color: $button-marked;
 }
 
 textarea {
-  @include borderOutline;
-  background-color: $back-input;
-  resize: none;
-  border-radius: 0;
-  color: $text-color;
-  padding: .1em .1em .1em .3em;
+  background-color: $button-background;
+  border-top: $border-size solid $button-border-color;
+  border-bottom: $border-size solid $button-border-color;
+  color: $button-text-color;
 }
 
-p {
-  margin: .5em 0 0 0;
+textarea:hover {
+  outline: none;
+  box-shadow:none;
+  cursor: pointer;
+  color: $button-hover-color;
+  border-top: $border-size solid $button-text-color;
+  border-bottom: $border-size solid $button-text-color;
+}
+
+textarea:focus {
+  background-color: $button-marked;
 }
 
 ul {
@@ -165,265 +119,22 @@ ul {
 }
 
 li {
-  p:nth-child(2) {
-    margin-top: 0;
-  }
-
-  .header {
-    border-top: $outline solid $text-color;
-    box-shadow: $top-box-shadow $second-color;
-    margin: .8em 0 .1em 0;
-
-    button {
-      padding: 0;
-      border: none;
-      vertical-align: text-bottom;
-      float: right;
-      color: $light-color;
-      outline-color: $light-color;
-      background-color: $back-color;
-      text-shadow: none;
-    }
-  }
-
-  img {
-    margin-top: .5em;
-  }
-}
-
-img {
-  max-width: 100%;
-  max-height: 40em;
-  outline: $outline solid $text-color;
-  width: auto;
-}
-
-pre {
-  line-height: .5em;
-}
-
-#background {
-  @include borderOutline;
-  width: $inner-container-width;
-  height: $inner-container-height;
-  margin-top: $padding;
-  margin-left: $padding;
-  text-shadow: $text-shadow;
-  overflow: hidden;
-}
-
-#top {
-  text-align: center;
-  border-bottom: .1em solid $text-color;
-  box-shadow: $bottom-box-shadow $second-color;
-  cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
-
-  > div {
-    > span {
-      margin-left: .4em;
-      padding-top: .2em;
-      padding-bottom: .2em;
-      display: inline-block;
-    }
-
-    > span:first-child {
-      margin-left: 0;
-    }
-
-    > span:last-child {
-      padding-right: .15em;
-    }
-  }
-
-  .isActive {
-    background-color: $darker-second-color;
-  }
-
-  #wrecking {
-    margin-left: .4em;
-    text-align: left;
-    padding: .2em .1em;
-    display: inline-block;
-    color: $text-color;
-    text-shadow: $text-shadow;
-    border-left: .05em solid $text-color;
-    border-right: .05em solid $text-color;
-
-    > div {
-      z-index: 4;
-      right: 1em;
-      margin-top: .3em;
-      background-color: $back-color;
-      margin-left: -.2em;
-      position: absolute;
-      display: flex;
-      max-height: calc(100% - 2.5em);
-      max-width: calc(100% - 1em);
-    }
-  }
-
-  #time {
-    span:last-child {
-      margin-left: .4em;
-    }
-  }
-
-  .stationInfo {
-    border-bottom: .05em solid;
-    padding: .2em .2em .4em .2em;
-  }
-
-  .stationInfo:last-child {
-    border-bottom: none;
-  }
-
-  .stationStats {
-    width: 9em;
-    border-left: .05em solid $text-color;
-    border-right: .05em solid $text-color;
-    border-bottom: .05em solid $text-color;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .stationStats::-webkit-scrollbar {
-    width: 0 !important;
-  }
-
-  .teamStats {
-    width: 8em;
-    padding-top: .2em;
-    padding-left: .2em;
-    padding-right: .2em;
-    border-right: .05em solid $text-color;
-    border-bottom: .05em solid $text-color;
-
-    li {
-      padding-top: .2em;
-      padding-bottom: .2em;
-      border-bottom: .05em solid $text-color;
-    }
-
-    li:first-child {
-      padding-top: 0;
-    }
-  }
 }
 
-#main {
-  overflow: hidden;
-  background: url(/images/logo.png) no-repeat 50% 50%;
-  background-size: contain;
-  height: 100%;
+::-webkit-scrollbar {
+  width: 0 !important;
 }
 
-#nodeHacking {
-  width: 100vw;
-  height: 100vh;
-}
-
-#messenger {
-  word-wrap: break-word;
-
-  .viewer {
-    overflow: hidden;
-
-    ul {
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
-      height: calc(100% - 6em);
-
-      li:first-child {
-        margin-top: 1em;
-      }
-
-      li {
-        p {
-          padding-left: .2em;
-        }
-
-        p:last-child {
-          padding-bottom: $padding;
-        }
-      }
-    }
-
-    ul::-webkit-scrollbar {
-      width: 0 !important;
-    }
-
-    .buttons {
-      margin-bottom: .2em;
-    }
-
-    textarea {
-      width: calc(100% - .3em);
-    }
-  }
-
-  .options {
-    @include borderOutline;
-    background-color: $back-color;
-    padding: .4em;
-    position: absolute;
-    z-index: 2;
-  }
-}
-
-#dirViewer {
-  word-wrap: break-word;
-
-  .viewer {
-    overflow-y: scroll;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-
-    textarea {
-      margin-left: 0;
-      margin-right: 0;
-    }
-
-    p {
-      margin-left: .2em;
-    }
-  }
-}
-
-#map {
-  height: 100%;
-  overflow: hidden;
-  background-color: $back-color;
-
-  canvas {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-  }
-
-  a {
-    display: none !important;
-  }
-
-  .gmnoprint {
-    display: none !important;
-  }
-
-  .gmnoscreen {
-    display: none !important;
-  }
-
-  .gm-style-cc {
-    display: none !important;
-  }
+::-webkit-input-placeholder {
+  color: $button-border-color;
 }
 
 #cover {
   background-color: rgba(0, 0, 0, .6);
-  z-index: 9;
+  z-index: 5;
   position: fixed;
   top: 0;
   left: 0;
@@ -431,418 +142,261 @@ pre {
   height: 100%;
 }
 
-.clickMenu {
-  position: absolute;
-  z-index: 3;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+#top {
+  color: $button-text-color;
+  background-color: $button-background;
+  border-bottom: $border-size solid $button-border-color;
+  margin-bottom: .5em;
+  min-height: 1.5em;
+  top: 0;
+  z-index: 5;
+  position: fixed;
+  width: calc(100% - .8em);
+  max-width: calc(40em - .8em);
+  padding: .5em .4em .2em .4em;
 
-  ul {
+  > div {
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 1em;
+    position: relative;
+
+    > span:before {
+      content: '[';
+    }
+
+    > span:after {
+      content: ']';
+    }
+  }
+
+  > div:hover {
+    > span {
+      color: $button-hover-color;
+    }
+  }
+
+  > div:last-child {
+    margin-right: .4em;
+  }
+
+  .systemSpacer {
+    margin-top: .5em;
+    margin-bottom: .2em;
+    color: $button-notify-background;
+  }
+
+  .userList {
+    position: absolute;
+    left: -.45em;
+    top: 1.75em;
+    padding: .5em .5em .5em .45em;
+    background-color: $button-background;
+    border-left: $border-size solid $button-border-color;
+    border-bottom: $border-size solid $button-border-color;
+    border-right: $border-size solid $button-border-color;
+
     li {
-      margin-bottom: .3em;
+      margin-bottom: .4em;
+    }
+
+    li:last-child{
+      margin-bottom: 0;
+    }
+
+    li:hover {
+      color: $button-hover-color;
     }
   }
-}
 
-#markerInfo {
-  @include borderOutline;
-  top: .1em !important;
-  left: .2em !important;
-  position: absolute;
-  z-index: 2;
-  width: calc(100% - .5em);
-  max-width: 40em;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-  height: auto;
-  max-height: calc(100% - 2.3em);
-  background-color: $back-color;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-
-  div {
-    width: 100%;
-    height: 100%;
-
-    p {
-      padding: 0 .4em;
-    }
-
-    p:first-child {
-      padding-top: .4em;
-    }
-
-    p:last-child {
-      padding-bottom: 1em;
-    }
-  }
-}
-
-#markerInfo::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-#home {
-  -webkit-overflow-scrolling: touch;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  height: calc(100% - 2.4em);
-  width: 21em;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: .5em;
-
-  button {
-    width: calc(50% - 1em);
-    max-width: calc(50% - 1em);
-    margin: .1em .5em 1em .5em;
-  }
-}
-
-#home::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-#toolsViewer {
-  .list {
-    .code {
-      margin: .2em 0;
-    }
-  }
-}
-
-#profile {
-  p {
-    margin-left: .3em;
+  .logout {
+    margin-top: 1em;
   }
 }
 
 #wallet {
-  .viewer {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
+  .userList {
+    z-index: 2;
+    cursor: pointer;
+    position: absolute;
+    padding: .5em;
+    margin-left: .9em;
+    margin-top: -$border-size;
+    background-color: $button-background;
+    border: $border-size solid $button-border-color;
+    min-width: 4.7em;
 
     li {
-      border-bottom: 1px solid $text-color;
-      padding: .5em 0 .5em .2em;
+      margin-bottom: .4em;
     }
 
-    p {
-      margin: 0;
+    li:last-child{
+      margin-bottom: 0;
     }
 
-    > p {
-      text-align: center;
-      border-bottom: 1px solid $text-color;
-      padding-top: .2em;
-      padding-bottom: .5em;
+    li:hover {
+      color: $button-hover-color;
+    }
+  }
+
+  .viewer {
+    margin-top: .4em;
+
+    li {
+      line-height: 1.4em;
+      background-color: $post-back-color;
+      position: relative;
+      padding: .1em .5em .5em .5em;
+      border-bottom: $border-size solid $border-color;
+
+      .leftCorner {
+        border: 0;
+      }
+
+      .rightCorner {
+        border: 0;
+      }
+
+      .upperRightCorner {
+        border: 0;
+      }
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    li:first-child {
+      border-top: $border-size solid $border-color;
+
+      .upperRightCorner {
+        border-top: $corner-size solid $back-color;
+        border-left: $corner-size solid $post-back-color;
+      }
+    }
+
+    li:last-child {
+      .leftCorner {
+        border-bottom: $corner-size solid $back-color;
+        border-right: $corner-size solid $post-back-color;
+      }
+
+      .rightCorner {
+        border-bottom: $corner-size solid $back-color;
+        border-left: $corner-size solid $post-back-color;
+      }
     }
   }
 }
 
-#toolsViewer {
-  .viewer {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
+.fullscreen {
+  margin-top: 2.6em;
+  max-width: 40em;
 
-    li {
-      border-bottom: 1px solid $text-color;
-      padding: .5em 0 .5em .2em;
-    }
-
-    p {
-      margin: 0;
-    }
-
-    > p {
-      text-align: center;
-      border-bottom: 1px solid $text-color;
-      padding-top: .2em;
-      padding-bottom: .5em;
-    }
-  }
-
-  .viewer::-webkit-scrollbar {
-    width: 0 !important;
-  }
 }
 
-#terminal {
-  overflow: hidden;
+button {
+  color: $button-text-color;
+  position: relative;
+  display: inline-block;
+  background-color: $button-background;
+  border: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
-
-  #terminalFeed {
-    padding-left: .4em;
-    height: calc(100% - 1.8em);
-    overflow-x: hidden;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    word-wrap: break-word;
-
-    li {
-      margin: .3em 0;
-
-      .linkLook {
-        background-color: $darker-second-color;
-        margin-right: .5em;
-      }
-
-      .clickable:hover, .clickable:active {
-        background-color: $darker-text-color;
-      }
-
-      .clickableRevealed {
-        background-color: $darker-text-color;
-      }
-    }
-  }
-
-  #terminalFeed::-webkit-scrollbar {
-    width: 0 !important;
-  }
-
-  .terminalInput {
-    width: calc(100% - .8em);
-    height: 1.5em;
-  }
 }
 
-
-.list {
-  width: 9em;
-  min-width: 9em;
-  padding: $padding 0 $padding $padding;
-  z-index: 1;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  height: calc(100% - .2em);
-
-  li {
-    margin-top: 1px;
-    margin-left: .1em;
-  }
-
-  p {
-    margin-bottom: .4em;
-    text-align: left;
-    border-bottom: 1px solid;
-  }
-
-  button {
-    margin-left: .1em;
-    width: calc(100% - .4em);
-    margin-bottom: .4em;
-    word-wrap: break-word;
-  }
-
-  button:first-letter {
-    text-transform: capitalize;
-  }
-}
-
-.collapsedIcon {
-  width: 0;
-  height: 0;
-  display: inline-block;
-  margin-left: .3em;
-  margin-right: .3em;
-  border-top: .4em solid transparent;
-  border-bottom: .4em solid transparent;
-  border-left: .4em solid $second-color;
-}
-
-.expandedIcon {
-  width: 0;
-  height: 0;
-  display: inline-block;
-  margin-right: .2em;
-  border-left: .4em solid transparent;
-  border-right: .4em solid transparent;
-  border-top: .4em solid $second-color;
-}
-
-.viewer::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-.list::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-.container {
-  max-width: $view-width;
-  height: calc(100% - 2.2em);
-  margin-left: auto;
-  margin-right: auto;
-  display: -webkit-flex;
-  display: flex;
-
-  > ul {
-    width: 100%;
-  }
-}
-
-.clickable {
+button:hover {
+  color: $button-hover-color;
   cursor: pointer;
+}
+
+.button {
+  color: $button-text-color;
+  position: relative;
+  display: inline-block;
+  background-color: $button-background;
+  border-top: $border-size solid $button-border-color;
+  border-bottom: $border-size solid $button-border-color;
+  padding: .3em .8em;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
 }
 
-.textAnimation {
-  @include borderOutline;
-  width: calc(100% - .8em);
-  height: $inner-container-height;
-  margin-top: $padding;
-  margin-left: $padding;
-  background-color: $back-color;
-  position: absolute;
-  padding-left: .4em;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  overflow: hidden;
-  cursor: none;
-
-  span {
-    display: block;
-  }
-}
-
-.viewer {
-  height: calc(100% - .6em);
-  padding: $padding;
-  width: 100%;
-
-  li:last-child {
-    margin-bottom: .6em;
-  }
-
-  input {
-    margin-left: 0;
-    width: calc(100% - .4em);
-  }
-
-  input:first-child {
-    margin-top: 0;
-  }
-
-  textarea {
-    margin-top: $padding;
-    width: calc(100% - .4em);
-  }
-
-  legend {
-    margin: .3em 0;
-  }
-
-  input[type=radio] {
-    width: auto;
-  }
-
-  label {
-    display: block;
-    margin-bottom: .3em;
-
-    span {
-      @include borderOutline;
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      vertical-align: middle;
-      cursor: pointer;
-      margin-right: .3em;
-    }
-  }
-
-  .listTitle {
-    text-align: left;
-  }
-}
-
-.viewer::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-.selected {
-  background-color: $note-color;
-}
-
-.imagePreview {
-  max-height: 15em;
-  max-width: 15em;
-  border: .2em solid $second-color;
-  outline: $outline solid $text-color;
+.button:hover {
+  color: $button-hover-color;
+  cursor: pointer;
+  border-top: $border-size solid $button-second-border-color;
+  border-bottom: $border-size solid $button-second-border-color;
 }
 
 .dialogBox {
-  @include borderOutline;
-  padding: .3em;
-  max-width: 20em;
-  word-wrap: break-word;
-  z-index: 10;
-  top: 3em;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  background-color: $back-color;
+  z-index: 6;
   position: absolute;
-  overflow-y: scroll;
-  max-height: calc(100% - 4.4em);
+  max-width: 20em;
+  top: 1.5em;
+  border: $border-size solid $border-color;
+  background-color: $post-back-color;
 
   input {
-    width: calc(100% - .8em);
+    width: calc(100% - 1em);
+    padding-left: .5em;
+    padding-right: .5em;
   }
 
   textarea {
-    width: calc(100% - .8em);
-    margin-left: $padding;
+    width: calc(100% - 1em);
+    padding-left: .5em;
+    padding-right: .5em;
   }
 
-  legend {
-    margin: .3em 0;
+  .description {
+    padding: .5em;
   }
 
-  input[type=radio] {
-    width: auto;
-  }
+  .extraDescription {
+    p:first-child {
+      margin-top: .2em;
+      padding-top: .2em;
+      border-top: $border-size solid $border-color;
+    }
 
-  label {
-    display: block;
-    margin-bottom: .3em;
+    p {
+      margin-bottom: .5em;
+    }
 
-    span {
-      @include borderOutline;
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      vertical-align: middle;
-      cursor: pointer;
-      margin-right: .3em;
+    p:last-child {
+      margin-bottom: 0;
     }
   }
 
-  .buttons {
-    margin: $padding .6em $padding 0;
+  .button {
+    padding: .2em .4em;
+    border: $border-size solid $button-border-color;
   }
 
-  .clickable:hover {
-    background-color: $darker-second-color;
+  .button:hover {
+    cursor: pointer;
+    border: $border-size solid $button-second-border-color;
   }
 
-  .clickable {
+  .closeButton {
+    padding: 0 .3em;
     float: right;
+    border-left: $border-size solid $button-border-color;
+    border-bottom: $border-size solid $button-border-color;
+    margin-top: .1em;
+    margin-right: .1em;
+  }
+
+  .buttons {
+    float: right;
+    margin: .1em;
+
+    .button:last-child {
+      margin-left: .2em;
+    }
   }
 }
 
@@ -850,375 +404,305 @@ pre {
   width: 0 !important;
 }
 
-.buttonBox {
-  button:first-child {
-    margin-top: .5em;
-  }
-
-  button {
-    width: 100%;
-    margin-bottom: .5em;
-  }
+.noBorder {
+  border: 0;
 }
 
-.description {
-  margin-bottom: $padding;
-  text-align: left;
-
-  p:first-child {
-    margin-right: 1em;
-  }
-
-  div {
-    border-top: 1px solid;
-    margin-top: .5em;
-
-    p:first-child {
-      margin: .5em 0 0 0;
-    }
-  }
-}
-
-.closeButton {
+.buttonLeftCorner {
   position: absolute;
-  right: 0;
-  top: 0;
-  padding: .2em;
-  margin: 0;
-  line-height: .8em;
-  font-size: ($font-size - .2em);
-  text-shadow: none;
+  bottom: -$border-size;
+  left: 0;
+  border-bottom: $corner-size solid $back-color;
+  border-right: $corner-size solid $button-background;
+  width: 0;
 }
 
-.markedInput {
-  background-color: $note-color;
+.buttonRightCorner {
+  position: absolute;
+  bottom: -$border-size;
+  right: 0;
+  border-bottom: $corner-size solid $back-color;
+  border-left: $corner-size solid $button-background;
+  width: 0;
+}
+
+.buttonUpperRightCorner {
+  position: absolute;
+  top: -$border-size;
+  right: 0;
+  border-top: $corner-size solid $back-color;
+  border-left: $corner-size solid $button-background;
+  width: 0;
+}
+
+.leftCorner {
+  position: absolute;
+  bottom: -$border-size;
+  left: 0;
+  border-bottom: $corner-size solid $back-color;
+  border-right: $corner-size solid $post-back-color;
+  width: 0;
+}
+
+.rightCorner {
+  position: absolute;
+  bottom: -$border-size;
+  right: 0;
+  border-bottom: $corner-size solid $back-color;
+  border-left: $corner-size solid $post-back-color;
+  width: 0;
+}
+
+.menuRightCorner {
+  position: absolute !important;
+  margin-right: 0 !important;
+  bottom: -$border-size;
+  right: 0;
+  border-bottom: $corner-size solid $back-color;
+  border-left: $corner-size solid $button-background;
+  width: 0;
+}
+
+.upperRightCorner {
+  position: absolute;
+  top: -$border-size;
+  right: 0;
+  border-top: $corner-size solid $back-color;
+  border-left: $corner-size solid $post-back-color;
+  width: 0;
+}
+
+.titleUpperRightCorner {
+  height: .4em;
+  position: absolute;
+  top: -$border-size;
+  right: 0;
+  border-top: $corner-size solid $back-color;
+  border-left: $corner-size solid $post-alt-back-color;
+  width: 0;
 }
 
 .hide {
-  display: none !important;
-}
-
-.inputArea {
-  height: 5.4em;
-
-  textarea {
-    width: calc(100% - .6em);
-    max-height: 80vh;
-  }
-
-  .buttons {
-    margin-top: $padding / 2;
-    width: calc(100% - .2em);
-  }
-}
-
-.buttons {
-  display: -webkit-flex;
-  -webkit-justify-content: flex-end;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: .2em;
-
-  div {
-    margin-right: $padding * 2;
-  }
-
-  button {
-    margin-right: $padding * 2;
-  }
-
-  button:last-child {
-    margin-right: -$padding;
-  }
-}
-
-.moreSpace {
-  line-height: 1.5em;
-}
-
-.locked {
-  @include lockedBorderOutline;
-  color: $light-color;
-  text-shadow: none;
-}
-
-.autoHeight {
-  height: auto;
-}
-
-/*
- * Set on #main when the map is in the main view
- * Avoids the map expanding out of view
- */
-.mapMain {
-  width: auto !important;
-  overflow-y: hidden !important;
-}
-
-.title {
-  font-size: ($font-size + .3em);
-  text-decoration: underline;
-}
-
-.center {
-  text-align: center;
-}
-
-.listTitle {
-  text-align: center;
-
-  span {
-    width: calc(100% - 1em);
-    display: inline-block;
-  }
-}
-
-.flash {
-  @include flashAnimation;
-  -webkit-animation-duration: .4s;
-  -webkit-animation-iteration-count: 1;
-  animation-iteration-count: 1;
-  animation-duration: .4s;
-}
-
-.selectedItem {
-  button {
-    @include selectedBorderOutline;
-  }
-}
-
-.selectedView {
-  padding: -1px .2em -1px -1px;
-  border-top: 1px solid;
-  border-left: 1px solid;
-  border-bottom: 1px solid;
-  background-color: rgba(0, 255, 204, .07);
-}
-
-.fullHeight {
-  height: calc(100% - 2em) !important;
-}
-
-.logo {
-  font-size: ($font-size - .1em);
-  white-space: pre;
-  display: block;
-}
-
-.show {
-  display: block !important;
-}
-
-.listButton {
-  z-index: 2;
-  position: absolute;
-  left: .5em;
-  top: 2.2em;
-  width: 8.6em;
-}
-
-.toggledList {
-  margin-top: 0 !important;
-  height: 100% !important;
-}
-
-#introText {
-  margin-bottom: 1em;
-
-  a, a:visited, a:active {
-    text-decoration: none;
-    color: $text-color;
-    text-shadow: $text-shadow;
-    background-color: $darker-second-color;
-    margin-right: 1em;
-  }
-
-  a:hover {
-    color: $text-color;
-    text-shadow: $text-shadow;
-    background-color: $darker-text-color;
-  }
-}
-
-.emptyParagraph {
-  margin-top: 1em;
-}
-
-.innerMenu {
-  box-shadow: $box-shadow $second-color;
-  outline: $outline solid $text-color;
-  background-color: $back-color;
-  position: absolute;
-  display: flex;
-  top: -.3em;
-  left: calc(50% - 10.5em);
-  width: $menu-width;
-  height: 1.7em;
-  padding-bottom: .3em;
-  z-index: 2;
-  margin-top: .1em;
-
-  > span {
-    display: inline-block;
-    align-self: flex-end;
-    margin-left: .3em;
-    margin-right: .5em;
-  }
-
-  .menuList {
-    display: inline-block;
-    align-self: flex-end;
-    margin-right: .5em;
-
-    ul {
-      position: absolute;
-      border: 1px solid;
-      border-top: 0;
-      background-color: $back-color;
-      padding: .3em .3em .3em 0;
-      margin-top: .3em;
-      left: 0;
-      width: calc(100% - .5em);
-      max-height: 80vh;
-      overflow-y: scroll;
-
-      li {
-        margin-left: .3em;
-        margin-bottom: .3em;
-
-        button {
-          width: 100%;
-        }
-      }
-    }
-
-    ul::-webkit-scrollbar {
-      width: 0 !important;
-    }
-
-    .listTitle {
-      margin-left: .2em;
-    }
-  }
-}
-
-.invitationItem {
-  p {
-    padding-left: 1em;
-    padding-bottom: 1em
-  }
-
-  span {
-    vertical-align: middle;
-  }
-
-  button {
-    margin-right: 1em;
-    padding: .1em;
-  }
-}
-
-.smaller {
-  font-size: .9em;
-}
-
-.warning {
-  background-color: $darker-second-color;
+  display: none;
 }
 
 .redWarning {
-  background-color: #A50047;
+background-color: $red-warning;
 }
 
-.androidPortraitKeyboardFix {
-  height: 50vh !important;
-}
+#messenger {
+  margin-top: 2.25em;
 
-.androidLandscapeKeyboardFix {
-  height: 35vh !important;
-}
-
-.redBack {
-  background-color: red;
-}
-
-@-webkit-keyframes flash {
-  0% {
-    background-color: $flash-color;
-    color: $flash-color;
-    text-shadow: none;
+  textarea {
+    width: 100%;
+    padding: .3em;
   }
 
-  100% {
-    color: inherit;
-    background-color: inherit;
-    text-shadow: inherit;
-  }
-}
+  .viewer {
+    padding: .2em .4em .2em .4em;
 
-@keyframes flash {
-  0% {
-    background-color: $flash-color;
-    color: $flash-color;
-    text-shadow: none;
+    ul {
+      margin-top: 3em;
+    }
   }
 
-  100% {
-    color: inherit;
-    background-color: inherit;
-    text-shadow: inherit;
-  }
-}
+  .inputArea {
+    position: fixed;
+    width: 100%;
+    max-width: 40em;
+    bottom: 0;
+    left: 0;
+    background-color: $back-color;
+    padding-bottom: .3em;
 
-@media (min-width: 480px) {
+    .buttons {
+      float: right;
+    }
+  }
+
   .list {
-    display: block;
+    border-bottom: $border-size solid $button-border-color;
+    background-color: $button-background;
+    height: 1.5em;
+    width: calc(100% - .8em);
+    max-width: calc(40em - .8em);
+    padding: .5em .4em .2em .4em;
+    position: fixed;
+
+    .button {
+      color: $button-text-color;
+      position: relative;
+      display: inline-block;
+      background-color: $button-background;
+      border: 0;
+      padding: 0;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      margin-right: .5em;
+
+      span:before {
+        content: '[';
+      }
+
+      span:after {
+        content: ']';
+      }
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .buttonLeftCorner, .buttonUpperRightCorner {
+      border: 0;
+    }
   }
 
-  .listButton {
-    display: none;
-  }
+  .menuList {
+    float: left;
+    position: relative;
 
-  .appleMenuFix {
-    padding-top: 0em;
-  }
-}
+    ul {
+      margin-top: .5em;
+      position: absolute;
+      padding: .5em .5em .5em .45em;
+      background-color: $button-background;
+      border-left: $border-size solid $button-border-color;
+      border-bottom: $border-size solid $button-border-color;
+      border-right: $border-size solid $button-border-color;
 
-@media (max-width: 479px) {
-  #top {
-    #wrecking {
-      padding: .2em .1em .1em .1em;
+      li {
+        margin-bottom: .4em;
+      }
 
-      > div {
-        right: .2em;
+      li:last-child{
+        margin-bottom: 0;
+      }
+
+      li:hover {
+        color: $button-hover-color;
       }
     }
   }
 
-  .container {
-    height: calc(100% - 3em);
+  .menuList:last-child {
+    margin-right: 0;
+  }
+}
+
+.multiMenu {
+  > div:first-child {
+    .menuRightCorner {
+      border: 0;
+      margin-bottom: 0;
+    }
+  }
+}
+
+/*
+  Forum
+ */
+
+.forum {
+  .forumUser {
+    margin-left: -.5em;
+    padding-left: .5em;
+    font-size: .9em;
+    text-decoration: underline;
   }
 
-  .list {
-    display: none;
-    padding-top: 1.9em;
-    height: calc(100% - 2.1em);
+  .forumThread {
+    margin-top: 1em;
+
+    .forumTitle {
+      position: relative;
+      display: inline-block;
+      font-size: 1.3em;
+      padding-left: .5em;
+      padding-right: 1em;
+      color: $text-alt-color;
+      background-color: $post-alt-back-color;
+      border-top: $border-size solid $border-color;
+    }
+
+    .threadStarter {
+      position: relative;
+      padding: .1em .5em .5em .5em;
+      line-height: 1.4em;
+      background-color: $post-back-color;
+      border-top: $border-size solid $border-color;
+      border-bottom: $border-size solid $border-color;
+    }
+
+    .forumPosts {
+      .forumText {
+        line-height: 1.4em;
+        background-color: $post-back-color;
+        position: relative;
+        border-top: $border-size solid $border-color;
+        padding: .1em .5em .5em .5em;
+
+        p {
+          margin-bottom: .5em;
+        }
+
+        p:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .forumPost {
+        padding-bottom: .5em;
+
+        .createButtons {
+          margin-left: .9em;
+        }
+
+        .forumSubPost {
+          padding-left: .8em;
+
+          .leftCorner {
+            border: 0;
+          }
+
+          .rightCorner {
+            border: 0;
+          }
+        }
+
+        .forumSubPost:last-child {
+          .forumText {
+            border-bottom: $border-size solid $border-color;
+          }
+
+          .leftCorner {
+            border-bottom: $corner-size solid $back-color;
+            border-right: $corner-size solid $post-back-color;
+          }
+
+          .rightCorner {
+            border-bottom: $corner-size solid $back-color;
+            border-left: $corner-size solid $post-back-color;
+          }
+        }
+      }
+
+      .forumPost:first-child {
+        padding-top: .5em;
+      }
+
+      .forumPost:last-child {
+        padding-bottom: 0;
+
+        .forumText {
+          border-bottom: $border-size solid $border-color;
+        }
+      }
+    }
   }
 
-  .listButton {
-    display: block;
-  }
-
-  .viewer {
-    margin-top: 2.1em;
-    height: calc(100% - 2.1em);
-  }
-
-  .appleListButtonFix {
-    top: 3em;
-  }
-
-  .appleMenuFix {
-    padding-top: 1em;
+  .forumThread:first-of {
+    margin-top: .4em !important;
   }
 }

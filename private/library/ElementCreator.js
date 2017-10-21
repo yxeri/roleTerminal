@@ -19,10 +19,17 @@ const eventCentral = require('./EventCentral');
 const storageManager = require('./StorageManager');
 
 class ElementCreator {
-  static createContainer({ classes = [], elementId }) {
+  static createContainer({ classes = [], elementId, func }) {
     const container = document.createElement('DIV');
     this.setClasses(container, classes);
     this.setElementId(container, elementId);
+
+    if (func) {
+      container.addEventListener('click', () => {
+        soundLibrary.playSound('button');
+        func();
+      });
+    }
 
     return container;
   }

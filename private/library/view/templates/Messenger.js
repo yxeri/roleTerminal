@@ -147,7 +147,7 @@ class Messenger extends StandardView {
       },
     });
     this.followList = new List({
-      title: 'following',
+      title: 'part_of',
       shouldSort: false,
       titleCallback: () => {
         this.lists.forEach((list) => {
@@ -448,7 +448,7 @@ class Messenger extends StandardView {
             placeholder: 'Name of the room',
             inputName: 'roomName',
             isRequired: true,
-            maxLength: 20,
+            maxLength: 10,
           }, {
             placeholder: 'Optional password',
             inputName: 'password',
@@ -670,7 +670,7 @@ class Messenger extends StandardView {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.USER,
-      func: ({ changedUser, firstConnection }) => {
+      func: ({}) => {
         if (storageManager.getToken()) {
           this.inputArea.classList.remove('hide');
           this.messageList.element.classList.remove('fullHeight');

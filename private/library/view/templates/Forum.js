@@ -20,7 +20,7 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
-// const textTools = require('../../TextTools');
+const textTools = require('../../TextTools');
 
 function createButton({ text, func }) {
   const buttonContainer = elementCreator.createContainer({ classes: ['button'], func });
@@ -31,42 +31,7 @@ function createButton({ text, func }) {
   return buttonContainer;
 }
 
-function createPost({ post, hasSubPosts }) {
-  const postContainer = elementCreator.createContainer({ classes: ['forumPost'], elementId: post.postId });
-  const postTextContainer = elementCreator.createContainer({ classes: ['forumText'] });
-  const userContainer = elementCreator.createContainer({ classes: ['forumUser'] });
-
-  userContainer.appendChild(elementCreator.createSpan({ text: post.ownerId }));
-
-  // if (post.lastUpdated !== post.timeCreated) {
-  //   const lastUpdated = textTools.generateTimeStamp({ date: post.lastUpdated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime} ${lastUpdated.fullDate}` }));
-  // } else {
-  //   const timeCreated = textTools.generateTimeStamp({ date: post.timeCreated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime} ${timeCreated.fullDate}` }));
-  // }
-
-  postTextContainer.appendChild(userContainer);
-
-  post.text.forEach((textParagraph) => {
-    postTextContainer.appendChild(elementCreator.createParagraph({ text: textParagraph }));
-  });
-
-  if (!hasSubPosts) {
-    postTextContainer.appendChild(elementCreator.createContainer({ classes: ['rightCorner'] }));
-  }
-
-  postTextContainer.appendChild(elementCreator.createContainer({ classes: ['leftCorner'] }));
-  postTextContainer.appendChild(elementCreator.createContainer({ classes: ['upperRightCorner'] }));
-
-  postContainer.appendChild(postTextContainer);
-
-  return postContainer;
-}
-
-function createPostButton({ parentElement, text, isSubReply }) {
+function createPostButton({ parentElement, text, isSubReply, threadId, parentPostId }) {
   return createButton({
     text,
     func: () => {
@@ -88,7 +53,9 @@ function createPostButton({ parentElement, text, isSubReply }) {
               }
 
               const postToCreate = {
-                title: threadBox.inputs.find(({ inputName }) => inputName === 'title').inputElement.value,
+                parentPostId,
+                threadId,
+                ownerAliasId: storageManager.getSelectedAlias(),
                 text: threadBox.inputs.find(({ inputName }) => inputName === 'text').inputElement.value.split('\n'),
               };
 
@@ -99,22 +66,14 @@ function createPostButton({ parentElement, text, isSubReply }) {
                   return;
                 }
 
-                const createdPost = threadData.data.post;
-                const postElement = createPost({
-                  parentElement,
-                  post: createdPost,
-                  hasSubPosts: createdPost.subPosts.length > 0,
-                });
-                const threadElement = document.getElementById(createdPost.threadId);
-                const parentPostElement = document.getElementById(createdPost.postId);
-
-                if (parentPostElement) {
-                  parentPostElement.appendChild(postElement);
-                } else {
-                  threadElement.appendChild(postElement);
-                }
-
                 threadBox.removeView();
+
+                const createdPost = threadData.data.post;
+
+                eventCentral.triggerEvent({
+                  event: eventCentral.Events.FORUMPOSTS,
+                  params: { posts: [createdPost] },
+                });
               });
             },
           },
@@ -126,11 +85,6 @@ function createPostButton({ parentElement, text, isSubReply }) {
         ],
         extraDescription: [],
         inputs: [{
-          placeholder: 'Title',
-          inputName: 'title',
-          isRequired: true,
-          maxLength: 20,
-        }, {
           placeholder: 'Text',
           inputName: 'text',
           type: 'textarea',
@@ -145,22 +99,67 @@ function createPostButton({ parentElement, text, isSubReply }) {
   });
 }
 
+function createPost({ post, parentElement, hasSubPosts }) {
+  const postContainer = elementCreator.createContainer({ classes: ['forumPost'], elementId: post.postId || post._id });
+  const postTextContainer = elementCreator.createContainer({ classes: ['forumText'] });
+  const userContainer = elementCreator.createContainer({ classes: ['forumUser'] });
+
+  userContainer.appendChild(elementCreator.createSpan({ text: post.ownerId }));
+
+  if (post.lastUpdated !== post.timeCreated) {
+    const lastUpdated = textTools.generateTimeStamp({ date: post.lastUpdated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime}` }));
+  } else {
+    const timeCreated = textTools.generateTimeStamp({ date: post.timeCreated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime}` }));
+  }
+
+  postTextContainer.appendChild(userContainer);
+
+  post.text.forEach((textParagraph) => {
+    postTextContainer.appendChild(elementCreator.createParagraph({ text: textParagraph }));
+  });
+
+  postTextContainer.appendChild(elementCreator.createContainer({ classes: ['leftCorner'] }));
+  postTextContainer.appendChild(elementCreator.createContainer({ classes: ['upperRightCorner'] }));
+  postContainer.appendChild(postTextContainer);
+
+  if (!hasSubPosts) {
+    postTextContainer.appendChild(elementCreator.createContainer({ classes: ['rightCorner'] }));
+
+    const createContainer = elementCreator.createContainer({ classes: ['createButtons'] });
+    createContainer.appendChild(createPostButton({
+      parentElement,
+      parentPostId: post.postId || post._id,
+      threadId: post.threadId,
+      isSubReply: true,
+      text: 'sub_reply',
+    }));
+
+    postContainer.appendChild(createContainer);
+  }
+
+  return postContainer;
+}
+
 function createSubPost({ post }) {
-  const subContainer = elementCreator.createContainer({ classes: ['forumSubPost'], elementId: post.postId });
+  const subContainer = elementCreator.createContainer({ classes: ['forumSubPost'], elementId: post.postId || post._id });
   const subPostTextContainer = elementCreator.createContainer({ classes: ['forumText'] });
   const userContainer = elementCreator.createContainer({ classes: ['forumUser'] });
 
   userContainer.appendChild(elementCreator.createSpan({ text: post.ownerId }));
 
-  // if (post.lastUpdated !== post.timeCreated) {
-  //   const lastUpdated = textTools.generateTimeStamp({ date: post.lastUpdated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime} ${lastUpdated.fullDate}` }));
-  // } else {
-  //   const timeCreated = textTools.generateTimeStamp({ date: post.timeCreated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime} ${timeCreated.fullDate}` }));
-  // }
+  if (post.lastUpdated !== post.timeCreated) {
+    const lastUpdated = textTools.generateTimeStamp({ date: post.lastUpdated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime}` }));
+  } else {
+    const timeCreated = textTools.generateTimeStamp({ date: post.timeCreated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime}` }));
+  }
 
   subPostTextContainer.appendChild(userContainer);
 
@@ -177,35 +176,44 @@ function createSubPost({ post }) {
 }
 
 function createThread({ thread, parentElement }) {
-  const threadContainer = elementCreator.createContainer({ classes: ['forumThread'], elementId: thread.threadId });
-  const threadTextContainer = elementCreator.createContainer({ classes: ['threadStarter'] });
+  const threadContainer = elementCreator.createContainer({ classes: ['forumThread'], elementId: thread.threadId || thread._id });
+  const threadTextContainer = elementCreator.createContainer({ classes: ['threadStarter', 'hide'] });
 
-  const createContainer = elementCreator.createContainer({ classes: ['createButtons'] });
-  const postButton = createPostButton({ parentElement, text: 'reply' });
-
-  const titleContainer = elementCreator.createContainer({ classes: ['forumTitle'] });
-  titleContainer.appendChild(elementCreator.createSpan({ text: thread.title }));
-  titleContainer.appendChild(elementCreator.createContainer({ classes: ['titleUpperRightCorner'] }));
+  const createContainer = elementCreator.createContainer({ classes: ['createButtons', 'hide'] });
+  const postButton = createPostButton({ parentElement, text: 'reply', threadId: thread.threadId || thread._id });
 
   const userContainer = elementCreator.createContainer({ classes: ['forumUser'] });
 
   userContainer.appendChild(elementCreator.createSpan({ text: thread.ownerId }));
 
-  // if (thread.lastUpdated !== thread.timeCreated) {
-  //   const lastUpdated = textTools.generateTimeStamp({ date: thread.lastUpdated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime} ${lastUpdated.fullDate}` }));
-  // } else {
-  //   const timeCreated = textTools.generateTimeStamp({ date: thread.timeCreated });
-  //
-  //   userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime} ${timeCreated.fullDate}` }));
-  // }
+  if (thread.lastUpdated !== thread.timeCreated) {
+    const lastUpdated = textTools.generateTimeStamp({ date: thread.lastUpdated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${lastUpdated.halfTime}` }));
+  } else {
+    const timeCreated = textTools.generateTimeStamp({ date: thread.timeCreated });
+
+    userContainer.appendChild(elementCreator.createSpan({ text: ` - ${timeCreated.halfTime}` }));
+  }
 
   threadTextContainer.appendChild(userContainer);
 
   thread.text.forEach((textParagraph) => {
     threadTextContainer.appendChild(elementCreator.createParagraph({ text: textParagraph }));
   });
+
+  const titleContainer = elementCreator.createContainer({
+    classes: ['forumTitle'],
+    func: () => {
+      Array.from(threadContainer.children).forEach((child, index) => {
+        if (index > 0) {
+          child.classList.toggle('hide');
+        }
+      });
+    },
+  });
+  titleContainer.appendChild(elementCreator.createSpan({ text: thread.title }));
+  titleContainer.appendChild(elementCreator.createContainer({ classes: ['titleUpperRightCorner'] }));
 
   threadTextContainer.appendChild(elementCreator.createContainer({ classes: ['upperRightCorner'] }));
   createContainer.appendChild(postButton);
@@ -241,6 +249,8 @@ function createForum({ forumKey, parentElement }) {
               }
 
               const threadToCreate = {
+                forumId: forumKey,
+                ownerAliasId: storageManager.getSelectedAlias(),
                 title: threadBox.inputs.find(({ inputName }) => inputName === 'title').inputElement.value,
                 text: threadBox.inputs.find(({ inputName }) => inputName === 'text').inputElement.value.split('\n'),
               };
@@ -252,14 +262,14 @@ function createForum({ forumKey, parentElement }) {
                   return;
                 }
 
-                const thread = threadData.data.thread;
-                const forumElement = document.getElementById(thread.forumId);
-
-                const threadElement = createThread({ thread });
-
-                forumElement.insertBefore(threadElement, forumElement.children[1]);
-
                 threadBox.removeView();
+
+                const thread = threadData.data.thread;
+
+                eventCentral.triggerEvent({
+                  event: eventCentral.Events.FORUMTHREADS,
+                  params: { threads: [thread] },
+                });
               });
             },
           },
@@ -273,7 +283,7 @@ function createForum({ forumKey, parentElement }) {
           placeholder: 'Title',
           inputName: 'title',
           isRequired: true,
-          maxLength: 20,
+          maxLength: 50,
         }, {
           placeholder: 'Text',
           inputName: 'text',
@@ -298,24 +308,71 @@ class Forum extends View {
   constructor() {
     super({ isFullscreen: true });
 
-    this.forum = {};
-    this.forumThreads = [];
-    this.forumContainer = document.createElement('div');
-    this.expandedThreads = [];
+    this.forumId = 0;
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.FORUMTHREADS,
-      func: ({ forumThreads }) => {
+      func: ({ threads }) => {
+        threads.forEach((thread) => {
+          const forumElement = document.getElementById(thread.forumId);
 
+          const threadElement = createThread({
+            thread,
+            parentElement: this.element,
+          });
+          const threadPostsContainer = elementCreator.createContainer({ classes: ['forumPosts', 'hide'], elementId: `posts-${thread.threadId || thread._id}` });
+
+          threadElement.appendChild(threadPostsContainer);
+          forumElement.insertBefore(threadElement, forumElement.children[1]);
+        });
       },
     });
 
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.FORUMPOSTS,
-      func: ({ forumPosts }) => {
+      func: ({ posts }) => {
+        posts.forEach((post) => {
+          const threadPostsContainer = document.getElementById(`posts-${post.threadId}`);
 
+          if (post.parentPostId) {
+            const parentPostElement = document.getElementById(post.parentPostId);
+            const postElement = createSubPost({
+              post,
+              parentElement: this.element,
+              hasSubPosts: post.subPosts && post.subPosts.length > 0,
+            });
+
+            const createContainer = elementCreator.createContainer({ classes: ['createButtons'] });
+            createContainer.appendChild(createPostButton({
+              parentPostId: post.parentPostId,
+              threadId: post.threadId,
+              isSubReply: true,
+              parentElement: this.element,
+              text: 'sub_reply',
+            }));
+
+            parentPostElement.firstElementChild.classList.add('notFirst');
+            parentPostElement.lastElementChild.lastElementChild.remove();
+            postElement.appendChild(createContainer);
+            parentPostElement.appendChild(postElement);
+          } else {
+            const postElement = createPost({
+              post,
+              parentElement: this.element,
+              hasSubPosts: post.subPosts && post.subPosts.length > 0,
+            });
+
+            threadPostsContainer.appendChild(postElement);
+          }
+
+          const threadContainer = document.getElementById(post.threadId);
+          const forumContainer = document.getElementById(this.forumId);
+
+          document.getElementById(post.threadId).remove();
+          forumContainer.insertBefore(threadContainer, forumContainer.children[1]);
+        });
       },
     });
 
@@ -334,8 +391,21 @@ class Forum extends View {
       const fragment = document.createDocumentFragment();
 
       Object.keys(forums).forEach((forumKey) => {
+        this.forumId = forumKey;
+
         const forum = forums[forumKey];
-        const threads = Object.keys(forum.threads).map(threadKey => forum.threads[threadKey]);
+        const threads = Object.keys(forum.threads)
+          .map(threadKey => forum.threads[threadKey])
+          .sort((a, b) => {
+            const firstDate = new Date(a.lastUpdated);
+            const secondDate = new Date(b.lastUpdated);
+
+            if (firstDate > secondDate) {
+              return -1;
+            }
+
+            return 1;
+          });
         const forumContainer = createForum({
           forumKey,
           parentElement: this.element,
@@ -347,10 +417,10 @@ class Forum extends View {
             parentElement: this.element,
           });
 
-          const threadPostsContainer = elementCreator.createContainer({ classes: ['forumPosts'] });
+          const threadPostsContainer = elementCreator.createContainer({ classes: ['forumPosts', 'hide'], elementId: `posts-${thread.threadId}` });
           const posts = Object.keys(thread.posts).map(postKey => thread.posts[postKey]);
 
-          posts.forEach((post, index) => {
+          posts.forEach((post) => {
             const subPosts = Object.keys(post.subPosts).map(postKey => post.subPosts[postKey]);
             const postContainer = createPost({
               post,
@@ -369,6 +439,8 @@ class Forum extends View {
                   const createContainer = elementCreator.createContainer({ classes: ['createButtons'] });
 
                   createContainer.appendChild(createPostButton({
+                    parentPostId: subPost.parentPostId,
+                    threadId: subPost.threadId,
                     isSubReply: true,
                     parentElement: this.element,
                     text: 'sub_reply',
@@ -378,15 +450,6 @@ class Forum extends View {
 
                 postContainer.appendChild(subContainer);
               });
-            } else if (posts.length === (index + 1)) {
-              const createContainer = elementCreator.createContainer({ classes: ['createButtons'] });
-
-              createContainer.appendChild(createPostButton({
-                isSubReply: true,
-                text: 'sub_reply',
-                parentElement: this.element,
-              }));
-              postContainer.appendChild(createContainer);
             }
 
             threadPostsContainer.appendChild(postContainer);

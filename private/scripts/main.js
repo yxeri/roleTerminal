@@ -27,7 +27,6 @@ const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
 const ButtonBox = require('../library/view/templates/ButtonBox');
 const TeamViewer = require('../library/view/templates/TeamViewer');
-const ToolsViewer = require('../library/view/templates/ToolsViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
 const DialogBox = require('../library/view/DialogBox');
 const Forum = require('../library/view/templates/Forum');
@@ -46,7 +45,6 @@ const mainView = document.getElementById('main');
 const top = document.getElementById('top');
 const onlineStatus = new OnlineStatus(top);
 
-const toolsViewer = new ToolsViewer({ isFullscreen: true });
 // const home = new Home({
 //   introText: [
 //     elementCreator.createParagraph({
@@ -91,12 +89,8 @@ const toolsViewer = new ToolsViewer({ isFullscreen: true });
 //   ],
 // });
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
-const dirViewer = new DirViewer({ isFullscreen: true });
 const forum = new Forum({});
 const walletViewer = new Wallet({ suffix: '¥' });
-const profile = new Profile();
-const teamViewer = new TeamViewer({});
-const tracker = new Tracker();
 
 let currentView = forum;
 forum.appendTo(mainView);
@@ -117,16 +111,14 @@ const logIn = elementCreator.createContainer({
           element: elementCreator.createSpan({ text: alias }),
           func: (event) => {
             const aliasElement = elementCreator.createSpan({
-              text: alias,
+              text: `u_ ${alias}`,
             });
 
             if (alias !== storageManager.getUserName()) {
               storageManager.setSelectedAlias(alias);
-
-              return;
+            } else {
+              storageManager.removeSelectedAlias();
             }
-
-            storageManager.removeSelectedAlias();
 
             logIn.removeChild(logIn.lastElementChild);
             logIn.replaceChild(aliasElement, logIn.firstElementChild);
@@ -204,7 +196,7 @@ const logIn = elementCreator.createContainer({
               placeholder: 'Handle',
               inputName: 'alias',
               isRequired: true,
-              maxLength: 20,
+              maxLength: 10,
             }],
             description: [
               'You can never have too many burner handles',
@@ -218,7 +210,7 @@ const logIn = elementCreator.createContainer({
       const spacerElement = elementCreator.createListItem({ element: elementCreator.createSpan({ text: '_system' }), classes: ['systemSpacer'] });
 
       const userElement = elementCreator.createSpan({
-        text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+        text: `u_ ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
         func: () => {
           if (logIn.childElementCount > 1) {
             isClosed = true;
@@ -299,7 +291,7 @@ const walletTop = elementCreator.createContainer({
 
 if (storageManager.getToken()) {
   logIn.appendChild(elementCreator.createSpan({
-    text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+    text: `u_ ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
   }));
 } else {
   logIn.appendChild(elementCreator.createSpan({ text: 'login' }));
@@ -328,7 +320,7 @@ eventCentral.addWatcher({
 
     if (storageManager.getToken()) {
       logIn.appendChild(elementCreator.createSpan({
-        text: `handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+        text: `u_ ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
       }));
     } else {
       logIn.appendChild(elementCreator.createSpan({ text: 'login' }));
@@ -1476,19 +1468,19 @@ socketManager.addEvents([
   }, {
     event: 'forumPosts',
     func: ({ data }) => {
-      const { forumPosts } = data;
+      const { posts } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.FORUMPOSTS,
-        params: { forumPosts },
+        params: { posts },
       });
     },
   }, {
     event: 'forumThreads',
     func: ({ data }) => {
-      const { forumThreads } = data;
+      const { threads } = data;
       eventCentral.triggerEvent({
         event: eventCentral.Events.FORUMTHREADS,
-        params: { forumThreads },
+        params: { threads },
       });
     },
   },

@@ -153,21 +153,19 @@ li {
   position: fixed;
   width: calc(100% - .8em);
   max-width: calc(40em - .8em);
-  padding: .5em .4em .2em .4em;
+  padding: .5em .3em .2em .3em;
 
   > div {
     cursor: pointer;
     display: inline-block;
-    margin-right: 1em;
+    margin-right: .3em;
+    padding-right: .3em;
+    border-right: $border-size solid $button-border-color;
     position: relative;
+  }
 
-    > span:before {
-      content: '[';
-    }
-
-    > span:after {
-      content: ']';
-    }
+  .menuRightCorner {
+    border-right: 0;
   }
 
   > div:hover {
@@ -186,11 +184,12 @@ li {
     color: $button-notify-background;
   }
 
-  .userList {
+  ul {
+    width: 8em;
     position: absolute;
     left: -.45em;
     top: 1.75em;
-    padding: .5em .5em .5em .45em;
+    padding: .2em .2em .2em .45em;
     background-color: $button-background;
     border-left: $border-size solid $button-border-color;
     border-bottom: $border-size solid $button-border-color;
@@ -291,7 +290,7 @@ li {
 
 .fullscreen {
   margin-top: 2.6em;
-  max-width: 40em;
+  max-width: calc(40em - .2em);
 
 }
 
@@ -318,7 +317,7 @@ button:hover {
   background-color: $button-background;
   border-top: $border-size solid $button-border-color;
   border-bottom: $border-size solid $button-border-color;
-  padding: .3em .8em;
+  padding: .3em .9em;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -503,17 +502,21 @@ background-color: $red-warning;
 
     ul {
       margin-top: 3em;
+      overflow-y: auto;
+      height: calc(100vh - 12.2em);
     }
   }
 
   .inputArea {
-    position: fixed;
+    position: relative;
     width: 100%;
-    max-width: 40em;
-    bottom: 0;
-    left: 0;
+    max-width: calc(40em - 1em);
     background-color: $back-color;
     padding-bottom: .3em;
+
+    textarea {
+      max-height: 3.6em;
+    }
 
     .buttons {
       float: right;
@@ -524,8 +527,8 @@ background-color: $red-warning;
     border-bottom: $border-size solid $button-border-color;
     background-color: $button-background;
     height: 1.5em;
-    width: calc(100% - .8em);
-    max-width: calc(40em - .8em);
+    width: calc(100% - 1em);
+    max-width: calc(40em - 1em);
     padding: .5em .4em .2em .4em;
     position: fixed;
 
@@ -534,20 +537,15 @@ background-color: $red-warning;
       position: relative;
       display: inline-block;
       background-color: $button-background;
-      border: 0;
-      padding: 0;
+      padding: 0 .3em 0 0;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
-      margin-right: .5em;
-
-      span:before {
-        content: '[';
-      }
-
-      span:after {
-        content: ']';
-      }
+      margin-right: .3em;
+      border-top: 0;
+      border-bottom: 0;
+      border-left: 0;
+      border-right: $border-size solid $button-border-color;
     }
 
     .button:last-child {
@@ -564,6 +562,7 @@ background-color: $red-warning;
     position: relative;
 
     ul {
+      width: 6em;
       margin-top: .5em;
       position: absolute;
       padding: .5em .5em .5em .45em;
@@ -573,11 +572,15 @@ background-color: $red-warning;
       border-right: $border-size solid $button-border-color;
 
       li {
-        margin-bottom: .4em;
+        margin-bottom: .2em;
+        padding-bottom: .2em;
+        border-bottom: $border-size solid $button-border-color;
       }
 
       li:last-child{
+        border-bottom: 0;
         margin-bottom: 0;
+        padding-bottom: 0;
       }
 
       li:hover {
@@ -616,6 +619,7 @@ background-color: $red-warning;
     margin-top: 1em;
 
     .forumTitle {
+      max-width: calc(100% - 2.2em);
       position: relative;
       display: inline-block;
       font-size: 1.3em;
@@ -686,6 +690,12 @@ background-color: $red-warning;
             border-left: $corner-size solid $post-back-color;
           }
         }
+
+        .notFirst {
+          .rightCorner {
+            border: 0;
+          }
+        }
       }
 
       .forumPost:first-child {
@@ -700,9 +710,5 @@ background-color: $red-warning;
         }
       }
     }
-  }
-
-  .forumThread:first-of {
-    margin-top: .4em !important;
   }
 }

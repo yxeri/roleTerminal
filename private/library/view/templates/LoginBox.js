@@ -274,13 +274,13 @@ class LoginBox extends DialogBox {
       placeholder: 'User name',
       inputName: 'userName',
       isRequired: true,
-      maxLength: 20,
+      maxLength: 10,
     }, {
       placeholder: 'Password',
       inputName: 'password',
       type: 'password',
       isRequired: true,
-      maxLength: 100,
+      maxLength: 80,
     }];
 
     super({

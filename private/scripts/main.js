@@ -332,140 +332,140 @@ const boot = new TextAnimation({ removeTime: 700, triggerValue: 'firstBoot' });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
-boot.setQueue([
-  {
-    func: boot.printLines,
-    params: {
-      corruption: true,
-      classes: ['logo'],
-      array: [
-        '                          ####',
-        '                ####    #########    ####',
-        '               ###########################',
-        '              #############################',
-        '            #######        ##   #  ##########',
-        '      ##########           ##    #  ###  ##########',
-        '     #########             #########   #   #########',
-        '       #####               ##     ########   #####',
-        '     #####                 ##     ##     ##########',
-        '     ####                  ##      ##     #   ######',
-        ' #######                   ##########     ##    ########',
-        '########                   ##       ########     ########',
-        ' ######      Organica      ##       #      #############',
-        '   ####     Oracle         ##       #      ##     ####',
-        '   ####     Operating      ##       #      ##    #####',
-        '   ####      System        ##       #      ###########',
-        '########                   ##       #########    ########',
-        '########                   ##########      #    #########',
-        ' ########                  ##      ##     ## ###########',
-        '     #####                 ##      ##     ### #####',
-        '       #####               ##     ########   #####',
-        '      #######              ##########   #  ########',
-        '     ###########           ##    ##    # ###########',
-        '      #############        ##    #   #############',
-        '            ################################',
-        '              ############################',
-        '              #######  ##########  #######',
-        '                ###      ######      ###',
-        '                          ####',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      corruption: false,
-      array: [
-        'Connecting to HQ...',
-        '...',
-        '...',
-        'Failed to connect to HQ',
-        'Rerouting...',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      waitTime: 700,
-      corruption: false,
-      array: [
-        'Connected!',
-        'Welcome to the Oracle, employee UNDEFINED.',
-        'May you have a productive day!',
-        '',
-        'Establishing uplink to relays...',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      waitTime: 1200,
-      corruption: false,
-      array: [
-        'Uplink established!',
-        'Downloading modules...',
-        'LAMM  - LANTERN Amplification Master Manipulator',
-        'OSAT  - Organica System Administrator Toolset',
-        'CHAT  - Communication Host-Agent Tracker',
-        'CREDS - Computer Registered Evaluative Decision System',
-        'PANIC - PANIC-Assisted Neglect Information Collector',
-        'YOU   - YOU Object Unifier',
-        'Booting O3S 5.0...',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      classes: ['logo'],
-      corruption: true,
-      array: [
-        'THIS RELEASE OF O3S WAS BROUGHT TO YOU BY',
-        '   ####',
-        '###############',
-        ' #####  #########                                           ####',
-        '  ####     #######  ########     ###########    ####     ###########',
-        '  ####    ######      #######   ####   #####  ########    ####   #####',
-        '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
-        '  #########        ####    ####     ####   #####     ##############',
-        '  #### ######     ####     #####  ####     #######   ###  ########',
-        '  ####   ######  ##### #### #### ############  #######    ####   ###',
-        ' ######    #############    ################     ###      ####    #####',
-        '########     ########        ####                        ######      #####   ##',
-        '               ###########        ##                                    ###### ',
-        '                    ###############',
-        '                  Razor  #####  Demos - Warez - Honey',
-        'ENJOY',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      corruption: false,
-      array: [
-        'Organica approved device detected!',
-        'Rewriting firmware...',
-        'Overriding lock...',
-      ],
-    },
-  }, {
-    func: boot.printLines,
-    params: {
-      corruption: false,
-      array: [
-        'Loading',
-        '...',
-        '...',
-        '...',
-        '...',
-      ],
-    },
-  },
-]);
+// boot.setQueue([
+//   {
+//     func: boot.printLines,
+//     params: {
+//       corruption: true,
+//       classes: ['logo'],
+//       array: [
+//         '                          ####',
+//         '                ####    #########    ####',
+//         '               ###########################',
+//         '              #############################',
+//         '            #######        ##   #  ##########',
+//         '      ##########           ##    #  ###  ##########',
+//         '     #########             #########   #   #########',
+//         '       #####               ##     ########   #####',
+//         '     #####                 ##     ##     ##########',
+//         '     ####                  ##      ##     #   ######',
+//         ' #######                   ##########     ##    ########',
+//         '########                   ##       ########     ########',
+//         ' ######      Organica      ##       #      #############',
+//         '   ####     Oracle         ##       #      ##     ####',
+//         '   ####     Operating      ##       #      ##    #####',
+//         '   ####      System        ##       #      ###########',
+//         '########                   ##       #########    ########',
+//         '########                   ##########      #    #########',
+//         ' ########                  ##      ##     ## ###########',
+//         '     #####                 ##      ##     ### #####',
+//         '       #####               ##     ########   #####',
+//         '      #######              ##########   #  ########',
+//         '     ###########           ##    ##    # ###########',
+//         '      #############        ##    #   #############',
+//         '            ################################',
+//         '              ############################',
+//         '              #######  ##########  #######',
+//         '                ###      ######      ###',
+//         '                          ####',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       corruption: false,
+//       array: [
+//         'Connecting to HQ...',
+//         '...',
+//         '...',
+//         'Failed to connect to HQ',
+//         'Rerouting...',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       waitTime: 700,
+//       corruption: false,
+//       array: [
+//         'Connected!',
+//         'Welcome to the Oracle, employee UNDEFINED.',
+//         'May you have a productive day!',
+//         '',
+//         'Establishing uplink to relays...',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       waitTime: 1200,
+//       corruption: false,
+//       array: [
+//         'Uplink established!',
+//         'Downloading modules...',
+//         'LAMM  - LANTERN Amplification Master Manipulator',
+//         'OSAT  - Organica System Administrator Toolset',
+//         'CHAT  - Communication Host-Agent Tracker',
+//         'CREDS - Computer Registered Evaluative Decision System',
+//         'PANIC - PANIC-Assisted Neglect Information Collector',
+//         'YOU   - YOU Object Unifier',
+//         'Booting O3S 5.0...',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       classes: ['logo'],
+//       corruption: true,
+//       array: [
+//         'THIS RELEASE OF O3S WAS BROUGHT TO YOU BY',
+//         '   ####',
+//         '###############',
+//         ' #####  #########                                           ####',
+//         '  ####     #######  ########     ###########    ####     ###########',
+//         '  ####    ######      #######   ####   #####  ########    ####   #####',
+//         '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
+//         '  #########        ####    ####     ####   #####     ##############',
+//         '  #### ######     ####     #####  ####     #######   ###  ########',
+//         '  ####   ######  ##### #### #### ############  #######    ####   ###',
+//         ' ######    #############    ################     ###      ####    #####',
+//         '########     ########        ####                        ######      #####   ##',
+//         '               ###########        ##                                    ###### ',
+//         '                    ###############',
+//         '                  Razor  #####  Demos - Warez - Honey',
+//         'ENJOY',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       corruption: false,
+//       array: [
+//         'Organica approved device detected!',
+//         'Rewriting firmware...',
+//         'Overriding lock...',
+//       ],
+//     },
+//   }, {
+//     func: boot.printLines,
+//     params: {
+//       corruption: false,
+//       array: [
+//         'Loading',
+//         '...',
+//         '...',
+//         '...',
+//         '...',
+//       ],
+//     },
+//   },
+// ]);
 
 if (!queryParameters.key && !queryParameters.mailEvent && !queryParameters.noBoot) {
   const firstBoot = storageManager.getLocalVal('firstBoot');
 
   if (typeof firstBoot === 'undefined' || firstBoot !== 'true') {
-    boot.appendTo(mainView);
+    // boot.appendTo(mainView);
     storageManager.setLocalVal('firstBoot', 'true');
   }
 }

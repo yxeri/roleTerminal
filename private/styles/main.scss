@@ -317,7 +317,7 @@ button:hover {
   background-color: $button-background;
   border-top: $border-size solid $button-border-color;
   border-bottom: $border-size solid $button-border-color;
-  padding: .3em .9em;
+  padding: .2em .9em;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -477,7 +477,7 @@ button:hover {
   top: -$border-size;
   right: 0;
   border-top: $corner-size solid $back-color;
-  border-left: $corner-size solid $post-alt-back-color;
+  border-left: $corner-size solid $button-background;
   width: 0;
 }
 
@@ -497,13 +497,24 @@ background-color: $red-warning;
     padding: .3em;
   }
 
+  .header {
+    border-top: $border-size solid $border-color;
+    font-size: .9em;
+    padding-top: .1em;
+    padding-bottom: .2em;
+  }
+
   .viewer {
     padding: .2em .4em .2em .4em;
 
     ul {
-      margin-top: 3em;
+      margin-top: 2.3em;
       overflow-y: auto;
-      height: calc(100vh - 12.2em);
+      height: calc(100vh - 11.4em);
+
+      li {
+        padding-bottom: .5em;
+      }
     }
   }
 
@@ -608,6 +619,8 @@ background-color: $red-warning;
  */
 
 .forum {
+  margin-bottom: 1em;
+
   .forumUser {
     margin-left: -.5em;
     padding-left: .5em;
@@ -622,12 +635,17 @@ background-color: $red-warning;
       max-width: calc(100% - 2.2em);
       position: relative;
       display: inline-block;
-      font-size: 1.3em;
-      padding-left: .5em;
-      padding-right: 1em;
-      color: $text-alt-color;
-      background-color: $post-alt-back-color;
-      border-top: $border-size solid $border-color;
+      font-size: 1.1em;
+      padding: .2em 1em .2em .5em;
+      color: $button-text-color;
+      background-color: $button-background;
+      border-top: $border-size solid $button-text-color;
+      border-bottom: $border-size solid $button-text-color;
+    }
+
+    .forumTitle:hover {
+      border-top: $border-size solid $button-second-border-color;
+      border-bottom: $border-size solid $button-second-border-color;
     }
 
     .threadStarter {
@@ -712,3 +730,55 @@ background-color: $red-warning;
     }
   }
 }
+
+.flash {
+  -webkit-animation-name: flash;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-duration: .5s;
+  -webkit-animation-iteration-count: 1;
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .5s;
+}
+
+@-webkit-keyframes flash {
+  0% {
+    color: inherit;
+    border-color: inherit;
+    text-shadow: none;
+  }
+
+  50% {
+    color: $button-text-color;
+    border-color: $button-text-color;
+    text-shadow: 1px 1px 3px $button-text-color;
+  }
+
+  100% {
+    color: inherit;
+    border-color: inherit;
+    text-shadow: none;
+  }
+}
+
+@keyframes flash {
+  0% {
+    color: inherit;
+    border-color: inherit;
+    text-shadow: none;
+  }
+
+  50% {
+    color: $button-text-color;
+    border-color: $button-text-color;
+    text-shadow: 1px 1px 3px $button-text-color;
+  }
+
+  100% {
+    color: inherit;
+    border-color: inherit;
+    text-shadow: none;
+  }
+}
+

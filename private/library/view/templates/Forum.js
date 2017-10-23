@@ -72,7 +72,7 @@ function createPostButton({ parentElement, text, isSubReply, threadId, parentPos
 
                 eventCentral.triggerEvent({
                   event: eventCentral.Events.FORUMPOSTS,
-                  params: { posts: [createdPost] },
+                  params: { posts: [createdPost], shouldScroll: true },
                 });
               });
             },
@@ -332,13 +332,14 @@ class Forum extends View {
     eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.FORUMPOSTS,
-      func: ({ posts }) => {
+      func: ({ posts, shouldScroll }) => {
         posts.forEach((post) => {
           const threadPostsContainer = document.getElementById(`posts-${post.threadId}`);
+          const parentPostElement = document.getElementById(post.parentPostId);
+          let postElement;
 
           if (post.parentPostId) {
-            const parentPostElement = document.getElementById(post.parentPostId);
-            const postElement = createSubPost({
+            postElement = createSubPost({
               post,
               parentElement: this.element,
               hasSubPosts: post.subPosts && post.subPosts.length > 0,
@@ -358,7 +359,7 @@ class Forum extends View {
             postElement.appendChild(createContainer);
             parentPostElement.appendChild(postElement);
           } else {
-            const postElement = createPost({
+            postElement = createPost({
               post,
               parentElement: this.element,
               hasSubPosts: post.subPosts && post.subPosts.length > 0,
@@ -372,6 +373,16 @@ class Forum extends View {
 
           document.getElementById(post.threadId).remove();
           forumContainer.insertBefore(threadContainer, forumContainer.children[1]);
+
+          if (shouldScroll) {
+            postElement.scrollIntoView(false);
+          }
+
+          postElement.firstElementChild.classList.add('flash');
+
+          setTimeout(() => {
+            postElement.firstElementChild.classList.remove('flash');
+          }, 700);
         });
       },
     });

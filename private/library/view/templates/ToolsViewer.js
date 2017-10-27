@@ -322,7 +322,7 @@ class ToolsViewer extends StandardView {
             placeholder: 'Alias',
             inputName: 'alias',
             isRequired: true,
-            maxLength: 10,
+            maxLength: 20,
           }],
           description: [
             'Alter Ego Creator 0.1.2 Razor Edition',
@@ -391,7 +391,7 @@ class ToolsViewer extends StandardView {
             placeholder: 'Alias',
             inputName: 'alias',
             isRequired: true,
-            maxLength: 10,
+            maxLength: 20,
           }],
           description: [
             'File Custom Creator 0.0.2 Razor Edition',

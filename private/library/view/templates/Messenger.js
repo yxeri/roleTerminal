@@ -157,6 +157,7 @@ class Messenger extends StandardView {
         });
       },
     });
+    this.followList.element.classList.add('roomList');
     this.roomsList = new List({
       title: 'rooms',
       shouldSort: true,
@@ -168,6 +169,7 @@ class Messenger extends StandardView {
         });
       },
     });
+    this.roomsList.element.classList.add('alignRight');
     this.userList = new List({
       title: 'users',
       shouldSort: true,
@@ -179,6 +181,7 @@ class Messenger extends StandardView {
         });
       },
     });
+    this.userList.element.classList.add('alignRight');
     this.lists = [
       this.systemList,
       this.followList,
@@ -448,7 +451,7 @@ class Messenger extends StandardView {
             placeholder: 'Name of the room',
             inputName: 'roomName',
             isRequired: true,
-            maxLength: 10,
+            maxLength: 20,
           }, {
             placeholder: 'Optional password',
             inputName: 'password',

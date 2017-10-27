@@ -86,17 +86,55 @@ class DirViewer extends StandardView {
     this.element.setAttribute('id', 'dirViewer');
     this.viewer.classList.add('selectedView');
     this.selectedItem = null;
-    this.systemList = new List({ shouldSort: false, title: 'SYSTEM' });
+    this.systemList = new List({
+      shouldSort: false,
+      title: 'system',
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.systemList !== list) {
+            list.hideList();
+          }
+        });
+      },
+    });
     this.aliasList = new List({ title: 'ALIASES', shouldSort: true, minimumToShow: 2 });
-    this.dirList = new List({ viewId: 'dirList', shouldSort: true, title: 'DIRECTORY' });
-    this.myFiles = new List({ viewId: 'myDir', shouldSort: true, title: 'My Files' });
+    this.dirList = new List({
+      viewId: 'dirList',
+      shouldSort: true,
+      title: 'dir',
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.dirList !== list) {
+            list.hideList();
+          }
+        });
+      },
+    });
+    this.myFiles = new List({
+      viewId: 'myDir',
+      shouldSort: true,
+      title: 'my_files',
+      titleCallback: () => {
+        this.lists.forEach((list) => {
+          if (this.myFiles !== list) {
+            list.hideList();
+          }
+        });
+      },
+    });
     this.myTeamFiles = new List({ viewId: 'myTeamDir', shouldSort: true, title: 'My Team' });
-    this.teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'TEAMS' });
-    this.userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'USERS' });
+    this.teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'teams' });
+    this.userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'users' });
     // User name : List
     this.userLists = {};
     // Team name : List
     this.teamLists = {};
+
+    this.lists = [
+      this.systemList,
+      this.dirList,
+      this.myFiles,
+    ];
 
     this.populateList();
   }
@@ -104,12 +142,18 @@ class DirViewer extends StandardView {
   showDoc(docFile) {
     const docFragment = document.createDocumentFragment();
     const system = elementCreator.createContainer({});
-    system.appendChild(elementCreator.createButton({
-      text: 'Edit doc',
+    const edit = elementCreator.createContainer({
+      classes: ['button'],
       func: () => {
         this.editDocFile(docFile);
       },
-    }));
+    });
+
+    edit.appendChild(elementCreator.createContainer({ classes: ['buttonLeftCorner'] }));
+    edit.appendChild(elementCreator.createContainer({ classes: ['buttonUpperRightCorner'] }));
+    edit.appendChild(elementCreator.createSpan({ text: 'edit doc' }));
+
+    system.appendChild(edit);
 
     if (docFile.creator === storageManager.getUserName()) {
       docFragment.appendChild(system);
@@ -148,6 +192,7 @@ class DirViewer extends StandardView {
       text: title,
       func: () => {
         const docFileId = button.getAttribute('data');
+        this.lists.forEach(list => list.hideList());
 
         if (docFileId || docFile.team === storageManager.getTeam() || (docFile.customCreator && storageManager.getCreatorAliases().indexOf(docFile.customCreator) > -1)) {
           socketManager.emitEvent('getDocFile', { docFileId, title: docFile.title }, ({ error: docFileError, data: docFileData }) => {
@@ -256,24 +301,15 @@ class DirViewer extends StandardView {
     this.viewer.innerHTML = '';
 
     const docFragment = document.createDocumentFragment();
-    const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true, maxLength: 100 });
-    const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true, maxLength: 20 });
+    const titleInput = elementCreator.createInput({ placeholder: 'Title', inputName: 'docTitle', isRequired: true, maxLength: 40 });
+    const idInput = elementCreator.createInput({ placeholder: 'Code to access the document with [a-z, 0-9]', inputName: 'docId', isRequired: true, maxLength: 10 });
     const bodyInput = elementCreator.createInput({ placeholder: 'Text', inputName: 'docBody', isRequired: true, multiLine: true, maxLength: 6000 });
-    const aliasInput = elementCreator.createInput({ placeholder: 'Set alias as creator', inputName: 'creatorAlias', inputId: 'creatorAlias', maxLength: 20 });
     const visibilitySet = elementCreator.createRadioSet({
       title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
       optionName: 'visibility',
       options: [
         { optionId: 'visPublic', optionLabel: 'Everyone' },
         { optionId: 'visPrivate', optionLabel: 'Only those with the correct code' },
-      ],
-    });
-    const teamSet = elementCreator.createRadioSet({
-      title: 'Should the document be added to your team directory? Your team will be able to see and access the document without any code.',
-      optionName: 'team',
-      options: [
-        { optionId: 'teamYes', optionLabel: 'Yes' },
-        { optionId: 'teamNo', optionLabel: 'No' },
       ],
     });
     const buttons = elementCreator.createContainer({ classes: ['buttons'] });
@@ -287,25 +323,14 @@ class DirViewer extends StandardView {
     docFragment.appendChild(titleInput);
     docFragment.appendChild(idInput);
 
-    if (storageManager.getCreatorAliases().length > 0 || storageManager.getAliases().length > 0) {
-      docFragment.appendChild(aliasInput);
-    }
-
     docFragment.appendChild(bodyInput);
     docFragment.appendChild(visibilitySet);
-
-    if (storageManager.getTeam()) {
-      docFragment.appendChild(teamSet);
-    }
 
     if (docFile) {
       titleInput.value = docFile.title;
       idInput.value = document.createTextNode(docFile.docFileId).textContent;
       idInput.setAttribute('disabled', 'true');
       idInput.classList.add('locked');
-      aliasInput.value = docFile.customCreator ? document.createTextNode(docFile.customCreator).textContent : document.createTextNode(docFile.creator).textContent;
-      aliasInput.setAttribute('disabled', 'true');
-      aliasInput.classList.add('locked');
 
       if (docFile.isPublic) {
         docFragment.getElementById('visPublic').setAttribute('checked', 'true');
@@ -313,21 +338,14 @@ class DirViewer extends StandardView {
         docFragment.getElementById('visPrivate').setAttribute('checked', 'true');
       }
 
-      if (storageManager.getTeam()) {
-        if (docFile.team) {
-          docFragment.getElementById('teamYes').setAttribute('checked', 'true');
-        } else {
-          docFragment.getElementById('teamNo').setAttribute('checked', 'true');
-        }
-      }
-
       bodyInput.innerHTML = '';
       bodyInput.value = document.createTextNode(docFile.text.join('\n')).textContent;
     }
 
-    buttons.appendChild(elementCreator.createButton({
-      text: 'Save',
+    const save = elementCreator.createContainer({
+      classes: ['button'],
       func: () => {
+        console.log('save');
         if (!markEmptyFields([titleInput, bodyInput, idInput])) {
           const docId = textTools.trimSpace(idInput.value);
           const docIdAllowed = textTools.isInternationalAllowed(docId);
@@ -340,25 +358,19 @@ class DirViewer extends StandardView {
             return;
           }
 
-          const teamYes = document.getElementById('teamYes');
           const newDocFile = {
             title: titleInput.value,
             docFileId: docId,
             text: bodyInput.value.split('\n'),
-            customCreator: aliasInput.value && aliasInput.value !== '' ? aliasInput.value : undefined,
+            customCreator: storageManager.getSelectedAlias(),
             isPublic: document.getElementById('visPublic').checked === true,
           };
           const updateExisting = typeof docFile !== 'undefined';
           const eventName = updateExisting ? 'updateDocFile' : 'createDocFile';
 
-          newDocFile.team = teamYes && teamYes.checked === true;
-
           socketManager.emitEvent(eventName, { docFile: newDocFile, userName: storageManager.getUserName() }, ({ error: docFileError }) => {
             if (docFileError) {
               if (docFileError.type === 'not allowed') {
-                aliasInput.setAttribute('placeholder', 'Incorrect name');
-                aliasInput.value = '';
-                aliasInput.classList.add('markedInput');
 
                 return;
               } else if (docFileError.type === 'invalid characters') {
@@ -399,7 +411,7 @@ class DirViewer extends StandardView {
             }
 
             this.viewer.innerHTML = '';
-            this.viewer.appendChild(document.createTextNode('Document has been saved'));
+            this.viewer.appendChild(document.createTextNode('doc uploaded'));
 
             if (updateExisting) {
               this.myFiles.removeItem({ name: docFile.docFileId });
@@ -409,7 +421,13 @@ class DirViewer extends StandardView {
           });
         }
       },
-    }));
+    });
+
+    save.appendChild(elementCreator.createContainer({ classes: ['buttonLeftCorner'] }));
+    save.appendChild(elementCreator.createContainer({ classes: ['buttonUpperRightCorner'] }));
+    save.appendChild(elementCreator.createSpan({ text: 'save' }));
+
+    buttons.appendChild(save);
     docFragment.appendChild(buttons);
 
     this.viewer.appendChild(docFragment);
@@ -421,6 +439,8 @@ class DirViewer extends StandardView {
     const searchButton = elementCreator.createButton({
       text: 'ID search',
       func: () => {
+        this.lists.forEach(list => list.hideList());
+
         const idDialog = new DialogBox({
           buttons: {
             left: {
@@ -464,7 +484,7 @@ class DirViewer extends StandardView {
             placeholder: 'Document ID',
             inputName: 'docFileId',
             isRequired: true,
-            maxLength: 20,
+            maxLength: 10,
           }],
           description: [
             'Retrieve a document from the archives',
@@ -478,6 +498,7 @@ class DirViewer extends StandardView {
       classes: ['hide'],
       text: 'Create doc',
       func: () => {
+        this.lists.forEach(list => list.hideList());
         this.editDocFile();
       },
     });
@@ -486,10 +507,11 @@ class DirViewer extends StandardView {
     this.dirList.addItems({ items: [this.teamFiles.element, this.userFiles.element] });
 
     this.itemList.appendChild(this.systemList.element);
-    this.itemList.appendChild(this.aliasList.element);
+    // this.itemList.appendChild(this.aliasList.element);
     this.itemList.appendChild(this.myFiles.element);
     this.itemList.appendChild(this.myTeamFiles.element);
     this.itemList.appendChild(this.dirList.element);
+    this.itemList.appendChild(elementCreator.createContainer({ classes: ['menuRightCorner'] }));
 
     this.accessElements.push({
       element: createButton,
@@ -709,7 +731,17 @@ class DirViewer extends StandardView {
     });
   }
 
+  appendTo(parentElement) {
+    const main = document.getElementById('main');
+    main.classList.add('multiMenu');
+
+    super.appendTo(parentElement);
+  }
+
   removeView() {
+    const main = document.getElementById('main');
+    main.classList.remove('multiMenu');
+
     super.removeView();
     this.viewer.classList.remove('flash');
   }

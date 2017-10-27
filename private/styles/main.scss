@@ -34,8 +34,9 @@ $button-text-color: #ffc200;
 $button-border-color: #b98b00;
 $button-second-border-color: #ffc200;
 $button-hover-color: #ffd865;
-$button-marked: #4b3e00;
+$button-marked: #5a4b00;
 $button-background: #291f00;
+$button-marked-background: #692304;
 $button-notify-background: #7d5e00;
 
 $red-warning: #5f1200;
@@ -63,9 +64,9 @@ h1, h2, h3, h4, h5 {
 }
 
 html, body {
-  overflow-x: hidden;
   height: 100%;
   width: 100%;
+  min-height: 100%;
   font-family: $font-family;
   font-size: $font-size;
   color: $text-color;
@@ -132,6 +133,11 @@ li {
   color: $button-border-color;
 }
 
+#main, #background {
+  width: 100%;
+  height: 100%;
+}
+
 #cover {
   background-color: rgba(0, 0, 0, .6);
   z-index: 5;
@@ -139,7 +145,7 @@ li {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100%;
+  height: 100vh;
 }
 
 #top {
@@ -147,12 +153,12 @@ li {
   background-color: $button-background;
   border-bottom: $border-size solid $button-border-color;
   margin-bottom: .5em;
-  min-height: 1.5em;
+  min-height: 1.6em;
   top: 0;
   z-index: 5;
   position: fixed;
   width: calc(100% - .8em);
-  max-width: calc(40em - .8em);
+  max-width: calc(45em - .8em);
   padding: .5em .3em .2em .3em;
 
   > div {
@@ -289,9 +295,12 @@ li {
 }
 
 .fullscreen {
-  margin-top: 2.6em;
-  max-width: calc(40em - .2em);
+  padding-top: 2.3em;
+  max-width: calc(45em - .4em);
+}
 
+.markedInput {
+  background-color: $button-marked-background;
 }
 
 button {
@@ -331,6 +340,7 @@ button:hover {
 }
 
 .dialogBox {
+  overflow-x: hidden;
   z-index: 6;
   position: absolute;
   max-width: 20em;
@@ -456,7 +466,7 @@ button:hover {
   position: absolute !important;
   margin-right: 0 !important;
   bottom: -$border-size;
-  right: 0;
+  right: -.3em;
   border-bottom: $corner-size solid $back-color;
   border-left: $corner-size solid $button-background;
   width: 0;
@@ -489,12 +499,47 @@ button:hover {
 background-color: $red-warning;
 }
 
-#messenger {
-  margin-top: 2.25em;
+input[type=radio] {
+  display: none;
+}
+
+input[type="radio"]:checked + span {
+  background-color: $button-marked;
+}
+
+legend {
+  margin-bottom: .5em;
+}
+
+label {
+  display: block;
+  margin-bottom: .5em;
+
+  span {
+    width: 1em;
+    height: 1em;
+    border: $border-size solid $button-border-color;
+    background-color: $button-background;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-right: .3em;
+  }
+}
+
+#dirViewer {
+  input {
+    width: 100%;
+    padding: 0 .3em;
+    margin-bottom: .5em;
+  }
 
   textarea {
     width: 100%;
     padding: .3em;
+  }
+
+  .buttons {
+    padding-left: .3em;
   }
 
   .header {
@@ -505,41 +550,20 @@ background-color: $red-warning;
   }
 
   .viewer {
-    padding: .2em .4em .2em .4em;
+    padding: 2.5em .4em .2em 0;
 
-    ul {
-      margin-top: 2.3em;
-      overflow-y: auto;
-      height: calc(100vh - 11.4em);
-
-      li {
-        padding-bottom: .5em;
-      }
-    }
-  }
-
-  .inputArea {
-    position: relative;
-    width: 100%;
-    max-width: calc(40em - 1em);
-    background-color: $back-color;
-    padding-bottom: .3em;
-
-    textarea {
-      max-height: 3.6em;
-    }
-
-    .buttons {
-      float: right;
+    p {
+      padding: 0 .3em;
     }
   }
 
   .list {
+    z-index: 4;
     border-bottom: $border-size solid $button-border-color;
     background-color: $button-background;
     height: 1.5em;
     width: calc(100% - 1em);
-    max-width: calc(40em - 1em);
+    max-width: calc(45em - 1em);
     padding: .5em .4em .2em .4em;
     position: fixed;
 
@@ -572,8 +596,11 @@ background-color: $red-warning;
     float: left;
     position: relative;
 
+    button {
+      text-align: left;
+    }
+
     ul {
-      width: 6em;
       margin-top: .5em;
       position: absolute;
       padding: .5em .5em .5em .45em;
@@ -583,6 +610,9 @@ background-color: $red-warning;
       border-right: $border-size solid $button-border-color;
 
       li {
+        width: 100%;
+        float: right;
+        display: inline-block;
         margin-bottom: .2em;
         padding-bottom: .2em;
         border-bottom: $border-size solid $button-border-color;
@@ -605,7 +635,143 @@ background-color: $red-warning;
   }
 }
 
+#messenger {
+  textarea {
+    width: 100%;
+    padding: .3em;
+  }
+
+  .header {
+    border-top: $border-size solid $border-color;
+    font-size: .9em;
+    padding-top: .1em;
+    padding-bottom: .2em;
+  }
+
+  .viewer {
+    padding: 2.5em .4em .2em 0;
+
+    li {
+      padding-bottom: .5em;
+    }
+  }
+
+  .inputArea {
+    position: relative;
+    width: 100%;
+    max-width: calc(45em - 1em);
+    background-color: $back-color;
+    padding-bottom: .3em;
+
+    textarea {
+      max-height: 3.6em;
+    }
+
+    .buttons {
+      float: right;
+    }
+  }
+
+  .list {
+    z-index: 4;
+    border-bottom: $border-size solid $button-border-color;
+    background-color: $button-background;
+    height: 1.5em;
+    width: calc(100% - 1em);
+    max-width: calc(45em - 1em);
+    padding: .5em .4em .2em .4em;
+    position: fixed;
+
+    .button {
+      color: $button-text-color;
+      position: relative;
+      display: inline-block;
+      background-color: $button-background;
+      padding: 0 .3em 0 0;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      margin-right: .3em;
+      border-top: 0;
+      border-bottom: 0;
+      border-left: 0;
+      border-right: $border-size solid $button-border-color;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .buttonLeftCorner, .buttonUpperRightCorner {
+      border: 0;
+    }
+  }
+
+  .menuList {
+    float: left;
+    position: relative;
+
+    button {
+      text-align: left;
+    }
+
+    ul {
+      margin-top: .5em;
+      position: absolute;
+      padding: .5em .5em .5em .45em;
+      background-color: $button-background;
+      border-left: $border-size solid $button-border-color;
+      border-bottom: $border-size solid $button-border-color;
+      border-right: $border-size solid $button-border-color;
+
+      li {
+        width: 100%;
+        float: right;
+        display: inline-block;
+        margin-bottom: .2em;
+        padding-bottom: .2em;
+        border-bottom: $border-size solid $button-border-color;
+      }
+
+      li:last-child{
+        border-bottom: 0;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      li:hover {
+        color: $button-hover-color;
+      }
+    }
+  }
+
+  .menuList:last-child {
+    margin-right: 0;
+  }
+}
+
+.alignRight {
+  button {
+    text-align: right !important;
+    float: right;
+  }
+
+  ul {
+    right: 0;
+  }
+}
+
+.roomList {
+  ul {
+    min-width: 11em;
+  }
+}
+
 .multiMenu {
+  .menuRightCorner {
+    right: 0;
+  }
+
   > div:first-child {
     .menuRightCorner {
       border: 0;
@@ -641,6 +807,7 @@ background-color: $red-warning;
       background-color: $button-background;
       border-top: $border-size solid $button-text-color;
       border-bottom: $border-size solid $button-text-color;
+      cursor: pointer;
     }
 
     .forumTitle:hover {

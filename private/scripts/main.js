@@ -19,7 +19,6 @@ require('../library/polyfills');
 const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const DirViewer = require('../library/view/templates/DirViewer');
 // const Home = require('../library/view/templates/Home');
 // const SoundElement = require('../library/audio/SoundElement');
 const TextAnimation = require('../library/view/templates/TextAnimation');
@@ -30,6 +29,7 @@ const TeamViewer = require('../library/view/templates/TeamViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
 const DialogBox = require('../library/view/DialogBox');
 const Forum = require('../library/view/templates/Forum');
+const DirViewer = require('../library/view/templates/DirViewer');
 
 const keyHandler = require('../library/KeyHandler');
 const socketManager = require('../library/SocketManager');
@@ -91,6 +91,7 @@ const onlineStatus = new OnlineStatus(top);
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const forum = new Forum({});
 const walletViewer = new Wallet({ suffix: '¥' });
+const dirViewer = new DirViewer({ isFullscreen: true });
 
 let currentView = forum;
 forum.appendTo(mainView);
@@ -274,6 +275,21 @@ const msgTop = elementCreator.createContainer({
   },
 });
 
+const dirTop = elementCreator.createContainer({
+  elementId: 'dirTop',
+  func: () => {
+    if (currentView !== dirViewer) {
+      if (logIn.childElementCount > 1) {
+        logIn.removeChild(logIn.lastElementChild);
+      }
+
+      currentView.removeView();
+      currentView = dirViewer;
+      dirViewer.appendTo(mainView);
+    }
+  },
+});
+
 const walletTop = elementCreator.createContainer({
   elementId: 'walletTop',
   func: () => {
@@ -303,6 +319,9 @@ walletTop.appendChild(elementCreator.createSpan({
 msgTop.appendChild(elementCreator.createSpan({
   text: 'msg',
 }));
+dirTop.appendChild(elementCreator.createSpan({
+  text: 'dir',
+}));
 
 bbsTop.appendChild(elementCreator.createSpan({ text: 'bbs' }));
 
@@ -310,6 +329,7 @@ top.appendChild(elementCreator.createContainer({ classes: ['menuRightCorner'] })
 top.appendChild(logIn);
 top.appendChild(bbsTop);
 top.appendChild(msgTop);
+top.appendChild(dirTop);
 top.appendChild(walletTop);
 
 eventCentral.addWatcher({

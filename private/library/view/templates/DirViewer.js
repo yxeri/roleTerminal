@@ -124,9 +124,6 @@ class DirViewer extends StandardView {
     });
     this.myTeamFiles = new List({ viewId: 'myTeamDir', shouldSort: true, title: 'My Team' });
     this.teamFiles = new List({ viewId: 'teamDir', shouldSort: true, title: 'teams' });
-    this.userFiles = new List({ viewId: 'userDir', shouldSort: true, title: 'users' });
-    // User name : List
-    this.userLists = {};
     // Team name : List
     this.teamLists = {};
 
@@ -257,7 +254,7 @@ class DirViewer extends StandardView {
                       item.firstElementChild.setAttribute('data', sentId);
                       item.firstElementChild.classList.remove('locked');
                     } else {
-                      const item = this.userLists[creator].getItem({ name: sentTitle });
+                      const item = this.dirList[creator].getItem({ name: sentTitle });
 
                       item.firstElementChild.setAttribute('data', sentId);
                       item.firstElementChild.classList.remove('locked');
@@ -504,7 +501,6 @@ class DirViewer extends StandardView {
     });
 
     this.systemList.addItems({ items: [searchButton, createButton] });
-    this.dirList.addItems({ items: [this.teamFiles.element, this.userFiles.element] });
 
     this.itemList.appendChild(this.systemList.element);
     // this.itemList.appendChild(this.aliasList.element);
@@ -531,7 +527,7 @@ class DirViewer extends StandardView {
           const userTeam = storageManager.getTeam();
 
           if (!oldTeam && docFile.team) {
-            const list = this.userLists[creator];
+            const list = this.dirList[creator];
 
             if (list) {
               previous = list.getItem({ name: oldTitle });
@@ -579,17 +575,17 @@ class DirViewer extends StandardView {
             }
           }
         } else {
-          const list = this.userLists[creator];
+          const list = this.dirList[creator];
 
           if (!list) {
-            this.userLists[creator] = new List({
+            this.dirList[creator] = new List({
               title: creator,
               shouldSort: true,
               showTitle: true,
               minimumToShow: 0,
             });
-            this.userLists[creator].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
-            this.userFiles.addItem({ item: this.userLists[creator].element });
+            this.dirList[creator].addItem({ item: this.createDocFileButton(docFile), shouldReplace: updating, oldTitle });
+            this.dirList.addItem({ item: this.dirList[creator].element });
           } else {
             previous = previous || oldTitle ? list.getItem({ name: oldTitle }) : undefined;
 
@@ -694,7 +690,7 @@ class DirViewer extends StandardView {
 
           this.myFiles.replaceAllItems({ items: myDocFiles.map(docFile => this.createDocFileButton(docFile)) });
           this.myTeamFiles.replaceAllItems({ items: myTeamDocFiles.map(docFile => this.createDocFileButton(docFile)) });
-          this.userFiles.replaceAllItems({
+          this.dirList.replaceAllItems({
             items: Object.keys(groupedUserDocs).map((userName) => {
               const docs = groupedUserDocs[userName];
               const list = new List({
@@ -705,7 +701,7 @@ class DirViewer extends StandardView {
                 minimumToShow: 0,
               });
 
-              this.userLists[userName] = list;
+              this.dirList[userName] = list;
 
               return list.element;
             }),

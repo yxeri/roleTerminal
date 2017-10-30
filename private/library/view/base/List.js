@@ -50,11 +50,12 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, titleCallback = () => {} }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, titleCallback = () => {}, alwaysShow = false }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.shouldSort = shouldSort;
+    this.alwaysShow = alwaysShow;
     this.showingList = showingList;
     this.minimumToShow = minimumToShow;
     this.toggleElement = elementCreator.createContainer({});
@@ -64,14 +65,6 @@ class List extends View {
     }
 
     if (title) {
-      const titleElement = document.createElement('P');
-      titleElement.classList.add('listTitle');
-      titleElement.classList.add('clickable');
-
-      titleElement.addEventListener('click', () => {
-
-      });
-
       if (!this.showingList) {
         this.toggleElement.classList.add('collapsedIcon');
       } else {
@@ -96,7 +89,7 @@ class List extends View {
 
     const list = elementCreator.createList({ elements: items });
 
-    if (!this.showingList) {
+    if (!this.showingList && !this.alwaysShow) {
       list.classList.add('hide');
     }
 
@@ -154,7 +147,7 @@ class List extends View {
   replaceAllItems({ items }) {
     const list = this.shouldSort ? createSortedList(elementCreator.createList({ elements: items })) : elementCreator.createList({ elements: items });
 
-    if (!this.showingList) {
+    if (!this.showingList && !this.alwaysShow) {
       list.classList.add('hide');
     }
 
@@ -174,11 +167,14 @@ class List extends View {
 
   hideList() {
     this.showingList = false;
-    this.element.lastElementChild.classList.add('hide');
+
+    if (!this.alwaysShow) {
+      this.element.lastElementChild.classList.add('hide');
+    }
   }
 
   toggleList(show) {
-    if (!this.showingList || show) {
+    if (!this.showingList || show || this.alwaysShow) {
       this.toggleElement.classList.remove('collapsedIcon');
       this.toggleElement.classList.add('expandedIcon');
       this.element.lastElementChild.classList.remove('hide');

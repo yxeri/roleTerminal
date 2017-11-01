@@ -434,20 +434,20 @@ class DirViewer extends StandardView {
 
   populateList() {
     const searchButton = elementCreator.createButton({
-      text: 'ID search',
+      text: 'id_search',
       func: () => {
         this.lists.forEach(list => list.hideList());
 
         const idDialog = new DialogBox({
           buttons: {
             left: {
-              text: 'Cancel',
+              text: 'cancel',
               eventFunc: () => {
                 idDialog.removeView();
               },
             },
             right: {
-              text: 'Search',
+              text: 'search',
               eventFunc: () => {
                 const emptyFields = idDialog.markEmptyFields();
 

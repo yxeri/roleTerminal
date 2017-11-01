@@ -333,6 +333,17 @@ top.appendChild(dirTop);
 top.appendChild(walletTop);
 
 eventCentral.addWatcher({
+  event: eventCentral.Events.SERVERMODE,
+  func: ({ showDevInfo, mode }) => {
+    if (showDevInfo || mode === 'dev') {
+      const devSpan = elementCreator.createSpan({ text: '!TEST SERVER!', classes: ['devInfo'] });
+      top.appendChild(devSpan);
+      top.classList.add('devInfo');
+    }
+  },
+});
+
+eventCentral.addWatcher({
   watcherParent: this,
   event: eventCentral.Events.USER,
   func: () => {

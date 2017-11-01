@@ -637,6 +637,9 @@ label {
         padding-bottom: .2em;
         border-bottom: $border-size solid $button-border-color;
 
+        button {
+          text-align: left;
+        }
       }
 
       li:last-child{
@@ -656,10 +659,14 @@ label {
   }
 }
 
-#dirList {
+#dirList, #myDir {
   ul {
     min-width: 11em;
   }
+}
+
+.devInfo {
+  background-color: #a50000;
 }
 
 #messenger {

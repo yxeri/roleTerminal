@@ -311,6 +311,17 @@ class Forum extends View {
     this.forumId = 0;
 
     eventCentral.addWatcher({
+      event: eventCentral.Events.SERVERMODE,
+      func: ({ showDevInfo, mode }) => {
+        if (showDevInfo || mode === 'dev') {
+          const devSpan = elementCreator.createSpan({ text: 'TEST SERVER! THIS WILL NOT BE USED IN-GAME. You can experiment as much as you want. Data may be deleted. Save a copy of everything you want to keep.', classes: ['devInfo'] });
+          top.appendChild(devSpan);
+          top.classList.add('devInfo');
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
       watcherParent: this,
       event: eventCentral.Events.FORUMTHREADS,
       func: ({ threads }) => {

@@ -314,9 +314,11 @@ class Forum extends View {
       event: eventCentral.Events.SERVERMODE,
       func: ({ showDevInfo, mode }) => {
         if (showDevInfo || mode === 'dev') {
-          const devSpan = elementCreator.createSpan({ text: 'TEST SERVER! THIS WILL NOT BE USED IN-GAME. You can experiment as much as you want. Data may be deleted. Save a copy of everything you want to keep.', classes: ['devInfo'] });
-          top.appendChild(devSpan);
-          top.classList.add('devInfo');
+          const devSpan = elementCreator.createSpan({
+            text: 'TEST SERVER! THIS WILL NOT BE USED IN-GAME. You can experiment as much as you want. Data may be deleted. Save a copy of everything you want to keep.',
+            classes: ['devInfo'],
+          });
+          this.element.appendChild(devSpan);
         }
       },
     });

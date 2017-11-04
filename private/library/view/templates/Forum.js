@@ -309,6 +309,8 @@ class Forum extends View {
     super({ isFullscreen: true });
 
     this.forumId = 0;
+    this.devSpan = elementCreator.createSpan({ text: '' });
+    this.element.appendChild(this.devSpan);
 
     eventCentral.addWatcher({
       event: eventCentral.Events.SERVERMODE,
@@ -318,7 +320,9 @@ class Forum extends View {
             text: 'TEST SERVER! THIS WILL NOT BE USED IN-GAME. You can experiment as much as you want. Data may be deleted. Save a copy of everything you want to keep.',
             classes: ['devInfo'],
           });
-          this.element.appendChild(devSpan);
+
+          this.devSpan = '';
+          this.devSpan.appendChild(devSpan);
         }
       },
     });

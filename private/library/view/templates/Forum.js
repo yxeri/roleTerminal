@@ -309,8 +309,6 @@ class Forum extends View {
     super({ isFullscreen: true });
 
     this.forumId = 0;
-    this.devSpan = elementCreator.createSpan({ text: '' });
-    this.element.appendChild(this.devSpan);
 
     eventCentral.addWatcher({
       event: eventCentral.Events.SERVERMODE,
@@ -321,8 +319,7 @@ class Forum extends View {
             classes: ['devInfo'],
           });
 
-          this.devSpan.innerHTML = '';
-          this.devSpan.appendChild(devSpan);
+          this.element.appendChild(devSpan);
         }
       },
     });

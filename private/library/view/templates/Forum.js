@@ -321,7 +321,7 @@ class Forum extends View {
             classes: ['devInfo'],
           });
 
-          this.devSpan = '';
+          this.devSpan.innerHTML = '';
           this.devSpan.appendChild(devSpan);
         }
       },

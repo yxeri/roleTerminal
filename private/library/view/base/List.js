@@ -88,6 +88,10 @@ class List extends View {
     }
 
     const list = elementCreator.createList({ elements: items });
+    list.addEventListener('scroll', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
 
     if (!this.showingList && !this.alwaysShow) {
       list.classList.add('hide');
@@ -110,6 +114,10 @@ class List extends View {
     if (this.shouldSort) {
       const list = createSortedList(this.element.lastElementChild, elementCreator.createListItem({ element: item }));
       list.classList.add('userList');
+      list.addEventListener('scroll', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
 
       this.element.replaceChild(list, this.element.lastElementChild);
     } else {
@@ -152,6 +160,10 @@ class List extends View {
     }
 
     list.classList.add('userList');
+    list.addEventListener('scroll', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
 
     this.element.replaceChild(list, this.element.lastElementChild);
     this.toggleView();

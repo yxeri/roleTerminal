@@ -504,9 +504,9 @@ class DirViewer extends StandardView {
 
     this.itemList.appendChild(this.systemList.element);
     // this.itemList.appendChild(this.aliasList.element);
-    this.itemList.appendChild(this.myFiles.element);
     this.itemList.appendChild(this.myTeamFiles.element);
     this.itemList.appendChild(this.dirList.element);
+    this.itemList.appendChild(this.myFiles.element);
     this.itemList.appendChild(elementCreator.createContainer({ classes: ['menuRightCorner'] }));
 
     this.accessElements.push({

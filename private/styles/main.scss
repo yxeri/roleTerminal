@@ -74,6 +74,7 @@ html, body {
   -webkit-text-size-adjust: 100%;
   background-color: $back-color;
   -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 input {
@@ -250,6 +251,7 @@ li {
   }
 
   .viewer {
+    padding-top: 0 !important;
     margin-top: .4em;
 
     li {
@@ -300,8 +302,11 @@ li {
 }
 
 .fullscreen {
-  padding-top: 2.3em;
+  padding-top: 2.5em;
   max-width: calc(45em - .4em);
+  padding-right: 1.2em;
+  word-wrap: break-word;
+  height: 100%;
 }
 
 .markedInput {
@@ -555,7 +560,7 @@ label {
   }
 
   .viewer {
-    padding: 2.5em .4em .2em 0;
+    padding-top: 5em !important;
 
     p {
       padding: 0 .3em;
@@ -662,11 +667,16 @@ label {
 #dirList, #myDir {
   ul {
     min-width: 11em;
+    max-width: 11em;
   }
 }
 
 .devInfo {
   background-color: #a50000;
+}
+
+.viewer {
+  padding: 2.5em .4em .2em .4em;
 }
 
 #messenger {
@@ -683,7 +693,14 @@ label {
   }
 
   .viewer {
-    padding: 2.5em .4em .2em 0;
+    padding-top: 0 !important;
+    height: calc(100% - 1.5em);
+
+    ul {
+      height: calc(100% - 10em);
+      padding-top: 5em;
+      overflow-y: auto;
+    }
 
     li {
       padding-bottom: .5em;
@@ -693,6 +710,7 @@ label {
   .inputArea {
     position: relative;
     width: 100%;
+    height: 5em;
     max-width: calc(45em - 1em);
     background-color: $back-color;
     padding-bottom: .3em;
@@ -715,6 +733,7 @@ label {
     max-width: calc(45em - 1em);
     padding: .5em .4em .2em .4em;
     position: fixed;
+    top: 2.4em;
 
     .button {
       color: $button-text-color;
@@ -802,6 +821,14 @@ label {
 }
 
 .multiMenu {
+  .fullscreen {
+    padding-top: 0 !important;
+
+    .list:first-child {
+      top: 2.4em;
+    }
+  }
+
   .menuRightCorner {
     right: 0;
   }
@@ -941,6 +968,16 @@ label {
   animation-timing-function: ease-in-out;
   animation-iteration-count: 1;
   animation-duration: .5s;
+}
+
+.userList {
+  max-height: 20em;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.userList::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 @-webkit-keyframes flash {

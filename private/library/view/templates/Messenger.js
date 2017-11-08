@@ -264,14 +264,16 @@ class Messenger extends StandardView {
 
     this.viewer.addEventListener('click', () => {
       this.optionsDiv.classList.add('hide');
+      this.lists.forEach(list => list.hideList());
     });
 
     this.inputArea.addEventListener('click', () => {
       this.optionsDiv.classList.add('hide');
+      this.lists.forEach(list => list.hideList());
     });
 
     this.inputField.addEventListener('focus', () => {
-      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID && viewTools.hasWindowHeightChanged()) {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
         if (viewTools.isLandscape()) {
           this.element.classList.add('androidLandscapeKeyboardFix');
         } else {

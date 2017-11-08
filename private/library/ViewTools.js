@@ -14,6 +14,9 @@
  limitations under the License.
  */
 
+const endElement = document.getElementById('end');
+let endOffset = endElement.getBoundingClientRect().top;
+
 class ViewTools {
   /**
    * Is the element inside the view or close to the end of the view?
@@ -43,6 +46,8 @@ class ViewTools {
     } else if (element.mozRequestFullScreen) {
       element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
     }
+
+    endOffset = endElement.getBoundingClientRect().top;
   }
 
   /**
@@ -52,6 +57,13 @@ class ViewTools {
    */
   static isLandscape() {
     return window.innerWidth > window.innerHeight;
+  }
+
+  static hasWindowHeightChanged() {
+    const top = document.getElementById('top');
+    top.appendChild(document.createTextNode(`${endOffset}:${endElement.getBoundingClientRect().top}.`));
+
+    return endOffset !== endElement.getBoundingClientRect().top;
   }
 }
 

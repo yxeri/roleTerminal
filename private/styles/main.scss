@@ -679,6 +679,15 @@ label {
   padding: 2.5em .4em .2em .4em;
 }
 
+#end {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 #messenger {
   textarea {
     width: 100%;
@@ -803,6 +812,10 @@ label {
   }
 }
 
+.androidPortraitKeyboardFix {
+  height: calc(100% - 15em) !important;
+}
+
 .alignRight {
   button {
     text-align: right !important;
@@ -825,7 +838,7 @@ label {
     padding-top: 0 !important;
 
     .list:first-child {
-      top: 2.2em;
+      top: 2.4em;
     }
   }
 

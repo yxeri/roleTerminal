@@ -271,7 +271,7 @@ class Messenger extends StandardView {
     });
 
     this.inputField.addEventListener('focus', () => {
-      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
+      if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID && viewTools.hasWindowHeightChanged()) {
         if (viewTools.isLandscape()) {
           this.element.classList.add('androidLandscapeKeyboardFix');
         } else {
@@ -285,7 +285,6 @@ class Messenger extends StandardView {
     this.viewer.firstElementChild.addEventListener('click', () => {
       if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
         this.element.classList.remove('androidLandscapeKeyboardFix', 'androidPortraitKeyboardFix');
-        this.inputField.value = 'android';
         this.messageList.scroll();
       }
     });

@@ -236,6 +236,10 @@ class Messenger extends StandardView {
     const buttons = document.createElement('DIV');
     buttons.classList.add('buttons');
 
+    sendButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
     buttons.appendChild(imageButton);
     buttons.appendChild(sendButton);
 
@@ -245,6 +249,7 @@ class Messenger extends StandardView {
     this.inputArea.appendChild(this.imagePreview);
     this.inputArea.appendChild(this.inputField);
     this.inputArea.appendChild(buttons);
+    this.inputArea.appendChild(elementCreator.createContainer({ classes: ['inputBuffer'] }));
     this.accessElements.push({
       element: this.inputArea,
       accessLevel: 1,
@@ -270,6 +275,11 @@ class Messenger extends StandardView {
     this.inputArea.addEventListener('click', () => {
       this.optionsDiv.classList.add('hide');
       this.lists.forEach(list => list.hideList());
+      this.element.classList.remove('androidLandscapeKeyboardFix', 'androidPortraitKeyboardFix');
+    });
+
+    this.inputField.addEventListener('click', (event) => {
+      event.stopPropagation();
     });
 
     this.inputField.addEventListener('focus', () => {

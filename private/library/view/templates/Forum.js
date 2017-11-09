@@ -275,8 +275,9 @@ function createForum({ forumKey, parentElement }) {
           },
         },
         description: [
-          'Create a new topic',
-          `Handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
+          'create a new topic',
+          'your activity will be monitored by the mods',
+          `current handle: ${storageManager.getSelectedAlias() || storageManager.getUserName()}`,
         ],
         extraDescription: [],
         inputs: [{
@@ -317,8 +318,7 @@ class Forum extends View {
     textContainer.appendChild(elementCreator.createParagraph({ text: '536861646f776c616e6473' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: '53656174746c652061726561' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: 'sh_v-3.1.17' }));
-    textContainer.appendChild(elementCreator.createParagraph({ text: 'uptime: 2 days' }));
-    textContainer.appendChild(elementCreator.createParagraph({ text: 'data sync: in progress' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'uptime: 2 days. data sync: in progress' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: '[READ ONLY] log in for full access' }));
 
     this.element.appendChild(textContainer);

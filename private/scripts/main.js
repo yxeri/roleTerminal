@@ -238,8 +238,12 @@ const logIn = elementCreator.createContainer({
     const loginBox = new LoginBox({
       socketManager,
       keyHandler,
-      description: ['Welcome to the Shadowland'],
-      extraDescription: ['Input your main handle and password'],
+      description: [
+        'running sh_v-3.1.17',
+        'current user: anon_user',
+        'auth required',
+      ],
+      extraDescription: ['input your main handle and password'],
       parentElement: mainView,
     });
 

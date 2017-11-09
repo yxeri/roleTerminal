@@ -74,6 +74,19 @@ class Wallet extends StandardView {
     super({ isFullscreen: true, viewId: 'wallet' });
 
     this.viewer.appendChild(elementCreator.createParagraph({ text: '' }));
+
+    this.textContainer = elementCreator.createContainer({ classes: ['walletIntro'] });
+    this.textContainer.appendChild(elementCreator.createContainer({ classes: ['leftCorner'] }));
+    this.textContainer.appendChild(elementCreator.createContainer({ classes: ['rightCorner'] }));
+    this.textContainer.appendChild(elementCreator.createContainer({ classes: ['upperRightCorner'] }));
+
+    const userTextContainer = elementCreator.createContainer({});
+    userTextContainer.appendChild(elementCreator.createParagraph({ text: '[ACCESS DENIED]' }));
+    userTextContainer.appendChild(elementCreator.createParagraph({ text: 'log in for wallet access' }));
+
+    this.textContainer.appendChild(userTextContainer);
+    this.itemList.appendChild(this.textContainer);
+
     this.viewer.appendChild(elementCreator.createList({}));
     this.viewer.classList.add('selectedView');
     this.walletAmount = 0;
@@ -272,12 +285,25 @@ class Wallet extends StandardView {
       watcherParent: this,
       event: eventCentral.Events.USER,
       func: () => {
+        const text = this.textContainer;
+        const textFragment = document.createDocumentFragment();
+
         if (storageManager.getToken()) {
+          textFragment.appendChild(elementCreator.createParagraph({ text: '[FULL ACCESS]' }));
+          textFragment.appendChild(elementCreator.createParagraph({ text: 'connection bouncer is active' }));
+          textFragment.appendChild(elementCreator.createParagraph({ text: 'transactions are nonreversible' }));
+
           this.getTransactions({ teamList });
         } else {
+          textFragment.appendChild(elementCreator.createParagraph({ text: '[ACCESS DENIED]' }));
+          textFragment.appendChild(elementCreator.createParagraph({ text: 'log in for wallet access' }));
+
           this.resetWallets();
           this.viewer.lastElementChild.innerHTML = '';
         }
+
+        text.lastElementChild.innerHTML = '';
+        text.lastElementChild.appendChild(textFragment);
       },
     });
 

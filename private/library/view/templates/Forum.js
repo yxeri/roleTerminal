@@ -310,6 +310,30 @@ class Forum extends View {
 
     this.forumId = 0;
 
+    const textContainer = elementCreator.createContainer({ classes: ['forumIntro'] });
+    textContainer.appendChild(elementCreator.createParagraph({ text: '536861646f776c616e6473' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: '53656174746c652061726561' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'uptime: 1725 days' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'stay on topic or get booted' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: '[READ ONLY] log in for full access' }));
+
+    this.element.appendChild(textContainer);
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.USER,
+      func: () => {
+        const text = this.element.firstElementChild;
+
+        if (storageManager.getToken()) {
+          const newLine = elementCreator.createParagraph({ text: '[FULL ACCESS] welcome to the shadowlands' });
+          text.replaceChild(newLine, text.lastElementChild);
+        } else {
+          const newLine = elementCreator.createParagraph({ text: '[READ ONLY] log in for full access' });
+          text.replaceChild(newLine, text.lastElementChild);
+        }
+      },
+    });
+
     eventCentral.addWatcher({
       event: eventCentral.Events.SERVERMODE,
       func: ({ showDevInfo, mode }) => {

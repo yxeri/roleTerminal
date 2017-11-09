@@ -311,9 +311,13 @@ class Forum extends View {
     this.forumId = 0;
 
     const textContainer = elementCreator.createContainer({ classes: ['forumIntro'] });
+    textContainer.appendChild(elementCreator.createParagraph({ text: '---' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: '536861646f776c616e6473' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: '53656174746c652061726561' }));
-    textContainer.appendChild(elementCreator.createParagraph({ text: 'uptime: 1725 days' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'sh_v-3.1.17' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'uptime: 2 days' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: 'data sync: in progress' }));
+    textContainer.appendChild(elementCreator.createParagraph({ text: '---' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: 'stay on topic or get booted' }));
     textContainer.appendChild(elementCreator.createParagraph({ text: '[READ ONLY] log in for full access' }));
 

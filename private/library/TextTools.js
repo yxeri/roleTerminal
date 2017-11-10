@@ -73,9 +73,13 @@ class TextTools {
     const newDate = new Date(date);
     const timeStamp = {};
     const yearModification = storageManager.getYearModification();
+    const dayModification = storageManager.getDayModification();
 
     if (offset) { newDate.setHours(newDate.getHours() + offset); }
-    if (!lockDate && !isNaN(yearModification)) { newDate.setFullYear(newDate.getFullYear() + parseInt(yearModification, 10)); }
+    if (!lockDate) {
+      if (yearModification && !isNaN(yearModification)) { newDate.setFullYear(newDate.getFullYear() + parseInt(yearModification, 10)); }
+      if (dayModification && !isNaN(dayModification)) { newDate.setDate(newDate.getDate() + parseInt(dayModification, 10)); }
+    }
 
     timeStamp.mins = this.beautifyNumber(newDate.getMinutes());
     timeStamp.hours = this.beautifyNumber(newDate.getHours());

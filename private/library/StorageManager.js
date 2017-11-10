@@ -239,6 +239,15 @@ class StorageManager {
 
   static getYearModification() { return converters.convertToInt(this.getLocalVal('yearModification')); }
 
+  /**
+   * Set day modification
+   * @static
+   * @param {number} dayModification - Amount of days that will be increased/decreased to current day
+   */
+  static setDayModification(dayModification) { this.setLocalVal('dayModification', dayModification); }
+
+  static getDayModification() { return converters.convertToInt(this.getLocalVal('dayModification')); }
+
   static setRoom(roomName) {
     this.setLocalVal('room', roomName);
     eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { roomName } });

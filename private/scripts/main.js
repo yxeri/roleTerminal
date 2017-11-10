@@ -1111,8 +1111,9 @@ socketManager.addEvents([
   }, {
     event: 'startup',
     func: ({ data }) => {
-      const { yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode, showDevInfo, requiresVerification } = data;
+      const { dayModification, yearModification, centerLat, centerLong, cornerOneLat, cornerOneLong, cornerTwoLat, cornerTwoLong, defaultZoomLevel, mode, showDevInfo, requiresVerification } = data;
       storageManager.setYearModification(yearModification);
+      storageManager.setDayModification(dayModification);
       storageManager.setCenterCoordinates(centerLong, centerLat);
       storageManager.setCornerOneCoordinates(cornerOneLong, cornerOneLat);
       storageManager.setCornerTwoCoordinates(cornerTwoLong, cornerTwoLat);

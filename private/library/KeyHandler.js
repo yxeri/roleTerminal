@@ -64,8 +64,8 @@ class KeyHandler {
       }
 
       if (sentKeyCode === this.triggerKey) {
-        this.triggerKeyPressed = true;
-        event.preventDefault();
+        // this.triggerKeyPressed = true;
+        // event.preventDefault();
       } else if (!this.keyPressed) {
         const storedKey = this.keys.find(({ keyCode }) => keyCode === sentKeyCode);
 

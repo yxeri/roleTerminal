@@ -87,6 +87,10 @@ class Wallet extends StandardView {
     this.textContainer.appendChild(userTextContainer);
     this.itemList.appendChild(this.textContainer);
 
+    this.viewer.addEventListener('click', () => {
+      this.userList.hideList();
+    });
+
     this.viewer.appendChild(elementCreator.createList({}));
     this.viewer.classList.add('selectedView');
     this.walletAmount = 0;
@@ -177,7 +181,8 @@ class Wallet extends StandardView {
             },
           },
           description: [
-            'Nyuen Transfer Tool',
+            '¥ transfer tool',
+            `handle: ${storageManager.getUserName()}`,
           ],
           extraDescription: [`How much do you want to transfer to ${receiverName}?`],
         });
@@ -275,6 +280,10 @@ class Wallet extends StandardView {
     this.userList = new List({
       title: 'transfer_to',
       shouldSort: true,
+    });
+    this.userList.element.addEventListener('scroll', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
     });
 
     this.itemList.appendChild(systemList.element);

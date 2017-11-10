@@ -226,6 +226,10 @@ li {
 }
 
 #wallet {
+  .menuList {
+    position: relative;
+  }
+
   .userList {
     z-index: 2;
     cursor: pointer;
@@ -253,6 +257,8 @@ li {
   .viewer {
     padding-top: 0 !important;
     margin-top: .4em;
+    padding-left: 0;
+    padding-right: 0;
 
     li {
       line-height: 1.4em;

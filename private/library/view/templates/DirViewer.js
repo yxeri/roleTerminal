@@ -256,8 +256,8 @@ class DirViewer extends StandardView {
                     } else {
                       const item = this.dirList[creator].getItem({ name: sentTitle });
 
-                      item.firstElementChild.setAttribute('data', sentId);
-                      item.firstElementChild.classList.remove('locked');
+                      item.setAttribute('data', sentId);
+                      item.classList.remove('locked');
                     }
 
                     if (this.selectedItem) {

@@ -23,6 +23,6 @@
     "eslint-plugin-import": "2.3.0"
   },
   "dependencies": {
-    "roleHaven": "git://github.com/yxeri/roleHaven.git"
+    "roleHaven": "git://github.com/yxeri/roleHaven.git#bbr"
   }
 }

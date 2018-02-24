@@ -25,35 +25,18 @@ class MessageList extends List {
    * MessageList constructor.
    * @param {Object} params - Parameters.
    * @param {boolean} [params.shouldSwitchRoom] - Should the messages only be retrieved from the user's current room?
-   * @param {boolean} [params.lockedToRoom] - Should the list be unaffected by room switches triggered by the user?
+   * @param {string} [params.roomId] - Id of the room to retrieve messages from.
    * @param {string[]} [params.classes] - CSS classes.
    * @param {string} [params.elementId] - Id of the list element.
    */
   constructor({
+    multiRoom = false,
     shouldSwitchRoom = false,
-    lockedToRoom = false,
+    roomId,
+    roomListId,
     classes = [],
     elementId = `mList-${Date.now()}`,
   }) {
-    const headerFields = [
-      {
-        paramName: 'roomId',
-        convertFunc: (objectId) => {
-          const room = dataHandler.rooms.getObject({ objectId });
-
-          return room ? room.roomName : objectId;
-        },
-      }, {
-        paramName: 'ownerAliasId',
-        fallbackTo: 'ownerId',
-        convertFunc: (objectId) => {
-          const user = dataHandler.users.getObject({ objectId });
-
-          return user ? user.username : objectId;
-        },
-      },
-    ];
-
     const superParams = {
       elementId,
       classes: classes.concat(['msgList']),
@@ -63,37 +46,48 @@ class MessageList extends List {
       ],
       shouldFocusOnClick: false,
       collector: dataHandler.messages,
-      listItemFields: headerFields,
       fieldToAppend: 'text',
+      listItemFields: [
+        {
+          paramName: 'roomId',
+          convertFunc: (objectId) => {
+            const room = dataHandler.rooms.getObject({ objectId });
+
+            return room ? room.roomName : objectId;
+          },
+        }, {
+          paramName: 'ownerAliasId',
+          fallbackTo: 'ownerId',
+          convertFunc: (objectId) => {
+            const user = dataHandler.users.getObject({ objectId });
+
+            return user ? user.username : objectId;
+          },
+        },
+      ],
     };
 
-    if (shouldSwitchRoom) {
+    if (!multiRoom) {
       superParams.filter = {
         rules: [
-          { paramName: 'roomId', paramValue: storageManager.getCurrentRoom() },
+          { paramName: 'roomId', paramValue: roomId || storageManager.getCurrentRoom() },
         ],
       };
+    }
 
-      if (!lockedToRoom) {
-        eventCentral.addWatcher({
-          event: eventCentral.Events.SWITCH_ROOM,
-          func: ({ room }) => {
+    if (shouldSwitchRoom) {
+      eventCentral.addWatcher({
+        event: eventCentral.Events.SWITCH_ROOM,
+        func: ({ origin, room }) => {
+          console.log(roomListId, origin)
+          if ((!origin && !roomListId) || roomListId === origin) {
             this.showMessagesByRoom({ roomId: room.objectId });
-          },
-        });
-      }
+          }
+        },
+      });
     }
 
     super(superParams);
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.ROOM,
-      func: ({ room }) => {
-        if ((shouldSwitchRoom && room.objectId === storageManager.getCurrentRoom()) || !shouldSwitchRoom) {
-
-        }
-      },
-    });
   }
 
   showMessagesByRoom({ roomId }) {

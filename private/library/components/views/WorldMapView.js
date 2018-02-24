@@ -52,8 +52,6 @@ class WorldMapView extends BaseView {
       func: ({ origin, position }) => {
         const marker = this.markers[position.objectId];
 
-        console.log(elementId, marker, this.listId, origin, (!this.listId || this.listId === origin));
-
         if (marker && (!listId || listId === origin)) {
           this.realignMap({ markers: [marker] });
         }
@@ -90,6 +88,10 @@ class WorldMapView extends BaseView {
         }
       },
     });
+
+    if (worldMapHandler.hasFected) {
+      this.startMap();
+    }
   }
 
   realignMap({ markers }) {

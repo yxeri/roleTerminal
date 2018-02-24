@@ -39,7 +39,10 @@ class RoomList extends List {
         leftFunc: (objectId) => {
           eventCentral.emitEvent({
             event: eventCentral.Events.SWITCH_ROOM,
-            params: { room: { objectId } },
+            params: {
+              origin: this.elementId,
+              room: { objectId },
+            },
           });
         },
       },

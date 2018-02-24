@@ -38,6 +38,7 @@ class PositionList extends List {
       dependencies: [
         dataHandler.users,
         dataHandler.teams,
+        dataHandler.positions,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {

@@ -147,6 +147,12 @@ class List extends BaseView {
     }
   }
 
+  addToView(params) {
+    this.appendList();
+
+    super.addToView(params);
+  }
+
   appendList() {
     if (!this.dependencies.every(dependency => dependency.hasFetched)) {
       setTimeout(() => {

@@ -13,6 +13,7 @@ class WorldMapHandler {
       WORLD: 'world',
       LOCAL: 'local',
     };
+    this.hasFected = false;
 
     eventHandler.addWatcher({
       event: eventHandler.Events.POSITION,
@@ -35,6 +36,8 @@ class WorldMapHandler {
 
       return;
     }
+
+    this.hasFected = true;
 
     eventHandler.emitEvent({
       event: eventHandler.Events.WORLDMAP,

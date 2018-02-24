@@ -334,14 +334,7 @@ class ForumView extends BaseView {
       },
     });
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.STARTUP,
-      func: () => {
-        const forumId = storageManager.getCurrentForum();
-
-        this.showForum({ forumId });
-      },
-    });
+    this.showForum({ forumId: storageManager.getCurrentForum() });
   }
 
   updateForum({ forum }) {

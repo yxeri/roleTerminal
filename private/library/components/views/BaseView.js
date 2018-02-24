@@ -58,7 +58,13 @@ class BaseView {
   }
 
   getParentElement() {
-    return this.getThisElement().parentNode;
+    const thisElement = this.getThisElement();
+
+    if (thisElement) {
+      return this.getThisElement().parentNode;
+    }
+
+    return undefined;
   }
 
   removeFromView() {

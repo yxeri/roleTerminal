@@ -17,12 +17,56 @@
 const converters = require('./Converters');
 const eventCentral = require('./EventCentral');
 
+const publicRoomId = '111111111111111111111110';
+
 class StorageManager {
+  static addWatchers() {
+    eventCentral.addWatcher({
+      event: eventCentral.Events.SWITCH_ROOM,
+      func: ({ room }) => {
+        this.setCurrentRoom(room.objectId);
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.SWITCH_FORUM,
+      func: ({ forum }) => {
+        this.setCurrentForum(forum.objectId);
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.SWITCH_LANGUAGE,
+      func: ({ language }) => {
+        this.setLanguage(language.code);
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGIN,
+      func: ({ user }) => {
+        const { accessLevel, defaultRoomId } = user;
+
+        this.setUser({
+          accessLevel,
+          defaultRoomId,
+        });
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        this.resetUser();
+      },
+    });
+  }
+
   /**
-   * Sets item to localStorage
+   * Sets item to localStorage.
    * @static
-   * @param {string} name - Name of the item
-   * @param {Object} item - Item to be set
+   * @param {string} name - Name of the item.
+   * @param {Object} item - Item to be set.
    */
   static setLocalVal(name, item) {
     if (typeof item === 'string') {
@@ -33,253 +77,164 @@ class StorageManager {
   }
 
   /**
-   * Gets item from localStorage
+   * Gets item from localStorage.
    * @static
-   * @param {string} name - Name of the item to be retrieved
-   * @returns {Object|number|boolean|string|[]} - Retrieved item
+   * @param {string} name - Name of the item to be retrieved.
+   * @returns {Object|number|boolean|string|[]} - Retrieved item.
    */
-  static getLocalVal(name) { return localStorage.getItem(name); }
-
-  /**
-   * Removes item from localStorage
-   * @static
-   * @param {string} name - Name of the item to be removed
-   */
-  static removeLocalVal(name) { localStorage.removeItem(name); }
-
-  /**
-   * Get access level
-   * @static
-   * @returns {number} Access level
-   */
-  static getAccessLevel() { return converters.convertToInt(this.getLocalVal('accessLevel')); }
-
-  /**
-   * Set access level
-   * @static
-   * @param {number} accessLevel - Access level
-   */
-  static setAccessLevel(accessLevel = 0) {
-    this.setLocalVal('accessLevel', accessLevel);
-    eventCentral.triggerEvent({ event: eventCentral.Events.ACCESS, params: { accessLevel } });
+  static getLocalVal(name) {
+    return localStorage.getItem(name);
   }
 
   /**
-   * Get user name
+   * Removes item from localStorage.
    * @static
-   * @returns {string} User name
+   * @param {string} name - Name of the item to be removed.
    */
-  static getUserName() { return this.getLocalVal('userName'); }
-
-  /**
-   * Set user name
-   * @static
-   * @param {string} userName - User name
-   */
-  static setUserName(userName) {
-    this.setLocalVal('userName', userName);
+  static removeLocalVal(name) {
+    localStorage.removeItem(name);
   }
 
   /**
-   * Remove user name and set access level to 0
+   * Set user.
    * @static
    */
-  static removeUser() {
-    this.setRoom('public');
-    this.removeLocalVal('userName');
-    this.setAccessLevel(0);
-    this.setCreatorAliases([]);
-    this.setAliases([]);
-    this.removeSelectedAlias();
-    this.removeTeam();
+  static setUser({
+    accessLevel,
+    currentRoom,
+  }) {
+    this.setAccessLevel(accessLevel);
+    this.setCurrentRoom(currentRoom);
+  }
+
+  /**
+   * Reset user.
+   * @static
+   */
+  static resetUser() {
     this.removeGameCode();
     this.removeToken();
-    this.removeBlockedBy();
+    this.setCurrentRoom(publicRoomId);
+    this.setAccessLevel(0);
+    this.setCurrentForum(-1);
   }
 
   /**
-   * Get device ID
+   * Get device Id.
    * @static
-   * @returns {string} Device ID
+   * @returns {string} Device Id.
    */
-  static getDeviceId() { return this.getLocalVal('deviceId'); }
-
-  /**
-   * Set device ID
-   * @static
-   * @param {string} deviceId - Device ID
-   */
-  static setDeviceId(deviceId) { this.setLocalVal('deviceId', deviceId); }
-
-  /**
-   * Get user aliases
-   * @static
-   * @returns {string[]} User aliases
-   */
-  static getAliases() { return converters.convertToObject(this.getLocalVal('aliases')) || []; }
-
-  /**
-   * Get creator aliases
-   * @static
-   * @returns {string[]} Creator aliases
-   */
-  static getCreatorAliases() { return converters.convertToObject(this.getLocalVal('creatorAliases')) || []; }
-
-  /**
-   * Set creator aliases
-   * @static
-   * @param {string[]} aliases Creator aliases
-   */
-  static setCreatorAliases(aliases = []) {
-    const sortedAliases = aliases.sort();
-
-    this.setLocalVal('creatorAliases', converters.stringifyObject(sortedAliases));
+  static getDeviceId() {
+    return this.getLocalVal('deviceId');
   }
 
   /**
-   * Add a user alias
+   * Set device Id.
    * @static
-   * @param {string} alias - User alias
+   * @param {string} deviceId - Device Id.
    */
-  static addCreatorAlias(alias) {
-    const aliases = this.getCreatorAliases();
-    aliases.push(alias.toLowerCase());
-
-    this.setCreatorAliases(aliases);
+  static setDeviceId(deviceId) {
+    this.setLocalVal('deviceId', deviceId);
   }
 
   /**
-   * Set user aliases
+   * Set center coordinates for the map.
    * @static
-   * @param {string[]} aliases - User aliases
+   * @param {Object} coordinates - Coordinates.
+   * @param {number} coordinates.longitude - Longitude.
+   * @param {number} coordinates.latitude - Latitude.
    */
-  static setAliases(aliases = []) {
-    const sortedAliases = aliases.sort();
+  static setCenterCoordinates(coordinates) {
+    this.setLocalVal('centerCoordinates', converters.stringifyObject(coordinates));
+  }
 
-    this.setLocalVal('aliases', converters.stringifyObject(sortedAliases));
+  static getCenterCoordinates() {
+    return converters.convertToObject(this.getLocalVal('centerCoordinates'));
   }
 
   /**
-   * Add a user alias
+   * Set corner one coordinates for the map.
    * @static
-   * @param {string} alias - User alias
+   * @param {Object} coordinates - Parameters.
+   * @param {number} coordinates.longitude - Longitude.
+   * @param {number} coordinates.latitude - Latitude.
    */
-  static addAlias(alias) {
-    const aliases = this.getAliases();
-    aliases.push(alias.toLowerCase());
+  static setCornerOneCoordinates(coordinates) {
+    this.setLocalVal('cornerOneCoordinates', converters.stringifyObject(coordinates));
+  }
 
-    this.setAliases(aliases);
+  static getCornerOneCoordinates() {
+    return converters.convertToObject(this.getLocalVal('cornerOneCoordinates'));
   }
 
   /**
-   * Set selected alias
+   * Set corner two coordinates for the map.
    * @static
-   * @param {string} alias - Selected alias
+   * @param {Object} coordinates - Coordinates.
+   * @param {number} coordinates.longitude - Longitude.
+   * @param {number} coordinates.latitude - Latitude.
    */
-  static setSelectedAlias(alias) { this.setLocalVal('selectedAlias', alias.toLowerCase()); }
-
-  /**
-   * Get selected alias
-   * @static
-   * @returns {string} Selected alias
-   */
-  static getSelectedAlias() { return this.getLocalVal('selectedAlias'); }
-
-  /**
-   * Remove selected alias
-   * @static
-   */
-  static removeSelectedAlias() { this.removeLocalVal('selectedAlias'); }
-
-  /**
-   * Set center coordinates for the map
-   * @static
-   * @param {number} longitude - Longitude
-   * @param {number} latitude - Latitude
-   */
-  static setCenterCoordinates(longitude, latitude) { this.setLocalVal('centerCoordinates', converters.stringifyObject({ longitude, latitude })); }
-
-  static getCenterCoordinates() { return converters.convertToObject(this.getLocalVal('centerCoordinates')); }
-
-  /**
-   * Set corner one coordinates for the map
-   * @static
-   * @param {number} longitude - Longitude
-   * @param {number} latitude - Latitude
-   */
-  static setCornerOneCoordinates(longitude, latitude) { this.setLocalVal('cornerOneCoordinates', converters.stringifyObject({ longitude, latitude })); }
-
-  static getCornerOneCoordinates() { return converters.convertToObject(this.getLocalVal('cornerOneCoordinates')); }
-
-  /**
-   * Set corner two coordinates for the map
-   * @static
-   * @param {number} longitude - Longitude
-   * @param {number} latitude - Latitude
-   */
-  static setCornerTwoCoordinates(longitude, latitude) { this.setLocalVal('cornerTwoCoordinates', converters.stringifyObject({ longitude, latitude })); }
-
-  static getCornerTwoCoordinates() { return converters.convertToObject(this.getLocalVal('cornerTwoCoordinates')); }
-
-  /**
-   * Set default zoom level on the map
-   * @static
-   * @param {number} defaultZoomLevel - Default zoom level on the map
-   */
-  static setDefaultZoomLevel(defaultZoomLevel) { this.setLocalVal('defaultZoomLevel', defaultZoomLevel); }
-
-  static getDefaultZoomlevel() { return converters.convertToInt(this.getLocalVal('defaultZoomLevel')); }
-
-  /**
-   * Set year modification
-   * @static
-   * @param {number} yearModification - Amount of years that will be increased/decreased to current year
-   */
-  static setYearModification(yearModification) { this.setLocalVal('yearModification', yearModification); }
-
-  static getYearModification() { return converters.convertToInt(this.getLocalVal('yearModification')); }
-
-  static setRoom(roomName) {
-    this.setLocalVal('room', roomName);
-    eventCentral.triggerEvent({ event: eventCentral.Events.SWITCHROOM, params: { roomName } });
+  static setCornerTwoCoordinates(coordinates) {
+    this.setLocalVal('cornerTwoCoordinates', converters.stringifyObject(coordinates));
   }
 
-  static getRoom() { return this.getLocalVal('room'); }
-
-  static setTeam(team, shortTeam) {
-    if (team && shortTeam) {
-      this.setLocalVal('team', team);
-      this.setLocalVal('shortTeam', shortTeam);
-    } else {
-      this.removeTeam();
-    }
+  static getCornerTwoCoordinates() {
+    return converters.convertToObject(this.getLocalVal('cornerTwoCoordinates'));
   }
 
-  static removeTeam() {
-    this.removeLocalVal('shortTeam');
-    this.removeLocalVal('team');
+  /**
+   * Set default zoom level on the map.
+   * @static
+   * @param {number} defaultZoomLevel - Default zoom level on the map.
+   */
+  static setDefaultZoomLevel(defaultZoomLevel) {
+    this.setLocalVal('defaultZoomLevel', defaultZoomLevel);
   }
 
-  static setBlockedBy(blockedBy) {
-    if (blockedBy) {
-      this.setLocalVal('blockedBy', blockedBy);
-    }
+  static getDefaultZoomlevel() {
+    return converters.convertToInt(this.getLocalVal('defaultZoomLevel'));
   }
 
-  static getBlockedBy() {
-    return this.getLocalVal('blockedBy');
+  /**
+   * Set the amount of years to be used to adjust the current date with.
+   * @static
+   * @param {number} yearModification - Amount of years that will be added/removed from the current year.
+   */
+  static setYearModification(yearModification) {
+    this.setLocalVal('yearModification', yearModification);
   }
 
-  static removeBlockedBy() {
-    this.removeLocalVal('blockedBy');
+  /**
+   * Get amount of years to adjust the current date with.
+   * @return {number} Amount of years.
+   */
+  static getYearModification() {
+    return converters.convertToInt(this.getLocalVal('yearModification'));
   }
 
-  static getTeam() {
-    return this.getLocalVal('team');
+  static removeYearModification() {
+    this.removeLocalVal('yearModification');
   }
 
-  static getShortTeam() {
-    return this.getLocalVal('shortTeam');
+  /**
+   * Set the amount of days to be used to adjust the current date with.
+   * @static
+   * @param {number} dayModification - Amount of days that will be added/removed from the current date.
+   */
+  static setDayModification(dayModification) {
+    this.setLocalVal('dayModification', dayModification);
+  }
+
+  /**
+   * Get amount of days to adjust the current date with.
+   * @return {number} Amount of years.
+   */
+  static getDayModification() {
+    return converters.convertToInt(this.getLocalVal('dayModification'));
+  }
+
+  static removeDayModification() {
+    this.removeLocalVal('dayModification');
   }
 
   static setGameCode(gameCode) {
@@ -325,6 +280,50 @@ class StorageManager {
   static getRequiresVerification() {
     return this.getLocalVal('requiresVerification') === 'true';
   }
+
+  static setCurrentRoom(roomId) {
+    this.setLocalVal('currentRoom', roomId);
+  }
+
+  static getCurrentRoom() {
+    return this.getLocalVal('currentRoom') || publicRoomId;
+  }
+
+  static setCurrentForum(forumId) {
+    this.setLocalVal('currentForum', forumId);
+  }
+
+  static getCurrentForum() {
+    return this.getLocalVal('currentForum');
+  }
+
+  /**
+   * Get user's access level.
+   * @static
+   * @returns {number} Access level.
+   */
+  static getAccessLevel() {
+    return converters.convertToInt(this.getLocalVal('accessLevel'));
+  }
+
+  /**
+   * Set user's access level.
+   * @static
+   * @param {number} accessLevel - User's access level.
+   */
+  static setAccessLevel(accessLevel) {
+    this.setLocalVal('accessLevel', accessLevel);
+  }
+
+  static setLanguage(language) {
+    this.setLocalVal('language', language);
+  }
+
+  static getLanguage() {
+    this.getLocalVal('language');
+  }
 }
+
+StorageManager.addWatchers();
 
 module.exports = StorageManager;

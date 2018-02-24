@@ -46,7 +46,7 @@ class Converters {
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToInt(value) {
-    if (isNaN(value)) { return null; }
+    if (Number.isNaN(value)) { return null; }
 
     return parseInt(value, 10);
   }
@@ -58,7 +58,7 @@ class Converters {
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToFloat(value) {
-    if (isNaN(value)) { return null; }
+    if (Number.isNaN(value)) { return null; }
 
     return parseFloat(value);
   }

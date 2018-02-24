@@ -15,8 +15,6 @@
  */
 
 const storageManager = require('./StorageManager');
-const tools = require('./Tools');
-const elementcreator = require('./ElementCreator');
 
 /**
  * Characters used when generating random text
@@ -24,17 +22,20 @@ const elementcreator = require('./ElementCreator');
  * @type {string}
  */
 const chars = 'abcdefghijklmnopqrstuvwxyz';
+
 /**
  * Numbers used when generating random text
  * Removed 1 to decrease user errors when reading the random string
  * @type {string}
  */
 const numbers = '0123456789';
+
 /**
  * Special characters used when generating random text
  * @type {string}
  */
 const specials = '!;#&()[]';
+
 /**
  * Used when generating random binary text
  * @type {string}
@@ -62,20 +63,33 @@ class TextTools {
   }
 
   /**
-   * Takes date and returns shorter human-readable time
+   * Takes date and returns shorter human-readable time.
    * @static
-   * @param {Date|number} params.date Date
-   * @param {Number} [params.offset] Should hours be modified from the final time?
-   * @param {boolean} [params.lockYear] Should the year stay unmodified?
-   * @returns {Object} Human-readable time and date
+   * @param {Object} params - Parameters.
+   * @param {Date|number} params.date - Date.
+   * @param {Number} [params.offset] - Should hours be modified from the final time?
+   * @param {boolean} [params.lockDate] - Should the year stay unmodified?
+   * @returns {Object} Human-readable time and date.
    */
   static generateTimeStamp({ date, offset, lockDate }) {
     const newDate = new Date(date);
     const timeStamp = {};
     const yearModification = storageManager.getYearModification();
+    const dayModification = storageManager.getDayModification();
 
-    if (offset) { newDate.setHours(newDate.getHours() + offset); }
-    if (!lockDate && !isNaN(yearModification)) { newDate.setFullYear(newDate.getFullYear() + parseInt(yearModification, 10)); }
+    if (offset) {
+      newDate.setHours(newDate.getHours() + offset);
+    }
+
+    if (!lockDate && !Number.isNaN(yearModification)) {
+      if (yearModification && !Number.isNaN(yearModification)) {
+        newDate.setFullYear(newDate.getFullYear() + parseInt(yearModification, 10));
+      }
+
+      if (dayModification && !Number.isNaN(dayModification)) {
+        newDate.setDate(newDate.getDate() + parseInt(dayModification, 10));
+      }
+    }
 
     timeStamp.mins = this.beautifyNumber(newDate.getMinutes());
     timeStamp.hours = this.beautifyNumber(newDate.getHours());
@@ -107,7 +121,9 @@ class TextTools {
    * @param {string} replaceWith - String that will replace the found substring
    * @returns {string} - Modified string
    */
-  static findOneReplace(text, find, replaceWith) { return text.replace(new RegExp(find), replaceWith); }
+  static findOneReplace(text, find, replaceWith) {
+    return text.replace(new RegExp(find), replaceWith);
+  }
 
   /**
    * Trims whitespaces from beginning and end of the string
@@ -126,8 +142,8 @@ class TextTools {
    */
   static createCharString(length) {
     return this.createRandString({
-      selection: chars,
       length,
+      selection: chars,
     });
   }
 
@@ -139,8 +155,8 @@ class TextTools {
    */
   static createAlphaNumbericalString(length) {
     return this.createRandString({
-      selection: numbers + chars,
       length,
+      selection: numbers + chars,
     });
   }
 
@@ -152,8 +168,8 @@ class TextTools {
    */
   static createBinaryString(length) {
     return this.createRandString({
-      selection: binary,
       length,
+      selection: binary,
     });
   }
 
@@ -165,8 +181,8 @@ class TextTools {
    */
   static createMixedString(length) {
     return this.createRandString({
-      selection: numbers + chars + specials,
       length,
+      selection: numbers + chars + specials,
     });
   }
 
@@ -195,61 +211,21 @@ class TextTools {
     return result;
   }
 
-  static createMixedArray({ classes, rowAmount, length, charToLower, requiredClickableStrings = [], requiredFunc = () => {} }) {
-    const selection = chars + numbers + specials;
-    const spans = [];
-    let indexes = [];
-
-    for (let i = 0; i < rowAmount; i += 1) {
-      spans.push(this.createRandString({ selection, length }));
-      indexes.push(i);
-    }
-
-    indexes = tools.shuffleArray(indexes);
-
-    for (let i = 0; i < requiredClickableStrings.length; i += 1) {
-      const stringLength = requiredClickableStrings[i].length;
-      const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
-      const randomIndex = indexes[i];
-      const randomString = spans[randomIndex];
-      const span = elementcreator.createSpan({});
-
-      /**
-       * Inserts required string and cuts away enough characters from the left and right of the random string to keep the length intact
-       */
-      span.appendChild(elementcreator.createSpan({
-        text: randomString.slice(0, randomStringIndex),
-      }));
-      span.appendChild(elementcreator.createSpan({
-        text: this.randomiseCase(requiredClickableStrings[i], charToLower),
-        classes: ['clickable'],
-        func: () => { requiredFunc(requiredClickableStrings[i]); },
-      }));
-      span.appendChild(elementcreator.createSpan({
-        text: randomString.slice(randomStringIndex + stringLength),
-      }));
-
-      if (classes) {
-        classes.forEach(cssClass => span.classList.add(cssClass));
-      }
-
-      spans[randomIndex] = span;
-    }
-
-    return spans;
-  }
-
   static replaceWhitespace(string) {
-    return Array.from(string).map(char => this.findOneReplace(char, ' ', this.createMixedString(1))).join('');
+    return Array.from(string).map((char) => {
+      return this.findOneReplace(char, ' ', this.createMixedString(1));
+    }).join('');
   }
 
   /**
-   * Copies string to avoid the original being consumed
+   * Copies string to avoid the original being consumed.
    * @static
-   * @param {string} string - String to copy
-   * @returns {string} - String copy
+   * @param {string} string - String to copy.
+   * @returns {string} - String copy.
    */
-  static copyString(string) { return string && string !== null ? JSON.parse(JSON.stringify(string)) : ''; }
+  static copyString(string) {
+    return string && string !== null ? JSON.parse(JSON.stringify(string)) : '';
+  }
 
   static isInternationalAllowed(text) {
     return internationalRegex.test(text);

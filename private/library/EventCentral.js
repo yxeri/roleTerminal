@@ -17,78 +17,80 @@
 class EventCentral {
   constructor() {
     this.Events = {
-      HISTORY: 'Chat history retrieved',
-      CHATMSG: 'Chat message retrieved',
-      NEWALIAS: 'New alias',
-      ALIAS: 'Aliases changed',
-      ACCESS: 'Access level changed',
-      MESSAGE: 'Message retrieved',
-      SWITCHROOM: 'Switched room',
-      DOCFILE: 'New docFile',
-      FOLLOWROOM: 'Followed room',
-      UNFOLLOWROOM: 'Unfollowed room',
-      NEWROOM: 'New room',
-      USER: 'Switched user',
-      NEWUSER: 'New user',
+      ERROR: 'Error',
+      USER: 'User',
+      USERS: 'Users',
+      TEAM: 'Team',
+      TEAMS: 'Teams',
+      ROOM: 'Room',
+      ROOMS: 'Rooms',
+      ALIAS: 'Alias',
+      ALIASES: 'Aliases',
+      FORUM: 'Forum',
+      FORUMS: 'Forums',
+      FORUMPOST: 'Forum post',
+      FORUMPOSTS: 'Forum posts',
+      FORUMTHREAD: 'Forum thread',
+      FORUMTHREADS: 'Forum threads',
+      DEVICE: 'Device',
+      DEVICES: 'Devices',
+      DOCFILE: 'Doc file',
+      DOCFILES: 'Doc files',
+      GAMECODE: 'Game code',
+      GAMECODES: 'Game codes',
+      POSITION: 'Position',
+      POSITIONS: 'Positions',
+      SIMPLEMSG: 'Simple message',
+      SIMPLEMSGS: 'Simple message',
+      TRANSACTION: 'Transaction',
+      TRANSACTIONS: 'Transactions',
+      WALLET: 'Wallet',
+      WALLETS: 'Wallets',
+      INVITATION: 'Invitation',
+      INVITATIONS: 'Invitations',
+      MESSAGE: 'Message',
+      MESSAGES: 'Messages',
+      STARTUP: 'Startup',
+      RECONNECT: 'Reconnect',
+      CHATMSG: 'Chat message',
+      BOOT: 'Boot complete',
       LOGOUT: 'Logged out',
       LOGIN: 'Logged in',
-      CREATEDOCFILE: 'Created docFile',
-      MYPOSITION: 'User position',
-      UPDATEDPOSITION: 'Updated position',
-      BCASTMSG: 'Broadcast message',
-      TRANSACTION: 'New transaction',
-      POSITIONS: 'Positions received',
-      TERMINAL: 'System message',
-      NEWMEMBER: 'New team member',
-      USERSTATUS: 'User sent status update',
-      PINGMAP: 'Ping map',
-      TEAM: 'Joined team',
-      NEWTEAM: 'New team',
-      SIMPLEMSG: 'Simple message received',
-      GAMECODE: 'New game code',
-      SERVERMODE: 'Server mode',
-      SIGNALBLOCK: 'Signal block',
-      REMOVEPOSITIONS: 'Remove positions',
-      LEAVETEAM: 'Leave team',
-      INVITATION: 'New invitation',
-      LANTERNSTATIONS: 'Updated stations',
-      LANTERNROUND: 'Updated lantern round',
-      LANTERNTEAMS: 'Updated lantern teams',
-      VERIFIED: 'User verified',
-      CHANGEPASSWORD: 'Change password',
-      NEWCREATORALIAS: 'new creator alias',
+      OPEN_DOCFILE: 'Open file',
+      ACCESS_DOCFILE: 'Access file',
+      SWITCH_ROOM: 'Switched room',
+      SWITCH_FORUM: 'Switched forum',
+      SWITCH_LANGUAGE: 'Switched language',
+      WORLDMAP: 'World map created',
+      FOCUS_MAPPOSITION: 'Focus on map position',
     };
     this.eventWatchers = {};
   }
 
   /**
-   * Adds a watcher for events
-   * @param {Object} watcherParent - Parent to the watcher
-   * @param {string} event - Name of the event to listen for
-   * @param {Function} func - Function to call
+   * Adds a watcher for events.
+   * @param {Object} params - Parameters.
+   * @param {string} params.event - Name of the event to listen for.
+   * @param {Function} params.func - Function to call.
    */
-  addWatcher({ watcherParent, event, func }) {
+  addWatcher({ event, func }) {
     if (!this.eventWatchers[event]) {
       this.eventWatchers[event] = [];
     }
 
-    this.eventWatchers[event].push({ watcherParent, func });
+    this.eventWatchers[event].push({ func });
   }
 
   /**
-   * Remove a watcher
-   * @param {Object} watcherParent - Parent to the watcher
-   * @param {string} event - Name of the event to listen for
-   * @param {Function} func - Function to call
+   * Emit event.
+   * @param {Object} params - Parameters.
+   * @param {string} params.event - Event to emit.
+   * @param {Object} [params.params] - Parameters to send.
    */
-  removeWatcher({ watcherParent, event, func }) {
-    if (this.eventWatchers[event]) {
-      const index = this.eventWatchers[event].findIndex(watcher => watcher.watcherParent === watcherParent && watcher.func === func);
-      this.eventWatchers[event].splice(index, 1);
-    }
-  }
-
-  triggerEvent({ event, params = {} }) {
+  emitEvent({
+    event,
+    params = {},
+  }) {
     if (this.eventWatchers[event]) {
       this.eventWatchers[event].forEach(watcher => watcher.func(params));
     }

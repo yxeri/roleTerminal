@@ -15,14 +15,8 @@
  */
 
 class DeviceChecker {
-  /** @namespace window.navigator.standalone */
-
-  /**
-   * @param {boolean} params.isStandalone - Is the Safari browser in standalone mode (opened through shortcut from Home screen in iOS)?
-   * @param {string} params.userAgent - Browser user agent
-   */
   constructor() {
-    const userAgent = window.navigator.userAgent;
+    const { userAgent } = window.navigator;
     this.isStandalone = window.navigator.standalone;
     this.DeviceEnum = {
       IOS: 'ios',

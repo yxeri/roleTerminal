@@ -802,7 +802,7 @@ terminal.addCommand({
                     });
                     terminal.resetNextFunc();
                   } else {
-                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} matched. ${triesLeft} tries left`] } });
+                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} characters matched. ${matches.correctPlacement} are in the correct position. ${triesLeft} tries left`] } });
                   }
                 });
               });
@@ -1765,7 +1765,14 @@ socketManager.addEvents([
     event: 'message',
     func: ({ data }) => {
       const { message } = data;
-      console.log(message);
+
+      if (message.lanternHack) {
+        console.log('lantern hack');
+        eventCentral.triggerEvent({
+          event: eventCentral.Events.CHATMSG,
+          params: { roomName: message.roomName, message, isWhisper: false, options: { printable: false } },
+        });
+      }
     },
   }, {
     event: 'history',

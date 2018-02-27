@@ -802,7 +802,7 @@ terminal.addCommand({
                     });
                     terminal.resetNextFunc();
                   } else {
-                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} characters matched. ${matches.correctPlacement} are in the correct position. ${triesLeft} tries left`] } });
+                    terminal.queueMessage({ message: { text: [`Incorrect. ${matches.amount} characters matched. ${triesLeft} tries left`] } });
                   }
                 });
               });

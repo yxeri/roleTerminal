@@ -209,6 +209,31 @@ window.addEventListener('error', (event) => {
 
 const terminal = new Terminal({ skipAnimation: queryParameters.noBoot });
 const toolsViewer = new ToolsViewer({ isFullscreen: true });
+const introDevText = [
+  elementCreator.createParagraph({ text: 'roleHaven - A universal larp app platform' }),
+  elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic (aleks@thethirdgift.com). More info at:' }),
+];
+
+if (queryParameters.showfloor) {
+  introDevText.push(elementCreator.createParagraph({ text: 'Patreon: http://patreon.com/yxeri' }));
+  introDevText.push(elementCreator.createParagraph({ text: 'Facebook: https://www.facebook.com/thethirdgiftgames/' }));
+} else {
+  introDevText.push(elementCreator.createLink({
+    text: 'Patreon',
+    href: 'http://patreon.com/yxeri',
+    target: '_blank',
+  }));
+  introDevText.push(elementCreator.createLink({
+    text: 'Facebook',
+    href: 'https://www.facebook.com/thethirdgiftgames/',
+    target: '_blank',
+  }));
+}
+
+introDevText.push(elementCreator.createParagraph({
+  text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
+}));
+
 const home = new Home({
   introText: [
     elementCreator.createParagraph({
@@ -218,39 +243,7 @@ const home = new Home({
       text: 'Welcome, employee. This is your cyberhome. You can always find your way to your cyberhome by clicking on the top menu. May you have a productive day!',
     }),
   ],
-  introDevText: [
-    elementCreator.createParagraph({
-      classes: ['redBack'],
-      text: 'THIS IS A EXPERIMENTAL SERVER. This will NOT be used during the event. You can play around as much as you want. Stuff might be broken. Data might be lost. Save a copy of everything of importance.',
-    }),
-    elementCreator.createParagraph({ text: 'Main developer: Aleksandar Jankovic' }),
-    elementCreator.createParagraph({ text: 'More info at:' }),
-    elementCreator.createLink({
-      text: 'Patreon',
-      href: 'http://patreon.com/yxeri',
-      target: '_blank',
-    }),
-    elementCreator.createLink({
-      text: 'Facebook',
-      href: 'https://www.facebook.com/thethirdgiftgames/',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({ text: 'This project is kept alive by your donations. Any small amount helps! Help support the project at ' }),
-    elementCreator.createLink({
-      text: 'Patreon',
-      href: 'http://patreon.com/yxeri',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({ text: 'Do you want to expand the world of BBR?' }),
-    elementCreator.createLink({
-      text: 'Join the cartographer group',
-      href: 'https://www.facebook.com/groups/585709954945167/',
-      target: '_blank',
-    }),
-    elementCreator.createParagraph({
-      text: 'NOTE! Use Chrome on laptop/desktop/Android devices and Safari for Apple phone/tablet devices. It may not work properly in other browsers',
-    }),
-  ],
+  introDevText,
 });
 const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', isTopDown: false });
 const dirViewer = new DirViewer({ isFullscreen: true });
@@ -614,7 +607,7 @@ terminal.addCommand({
             '----',
             'You will be shown a user with access to your chosen LANTERN and a text dump.',
             'Each user will have information about its password attached to it. Use it as a hint and try to find the correct password.',
-            'Each user might have more than one password, so don\'t blindly start clicking around. Check if the information corresponds to the password you are about to choose',
+            'Check if the information corresponds to the password you are about to choose',
             'You must find the user\'s password within the dumps to get access to the LANTERN. You will have 3 tries until the automated defense system shuts down the connection.',
             'We take no responsibility for deaths due to accidental activitation of defense systems.',
             `Window closes in ${timeString}.`,
@@ -1997,3 +1990,151 @@ socketManager.addEvents([
   //
   //   },
 ]);
+
+if (queryParameters.showfloor) {
+  const sleepBoot = new TextAnimation({ removeTime: 700 });
+  const sleepTime = 360000;
+  const sleepFunc = () => {
+    sleepBoot.setQueue([
+      {
+        func: boot.printLines,
+        params: {
+          corruption: true,
+          classes: ['logo'],
+          array: [
+            '                          ####',
+            '                ####    #########    ####',
+            '               ###########################',
+            '              #############################',
+            '            #######        ##   #  ##########',
+            '      ##########           ##    #  ###  ##########',
+            '     #########             #########   #   #########',
+            '       #####               ##     ########   #####',
+            '     #####                 ##     ##     ##########',
+            '     ####                  ##      ##     #   ######',
+            ' #######                   ##########     ##    ########',
+            '########                   ##       ########     ########',
+            ' ######      Organica      ##       #      #############',
+            '   ####     Oracle         ##       #      ##     ####',
+            '   ####     Operating      ##       #      ##    #####',
+            '   ####      System        ##       #      ###########',
+            '########                   ##       #########    ########',
+            '########                   ##########      #    #########',
+            ' ########                  ##      ##     ## ###########',
+            '     #####                 ##      ##     ### #####',
+            '       #####               ##     ########   #####',
+            '      #######              ##########   #  ########',
+            '     ###########           ##    ##    # ###########',
+            '      #############        ##    #   #############',
+            '            ################################',
+            '              ############################',
+            '              #######  ##########  #######',
+            '                ###      ######      ###',
+            '                          ####',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          array: [
+            'Connecting to HQ...',
+            '...',
+            '...',
+            'Failed to connect to HQ',
+            'Rerouting...',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          waitTime: 700,
+          corruption: false,
+          array: [
+            'Connected!',
+            'Welcome to the Oracle, employee UNDEFINED.',
+            'May you have a productive day!',
+            '',
+            'Establishing uplink to relays...',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          waitTime: 1200,
+          corruption: false,
+          array: [
+            'Uplink established!',
+            'Downloading modules...',
+            'LAMM  - LANTERN Amplification Master Manipulator',
+            'OSAT  - Organica System Administrator Toolset',
+            'CHAT  - Communication Host-Agent Tracker',
+            'CREDS - Computer Registered Evaluative Decision System',
+            'PANIC - PANIC-Assisted Neglect Information Collector',
+            'YOU   - YOU Object Unifier',
+            'Booting O3S 5.0...',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          classes: ['logo'],
+          corruption: true,
+          array: [
+            'THIS RELEASE OF O3S WAS BROUGHT TO YOU BY',
+            '   ####',
+            '###############',
+            ' #####  #########                                           ####',
+            '  ####     #######  ########     ###########    ####     ###########',
+            '  ####    ######      #######   ####   #####  ########    ####   #####',
+            '  ####  ###         ####  ####        ####  ###    ###### ####   #####',
+            '  #########        ####    ####     ####   #####     ##############',
+            '  #### ######     ####     #####  ####     #######   ###  ########',
+            '  ####   ######  ##### #### #### ############  #######    ####   ###',
+            ' ######    #############    ################     ###      ####    #####',
+            '########     ########        ####                        ######      #####   ##',
+            '               ###########        ##                                    ###### ',
+            '                    ###############',
+            '                  Razor  #####  Demos - Warez - Honey',
+            'ENJOY',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          array: [
+            'Organica approved device detected!',
+            'Rewriting firmware...',
+            'Overriding lock...',
+          ],
+        },
+      }, {
+        func: boot.printLines,
+        params: {
+          corruption: false,
+          array: [
+            'Loading',
+            '...',
+            '...',
+            '...',
+            '...',
+          ],
+        },
+      },
+    ]);
+
+    sleepBoot.appendTo(mainView);
+  };
+  let sleepTimeout = setTimeout(sleepFunc, sleepTime);
+  const movementFunc = () => {
+    clearTimeout(sleepTimeout);
+
+    sleepTimeout = setTimeout(sleepFunc, sleepTime);
+  };
+
+  window.addEventListener('click', movementFunc);
+  window.addEventListener('mousemove', movementFunc);
+  window.addEventListener('keydown', movementFunc);
+  window.addEventListener('touchstart', movementFunc);
+}

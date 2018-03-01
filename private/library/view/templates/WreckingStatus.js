@@ -19,7 +19,7 @@ const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
 
 class WreckingStatus {
-  constructor({ element }) {
+  constructor({ element, showfloor }) {
     this.element = element;
     this.element.classList.add('clickable');
 
@@ -41,11 +41,15 @@ class WreckingStatus {
 
     this.startTime();
 
-    this.element.addEventListener('click', (event) => {
-      this.container.classList.toggle('hide');
+    if (!showfloor) {
+      this.element.addEventListener('click', (event) => {
+        this.container.classList.toggle('hide');
 
-      event.stopPropagation();
-    });
+        event.stopPropagation();
+      });
+    } else {
+      this.container.classList.remove('hide');
+    }
 
     eventCentral.addWatcher({
       watcherParent: this.stationStats,

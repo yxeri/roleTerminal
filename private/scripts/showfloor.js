@@ -15,11 +15,11 @@ infoContainer.appendChild(elementCreator.createParagraph({
   'roleHaven är en samling av tillgängliga verktyg och spel för både arrangörer och deltagare.',
 }));
 infoContainer.appendChild(elementCreator.createParagraph({
-  text: 'Ni kan testa appen på datorerna här eller genom att besöka' +
+  text: 'Ni kan testa appen på datorerna här eller genom att gå till' +
   ' bbrterminal.thethirdgift.com (Blodsband) eller tales.thethirdgift.com (Tales from the Sprawl)',
 }));
 infoContainer.appendChild(elementCreator.createParagraph({
-  text: 'Vill ni veta mer? Ta en titt på www.facebook.com/thethirdgiftgames/ eller www.patreon.com/yxeri. Ni kan kontakta utvecklaren, Aleksandar Jankovic, via aleks@thethirdgift.com.',
+  text: 'Vill ni veta mer? Besök på www.facebook.com/thethirdgiftgames/ eller www.patreon.com/yxeri. Ni kan kontakta utvecklaren, Aleksandar Jankovic, via aleks@thethirdgift.com.',
 }));
 info.appendChild(infoContainer);
 

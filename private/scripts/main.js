@@ -1993,7 +1993,7 @@ socketManager.addEvents([
 
 if (queryParameters.showfloor) {
   const sleepBoot = new TextAnimation({ removeTime: 700 });
-  const sleepTime = 360000;
+  const sleepTime = queryParameters.showfloorTime || 300000;
   const sleepFunc = () => {
     sleepBoot.setQueue([
       {

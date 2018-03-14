@@ -11,7 +11,7 @@ let hackers = [];
 const infoContainer = elementCreator.createContainer({});
 infoContainer.appendChild(elementCreator.createParagraph({
   text: 'Rolehaven is an initiative to create a universal larp app. ' +
-  'Rolehaven is a collection of tools and games targeted at both organisers and participants.',
+  'Rolehaven is a collection of tools and games for organisers and participants.',
 }));
 infoContainer.appendChild(elementCreator.createParagraph({
   text: 'You can try out the app on the computers here or visit' +

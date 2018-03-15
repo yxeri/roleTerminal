@@ -34,9 +34,10 @@ function wrapChar(text, index) {
 }
 
 class Home extends View {
-  constructor({ introText = [], introDevText = [] }) {
+  constructor({ introText = [], introDevText = [], showfloor }) {
     super({ isFullscreen: false, viewId: 'home' });
 
+    this.showfloor = showfloor;
     this.links = [];
     this.previousLink = '';
     this.activeLink = '';

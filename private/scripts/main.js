@@ -9,9 +9,14 @@ const DocFileView = require('../library/components/views/DocFileView');
 const ForumView = require('../library/components/views/ForumView');
 const WorldMapView = require('../library/components/views/WorldMapView');
 const PositionList = require('../library/components/lists/PositionList');
+const ViewWrapper = require('../library/components/ViewWrapper');
+const LoginDialog = require('../library/components/views/dialogues/LoginDialog');
+const RegisterDialog = require('../library/components/views/dialogues/RegisterDialog');
 
-// const worldMapHandler = require('./../library/WorldMapHandler');
 const dataHandler = require('../library/data/DataHandler');
+const elementCreator = require('../library/ElementCreator');
+const labelHandler = require('../library/labels/LabelHandler');
+const socketManager = require('../library/SocketManager');
 
 const element = document.getElementById('main');
 
@@ -22,62 +27,124 @@ const userList = new List({
     { paramName: 'username' },
   ],
 });
-const roomList = new RoomList({});
+const roomList = new RoomList({
+  elementId: 'first room',
+});
+const secondRoomList = new RoomList({
+  elementId: 'second room',
+});
 const messageList = new MessageList({
+  shouldSwitchRoom: false,
+  roomId: '111111111111111111111110',
+});
+const secondMessageList = new MessageList({
+  roomListId: secondRoomList.getElementId(),
   shouldSwitchRoom: true,
 });
 const docFileList = new DocFileList({});
-const forumList = new ForumList({});
 const positionList = new PositionList({
   positionTypes: ['world'],
+  elementId: 'list one',
 });
 const secondPositionList = new PositionList({
   positionTypes: ['world'],
+  elementId: 'list two',
 });
-
 const docFileView = new DocFileView({});
-const forumView = new ForumView({});
-const worldMapView = new WorldMapView({
-  elementId: 'worldMap',
-  positionTypes: ['world'],
+
+const forumList = new ForumList({
+  classes: ['feedList'],
 });
-const secondWorldMapView = new WorldMapView({
-  elementId: 'secondWorldMap',
-  positionTypes: ['world'],
-  listId: positionList.getElementId(),
+const forumView = new ForumView({
+  classes: ['feedView'],
 });
 
-positionList.addToView({
-  element,
+// positionList.addToView({
+//   element,
+// });
+// secondPositionList.addToView({
+//   element,
+// });
+// userList.addToView({
+//   element,
+// });
+// secondRoomList.addToView({
+//   element,
+// });
+// secondMessageList.addToView({
+//   element,
+// });
+// docFileList.addToView({
+//   element,
+// });
+// docFileView.addToView({
+//   element,
+// });
+
+const loginButton = elementCreator.createButton({
+  text: 'login',
+  clickFuncs: {
+    leftFunc: () => {
+      const login = new LoginDialog({});
+
+      login.addToView({
+        element,
+      });
+    },
+  },
 });
-secondPositionList.addToView({
-  element,
+const registerButton = elementCreator.createButton({
+  text: 'register',
+  clickFuncs: {
+    leftFunc: () => {
+      const register = new RegisterDialog({});
+
+      register.addToView({
+        element,
+      });
+    },
+  },
 });
-worldMapView.addToView({
-  element,
+const logoutButton = elementCreator.createButton({
+  text: 'logout',
+  clickFuncs: {
+    leftFunc: () => {
+      socketManager.logout({
+        callback: ({ error }) => {
+          if (error) {
+            console.log('Failed to logout');
+
+            return;
+          }
+
+          console.log('Logged out');
+        },
+      });
+    },
+  },
 });
-secondWorldMapView.addToView({
-  element,
+
+element.appendChild(loginButton);
+element.appendChild(registerButton);
+element.appendChild(logoutButton);
+
+const feedWrapper = new ViewWrapper({
+  classes: ['feedWrapper'],
+  columns: [
+    [
+      {
+        component: forumList,
+        title: labelHandler.getLabel({ baseObject: 'FeedView', label: 'messageListTitle' }),
+      },
+    ], [
+      { component: forumView },
+    ], [
+      { component: messageList },
+    ],
+  ],
 });
-userList.addToView({
-  element,
-});
-roomList.addToView({
-  element,
-});
-messageList.addToView({
-  element,
-});
-docFileList.addToView({
-  element,
-});
-docFileView.addToView({
-  element,
-});
-forumList.addToView({
-  element,
-});
-forumView.addToView({
+
+feedWrapper.addToView({
   element,
 });
 

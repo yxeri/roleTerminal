@@ -16,6 +16,7 @@
 
 const storageManager = require('./StorageManager');
 const eventCentral = require('./EventCentral');
+const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
@@ -24,6 +25,7 @@ class SocketManager {
     this.reconnecting = false;
     this.hasConnected = false;
     this.isOnline = false;
+    this.isLoggedIn = false;
 
     this.EmitTypes = {
       FORUM: 'forum',
@@ -45,14 +47,13 @@ class SocketManager {
       INVITATION: 'invitation',
       TEAMMEMBER: 'team member',
       LOGOUT: 'logout',
-      LOGIN: 'login',
       BAN: 'ban',
       WALLET: 'wallet',
       TRANSACTION: 'transaction',
       DISCONNECT: 'disconnect',
       RECONNECT: 'reconnect',
       STARTUP: 'startup',
-      SIMPLEMSG: 'simpleMsg',
+      MSG: 'msg',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -63,6 +64,11 @@ class SocketManager {
     this.addEvents([{
       event: this.EmitTypes.STARTUP,
       func: ({ data }) => {
+        if (!storageManager.getDeviceId()) {
+          storageManager.setDeviceId(textTools.createAlphaNumbericalString(16));
+        }
+
+        if (data.publicRoomId) { storageManager.setPublicRoomId(data.publicRoomId); }
         if (data.defaultLanguage) { storageManager.setLanguage(data.defaultLanguage); }
         if (data.centerCoordinates) { storageManager.setCenterCoordinates(data.centerCoordinates); }
         if (data.cornerOneCoordinates) { storageManager.setCornerOneCoordinates(data.cornerOneCoordinates); }
@@ -73,9 +79,11 @@ class SocketManager {
           this.isOnline = true;
           this.hasConnected = true;
 
-          eventCentral.emitEvent({
-            event: eventCentral.Events.STARTUP,
-            params: {},
+          this.updateId(() => {
+            eventCentral.emitEvent({
+              event: eventCentral.Events.STARTUP,
+              params: {},
+            });
           });
         }
       },
@@ -93,11 +101,9 @@ class SocketManager {
 
     /**
      * Checks if the screen has been unresponsive for some time.
-     * Some devices disable Javascript when screen is off (iOS)
-     * They also fail to notice that they have been disconnected
-     * We check the time between heartbeats and if the time i
-     * over 10 seconds (example: when screen is turned off and then on)
-     * we force them to reconnect
+     * Some devices disable Javascript when screen is off (iOS).
+     * They also fail to notice that they have been disconnected.
+     * The time between heartbeats is checked and a forced reconnect will be done if it's over 10 seconds.
      */
     const timeoutFunc = () => {
       const now = (new Date()).getTime();
@@ -116,38 +122,32 @@ class SocketManager {
   }
 
   addEvent(event, callback) {
-    console.log('adding event', event);
     this.socket.on(event, (params) => { console.log('Socket event', event, params); callback(params); });
   }
 
   addEvents(events) {
-    console.log('adding events', events);
     events.forEach(event => this.addEvent(event.event, event.func));
   }
 
-  updateId() {
-    const device = { deviceId: storageManager.getDeviceId() };
-
+  updateId(callback) {
     console.log('Updating id');
 
-    this.emitEvent('updateId', { device }, ({ error }) => {
+    this.emitEvent('updateId', {
+      device: { objectId: storageManager.getDeviceId() },
+    }, ({ error }) => {
       if (error) {
-        console.log('Sending logout');
+        this.isLoggedIn = false;
 
-        eventCentral.emitEvent({
-          event: eventCentral.Events.LOGOUT,
-          params: {},
-        });
+        storageManager.resetUser();
+
+        callback({ error });
 
         return;
       }
 
-      console.log('Sending reconnect');
+      this.isLoggedIn = true;
 
-      eventCentral.emitEvent({
-        event: eventCentral.Events.RECONNECT,
-        params: {},
-      });
+      callback({ data: { success: true } });
     });
   }
 
@@ -159,7 +159,12 @@ class SocketManager {
       this.reconnecting = true;
       this.socket.disconnect();
       this.socket.connect({ forceNew: true });
-      this.updateId();
+      this.updateId(() => {
+        eventCentral.emitEvent({
+          event: eventCentral.Events.RECONNECT,
+          params: {},
+        });
+      });
     }
   }
 
@@ -184,6 +189,56 @@ class SocketManager {
 
   getIsOnline() {
     return this.isOnline;
+  }
+
+  login({ username, password, callback }) {
+    this.emitEvent('login', {
+      user: {
+        username,
+        password,
+      },
+      device: { objectId: storageManager.getDeviceId() },
+    }, ({ error, data }) => {
+      if (error) {
+        callback({ error });
+
+        return;
+      }
+
+      const { token, user } = data;
+
+      this.isLoggedIn = true;
+
+      storageManager.setToken(token);
+
+      eventCentral.emitEvent({
+        event: eventCentral.Events.LOGIN,
+        params: { user },
+      });
+
+      callback({ data: { success: true } });
+    });
+  }
+
+  logout({ callback }) {
+    this.emitEvent('logout', {}, ({ error }) => {
+      if (error) {
+        callback({ error });
+
+        return;
+      }
+
+      this.isLoggedIn = false;
+
+      storageManager.resetUser();
+
+      eventCentral.emitEvent({
+        event: eventCentral.Events.LOGOUT,
+        params: {},
+      });
+
+      callback({ data: { success: true } });
+    });
   }
 }
 

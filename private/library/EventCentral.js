@@ -63,6 +63,8 @@ class EventCentral {
       SWITCH_LANGUAGE: 'Switched language',
       WORLDMAP: 'World map created',
       FOCUS_MAPPOSITION: 'Focus on map position',
+      COMPLETE_FORUM: 'Forum dependencies fetched',
+      ACCESS_CHANGE: 'Access level has changed',
     };
     this.eventWatchers = {};
   }
@@ -91,6 +93,8 @@ class EventCentral {
     event,
     params = {},
   }) {
+    console.log(event, params);
+
     if (this.eventWatchers[event]) {
       this.eventWatchers[event].forEach(watcher => watcher.func(params));
     }

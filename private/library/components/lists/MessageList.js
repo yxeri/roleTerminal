@@ -79,7 +79,6 @@ class MessageList extends List {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          console.log(roomListId, origin)
           if ((!origin && !roomListId) || roomListId === origin) {
             this.showMessagesByRoom({ roomId: room.objectId });
           }

@@ -1,39 +1,27 @@
 const storageManager = require('../StorageManager');
-
-const labels = {
-  List: {
-    removedItem: {
-      en: ['The item has been removed.'],
-      se: ['Raden har raderats.'],
-    },
-  },
-  ForumView: {
-    removedForum: {
-      en: ['The forum no longer exists.'],
-      se: ['Forumet existerar inte.'],
-    },
-  },
-  Dialog: {
-    cancel: {
-      en: ['Cancel'],
-      se: ['Avbryt'],
-    },
-    login: {
-      en: ['Login'],
-      se: ['Logga in'],
-    },
-    register: {
-      en: ['Register'],
-      se: ['Registera'],
-    },
-  },
-};
+const labels = require('./labels');
 
 class LabelHandler {
-  static getLabel({ baseObject, label }) {
-    const language = storageManager.getLanguage();
+  static getLabel({
+    baseObject,
+    label,
+    prependSpace,
+    appendSpace,
+  }) {
+    const language = storageManager.getLanguage() || 'en';
 
-    return labels[baseObject][label][language];
+    if (!labels[baseObject] || !labels[baseObject][label] || (!labels[baseObject][label][language] && !labels[baseObject][label].en)) {
+      return '';
+    }
+
+    let labelToReturn = labels[baseObject][label][language] || labels[baseObject][label].en;
+
+    if (labelToReturn !== '') {
+      if (prependSpace) { labelToReturn = ` ${labelToReturn}`; }
+      if (appendSpace) { labelToReturn = `${labelToReturn} `; }
+    }
+
+    return labelToReturn;
   }
 }
 

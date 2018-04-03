@@ -61,6 +61,26 @@ class ElementCreator {
     return list;
   }
 
+  static createPicture({
+    picture,
+    clickFuncs,
+    classes,
+    elementId,
+  }) {
+    const pictureElement = document.createElement('img');
+
+    pictureElement.setAttribute('src', picture.url);
+
+    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width};`); }
+    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height};`); }
+
+    this.setClickFuncs(pictureElement, clickFuncs);
+    this.setClasses(pictureElement, classes);
+    this.setElementId(pictureElement, elementId);
+
+    return pictureElement;
+  }
+
   static createListItem({
     elements,
     clickFuncs,
@@ -85,8 +105,9 @@ class ElementCreator {
     clickFuncs,
     elementId,
     classes,
+    spanType,
   }) {
-    const span = document.createElement('span');
+    const span = document.createElement(spanType || 'span');
 
     if (text) {
       span.appendChild(document.createTextNode(text));
@@ -166,13 +187,13 @@ class ElementCreator {
 
   static createInput({
     type,
-    placeholder,
     inputName,
     isRequired,
     multiLine,
     maxLength,
     elementId,
     classes,
+    placeholder = '',
   }) {
     const input = multiLine ? document.createElement('textarea') : document.createElement('input');
 

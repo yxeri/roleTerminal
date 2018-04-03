@@ -23,7 +23,7 @@ class MessageData extends BaseData {
   constructor() {
     super({
       createEvents: {
-        one: 'sendChatMsg',
+        one: 'sendMessage',
       },
       retrieveEvents: {
         one: 'getMessage',
@@ -54,40 +54,8 @@ class MessageData extends BaseData {
       CHAT: 'chat',
       WHISPER: 'whisper',
       BROADCAST: 'broadcast',
+      MESSAGE: 'message',
     };
-  }
-
-  sendChatMessage({
-    message,
-    callback,
-  }) {
-    super.createObject({
-      callback,
-      event: 'sendChatMsg',
-      params: { message },
-    });
-  }
-
-  sendBroadcast({
-    message,
-    callback,
-  }) {
-    super.createObject({
-      callback,
-      event: 'sendBroadcastMsg',
-      params: { message },
-    });
-  }
-
-  sendWhisper({
-    message,
-    callback,
-  }) {
-    super.createObject({
-      callback,
-      event: 'sendWhisperMsg',
-      params: { message },
-    });
   }
 }
 

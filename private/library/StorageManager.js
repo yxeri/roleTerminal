@@ -17,8 +17,6 @@
 const converters = require('./Converters');
 const eventCentral = require('./EventCentral');
 
-const publicRoomId = '111111111111111111111110';
-
 class StorageManager {
   static addWatchers() {
     eventCentral.addWatcher({
@@ -45,19 +43,13 @@ class StorageManager {
     eventCentral.addWatcher({
       event: eventCentral.Events.LOGIN,
       func: ({ user }) => {
-        const { accessLevel, defaultRoomId } = user;
+        const { accessLevel, defaultRoomId, objectId } = user;
 
         this.setUser({
           accessLevel,
           defaultRoomId,
+          userId: objectId,
         });
-      },
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.LOGOUT,
-      func: () => {
-        this.resetUser();
       },
     });
   }
@@ -102,9 +94,16 @@ class StorageManager {
   static setUser({
     accessLevel,
     currentRoom,
+    userId,
   }) {
     this.setAccessLevel(accessLevel);
     this.setCurrentRoom(currentRoom);
+    this.setUserId(userId);
+
+    eventCentral.emitEvent({
+      event: eventCentral.Events.ACCESS_CHANGE,
+      params: { accessLevel },
+    });
   }
 
   /**
@@ -114,9 +113,23 @@ class StorageManager {
   static resetUser() {
     this.removeGameCode();
     this.removeToken();
-    this.setCurrentRoom(publicRoomId);
+    this.setCurrentRoom(this.getPublicRoomId());
     this.setAccessLevel(0);
-    this.setCurrentForum(-1);
+    this.removeCurrentForum();
+    this.removeUserId();
+
+    eventCentral.emitEvent({
+      event: eventCentral.Events.ACCESS_CHANGE,
+      params: { accessLevel: 0 },
+    });
+  }
+
+  static setPublicRoomId(roomId) {
+    this.setLocalVal('publicRoom', roomId);
+  }
+
+  static getPublicRoomId() {
+    return this.getLocalVal('publicRoom');
   }
 
   /**
@@ -135,6 +148,28 @@ class StorageManager {
    */
   static setDeviceId(deviceId) {
     this.setLocalVal('deviceId', deviceId);
+  }
+
+  /**
+   * Get user Id.
+   * @static
+   * @returns {string} User Id.
+   */
+  static getUserId() {
+    return this.getLocalVal('userId');
+  }
+
+  /**
+   * Set user Id.
+   * @static
+   * @param {string} userId - User Id.
+   */
+  static setUserId(userId) {
+    this.setLocalVal('userId', userId);
+  }
+
+  static removeUserId() {
+    this.removeLocalVal('userId');
   }
 
   /**
@@ -188,11 +223,11 @@ class StorageManager {
    * @param {number} defaultZoomLevel - Default zoom level on the map.
    */
   static setDefaultZoomLevel(defaultZoomLevel) {
-    this.setLocalVal('defaultZoomLevel', defaultZoomLevel);
+    this.setLocalVal('defaultZoom', defaultZoomLevel);
   }
 
   static getDefaultZoomlevel() {
-    return converters.convertToInt(this.getLocalVal('defaultZoomLevel'));
+    return converters.convertToInt(this.getLocalVal('defaultZoom'));
   }
 
   /**
@@ -286,10 +321,16 @@ class StorageManager {
   }
 
   static getCurrentRoom() {
-    return this.getLocalVal('currentRoom') || publicRoomId;
+    return this.getLocalVal('currentRoom');
+  }
+
+  static removeCurrentForum() {
+    this.removeLocalVal('currentForum');
   }
 
   static setCurrentForum(forumId) {
+    console.log('set current', forumId);
+
     this.setLocalVal('currentForum', forumId);
   }
 

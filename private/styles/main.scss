@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, img, ul, li, video, textarea, button, input, fieldset {
+html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
   padding: 0;
   border: 0;
@@ -32,11 +32,29 @@ input::-moz-focus-inner {
 html, body {
   height: 100%;
   width: 100%;
+  background-color: #e9ebee;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: .9em;
+  color: #1d2129;
 }
+
 
 span.clickable {
   cursor: pointer;
   text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+.viewWrapper {
+  display: flex;
+  width: fit-content;
+  width: -moz-fit-content;
+  height: 100%;
+  width: 100%;
 }
 
 /**********
@@ -63,10 +81,6 @@ span.clickable {
 
 }
 
-.worldMapView {
-
-}
-
 /*********
  * Lists *
  *********/
@@ -83,28 +97,18 @@ span.clickable {
  * A list of rooms.
  */
 .roomList {
-  background-color: #8c8c8c;
 }
 
 /*
  * A list of messages.
  */
 .msgList {
-  background-color: #5cb85c;
 }
 
 /*
  * A list of files.
  */
 .docFileList {
-  background-color: #5bc0de;
-}
-
-/*
- * A list of forums
- */
-.forumList {
-  background-color: #1b6d85;
 }
 
 .positionList {
@@ -137,34 +141,145 @@ span.clickable {
   background-color: green;
 }
 
-/*********
- * Forum *
- *********/
+/*******************
+ * Missile Command *
+ *******************/
 
-.thread {
-  background-color: #67b168;
+.missileCommandWrapper {
+  .worldMapView {
+    width: 50vw;
+    height: 50vh;
+  }
 }
 
-.forum {
-}
+/**************
+ * Forum Feed *
+ **************/
 
-.post {
-  background-color: #761c19;
-}
+$border-color: #dddfe2;
+$border-width: .1em;
+$border: $border-width solid $border-color;
+$forum-pieces-background-color: #ffffff;
+$border-radius: .3em;
+$forum-pieces-bottom-margin: .5em;
+$post-padding: .5em;
+$forum-padding: .5em;
 
-.subpost {
-  background-color: #696900;
-}
+.feedWrapper {
+  margin-left: auto;
+  margin-right: auto;
 
-/*************
- * World Map *
- *************/
+  > div {
+    width: 40em;
+  }
 
-.worldMapView {
-  border: 10px black solid;
-  width: 47%;
-  height: 250px;
-  display: inline-block;
+  > div:first-child {
+    width: 15em;
+  }
+
+  > div:last-child {
+    width: 15em;
+  }
+
+  .forum {
+    > header {
+      border-top: $border;
+      border-right: $border;
+      border-left: $border;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .timeCreated, .lastUpdated {
+      color: #90949c
+    }
+
+    .username {
+      color: #3f9946;
+      font-weight: bold;
+    }
+
+    .forumList {
+    }
+
+    .contentEnd {
+      font-size: .9em;
+
+      span {
+        margin-right: .5em;
+      }
+    }
+
+    .forumContent {
+      border-bottom: $border;
+      border-right: $border;
+      border-left: $border;
+      margin-bottom: $forum-pieces-bottom-margin;
+    }
+
+    .thread {
+      border: $border;
+      -webkit-border-radius: $border-radius;
+      -moz-border-radius: $border-radius;
+      margin-bottom: $forum-pieces-bottom-margin;
+      background-color: $forum-pieces-background-color;
+
+      > header {
+        padding: 0 $forum-padding;
+      }
+    }
+
+    .threadContent {
+      padding: 0 $forum-padding;
+      border-bottom: $border-width solid #e5e5e5;
+    }
+
+    .post {
+      -webkit-border-radius: $border-radius;
+      -moz-border-radius: $border-radius;
+      margin: 0 $forum-padding;
+
+      > header {
+        -webkit-border-top-left-radius: $border-radius;
+        -webkit-border-top-right-radius: $border-radius;
+        background-color: $forum-pieces-background-color;
+        padding: 0 $post-padding 0 $post-padding;
+      }
+    }
+
+    .postContent {
+      -webkit-border-bottom-left-radius: $border-radius;
+      -webkit-border-bottom-right-radius: $border-radius;
+      background-color: $forum-pieces-background-color;
+      margin-bottom: $forum-pieces-bottom-margin;
+      padding: 0 $post-padding 0 $post-padding;
+    }
+
+    .postContainer {
+      padding-top: $forum-pieces-bottom-margin;
+      border-bottom: $border;
+      background-color: #f2f3f5;
+    }
+
+    .subPost {
+      -webkit-border-radius: $border-radius;
+      background-color: $forum-pieces-background-color;
+      padding: $post-padding $post-padding 0 $post-padding;
+      margin: 0 0 $forum-pieces-bottom-margin $forum-padding * 2;
+    }
+
+    .subContainer {
+    }
+
+    .pictureContainer {
+    }
+  }
+
+  .msgList {
+    list-style: none;
+  }
 }
 
 /********

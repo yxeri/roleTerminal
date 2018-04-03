@@ -54,8 +54,8 @@ class BaseData {
 
     eventCentral.addWatcher({
       event: eventCentral.Events.STARTUP,
-      func: () => {
-        this.fetchObjects({});
+      func: ({ shouldReset }) => {
+        this.fetchObjects({ reset: shouldReset });
       },
     });
 
@@ -173,12 +173,11 @@ class BaseData {
 
       if (reset) {
         this.objects = {};
-        this.objects = objects;
-      } else {
-        objects.forEach((object) => {
-          this.objects[object.objectId] = object;
-        });
       }
+
+      objects.forEach((object) => {
+        this.objects[object.objectId] = object;
+      });
 
       this.hasFetched = true;
 
@@ -193,8 +192,10 @@ class BaseData {
    * Retrieve object from server.
    * @param {Object} params - Parameters.
    * @param {Object} params.params - Parameters to send to the server.
+   * @param {boolean} [params.noEmit] - Should the event emit be suppressed?
+   * @param {Function} [params.callback] - Callback.
    */
-  fetchObject({ params }) {
+  fetchObject({ params, noEmit, callback = () => {} }) {
     if (!socketManager.isOnline) {
       eventCentral.emitEvent({
         event: eventCentral.Events.ERROR,
@@ -208,15 +209,19 @@ class BaseData {
 
     socketManager.emitEvent(this.retrieveEvents.one, params, ({ error, data }) => {
       if (error) {
-        const errorParams = {
-          event: this.retrieveEvents.one,
-          data: params,
-        };
+        if (!noEmit) {
+          const errorParams = {
+            event: this.retrieveEvents.one,
+            data: params,
+          };
 
-        eventCentral.emitEvent({
-          event: eventCentral.Events.ERROR,
-          params: errorParams,
-        });
+          eventCentral.emitEvent({
+            event: eventCentral.Events.ERROR,
+            params: errorParams,
+          });
+        }
+
+        callback({ error });
 
         return;
       }
@@ -236,10 +241,14 @@ class BaseData {
         this.objects[object.objectId] = object;
       }
 
-      eventCentral.emitEvent({
-        params: eventParams,
-        event: this.eventTypes.one,
-      });
+      if (!noEmit) {
+        eventCentral.emitEvent({
+          params: eventParams,
+          event: this.eventTypes.one,
+        });
+      }
+
+      callback(dataToSend);
     });
   }
 
@@ -368,11 +377,32 @@ class BaseData {
    * @param {Object} params - Parameters.
    * @param {Object} params.filter - Filter to check against.
    * @param {boolean} [params.orCheck] - Is it enough for only one sent value to match?
+   * @param {Object} [params.sorting] - Sorting of the returned objects.
+   * @param {string} params.sorting.paramName - Name of the parameter to sort by.
+   * @param {string} [params.sorting.fallbackParamName] - Name of the parameter to sort by, if paramName is not found.
+   * @param {boolean} [params.sorting.reverse] - Should the sort order be reversed?
    * @return {Object} Stored objects.
    */
-  getObjects({ orCheck, filter }) {
+  getObjects({
+    orCheck,
+    filter,
+    sorting,
+  }) {
+    const sortFunc = (a, b) => {
+      const aParam = a[sorting.paramName] || a[sorting.fallbackParamName];
+      const bParam = b[sorting.paramName] || b[sorting.fallbackParamName];
+
+      if (aParam < bParam) {
+        return sorting.reverse ? 1 : -1;
+      } else if (aParam > bParam) {
+        return sorting.reverse ? -1 : 1;
+      }
+
+      return 0;
+    };
+
     if (filter) {
-      return Object.keys(this.objects).filter((objectKey) => {
+      const objects = Object.keys(this.objects).filter((objectKey) => {
         const object = this.objects[objectKey];
 
         if (orCheck) {
@@ -381,9 +411,11 @@ class BaseData {
 
         return filter.rules.every(rule => rule.paramValue === object[rule.paramName]);
       }).map(objectKey => this.objects[objectKey]);
+
+      return sorting ? objects.sort(sortFunc) : objects;
     }
 
-    return this.objects;
+    return sorting ? this.objects.sort(sortFunc) : this.objects;
   }
 }
 

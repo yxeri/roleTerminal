@@ -1,5 +1,5 @@
-const eventHandler = require('./EventCentral');
-const dataHandler = require('./data/DataHandler');
+const eventHandler = require('../EventCentral');
+const dataHandler = require('../data/DataHandler');
 
 class WorldMapHandler {
   constructor() {
@@ -10,8 +10,10 @@ class WorldMapHandler {
      */
     this.PositionTypes = {
       USER: 'user',
+      DEVICE: 'device',
       WORLD: 'world',
       LOCAL: 'local',
+      TOOL: 'tool',
     };
     this.hasFected = false;
 
@@ -26,6 +28,7 @@ class WorldMapHandler {
   startMap() {
     if (
       typeof google === 'undefined'
+      || typeof google.maps.geometry === 'undefined'
       || typeof MarkerClusterer === 'undefined'
       || typeof MapLabel === 'undefined'
       || !dataHandler.positions.hasFetched

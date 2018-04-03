@@ -1,12 +1,15 @@
 const Label = require('./Label');
 
+const mouseHandler = require('../MouseHandler');
+
 /**
  * Requires Google maps library
  */
 class MapMarker {
   constructor({
-    icon,
     position,
+    worldMapView,
+    icon = {},
     circleStyles = {},
     alwaysShowLabel = false,
     shouldCluster = true,
@@ -27,11 +30,11 @@ class MapMarker {
         lat: coordinates.latitude,
         lng: coordinates.longitude,
       },
-      icon: icon || {
+      icon: {
         url,
-        size: new google.maps.Size(14, 14),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(7, 7),
+        size: icon.size || new google.maps.Size(14, 14),
+        origin: icon.origin || new google.maps.Point(0, 0),
+        anchor: icon.anchor || new google.maps.Point(7, 7),
       },
       opacity,
     });
@@ -52,6 +55,16 @@ class MapMarker {
     });
     this.shouldCluster = shouldCluster;
     this.alwaysShowLabel = alwaysShowLabel;
+
+    mouseHandler.addGMapsClickListener({
+      element: this.marker,
+      leftFunc: (event) => {
+        worldMapView.createPositionClickBox({ event, positionId });
+      },
+      right: (event) => {
+        worldMapView.createPositionRightClickBox({ event, positionId });
+      },
+    });
   }
 
   getPosition() {
@@ -60,40 +73,6 @@ class MapMarker {
 
   setMap(map) {
     this.marker.setMap(map);
-  }
-
-  attachMouseListeners() {
-    let longClick = false;
-
-    google.maps.event.addListener(this.marker, 'mouseover', () => {
-    });
-
-    google.maps.event.addListener(this.marker, 'mouseout', () => {
-    });
-
-    google.maps.event.addListener(this.marker, 'click', () => {
-    });
-
-    google.maps.event.addListener(this.marker, 'rightclick', () => {
-    });
-
-    google.maps.event.addListener(this.marker, 'mousedown', () => {
-      longClick = true;
-
-      setTimeout(() => {
-        if (longClick) {
-          // TODO Right click stuff
-        }
-      }, 500);
-    });
-
-    google.maps.event.addListener(this.marker, 'mouseup', () => {
-      longClick = false;
-    });
-
-    google.maps.event.addListener(this.marker, 'dragstart', () => {
-      longClick = false;
-    });
   }
 
   showLabel() {

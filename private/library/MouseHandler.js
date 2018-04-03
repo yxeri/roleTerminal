@@ -14,11 +14,10 @@
  limitations under the License.
  */
 
-const touchTimeout = 500;
-
 class MouseHandler {
   constructor() {
     this.longClick = false;
+    this.touchTimeout = 500;
 
     window.addEventListener('touchmove', () => {
       this.longClick = false;
@@ -58,10 +57,42 @@ class MouseHandler {
           if (this.longClick) {
             right();
           }
-        }, touchTimeout);
+        }, this.touchTimeout);
       });
 
       element.addEventListener('mouseup', () => {
+        this.longClick = false;
+      });
+    }
+  }
+
+  addGMapsClickListener({
+    element,
+    leftFunc,
+    right,
+  }) {
+    if (leftFunc) {
+      google.maps.event.addListener(element, 'click', leftFunc);
+    }
+
+    if (right) {
+      google.maps.event.addListener(element, 'rightclick', (event) => {
+        this.longClick = false;
+
+        right(event);
+      });
+
+      google.maps.event.addListener(element, 'mousedown', (event) => {
+        this.longClick = true;
+
+        setTimeout(() => {
+          if (this.longClick) {
+            right(event);
+          }
+        }, this.touchTimeout);
+      });
+
+      google.maps.event.addListener(element, 'mouseup', () => {
         this.longClick = false;
       });
     }

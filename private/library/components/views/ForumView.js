@@ -16,31 +16,59 @@
 
 const BaseView = require('./BaseView');
 
-const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const labelHandler = require('../../labels/LabelHandler');
 const storageManager = require('../../StorageManager');
+const textTools = require('../../TextTools');
+const forumComposer = require('../../data/ForumComposer');
 
 const cssClasses = {
   subPost: 'subPost',
   post: 'post',
   thread: 'thread',
-  threadContent: 'thContent',
-  postContainer: 'poContainer',
+  threadContent: 'threadContent',
+  postContainer: 'postContainer',
   subpostContainer: 'subContainer',
-  postContent: 'poContent',
+  postContent: 'postContent',
   forum: 'forum',
+  forumContent: 'forumContent',
+  forumInfo: 'forumInfo',
+  username: 'username',
+  timeCreated: 'timeCreated',
+  lastUpdated: 'lastUpdated',
+  likes: 'likes',
+  timestamp: 'timestamp',
+  pictureContainer: 'pictureContainer',
+  contentEnd: 'contentEnd',
+
 };
 const ids = {
-  postContent: 'po',
-  threadContent: 'th',
-  footer: 'ft',
-  postContainer: 'poCon',
-  subpostContainer: 'subCon',
+  postContent: 'poCon',
+  threadContent: 'thCon',
+  footer: 'footer',
+  postContainer: 'poContainer',
+  subpostContainer: 'suContainer',
+  forumContent: 'foCon',
+  contentEnd: 'coEnd',
 };
 const elementChangeTimeout = 800;
+let disableVoting = false;
+let disablePictures = false;
+
+/**
+ * Create a picture container.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.object - Post/thread/subpost that contains pictures.
+ * @return {HTMLElement} Container with the pictures.
+ */
+function createPictureContainer({ object }) {
+  return elementCreator.createContainer({
+    classes: [cssClasses.pictureContainer],
+    elements: object.pictures.map(picture => elementCreator.createPicture({ picture })),
+  });
+}
 
 /**
  * Create a header paragraph.
@@ -49,13 +77,77 @@ const elementChangeTimeout = 800;
  * @return {HTMLParagraphElement} Header element.
  */
 function createHeader({ object }) {
-  const creator = dataHandler.users.getObject({ objectId: object.ownerAliasId || object.ownerId });
-
   return elementCreator.createParagraph({
+    classes: [cssClasses.forumInfo],
     elements: [
-      elementCreator.createSpan({ text: creator ? creator.username : object.ownerAliasId || object.ownerId }),
-      elementCreator.createSpan({ text: object.customTimeCreated || object.timeCreated }),
-      elementCreator.createSpan({ text: object.customLastUpdated || object.lastUpdated }),
+      elementCreator.createSpan({
+        classes: [cssClasses.username],
+        text: object.creatorName,
+      }),
+    ],
+  });
+}
+
+/**
+ * Create human-readable dates for when the item was created and last updated.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.object - Post/subpost/thread.
+ * @return {HTMLParagraphElement} Paragraph with dates.
+ */
+function createTimestamp({ object }) {
+  const timeCreated = object.customTimeCreated || object.timeCreated;
+  const lastUpdated = object.customLastUpdated || object.lastUpdated;
+  const timeCreatedStamp = textTools.generateTimeStamp({ date: timeCreated });
+  const lastUpdatedStamp = textTools.generateTimeStamp({ date: lastUpdated });
+  const elements = [
+    elementCreator.createSpan({
+      classes: [cssClasses.timeCreated],
+      text: `${labelHandler.getLabel({ baseObject: 'ForumView', label: 'timeCreated', appendSpace: true })}${timeCreatedStamp.fullDate}`,
+    }),
+  ];
+
+  if (timeCreated !== lastUpdated) {
+    elements.push(elementCreator.createSpan({
+      classes: [cssClasses.lastUpdated],
+      text: `${labelHandler.getLabel({ baseObject: 'ForumView', label: 'lastUpdated', appendSpace: true })}${lastUpdatedStamp.fullDate}`,
+    }));
+  }
+
+  return elementCreator.createParagraph({ elements });
+}
+
+/**
+ * Create element that will be added to the end of the content.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.object - Object to use to create the content end.
+ * @return {HTMLParagraphElement} Paragraph.
+ */
+function createContentEnd({ object }) {
+  const timeStamp = createTimestamp({ object });
+
+  timeStamp.classList.add(cssClasses.contentEnd);
+  timeStamp.setAttribute('id', ids.contentEnd);
+
+  if (!disableVoting) {
+    timeStamp.insertBefore(elementCreator.createSpan({
+      classes: [cssClasses.likes],
+      text: `${object.likes}${labelHandler.getLabel({ baseObject: 'ForumView', label: 'likes', prependSpace: true })}`,
+    }), timeStamp.firstElementChild);
+  }
+
+  return timeStamp;
+}
+
+/**
+ * Create a post header.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.post - Post to create a header for.
+ * @return {HTMLElement} Header container.
+ */
+function createPostHeader({ post }) {
+  return elementCreator.createContainer({
+    elements: [
+      createHeader({ object: post }),
     ],
   });
 }
@@ -67,13 +159,21 @@ function createHeader({ object }) {
  * @return {HTMLElement} Sub post element.
  */
 function createSubPost({ subPost, elementId }) {
+  const elements = subPost.text.map(lines => elementCreator.createParagraph({
+    elements: [elementCreator.createSpan({ text: lines })],
+  }));
+
+  if (!disablePictures && subPost.pictures) {
+    elements.push(createPictureContainer({ object: subPost }));
+  }
+
+  elements.push(createContentEnd({ object: subPost }));
+
   return elementCreator.createSection({
+    elements,
     classes: [cssClasses.subPost],
     elementId: `${elementId}${subPost.objectId}`,
-    headerElement: createHeader({ object: subPost }),
-    elements: subPost.text.map(lines => elementCreator.createParagraph({
-      elements: [elementCreator.createSpan({ text: lines })],
-    })),
+    headerElement: createPostHeader({ post: subPost }),
   });
 }
 
@@ -85,12 +185,20 @@ function createSubPost({ subPost, elementId }) {
  * @return {HTMLElement} Thread container.
  */
 function createPostContent({ post, elementId }) {
+  const elements = post.text.map((lines) => {
+    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
+  });
+
+  if (!disablePictures && post.pictures) {
+    elements.push(createPictureContainer({ object: post }));
+  }
+
+  elements.push(createContentEnd({ object: post }));
+
   return elementCreator.createContainer({
+    elements,
     classes: [cssClasses.postContent],
     elementId: `${elementId}${ids.postContent}`,
-    elements: post.text.map((lines) => {
-      return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
-    }),
   });
 }
 
@@ -109,13 +217,7 @@ function createPost({
   const fullElementId = `${elementId}${post.objectId}`;
 
   if (!ignoreSubPosts) {
-    const subPosts = dataHandler.forumPosts.getObjects({
-      filter: {
-        rules: [
-          { paramName: 'parentPostId', paramValue: post.objectId },
-        ],
-      },
-    });
+    const { subPosts } = post;
 
     elements.push(elementCreator.createContainer({
       classes: [cssClasses.subpostContainer],
@@ -130,7 +232,7 @@ function createPost({
     elements,
     classes: [cssClasses.post],
     elementId: fullElementId,
-    headerElement: createHeader({ object: post }),
+    headerElement: createPostHeader({ post }),
   });
 }
 
@@ -144,7 +246,7 @@ function createThreadHeader({ thread }) {
   return elementCreator.createContainer({
     elements: [
       elementCreator.createParagraph({
-        elements: [elementCreator.createSpan({ text: thread.title })],
+        elements: [elementCreator.createSpan({ spanType: 'h2', text: thread.title })],
       }),
       createHeader({ object: thread }),
     ],
@@ -159,10 +261,35 @@ function createThreadHeader({ thread }) {
  * @return {HTMLElement} Thread container.
  */
 function createThreadContent({ thread, elementId }) {
+  const elements = thread.text.map((lines) => {
+    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
+  });
+
+  if (!disablePictures && thread.pictures) {
+    elements.push(createPictureContainer({ object: thread }));
+  }
+
+  elements.push(createContentEnd({ object: thread }));
+
   return elementCreator.createContainer({
+    elements,
     classes: [cssClasses.threadContent],
     elementId: `${elementId}${ids.threadContent}`,
-    elements: thread.text.map((lines) => {
+  });
+}
+
+/**
+ * Create a forum content container.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.forum - Forum to create a container for.
+ * @param {string} params.elementId - Base Id of the element.
+ * @return {HTMLElement} Thread container.
+ */
+function createForumContent({ forum, elementId }) {
+  return elementCreator.createContainer({
+    classes: [cssClasses.forumContent],
+    elementId: `${elementId}${ids.forumContent}`,
+    elements: forum.text.map((lines) => {
       return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
     }),
   });
@@ -171,21 +298,14 @@ function createThreadContent({ thread, elementId }) {
 /**
  * Create a thread article. It will include any posts connected to the thread.
  * @param {Object} params - Parameters.
- * @param {Object} params.thread - Thread to create an element from.
+ * @param {string} params.thread - The thread to create an element from.
  * @return {HTMLElement} Thread element.
  */
 function createThread({
   thread,
   elementId,
 }) {
-  const { objectId: threadId } = thread;
-  const posts = dataHandler.forumPosts.getObjects({
-    filter: {
-      rules: [
-        { paramName: 'threadId', paramValue: threadId },
-      ],
-    },
-  }).filter(post => !post.parentPostId);
+  const { objectId: threadId, posts } = thread;
   const elements = [];
   const fullElementId = `${elementId}${threadId}`;
 
@@ -194,15 +314,13 @@ function createThread({
     elementId: fullElementId,
   }));
 
-  if (posts && posts.length > 0) {
-    elements.push(elementCreator.createContainer({
-      classes: [cssClasses.postContainer],
-      elementId: `${fullElementId}${ids.postContainer}`,
-      elements: posts.map((post) => {
-        return createPost({ post, elementId });
-      }),
-    }));
-  }
+  elements.push(elementCreator.createContainer({
+    classes: [cssClasses.postContainer],
+    elementId: `${fullElementId}${ids.postContainer}`,
+    elements: posts.map((post) => {
+      return createPost({ post, elementId });
+    }),
+  }));
 
   return elementCreator.createArticle({
     elements,
@@ -214,7 +332,10 @@ function createThread({
 
 class ForumView extends BaseView {
   constructor({
+    forumId,
+    shouldDisableVoting = false,
     lockedToForum = false,
+    shouldDisablePictures = false,
     classes = [],
     elementId = `fView-${Date.now()}`,
   }) {
@@ -223,18 +344,33 @@ class ForumView extends BaseView {
       classes: classes.concat(['forumView']),
     });
 
+    this.currentForum = forumId;
+
+    disableVoting = shouldDisableVoting;
+    disablePictures = shouldDisablePictures;
+
     if (!lockedToForum) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_FORUM,
         func: ({ forum }) => {
-          this.showForum({ forumId: forum.objectId });
+          if (!forumComposer.isComplete) {
+            return;
+          }
+
+          this.currentForum = forum.objectId;
+
+          this.showForum({ forumId: this.getCurrentForumId() });
         },
       });
     }
 
     eventCentral.addWatcher({
       event: eventCentral.Events.FORUMTHREAD,
-      func: ({ thread, changeType}) => {
+      func: ({ thread, changeType }) => {
+        if (!forumComposer.isComplete) {
+          return;
+        }
+
         const { objectId } = thread;
 
         switch (changeType) {
@@ -246,17 +382,17 @@ class ForumView extends BaseView {
           case socketManager.ChangeTypes.CREATE: {
             const newThread = createThread({ thread, elementId: this.elementId });
 
-            this.element.insertBefore(newThread, this.element.firstElementChild);
+            this.element.insertBefore(newThread, this.getThisElement().firstElementChild);
 
             break;
           }
           case socketManager.ChangeTypes.REMOVE: {
-            const toRemove = this.getElement(thread.objectId);
+            const toRemove = this.getElement({ objectId: thread.objectId });
 
             toRemove.classList.add(cssClasses.removeListItem);
 
             setTimeout(() => {
-              this.element.removeChild(this.getElement(objectId));
+              this.element.removeChild(this.getElement({ objectId }));
             }, elementChangeTimeout);
 
             break;
@@ -271,6 +407,10 @@ class ForumView extends BaseView {
     eventCentral.addWatcher({
       event: eventCentral.Events.FORUMPOST,
       func: ({ post, changeType }) => {
+        if (!forumComposer.isComplete) {
+          return;
+        }
+
         const { parentPostId, objectId } = post;
 
         switch (changeType) {
@@ -282,9 +422,9 @@ class ForumView extends BaseView {
           case socketManager.ChangeTypes.CREATE: {
             if (parentPostId) {
               const newPost = createSubPost({ subPost: post, elementId: this.elementId });
-              const parentPost = this.getElement({ objectId: parentPostId });
+              const parentPostContainer = this.getElement({ objectId: `${parentPostId}${ids.subpostContainer}` });
 
-              parentPost.appendChild(newPost);
+              parentPostContainer.appendChild(newPost);
             } else {
               const newPost = createPost({ post, elementId: this.elementId });
               const postContainer = this.getElement({ objectId: `${post.threadId}${ids.postContainer}` });
@@ -295,13 +435,13 @@ class ForumView extends BaseView {
             break;
           }
           case socketManager.ChangeTypes.REMOVE: {
-            const toRemove = this.getElement(objectId);
+            const toRemove = this.getElement({ objectId });
             const thread = this.getElement({ objectId: post.threadId });
 
             toRemove.classList.add(cssClasses.removeListItem);
 
             setTimeout(() => {
-              thread.removeChild(this.getElement(objectId));
+              thread.removeChild(this.getElement({ objectId }));
             }, elementChangeTimeout);
 
             break;
@@ -316,6 +456,10 @@ class ForumView extends BaseView {
     eventCentral.addWatcher({
       event: eventCentral.Events.FORUM,
       func: ({ forum, changeType }) => {
+        if (!forumComposer.isComplete) {
+          return;
+        }
+
         switch (changeType) {
           case socketManager.ChangeTypes.UPDATE: {
             this.updateForum({ forum });
@@ -334,7 +478,16 @@ class ForumView extends BaseView {
       },
     });
 
-    this.showForum({ forumId: storageManager.getCurrentForum() });
+    eventCentral.addWatcher({
+      event: eventCentral.Events.COMPLETE_FORUM,
+      func: () => {
+        this.showForum({ forumId: this.getCurrentForumId() });
+      },
+    });
+  }
+
+  getCurrentForumId() {
+    return this.currentForum || storageManager.getCurrentForum();
   }
 
   updateForum({ forum }) {
@@ -344,14 +497,18 @@ class ForumView extends BaseView {
   updateThread({ thread }) {
     const existingThread = this.getElement({ objectId: thread.objectId });
     const threadContent = this.getElement({ objectId: `${thread.objectId}${ids.threadContent}` });
+    const forum = this.getThisElement();
+    const forumContent = this.getElement({ objectId: ids.forumContent });
+
+    forum.insertBefore(existingThread, forumContent.nextSibling);
 
     existingThread.replaceChild(
       elementCreator.createHeader({ elements: [createThreadHeader({ thread })] }),
       existingThread.getElementsByTagName('header')[0],
     );
     existingThread.replaceChild(
-      createThreadContent({ thread, elementId: `${this.elementId}${thread.objectId}` }),
       threadContent,
+      createThreadContent({ thread, elementId: `${this.elementId}${thread.objectId}` }),
     );
   }
 
@@ -367,8 +524,8 @@ class ForumView extends BaseView {
         existingPost.getElementsByTagName('header')[0],
       );
       existingPost.replaceChild(
-        createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
         postContent,
+        createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
       );
     }
   }
@@ -378,23 +535,13 @@ class ForumView extends BaseView {
   }
 
   showForum({ forumId }) {
-    const dependencies = [
-      dataHandler.forums,
-      dataHandler.forumPosts,
-      dataHandler.forumThreads,
-      dataHandler.users,
-      dataHandler.teams,
-    ];
-
-    if (!dependencies.every(dependency => dependency.hasFetched)) {
-      setTimeout(() => {
-        this.showForum({ forumId });
-      }, 200);
-
+    if (!forumId) {
       return;
     }
 
-    const forum = dataHandler.forums.getObject({ objectId: forumId });
+    const forum = forumComposer.getForum({ forumId });
+
+    console.log('showForum', forum, forumId);
 
     if (!forum) {
       this.replaceOnParent({
@@ -411,20 +558,14 @@ class ForumView extends BaseView {
       return;
     }
 
-    const threads = dataHandler.forumThreads.getObjects({
-      filter: {
-        rules: [
-          { paramName: 'forumId', paramValue: forumId },
-        ],
-      },
-    });
-    const forumElements = [];
+    const forumElements = [
+      createForumContent({
+        forum,
+        elementId: this.elementId,
+      }),
+    ];
 
-    forum.text.forEach((lines) => {
-      elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
-    });
-
-    threads.forEach((thread) => {
+    forum.threads.forEach((thread) => {
       forumElements.push(createThread({ thread, elementId: this.elementId }));
     });
 
@@ -434,38 +575,11 @@ class ForumView extends BaseView {
         elementId: this.elementId,
         elements: forumElements,
         headerElement: elementCreator.createParagraph({
-          elements: [elementCreator.createSpan({ text: forum.title })],
+          elements: [elementCreator.createSpan({ spanType: 'h1', text: forum.title })],
         }),
       }),
     });
   }
 }
-
-/**
- * article forum
- *   article thread
- *     section post
- *       section sub-post
- */
-
-/**
- * ul forum
- *   li
- *   ul thread
- *     li
- *     ul post
- *       li
- *       ul subpost
- *         li
- */
-
-/**
- * Forum
- *   Thread
- *     Post
- *       Sub-post
- *   Thread
- *     Post
- */
 
 module.exports = ForumView;

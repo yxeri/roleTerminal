@@ -1,11 +1,18 @@
 const BaseView = require('./BaseView');
-const MapMarker = require('../MapMarker');
+const MapMarker = require('../../worldMap/MapMarker');
 
-const worldMapHandler = require('../../WorldMapHandler');
+const worldMapHandler = require('../../worldMap/WorldMapHandler');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../../data/DataHandler');
 const socketManager = require('../../SocketManager');
+const mouseHandler = require('../../MouseHandler');
+const elementCreator = require('../../ElementCreator');
+
+const ids = {
+  RIGHTCLICKMENU: 'rMenu',
+  LEFTCLICKMENU: 'lMenu',
+};
 
 class WorldMapView extends BaseView {
   constructor({
@@ -31,6 +38,8 @@ class WorldMapView extends BaseView {
     this.markers = {};
     this.worldMap = undefined;
     this.clusterer = undefined;
+    this.heatMapPoints = undefined;
+    this.heatMapLayer = undefined;
     this.backgroundColor = backgroundColor;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
@@ -39,6 +48,12 @@ class WorldMapView extends BaseView {
     this.cornerCoordinates = cornerCoordinates;
     this.positionTypes = positionTypes;
     this.listId = listId;
+    this.rightClickMenu = elementCreator.createContainer({
+      elementId: `${this.elementId}${ids.RIGHTCLICKMENU}`,
+    });
+    this.leftClickMenu = elementCreator.createContainer({
+      elementId: `${this.elementId}${ids.LEFTCLICKMENU}`,
+    });
 
     eventHandler.addWatcher({
       event: eventHandler.Events.WORLDMAP,
@@ -63,14 +78,14 @@ class WorldMapView extends BaseView {
       func: ({ position, changeType }) => {
         switch (changeType) {
           case socketManager.ChangeTypes.CREATE: {
-            const marker = new MapMarker({ position });
+            const marker = new MapMarker({ position, worldMapView: this });
 
             this.markers[position.objectId] = marker;
 
             break;
           }
           case socketManager.ChangeTypes.UPDATE: {
-            const marker = new MapMarker({ position });
+            const marker = new MapMarker({ position, worldMapView: this });
 
             this.markers[position.objectId] = marker;
 
@@ -128,10 +143,52 @@ class WorldMapView extends BaseView {
     });
 
     positions.forEach((position) => {
-      markers[position.objectId] = new MapMarker({ position });
+      markers[position.objectId] = new MapMarker({ position, worldMapView: this });
     });
 
     return markers;
+  }
+
+  showRightClickBox(event) {
+    const projection = this.overlay.getProjection();
+    const xy = projection.fromLatLngToContainerPixel(event.latLng);
+
+    this.rightClickMenu.style.left = `${xy.x + 5}px`;
+    this.rightClickMenu.style.top = `${xy.y + 5}px`;
+
+    this.rightClickMenu.classList.remove('hide');
+  }
+
+  hideRightClickMenu() {
+    this.rightClickMenu.classList.add('hide');
+  }
+
+  createPositionClickBox({ event, positionId }) {
+    const position = dataHandler.positions.getObject({ objectId: positionId });
+
+
+  }
+
+  createPositionRightClickBox({ event, positionId }) {
+    dataHandler.positions.fetchObject({
+      params: { positionId, full: true },
+      noEmit: true,
+      callback: ({ error, data }) => {
+        if (error) {
+          return;
+        }
+
+        this.showRightClickBox(event);
+      },
+    });
+  }
+
+  createMapRightClickBox(event) {
+    this.showRightClickBox(event);
+  }
+
+  createMapClickBox() {
+
   }
 
   startMap() {
@@ -160,6 +217,13 @@ class WorldMapView extends BaseView {
       styles: this.mapStyles,
     });
 
+    mouseHandler.addGMapsClickListener({
+      element: this.worldMap,
+      right: (event) => {
+        this.createMapRightClickBox(event);
+      },
+    });
+
     this.markers = this.createMarkers();
 
     Object.keys(this.markers).forEach((markerId) => {
@@ -169,6 +233,12 @@ class WorldMapView extends BaseView {
         marker.setMap(this.worldMap);
       }
     });
+
+    this.overlay = new google.maps.OverlayView();
+    this.overlay.draw = () => {};
+    this.overlay.setMap(this.worldMap);
+
+    this.element.appendChild(this.rightClickMenu);
 
     this.realignMap({
       markers: this.createMarkers(),

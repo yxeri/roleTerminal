@@ -20,6 +20,7 @@ const Message = require('../elements/Message');
 const List = require('../base/List');
 const DialogBox = require('../DialogBox');
 const ButtonBox = require('../templates/ButtonBox');
+const LoginBox = require('../templates/LoginBox');
 
 const keyHandler = require('../../KeyHandler');
 const socketManager = require('../../SocketManager');
@@ -139,23 +140,28 @@ class Messenger extends StandardView {
     this.systemList = new List({
       title: 'SYSTEM',
       shouldSort: false,
+      alwaysVisible: true,
     });
     this.aliasList = new List({
       title: 'ALIASES',
       shouldSort: true,
       minimumToShow: 2,
+      alwaysVisible: true,
     });
     this.followList = new List({
       title: 'FOLLOWING',
       shouldSort: false,
+      alwaysVisible: true,
     });
     this.roomsList = new List({
       title: 'PUBLIC',
       shouldSort: true,
+      alwaysVisible: true,
     });
     this.userList = new List({
       title: 'USERS',
       shouldSort: true,
+      alwaysVisible: true,
     });
 
     this.imagePreview = new Image();
@@ -194,7 +200,7 @@ class Messenger extends StandardView {
     imageButton.appendChild(imageInput);
     this.accessElements.push({
       element: imageButton,
-      accessLevel: 2,
+      accessLevel: 3,
     });
 
     const buttons = document.createElement('DIV');
@@ -352,7 +358,7 @@ class Messenger extends StandardView {
   populate() {
     const createButton = elementCreator.createButton({
       classes: ['hide'],
-      text: 'Create room',
+      text: 'Create_room',
       func: () => {
         const createDialog = new DialogBox({
           buttons: {
@@ -422,25 +428,126 @@ class Messenger extends StandardView {
         createDialog.appendTo(this.element.parentElement);
       },
     });
+    const loginButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Login',
+      func: () => {
+        new LoginBox({
+          description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+          extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
+          parentElement: this.element.parentElement,
+          socketManager,
+          keyHandler,
+        }).appendTo(this.element.parentElement);
+      },
+    });
+    const logoutButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Logout',
+      func: () => {
+        socketManager.emitEvent('logout', { device: { deviceId: storageManager.getDeviceId() } }, (error) => {
+          if (error) {
+            console.log(error);
+          }
 
-    this.systemList.addItems({ items: [createButton] });
+          eventCentral.triggerEvent({ event: eventCentral.Events.LOGOUT });
+        });
+      },
+    });
+    const createAliasButton = elementCreator.createButton({
+      classes: ['hide'],
+      text: 'Create_alias',
+      func: () => {
+        const createDialog = new DialogBox({
+          buttons: {
+            left: {
+              text: 'Cancel',
+              eventFunc: () => {
+                createDialog.removeView();
+              },
+            },
+            right: {
+              text: 'Create',
+              eventFunc: () => {
+                const emptyFields = createDialog.markEmptyFields();
 
-    this.itemList.appendChild(this.systemList.element);
+                if (emptyFields) {
+                  soundLibrary.playSound('fail');
+                  createDialog.changeExtraDescription({ text: ['You cannot leave obligatory fields empty!'] });
+
+                  return;
+                }
+
+                const alias = createDialog.inputs.find(({ inputName }) => inputName === 'alias').inputElement.value.toLowerCase();
+
+                socketManager.emitEvent('createAlias', { alias, user: { userName: storageManager.getUserName() } }, ({ error: createError }) => {
+                  if (createError) {
+                    console.log(createError);
+
+                    if (createError.type === 'already exists') {
+                      createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+
+                      return;
+                    }
+
+                    createDialog.changeExtraDescription({ text: ['Something went wrong.', 'Unable to create alias'] });
+
+                    return;
+                  }
+
+                  storageManager.addAlias(alias);
+                  eventCentral.triggerEvent({
+                    event: eventCentral.Events.NEWALIAS,
+                    params: { alias },
+                  });
+                  createDialog.removeView();
+                });
+              },
+            },
+          },
+          inputs: [{
+            placeholder: 'Alias',
+            inputName: 'alias',
+            isRequired: true,
+            maxLength: 10,
+          }],
+          description: [
+            textTools.createMixedString(25),
+            'You created alias will be available in CHAT.',
+          ],
+          extraDescription: ['Enter your new alias'],
+        });
+        createDialog.appendTo(this.element.parentElement);
+      },
+    });
+
+    this.systemList.addItems({ items: [loginButton, createButton, createAliasButton, logoutButton] });
+
     this.itemList.appendChild(this.aliasList.element);
     this.itemList.appendChild(this.followList.element);
     this.itemList.appendChild(this.roomsList.element);
     this.itemList.appendChild(this.userList.element);
+    this.itemList.appendChild(this.systemList.element);
 
     this.accessElements.push({
-      element: this.systemList.element,
-      accessLevel: 1,
+      element: this.aliasList.element,
+      accessLevel: 2,
     });
     this.accessElements.push({
-      element: this.aliasList.element,
-      accessLevel: 1,
+      element: loginButton,
+      accessLevel: 0,
+      maxAccessLevel: 0,
     });
     this.accessElements.push({
       element: createButton,
+      accessLevel: 2,
+    });
+    this.accessElements.push({
+      element: createAliasButton,
+      accessLevel: 2,
+    });
+    this.accessElements.push({
+      element: logoutButton,
       accessLevel: 1,
     });
 
@@ -670,7 +777,7 @@ class Messenger extends StandardView {
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
 
             if (firstConnection || changedUser) {
-              this.aliasList.toggleList(true);
+              // this.aliasList.toggleList(true);
             }
           } else {
             const userName = storageManager.getUserName();
@@ -739,7 +846,7 @@ class Messenger extends StandardView {
           });
 
           if (followedRooms.length > 0 && (firstConnection || changedUser)) {
-            this.followList.toggleList(true);
+            // this.followList.toggleList(true);
           }
 
           this.roomsList.replaceAllItems({

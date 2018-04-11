@@ -50,12 +50,12 @@ function createSortedList(list, newItem) {
 }
 
 class List extends View {
-  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false }) {
+  constructor({ isFullscreen, viewId, shouldSort, items = [], title, showingList = false, minimumToShow = 1, showTitle = false, alwaysVisible = false }) {
     super({ isFullscreen, viewId });
 
     this.element.classList.add('menuList');
     this.shouldSort = shouldSort;
-    this.showingList = showingList;
+    this.showingList = showingList || alwaysVisible;
     this.minimumToShow = minimumToShow;
     this.toggleElement = elementCreator.createContainer({ });
 
@@ -66,16 +66,19 @@ class List extends View {
     if (title) {
       const titleElement = document.createElement('P');
       titleElement.classList.add('listTitle');
-      titleElement.classList.add('clickable');
 
-      titleElement.addEventListener('click', () => {
-        this.toggleList();
-      });
+      if (!alwaysVisible) {
+        titleElement.classList.add('clickable');
 
-      if (!this.showingList) {
-        this.toggleElement.classList.add('collapsedIcon');
-      } else {
-        this.toggleElement.classList.add('expandedIcon');
+        titleElement.addEventListener('click', () => {
+          this.toggleList();
+        });
+
+        if (!this.showingList) {
+          this.toggleElement.classList.add('collapsedIcon');
+        } else {
+          this.toggleElement.classList.add('expandedIcon');
+        }
       }
 
       titleElement.appendChild(this.toggleElement);

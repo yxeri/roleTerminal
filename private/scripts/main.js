@@ -957,16 +957,16 @@ mainView.addEventListener('contextmenu', (event) => {
   event.preventDefault();
 });
 
-top.addEventListener('click', () => {
-  home.appendTo(mainView);
-});
+// top.addEventListener('click', () => {
+//   home.appendTo(mainView);
+// });
 
 keyHandler.setTriggerKey(18); // Alt
 keyHandler.addIgnoredKey(17); // Ctrl
 keyHandler.addIgnoredKey(27); // Esc
 keyHandler.addIgnoredKey(91); // Win/Cmd
 keyHandler.addIgnoredKey(93); // Win/Cmd
-keyHandler.addKey(32, () => { home.appendTo(mainView); });
+// keyHandler.addKey(32, () => { home.appendTo(mainView); });
 
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOS) {
   if (!viewTools.isLandscape()) {
@@ -1481,7 +1481,8 @@ home.addLink({
   shortcut: true,
 });
 
-home.appendTo(mainView);
+// home.appendTo(mainView);
+messenger.appendTo(mainView);
 
 map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
 map.setCenterCoordinates(storageManager.getCenterCoordinates());

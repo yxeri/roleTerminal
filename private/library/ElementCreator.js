@@ -151,7 +151,7 @@ class ElementCreator {
   static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine, maxLength, inputId }) {
     const input = multiLine ? document.createElement('TEXTAREA') : document.createElement('INPUT');
 
-    input.setAttribute('placeholder', placeholder);
+    input.setAttribute('placeholder', placeholder.toUpperCase());
     input.setAttribute('name', inputName);
     input.setAttribute('type', 'text');
 

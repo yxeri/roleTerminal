@@ -14,21 +14,22 @@
  limitations under the License.
  */
 
-$text-color: #00ffcc;
-$darker-text-color: #009170;
-$second-color: #ff02e5;
-$darker-second-color: #a50293;
-$flash-color: #ff02e5;
-$light-color: #9b9b9b;
-$back-color: #11000f;
-$back-button: #1b0019;
-$back-input: #1b0019;
-$hoverInput: #00372d;
-$note-color: #cd02b7;
+$text-color: #00f905;
+$darker-text-color: #00f905;
+$second-color: #009b05;
+$darker-second-color: #008705;
+$flash-color: #00f905;
+$light-color: #00f905;
+$back-color: #001401;
+$back-button: #001401;
+$back-input: #001401;
+$hoverInput: #004b05;
+$note-color: #007305;
+$header-back: #001e02;
 $padding: .2em;
 $outline: .1em;
 $font-size: 1.1em;
-$text-shadow: 1px 1px 3px #ff02e5;
+$text-shadow: 1px 1px 3px #005502;
 $view-width: 65em;
 $menu-width: 21em;
 $short-list-width: 8em;
@@ -39,18 +40,18 @@ $inner-container-width: calc(100% - .4em);
 $inner-container-height: calc(100% - .4em);
 
 @mixin borderOutline {
-  box-shadow: $box-shadow $second-color;
+  //box-shadow: $box-shadow $second-color;
   outline: $outline solid $text-color;
 }
 
 @mixin selectedBorderOutline {
-  box-shadow: $box-shadow $text-color;
+  //box-shadow: $box-shadow $text-color;
   outline: $outline solid $text-color;
   color: $text-color;
 }
 
 @mixin lockedBorderOutline {
-  box-shadow: $box-shadow $light-color;
+  //box-shadow: $box-shadow $light-color;
   outline: $outline solid $light-color;
 }
 
@@ -115,6 +116,7 @@ button {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+  text-transform: uppercase;
 }
 
 button:focus, button:hover, textarea:focus, textarea:hover, input:focus, input:hover {
@@ -136,7 +138,7 @@ input {
   font-family: monospace;
   -webkit-text-size-adjust: 100%;
   border-radius: 0;
-  padding: .1em .1em .1em .3em;
+  padding: .15em .1em .15em .3em;
 }
 
 input[type=radio] {
@@ -153,7 +155,7 @@ textarea {
   resize: none;
   border-radius: 0;
   color: $text-color;
-  padding: .1em .1em .1em .3em;
+  padding: .15em .1em .15em .3em;
 }
 
 p {
@@ -170,9 +172,11 @@ li {
   }
 
   .header {
+    background-color: $header-back;
     border-top: $outline solid $text-color;
-    box-shadow: $top-box-shadow $second-color;
+    //box-shadow: $top-box-shadow $second-color;
     margin: .8em 0 .1em 0;
+    text-transform: uppercase;
 
     button {
       padding: 0;
@@ -181,7 +185,6 @@ li {
       float: right;
       color: $light-color;
       outline-color: $light-color;
-      background-color: $back-color;
       text-shadow: none;
     }
   }
@@ -203,10 +206,10 @@ pre {
 }
 
 #background {
-  @include borderOutline;
+  outline: $outline solid $back-color;
   width: $inner-container-width;
   height: $inner-container-height;
-  margin-top: $padding;
+  //margin-top: $padding;
   margin-left: $padding;
   text-shadow: $text-shadow;
   overflow: hidden;
@@ -215,8 +218,8 @@ pre {
 #top {
   text-align: center;
   border-bottom: .1em solid $text-color;
-  box-shadow: $bottom-box-shadow $second-color;
-  cursor: pointer;
+  //box-shadow: $bottom-box-shadow $second-color;
+  //cursor: pointer;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -250,8 +253,8 @@ pre {
     display: inline-block;
     color: $text-color;
     text-shadow: $text-shadow;
-    border-left: .05em solid $text-color;
-    border-right: .05em solid $text-color;
+    //border-left: .05em solid $text-color;
+    //border-right: .05em solid $text-color;
 
     > div {
       z-index: 4;
@@ -316,7 +319,6 @@ pre {
 
 #main {
   overflow: hidden;
-  background: url(/images/logo.png) no-repeat 50% 50%;
   background-size: contain;
   height: 100%;
 }
@@ -633,16 +635,23 @@ pre {
   }
 
   p {
+    margin-top: 0em;
     margin-bottom: .4em;
     text-align: left;
-    border-bottom: 1px solid;
+    //border-bottom: 1px solid;
   }
 
   button {
     margin-left: .1em;
-    width: calc(100% - .4em);
+    width: 100%;
     margin-bottom: .4em;
     word-wrap: break-word;
+    outline: none;
+    background-color: $hoverInput;
+    border-left: 1px solid;
+    text-align: left;
+    //border-top: 1px solid;
+    //border-bottom: 1px solid;
   }
 
   button:first-letter {
@@ -983,16 +992,19 @@ pre {
 
 .selectedItem {
   button {
-    @include selectedBorderOutline;
+    //@include selectedBorderOutline;
+    background-color: $text-color;
+    color: $back-color;
+    border-left: 1px solid $text-color;
+    text-shadow: none !important;
   }
 }
 
 .selectedView {
   padding: -1px .2em -1px -1px;
-  border-top: 1px solid;
-  border-left: 1px solid;
-  border-bottom: 1px solid;
-  background-color: rgba(0, 255, 204, .07);
+  //border-top: 1px solid;
+  //border-left: 1px solid;
+  //border-bottom: 1px solid;
 }
 
 .fullHeight {
@@ -1013,8 +1025,8 @@ pre {
   z-index: 2;
   position: absolute;
   left: .5em;
-  top: 2.2em;
-  width: 8.6em;
+  //top: 2.2em;
+  width: 8.8em;
 }
 
 .toggledList {
@@ -1045,7 +1057,7 @@ pre {
 }
 
 .innerMenu {
-  box-shadow: $box-shadow $second-color;
+  //box-shadow: $box-shadow $second-color;
   outline: $outline solid $text-color;
   background-color: $back-color;
   position: absolute;
@@ -1201,7 +1213,7 @@ pre {
 
   .list {
     display: none;
-    padding-top: 1.9em;
+    padding-top: 2em;
     height: calc(100% - 2.1em);
   }
 
@@ -1215,7 +1227,7 @@ pre {
   }
 
   .appleListButtonFix {
-    top: 3em;
+    //top: 3em;
   }
 
   .appleMenuFix {

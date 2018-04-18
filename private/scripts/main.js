@@ -20,7 +20,7 @@ const LoginBox = require('../library/view/templates/LoginBox');
 const Messenger = require('../library/view/templates/Messenger');
 const Clock = require('../library/view/templates/Clock');
 const OnlineStatus = require('../library/view/templates/OnlineStatus');
-const WorldMap = require('../library/view/worldMap/WorldMap');
+// const WorldMap = require('../library/view/worldMap/WorldMap');
 const DirViewer = require('../library/view/templates/DirViewer');
 const WreckingStatus = require('../library/view/templates/WreckingStatus');
 const Home = require('../library/view/templates/Home');
@@ -30,7 +30,7 @@ const Profile = require('../library/view/templates/Profile');
 const Wallet = require('../library/view/templates/Wallet');
 const Terminal = require('../library/view/templates/Terminal');
 const ButtonBox = require('../library/view/templates/ButtonBox');
-const TeamViewer = require('../library/view/templates/TeamViewer');
+// const TeamViewer = require('../library/view/templates/TeamViewer');
 const ToolsViewer = require('../library/view/templates/ToolsViewer');
 const Tracker = require('../library/view/worldMap/Tracker');
 const DialogBox = require('../library/view/DialogBox');
@@ -249,72 +249,72 @@ const messenger = new Messenger({ isFullscreen: true, sendButtonText: 'Send', is
 const dirViewer = new DirViewer({ isFullscreen: true });
 const walletViewer = new Wallet({ suffix: 'vcaps' });
 const profile = new Profile();
-const map = new WorldMap({
-  mapView: WorldMap.MapViews.AREA,
-  clusterStyle: {
-    gridSize: 22,
-    maxZoom: 17,
-    zoomOnClick: false,
-    singleSize: true,
-    averageCenter: true,
-    styles: [{
-      width: 24,
-      height: 24,
-      iconAnchor: [12, 12],
-      textSize: 12,
-      url: 'images/mapcluster.png',
-      textColor: '00ffcc',
-      fontFamily: 'monospace',
-    }],
-  },
-  mapStyles: [
-    {
-      featureType: 'all',
-      elementType: 'all',
-      stylers: [
-        { color: '#11000f' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'geometry',
-      stylers: [
-        { color: '#00ffcc' },
-      ],
-    }, {
-      featureType: 'road',
-      elementType: 'labels',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'poi',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'administrative',
-      elementType: 'all',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'water',
-      elementType: 'all',
-      stylers: [
-        { color: '#ff02e5' },
-      ],
-    },
-  ],
-  labelStyle: {
-    fontFamily: 'monospace',
-    fontColor: '#00ffcc',
-    strokeColor: '#001e15',
-    fontSize: 12,
-  },
-  mapBackground: '#11000f',
-});
-const teamViewer = new TeamViewer({ worldMap: map });
+// const map = new WorldMap({
+//   mapView: WorldMap.MapViews.AREA,
+//   clusterStyle: {
+//     gridSize: 22,
+//     maxZoom: 17,
+//     zoomOnClick: false,
+//     singleSize: true,
+//     averageCenter: true,
+//     styles: [{
+//       width: 24,
+//       height: 24,
+//       iconAnchor: [12, 12],
+//       textSize: 12,
+//       url: 'images/mapcluster.png',
+//       textColor: '00ffcc',
+//       fontFamily: 'monospace',
+//     }],
+//   },
+//   mapStyles: [
+//     {
+//       featureType: 'all',
+//       elementType: 'all',
+//       stylers: [
+//         { color: '#11000f' },
+//       ],
+//     }, {
+//       featureType: 'road',
+//       elementType: 'geometry',
+//       stylers: [
+//         { color: '#00ffcc' },
+//       ],
+//     }, {
+//       featureType: 'road',
+//       elementType: 'labels',
+//       stylers: [
+//         { visibility: 'off' },
+//       ],
+//     }, {
+//       featureType: 'poi',
+//       elementType: 'all',
+//       stylers: [
+//         { visibility: 'off' },
+//       ],
+//     }, {
+//       featureType: 'administrative',
+//       elementType: 'all',
+//       stylers: [
+//         { visibility: 'off' },
+//       ],
+//     }, {
+//       featureType: 'water',
+//       elementType: 'all',
+//       stylers: [
+//         { color: '#ff02e5' },
+//       ],
+//     },
+//   ],
+//   labelStyle: {
+//     fontFamily: 'monospace',
+//     fontColor: '#00ffcc',
+//     strokeColor: '#001e15',
+//     fontSize: 12,
+//   },
+//   mapBackground: '#11000f',
+// });
+// const teamViewer = new TeamViewer({ worldMap: map });
 const tracker = new Tracker();
 
 terminal.addCommand({
@@ -1029,7 +1029,7 @@ home.addLink({
   linkName: 'login',
   startFunc: () => {
     new LoginBox({
-      description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+      description: ['Welcome! You have to login to begin using RAWcom!', 'All your actions will be monitored.'],
       extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
       parentElement: mainView,
       socketManager,
@@ -1064,12 +1064,12 @@ home.addLink({
   endFunc: () => { dirViewer.removeView(); },
   shortcut: true,
 });
-home.addLink({
-  linkName: 'maps',
-  startFunc: () => { map.appendTo(mainView); },
-  endFunc: () => { map.removeView(); },
-  shortcut: true,
-});
+// home.addLink({
+//   linkName: 'maps',
+//   startFunc: () => { map.appendTo(mainView); },
+//   endFunc: () => { map.removeView(); },
+//   shortcut: true,
+// });
 home.addLink({
   linkName: 'wallet',
   startFunc: () => { walletViewer.appendTo(mainView); },
@@ -1078,14 +1078,14 @@ home.addLink({
   accessLevel: 1,
   shortcut: true,
 });
-home.addLink({
-  linkName: 'team',
-  startFunc: () => { teamViewer.appendTo(mainView); },
-  endFunc: () => { teamViewer.removeView(); },
-  accessLevel: 1,
-  classes: ['hide'],
-  shortcut: true,
-});
+// home.addLink({
+//   linkName: 'team',
+//   startFunc: () => { teamViewer.appendTo(mainView); },
+//   endFunc: () => { teamViewer.removeView(); },
+//   accessLevel: 1,
+//   classes: ['hide'],
+//   shortcut: true,
+// });
 home.addLink({
   linkName: 'panic',
   startFunc: () => {
@@ -1484,9 +1484,9 @@ home.addLink({
 // home.appendTo(mainView);
 messenger.appendTo(mainView);
 
-map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-map.setCenterCoordinates(storageManager.getCenterCoordinates());
-map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
+// map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+// map.setCenterCoordinates(storageManager.getCenterCoordinates());
+// map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
 
 // eventCentral.addWatcher({
 //   watcherParent: this,
@@ -1604,15 +1604,15 @@ socketManager.addEvents([
       if (!socketManager.hasConnected) {
         new Clock(document.getElementById('time')).start();
         new WreckingStatus({ element: document.getElementById('wrecking'), showfloor: queryParameters.showfloor }); // eslint-disable-line
-        map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
-        map.setCenterCoordinates(storageManager.getCenterCoordinates());
-        map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
+        // map.setCornerCoordinates(storageManager.getCornerOneCoordinates(), storageManager.getCornerTwoCoordinates());
+        // map.setCenterCoordinates(storageManager.getCenterCoordinates());
+        // map.setDefaultZoomLevel(storageManager.getDefaultZoomlevel());
       }
 
       eventCentral.triggerEvent({ event: eventCentral.Events.SERVERMODE, params: { mode, showDevInfo } });
 
       onlineStatus.setOnline();
-      map.startMap();
+      // map.startMap();
       socketManager.updateId();
 
       if (queryParameters) {

@@ -380,9 +380,21 @@ class Messenger extends StandardView {
                   return;
                 }
 
+                const password = createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value;
+                const repeatPassword = createDialog.inputs.find(({ inputName }) => inputName === 'repeatPassword').inputElement.value;
+
+                if ((password && password !== '') && (!repeatPassword || repeatPassword === '' || password !== repeatPassword)) {
+                  createDialog.changeExtraDescription({ text: ['Passwords do not match. Try again'] });
+                  createDialog.clearInput('password');
+                  createDialog.clearInput('repeatPassword');
+                  createDialog.focusInput('password');
+
+                  return;
+                }
+
                 const room = {
+                  password,
                   roomName: createDialog.inputs.find(({ inputName }) => inputName === 'roomName').inputElement.value,
-                  password: createDialog.inputs.find(({ inputName }) => inputName === 'password').inputElement.value,
                 };
 
                 if (!textTools.isInternationalAllowed()) {
@@ -420,6 +432,10 @@ class Messenger extends StandardView {
           }, {
             placeholder: 'Optional password',
             inputName: 'password',
+            type: 'password',
+          }, {
+            placeholder: 'Repeat optional password',
+            inputName: 'repeatPassword',
             type: 'password',
           }],
           description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
@@ -526,7 +542,7 @@ class Messenger extends StandardView {
     this.itemList.appendChild(this.aliasList.element);
     this.itemList.appendChild(this.followList.element);
     this.itemList.appendChild(this.roomsList.element);
-    this.itemList.appendChild(this.userList.element);
+    // this.itemList.appendChild(this.userList.element);
     this.itemList.appendChild(this.systemList.element);
 
     this.accessElements.push({
@@ -1067,13 +1083,13 @@ class Messenger extends StandardView {
                   }, ({ error: followError }) => {
                     if (followError) {
                       if (followError.type === 'not allowed') {
-                        console.log(followError);
                         followDialog.changeExtraDescription({ text: ['Access denied', 'Incorrect password or access level'] });
+                        followDialog.clearInput('password');
+                        followDialog.focusInput('password');
 
                         return;
                       }
 
-                      console.log(followError);
                       followDialog.changeExtraDescription({ text: ['Failed to join the room'] });
 
                       return;

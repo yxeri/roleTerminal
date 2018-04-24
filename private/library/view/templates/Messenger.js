@@ -140,28 +140,25 @@ class Messenger extends StandardView {
     this.systemList = new List({
       title: 'SYSTEM',
       shouldSort: false,
-      alwaysVisible: true,
+      showingList: true,
     });
     this.aliasList = new List({
       title: 'ALIASES',
       shouldSort: true,
       minimumToShow: 2,
-      alwaysVisible: true,
+      showingList: true,
     });
     this.followList = new List({
       title: 'FOLLOWING',
       shouldSort: false,
-      alwaysVisible: true,
     });
     this.roomsList = new List({
       title: 'PUBLIC',
       shouldSort: true,
-      alwaysVisible: true,
     });
     this.userList = new List({
       title: 'USERS',
       shouldSort: true,
-      alwaysVisible: true,
     });
 
     this.imagePreview = new Image();
@@ -542,7 +539,7 @@ class Messenger extends StandardView {
     this.itemList.appendChild(this.aliasList.element);
     this.itemList.appendChild(this.followList.element);
     this.itemList.appendChild(this.roomsList.element);
-    // this.itemList.appendChild(this.userList.element);
+    this.itemList.appendChild(this.userList.element);
     this.itemList.appendChild(this.systemList.element);
 
     this.accessElements.push({
@@ -565,6 +562,10 @@ class Messenger extends StandardView {
     this.accessElements.push({
       element: logoutButton,
       accessLevel: 1,
+    });
+    this.accessElements.push({
+      element: this.userList.element,
+      accessLevel: 2,
     });
 
     eventCentral.addWatcher({
@@ -793,7 +794,7 @@ class Messenger extends StandardView {
             eventCentral.triggerEvent({ event: eventCentral.Events.ALIAS, params: { alias: selectedAlias } });
 
             if (firstConnection || changedUser) {
-              // this.aliasList.toggleList(true);
+              this.aliasList.toggleList(true);
             }
           } else {
             const userName = storageManager.getUserName();
@@ -830,7 +831,11 @@ class Messenger extends StandardView {
               const retrievedAliases = filterUserAliases(aliasData.aliases);
               const userName = storageManager.getSelectedAlias() || storageManager.getUserName();
 
-              this.userList.replaceAllItems({ items: users.concat(retrievedAliases).map(thisUserName => this.createWhisperButton({ roomName: userName, whisperTo: thisUserName })) });
+              if (storageManager.getAccessLevel() >= 2) {
+                this.userList.replaceAllItems({ items: users.concat(retrievedAliases).map(thisUserName => this.createWhisperButton({ roomName: userName, whisperTo: thisUserName })) });
+              } else {
+                this.userList.replaceAllItems({ items: [] });
+              }
             });
           });
         } else {
@@ -862,7 +867,7 @@ class Messenger extends StandardView {
           });
 
           if (followedRooms.length > 0 && (firstConnection || changedUser)) {
-            // this.followList.toggleList(true);
+            this.followList.toggleList(true);
           }
 
           this.roomsList.replaceAllItems({

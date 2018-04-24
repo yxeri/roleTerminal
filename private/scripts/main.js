@@ -1029,7 +1029,7 @@ home.addLink({
   linkName: 'login',
   startFunc: () => {
     new LoginBox({
-      description: ['Welcome! You have to login to begin using RAWcom!', 'All your actions will be monitored.'],
+      description: ['Welcome to RAWcom, kindly provided to you by RAW radio, your premium provider of underground information.'],
       extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
       parentElement: mainView,
       socketManager,

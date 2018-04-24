@@ -1164,6 +1164,11 @@ pre {
   background-color: red;
 }
 
+.offGame {
+  background-color: red !important;
+  color: white !important;
+}
+
 @-webkit-keyframes flash {
   0% {
     background-color: $flash-color;

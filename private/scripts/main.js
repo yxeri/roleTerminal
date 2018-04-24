@@ -53,6 +53,17 @@ const boot = new TextAnimation({ removeTime: 700, triggerValue: 'firstBoot' });
 // const signalBlockAnimation = new TextAnimation({ isPermanent: true });
 const queryParameters = tools.getQueryParameters();
 
+eventCentral.addWatcher({
+  watcherParent: this,
+  event: eventCentral.Events.SERVERMODE,
+  func: ({ mode, showDevInfo }) => {
+    if (mode === 'dev' || showDevInfo) {
+      top.replaceChild(elementCreator.createSpan({ text: 'OFF GAME. FOR TESTING' }), top.firstElementChild);
+      top.classList.add('offGame');
+    }
+  },
+});
+
 boot.setQueue([
   {
     func: boot.printLines,

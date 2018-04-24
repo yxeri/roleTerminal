@@ -252,7 +252,6 @@ class Messenger extends StandardView {
     this.viewer.firstElementChild.addEventListener('click', () => {
       if (deviceChecker.deviceType === deviceChecker.DeviceEnum.ANDROID) {
         this.element.classList.remove('androidLandscapeKeyboardFix', 'androidPortraitKeyboardFix');
-        this.inputField.value = 'android';
         this.messageList.scroll();
       }
     });

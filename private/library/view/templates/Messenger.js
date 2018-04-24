@@ -435,7 +435,7 @@ class Messenger extends StandardView {
             inputName: 'repeatPassword',
             type: 'password',
           }],
-          description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
+          description: ['Create a new RAW com room.'],
           extraDescription: ['Enter a name and optional password for the room', 'Allowed characters in the name: a-z 0-9'],
         });
         createDialog.appendTo(this.element.parentElement);
@@ -446,7 +446,7 @@ class Messenger extends StandardView {
       text: 'Login',
       func: () => {
         new LoginBox({
-          description: ['Welcome, employee! You have to login to begin your productive day!', 'All your actions in O3C will be monitored'],
+          description: ['Welcome to RAWcom, kindly provided to you by RAW radio, your premium provider of underground information.'],
           extraDescription: ['Input your user name and password', 'Allowed characters in the name: a-z 0-9'],
           parentElement: this.element.parentElement,
           socketManager,
@@ -691,7 +691,7 @@ class Messenger extends StandardView {
         };
 
         const intro = message.intro || [
-          'EMPLOYEE. STAND AT ATTENTION', '----------',
+          'STAND AT ATTENTION', '----------',
         ];
         const extro = message.extro || [
           'END OF MESSAGE', '----------',

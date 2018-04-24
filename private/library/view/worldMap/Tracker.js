@@ -56,8 +56,8 @@ class Tracker {
       },
     });
 
-    this.startTracker();
-    this.startSendTimeout();
+    // this.startTracker();
+    // this.startSendTimeout();
   }
 
   startTracker() {

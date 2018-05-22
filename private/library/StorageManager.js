@@ -17,6 +17,15 @@
 const converters = require('./Converters');
 const eventCentral = require('./EventCentral');
 
+/**
+ * Converts text coordinats to float.
+ * @param {Object} coordinates - Coordinates to convert.
+ * @return {{longitude: Number, latitude: Number}} Coordinates.
+ */
+function createCoordinates(coordinates) {
+  return coordinates ? { longitude: parseFloat(coordinates.longitude), latitude: parseFloat(coordinates.latitude) } : {};
+}
+
 class StorageManager {
   static addWatchers() {
     eventCentral.addWatcher({
@@ -93,11 +102,11 @@ class StorageManager {
    */
   static setUser({
     accessLevel,
-    currentRoom,
+    defaultRoomId,
     userId,
   }) {
     this.setAccessLevel(accessLevel);
-    this.setCurrentRoom(currentRoom);
+    this.setCurrentRoom(defaultRoomId);
     this.setUserId(userId);
 
     eventCentral.emitEvent({
@@ -184,7 +193,7 @@ class StorageManager {
   }
 
   static getCenterCoordinates() {
-    return converters.convertToObject(this.getLocalVal('centerCoordinates'));
+    return createCoordinates(converters.convertToObject(this.getLocalVal('centerCoordinates')));
   }
 
   /**
@@ -199,7 +208,7 @@ class StorageManager {
   }
 
   static getCornerOneCoordinates() {
-    return converters.convertToObject(this.getLocalVal('cornerOneCoordinates'));
+    return createCoordinates(converters.convertToObject(this.getLocalVal('cornerOneCoordinates')));
   }
 
   /**
@@ -214,7 +223,7 @@ class StorageManager {
   }
 
   static getCornerTwoCoordinates() {
-    return converters.convertToObject(this.getLocalVal('cornerTwoCoordinates'));
+    return createCoordinates(converters.convertToObject(this.getLocalVal('cornerTwoCoordinates')));
   }
 
   /**

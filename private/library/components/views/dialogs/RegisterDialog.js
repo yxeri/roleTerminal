@@ -69,7 +69,7 @@ class RegisterDialog extends BaseDialog {
     ];
     const lowerButtons = [
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'cancel' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
         clickFuncs: {
           leftFunc: () => { this.removeFromView(); },
         },

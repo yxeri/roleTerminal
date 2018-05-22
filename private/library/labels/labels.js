@@ -2,6 +2,16 @@ module.exports = {
   General: {
 
   },
+  BaseDialog: {
+    cancel: {
+      en: 'Cancel',
+      se: 'Avbryt',
+    },
+    create: {
+      en: 'Create',
+      se: 'Skapa',
+    },
+  },
   RegisterDialog: {
     username: {
       en: 'Your username',
@@ -27,10 +37,6 @@ module.exports = {
       en: 'User already exists.',
       se: 'Användare existerar redan.',
     },
-    cancel: {
-      en: 'Cancel',
-      se: 'Avbryt',
-    },
     usernameLength: {
       en: 'The user name has to be 3 - 40 characters long.',
       se: 'Användarnamnet måste vara 3 - 40 tecken långt.',
@@ -48,10 +54,6 @@ module.exports = {
     password: {
       en: 'Your password',
       se: 'Ditt lösenord',
-    },
-    cancel: {
-      en: 'Cancel',
-      se: 'Avbryt',
     },
     login: {
       en: 'Login',
@@ -102,6 +104,30 @@ module.exports = {
     edit: {
       en: 'Edit',
       se: 'Ändra',
+    },
+  },
+  WorldMapView: {
+    noName: {
+      en: 'Unknown position.',
+      se: 'Okänd plats.',
+    },
+    noDescription: {
+      en: 'No information found.',
+      se: 'Ingen information kunde hittas.',
+    },
+  },
+  MapObject: {
+    createPosition: {
+      en: 'Create position',
+      se: 'Skapa en plats',
+    },
+    createPositionName: {
+      en: 'Position name',
+      se: 'Platsens namn',
+    },
+    movePosition: {
+      en: 'Move position',
+      se: 'Flytta platsen',
     },
   },
 };

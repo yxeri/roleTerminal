@@ -6,6 +6,7 @@ const eventCentral = require('../EventCentral');
 class ForumComposer extends DataComposer {
   constructor() {
     super({
+      handler: dataHandler.forums,
       completionEvent: eventCentral.Events.COMPLETE_FORUM,
       dependencies: [
         dataHandler.forums,
@@ -15,10 +16,13 @@ class ForumComposer extends DataComposer {
         dataHandler.teams,
       ],
     });
+
+    this.forumPostHandler = dataHandler.forumPosts;
+    this.forumThreadHandler = dataHandler.forumThreads;
   }
 
   getSubPosts({ parentPostId }) {
-    return dataHandler.forumPosts.getObjects({
+    return this.forumPostHandler.getObjects({
       filter: {
         rules: [
           { paramName: 'parentPostId', paramValue: parentPostId },
@@ -33,7 +37,7 @@ class ForumComposer extends DataComposer {
   }
 
   getPost({ postId, full = true }) {
-    const post = dataHandler.forumPosts.getObject({ objectId: postId });
+    const post = this.forumPostHandler.getObject({ objectId: postId });
 
     if (post) {
       post.creatorName = this.createCreatorName({ object: post });
@@ -51,7 +55,7 @@ class ForumComposer extends DataComposer {
     sorting,
     full = true,
   }) {
-    const allPosts = dataHandler.forumPosts.getObjects({
+    const allPosts = this.forumPostHandler.getObjects({
       sorting,
       filter: {
         rules: [
@@ -89,7 +93,7 @@ class ForumComposer extends DataComposer {
   }
 
   getThread({ threadId, full = true }) {
-    const thread = dataHandler.forumThreads.getObject({ objectId: threadId });
+    const thread = this.forumThreadHandler.getObject({ objectId: threadId });
 
     if (thread) {
       thread.creatorName = this.createCreatorName({ object: thread });
@@ -99,7 +103,7 @@ class ForumComposer extends DataComposer {
       }
     }
 
-    return dataHandler.forumThreads.getObject({ objectId: threadId });
+    return thread;
   }
 
   getThreadsByForum({
@@ -111,7 +115,7 @@ class ForumComposer extends DataComposer {
       fallbackParamName: 'lastUpdated',
     },
   }) {
-    const threads = dataHandler.forumThreads.getObjects({
+    const threads = this.forumThreadHandler.getObjects({
       sorting,
       filter: {
         rules: [
@@ -143,8 +147,7 @@ class ForumComposer extends DataComposer {
     forumId,
     full = true,
   }) {
-    const forum = dataHandler.forums.getObject({ objectId: forumId });
-    console.log('getForum', forumId, forum);
+    const forum = this.handler.getObject({ objectId: forumId });
 
     if (forum) {
       forum.creatorName = this.createCreatorName({ object: forum });
@@ -157,15 +160,15 @@ class ForumComposer extends DataComposer {
     return forum;
   }
 
-  static createPost({ post, callback }) {
-    dataHandler.forumPosts.createObject({
+  createPost({ post, callback }) {
+    this.forumPostHandler.createObject({
       callback,
       params: { post },
     });
   }
 
-  static createThread({ thread, callback }) {
-    dataHandler.forumThreads.createObject({
+  createThread({ thread, callback }) {
+    this.forumThreadHandler.createObject({
       callback,
       params: { thread },
     });

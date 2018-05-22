@@ -4,11 +4,14 @@ const eventCentral = require('../EventCentral');
 class BaseComposer {
   constructor({
     completionEvent,
+    handler,
     dependencies = [],
   }) {
     this.isComplete = false;
     this.dependencies = dependencies;
     this.completionEvent = completionEvent;
+    this.handler = handler;
+    this.userHandler = dataHandler.users;
 
     this.checkIsComplete();
   }
@@ -22,7 +25,7 @@ class BaseComposer {
       return;
     }
 
-    this.dependencies.forEach((dependency) => { console.log(dependency, dependency.hasFetched) });
+    this.dependencies.forEach((dependency) => { console.log(dependency, dependency.hasFetched); });
 
     this.isComplete = true;
 
@@ -35,7 +38,7 @@ class BaseComposer {
   }
 
   createCreatorName({ object, full = true }) {
-    const user = dataHandler.users.getObject({ objectId: object.ownerAliasId || object.ownerId });
+    const user = this.userHandler.getObject({ objectId: object.ownerAliasId || object.ownerId });
 
     if (!user) {
       return object.ownerAliasId || object.ownerId;

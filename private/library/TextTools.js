@@ -71,7 +71,7 @@ class TextTools {
    * @param {boolean} [params.lockDate] - Should the year stay unmodified?
    * @returns {Object} Human-readable time and date.
    */
-  static generateTimeStamp({ date, offset, lockDate }) {
+  static generateTimestamp({ date, offset, lockDate }) {
     const newDate = new Date(date);
     const timeStamp = {};
     const yearModification = storageManager.getYearModification();

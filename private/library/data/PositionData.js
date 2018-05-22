@@ -46,6 +46,20 @@ class PositionData extends BaseData {
       emitTypes: [EmitTypes.POSITION],
     });
   }
+
+  getPositions({ positionTypes = [] }) {
+    return this.getObjects({
+      orCheck: true,
+      filter: {
+        rules: positionTypes.map((positionType) => {
+          return {
+            paramName: 'positionType',
+            paramValue: positionType,
+          };
+        }),
+      },
+    });
+  }
 }
 
 const positionData = new PositionData();

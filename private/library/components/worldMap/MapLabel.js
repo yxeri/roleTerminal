@@ -62,7 +62,7 @@ class Label {
     this.mapLabel.setMap(map);
   }
 
-  setPosition({ coordinates }) {
+  setCurrentCoordinates({ coordinates }) {
     this.mapLabel.set('position', new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
   }
 

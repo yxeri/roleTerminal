@@ -1,5 +1,5 @@
-const eventHandler = require('../EventCentral');
-const dataHandler = require('../data/DataHandler');
+const eventHandler = require('../../EventCentral');
+const dataHandler = require('../../data/DataHandler');
 
 class WorldMapHandler {
   constructor() {
@@ -15,12 +15,13 @@ class WorldMapHandler {
       LOCAL: 'local',
       TOOL: 'tool',
     };
+    this.PositionStructures = {
+      MARKER: 'marker',
+      CIRCLE: 'circle',
+      POLYGON: 'polygon',
+      LINE: 'line',
+    };
     this.hasFected = false;
-
-    eventHandler.addWatcher({
-      event: eventHandler.Events.POSITION,
-      func: () => {},
-    });
 
     this.startMap();
   }

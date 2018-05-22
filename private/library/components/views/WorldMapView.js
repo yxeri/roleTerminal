@@ -1,27 +1,30 @@
 const BaseView = require('./BaseView');
-const MapMarker = require('../../worldMap/MapMarker');
+const MapMarker = require('../worldMap/MapMarker');
+const MapLine = require('../worldMap/MapLine');
+const MapPolygon = require('../worldMap/MapPolygon');
+const MapObject = require('../worldMap/MapObject');
 
-const worldMapHandler = require('../../worldMap/WorldMapHandler');
+const worldMapHandler = require('../worldMap/WorldMapHandler');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../../data/DataHandler');
 const socketManager = require('../../SocketManager');
 const mouseHandler = require('../../MouseHandler');
 const elementCreator = require('../../ElementCreator');
-
-const ids = {
-  RIGHTCLICKMENU: 'rMenu',
-  LEFTCLICKMENU: 'lMenu',
-};
+const labelHandler = require('../../labels/LabelHandler');
 
 class WorldMapView extends BaseView {
   constructor({
     mapStyles,
+    polygonStyle,
+    lineStyle,
+    markerStyle,
+    circleStyle,
     listId,
     classes = [],
     elementId = `mapView-${Date.now()}`,
     positionTypes = Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]),
-    backgroundColor = '000000',
+    backgroundColor = '#000000',
     minZoom = 3,
     maxZoom = 16,
     centerCoordinates = storageManager.getCenterCoordinates(),
@@ -38,9 +41,11 @@ class WorldMapView extends BaseView {
     this.markers = {};
     this.worldMap = undefined;
     this.clusterer = undefined;
-    this.heatMapPoints = undefined;
-    this.heatMapLayer = undefined;
     this.backgroundColor = backgroundColor;
+    this.polygonStyle = polygonStyle;
+    this.lineStyle = lineStyle;
+    this.markerStyle = markerStyle;
+    this.circleStyle = circleStyle;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.mapStyles = mapStyles;
@@ -48,12 +53,9 @@ class WorldMapView extends BaseView {
     this.cornerCoordinates = cornerCoordinates;
     this.positionTypes = positionTypes;
     this.listId = listId;
-    this.rightClickMenu = elementCreator.createContainer({
-      elementId: `${this.elementId}${ids.RIGHTCLICKMENU}`,
-    });
-    this.leftClickMenu = elementCreator.createContainer({
-      elementId: `${this.elementId}${ids.LEFTCLICKMENU}`,
-    });
+
+    this.element.appendChild(MapObject.leftClickBox);
+    this.element.appendChild(MapObject.rightClickBox);
 
     eventHandler.addWatcher({
       event: eventHandler.Events.WORLDMAP,
@@ -75,17 +77,24 @@ class WorldMapView extends BaseView {
 
     eventHandler.addWatcher({
       event: eventHandler.Events.POSITION,
-      func: ({ position, changeType }) => {
+      func: (data) => {
+        const { position, changeType } = data;
         switch (changeType) {
           case socketManager.ChangeTypes.CREATE: {
-            const marker = new MapMarker({ position, worldMapView: this });
+            const marker = new MapMarker({
+              position,
+              worldMapView: this,
+            });
 
             this.markers[position.objectId] = marker;
 
             break;
           }
           case socketManager.ChangeTypes.UPDATE: {
-            const marker = new MapMarker({ position, worldMapView: this });
+            const marker = new MapMarker({
+              position,
+              worldMapView: this,
+            });
 
             this.markers[position.objectId] = marker;
 
@@ -117,7 +126,9 @@ class WorldMapView extends BaseView {
         const marker = markers[markerId];
 
         if (marker) {
-          bounds.extend(marker.getPosition());
+          const coordinates = marker.getLatestCoordinates();
+
+          bounds.extend(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
         }
       });
     } else {
@@ -130,68 +141,82 @@ class WorldMapView extends BaseView {
 
   createMarkers() {
     const markers = {};
-    const positions = dataHandler.positions.getObjects({
-      orCheck: true,
-      filter: {
-        rules: this.positionTypes.map((positionType) => {
-          return {
-            paramName: 'positionType',
-            paramValue: positionType,
-          };
-        }),
-      },
-    });
+    const positions = dataHandler.positions.getPositions({ positionTypes: this.positionTypes });
 
     positions.forEach((position) => {
-      markers[position.objectId] = new MapMarker({ position, worldMapView: this });
+      switch (position.positionStructure) {
+        case worldMapHandler.PositionStructures.CIRCLE: {
+          break;
+        }
+        case worldMapHandler.PositionStructures.LINE: {
+          markers[position.objectId] = new MapLine({
+            position,
+            styles: this.lineStyle,
+          });
+
+          break;
+        }
+        case worldMapHandler.PositionStructures.POLYGON: {
+          markers[position.objectId] = new MapPolygon({
+            position,
+            styles: this.polygonStyle,
+          });
+
+          break;
+        }
+        default: {
+          markers[position.objectId] = new MapMarker({
+            position,
+            styles: this.markerStyle,
+          });
+
+          break;
+        }
+      }
     });
 
     return markers;
   }
 
-  showRightClickBox(event) {
-    const projection = this.overlay.getProjection();
-    const xy = projection.fromLatLngToContainerPixel(event.latLng);
+  resetClusterer() {
+    if (!this.clusterer) {
+      return;
+    }
 
-    this.rightClickMenu.style.left = `${xy.x + 5}px`;
-    this.rightClickMenu.style.top = `${xy.y + 5}px`;
-
-    this.rightClickMenu.classList.remove('hide');
+    this.clusterer.clearMarkers();
+    this.clusterer.addMarkers(Object.keys(this.markers).filter(markerId => this.markers[markerId].shouldCluster).map(markerId => this.markers[markerId]));
   }
 
-  hideRightClickMenu() {
-    this.rightClickMenu.classList.add('hide');
-  }
+  showPositionClickBox({ position }) {
+    const { description = [labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noDescription' })] } = position;
 
-  createPositionClickBox({ event, positionId }) {
-    const position = dataHandler.positions.getObject({ objectId: positionId });
-
-
-  }
-
-  createPositionRightClickBox({ event, positionId }) {
-    dataHandler.positions.fetchObject({
-      params: { positionId, full: true },
-      noEmit: true,
-      callback: ({ error, data }) => {
-        if (error) {
-          return;
-        }
-
-        this.showRightClickBox(event);
-      },
+    const descriptionContainer = elementCreator.createContainer({
+      elements: [elementCreator.createArticle({
+        headerElement: elementCreator.createParagraph({
+          elements: [elementCreator.createSpan({ text: position.positionName || labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noName' }) })],
+        }),
+        elements: [
+          elementCreator.createSection({
+            elements: description.map((line) => {
+              return elementCreator.createParagraph({
+                elements: [elementCreator.createSpan({ text: line })],
+              });
+            }),
+          }),
+        ],
+      })],
     });
-  }
 
-  createMapRightClickBox(event) {
-    this.showRightClickBox(event);
-  }
+    elementCreator.replaceFirstChild(this.leftClickBox, descriptionContainer);
 
-  createMapClickBox() {
-
+    this.leftClickBox.classList.remove('hide');
   }
 
   startMap() {
+    if (this.worldMap) {
+      return;
+    }
+
     const centerCoordinates = storageManager.getCenterCoordinates();
 
     this.worldMap = new google.maps.Map(this.element, {
@@ -216,15 +241,8 @@ class WorldMapView extends BaseView {
       maxZoom: this.maxZoom,
       styles: this.mapStyles,
     });
-
-    mouseHandler.addGMapsClickListener({
-      element: this.worldMap,
-      right: (event) => {
-        this.createMapRightClickBox(event);
-      },
-    });
-
     this.markers = this.createMarkers();
+    this.clusterer = new MarkerClusterer(this.worldMap, this.marker);
 
     Object.keys(this.markers).forEach((markerId) => {
       const marker = this.markers[markerId];
@@ -238,10 +256,42 @@ class WorldMapView extends BaseView {
     this.overlay.draw = () => {};
     this.overlay.setMap(this.worldMap);
 
-    this.element.appendChild(this.rightClickMenu);
-
     this.realignMap({
-      markers: this.createMarkers(),
+      markers: this.markers,
+    });
+
+    mouseHandler.addGMapsClickListener({
+      element: this.worldMap,
+      leftFunc: () => {
+        MapObject.hideLeftClickBox();
+        MapObject.hideRightClickBox();
+      },
+      right: () => {
+        MapObject.hideLeftClickBox();
+      },
+    });
+
+    google.maps.event.addListener(this.worldMap, 'drag', () => {
+      MapObject.hideLeftClickBox();
+      MapObject.hideRightClickBox();
+    });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.MARKER_DESCRIPTION,
+      func: ({
+        position,
+        shouldShow,
+        event,
+      }) => {
+        if (shouldShow) {
+          this.showPositionClickBox({
+            event,
+            position,
+          });
+        } else {
+          MapObject.hideLeftClickBox();
+        }
+      },
     });
   }
 }

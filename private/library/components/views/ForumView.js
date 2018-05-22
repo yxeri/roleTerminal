@@ -97,8 +97,8 @@ function createHeader({ object }) {
 function createTimestamp({ object }) {
   const timeCreated = object.customTimeCreated || object.timeCreated;
   const lastUpdated = object.customLastUpdated || object.lastUpdated;
-  const timeCreatedStamp = textTools.generateTimeStamp({ date: timeCreated });
-  const lastUpdatedStamp = textTools.generateTimeStamp({ date: lastUpdated });
+  const timeCreatedStamp = textTools.generateTimestamp({ date: timeCreated });
+  const lastUpdatedStamp = textTools.generateTimestamp({ date: lastUpdated });
   const elements = [
     elementCreator.createSpan({
       classes: [cssClasses.timeCreated],
@@ -339,15 +339,15 @@ class ForumView extends BaseView {
     classes = [],
     elementId = `fView-${Date.now()}`,
   }) {
+    disableVoting = shouldDisableVoting;
+    disablePictures = shouldDisablePictures;
+
     super({
       elementId,
       classes: classes.concat(['forumView']),
     });
 
     this.currentForum = forumId;
-
-    disableVoting = shouldDisableVoting;
-    disablePictures = shouldDisablePictures;
 
     if (!lockedToForum) {
       eventCentral.addWatcher({
@@ -490,9 +490,9 @@ class ForumView extends BaseView {
     return this.currentForum || storageManager.getCurrentForum();
   }
 
-  updateForum({ forum }) {
-
-  }
+  // updateForum({ forum }) {
+  //
+  // }
 
   updateThread({ thread }) {
     const existingThread = this.getElement({ objectId: thread.objectId });
@@ -516,18 +516,18 @@ class ForumView extends BaseView {
     const existingPost = this.getElement({ objectId: post.objectId });
     const postContent = this.getElement({ objectId: `${post.objectId}${ids.postContent}` });
 
-    if (post.parentPostId) {
-
-    } else {
-      existingPost.replaceChild(
-        elementCreator.createHeader({ elements: [createHeader({ object: post })] }),
-        existingPost.getElementsByTagName('header')[0],
-      );
-      existingPost.replaceChild(
-        postContent,
-        createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
-      );
-    }
+    // if (post.parentPostId) {
+    //
+    // } else {
+    existingPost.replaceChild(
+      elementCreator.createHeader({ elements: [createHeader({ object: post })] }),
+      existingPost.getElementsByTagName('header')[0],
+    );
+    existingPost.replaceChild(
+      postContent,
+      createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
+    );
+    // }
   }
 
   getElement({ objectId }) {
@@ -540,8 +540,6 @@ class ForumView extends BaseView {
     }
 
     const forum = forumComposer.getForum({ forumId });
-
-    console.log('showForum', forum, forumId);
 
     if (!forum) {
       this.replaceOnParent({

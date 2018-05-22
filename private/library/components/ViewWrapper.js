@@ -4,6 +4,7 @@ const elementCreator = require('../ElementCreator');
 
 class ViewWrapper extends BaseView {
   constructor({
+    topRow,
     columns,
     classes = [],
   }) {
@@ -12,11 +13,34 @@ class ViewWrapper extends BaseView {
       classes: classes.concat(['viewWrapper']),
     });
 
-    columns.forEach((components) => {
-      const container = elementCreator.createContainer({});
+    if (topRow) {
+      this.element.appendChild(topRow);
+    }
+
+    const columnAmount = columns.length;
+
+    columns.forEach(({ components, classes: columnClasses = [] }) => {
+      const containerClasses = ['column'].concat(columnClasses);
+
+      if (columnAmount === 2) {
+        containerClasses.push('oneOfTwo');
+      } else if (columnAmount === 3) {
+        containerClasses.push('oneOfThree');
+      } else {
+        containerClasses.push('one');
+      }
+
+      if (topRow) {
+        containerClasses.push('withTopRow');
+      }
+
+      const container = elementCreator.createContainer({ classes: containerClasses });
 
       components.forEach((object) => {
-        const { title, component } = object;
+        const {
+          title,
+          component,
+        } = object;
 
         if (title) {
           container.appendChild(elementCreator.createSpan({

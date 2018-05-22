@@ -22,6 +22,7 @@ const storageManager = require('../../StorageManager');
 
 class RoomList extends List {
   constructor({
+    isUsers = false,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -46,7 +47,7 @@ class RoomList extends List {
           });
         },
       },
-      collector: dataHandler.rooms,
+      collector: isUsers ? dataHandler.users : dataHandler.rooms,
       listItemFields: headerFields,
     });
   }

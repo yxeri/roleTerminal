@@ -67,6 +67,8 @@ class List extends BaseView {
     listItemFields,
     fieldToAppend,
     filter,
+    appendClasses,
+    listItemFieldsClasses,
     listItemClickFuncs = {},
     dependencies = [],
     focusedId = '-1',
@@ -82,7 +84,9 @@ class List extends BaseView {
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
     this.collector = collector;
+    this.listItemFieldsClasses = listItemFieldsClasses;
     this.listItemFields = listItemFields;
+    this.appendClasses = appendClasses;
     this.fieldToAppend = fieldToAppend;
     this.focusedId = focusedId;
     this.markedIds = [];
@@ -103,29 +107,24 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              this.updateListItem({ object });
+              this.addOneItem({
+                object,
+                shouldAnimate: true,
+                shouldReplace: true,
+              });
 
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              const newItem = this.createListItem({ object });
-
-              newItem.classList.add(cssClasses.newListItem);
-
-              this.element.appendChild(newItem);
-
-              setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+              this.addOneItem({
+                object,
+                shouldAnimate: true,
+              });
 
               break;
             }
             case socketManager.ChangeTypes.REMOVE: {
-              const toRemove = this.getElement(objectId);
-
-              toRemove.classList.add(cssClasses.removeListItem);
-
-              setTimeout(() => {
-                this.element.removeChild(this.getElement(objectId));
-              }, itemChangeTimeout);
+              this.removeOneItem({ object });
 
               break;
             }
@@ -165,17 +164,6 @@ class List extends BaseView {
     const listElement = this.createList();
 
     this.replaceOnParent({ element: listElement });
-  }
-
-  updateListItem({ object }) {
-    const { objectId } = object;
-    const newItem = this.createListItem({ object });
-
-    newItem.classList.add(cssClasses.newListItem);
-
-    this.element.replaceChild(newItem, this.getElement(objectId));
-
-    setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
   }
 
   removeListItem({ objectId }) {
@@ -281,10 +269,15 @@ class List extends BaseView {
               fallbackTo,
               convertFunc,
               func,
+              classes: fieldClasses,
             } = field;
             const value = object[paramName] || object[fallbackTo];
             const text = convertFunc ? convertFunc(value) : value;
-            const spanParams = { text, clickFuncs: {} };
+            const spanParams = {
+              text,
+              classes: fieldClasses,
+              clickFuncs: {},
+            };
 
             if (func) {
               spanParams.clickFuncs.leftFunc = () => {
@@ -295,7 +288,10 @@ class List extends BaseView {
             return elementCreator.createSpan(spanParams);
           });
 
-        listItemElements.push(elementCreator.createParagraph({ elements }));
+        listItemElements.push(elementCreator.createParagraph({
+          elements,
+          classes: this.listItemFieldsClasses,
+        }));
       }
 
       /**
@@ -307,11 +303,13 @@ class List extends BaseView {
         if (Array.isArray(field)) {
           field.forEach((value) => {
             listItemElements.push(elementCreator.createParagraph({
+              classes: this.appendClasses,
               elements: [elementCreator.createSpan({ text: value })],
             }));
           });
         } else {
           listItemElements.push(elementCreator.createParagraph({
+            classes: this.appendClasses,
             elements: [elementCreator.createSpan({ text: field })],
           }));
         }
@@ -328,6 +326,39 @@ class List extends BaseView {
       elementId: `${this.elementId}${objectId}`,
       elements: listItemElements,
     });
+  }
+
+  addOneItem({
+    object,
+    shouldReplace = false,
+    shouldAnimate = false,
+  }) {
+    const { objectId } = object;
+    const newItem = this.createListItem({ object });
+
+    if (shouldAnimate) {
+      newItem.classList.add(cssClasses.newListItem);
+      setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+    }
+
+    if (shouldReplace) {
+      this.element.replaceChild(newItem, this.getElement(objectId));
+    } else {
+      this.element.appendChild(newItem);
+    }
+  }
+
+  removeOneItem({
+    object,
+  }) {
+    const { objectId } = object;
+    const toRemove = this.getElement(objectId);
+
+    toRemove.classList.add(cssClasses.removeListItem);
+
+    setTimeout(() => {
+      this.element.removeChild(this.getElement(objectId));
+    }, itemChangeTimeout);
   }
 }
 

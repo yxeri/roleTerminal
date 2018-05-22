@@ -53,7 +53,9 @@ class SocketManager {
       DISCONNECT: 'disconnect',
       RECONNECT: 'reconnect',
       STARTUP: 'startup',
-      MSG: 'msg',
+      SENDMSG: 'sendMessage',
+      UPDATEPOSITION: 'updatePosition',
+      UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -206,8 +208,6 @@ class SocketManager {
       }
 
       const { token, user } = data;
-
-      this.isLoggedIn = true;
 
       storageManager.setToken(token);
 

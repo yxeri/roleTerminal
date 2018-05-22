@@ -23,13 +23,16 @@ class InputArea extends BaseView {
       type: 'text',
       multiLine: true,
     });
+    this.isFocused = false;
 
     this.textArea.addEventListener('focus', () => {
+      this.isFocused = true;
       this.textArea.classList.add('focused');
 
       focusCallback();
     });
     this.textArea.addEventListener('blur', () => {
+      this.isFocused = false;
       this.textArea.classList.remove('focused');
 
       blurCallback();
@@ -42,9 +45,13 @@ class InputArea extends BaseView {
       inputCallback(this.getInputValue());
     });
 
-    if (sendOnEnter) {
-      keyhandler.addKey(13, triggerCallback);
-    }
+    this.element.appendChild(this.textArea);
+
+    keyhandler.addKey(13, () => {
+      if (this.isFocused) {
+        triggerCallback({ text: this.getSplitInputValue() });
+      }
+    }, sendOnEnter);
   }
 
   resizeInput() {

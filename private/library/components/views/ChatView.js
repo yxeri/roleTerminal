@@ -19,9 +19,7 @@ const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
 const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
-const socketManager = require('../../SocketManager');
+const messageComposer = require('../../data/MessageComposer');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -42,25 +40,49 @@ class ChatView extends ViewWrapper {
       placeholder,
       sendOnEnter,
       classes: [inputPlacement],
-      triggerCallback: () => {},
+      triggerCallback: ({ text }) => {
+        messageComposer.sendMessage({
+          message: {
+            text,
+            roomId: messageList.getRoomId(),
+            messageType: dataHandler.messages.MessageTypes.CHAT,
+          },
+          callback: ({ data, error }) => {
+            if (error) {
+              console.log('sendMessage', error);
+
+              return;
+            }
+
+            this.messageList.addOneItem({
+              object: data.message,
+              shouldAnimate: true,
+            });
+            this.inputArea.clearInput();
+          },
+        });
+      },
       focusCallback: () => {},
       blurCallback: () => {},
       inputCallback: () => {},
     });
     const columns = [];
-    const mainColumn = [];
+    const mainColumn = {
+      components: [],
+      classes: ['columnChat'],
+    };
     let roomList;
 
     switch (inputPlacement) {
       case 'top': {
-        mainColumn.push({ component: inputArea });
-        mainColumn.push({ component: messageList });
+        mainColumn.components.push({ component: inputArea });
+        mainColumn.components.push({ component: messageList });
 
         break;
       }
       default: {
-        mainColumn.push({ component: messageList });
-        mainColumn.push({ component: inputArea });
+        mainColumn.components.push({ component: messageList });
+        mainColumn.components.push({ component: inputArea });
 
         break;
       }
@@ -69,16 +91,24 @@ class ChatView extends ViewWrapper {
     if (!hideRoomList) {
       roomList = new RoomList({});
 
+      messageList.setRoomListId(roomList.getElementId());
+
       switch (roomListPlacement) {
         case 'left': {
-          columns.push([{ component: roomList }]);
+          columns.push({
+            components: [{ component: roomList }],
+            classes: ['columnRoomList'],
+          });
           columns.push(mainColumn);
 
           break;
         }
         default: {
           columns.push(mainColumn);
-          columns.push([{ component: roomList }]);
+          columns.push({
+            components: [{ component: roomList }],
+            classes: ['columnRoomList'],
+          });
 
           break;
         }
@@ -97,47 +127,6 @@ class ChatView extends ViewWrapper {
 
     this.inputArea = inputArea;
     this.messageList = messageList;
-  }
-
-  sendMessage({
-    text,
-    messageType,
-    roomId,
-  }) {
-    const message = {
-      text,
-      messageType,
-      roomId,
-    };
-    let emitType = '';
-
-    switch (messageType) {
-      case dataHandler.messages.MessageTypes.CHAT: {
-        emitType = socketManager.EmitTypes.CHATMSG;
-
-        break;
-      }
-      case dataHandler.messages.MessageTypes.WHISPER: {
-        emitType = socketManager.EmitTypes.WHISPER;
-
-        break;
-      }
-      default: {
-        console.log('Incorrect message type');
-
-        break;
-      }
-    }
-
-    socketManager.emitEvent(emitType, { message }, ({ error }) => {
-      if (error) {
-        console.log('Error sending message');
-
-        return;
-      }
-
-      this.inputArea.clearInput();
-    });
   }
 }
 

@@ -19,6 +19,8 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
+const textTools = require('../../TextTools');
+const socketManager = require('../../SocketManager');
 
 class MessageList extends List {
   /**
@@ -48,21 +50,32 @@ class MessageList extends List {
       shouldFocusOnClick: false,
       collector: dataHandler.messages,
       fieldToAppend: 'text',
+      appendClasses: ['msgLine'],
+      listItemFieldsClasses: ['msgInfo'],
       listItemFields: [
         {
-          paramName: 'roomId',
-          convertFunc: (objectId) => {
-            const room = dataHandler.rooms.getObject({ objectId });
-
-            return room ? room.roomName : objectId;
-          },
-        }, {
           paramName: 'ownerAliasId',
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
             const user = dataHandler.users.getObject({ objectId });
 
             return user ? user.username : objectId;
+          },
+        }, {
+          paramName: 'customTimeCreated',
+          fallbackTo: 'timeCreated',
+          convertFunc: (date) => {
+            const timestamp = textTools.generateTimestamp({ date });
+
+            return `${timestamp.fullTime} ${timestamp.fullDate}`;
+          },
+        }, {
+          classes: ['msgRoomName'],
+          paramName: 'roomId',
+          convertFunc: (objectId) => {
+            const room = dataHandler.rooms.getObject({ objectId });
+
+            return room ? room.roomName : objectId;
           },
         },
       ],
@@ -76,23 +89,102 @@ class MessageList extends List {
       };
     }
 
+    super(superParams);
+
+    this.roomListId = roomListId;
+    this.roomId = roomId || storageManager.getCurrentRoom();
+
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if ((!origin && !roomListId) || roomListId === origin) {
+          if ((!origin && !this.roomListId) || this.roomListId === origin) {
             this.showMessagesByRoom({ roomId: room.objectId });
           }
         },
       });
     }
 
-    super(superParams);
+    eventCentral.addWatcher({
+      event: eventCentral.Events.CHATMSG,
+      func: ({ message, changeType }) => {
+        if (!dataHandler.messages.hasFetched) {
+          return;
+        }
+
+        switch (changeType) {
+          case socketManager.ChangeTypes.CREATE: {
+            console.log('chat msg create', message);
+
+            this.addOneItem({
+              object: message,
+              shouldAnimate: true,
+            });
+
+            break;
+          }
+          case socketManager.ChangeTypes.UPDATE: {
+            console.log('chat msg update', message);
+
+            this.addOneItem({
+              object: message,
+              shouldAnimate: true,
+              shouldReplace: true,
+            });
+
+            break;
+          }
+          case socketManager.ChangeTypes.REMOVE: {
+            console.log('chat msg remove', message);
+
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.BROADCAST,
+      func: ({ message, changeType }) => {
+        if (!dataHandler.messages.hasFetched) {
+          return;
+        }
+
+        console.log('broadcast', message);
+
+        switch (changeType) {
+          case socketManager.ChangeTypes.UPDATE: {
+            console.log('broadcast update', message);
+
+            break;
+          }
+          case socketManager.ChangeTypes.REMOVE: {
+            console.log('broadcast remove', message);
+
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      },
+    });
   }
 
   showMessagesByRoom({ roomId }) {
     this.filter = { rules: [{ paramName: 'roomId', paramValue: roomId }] };
     this.appendList();
+  }
+
+  setRoomListId(id) {
+    this.roomListId = id;
+  }
+
+  getRoomId() {
+    return this.roomId;
   }
 }
 

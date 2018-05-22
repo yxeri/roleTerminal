@@ -95,6 +95,10 @@ class MouseHandler {
       google.maps.event.addListener(element, 'mouseup', () => {
         this.longClick = false;
       });
+
+      google.maps.event.addListener(element, 'drag', () => {
+        this.longClick = false;
+      });
     }
   }
 }

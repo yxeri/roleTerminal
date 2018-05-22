@@ -21,42 +21,97 @@ const cssClasses = {
   clickable: 'clickable',
 };
 
+/**
+ * Set an Id on the element.
+ * @param {HTMLElement} element - Element to add an Id to.
+ * @param {string} id - Id to add.
+ */
+function setElementId(element, id) {
+  if (id) {
+    element.setAttribute('id', id);
+  }
+}
+
+/**
+ * Set a name on the element.
+ * @param {HTMLElement} element - Element to add a name to.
+ * @param {string} name - Name to add.
+ */
+function setName(element, name) {
+  if (name) {
+    element.setAttribute('name', name);
+  }
+}
+
+/**
+ * Set classes on the element.
+ * @param {HTMLElement} element - Element to add classes to.
+ * @param {string[]} classes - Classes to add.
+ */
+function setClasses(element, classes = []) {
+  classes.forEach(cssClass => element.classList.add(cssClass));
+}
+
+/**
+ * Set click listeners on the element.
+ * @param {HTMLElement} element - Element to add click listeners to.
+ * @param {Object} clickFuncs - Functions to call on clicks.
+ * @param {Function} clickFuncs.leftFunc - Function that is called on left click.
+ * @param {Function} clickFuncs.right - Function that is called on right click.
+ */
+function setClickFuncs(element, clickFuncs) {
+  if (clickFuncs && (clickFuncs.leftFunc || clickFuncs.right)) {
+    const params = clickFuncs;
+    params.element = element;
+
+    mouseHandler.addClickListener(params);
+
+    element.classList.add(cssClasses.clickable);
+  }
+}
+
+/**
+ * Create an element and set the set parameters.
+ * @param {Object} params - Parameters.
+ * @param {string} params.elementType - Type of element to create.
+ * @param {string} [params.elementId] - Id of the element.
+ * @param {string[]} [params.classes] - CSS classes.
+ * @param {Function} [params.clickFuncs] - Functions called on clicks.
+ * @param {string} [params.name] - Name of the element.
+ * @return {HTMLElement} The created element.
+ */
+function createBaseElement({
+  elementId,
+  classes,
+  elementType,
+  clickFuncs,
+  name,
+}) {
+  const element = document.createElement(elementType);
+
+  setClasses(element, classes);
+  setElementId(element, elementId);
+  setClickFuncs(element, clickFuncs);
+  setName(element, name);
+
+  return element;
+}
+
 class ElementCreator {
-  static setElementId(element, id) {
-    if (id) {
-      element.setAttribute('id', id);
-    }
-  }
-
-  static setName(element, name) {
-    if (name) {
-      element.setAttribute('name', name);
-    }
-  }
-
-  static setClasses(element, classes = []) {
-    classes.forEach(cssClass => element.classList.add(cssClass));
-  }
-
-  static setClickFuncs(element, clickFuncs) {
-    if (clickFuncs && (clickFuncs.leftFunc || clickFuncs.right)) {
-      const params = clickFuncs;
-      params.element = element;
-
-      mouseHandler.addClickListener(params);
-
-      element.classList.add(cssClasses.clickable);
-    }
-  }
-
   static createList({
     elementId,
+    items = [],
     classes = [],
   }) {
-    const list = document.createElement('ul');
+    const list = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'ul',
+    });
 
-    this.setClasses(list, classes);
-    this.setElementId(list, elementId);
+    items.forEach((item) => {
+      list.appendChild(this.createListItem(item));
+    });
 
     return list;
   }
@@ -67,16 +122,17 @@ class ElementCreator {
     classes,
     elementId,
   }) {
-    const pictureElement = document.createElement('img');
+    const pictureElement = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: 'img',
+    });
 
     pictureElement.setAttribute('src', picture.url);
 
     if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width};`); }
     if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height};`); }
-
-    this.setClickFuncs(pictureElement, clickFuncs);
-    this.setClasses(pictureElement, classes);
-    this.setElementId(pictureElement, elementId);
 
     return pictureElement;
   }
@@ -87,15 +143,16 @@ class ElementCreator {
     classes,
     elementId,
   }) {
-    const listItem = document.createElement('li');
+    const listItem = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: 'li',
+    });
 
     if (elements) {
       elements.forEach(element => listItem.appendChild(element));
     }
-
-    this.setClickFuncs(listItem, clickFuncs);
-    this.setElementId(listItem, elementId);
-    this.setClasses(listItem, classes);
 
     return listItem;
   }
@@ -107,15 +164,16 @@ class ElementCreator {
     classes,
     spanType,
   }) {
-    const span = document.createElement(spanType || 'span');
+    const span = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: spanType || 'span',
+    });
 
     if (text) {
       span.appendChild(document.createTextNode(text));
     }
-
-    this.setElementId(span, elementId);
-    this.setClickFuncs(span, clickFuncs);
-    this.setClasses(span, classes);
 
     return span;
   }
@@ -129,12 +187,15 @@ class ElementCreator {
     const span = this.createSpan({
       classes: classes.concat(['button']),
     });
-    const button = document.createElement('button');
+    const button = createBaseElement({
+      elementId,
+      clickFuncs,
+      classes,
+      elementType: 'button',
+    });
 
     button.appendChild(document.createTextNode(text));
     span.appendChild(button);
-    this.setElementId(button, elementId);
-    this.setClickFuncs(button, clickFuncs);
 
     return span;
   }
@@ -145,15 +206,16 @@ class ElementCreator {
     elements,
     name,
   }) {
-    const container = document.createElement('div');
+    const container = createBaseElement({
+      elementId,
+      classes,
+      name,
+      elementType: 'div',
+    });
 
     if (elements) {
       elements.forEach(element => container.appendChild(element));
     }
-
-    this.setClasses(container, classes);
-    this.setElementId(container, elementId);
-    this.setName(container, name);
 
     return container;
   }
@@ -165,22 +227,23 @@ class ElementCreator {
    * @param {Object[]} [params.elements] - Elements to attach.
    * @param {string} [params.text] - Text to add to the paragraph. It is overriden by elements.
    * @param {string[]} [params.classes] - Css classes.
-   * @return {HTMLParagraphElement} Paragraph element.
+   * @return {HTMLElement} Paragraph element.
    */
   static createParagraph({
     elements,
     text,
     classes,
   }) {
-    const paragraph = document.createElement('p');
+    const paragraph = createBaseElement({
+      classes: classes.concat(['button']),
+      elementType: 'p',
+    });
 
     if (elements) {
       elements.forEach(element => paragraph.appendChild(element));
     } else {
       paragraph.appendChild(document.createTextNode(text));
     }
-
-    this.setClasses(paragraph, classes);
 
     return paragraph;
   }
@@ -195,10 +258,14 @@ class ElementCreator {
     classes,
     placeholder = '',
   }) {
-    const input = multiLine ? document.createElement('textarea') : document.createElement('input');
+    const input = createBaseElement({
+      elementId,
+      classes,
+      name: inputName,
+      elementType: multiLine ? 'textarea' : 'input',
+    });
 
     input.setAttribute('placeholder', placeholder);
-    input.setAttribute('name', inputName);
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
 
@@ -213,18 +280,14 @@ class ElementCreator {
         if (input.value === '') { input.classList.add(cssClasses.emptyInput); }
       });
       input.addEventListener('input', () => { input.classList.remove(cssClasses.emptyInput); });
-
       input.setAttribute('required', 'true');
     }
-
-    this.setElementId(input, elementId);
-    this.setClasses(input, classes);
 
     return input;
   }
 
   static createHeader({ elements }) {
-    const header = document.createElement('header');
+    const header = createBaseElement({ elementType: 'header' });
 
     if (elements) {
       elements.forEach(element => header.appendChild(element));
@@ -240,10 +303,14 @@ class ElementCreator {
     headerElement,
     elementId,
   }) {
-    const article = document.createElement('article');
+    const article = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'article',
+    });
 
     if (headerElement) {
-      const header = document.createElement('header');
+      const header = createBaseElement({ elementType: 'header' });
 
       header.appendChild(headerElement);
       article.appendChild(header);
@@ -254,14 +321,11 @@ class ElementCreator {
     }
 
     if (footerElement) {
-      const footer = document.createElement('footer');
+      const footer = createBaseElement({ elementType: 'footer' });
 
       footer.appendChild(footerElement);
       article.appendChild(footer);
     }
-
-    this.setElementId(article, elementId);
-    this.setClasses(article, classes);
 
     return article;
   }
@@ -273,10 +337,14 @@ class ElementCreator {
     headerElement,
     elementId,
   }) {
-    const section = document.createElement('section');
+    const section = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'section',
+    });
 
     if (headerElement) {
-      const header = document.createElement('header');
+      const header = createBaseElement({ elementType: 'header' });
 
       header.appendChild(headerElement);
       section.appendChild(header);
@@ -287,16 +355,21 @@ class ElementCreator {
     }
 
     if (footerElement) {
-      const footer = document.createElement('footer');
+      const footer = createBaseElement({ elementType: 'footer' });
 
       footer.appendChild(footerElement);
       section.appendChild(footer);
     }
 
-    this.setElementId(section, elementId);
-    this.setClasses(section, classes);
-
     return section;
+  }
+
+  static replaceFirstChild(parentElement, newChild) {
+    if (parentElement.firstElementChild) {
+      parentElement.replaceChild(newChild, parentElement.firstElementChild);
+    } else {
+      parentElement.appendChild(newChild);
+    }
   }
 }
 

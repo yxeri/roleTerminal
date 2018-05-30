@@ -42,6 +42,7 @@ class MessageList extends List {
   }) {
     const superParams = {
       elementId,
+      shouldScrollToBottom: true,
       classes: classes.concat(['msgList']),
       dependencies: [
         dataHandler.users,

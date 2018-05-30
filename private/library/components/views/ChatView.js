@@ -18,7 +18,7 @@ const ViewWrapper = require('../ViewWrapper');
 const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
-const dataHandler = require('../../data/DataHandler');
+
 const messageComposer = require('../../data/MessageComposer');
 
 class ChatView extends ViewWrapper {
@@ -45,7 +45,7 @@ class ChatView extends ViewWrapper {
           message: {
             text,
             roomId: messageList.getRoomId(),
-            messageType: dataHandler.messages.MessageTypes.CHAT,
+            messageType: messageComposer.MessageTypes.CHAT,
           },
           callback: ({ data, error }) => {
             if (error) {

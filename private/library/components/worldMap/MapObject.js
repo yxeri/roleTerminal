@@ -17,7 +17,7 @@ const BaseDialog = require('../views/dialogs/BaseDialog');
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
 const elementCreator = require('../../ElementCreator');
-const socketManager = require('../../SocketManager');
+const positionComposer = require('../../data/PositionComposer');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -151,14 +151,17 @@ class MapObject {
   }
 
   updatePosition() {
-    socketManager.emitEvent(socketManager.EmitTypes.UPDATEPOSITION, { position: this.position }, ({ data, error }) => {
-      if (error) {
-        console.log('position error', this.position, error);
+    positionComposer.updatePosition({
+      position: this.position,
+      callback: ({ data, error }) => {
+        if (error) {
+          console.log('position error', this.position, error);
 
-        return;
-      }
+          return;
+        }
 
-      console.log('position updated', data);
+        console.log('position updated', data);
+      },
     });
   }
 

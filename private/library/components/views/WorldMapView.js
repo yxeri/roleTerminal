@@ -4,10 +4,9 @@ const MapLine = require('../worldMap/MapLine');
 const MapPolygon = require('../worldMap/MapPolygon');
 const MapObject = require('../worldMap/MapObject');
 
-const worldMapHandler = require('../worldMap/WorldMapHandler');
+const positionComposer = require('../../data/PositionComposer');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
-const dataHandler = require('../../data/DataHandler');
 const socketManager = require('../../SocketManager');
 const mouseHandler = require('../../MouseHandler');
 const elementCreator = require('../../ElementCreator');
@@ -112,10 +111,6 @@ class WorldMapView extends BaseView {
         }
       },
     });
-
-    if (worldMapHandler.hasFected) {
-      this.startMap();
-    }
   }
 
   realignMap({ markers }) {
@@ -141,7 +136,7 @@ class WorldMapView extends BaseView {
 
   createMarkers() {
     const markers = {};
-    const positions = dataHandler.positions.getPositions({ positionTypes: this.positionTypes });
+    const positions = positionComposer.getPositions({ positionTypes: this.positionTypes });
 
     positions.forEach((position) => {
       switch (position.positionStructure) {

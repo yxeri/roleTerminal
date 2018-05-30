@@ -49,13 +49,6 @@ class MessageData extends BaseData {
         EmitTypes.BROADCAST,
       ],
     });
-
-    this.MessageTypes = {
-      CHAT: 'chat',
-      WHISPER: 'whisper',
-      BROADCAST: 'broadcast',
-      MESSAGE: 'message',
-    };
   }
 }
 

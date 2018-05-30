@@ -20,6 +20,7 @@ const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
 
 const messageComposer = require('../../data/MessageComposer');
+const accessCentral = require('../../AccessCentral');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -119,6 +120,11 @@ class ChatView extends ViewWrapper {
 
     this.inputArea = inputArea;
     this.messageList = messageList;
+
+    accessCentral.addAccessElement({
+      element: this.inputArea.element,
+      minimumAccessLevel: 1,
+    });
   }
 }
 

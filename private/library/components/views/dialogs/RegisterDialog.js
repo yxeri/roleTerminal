@@ -20,6 +20,7 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const storageManager = require('../../../StorageManager');
+const dataHandler = require('../../../data/DataHandler');
 
 const ids = {
   FULLNAME: 'fullName',
@@ -35,7 +36,7 @@ class RegisterDialog extends BaseDialog {
   }) {
     const inputs = [
       elementCreator.createInput({
-        elementId: `${elementId}${ids.USERNAME}`,
+        elementId: ids.USERNAME,
         inputName: 'username',
         type: 'text',
         isRequired: true,
@@ -43,7 +44,7 @@ class RegisterDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'username' }),
       }),
       elementCreator.createInput({
-        elementId: `${elementId}${ids.FULLNAME}`,
+        elementId: ids.FULLNAME,
         inputName: 'fullName',
         type: 'text',
         isRequired: true,
@@ -51,7 +52,7 @@ class RegisterDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),
       elementCreator.createInput({
-        elementId: `${elementId}${ids.PASSWORD}`,
+        elementId: ids.PASSWORD,
         inputName: 'password',
         type: 'password',
         isRequired: true,
@@ -59,7 +60,7 @@ class RegisterDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'password' }),
       }),
       elementCreator.createInput({
-        elementId: `${elementId}${ids.REPEATPASSWORD}`,
+        elementId: ids.REPEATPASSWORD,
         inputName: 'repeatPassword',
         type: 'password',
         isRequired: true,
@@ -82,43 +83,46 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
-            socketManager.emitEvent('createUser', {
-              user: {
-                username: this.getInputValue(ids.USERNAME),
-                fullName: this.getInputValue(ids.FULLNAME),
-                password: this.getInputValue(ids.PASSWORD),
-                registerDevice: storageManager.getDeviceId(),
+            dataHandler.users.createObject({
+              params: {
+                user: {
+                  username: this.getInputValue(ids.USERNAME),
+                  fullName: this.getInputValue(ids.FULLNAME),
+                  password: this.getInputValue(ids.PASSWORD),
+                  registerDevice: storageManager.getDeviceId(),
+                },
               },
-            }, ({ error }) => {
-              if (error) {
-                let text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' });
+              callback: ({ error }) => {
+                if (error) {
+                  let text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' });
 
-                if (error.type === 'invalid length') {
-                  switch (error.extraData.param) {
-                    case 'username': {
-                      text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'usernameLength' });
+                  if (error.type === 'invalid length') {
+                    switch (error.extraData.param) {
+                      case 'username': {
+                        text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'usernameLength' });
 
-                      break;
-                    }
-                    case 'password': {
-                      text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'passwordLength' });
+                        break;
+                      }
+                      case 'password': {
+                        text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'passwordLength' });
 
-                      break;
-                    }
-                    default: {
-                      break;
+                        break;
+                      }
+                      default: {
+                        break;
+                      }
                     }
                   }
+
+                  this.updateLowerText({
+                    text: [text],
+                  });
+
+                  return;
                 }
 
-                this.updateLowerText({
-                  text: [text],
-                });
-
-                return;
-              }
-
-              this.removeFromView();
+                this.removeFromView();
+              },
             });
           },
         },

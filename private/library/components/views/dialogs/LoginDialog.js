@@ -34,7 +34,7 @@ class LoginDialog extends BaseDialog {
   }) {
     const inputs = [
       elementCreator.createInput({
-        elementId: `${elementId}${ids.USERNAME}`,
+        elementId: ids.USERNAME,
         inputName: 'username',
         type: 'text',
         isRequired: true,
@@ -42,7 +42,7 @@ class LoginDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'username' }),
       }),
       elementCreator.createInput({
-        elementId: `${elementId}${ids.PASSWORD}`,
+        elementId: ids.PASSWORD,
         inputName: 'password',
         type: 'password',
         isRequired: true,

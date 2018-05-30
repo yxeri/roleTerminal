@@ -40,6 +40,7 @@ class SocketManager {
       BROADCAST: 'broadcast',
       GAMECODE: 'gameCode',
       ALIAS: 'alias',
+      CREATEPOSITION: 'createPosition',
       POSITION: 'position',
       ROOM: 'room',
       FOLLOWER: 'follower',
@@ -180,7 +181,7 @@ class SocketManager {
    * @param {Object} [params] - Parameters to send in the emit.
    * @param {Function} [callback] - Callback.
    */
-  emitEvent(event, params, callback) {
+  emitEvent(event, params = {}, callback) {
     const paramsToSend = params;
     paramsToSend.token = storageManager.getToken() || '';
 

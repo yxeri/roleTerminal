@@ -33,8 +33,10 @@ class ChatView extends ViewWrapper {
     inputPlacement = 'bottom',
     elementId = `chView-${Date.now()}`,
   }) {
+    const roomList = new RoomList({});
     const messageList = new MessageList({
       shouldSwitchRoom: true,
+      roomListId: roomList.elementId,
     });
     const inputArea = new InputArea({
       shouldResize,
@@ -68,7 +70,6 @@ class ChatView extends ViewWrapper {
       components: [],
       classes: ['columnChat'],
     };
-    const roomList = new RoomList({});
     const roomListComponent = {
       components: [{ component: roomList }],
       classes: ['columnRoomList'],

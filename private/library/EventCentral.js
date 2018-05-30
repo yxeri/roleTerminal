@@ -65,6 +65,7 @@ class EventCentral {
       FOCUS_MAPPOSITION: 'Focus on map position',
       COMPLETE_FORUM: 'Forum dependencies fetched',
       COMPLETE_MESSAGE: 'Message dependencies fetched',
+      COMPLETE_POSITION: 'Position dependencies fetched',
       ACCESS_CHANGE: 'Access level has changed',
       MARKER_DESCRIPTION: 'Map marker description',
     };

@@ -3,6 +3,7 @@ const MapMarker = require('../worldMap/MapMarker');
 const MapLine = require('../worldMap/MapLine');
 const MapPolygon = require('../worldMap/MapPolygon');
 const MapObject = require('../worldMap/MapObject');
+const BaseDialog = require('../views/dialogs/BaseDialog');
 
 const positionComposer = require('../../data/PositionComposer');
 const storageManager = require('../../StorageManager');
@@ -12,6 +13,13 @@ const mouseHandler = require('../../MouseHandler');
 const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
 
+const ids = {
+  RIGHTCLICKBOX: 'rMapBox',
+  LEFTCLICKBOX: 'lMapBox',
+  CREATEPOSITIONNAME: 'createPositionName',
+  CREATEPOSITIONDESCRIPTION: 'createPositionDescription',
+};
+
 class WorldMapView extends BaseView {
   constructor({
     mapStyles,
@@ -19,13 +27,16 @@ class WorldMapView extends BaseView {
     lineStyle,
     markerStyle,
     circleStyle,
+    labelStyle,
     listId,
+    clusterStyle,
+    alwaysShowLabels = {},
     classes = [],
     elementId = `mapView-${Date.now()}`,
-    positionTypes = Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]),
+    positionTypes = [],
     backgroundColor = '#000000',
-    minZoom = 3,
-    maxZoom = 16,
+    minZoom = 4,
+    maxZoom = 15,
     centerCoordinates = storageManager.getCenterCoordinates(),
     cornerCoordinates = {
       upperLeft: storageManager.getCornerOneCoordinates(),
@@ -45,13 +56,16 @@ class WorldMapView extends BaseView {
     this.lineStyle = lineStyle;
     this.markerStyle = markerStyle;
     this.circleStyle = circleStyle;
+    this.clusterStyle = clusterStyle;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.mapStyles = mapStyles;
     this.centerCoordinates = centerCoordinates;
     this.cornerCoordinates = cornerCoordinates;
-    this.positionTypes = positionTypes;
+    this.positionTypes = Object.values(positionComposer.PositionTypes).concat(positionTypes);
     this.listId = listId;
+    this.labelStyle = labelStyle;
+    this.alwaysShowLabels = alwaysShowLabels;
 
     this.element.appendChild(MapObject.leftClickBox);
     this.element.appendChild(MapObject.rightClickBox);
@@ -134,39 +148,68 @@ class WorldMapView extends BaseView {
     this.worldMap.fitBounds(bounds);
   }
 
+  addMarker({ marker }) {
+    marker.setMap(this.worldMap);
+
+    this.markers[marker.position.objectId] = marker;
+
+    if (marker.shouldCluster) {
+      this.clusterer.addMarker(marker.mapObject);
+    }
+  }
+
+  createMarker({ position }) {
+    let newMarker;
+
+    switch (position.positionStructure) {
+      case positionComposer.PositionStructures.CIRCLE: {
+        break;
+      }
+      case positionComposer.PositionStructures.LINE: {
+        newMarker = new MapLine({
+          position,
+          alwaysShowLabel: this.alwaysShowLabels.line,
+          labelStyle: this.labelStyle,
+          styles: this.lineStyle,
+        });
+
+        break;
+      }
+      case positionComposer.PositionStructures.POLYGON: {
+        newMarker = new MapPolygon({
+          position,
+          alwaysShowLabel: this.alwaysShowLabels.polygon,
+          labelStyle: this.labelStyle,
+          styles: this.polygonStyle,
+        });
+
+        break;
+      }
+      default: {
+        newMarker = new MapMarker({
+          position,
+          alwaysShowLabel: this.alwaysShowLabels.marker,
+          labelStyle: this.labelStyle,
+          styles: this.markerStyle,
+        });
+
+        break;
+      }
+    }
+
+    return newMarker;
+  }
+
+
   createMarkers() {
     const markers = {};
     const positions = positionComposer.getPositions({ positionTypes: this.positionTypes });
 
     positions.forEach((position) => {
-      switch (position.positionStructure) {
-        case worldMapHandler.PositionStructures.CIRCLE: {
-          break;
-        }
-        case worldMapHandler.PositionStructures.LINE: {
-          markers[position.objectId] = new MapLine({
-            position,
-            styles: this.lineStyle,
-          });
+      const marker = this.createMarker({ position });
 
-          break;
-        }
-        case worldMapHandler.PositionStructures.POLYGON: {
-          markers[position.objectId] = new MapPolygon({
-            position,
-            styles: this.polygonStyle,
-          });
-
-          break;
-        }
-        default: {
-          markers[position.objectId] = new MapMarker({
-            position,
-            styles: this.markerStyle,
-          });
-
-          break;
-        }
+      if (marker) {
+        markers[position.objectId] = this.createMarker({ position });
       }
     });
 
@@ -179,32 +222,93 @@ class WorldMapView extends BaseView {
     }
 
     this.clusterer.clearMarkers();
-    this.clusterer.addMarkers(Object.keys(this.markers).filter(markerId => this.markers[markerId].shouldCluster).map(markerId => this.markers[markerId]));
+    this.clusterer.addMarkers(Object.keys(this.markers).filter(markerId => this.markers[markerId].shouldCluster).map(markerId => this.markers[markerId].mapObject));
   }
 
-  showPositionClickBox({ position }) {
-    const { description = [labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noDescription' })] } = position;
+  showMapRightClickBox({ event }) {
+    const { x, y } = event.pixel;
 
-    const descriptionContainer = elementCreator.createContainer({
-      elements: [elementCreator.createArticle({
-        headerElement: elementCreator.createParagraph({
-          elements: [elementCreator.createSpan({ text: position.positionName || labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noName' }) })],
-        }),
-        elements: [
-          elementCreator.createSection({
-            elements: description.map((line) => {
-              return elementCreator.createParagraph({
-                elements: [elementCreator.createSpan({ text: line })],
-              });
-            }),
-          }),
-        ],
+    const items = [{
+      elements: [elementCreator.createSpan({
+        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPosition' }),
       })],
+      clickFuncs: {
+        leftFunc: () => {
+          MapObject.hideRightClickBox();
+
+          const dialog = new BaseDialog({
+            lowerButtons: [
+              elementCreator.createButton({
+                text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                clickFuncs: {
+                  leftFunc: () => {
+                    dialog.removeFromView();
+                  },
+                },
+              }),
+              elementCreator.createButton({
+                text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
+                clickFuncs: {
+                  leftFunc: () => {
+                    const position = {
+                      coordinates: {
+                        longitude: event.latLng.lng(),
+                        latitude: event.latLng.lat(),
+                      },
+                      positionName: dialog.getInputValue(ids.CREATEPOSITIONNAME),
+                    };
+                    const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
+
+                    if (description) {
+                      position.description = description;
+                    }
+
+                    positionComposer.createPosition({
+                      position,
+                      callback: ({ data, error }) => {
+                        if (error) {
+                          console.log('Create position', error);
+
+                          return;
+                        }
+
+                        console.log('Created position', data);
+
+                        dialog.removeFromView();
+                      },
+                    });
+                  },
+                },
+              }),
+            ],
+            inputs: [
+              elementCreator.createInput({
+                elementId: ids.CREATEPOSITIONNAME,
+                inputName: 'positionName',
+                type: 'text',
+                isRequired: true,
+                placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
+              }),
+              elementCreator.createInput({
+                elementId: ids.CREATEPOSITIONDESCRIPTION,
+                inputName: 'positionDescription',
+                type: 'text',
+                multiLine: true,
+                placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
+              }),
+            ],
+          });
+
+          dialog.addToView({ element: MapObject.rightClickBox.parentElement });
+        },
+      },
+    }];
+
+    MapObject.showRightClickBox({
+      x,
+      y,
+      container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
     });
-
-    elementCreator.replaceFirstChild(this.leftClickBox, descriptionContainer);
-
-    this.leftClickBox.classList.remove('hide');
   }
 
   startMap() {
@@ -237,7 +341,7 @@ class WorldMapView extends BaseView {
       styles: this.mapStyles,
     });
     this.markers = this.createMarkers();
-    this.clusterer = new MarkerClusterer(this.worldMap, this.marker);
+    this.clusterer = new MarkerClusterer(this.worldMap, [], this.clusterStyle);
 
     Object.keys(this.markers).forEach((markerId) => {
       const marker = this.markers[markerId];
@@ -246,6 +350,8 @@ class WorldMapView extends BaseView {
         marker.setMap(this.worldMap);
       }
     });
+
+    this.resetClusterer();
 
     this.overlay = new google.maps.OverlayView();
     this.overlay.draw = () => {};
@@ -261,8 +367,9 @@ class WorldMapView extends BaseView {
         MapObject.hideLeftClickBox();
         MapObject.hideRightClickBox();
       },
-      right: () => {
+      right: (event) => {
         MapObject.hideLeftClickBox();
+        this.showMapRightClickBox({ event });
       },
     });
 
@@ -272,20 +379,10 @@ class WorldMapView extends BaseView {
     });
 
     eventHandler.addWatcher({
-      event: eventHandler.Events.MARKER_DESCRIPTION,
-      func: ({
-        position,
-        shouldShow,
-        event,
-      }) => {
-        if (shouldShow) {
-          this.showPositionClickBox({
-            event,
-            position,
-          });
-        } else {
-          MapObject.hideLeftClickBox();
-        }
+      event: eventHandler.Events.POSITION,
+      func: ({ position }) => {
+        this.addMarker({ marker: this.createMarker({ position }) });
+        console.log('event pos', position);
       },
     });
   }

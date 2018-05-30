@@ -4,7 +4,7 @@ const elementCreator = require('../ElementCreator');
 
 class ViewWrapper extends BaseView {
   constructor({
-    topRow,
+    topView,
     columns,
     classes = [],
   }) {
@@ -13,8 +13,8 @@ class ViewWrapper extends BaseView {
       classes: classes.concat(['viewWrapper']),
     });
 
-    if (topRow) {
-      this.element.appendChild(topRow);
+    if (topView) {
+      topView.addToView({ element: this.element });
     }
 
     const columnAmount = columns.length;
@@ -30,7 +30,7 @@ class ViewWrapper extends BaseView {
         containerClasses.push('one');
       }
 
-      if (topRow) {
+      if (topView) {
         containerClasses.push('withTopRow');
       }
 

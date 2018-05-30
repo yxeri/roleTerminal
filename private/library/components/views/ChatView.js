@@ -47,17 +47,13 @@ class ChatView extends ViewWrapper {
             roomId: messageList.getRoomId(),
             messageType: messageComposer.MessageTypes.CHAT,
           },
-          callback: ({ data, error }) => {
+          callback: ({ error }) => {
             if (error) {
               console.log('sendMessage', error);
 
               return;
             }
 
-            this.messageList.addOneItem({
-              object: data.message,
-              shouldAnimate: true,
-            });
             this.inputArea.clearInput();
           },
         });
@@ -71,7 +67,11 @@ class ChatView extends ViewWrapper {
       components: [],
       classes: ['columnChat'],
     };
-    let roomList;
+    const roomList = new RoomList({});
+    const roomListComponent = {
+      components: [{ component: roomList }],
+      classes: ['columnRoomList'],
+    };
 
     switch (inputPlacement) {
       case 'top': {
@@ -89,26 +89,18 @@ class ChatView extends ViewWrapper {
     }
 
     if (!hideRoomList) {
-      roomList = new RoomList({});
-
       messageList.setRoomListId(roomList.getElementId());
 
       switch (roomListPlacement) {
         case 'left': {
-          columns.push({
-            components: [{ component: roomList }],
-            classes: ['columnRoomList'],
-          });
+          columns.push(roomListComponent);
           columns.push(mainColumn);
 
           break;
         }
         default: {
           columns.push(mainColumn);
-          columns.push({
-            components: [{ component: roomList }],
-            classes: ['columnRoomList'],
-          });
+          columns.push(roomListComponent);
 
           break;
         }
@@ -123,7 +115,7 @@ class ChatView extends ViewWrapper {
       classes: classes.concat(['chatView']),
     });
 
-    if (roomList) { this.roomList = roomList; }
+    if (!hideRoomList) { this.roomList = roomList; }
 
     this.inputArea = inputArea;
     this.messageList = messageList;

@@ -107,6 +107,7 @@ class MessageList extends List {
   }
 
   showMessagesByRoom({ roomId }) {
+    this.roomId = roomId;
     this.filter = { rules: [{ paramName: 'roomId', paramValue: roomId }] };
     this.appendList();
   }

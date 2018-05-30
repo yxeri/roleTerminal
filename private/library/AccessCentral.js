@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2018 Aleksandar Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,43 +14,63 @@
  limitations under the License.
  */
 
+const eventCentral = require('./EventCentral');
+
 class AccessCentral {
   constructor() {
+    this.accessElements = {};
 
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ACCESS_CHANGE,
+      func: ({ accessLevel }) => {
+        Object.keys(this.accessElements).forEach((level) => {
+          const levelElements = this.accessElements[level] || [];
+
+          levelElements.forEach((accessElement) => {
+            const {
+              minimumAccessLevel,
+              maxAccessLevel,
+            } = accessElement;
+
+            if (accessLevel >= minimumAccessLevel && accessLevel <= maxAccessLevel) {
+              accessElement.element.classList.remove('hide');
+            } else {
+              accessElement.element.classList.add('hide');
+            }
+          });
+        });
+      },
+    });
   }
 
-  /**
-   * Adds a watcher for events.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Name of the event to listen for.
-   * @param {Function} params.func - Function to call.
-   */
-  addWatcher({ event, func }) {
-    if (!this.eventWatchers[event]) {
-      this.eventWatchers[event] = [];
-    }
-
-    this.eventWatchers[event].push({ func });
-  }
-
-  /**
-   * Emit event.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Event to emit.
-   * @param {Object} [params.params] - Parameters to send.
-   */
-  emitEvent({
-    event,
-    params = {},
+  addAccessElement({
+    element,
+    minimumAccessLevel = 0,
+    maxAccessLevel = 999,
   }) {
-    console.log(event, params);
+    if (!this.accessElements[minimumAccessLevel]) { this.accessElements[minimumAccessLevel] = []; }
 
-    if (this.eventWatchers[event]) {
-      this.eventWatchers[event].forEach(watcher => watcher.func(params));
-    }
+    this.accessElements[minimumAccessLevel].push({
+      element,
+      minimumAccessLevel,
+      maxAccessLevel,
+    });
+  }
+
+  removeAccessElement({
+    minimumAccessLevel,
+    element,
+  }) {
+    if (!this.accessElements[minimumAccessLevel]) { this.accessElements[minimumAccessLevel] = []; }
+
+    const levelElements = this.accessElements[minimumAccessLevel];
+
+    levelElements.splice(levelElements.findIndex((accessElement) => {
+      return accessElement.element === element;
+    }), 1);
   }
 }
 
-const eventCentral = new EventCentral();
+const accessCentral = new AccessCentral();
 
-module.exports = eventCentral;
+module.exports = accessCentral;

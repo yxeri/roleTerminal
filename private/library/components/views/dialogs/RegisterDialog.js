@@ -18,7 +18,6 @@ const BaseDialog = require('./BaseDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
-const socketManager = require('../../../SocketManager');
 const storageManager = require('../../../StorageManager');
 const dataHandler = require('../../../data/DataHandler');
 

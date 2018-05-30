@@ -20,7 +20,6 @@ const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
-const socketManager = require('../../SocketManager');
 
 class MessageList extends List {
   /**

@@ -20,6 +20,12 @@ const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
+/**
+ * Create header part of the document.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.docFile - Document to create header for.
+ * @return {HTMLElement} Header paragraph.
+ */
 function createHeader({ docFile }) {
   const elements = [
     elementCreator.createSpan({ text: docFile.title }),
@@ -34,6 +40,12 @@ function createHeader({ docFile }) {
   return elementCreator.createParagraph({ elements });
 }
 
+/**
+ * Create body part of the document.
+ * @param {Object} params - Parameters.
+ * @param {Object} params.docFile - Document to create body for.
+ * @return {DocumentFragment} Body fragment.
+ */
 function createBody({ docFile }) {
   const fragment = document.createDocumentFragment();
 

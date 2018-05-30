@@ -16,10 +16,7 @@
 
 const BaseView = require('../BaseView');
 
-const dataHandler = require('../../../data/DataHandler');
-const eventCentral = require('../../../EventCentral');
 const elementCreator = require('../../../ElementCreator');
-const labelHandler = require('../../../labels/LabelHandler');
 
 const ids = {
   UPPERTEXT: 'upperText',

@@ -299,7 +299,7 @@ class WorldMapView extends BaseView {
             ],
           });
 
-          dialog.addToView({ element: MapObject.rightClickBox.parentElement });
+          dialog.addToView({ element: this.element });
         },
       },
     }];

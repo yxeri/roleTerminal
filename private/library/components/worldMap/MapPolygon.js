@@ -68,7 +68,6 @@ class MapPolygon extends MapObject {
         fillOpacity: styles.fillOpacity || 0.35,
       }),
     });
-
   }
 
   // TODO Combine with MapLine

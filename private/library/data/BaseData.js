@@ -264,7 +264,7 @@ class BaseData {
     callback,
     event,
   }) {
-    if (!this.createEvents) {
+    if (!event && !this.createEvents) {
       callback({ error: noFunctionError });
 
       return;
@@ -294,12 +294,14 @@ class BaseData {
    * @param {Object} params - Parameters.
    * @param {Object} params.params - Parameters to send.
    * @param {Function} params.callback - Callback.
+   * @param {string} [params.event] - Event type to emit. Will override the default one.
    */
   updateObject({
     params,
     callback,
+    event,
   }) {
-    if (!this.updateEvents) {
+    if (!event && !this.updateEvents) {
       callback({ error: noFunctionError });
 
       return;
@@ -309,7 +311,7 @@ class BaseData {
       return;
     }
 
-    socketManager.emitEvent(this.updateEvents.one, params, ({ error, data }) => {
+    socketManager.emitEvent(event || this.updateEvents.one, params, ({ error, data }) => {
       if (error) {
         callback({ error });
 

@@ -21,6 +21,8 @@ class MapMarker extends MapObject {
   constructor({
     position,
     clickFuncs,
+    labelStyle,
+    zIndex = 4,
     icon = {},
     alwaysShowLabel = false,
     shouldCluster = true,
@@ -34,6 +36,7 @@ class MapMarker extends MapObject {
       shouldCluster,
       position,
       clickFuncs,
+      labelStyle,
       dragEndFunc: () => {
         this.setCurrentCoordinates({
           coordinates: {
@@ -43,6 +46,7 @@ class MapMarker extends MapObject {
         });
       },
       mapObject: new google.maps.Marker({
+        zIndex,
         opacity: styles.opacity || 1,
         position: {
           lat: latestCoordinates.latitude,

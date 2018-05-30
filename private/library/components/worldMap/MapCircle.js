@@ -21,6 +21,7 @@ class MapCircle extends MapObject {
     position,
     clickFuncs,
     pulseOptions,
+    zIndex = 3,
     radius = 10,
     styles = {},
     alwaysShowLabel = false,
@@ -44,6 +45,7 @@ class MapCircle extends MapObject {
       },
       mapObject: new google.maps.Circle({
         radius,
+        zIndex,
         center: new google.maps.LatLng(latestCoordinates.latitude, latestCoordinates.longitude),
         strokeColor: styles.strokeColor || '#FFFFFF',
         strokeOpacity: styles.strokeOpacity || 0.5,

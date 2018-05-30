@@ -20,8 +20,11 @@ class MapLine extends MapObject {
   constructor({
     position,
     clickFuncs,
+    labelStyle,
+    zIndex = 2,
+    descriptionOnClick = false,
     alwaysShowLabel = false,
-    shouldCluster = true,
+    shouldCluster = false,
     styles = {},
   }) {
     const { coordinatesHistory } = position;
@@ -34,6 +37,8 @@ class MapLine extends MapObject {
       shouldCluster,
       position,
       clickFuncs,
+      descriptionOnClick,
+      zIndex,
       // TODO Combine with MapPolygon
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -53,6 +58,8 @@ class MapLine extends MapObject {
         });
       },
       mapObject: new google.maps.Polyline({
+        labelStyle,
+        zIndex,
         path: new google.maps.MVCArray(allPoints),
         strokeColor: styles.strokeColor || '#000000',
         strokeOpacity: styles.strokeOpacity || 0.8,

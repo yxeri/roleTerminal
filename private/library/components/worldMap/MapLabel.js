@@ -31,21 +31,17 @@ class Label {
   constructor({
     coordinates,
     text,
-    align = 'right',
-    fontFamily = 'monospace',
-    fontColor = '#00ffcc',
-    strokeColor = '#001e15',
-    fontSize = 12,
+    labelStyle = {},
     map = null,
   }) {
     this.mapLabel = new MapLabel({
-      align,
-      fontFamily,
-      fontColor,
-      strokeColor,
-      fontSize,
       map,
       text,
+      align: labelStyle.align || 'right',
+      fontFamily: labelStyle.fontFamily || 'monospace',
+      fontColor: labelStyle.fontColor || '#ffffff',
+      strokeColor: labelStyle.strokeColor || '#000000',
+      fontSize: labelStyle.fontSize || 12,
       position: new google.maps.LatLng(coordinates.latitude, coordinates.longitude),
     });
   }

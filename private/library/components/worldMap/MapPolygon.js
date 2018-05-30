@@ -20,8 +20,11 @@ class MapPolygon extends MapObject {
   constructor({
     position,
     clickFuncs,
+    labelStyle,
+    zIndex = 1,
+    descriptionOnClick = false,
     alwaysShowLabel = false,
-    shouldCluster = true,
+    shouldCluster = false,
     styles = {},
   }) {
     const { coordinatesHistory } = position;
@@ -30,10 +33,12 @@ class MapPolygon extends MapObject {
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
 
     super({
+      descriptionOnClick,
       alwaysShowLabel,
       shouldCluster,
       position,
       clickFuncs,
+      labelStyle,
       // TODO Combine with MapLine
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -53,17 +58,17 @@ class MapPolygon extends MapObject {
         });
       },
       mapObject: new google.maps.Polygon({
+        zIndex,
         paths: new google.maps.MVCArray(allPoints),
         opacity: styles.opacity || 1,
         strokeColor: styles.strokeColor || '#000000',
         strokeOpacity: styles.strokeOpacity || 0.8,
-        strokeWeight: styles.strokeWeight || 3,
+        strokeWeight: styles.strokeWeight || 1,
         fillColor: styles.fillColor || '#000000',
         fillOpacity: styles.fillOpacity || 0.35,
       }),
     });
 
-    this.mapObject.getPath().forEach((data) => { console.log('data', data); });
   }
 
   // TODO Combine with MapLine

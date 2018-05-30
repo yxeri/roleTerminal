@@ -2,6 +2,20 @@ module.exports = {
   General: {
 
   },
+  Button: {
+    logout: {
+      en: 'Log out',
+      se: 'Logga ut',
+    },
+    login: {
+      en: 'Log in',
+      se: 'Logga in',
+    },
+    register: {
+      en: 'Register user',
+      se: 'Registrera användare',
+    },
+  },
   BaseDialog: {
     cancel: {
       en: 'Cancel',
@@ -125,9 +139,22 @@ module.exports = {
       en: 'Position name',
       se: 'Platsens namn',
     },
+    createPositionDescription: {
+      en: 'Position description',
+      se: 'Platsens beskrivning',
+    },
     movePosition: {
       en: 'Move position',
       se: 'Flytta platsen',
+    },
+  },
+  TopView: {
+    menu: {
+      en: 'Menu',
+      se: 'Meny',
+    },
+    emptyTime: {
+      en: '--:--',
     },
   },
 };

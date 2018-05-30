@@ -57,7 +57,7 @@ class BaseDialog extends BaseView {
     });
 
     this.inputs.forEach((input) => {
-      inputContainer.appendChild(input);
+      this.appendInput({ container: inputContainer, input });
     });
 
     this.element.appendChild(elementCreator.createContainer({
@@ -150,11 +150,12 @@ class BaseDialog extends BaseView {
     }
   }
 
-  addInput({ input }) {
-    const inputContainer = `${this.elementId}${ids.INPUTCONTAINER}`;
+  appendInput({ container, input }) {
+    const inputToAdd = input;
 
-    inputContainer.appendChild(input);
-    this.inputs.push(input);
+    inputToAdd.setAttribute('id', `${this.elementId}${inputToAdd.getAttribute('id')}`);
+
+    container.appendChild(input);
   }
 
   getInputValue(elementId) {

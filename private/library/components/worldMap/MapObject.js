@@ -12,7 +12,6 @@
  */
 
 const Label = require('./MapLabel');
-const BaseDialog = require('../views/dialogs/BaseDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
@@ -23,11 +22,12 @@ const ids = {
   RIGHTCLICKBOX: 'rMapBox',
   LEFTCLICKBOX: 'lMapBox',
 };
-
 const cssClasses = {
   RIGHTCLICKBOX: 'mapRightClickBox',
   LEFTCLICKBOX: 'mapLeftClickBox',
 };
+
+let positionCanBeDragged;
 
 /**
  * Create functions for hovering and mouse out on MapObjects
@@ -82,12 +82,13 @@ class MapObject {
     mapObject,
     label,
     position,
+    labelStyle,
+    descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
   }) {
-    this.canBeDragged = canBeDragged;
     this.isDraggable = false;
     this.position = position;
     this.mapObject = mapObject;
@@ -95,13 +96,15 @@ class MapObject {
     this.shouldCluster = shouldCluster;
     this.alwaysShowLabel = alwaysShowLabel;
     this.label = label || new Label({
+      labelStyle,
       coordinates: this.getCenter(),
       text: this.position.positionName,
     });
 
-    if (canBeDragged) {
+    positionCanBeDragged = canBeDragged;
+
+    if (positionCanBeDragged) {
       this.mapObject.addListener('dragend', () => {
-        console.log('dragend');
         this.setCurrentCoordinates({
           coordinates: {
             longitude: this.mapObject.position.lng(),
@@ -115,11 +118,13 @@ class MapObject {
     mouseHandler.addGMapsClickListener({
       element: this.mapObject,
       leftFunc: (event) => {
+        MapObject.hideRightClickBox();
+
         if (!this.isDraggable) {
           if (clickFuncs.leftFunc) {
             clickFuncs.leftFunc(event);
-          } else {
-            MapObject.showLeftClickBox({ thisMapObject: this });
+          } else if (descriptionOnClick) {
+            MapObject.buildLeftClickBox({ thisMapObject: this });
           }
 
           return;
@@ -128,10 +133,15 @@ class MapObject {
         this.toggleDraggable(false);
       },
       right: (event) => {
+        MapObject.hideLeftClickBox();
+
         if (clickFuncs.right) {
           clickFuncs.right(event);
         } else {
-          MapObject.showRightClickBox({ thisMapObject: this });
+          MapObject.buildRightClickBox({
+            event,
+            thisMapObject: this,
+          });
         }
       },
     });
@@ -166,17 +176,18 @@ class MapObject {
   }
 
   updatePositionCoordinates() {
-    socketManager.emitEvent(socketManager.EmitTypes.UPDATEPOSITIONCOORDINATES, {
+    positionComposer.updatePositionCoordinates({
       positionId: this.position.objectId,
       coordinates: this.currentCoordinates,
-    }, ({ data, error }) => {
-      if (error) {
-        console.log('position error', this.position, error);
+      callback: ({ data, error }) => {
+        if (error) {
+          console.log('position error', this.position, error);
 
-        return;
-      }
+          return;
+        }
 
-      console.log('position updated', data);
+        console.log('position updated', data);
+      },
     });
   }
 
@@ -209,6 +220,10 @@ class MapObject {
   setMap(map) {
     this.worldMap = map;
     this.mapObject.setMap(map);
+
+    if (this.alwaysShowLabel) {
+      this.showLabel();
+    }
   }
 
   showLabel() {
@@ -223,6 +238,10 @@ class MapObject {
 
   showObject() {
     this.mapObject.setMap(this.worldMap);
+
+    if (this.alwaysShowLabel) {
+      this.showLabel();
+    }
   }
 
   hideObject() {
@@ -254,9 +273,7 @@ class MapObject {
     return this.position.positionType;
   }
 
-  static showLeftClickBox({ thisMapObject }) {
-    console.log('showLeftClickBox', thisMapObject);
-
+  static buildLeftClickBox({ thisMapObject }) {
     const {
       positionName,
       description = [labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noDescription' })],
@@ -279,69 +296,16 @@ class MapObject {
       })],
     });
 
-    elementCreator.replaceFirstChild(MapObject.leftClickBox, descriptionContainer);
-    MapObject.leftClickBox.classList.remove('hide');
+    MapObject.showLeftClickBox({ container: descriptionContainer });
   }
 
-  static hideLeftClickBox() {
-    MapObject.leftClickBox.classList.add('hide');
-  }
+  static buildRightClickBox({
+    event,
+    thisMapObject,
+  }) {
+    const items = [];
 
-  static showRightClickBox({ thisMapObject }) {
-    const items = [
-      {
-        elements: [elementCreator.createSpan({
-          text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPosition' }),
-        })],
-        clickFuncs: {
-          leftFunc: () => {
-            const dialog = new BaseDialog({
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => { dialog.removeFromView(); },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      socketManager.emitEvent({
-                        event: socketManager.EmitTypes.POSITION,
-                        params: {},
-                        callback: ({ data, error }) => {
-                          if (error) {
-                            return;
-                          }
-
-                          const { position } = data;
-
-                          dialog.removeFromView();
-                        },
-                      });
-                    },
-                  },
-                }),
-              ],
-              inputs: [
-                elementCreator.createInput({
-                  elementId: `${ids.RIGHTCLICKBOX}Input`,
-                  inputName: 'position',
-                  type: 'text',
-                  isRequired: true,
-                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
-                }),
-              ],
-            });
-
-            dialog.addToView({ element: MapObject.rightClickBox.parentElement });
-          },
-        },
-      },
-    ];
-
-    if (this.canBeDragged) {
+    if (positionCanBeDragged) {
       items.push({
         elements: [elementCreator.createSpan({
           text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'movePosition' }),
@@ -353,9 +317,49 @@ class MapObject {
         },
       });
     }
-    
-    elementCreator.replaceFirstChild(MapObject.rightClickBox, elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }));
+
+    MapObject.showRightClickBox({
+      x: event.pixel.x,
+      y: event.pixel.y,
+      container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
+    });
+  }
+
+  static showLeftClickBox({ container }) {
+    elementCreator.replaceFirstChild(MapObject.leftClickBox, container);
+    MapObject.leftClickBox.classList.remove('hide');
+  }
+
+  static showRightClickBox({
+    x,
+    y,
+    container,
+  }) {
+    elementCreator.replaceFirstChild(MapObject.rightClickBox, container);
     MapObject.rightClickBox.classList.remove('hide');
+
+    if (x && y) {
+      MapObject.rightClickBox.setAttribute('style', `left: ${x}px; top: ${y}px;`);
+
+      const bound = MapObject.rightClickBox.getBoundingClientRect();
+      const bottomOverflow = bound.bottom - window.innerHeight;
+      const rightOverflow = bound.right - window.innerWidth;
+
+      if (bound.bottom > window.innerHeight || bound.right > window.innerWidth) {
+        const newX = bottomOverflow < 0 ? x - rightOverflow : x;
+        const newY = rightOverflow < 0 ? y - bottomOverflow : y;
+
+        MapObject.rightClickBox.setAttribute('style', `left: ${newX}px; top: ${newY}px;`);
+      }
+
+      return;
+    }
+
+    MapObject.rightClickBox.removeAttribute('style');
+  }
+
+  static hideLeftClickBox() {
+    MapObject.leftClickBox.classList.add('hide');
   }
 
   static hideRightClickBox() {

@@ -185,7 +185,7 @@ class ElementCreator {
     classes = [],
   }) {
     const span = this.createSpan({
-      classes: classes.concat(['button']),
+      classes: classes.concat(['button', 'clickable']),
     });
     const button = createBaseElement({
       elementId,
@@ -232,7 +232,7 @@ class ElementCreator {
   static createParagraph({
     elements,
     text,
-    classes,
+    classes = [],
   }) {
     const paragraph = createBaseElement({
       classes: classes.concat(['button']),

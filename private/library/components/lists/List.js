@@ -36,6 +36,7 @@ const BaseView = require('../views/BaseView');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
+const storageManager = require('../../StorageManager');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -98,8 +99,8 @@ class List extends BaseView {
         event: collector.eventTypes.one,
         func: (data) => {
           const object = data[collector.objectTypes.one];
-          const { objectId } = object;
           const { changeType } = data;
+          const userAccessLevel = storageManager.getAccessLevel();
 
           if (this.filter && !this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
             return;
@@ -107,19 +108,25 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              this.addOneItem({
-                object,
-                shouldAnimate: true,
-                shouldReplace: true,
-              });
+              if (userAccessLevel >= object.visibility) {
+                this.addOneItem({
+                  object,
+                  shouldAnimate: true,
+                  shouldReplace: true,
+                });
+              } else {
+                this.removeOneItem({ object });
+              }
 
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              this.addOneItem({
-                object,
-                shouldAnimate: true,
-              });
+              if (userAccessLevel >= object.visibility) {
+                this.addOneItem({
+                  object,
+                  shouldAnimate: true,
+                });
+              }
 
               break;
             }
@@ -173,6 +180,7 @@ class List extends BaseView {
   }
 
   createList() {
+    const userAccessLevel = storageManager.getAccessLevel();
     const listElement = elementCreator.createList({
       elementId: this.elementId,
       classes: this.classes,
@@ -182,7 +190,9 @@ class List extends BaseView {
     Object.keys(allObjects).forEach((objectId) => {
       const object = allObjects[objectId];
 
-      listElement.appendChild(this.createListItem({ object }));
+      if (userAccessLevel >= object.visibility) {
+        listElement.appendChild(this.createListItem({ object }));
+      }
     });
 
     return listElement;

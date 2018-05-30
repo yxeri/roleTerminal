@@ -15,32 +15,17 @@
  */
 
 const elementCreator = require('../../ElementCreator');
-const eventCentral = require('../../EventCentral');
 
 class BaseView {
   constructor({
     classes,
     elementId = `elem-${Date.now()}`,
   }) {
-    this.accessElements = [];
     this.classes = classes;
     this.elementId = elementId;
     this.element = elementCreator.createContainer({
       classes,
       elementId,
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.ACCESS_CHANGE,
-      func: ({ accessLevel }) => {
-        this.accessElements.forEach((accessElement) => {
-          if (accessLevel >= accessElement.accessLevel) {
-            accessElement.element.classList.remove('hide');
-          } else {
-            accessElement.element.classList.add('hide');
-          }
-        });
-      },
     });
   }
 
@@ -100,10 +85,6 @@ class BaseView {
 
   getElementId() {
     return this.elementId;
-  }
-
-  addAccessElement(element) {
-    this.accessElements.push(element);
   }
 }
 

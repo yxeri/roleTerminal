@@ -86,6 +86,10 @@ class SocketManager {
               event: eventCentral.Events.STARTUP,
               params: {},
             });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.ACCESS_CHANGE,
+              params: { accessLevel: storageManager.getAccessLevel() },
+            });
           });
         }
       },

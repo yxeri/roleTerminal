@@ -70,6 +70,7 @@ class List extends BaseView {
     filter,
     appendClasses,
     listItemFieldsClasses,
+    shouldScrollToBottom = false,
     listItemClickFuncs = {},
     dependencies = [],
     focusedId = '-1',
@@ -93,6 +94,7 @@ class List extends BaseView {
     this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
+    this.shouldScrollToBottom = shouldScrollToBottom;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -126,6 +128,7 @@ class List extends BaseView {
                   object,
                   shouldAnimate: true,
                 });
+                this.scrollList();
               }
 
               break;
@@ -153,6 +156,12 @@ class List extends BaseView {
     }
   }
 
+  scrollList() {
+    if (this.shouldScrollToBottom && this.element.lastElementChild) {
+      this.element.lastElementChild.scrollIntoView();
+    }
+  }
+
   addToView(params) {
     this.appendList();
 
@@ -171,6 +180,7 @@ class List extends BaseView {
     const listElement = this.createList();
 
     this.replaceOnParent({ element: listElement });
+    this.scrollList();
   }
 
   removeListItem({ objectId }) {

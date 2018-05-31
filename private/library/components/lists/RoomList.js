@@ -34,6 +34,13 @@ class RoomList extends List {
     super({
       elementId,
       classes,
+      filter: {
+        rules: [{ paramName: 'isUser', paramValue: false }],
+      },
+      sorting: {
+        paramName: 'roomName',
+        fallbackParamName: 'objectId',
+      },
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {

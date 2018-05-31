@@ -70,6 +70,7 @@ class List extends BaseView {
     filter,
     appendClasses,
     listItemFieldsClasses,
+    sorting,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
     dependencies = [],
@@ -95,6 +96,7 @@ class List extends BaseView {
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
     this.shouldScrollToBottom = shouldScrollToBottom;
+    this.sorting = sorting;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -195,13 +197,19 @@ class List extends BaseView {
       elementId: this.elementId,
       classes: this.classes,
     });
-    const allObjects = this.collector.getObjects({ filter: this.filter });
+    const allObjects = this.collector.getObjects({
+      filter: this.filter,
+      sorting: this.sorting,
+    });
+    const userId = storageManager.getUserId();
 
     Object.keys(allObjects).forEach((objectId) => {
-      const object = allObjects[objectId];
+      if (objectId !== userId) {
+        const object = allObjects[objectId];
 
-      if (userAccessLevel >= object.visibility) {
-        listElement.appendChild(this.createListItem({ object }));
+        if (userAccessLevel >= object.visibility) {
+          listElement.appendChild(this.createListItem({ object }));
+        }
       }
     });
 

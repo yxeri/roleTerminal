@@ -14,6 +14,19 @@
  limitations under the License.
  */
 
+$background-color: #11433e;
+$second-background-color: #11433e;
+$text-color: white;
+$second-color: #a5a5a5;
+$darker-color: #092522;
+$warning-color: #910000;
+$focus-color: #218277;
+$new-color: #218277;
+$p-margin: .4em;
+$border-width: .1em;
+$top-row-height: 1.3em;
+$map-box-padding: .5em;
+
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
   padding: 0;
@@ -32,16 +45,19 @@ input::-moz-focus-inner {
 html, body {
   height: 100%;
   width: 100%;
-  background-color: #e9ebee;
+  background-color: $background-color;
+  color: $text-color;
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
   font-size: .9em;
-  color: #1d2129;
 }
 
 
 span.clickable {
   cursor: pointer;
   text-decoration: underline;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -49,12 +65,72 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
-.viewWrapper {
-  display: flex;
-  width: fit-content;
-  width: -moz-fit-content;
-  height: 100%;
+ul, li {
+  list-style: none;
+}
+
+textarea {
   width: 100%;
+  border-radius: 0;
+}
+
+button {
+  background-color: $darker-color;
+  color: $text-color;
+  box-sizing: border-box;
+  border: $border-width solid $text-color;
+}
+
+.cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+}
+
+/**********
+ * Dialog *
+ **********/
+
+.dialog {
+  max-height: calc(99% - 4em);
+  max-width: 20em;
+  overflow-y: auto;
+  background-color: $background-color;
+  border: $border-width solid $text-color;
+  position: absolute;
+  top: 2em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: .5em;
+  z-index: 10;
+
+  input {
+    width: 99%;
+    padding: .1em;
+    margin-bottom: $p-margin;
+  }
+
+  input:last-child {
+    margin-bottom: 0;
+  }
+
+  #lowerButtons {
+    float: right;
+    padding-top: $p-margin;
+
+    span {
+      margin-right: $p-margin;
+    }
+
+    span:last-child {
+      margin-right: 0;
+    }
+  }
 }
 
 /**********
@@ -66,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
  * The class is most commonly added when the input is blurred.
  */
 .emptyInput {
-  background-color: red;
+  background-color: $warning-color;
 }
 
 /*********
@@ -90,7 +166,7 @@ h1, h2, h3, h4, h5, h6 {
  */
 
 .list {
-
+  word-wrap: break-word;
 }
 
 /*
@@ -113,7 +189,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .positionList {
   display: inline-block;
-  border-bottom: 10px black solid;
+  border-bottom: 10px $darker-color solid;
   width: 20%;
 }
 
@@ -121,7 +197,8 @@ h1, h2, h3, h4, h5, h6 {
  * A list item that has focus in a list.
  */
 .focusListItem {
-  background-color: blue;
+  background-color: $focus-color;
+  font-weight: bold;
 }
 
 /*
@@ -138,18 +215,53 @@ h1, h2, h3, h4, h5, h6 {
  * The class is removed after a set amount of time.
  */
 .newListItem {
-  background-color: green;
+  background-color: $new-color;
 }
 
-/*******************
- * Missile Command *
- *******************/
+/*************
+ * World Map *
+ *************/
 
-.missileCommandWrapper {
-  .worldMapView {
-    width: 50vw;
-    height: 50vh;
+$map-box-border-weight: .1em;
+$map-box-border: $map-box-border-weight solid $second-color;
+$map-box-left: .5em;
+
+.worldMapView {
+  padding-top: 2em; // Gmaps fix
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  a {
+    display: none !important;
   }
+}
+
+.mapLeftClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  width: calc(100% - ((#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
+  max-width: 30em;
+  max-height: calc(100% - (#{$top-row-height} + #{$map-box-padding}));
+  padding: $map-box-padding;
+  overflow-y: auto;
+  background-color: $background-color;
+  border: $map-box-border;
+
+  p {
+    margin-bottom: $p-margin;
+  }
+}
+
+.mapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  background-color: $background-color;
+  border: $map-box-border;
+  padding: .2em;
+  max-width: 15em;
 }
 
 /**************
@@ -157,7 +269,6 @@ h1, h2, h3, h4, h5, h6 {
  **************/
 
 $border-color: #dddfe2;
-$border-width: .1em;
 $border: $border-width solid $border-color;
 $forum-pieces-background-color: #ffffff;
 $border-radius: .3em;
@@ -282,10 +393,232 @@ $forum-padding: .5em;
   }
 }
 
+/****************
+ * View Wrapper *
+ ****************/
+
+.viewWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: row wrap;
+}
+
+.column {
+  overflow: hidden;
+}
+
+.one {
+  width: 100%;
+  max-width: 100vw;
+}
+
+.oneOfTwo {
+  width: 50%;
+  max-width: 50vw;
+}
+
+.oneOfThree {
+  width: 33%;
+  max-width: 33vw;
+}
+
+.withTopRow {
+  height: calc(100% - #{$top-row-height});
+  order: 2;
+}
+
+/*************
+ * Chat View *
+ *************/
+
+//$column-padding: .4em;
+$msgList-msgInfo-border: .1em solid $second-color;
+$msgList-li-padding: .5em;
+$msgList-msgLine-side-padding: .2em;
+$msgList-msgInfo-padding: .1em;
+$msgList-textarea-border: .3em solid $darker-color;
+
+.chatView {
+  .msgList {
+    overflow-y: auto;
+
+    li {
+      padding-bottom: $msgList-li-padding;
+    }
+
+    .msgInfo {
+      border-top: $msgList-msgInfo-border;
+      border-bottom: $msgList-msgInfo-border;
+      padding: $msgList-msgInfo-padding ($msgList-msgLine-side-padding / 2);
+      background-color: $darker-color;
+      margin-bottom: $p-margin;
+
+      span {
+        padding: 0 .2em;
+      }
+
+      span:first-child {
+        padding-left: 0;
+      }
+
+      span:last-child {
+        padding-right: 0;
+      }
+    }
+
+    .msgLine {
+      padding: 0 $msgList-msgLine-side-padding;
+      margin-bottom: $p-margin;
+    }
+
+    .msgLine:last-child {
+      margin-bottom: 0;
+    }
+
+    .msgRoomName:before {
+      content: '[';
+    }
+
+    .msgRoomName:after {
+      content: ']';
+    }
+  }
+
+  .msgList::-webkit-scrollbar {
+    display: none;
+  }
+
+  .one {
+    //padding: $column-padding;
+  }
+
+  .oneOfTwo {
+    width: 0;
+    //padding: $column-padding;
+  }
+
+  .oneOfTwo:first-child {
+    flex-grow: 1;
+  }
+
+  .oneOfTwo:last-child {
+    flex-grow: 3;
+  }
+
+  .inputArea {
+    padding-top: .5em;
+    margin-top: auto;
+
+    textarea {
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2));
+      padding: 0 $msgList-msgLine-side-padding;
+      border-top: $msgList-textarea-border;
+      border-bottom: $msgList-textarea-border;
+    }
+  }
+
+  .columnChat {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.columnRoomList {
+  max-width: 10em;
+  overflow-y: auto;
+}
+
+.columnRoomList::-webkit-scrollbar {
+  display: none;
+}
+
 /********
  * Misc *
  ********/
 
+#main {
+  height: 100%;
+  width: 100%;
+}
+
+#topMenuButton {
+  text-decoration: none;
+  font-weight: bold;
+  background-color: $text-color;
+  color: $darker-color;
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+#topMenuButton:before {
+  content: '> ';
+}
+
+#topMenuButton:after {
+  content: ' <';
+}
+
+.topView {
+  order: 1;
+  height: $top-row-height;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: $border-width solid $text-color;
+  background-color: $second-background-color;
+
+  > span {
+    margin-right: .5em;
+  }
+
+  > span:last-child {
+    margin-right: 0;
+  }
+
+  .topMenu {
+    position: fixed;
+    background-color: $second-background-color;
+    width: 12em;
+
+    button {
+      width: 100%;
+    }
+
+    button {
+      padding: .3em 0;
+    }
+  }
+}
+
 .hide {
   display: none;
+}
+
+.hideOverflow {
+  overflow: hidden;
+}
+
+@media (max-width: 479px) {
+  #main {
+    > .viewWrapper {
+      > .oneOfTwo:last-child {
+        display: none;
+      }
+    }
+  }
+
+  .oneOfTwo {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .oneOfThree {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .mapLeftClickBox {
+    left: 0;
+    width: calc(100% - ((#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
+  }
 }

@@ -205,11 +205,13 @@ class ElementCreator {
     classes,
     elements,
     name,
+    clickFuncs,
   }) {
     const container = createBaseElement({
       elementId,
       classes,
       name,
+      clickFuncs,
       elementType: 'div',
     });
 

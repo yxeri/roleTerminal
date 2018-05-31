@@ -52,6 +52,7 @@ class TopView extends BaseView {
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'logout' }),
         clickFuncs: {
           leftFunc: () => {
+
             socketManager.logout({
               callback: ({ error }) => {
                 if (error) {
@@ -129,6 +130,11 @@ class TopView extends BaseView {
 
     if (items.concat(menuItems, lastItems).length > 0) {
       const menu = elementCreator.createContainer({
+        clickFuncs: {
+          leftFunc: () => {
+            menu.classList.add('hide');
+          },
+        },
         classes: ['topMenu', 'hide'],
         elements: [
           elementCreator.createList({

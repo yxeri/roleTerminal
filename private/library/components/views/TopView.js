@@ -52,7 +52,6 @@ class TopView extends BaseView {
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'logout' }),
         clickFuncs: {
           leftFunc: () => {
-
             socketManager.logout({
               callback: ({ error }) => {
                 if (error) {

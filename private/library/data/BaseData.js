@@ -417,7 +417,7 @@ class BaseData {
       return sorting ? objects.sort(sortFunc) : objects;
     }
 
-    return sorting ? this.objects.sort(sortFunc) : this.objects;
+    return sorting ? Object.keys(this.objects).map(objectKey => this.objects[objectKey]).sort(sortFunc) : this.objects;
   }
 }
 

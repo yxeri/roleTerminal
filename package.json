@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "test": "DEBUG=eslint:cli-engine eslint ./",
-    "prestart": "rsync -aP --exclude=.git --exclude=.idea --exclude=.DS_Store ../roleHaven ./node_modules && ./node_modules/roleHaven/start.sh",
     "start": "node app",
     "nsp": "nsp check"
   },

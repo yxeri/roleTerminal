@@ -17,7 +17,7 @@ const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
 const elementCreator = require('../../ElementCreator');
 const positionComposer = require('../../data/PositionComposer');
-const accessCentral = require('../../AccessCentral');
+const storageManager = require('../../StorageManager');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -336,7 +336,7 @@ class MapObject {
     y,
     container,
   }) {
-    if (!accessCentral.hasEnoughAccess({ requiredLevel: 1 })) {
+    if (storageManager.getAccessLevel() < 1) {
       return;
     }
 

@@ -70,12 +70,6 @@ class AccessCentral {
       return accessElement.element === element;
     }), 1);
   }
-
-  hasEnoughAccess({ requiredLevel }) {
-    const userLevel = storageManager.getAccessLevel();
-
-    return userLevel >= requiredLevel;
-  }
 }
 
 const accessCentral = new AccessCentral();

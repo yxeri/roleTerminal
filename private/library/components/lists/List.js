@@ -197,23 +197,24 @@ class List extends BaseView {
       elementId: this.elementId,
       classes: this.classes,
     });
-    const allObjects = this.collector.getObjects({
-      filter: this.filter,
-      sorting: this.sorting,
-    });
-    const userId = storageManager.getUserId();
+    const allObjects = this.getCollectorObjects();
 
     Object.keys(allObjects).forEach((objectId) => {
-      if (objectId !== userId) {
-        const object = allObjects[objectId];
+      const object = allObjects[objectId];
 
-        if (userAccessLevel >= object.visibility) {
-          listElement.appendChild(this.createListItem({ object }));
-        }
+      if (userAccessLevel >= object.visibility) {
+        listElement.appendChild(this.createListItem({ object }));
       }
     });
 
     return listElement;
+  }
+
+  getCollectorObjects() {
+    return this.collector.getObjects({
+      filter: this.filter,
+      sorting: this.sorting,
+    });
   }
 
   getFocusedListItem() {

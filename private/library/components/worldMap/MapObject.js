@@ -139,7 +139,7 @@ class MapObject {
         if (clickFuncs.right) {
           clickFuncs.right(event);
         } else {
-          MapObject.buildRightClickBox({
+          MapObject.showPositionRightClickBox({
             event,
             thisMapObject: this,
           });
@@ -300,7 +300,7 @@ class MapObject {
     MapObject.showLeftClickBox({ container: descriptionContainer });
   }
 
-  static buildRightClickBox({
+  static showPositionRightClickBox({
     event,
     thisMapObject,
   }) {

@@ -402,22 +402,21 @@ class BaseData {
 
       return 0;
     };
+    const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
 
     if (filter) {
-      const objects = Object.keys(this.objects).filter((objectKey) => {
-        const object = this.objects[objectKey];
-
+      const filteredObjects = objects.filter((object) => {
         if (orCheck) {
           return filter.rules.some(rule => rule.paramValue === object[rule.paramName]);
         }
 
         return filter.rules.every(rule => rule.paramValue === object[rule.paramName]);
-      }).map(objectKey => this.objects[objectKey]);
+      });
 
-      return sorting ? objects.sort(sortFunc) : objects;
+      return sorting ? filteredObjects.sort(sortFunc) : filteredObjects;
     }
 
-    return sorting ? Object.keys(this.objects).map(objectKey => this.objects[objectKey]).sort(sortFunc) : this.objects;
+    return sorting ? objects.sort(sortFunc) : objects;
   }
 }
 

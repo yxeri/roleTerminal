@@ -100,12 +100,14 @@ function createBaseElement({
 class ElementCreator {
   static createList({
     elementId,
+    clickFuncs,
     items = [],
     classes = [],
   }) {
     const list = createBaseElement({
       elementId,
       classes,
+      clickFuncs,
       elementType: 'ul',
     });
 

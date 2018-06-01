@@ -23,6 +23,10 @@ const textTools = require('../../TextTools');
 const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');
 const socketManager = require('../../SocketManager');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
+const aliasComposer = require('../../data/AliasComposer');
+const userComposer = require('../../data/UserComposer');
 
 class TopView extends BaseView {
   constructor({
@@ -133,30 +137,71 @@ class TopView extends BaseView {
     }
 
     if (items.concat(menuItems, lastItems).length > 0) {
-      const menu = elementCreator.createContainer({
+      this.menuList = elementCreator.createList({
+        classes: ['hide', 'topMenu'],
+        items: items.concat(menuItems, lastItems),
         clickFuncs: {
           leftFunc: () => {
-            menu.classList.add('hide');
+            this.menuList.classList.add('hide');
           },
         },
-        classes: ['topMenu', 'hide'],
-        elements: [
-          elementCreator.createList({
-            items: items.concat(menuItems, lastItems),
-          }),
-        ],
       });
-
-      this.element.appendChild(elementCreator.createSpan({
-        elementId: 'topMenuButton',
+      const menuButton = elementCreator.createSpan({
+        classes: ['topMenuButton'],
         text: labelHandler.getLabel({ baseObject: 'TopView', label: 'menu' }),
         clickFuncs: {
           leftFunc: () => {
-            menu.classList.toggle('hide');
+            this.menuList.classList.toggle('hide');
+
+            if (this.userList) { this.userList.classList.add('hide'); }
           },
         },
+      });
+
+      this.element.appendChild(elementCreator.createContainer({
+        elements: [menuButton, this.menuList],
       }));
-      this.element.appendChild(menu);
+    }
+
+    if (showControls.userList) {
+      this.userList = elementCreator.createList({
+        classes: ['hide', 'topMenu'],
+        items: [elementCreator.createSpan({ text: 'user' })],
+        clickFuncs: {
+          leftFunc: () => {
+            this.userList.classList.add('hide');
+          },
+        },
+      });
+      const menuButton = elementCreator.createSpan({
+        classes: ['topMenuButton'],
+        text: '-----',
+        clickFuncs: {
+          leftFunc: () => {
+            this.userList.classList.toggle('hide');
+
+            if (this.menuList) { this.menuList.classList.add('hide'); }
+          },
+        },
+      });
+
+      this.element.appendChild(elementCreator.createContainer({
+        elements: [menuButton, this.userList],
+      }));
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.COMPLETE_USER,
+        func: () => {
+          TopView.setUsername({ button: menuButton });
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.USER_CHANGE,
+        func: () => {
+          TopView.setUsername({ button: menuButton });
+        },
+      });
     }
 
     if (this.showClock) {
@@ -171,6 +216,20 @@ class TopView extends BaseView {
 
     if (title) {
       this.element.appendChild(elementCreator.createSpan({ text: title }));
+    }
+  }
+
+  static setUsername({ button }) {
+    const buttonToChange = button;
+    const userId = storageManager.getUserId();
+    const aliasId = storageManager.getAliasId();
+
+    if (aliasId) {
+      buttonToChange.textContent = aliasComposer.getAliasName({ aliasId });
+    } else if (userId) {
+      buttonToChange.textContent = userComposer.getUsername({ userId });
+    } else {
+      buttonToChange.textContent = '-----';
     }
   }
 

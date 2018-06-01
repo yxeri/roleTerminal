@@ -15,6 +15,7 @@
  */
 
 const eventCentral = require('./EventCentral');
+const storageManager = require('./StorageManager');
 
 class AccessCentral {
   constructor() {
@@ -68,6 +69,12 @@ class AccessCentral {
     levelElements.splice(levelElements.findIndex((accessElement) => {
       return accessElement.element === element;
     }), 1);
+  }
+
+  hasEnoughAccess({ requiredLevel }) {
+    const userLevel = storageManager.getAccessLevel();
+
+    return userLevel >= requiredLevel;
   }
 }
 

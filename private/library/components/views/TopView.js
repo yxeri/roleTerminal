@@ -125,6 +125,11 @@ class TopView extends BaseView {
       });
 
       items.push({ elements: [createAliasButton] });
+
+      accessCentral.addAccessElement({
+        element: createAliasButton,
+        minimumAccessLevel: 1,
+      });
     }
 
     if (items.concat(menuItems, lastItems).length > 0) {

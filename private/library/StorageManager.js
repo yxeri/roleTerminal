@@ -138,7 +138,7 @@ class StorageManager {
   }
 
   static getPublicRoomId() {
-    return this.getLocalVal('publicRoom');
+    return this.getLocalVal('publicRoom') || '111111111111111111111110';
   }
 
   /**
@@ -330,7 +330,7 @@ class StorageManager {
   }
 
   static getCurrentRoom() {
-    return this.getLocalVal('currentRoom');
+    return this.getLocalVal('currentRoom') || StorageManager.getPublicRoomId();
   }
 
   static removeCurrentForum() {

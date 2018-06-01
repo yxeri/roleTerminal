@@ -19,6 +19,7 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const aliasComposer = require('../../data/AliasComposer');
 
 class RoomList extends List {
   constructor({
@@ -56,6 +57,16 @@ class RoomList extends List {
       collector: dataHandler.rooms,
       listItemFields: headerFields,
     });
+  }
+
+  getCollectorObjects() {
+    const allObjects = this.collector.getObjects({
+      filter: this.filter,
+      sorting: this.sorting,
+    });
+    const aliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+
+    return allObjects.filter(object => !aliases.includes(object.objectId));
   }
 }
 

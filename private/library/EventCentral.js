@@ -63,11 +63,14 @@ class EventCentral {
       SWITCH_LANGUAGE: 'Switched language',
       WORLDMAP: 'World map created',
       FOCUS_MAPPOSITION: 'Focus on map position',
+      ACCESS_CHANGE: 'Access level has changed',
+      MARKER_DESCRIPTION: 'Map marker description',
+      USER_CHANGE: 'User has logged in/logged out/reconnected',
       COMPLETE_FORUM: 'Forum dependencies fetched',
       COMPLETE_MESSAGE: 'Message dependencies fetched',
       COMPLETE_POSITION: 'Position dependencies fetched',
-      ACCESS_CHANGE: 'Access level has changed',
-      MARKER_DESCRIPTION: 'Map marker description',
+      COMPLETE_ALIAS: 'Alias dependencies fetched',
+      COMPLETE_USER: 'User dependencies fetched',
     };
     this.eventWatchers = {};
   }

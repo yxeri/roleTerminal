@@ -563,23 +563,6 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 }
 
-#topMenuButton {
-  text-decoration: none;
-  font-weight: bold;
-  background-color: $text-color;
-  color: $darker-color;
-  padding-left: .5em;
-  padding-right: .5em;
-}
-
-#topMenuButton:before {
-  content: '> ';
-}
-
-#topMenuButton:after {
-  content: ' <';
-}
-
 .topView {
   order: 1;
   height: $top-row-height;
@@ -587,6 +570,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   box-sizing: border-box;
   border-bottom: $border-width solid $text-color;
   background-color: $darkest-color;
+  display: flex;
 
   > span {
     margin-right: .5em;
@@ -596,8 +580,32 @@ $msgList-textarea-border: .3em solid $darker-color;
     margin-right: 0;
   }
 
+  > div {
+    margin-right: .5em;
+  }
+
+  .clickable {
+    text-decoration: none;
+  }
+
+  .topMenuButton {
+    font-weight: bold;
+    background-color: $text-color;
+    color: $darker-color;
+    padding-left: .5em;
+    padding-right: .5em;
+  }
+
+  .topMenuButton:before {
+    content: '> ';
+  }
+
+  .topMenuButton:after {
+    content: ' <';
+  }
+
   .topMenu {
-    position: fixed;
+    position: absolute;
     background-color: $second-background-color;
     width: 12em;
 

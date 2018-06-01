@@ -96,6 +96,7 @@ const viewWrapper = new ViewWrapper({
     showControls: {
       user: true,
       alias: true,
+      userList: true,
     },
   }),
   columns: [{
@@ -110,9 +111,3 @@ const viewWrapper = new ViewWrapper({
 });
 
 viewWrapper.addToView({ element });
-
-window.addEventListener('error', (event) => {
-  element.appendChild(document.createTextNode(`<<ERROR>>${JSON.stringify(event)}`));
-
-  return false;
-});

@@ -2,6 +2,7 @@ const DataComposer = require('./BaseComposer');
 
 const dataHandler = require('./DataHandler');
 const eventCentral = require('../EventCentral');
+const storageManager = require('../StorageManager');
 
 class MessageComposer extends DataComposer {
   constructor() {
@@ -40,6 +41,11 @@ class MessageComposer extends DataComposer {
     message,
     callback,
   }) {
+    const aliasId = storageManager.getAliasId();
+    const messageToSend = message;
+
+    if (aliasId) { messageToSend.ownerAliasId = aliasId; }
+
     this.handler.createObject({
       callback,
       params: { message },

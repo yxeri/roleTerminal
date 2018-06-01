@@ -19,6 +19,7 @@ $second-background-color: #11433e;
 $text-color: white;
 $second-color: #a5a5a5;
 $darker-color: #092522;
+$darkest-color: black;
 $warning-color: #910000;
 $focus-color: #218277;
 $new-color: #218277;
@@ -416,11 +417,13 @@ $forum-padding: .5em;
 .oneOfTwo {
   width: 50%;
   max-width: 50vw;
+  box-sizing: border-box;
 }
 
 .oneOfThree {
   width: 33%;
   max-width: 33vw;
+  box-sizing: border-box;
 }
 
 .withTopRow {
@@ -540,6 +543,24 @@ $msgList-textarea-border: .3em solid $darker-color;
 #main {
   height: 100%;
   width: 100%;
+
+  .viewWrapper {
+    > .oneOfTwo {
+      border-right: $border-width solid;
+    }
+
+    > .oneOfTwo:last-child {
+      border-right: 0;
+    }
+
+    > .oneOfThree {
+      border-right: $border-width solid;
+    }
+
+    > .oneOfThree:last-child {
+      border-right: $border-width solid;
+    }
+  }
 }
 
 #topMenuButton {
@@ -565,7 +586,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   width: 100%;
   box-sizing: border-box;
   border-bottom: $border-width solid $text-color;
-  background-color: $second-background-color;
+  background-color: $darkest-color;
 
   > span {
     margin-right: .5em;
@@ -603,6 +624,14 @@ $msgList-textarea-border: .3em solid $darker-color;
     > .viewWrapper {
       > .oneOfTwo:last-child {
         display: none;
+      }
+
+      > .oneOfTwo {
+        border-right: 0;
+      }
+
+      > .oneOfThree {
+        border-right: 0;
       }
     }
   }

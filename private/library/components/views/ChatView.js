@@ -44,6 +44,10 @@ class ChatView extends ViewWrapper {
       sendOnEnter,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
+        if (text.join('').length === 0) {
+          return;
+        }
+
         messageComposer.sendMessage({
           message: {
             text,

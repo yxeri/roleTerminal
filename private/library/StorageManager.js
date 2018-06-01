@@ -59,6 +59,11 @@ class StorageManager {
           defaultRoomId,
           userId: objectId,
         });
+
+        eventCentral.emitEvent({
+          event: eventCentral.Events.USER_CHANGE,
+          params: {},
+        });
       },
     });
   }
@@ -120,6 +125,7 @@ class StorageManager {
    * @static
    */
   static resetUser() {
+    this.removeAliasId();
     this.removeGameCode();
     this.removeToken();
     this.setCurrentRoom(this.getPublicRoomId());
@@ -130,6 +136,11 @@ class StorageManager {
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
       params: { accessLevel: 0 },
+    });
+
+    eventCentral.emitEvent({
+      event: eventCentral.Events.USER_CHANGE,
+      params: {},
     });
   }
 
@@ -175,6 +186,28 @@ class StorageManager {
    */
   static setUserId(userId) {
     this.setLocalVal('userId', userId);
+  }
+
+  /**
+   * Get alias Id.
+   * @static
+   * @returns {string} Alias Id.
+   */
+  static getAliasId() {
+    return this.getLocalVal('aliasId');
+  }
+
+  /**
+   * Set alias Id.
+   * @static
+   * @param {string} aliasId - Alias Id.
+   */
+  static setAliasId(aliasId) {
+    this.setLocalVal('aliasId', aliasId);
+  }
+
+  static removeAliasId() {
+    this.removeLocalVal('aliasId');
   }
 
   static removeUserId() {

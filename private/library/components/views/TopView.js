@@ -317,6 +317,65 @@ class TopView extends BaseView {
       this.updateClock();
     }, 100);
   }
+
+  setViews({ views, viewSwitcher }) {
+    views.forEach((viewObject) => {
+      const viewObjectToAdd = viewObject;
+
+      viewObjectToAdd.clickFuncs = {
+        leftFunc: () => {
+          viewSwitcher.switchView({ view: viewObjectToAdd.view });
+        },
+      };
+    });
+
+    this.viewList = elementCreator.createList({
+      items: views.map((viewObject) => {
+        const { clickFuncs, view } = viewObject;
+
+        return {
+          elements: [elementCreator.createButton({
+            clickFuncs,
+            text: view.getTitle(),
+          })],
+        };
+      }),
+      classes: ['hide', 'topMenu'],
+      clickFuncs: {
+        leftFunc: () => {
+          this.viewList.classList.add('hide');
+        },
+      },
+    });
+
+    const menuButton = elementCreator.createSpan({
+      classes: ['topMenuButton'],
+      text: labelHandler.getLabel({ baseObject: 'TopView', label: '-----' }),
+      clickFuncs: {
+        leftFunc: () => {
+          this.viewList.classList.toggle('hide');
+
+          this.hideLists({ currentList: this.viewList });
+        },
+      },
+    });
+    const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
+
+    if (this.lists.length === 0) {
+      this.element.insertBefore(container, this.element.firstElementChild);
+    } else {
+      this.element.insertBefore(container, this.element.childNodes[this.lists.length - 1].nextSibling);
+    }
+
+    this.lists.push(this.viewList);
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.VIEW_SWITCHED,
+      func: ({ view }) => {
+        menuButton.textContent = view.getTitle();
+      },
+    });
+  }
 }
 
 module.exports = TopView;

@@ -200,10 +200,8 @@ class List extends BaseView {
     });
     const allObjects = this.getCollectorObjects();
 
-    Object.keys(allObjects).forEach((objectId) => {
-      const object = allObjects[objectId];
-
-      if (!object.visibility || userAccessLevel >= object.visibility) {
+    allObjects.forEach((object) => {
+      if (object && (object.isPublic || userAccessLevel >= object.visibility)) {
         listElement.appendChild(this.createListItem({ object }));
       }
     });

@@ -36,7 +36,7 @@ class UserComposer extends DataComposer {
   getUsername({ userId }) {
     const user = this.handler.getObject({ objectId: userId });
 
-    return user ? user.username: '';
+    return user ? user.username : '';
   }
 
   getUser({ userId }) {

@@ -79,6 +79,10 @@ class BaseView {
     this.element.classList.add('hide');
   }
 
+  toggleView() {
+    this.element.classList.toggle('hide');
+  }
+
   getElement(elementId) {
     return document.getElementById(`${this.elementId}${elementId}`);
   }

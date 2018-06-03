@@ -80,6 +80,17 @@ class InputArea extends BaseView {
     }, this.sendOnEnter);
   }
 
+  showView() {
+    super.showView();
+
+    this.setKeyListener();
+  }
+
+  hideView() {
+    super.hideView();
+
+    keyhandler.removeKey(13);
+  }
 }
 
 module.exports = InputArea;

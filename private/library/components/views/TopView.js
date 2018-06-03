@@ -17,6 +17,7 @@
 const BaseView = require('./BaseView');
 const LoginDialog = require('../../components/views/dialogs/LoginDialog');
 const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
+const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -123,6 +124,27 @@ class TopView extends BaseView {
      elementId,
      */
 
+    if (showControls.docFile) {
+      const createDocFileButton = elementCreator.createButton({
+        text: 'Create document',
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new DocFileDialog({});
+
+            dialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
+
+      items.push({ elements: [createDocFileButton] });
+
+      accessCentral.addAccessElement({
+        element: createDocFileButton,
+        minimumAccessLevel: 1,
+      });
+    }
     if (showControls.alias) {
       const createAliasButton = elementCreator.createButton({
         text: 'Create alias',

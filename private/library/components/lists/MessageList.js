@@ -46,6 +46,8 @@ class MessageList extends List {
       dependencies: [
         dataHandler.users,
         dataHandler.rooms,
+        dataHandler.aliases,
+        dataHandler.teams,
       ],
       shouldFocusOnClick: false,
       collector: dataHandler.messages,

@@ -18,7 +18,7 @@ class DocFileComposer extends DataComposer {
     });
   }
 
-  unlockDocFile({ docFileId, code, callback }) {
+  unlockDocFile({ docFileId, code, callback }) { // eslint-disable-line class-methods-use-this
     socketManager.emitEvent(socketManager.EmitTypes.UNLOCKDOCFILE, { docFileId, code }, callback);
   }
 

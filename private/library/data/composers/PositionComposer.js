@@ -1,8 +1,8 @@
 const BaseComposer = require('./BaseComposer');
 
-const eventHandler = require('../EventCentral');
-const dataHandler = require('./DataHandler');
-const socketManager = require('../SocketManager');
+const eventHandler = require('../../EventCentral');
+const dataHandler = require('../DataHandler');
+const socketManager = require('../../SocketManager');
 
 class PositionComposer extends BaseComposer {
   constructor() {

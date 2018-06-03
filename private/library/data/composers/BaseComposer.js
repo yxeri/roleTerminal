@@ -1,5 +1,5 @@
-const dataHandler = require('./DataHandler');
-const eventCentral = require('../EventCentral');
+const dataHandler = require('../DataHandler');
+const eventCentral = require('../../EventCentral');
 
 class BaseComposer {
   constructor({

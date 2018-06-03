@@ -24,6 +24,11 @@ class InputArea extends BaseView {
       multiLine: true,
     });
     this.isFocused = false;
+    this.focusCallback = focusCallback;
+    this.blurCallback = blurCallback;
+    this.inputCallback = inputCallback;
+    this.triggerCallback = triggerCallback;
+    this.sendOnEnter = sendOnEnter;
 
     this.textArea.addEventListener('focus', () => {
       this.isFocused = true;

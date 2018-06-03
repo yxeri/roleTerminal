@@ -148,6 +148,8 @@ class BaseData {
           params: errorParams,
         });
 
+        this.hasFetched = true;
+
         return;
       }
 

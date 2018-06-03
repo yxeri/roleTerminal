@@ -19,7 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const storageManager = require('../../../StorageManager');
-const dataHandler = require('../../../data/DataHandler');
+const userComposer = require('../../../data/composers/UserComposer');
 
 const ids = {
   FULLNAME: 'fullName',
@@ -82,14 +82,12 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
-            dataHandler.users.createObject({
-              params: {
-                user: {
-                  username: this.getInputValue(ids.USERNAME),
-                  fullName: this.getInputValue(ids.FULLNAME),
-                  password: this.getInputValue(ids.PASSWORD),
-                  registerDevice: storageManager.getDeviceId(),
-                },
+            userComposer.createUser({
+              user: {
+                username: this.getInputValue(ids.USERNAME),
+                fullName: this.getInputValue(ids.FULLNAME),
+                password: this.getInputValue(ids.PASSWORD),
+                registerDevice: storageManager.getDeviceId(),
               },
               callback: ({ error }) => {
                 if (error) {

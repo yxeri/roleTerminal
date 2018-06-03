@@ -19,7 +19,7 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/AliasComposer');
+const aliasComposer = require('../../data/composers/AliasComposer');
 
 class RoomList extends List {
   constructor({

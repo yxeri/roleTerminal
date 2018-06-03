@@ -18,7 +18,7 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
-const worldMapHandler = require('../../data/PositionComposer');
+const worldMapHandler = require('../../data/composers/PositionComposer');
 
 class PositionList extends List {
   constructor({

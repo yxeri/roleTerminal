@@ -25,6 +25,57 @@ module.exports = {
       en: 'Create',
       se: 'Skapa',
     },
+    notMatchingPassword: {
+      en: 'Passwords do not match. Try again.',
+      se: 'Lösenorden stämmer inte överens. Försök igen.',
+    },
+  },
+  LockedDocFileDialog: {
+    unlock: {
+      en: 'Unlock',
+      se: 'Lås upp',
+    },
+    isLocked: {
+      en: 'is locked.',
+      se: 'är låst',
+    },
+    enterCode: {
+      en: 'Enter the document code to access it.',
+      se: 'Skriv in dokumentets kod för att låsa upp det.',
+    },
+    incorrectCode: {
+      en: 'Incorrect code. Try again.',
+      se: 'Fel kod. Försök igen',
+    },
+  },
+  DocFileDialog: {
+    title: {
+      en: 'Title',
+      se: 'Titel',
+    },
+    code: {
+      en: 'Code to access document',
+      se: 'Kod för att komma åt dokumentet',
+    },
+    text: {
+      en: 'Text',
+    },
+    titleLength: {
+
+    },
+  },
+  AliasDialog: {
+    aliasName: {
+      en: 'Alias',
+    },
+    aliasNameLength: {
+      en: 'Alias must be 2 - 40 characters long',
+      se: 'Alias måste vara 2 - 40 tecken långt.',
+    },
+    fullName: {
+      en: 'Full name',
+      se: 'Hela namnet',
+    },
   },
   RegisterDialog: {
     username: {
@@ -33,7 +84,7 @@ module.exports = {
     },
     fullName: {
       en: 'Your full name',
-      se: 'Ditt namn',
+      se: 'Hela namnet',
     },
     password: {
       en: 'Your password',
@@ -52,12 +103,26 @@ module.exports = {
       se: 'Användare existerar redan.',
     },
     usernameLength: {
-      en: 'The user name has to be 3 - 40 characters long.',
-      se: 'Användarnamnet måste vara 3 - 40 tecken långt.',
+      en: 'The user name must be be 2 - 40 characters long.',
+      se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
     },
     passwordLength: {
-      en: 'The password has to be 4 - 40 characters long.',
+      en: 'The password must be be 4 - 40 characters long.',
       se: 'Lösenordet måste vara 4 - 40 tecken långt.',
+    },
+  },
+  RoomDialog: {
+    password: {
+      en: 'Password to access room',
+      se: 'Lösenordet för att komma åt rummet',
+    },
+    repeatPassword: {
+      en: 'Repeat password',
+      se: 'Skriv in lösenordet igen',
+    },
+    roomName: {
+      en: 'Name of the room',
+      se: 'Rummets namn',
     },
   },
   LoginDialog: {

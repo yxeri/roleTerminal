@@ -57,6 +57,7 @@ class SocketManager {
       SENDMSG: 'sendMessage',
       UPDATEPOSITION: 'updatePosition',
       UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
+      UNLOCKDOCFILE: 'unlockDocFile',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

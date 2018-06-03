@@ -80,6 +80,16 @@ class RegisterDialog extends BaseDialog {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
+            } else if (this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+              BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
+              BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
+
+              this.setInputValue({ elementId: ids.PASSWORD, value: '' });
+              this.setInputValue({ elementId: ids.REPEATPASSWORD, value: '' });
+
+              this.updateLowerText({ text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'notMatchingPassword' }) });
+
+              return;
             }
 
             userComposer.createUser({

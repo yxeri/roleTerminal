@@ -24,10 +24,6 @@
 const socketManager = require('../SocketManager');
 const eventCentral = require('../EventCentral');
 
-const offlineError = {
-  type: 'offline',
-  text: ['Unable to connect to the server.'],
-};
 const noFunctionError = {
   type: 'no function',
   text: ['This data type does not support the function.'],

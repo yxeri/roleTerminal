@@ -1,8 +1,8 @@
 const DataComposer = require('./BaseComposer');
 
-const dataHandler = require('./DataHandler');
-const eventCentral = require('../EventCentral');
-const storageManager = require('../StorageManager');
+const dataHandler = require('../DataHandler');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class UserComposer extends DataComposer {
   constructor() {
@@ -37,6 +37,10 @@ class UserComposer extends DataComposer {
     const user = this.handler.getObject({ objectId: userId });
 
     return user ? user.username: '';
+  }
+
+  getUser({ userId }) {
+    return this.handler.getObject({ objectId: userId });
   }
 }
 

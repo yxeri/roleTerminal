@@ -1,7 +1,7 @@
 const DataComposer = require('./BaseComposer');
 
-const dataHandler = require('./DataHandler');
-const eventCentral = require('../EventCentral');
+const dataHandler = require('../DataHandler');
+const eventCentral = require('../../EventCentral');
 
 class ForumComposer extends DataComposer {
   constructor() {

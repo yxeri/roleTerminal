@@ -1,8 +1,8 @@
 const DataComposer = require('./BaseComposer');
 
-const dataHandler = require('./DataHandler');
-const eventCentral = require('../EventCentral');
-const storageManager = require('../StorageManager');
+const dataHandler = require('../DataHandler');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class MessageComposer extends DataComposer {
   constructor() {

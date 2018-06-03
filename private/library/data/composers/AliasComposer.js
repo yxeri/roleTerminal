@@ -1,8 +1,8 @@
 const DataComposer = require('./BaseComposer');
 
-const dataHandler = require('./DataHandler');
-const eventCentral = require('../EventCentral');
-const storageManager = require('../StorageManager');
+const dataHandler = require('../DataHandler');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class AliasComposer extends DataComposer {
   constructor() {
@@ -35,12 +35,12 @@ class AliasComposer extends DataComposer {
   }
 
   createAlias({
-    aliasName,
+    alias,
     callback,
   }) {
     this.handler.createObject({
       callback,
-      params: { alias: { aliasName } },
+      params: { alias },
     });
   }
 

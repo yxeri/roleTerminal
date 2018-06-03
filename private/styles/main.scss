@@ -27,6 +27,7 @@ $p-margin: .4em;
 $border-width: .1em;
 $top-row-height: 1.3em;
 $map-box-padding: .5em;
+$padding: .3em;
 
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
@@ -80,6 +81,7 @@ button {
   color: $text-color;
   box-sizing: border-box;
   border: $border-width solid $text-color;
+  padding: $padding;
 }
 
 .cover {
@@ -98,7 +100,7 @@ button {
 
 .dialog {
   max-height: calc(99% - 4em);
-  max-width: 20em;
+  max-width: 30em;
   overflow-y: auto;
   background-color: $background-color;
   border: $border-width solid $text-color;
@@ -592,8 +594,8 @@ $msgList-textarea-border: .3em solid $darker-color;
     font-weight: bold;
     background-color: $text-color;
     color: $darker-color;
-    padding-left: .5em;
-    padding-right: .5em;
+    padding-left: .1em;
+    padding-right: .1em;
   }
 
   .topMenuButton:before {
@@ -607,14 +609,25 @@ $msgList-textarea-border: .3em solid $darker-color;
   .topMenu {
     position: absolute;
     background-color: $second-background-color;
-    width: 12em;
+    max-width: 12em;
+    z-index: 9;
 
     button {
       width: 100%;
     }
 
-    button {
+    p {
+      background-color: $darker-color;
+      color: $text-color;
+      box-sizing: border-box;
+      border: $border-width solid $text-color;
+      width: 100%;
       padding: .3em 0;
+      text-align: center;
+
+      span {
+        padding: 0 .3em;
+      }
     }
   }
 }

@@ -4,17 +4,18 @@ const WorldMapView = require('../library/components/views/WorldMapView');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const TopView = require('../library/components/views/TopView');
+const DocFileView = require('../library/components/views/DocFileView');
 
-const element = document.getElementById('main');
+const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 
 const chatView = new ChatView({
   sendOnEnter: true,
   placeholder: 'Enter your message',
 });
-
+const docFileView = new DocFileView({});
 const worldMapView = new WorldMapView({
   clusterStyle: {
-    gridSize: 22,
+    gridSize: 50,
     maxZoom: 16,
     styles: [{
       width: 24,
@@ -89,19 +90,40 @@ const worldMapView = new WorldMapView({
   ],
 });
 
-const viewWrapper = new ViewWrapper({
-  topView: new TopView({
-    title: 'SISCOM',
-    showClock: true,
-    showControls: {
-      user: true,
-      alias: true,
-      userList: true,
+const topView = new TopView({
+  viewSwitcher,
+  title: 'SISCOM',
+  showClock: true,
+  showControls: {
+    user: true,
+    alias: true,
+    currentUser: true,
+    room: true,
+    view: true,
+    docFile: true,
+  },
+});
+const mapWrapper = new ViewWrapper({
+  topView,
+  title: 'MAPS',
+  columns: [
+    {
+      components: [
+        { component: worldMapView },
+      ],
+    }, {
+      components: [
+        { component: chatView },
+      ],
     },
-  }),
+  ],
+});
+const docWrapper = new ViewWrapper({
+  topView,
+  title: 'DOCS',
   columns: [{
     components: [
-      { component: chatView },
+      { component: docFileView },
     ],
   }, {
     components: [
@@ -109,5 +131,29 @@ const viewWrapper = new ViewWrapper({
     ],
   }],
 });
+const chatWrapper = new ViewWrapper({
+  topView,
+  title: 'COMS',
+  columns: [
+    {
+      components: [
+        { component: chatView },
+      ],
+    }, {
+      components: [
+        { component: worldMapView },
+      ],
+    },
+  ],
+});
 
-viewWrapper.addToView({ element });
+topView.setViews({
+  viewSwitcher,
+  views: [
+    { view: chatWrapper },
+    { view: mapWrapper },
+    { view: docWrapper },
+  ],
+});
+
+viewSwitcher.switchView({ view: chatWrapper });

@@ -15,7 +15,6 @@
  */
 
 const eventCentral = require('./EventCentral');
-const storageManager = require('./StorageManager');
 
 class AccessCentral {
   constructor() {

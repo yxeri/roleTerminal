@@ -17,6 +17,7 @@
 const BaseView = require('./BaseView');
 const LoginDialog = require('../../components/views/dialogs/LoginDialog');
 const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
+const CurrentUserList = require('../../components/lists/CurrentUserList');
 const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
@@ -28,8 +29,8 @@ const accessCentral = require('../../AccessCentral');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const userComposer = require('../../data/UserComposer');
 const aliasComposer = require('../../data/composers/AliasComposer');
+const userComposer = require('../../data/composers/UserComposer');
 
 class TopView extends BaseView {
   constructor({
@@ -210,41 +211,37 @@ class TopView extends BaseView {
           leftFunc: () => {
             this.menuList.classList.toggle('hide');
 
-            if (this.userList) { this.userList.classList.add('hide'); }
+            this.hideLists({ currentList: this.menuList });
           },
         },
       });
 
+      this.lists.push(this.menuList);
       this.element.appendChild(elementCreator.createContainer({
         elements: [menuButton, this.menuList],
       }));
     }
 
-    if (showControls.userList) {
-      this.userList = elementCreator.createList({
+    if (showControls.currentUser) {
+      this.currentUserList = new CurrentUserList({
         classes: ['hide', 'topMenu'],
-        items: [elementCreator.createSpan({ text: 'user' })],
-        clickFuncs: {
-          leftFunc: () => {
-            this.userList.classList.add('hide');
-          },
-        },
       });
       const menuButton = elementCreator.createSpan({
         classes: ['topMenuButton'],
         text: '-----',
         clickFuncs: {
           leftFunc: () => {
-            this.userList.classList.toggle('hide');
-
-            if (this.menuList) { this.menuList.classList.add('hide'); }
+            this.currentUserList.toggleView();
           },
         },
       });
+      const container = elementCreator.createContainer({
+        elements: [menuButton],
+      });
 
-      this.element.appendChild(elementCreator.createContainer({
-        elements: [menuButton, this.userList],
-      }));
+      this.lists.push(this.currentUserList);
+      this.currentUserList.addToView({ element: container });
+      this.element.appendChild(container);
 
       eventCentral.addWatcher({
         event: eventCentral.Events.COMPLETE_USER,
@@ -257,6 +254,14 @@ class TopView extends BaseView {
         event: eventCentral.Events.USER_CHANGE,
         func: () => {
           TopView.setUsername({ button: menuButton });
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.ALIAS,
+        func: ({ alias }) => {
+          console.log('alias', alias);
+          menuButton.textContent = alias.aliasName;
         },
       });
     }
@@ -274,6 +279,12 @@ class TopView extends BaseView {
     if (title) {
       this.element.appendChild(elementCreator.createSpan({ text: title }));
     }
+  }
+
+  hideLists({ currentList }) {
+    if (this.menuList && this.menuList !== currentList) { this.menuList.classList.add('hide'); }
+    if (this.viewList && this.viewList !== currentList) { this.viewList.classList.add('hide'); }
+    if (this.currentUserList && this.currentUserList !== currentList) { this.currentUserList.hideView(); }
   }
 
   static setUsername({ button }) {

@@ -50,6 +50,8 @@ class DocFileList extends List {
       elementId,
       classes: classes.concat(['docFileList']),
       dependencies: [
+        dataHandler.docFiles,
+        dataHandler.aliases,
         dataHandler.users,
         dataHandler.teams,
       ],

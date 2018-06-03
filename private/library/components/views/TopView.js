@@ -17,6 +17,7 @@
 const BaseView = require('./BaseView');
 const LoginDialog = require('../../components/views/dialogs/LoginDialog');
 const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
+const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 
 const elementCreator = require('../../ElementCreator');
@@ -145,6 +146,29 @@ class TopView extends BaseView {
         minimumAccessLevel: 1,
       });
     }
+
+    if (showControls.room) {
+      const createRoomButton = elementCreator.createButton({
+        text: 'Create room',
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new RoomDialog({});
+
+            dialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
+
+      items.push({ elements: [createRoomButton] });
+
+      accessCentral.addAccessElement({
+        element: createRoomButton,
+        minimumAccessLevel: 1,
+      });
+    }
+
     if (showControls.alias) {
       const createAliasButton = elementCreator.createButton({
         text: 'Create alias',

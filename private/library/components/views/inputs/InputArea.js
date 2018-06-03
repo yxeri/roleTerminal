@@ -46,12 +46,6 @@ class InputArea extends BaseView {
     });
 
     this.element.appendChild(this.textArea);
-
-    keyhandler.addKey(13, () => {
-      if (this.isFocused) {
-        triggerCallback({ text: this.getSplitInputValue() });
-      }
-    }, sendOnEnter);
   }
 
   resizeInput() {
@@ -72,6 +66,15 @@ class InputArea extends BaseView {
 
     this.resizeInput();
   }
+
+  setKeyListener() {
+    keyhandler.addKey(13, () => {
+      if (this.isFocused) {
+        this.triggerCallback({ text: this.getSplitInputValue() });
+      }
+    }, this.sendOnEnter);
+  }
+
 }
 
 module.exports = InputArea;

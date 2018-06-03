@@ -54,6 +54,12 @@ class RoomList extends List {
           });
         },
       },
+      dependencies: [
+        dataHandler.rooms,
+        dataHandler.users,
+        dataHandler.aliases,
+        dataHandler.teams,
+      ],
       collector: dataHandler.rooms,
       listItemFields: headerFields,
     });

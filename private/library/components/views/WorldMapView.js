@@ -5,7 +5,7 @@ const MapPolygon = require('../worldMap/MapPolygon');
 const MapObject = require('../worldMap/MapObject');
 const BaseDialog = require('../views/dialogs/BaseDialog');
 
-const positionComposer = require('../../data/PositionComposer');
+const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const socketManager = require('../../SocketManager');

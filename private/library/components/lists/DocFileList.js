@@ -18,6 +18,7 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
+const userComposer = require('../../data/composers/UserComposer');
 
 class DocFileList extends List {
   constructor({
@@ -31,7 +32,7 @@ class DocFileList extends List {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',
         convertFunc: (objectId) => {
-          const user = dataHandler.users.getObject({ objectId });
+          const user = userComposer.getUser({ userId: objectId });
 
           return user ? user.username : objectId;
         },

@@ -19,7 +19,7 @@ const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
 
-const messageComposer = require('../../data/MessageComposer');
+const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
 
 class ChatView extends ViewWrapper {

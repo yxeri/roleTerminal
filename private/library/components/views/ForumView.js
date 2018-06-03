@@ -22,7 +22,7 @@ const socketManager = require('../../SocketManager');
 const labelHandler = require('../../labels/LabelHandler');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
-const forumComposer = require('../../data/ForumComposer');
+const forumComposer = require('../../data/composers/ForumComposer');
 
 const cssClasses = {
   subPost: 'subPost',

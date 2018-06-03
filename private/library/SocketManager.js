@@ -187,7 +187,21 @@ class SocketManager {
    */
   emitEvent(event, params = {}, callback) {
     const paramsToSend = params;
-    paramsToSend.token = storageManager.getToken() || '';
+    paramsToSend.token = storageManager.getToken();
+
+    if (!this.isOnline) {
+      this.reconnect({
+        callback: () => {
+          if (!callback) {
+            this.socket.emit(event, paramsToSend);
+          } else {
+            this.socket.emit(event, paramsToSend, callback);
+          }
+        },
+      });
+
+      return;
+    }
 
     if (!callback) {
       this.socket.emit(event, paramsToSend);

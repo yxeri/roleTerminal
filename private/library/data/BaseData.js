@@ -140,17 +140,6 @@ class BaseData {
     emitParams = {},
     reset = false,
   }) {
-    if (!socketManager.isOnline) {
-      eventCentral.emitEvent({
-        event: eventCentral.Events.ERROR,
-        params: {
-          event: this.retrieveEvents.many,
-        },
-      });
-
-      return;
-    }
-
     socketManager.emitEvent(this.retrieveEvents.many, emitParams, ({ error, data }) => {
       if (error) {
         const errorParams = {
@@ -195,18 +184,11 @@ class BaseData {
    * @param {boolean} [params.noEmit] - Should the event emit be suppressed?
    * @param {Function} [params.callback] - Callback.
    */
-  fetchObject({ params, noEmit, callback = () => {} }) {
-    if (!socketManager.isOnline) {
-      eventCentral.emitEvent({
-        event: eventCentral.Events.ERROR,
-        params: {
-          event: this.retrieveEvents.one,
-        },
-      });
-
-      return;
-    }
-
+  fetchObject({
+    params,
+    noEmit,
+    callback = () => {},
+  }) {
     socketManager.emitEvent(this.retrieveEvents.one, params, ({ error, data }) => {
       if (error) {
         if (!noEmit) {
@@ -268,10 +250,6 @@ class BaseData {
       callback({ error: noFunctionError });
 
       return;
-    } else if (!socketManager.isOnline) {
-      callback({ error: offlineError });
-
-      return;
     }
 
     socketManager.emitEvent(event || this.createEvents.one, params, ({ error, data }) => {
@@ -305,10 +283,6 @@ class BaseData {
       callback({ error: noFunctionError });
 
       return;
-    } else if (!socketManager.isOnline) {
-      callback({ error: offlineError });
-
-      return;
     }
 
     socketManager.emitEvent(event || this.updateEvents.one, params, ({ error, data }) => {
@@ -338,10 +312,6 @@ class BaseData {
   }) {
     if (!this.removeEvents) {
       callback({ error: noFunctionError });
-
-      return;
-    } else if (!socketManager.isOnline) {
-      callback({ error: offlineError });
 
       return;
     }

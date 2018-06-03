@@ -232,6 +232,8 @@ class TopView extends BaseView {
         clickFuncs: {
           leftFunc: () => {
             this.currentUserList.toggleView();
+
+            this.hideLists({ currentList: this.currentUserList });
           },
         },
       });

@@ -131,6 +131,18 @@ class ChatView extends ViewWrapper {
       minimumAccessLevel: 1,
     });
   }
+
+  addToView(params) {
+    this.inputArea.showView();
+
+    super.addToView(params);
+  }
+
+  removeFromView() {
+    super.removeFromView();
+
+    this.inputArea.hideView();
+  }
 }
 
 module.exports = ChatView;

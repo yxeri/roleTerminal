@@ -17,6 +17,7 @@
 const BaseView = require('./BaseView');
 const LoginDialog = require('../../components/views/dialogs/LoginDialog');
 const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
+const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 
@@ -27,8 +28,8 @@ const accessCentral = require('../../AccessCentral');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/AliasComposer');
 const userComposer = require('../../data/UserComposer');
+const aliasComposer = require('../../data/composers/AliasComposer');
 
 class TopView extends BaseView {
   constructor({
@@ -52,6 +53,7 @@ class TopView extends BaseView {
     const lastItems = [];
 
     this.showClock = showClock;
+    this.lists = [];
 
     if (controls.user) {
       const logoutButton = elementCreator.createButton({
@@ -172,6 +174,15 @@ class TopView extends BaseView {
     if (showControls.alias) {
       const createAliasButton = elementCreator.createButton({
         text: 'Create alias',
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new AliasDialog({});
+
+            dialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
       });
 
       items.push({ elements: [createAliasButton] });

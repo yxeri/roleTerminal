@@ -166,7 +166,7 @@ class SocketManager {
   /**
    * Reconnect to socket.io
    */
-  reconnect() {
+  reconnect({ callback }) {
     if (!this.reconnecting) {
       this.reconnecting = true;
       this.socket.disconnect();
@@ -176,6 +176,8 @@ class SocketManager {
           event: eventCentral.Events.RECONNECT,
           params: {},
         });
+
+        callback();
       });
     }
   }

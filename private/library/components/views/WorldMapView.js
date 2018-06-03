@@ -146,6 +146,7 @@ class WorldMapView extends BaseView {
     }
 
     this.worldMap.fitBounds(bounds);
+    this.worldMap.setCenter(bounds.getCenter());
   }
 
   addMarker({ marker }) {

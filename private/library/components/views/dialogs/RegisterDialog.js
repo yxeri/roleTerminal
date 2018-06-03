@@ -101,29 +101,25 @@ class RegisterDialog extends BaseDialog {
               },
               callback: ({ error }) => {
                 if (error) {
-                  let text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' });
-
                   if (error.type === 'invalid length') {
                     switch (error.extraData.param) {
                       case 'username': {
-                        text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'usernameLength' });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'usernameLength' })] });
 
                         break;
                       }
                       case 'password': {
-                        text = labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'passwordLength' });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'passwordLength' })] });
 
                         break;
                       }
                       default: {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
+
                         break;
                       }
                     }
                   }
-
-                  this.updateLowerText({
-                    text: [text],
-                  });
 
                   return;
                 }

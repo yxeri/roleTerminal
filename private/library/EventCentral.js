@@ -66,11 +66,14 @@ class EventCentral {
       ACCESS_CHANGE: 'Access level has changed',
       MARKER_DESCRIPTION: 'Map marker description',
       USER_CHANGE: 'User has logged in/logged out/reconnected',
+      CHANGED_ALIAS: 'Changed current alias',
+      VIEW_SWITCHED: 'View has changed',
       COMPLETE_FORUM: 'Forum dependencies fetched',
       COMPLETE_MESSAGE: 'Message dependencies fetched',
       COMPLETE_POSITION: 'Position dependencies fetched',
       COMPLETE_ALIAS: 'Alias dependencies fetched',
       COMPLETE_USER: 'User dependencies fetched',
+      COMPLETE_DOCFILE: 'Doc file dependencies fetched',
     };
     this.eventWatchers = {};
   }

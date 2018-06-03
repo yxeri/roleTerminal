@@ -125,7 +125,7 @@ class BaseDialog extends BaseView {
       .filter(input => input.value === '');
 
     emptyInputs.forEach((input) => {
-      input.classList.add(cssClasses.EMPTYINPUT);
+      BaseDialog.markInput({ input });
     });
 
     return emptyInputs.length > 0;
@@ -145,6 +145,10 @@ class BaseDialog extends BaseView {
     } else {
       this.element.replaceChild(this.createTextContainer({ text, elementId: ids.LOWERTEXT }), this.getElement(ids.LOWERTEXT));
     }
+  }
+
+  static markInput({ input }) {
+    input.classList.add(cssClasses.EMPTYINPUT);
   }
 
   appendInput({ container, input }) {

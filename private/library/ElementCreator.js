@@ -381,6 +381,52 @@ class ElementCreator {
     return section;
   }
 
+  static createRadioSet({
+    classes,
+    elementId,
+    title,
+    optionName,
+    options = [],
+  }) {
+    const fieldset = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'fieldset',
+    });
+    const legend = document.createElement('legend');
+
+    legend.appendChild(document.createTextNode(title));
+    fieldset.appendChild(legend);
+
+    options.forEach((option) => {
+      const {
+        optionId,
+        value,
+        isDefault,
+        optionLabel,
+      } = option;
+      const inputLabel = document.createElement('label');
+      const input = document.createElement('input');
+
+      inputLabel.setAttribute('for', optionId);
+      input.setAttribute('type', 'radio');
+      input.setAttribute('id', optionId);
+      input.setAttribute('name', optionName);
+      input.setAttribute('value', value);
+
+      if (isDefault) {
+        input.setAttribute('checked', 'true');
+      }
+
+      inputLabel.appendChild(input);
+      inputLabel.appendChild(document.createElement('span'));
+      inputLabel.appendChild(document.createTextNode(optionLabel));
+      fieldset.appendChild(inputLabel);
+    });
+
+    return fieldset;
+  }
+
   static replaceFirstChild(parentElement, newChild) {
     if (parentElement.firstElementChild) {
       parentElement.replaceChild(newChild, parentElement.firstElementChild);

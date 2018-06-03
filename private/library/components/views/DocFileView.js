@@ -14,72 +14,25 @@
  limitations under the License.
  */
 
-const BaseView = require('./BaseView');
+const ViewWrapper = require('../ViewWrapper');
+const DocFileList = require('../lists/DocFileList');
+const DocFilePage = require('./DocFilePage');
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
-
-/**
- * Create header part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create header for.
- * @return {HTMLElement} Header paragraph.
- */
-function createHeader({ docFile }) {
-  const elements = [
-    elementCreator.createSpan({ text: docFile.title }),
-    elementCreator.createSpan({ text: docFile.ownerAliasId || docFile.ownerId }),
-    elementCreator.createSpan({ text: docFile.code }),
-  ];
-
-  if (docFile.team) {
-    elements.push(elementCreator.createSpan({ text: docFile.team }));
-  }
-
-  return elementCreator.createParagraph({ elements });
-}
-
-/**
- * Create body part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create body for.
- * @return {DocumentFragment} Body fragment.
- */
-function createBody({ docFile }) {
-  const fragment = document.createDocumentFragment();
-
-  docFile.text.forEach((section) => {
-    fragment.appendChild(elementCreator.createParagraph({ text: section }));
-  });
-
-  return fragment;
-}
-
-class DocFileView extends BaseView {
+class DocFileView extends ViewWrapper {
   constructor({
     classes = [],
     elementId = `dFView-${Date.now()}`,
   }) {
+    const docFileList = new DocFileList({});
+    const docFilePage = new DocFilePage({});
+
     super({
       elementId,
+      columns: [
+        { components: [{ component: docFileList }] },
+        { components: [{ component: docFilePage }] },
+      ],
       classes: classes.concat(['docFileView']),
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.OPEN_DOCFILE,
-      func: ({ docFile }) => {
-        const storedDocFile = dataHandler.docFiles.getObject({ objectId: docFile.objectId });
-        const newElement = elementCreator.createContainer({
-          elementId,
-          classes,
-        });
-
-        newElement.appendChild(createHeader({ docFile: storedDocFile }));
-        newElement.appendChild(createBody({ docFile: storedDocFile }));
-
-        this.replaceOnParent({ element: newElement });
-      },
     });
   }
 }

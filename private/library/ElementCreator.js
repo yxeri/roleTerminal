@@ -260,6 +260,7 @@ class ElementCreator {
     maxLength,
     elementId,
     classes,
+    shouldResize,
     placeholder = '',
   }) {
     const input = createBaseElement({
@@ -283,8 +284,20 @@ class ElementCreator {
       input.addEventListener('blur', () => {
         if (input.value === '') { input.classList.add(cssClasses.emptyInput); }
       });
-      input.addEventListener('input', () => { input.classList.remove(cssClasses.emptyInput); });
       input.setAttribute('required', 'true');
+    }
+
+    if (isRequired || (multiLine && shouldResize)) {
+      input.addEventListener('input', () => {
+        if (isRequired) {
+          input.classList.remove(cssClasses.emptyInput);
+        }
+
+        if (multiLine && shouldResize) {
+          input.style.height = 'auto';
+          input.style.height = `${input.scrollHeight}px`;
+        }
+      });
     }
 
     return input;

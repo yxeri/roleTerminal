@@ -103,6 +103,7 @@ class List extends BaseView {
         event: collector.eventTypes.one,
         func: (data) => {
           const object = data[collector.objectTypes.one];
+          const { visibility, isPublic } = object;
           const { changeType } = data;
           const userAccessLevel = storageManager.getAccessLevel();
 
@@ -112,7 +113,7 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (userAccessLevel >= object.visibility) {
+              if (isPublic || userAccessLevel >= visibility) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -125,7 +126,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (userAccessLevel >= object.visibility) {
+              if (isPublic || userAccessLevel >= visibility) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -202,7 +203,7 @@ class List extends BaseView {
     Object.keys(allObjects).forEach((objectId) => {
       const object = allObjects[objectId];
 
-      if (userAccessLevel >= object.visibility) {
+      if (!object.visibility || userAccessLevel >= object.visibility) {
         listElement.appendChild(this.createListItem({ object }));
       }
     });

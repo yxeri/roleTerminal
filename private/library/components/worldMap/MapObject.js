@@ -16,7 +16,7 @@ const Label = require('./MapLabel');
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
 const elementCreator = require('../../ElementCreator');
-const positionComposer = require('../../data/PositionComposer');
+const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
 
 const ids = {
@@ -300,10 +300,19 @@ class MapObject {
     MapObject.showLeftClickBox({ container: descriptionContainer });
   }
 
-  static showPositionRightClickBox({
+  showPositionRightClickBox({
     event,
     thisMapObject,
   }) {
+    const userAccessLevel = storageManager.getAccessLevel();
+
+    if (userAccessLevel) {
+      return;
+      // TODO Check if admin
+    } else if (userAccessLevel < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId) {
+      return;
+    }
+
     const items = [];
 
     if (positionCanBeDragged) {

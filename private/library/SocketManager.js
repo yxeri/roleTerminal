@@ -166,7 +166,7 @@ class SocketManager {
   /**
    * Reconnect to socket.io
    */
-  reconnect({ callback }) {
+  reconnect({ callback = () => {} }) {
     if (!this.reconnecting) {
       this.reconnecting = true;
       this.socket.disconnect();

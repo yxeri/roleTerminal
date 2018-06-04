@@ -113,7 +113,7 @@ module.exports = {
   },
   RoomDialog: {
     password: {
-      en: 'Password to access room',
+      en: 'Password to access the room',
       se: 'Lösenordet för att komma åt rummet',
     },
     repeatPassword: {

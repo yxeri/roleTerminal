@@ -42,22 +42,16 @@ class CurrentUserList extends List {
       focusedId: storageManager.getAliasId() || storageManager.getUserId(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const params = {};
+          if (objectId === storageManager.getUserId()) {
+            storageManager.removeAliasId();
+          } else {
+            storageManager.setAliasId(objectId);
+          }
 
           this.hideView();
 
-          if (objectId === storageManager.getUserId()) {
-            storageManager.removeAliasId();
-
-            params.userId = objectId;
-          } else {
-            storageManager.setAliasId(objectId);
-
-            params.aliasId = objectId;
-          }
-
           eventCentral.emitEvent({
-            params,
+            params: { userId: objectId },
             event: eventCentral.Events.CHANGED_ALIAS,
           });
         },

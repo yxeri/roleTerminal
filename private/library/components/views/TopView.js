@@ -204,16 +204,9 @@ class TopView extends BaseView {
           },
         },
       });
-      const menuButton = elementCreator.createSpan({
-        classes: ['topMenuButton'],
+      const menuButton = this.createMenuButton({
+        list: this.menuList,
         text: labelHandler.getLabel({ baseObject: 'TopView', label: 'menu' }),
-        clickFuncs: {
-          leftFunc: () => {
-            this.menuList.classList.toggle('hide');
-
-            this.hideLists({ currentList: this.menuList });
-          },
-        },
       });
 
       this.lists.push(this.menuList);
@@ -226,20 +219,15 @@ class TopView extends BaseView {
       this.currentUserList = new CurrentUserList({
         classes: ['hide', 'topMenu'],
       });
-      const menuButton = elementCreator.createSpan({
-        classes: ['topMenuButton'],
-        text: '-----',
-        clickFuncs: {
-          leftFunc: () => {
-            this.currentUserList.toggleView();
-
-            this.hideLists({ currentList: this.currentUserList });
-          },
-        },
+      const menuButton = this.createMenuButton({
+        list: this.currentUserList,
       });
       const container = elementCreator.createContainer({
         elements: [menuButton],
       });
+      const watcherFunc = () => {
+        TopView.setUsername({ button: menuButton });
+      };
 
       this.lists.push(this.currentUserList);
       this.currentUserList.addToView({ element: container });
@@ -247,23 +235,17 @@ class TopView extends BaseView {
 
       eventCentral.addWatcher({
         event: eventCentral.Events.COMPLETE_USER,
-        func: () => {
-          TopView.setUsername({ button: menuButton });
-        },
+        func: watcherFunc,
       });
 
       eventCentral.addWatcher({
         event: eventCentral.Events.USER_CHANGE,
-        func: () => {
-          TopView.setUsername({ button: menuButton });
-        },
+        func: watcherFunc,
       });
 
       eventCentral.addWatcher({
         event: eventCentral.Events.CHANGED_ALIAS,
-        func: ({ userId }) => {
-          menuButton.textContent = userComposer.getUsername({ userId });
-        },
+        func: watcherFunc,
       });
     }
 
@@ -286,6 +268,24 @@ class TopView extends BaseView {
     if (this.menuList && this.menuList !== currentList) { this.menuList.classList.add('hide'); }
     if (this.viewList && this.viewList !== currentList) { this.viewList.classList.add('hide'); }
     if (this.currentUserList && this.currentUserList !== currentList) { this.currentUserList.hideView(); }
+  }
+
+  createMenuButton({
+    list,
+    text = '-----',
+    classes = [],
+  }) {
+    return elementCreator.createSpan({
+      text,
+      classes: ['topMenuButton'].concat(classes),
+      clickFuncs: {
+        leftFunc: () => {
+          this.list.toggleView();
+
+          this.hideLists({ currentList: list });
+        },
+      },
+    });
   }
 
   static setUsername({ button }) {
@@ -349,16 +349,9 @@ class TopView extends BaseView {
       },
     });
 
-    const menuButton = elementCreator.createSpan({
-      classes: ['topMenuButton'],
+    const menuButton = this.createMenuButton({
+      list: this.viewList,
       text: labelHandler.getLabel({ baseObject: 'TopView', label: '-----' }),
-      clickFuncs: {
-        leftFunc: () => {
-          this.viewList.classList.toggle('hide');
-
-          this.hideLists({ currentList: this.viewList });
-        },
-      },
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 

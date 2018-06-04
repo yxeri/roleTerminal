@@ -260,10 +260,9 @@ class TopView extends BaseView {
       });
 
       eventCentral.addWatcher({
-        event: eventCentral.Events.ALIAS,
-        func: ({ alias }) => {
-          console.log('alias', alias);
-          menuButton.textContent = alias.aliasName;
+        event: eventCentral.Events.CHANGED_ALIAS,
+        func: ({ userId }) => {
+          menuButton.textContent = userComposer.getUsername({ userId });
         },
       });
     }

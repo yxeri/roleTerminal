@@ -72,8 +72,14 @@ class CurrentUserList extends List {
       },
       sorting: this.sorting,
     });
+    const currentUser = userComposer.getCurrentUser();
 
-    return [userComposer.getCurrentUser()].concat(allObjects);
+
+    if (currentUser) {
+      return [currentUser].concat(allObjects);
+    }
+
+    return allObjects;
   }
 }
 

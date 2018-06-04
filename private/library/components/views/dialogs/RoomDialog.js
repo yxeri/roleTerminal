@@ -63,7 +63,7 @@ class RoomDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'register' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
         clickFuncs: {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {

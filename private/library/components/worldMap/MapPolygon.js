@@ -21,6 +21,7 @@ class MapPolygon extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    choosableStyles,
     zIndex = 1,
     descriptionOnClick = false,
     alwaysShowLabel = false,
@@ -31,8 +32,10 @@ class MapPolygon extends MapObject {
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
     const allPoints = [new google.maps.LatLng(latestCoordinates.latitude, latestCoordinates.longitude)]
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
+    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) : {};
 
     super({
+      choosableStyles,
       descriptionOnClick,
       alwaysShowLabel,
       shouldCluster,
@@ -60,14 +63,35 @@ class MapPolygon extends MapObject {
       mapObject: new google.maps.Polygon({
         zIndex,
         paths: new google.maps.MVCArray(allPoints),
-        opacity: styles.opacity || 1,
-        strokeColor: styles.strokeColor || '#000000',
-        strokeOpacity: styles.strokeOpacity || 0.8,
-        strokeWeight: styles.strokeWeight || 1,
-        fillColor: styles.fillColor || '#000000',
-        fillOpacity: styles.fillOpacity || 0.35,
+        opacity: chosenStyle.opacity || styles.opacity || 1,
+        strokeColor: chosenStyle.strokeColor || styles.strokeColor || '#000000',
+        strokeOpacity: chosenStyle.strokeOpacity || styles.strokeOpacity || 0.8,
+        strokeWeight: chosenStyle.strokeWeight || styles.strokeWeight || 1,
+        fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
+        fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
       }),
     });
+  }
+
+  changeStyle({ styleName, style }) {
+    const {
+      strokeColor,
+      strokeOpacity,
+      strokeWeight,
+      fillColor,
+      fillOpacity,
+      opacity,
+    } = style;
+    const options = {};
+
+    if (strokeColor) { options.strokeColor = strokeColor; }
+    if (strokeOpacity) { options.strokeOpacity = strokeOpacity; }
+    if (strokeWeight) { options.strokeWeight = strokeWeight; }
+    if (fillColor) { options.fillColor = fillColor; }
+    if (fillOpacity) { options.fillOpacity = fillOpacity; }
+    if (opacity) { options.opacity = opacity; }
+
+    super.changeStyle({ styleName, style: options });
   }
 
   // TODO Combine with MapLine

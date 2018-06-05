@@ -30,6 +30,7 @@ class WorldMapView extends BaseView {
     labelStyle,
     listId,
     clusterStyle,
+    choosableStyles = {},
     alwaysShowLabels = {},
     classes = [],
     elementId = `mapView-${Date.now()}`,
@@ -66,6 +67,7 @@ class WorldMapView extends BaseView {
     this.listId = listId;
     this.labelStyle = labelStyle;
     this.alwaysShowLabels = alwaysShowLabels;
+    this.choosableStyles = choosableStyles;
 
     this.element.appendChild(MapObject.leftClickBox);
     this.element.appendChild(MapObject.rightClickBox);
@@ -169,6 +171,7 @@ class WorldMapView extends BaseView {
       case positionComposer.PositionStructures.LINE: {
         newMarker = new MapLine({
           position,
+          choosableStyles: this.choosableStyles.lines,
           alwaysShowLabel: this.alwaysShowLabels.line,
           labelStyle: this.labelStyle,
           styles: this.lineStyle,
@@ -179,6 +182,7 @@ class WorldMapView extends BaseView {
       case positionComposer.PositionStructures.POLYGON: {
         newMarker = new MapPolygon({
           position,
+          choosableStyles: this.choosableStyles.polygons,
           alwaysShowLabel: this.alwaysShowLabels.polygon,
           labelStyle: this.labelStyle,
           styles: this.polygonStyle,
@@ -189,6 +193,7 @@ class WorldMapView extends BaseView {
       default: {
         newMarker = new MapMarker({
           position,
+          choosableStyles: this.choosableStyles.markers,
           alwaysShowLabel: this.alwaysShowLabels.marker,
           labelStyle: this.labelStyle,
           styles: this.markerStyle,
@@ -341,8 +346,9 @@ class WorldMapView extends BaseView {
       maxZoom: this.maxZoom,
       styles: this.mapStyles,
     });
-    this.markers = this.createMarkers();
     this.clusterer = new MarkerClusterer(this.worldMap, [], this.clusterStyle);
+
+    this.markers = this.createMarkers();
 
     Object.keys(this.markers).forEach((markerId) => {
       const marker = this.markers[markerId];

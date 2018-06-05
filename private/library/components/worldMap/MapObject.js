@@ -22,6 +22,7 @@ const storageManager = require('../../StorageManager');
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
   LEFTCLICKBOX: 'lMapBox',
+  CHOOSABLE_STYLE: 'chooseStyleMapObj',
 };
 const cssClasses = {
   RIGHTCLICKBOX: 'mapRightClickBox',
@@ -84,12 +85,14 @@ class MapObject {
     label,
     position,
     labelStyle,
+    choosableStyles,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
   }) {
+    this.choosableStyles = choosableStyles;
     this.isDraggable = false;
     this.position = position;
     this.mapObject = mapObject;
@@ -139,7 +142,7 @@ class MapObject {
         if (clickFuncs.right) {
           clickFuncs.right(event);
         } else {
-          MapObject.showPositionRightClickBox({
+          this.showPositionRightClickBox({
             event,
             thisMapObject: this,
           });
@@ -274,6 +277,24 @@ class MapObject {
     return this.position.positionType;
   }
 
+  changeStyle({ styleName, style }) {
+    positionComposer.updatePosition({
+      positionId: this.position.objectId,
+      position: {
+        styleName,
+      },
+      callback: ({ error }) => {
+        if (error) {
+          console.log(error);
+
+          return;
+        }
+
+        this.mapObject.setOptions(style);
+      },
+    });
+  }
+
   static buildLeftClickBox({ thisMapObject }) {
     const {
       positionName,
@@ -328,6 +349,63 @@ class MapObject {
       });
     }
 
+    if (this.choosableStyles) {
+      const radioSet = elementCreator.createRadioSet({
+        title: 'Choose color scheme:',
+        optionName: ids.CHOOSABLE_STYLE,
+        options: this.choosableStyles.map((style) => {
+          return {
+            optionId: `chooseStyle${style.styleName}`,
+            optionLabel: style.styleName,
+            value: style.styleName,
+          };
+        }),
+      });
+
+      items.push({
+        elements: [elementCreator.createSpan({
+          text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'changeStyle' }),
+        })],
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new BaseDialog({
+              inputs: [radioSet],
+              lowerButtons: [
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                  clickFuncs: {
+                    leftFunc: () => { dialog.removeFromView(); },
+                  },
+                }),
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      const chosen = document.querySelector(`input[name="${ids.CHOOSABLE_STYLE}"]:checked`);
+                      const styleName = chosen.value;
+
+                      if (!chosen) {
+                        dialog.removeFromView();
+
+                        return;
+                      }
+
+                      dialog.removeFromView();
+                      this.changeStyle({
+                        styleName,
+                        style: this.choosableStyles.find(item => item.styleName === styleName),
+                      });
+                    },
+                  },
+                }),
+              ],
+            });
+
+            dialog.addToView({ element: this.worldMap.getDiv().parentElement });
+          },
+        },
+      });
+    }
     MapObject.showRightClickBox({
       x: event.pixel.x,
       y: event.pixel.y,

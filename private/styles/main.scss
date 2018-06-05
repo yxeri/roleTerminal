@@ -90,7 +90,7 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100%;
 }
 
@@ -153,7 +153,17 @@ button {
  *********/
 
 .docFileView {
+  .oneOfTwo {
+    width: 0;
+  }
 
+  .oneOfTwo:first-child {
+    flex-grow: 1;
+  }
+
+  .oneOfTwo:last-child {
+    flex-grow: 3;
+  }
 }
 
 .forumView {
@@ -259,7 +269,7 @@ $map-box-left: .5em;
 }
 
 .mapRightClickBox {
-  position: absolute;
+  position: fixed;
   z-index: 3;
   background-color: $background-color;
   border: $map-box-border;
@@ -413,18 +423,15 @@ $forum-padding: .5em;
 
 .one {
   width: 100%;
-  max-width: 100vw;
 }
 
 .oneOfTwo {
   width: 50%;
-  max-width: 50vw;
   box-sizing: border-box;
 }
 
 .oneOfThree {
   width: 33%;
-  max-width: 33vw;
   box-sizing: border-box;
 }
 
@@ -530,7 +537,6 @@ $msgList-textarea-border: .3em solid $darker-color;
 }
 
 .columnRoomList {
-  max-width: 10em;
   overflow-y: auto;
 }
 
@@ -567,12 +573,12 @@ $msgList-textarea-border: .3em solid $darker-color;
 
 .topView {
   order: 1;
-  height: $top-row-height;
   width: 100%;
   box-sizing: border-box;
   border-bottom: $border-width solid $text-color;
   background-color: $darkest-color;
   display: flex;
+  z-index: 8;
 
   > span {
     margin-right: .5em;
@@ -640,7 +646,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   overflow: hidden;
 }
 
-@media (max-width: 479px) {
+@media (orientation: portrait) {
   #main {
     > .viewWrapper {
       > .oneOfTwo:last-child {
@@ -657,14 +663,12 @@ $msgList-textarea-border: .3em solid $darker-color;
     }
   }
 
-  .oneOfTwo {
+  .viewWrapper {
     width: 100%;
-    max-width: 100vw;
   }
 
-  .oneOfThree {
+  .oneOfTwo {
     width: 100%;
-    max-width: 100vw;
   }
 
   .mapLeftClickBox {

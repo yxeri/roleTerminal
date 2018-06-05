@@ -360,10 +360,6 @@ class WorldMapView extends BaseView {
 
     this.resetClusterer();
 
-    this.overlay = new google.maps.OverlayView();
-    this.overlay.draw = () => {};
-    this.overlay.setMap(this.worldMap);
-
     this.realignMap({
       markers: this.markers,
     });

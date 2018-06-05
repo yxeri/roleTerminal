@@ -34,7 +34,20 @@ const worldMapView = new WorldMapView({
   ],
   polygonStyle: {
     strokeColor: '#000000',
-    fillColor: '#FFFFFF',
+    fillColor: '#b40000',
+  },
+  choosableStyles: {
+    polygons: [
+      {
+        strokeColor: '#000000',
+        fillColor: '#9b0000',
+        styleName: 'Red',
+      }, {
+        styleName: 'Green',
+        strokeColor: '#000000',
+        fillColor: '#00b402',
+      },
+    ],
   },
   lineStyle: {
     strokeColor: '#FFFFFF',

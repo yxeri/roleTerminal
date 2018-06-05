@@ -15,6 +15,7 @@
  */
 
 const BaseView = require('./BaseView');
+const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
 
 const docFileComposer = require('../../data/composers/DocFileComposer');
 const eventCentral = require('../../EventCentral');
@@ -69,16 +70,28 @@ class DocFilePage extends BaseView {
     eventCentral.addWatcher({
       event: eventCentral.Events.OPEN_DOCFILE,
       func: ({ docFile }) => {
-        const storedDocFile = docFileComposer.getDocFile({ docFileId: docFile.objectId });
         const newElement = elementCreator.createContainer({
           elementId,
           classes,
         });
 
-        newElement.appendChild(createHeader({ docFile: storedDocFile }));
-        newElement.appendChild(createBody({ docFile: storedDocFile }));
+        newElement.appendChild(createHeader({ docFile }));
+        newElement.appendChild(createBody({ docFile }));
 
         this.replaceOnParent({ element: newElement });
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ACCESS_DOCFILE,
+      func: ({ docFile }) => {
+        const { title, objectId } = docFile;
+        const dialog = new LockedDocFileDialog({
+          title,
+          docFileId: objectId,
+        });
+
+        dialog.addToView({ element: this.getParentElement() });
       },
     });
   }

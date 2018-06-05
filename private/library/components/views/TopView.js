@@ -206,6 +206,7 @@ class TopView extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.menuList,
+        leftFunc: () => { this.menuList.classList.toggle('hide'); },
         text: labelHandler.getLabel({ baseObject: 'TopView', label: 'menu' }),
       });
 
@@ -221,6 +222,7 @@ class TopView extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.currentUserList,
+        leftFunc: () => { this.currentUserList.toggleView(); },
       });
       const container = elementCreator.createContainer({
         elements: [menuButton],
@@ -272,6 +274,7 @@ class TopView extends BaseView {
 
   createMenuButton({
     list,
+    leftFunc = () => {},
     text = '-----',
     classes = [],
   }) {
@@ -280,7 +283,7 @@ class TopView extends BaseView {
       classes: ['topMenuButton'].concat(classes),
       clickFuncs: {
         leftFunc: () => {
-          this.list.toggleView();
+          leftFunc();
 
           this.hideLists({ currentList: list });
         },
@@ -351,6 +354,7 @@ class TopView extends BaseView {
 
     const menuButton = this.createMenuButton({
       list: this.viewList,
+      leftFunc: () => { this.viewList.classList.toggle('hide'); },
       text: labelHandler.getLabel({ baseObject: 'TopView', label: '-----' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });

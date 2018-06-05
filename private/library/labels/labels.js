@@ -212,6 +212,10 @@ module.exports = {
       en: 'Move position',
       se: 'Flytta platsen',
     },
+    changeStyle: {
+      en: 'Change style',
+      se: 'Byt stil',
+    },
   },
   TopView: {
     menu: {

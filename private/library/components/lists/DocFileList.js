@@ -62,12 +62,12 @@ class DocFileList extends List {
           if (docFile.code) {
             eventCentral.emitEvent({
               event: eventCentral.Events.OPEN_DOCFILE,
-              params: { docFile: { objectId } },
+              params: { docFile },
             });
           } else {
             eventCentral.emitEvent({
               event: eventCentral.Events.ACCESS_DOCFILE,
-              params: { docFile: { objectId } },
+              params: { docFile },
             });
           }
         },

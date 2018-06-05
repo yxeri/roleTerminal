@@ -47,12 +47,16 @@ class PositionComposer extends BaseComposer {
   }
 
   updatePosition({
+    positionId,
     position,
     callback,
   }) {
     this.handler.updateObject({
       callback,
-      params: { position },
+      params: {
+        positionId,
+        position,
+      },
     });
   }
 

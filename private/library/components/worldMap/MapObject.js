@@ -310,10 +310,7 @@ class MapObject {
   }) {
     const userAccessLevel = storageManager.getAccessLevel();
 
-    if (userAccessLevel) {
-      return;
-      // TODO Check if admin
-    } else if (userAccessLevel < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId) {
+    if (userAccessLevel < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId) {
       return;
     }
 

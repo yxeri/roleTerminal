@@ -406,9 +406,12 @@ class MapObject {
         },
       });
     }
+
+    const { clientX: x, clientY: y } = event.Ia;
+
     MapObject.showRightClickBox({
-      x: event.pixel.x,
-      y: event.pixel.y,
+      x,
+      y,
       container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
     });
   }

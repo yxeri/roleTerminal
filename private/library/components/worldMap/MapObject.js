@@ -411,7 +411,6 @@ class MapObject {
     }
 
     elementCreator.replaceFirstChild(MapObject.rightClickBox, container);
-    MapObject.rightClickBox.classList.remove('hide');
 
     if (x && y) {
       MapObject.rightClickBox.setAttribute('style', `left: ${x}px; top: ${y}px;`);
@@ -427,9 +426,12 @@ class MapObject {
         MapObject.rightClickBox.setAttribute('style', `left: ${newX}px; top: ${newY}px;`);
       }
 
+      MapObject.rightClickBox.classList.remove('hide');
+
       return;
     }
 
+    MapObject.rightClickBox.classList.remove('hide');
     MapObject.rightClickBox.removeAttribute('style');
   }
 
@@ -452,6 +454,11 @@ MapObject.rightClickBox = elementCreator.createContainer({
   elementId: ids.RIGHTCLICKBOX,
   classes: ['hide', cssClasses.RIGHTCLICKBOX],
   elements: [elementCreator.createContainer({})],
+  clickFuncs: {
+    leftFunc: () => {
+      MapObject.hideRightClickBox();
+    },
+  },
 });
 
 module.exports = MapObject;

@@ -12,6 +12,7 @@
  */
 
 const Label = require('./MapLabel');
+const BaseDialog = require('../views/dialogs/BaseDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
@@ -28,8 +29,6 @@ const cssClasses = {
   RIGHTCLICKBOX: 'mapRightClickBox',
   LEFTCLICKBOX: 'mapLeftClickBox',
 };
-
-let positionCanBeDragged;
 
 /**
  * Create functions for hovering and mouse out on MapObjects
@@ -92,6 +91,7 @@ class MapObject {
     shouldCluster = false,
     clickFuncs = {},
   }) {
+    this.canBeDragged = canBeDragged;
     this.choosableStyles = choosableStyles;
     this.isDraggable = false;
     this.position = position;
@@ -105,9 +105,7 @@ class MapObject {
       text: this.position.positionName,
     });
 
-    positionCanBeDragged = canBeDragged;
-
-    if (positionCanBeDragged) {
+    if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
         this.setCurrentCoordinates({
           coordinates: {
@@ -321,7 +319,7 @@ class MapObject {
 
     const items = [];
 
-    if (positionCanBeDragged) {
+    if (this.canBeDragged) {
       items.push({
         elements: [elementCreator.createSpan({
           text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'movePosition' }),

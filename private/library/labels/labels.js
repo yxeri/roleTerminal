@@ -79,16 +79,16 @@ module.exports = {
   },
   RegisterDialog: {
     username: {
-      en: 'Your username',
-      se: 'Ditt användarnamn',
+      en: 'Username [a-z 0-9 -_]',
+      se: 'Användarnamn [a-z 0-9 -_]',
     },
     fullName: {
-      en: 'Your full name',
-      se: 'Hela namnet',
+      en: 'Full name [a-z 0-9]',
+      se: 'Hela namnet [a-z 0-9]',
     },
     password: {
-      en: 'Your password',
-      se: 'Ditt lösenord',
+      en: 'Password',
+      se: 'Lösenord',
     },
     repeatPassword: {
       en: 'Repeat password',

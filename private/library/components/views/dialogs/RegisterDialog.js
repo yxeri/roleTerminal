@@ -121,6 +121,8 @@ class RegisterDialog extends BaseDialog {
                   }
 
                   return;
+                } else if (error.type === 'invalid characters') {
+                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
                 }
 
                 this.removeFromView();

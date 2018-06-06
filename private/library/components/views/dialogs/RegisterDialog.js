@@ -46,7 +46,6 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.FULLNAME,
         inputName: 'fullName',
         type: 'text',
-        isRequired: true,
         maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),

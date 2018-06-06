@@ -17,7 +17,6 @@
 const BaseView = require('./BaseView');
 const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
 
-const docFileComposer = require('../../data/composers/DocFileComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 

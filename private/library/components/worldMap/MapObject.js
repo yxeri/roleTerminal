@@ -312,19 +312,6 @@ class MapObject {
 
     const items = [];
 
-    if (this.canBeDragged) {
-      items.push({
-        elements: [elementCreator.createSpan({
-          text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'movePosition' }),
-        })],
-        clickFuncs: {
-          leftFunc: () => {
-            thisMapObject.toggleDraggable(!thisMapObject.isDraggable);
-          },
-        },
-      });
-    }
-
     if (this.choosableStyles) {
       const radioSet = elementCreator.createRadioSet({
         title: 'Choose color scheme:',
@@ -383,7 +370,29 @@ class MapObject {
       });
     }
 
-    const { clientX: x, clientY: y } = event.Ha || event.Ia;
+    if (this.canBeDragged) {
+      items.push({
+        elements: [elementCreator.createSpan({
+          text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'movePosition' }),
+        })],
+        clickFuncs: {
+          leftFunc: () => {
+            thisMapObject.toggleDraggable(!thisMapObject.isDraggable);
+          },
+        },
+      });
+    }
+
+    const mouseEvent = event.Ha || event.Ia;
+    let x;
+    let y;
+
+    if (mouseEvent) {
+      const { clientX, clientY } = mouseEvent;
+
+      x = clientX;
+      y = clientY;
+    }
 
     MapObject.showRightClickBox({
       x,
@@ -426,6 +435,11 @@ class MapObject {
 
       return;
     }
+
+    /**
+     * Fallback if Google Maps mouse event changes var name
+     */
+    MapObject.rightClickBox.classList.add('fallbackMapRightClickBox');
 
     MapObject.rightClickBox.classList.remove('hide');
     MapObject.rightClickBox.removeAttribute('style');

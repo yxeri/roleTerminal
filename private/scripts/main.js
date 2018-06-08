@@ -7,6 +7,7 @@ const TopView = require('../library/components/views/TopView');
 const DocFileView = require('../library/components/views/DocFileView');
 
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
+const viewTools = require('../library/ViewTools');
 
 const chatView = new ChatView({
   sendOnEnter: true,
@@ -189,3 +190,7 @@ topView.setViews({
 });
 
 viewSwitcher.switchView({ view: chatWrapper });
+
+window.addEventListener('click', () => {
+  viewTools.goFullScreen({ queryBypass: 'noFullscreen' });
+});

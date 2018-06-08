@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const Tools = require('./Tools');
+
 class ViewTools {
   /**
    * Is the element inside the view or close to the end of the views?
@@ -33,7 +35,13 @@ class ViewTools {
    * This is not supported in iOS Safari
    * @static
    */
-  static goFullScreen() {
+  static goFullScreen({ queryBypass }) {
+    const parameters = Tools.getQueryParameters();
+
+    if (parameters[queryBypass]) {
+      return;
+    }
+
     const element = document.documentElement;
 
     if (element.requestFullscreen) {

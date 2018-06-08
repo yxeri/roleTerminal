@@ -383,7 +383,7 @@ class MapObject {
       });
     }
 
-    const { clientX: x, clientY: y } = event.Ia;
+    const { clientX: x, clientY: y } = event.Ha || event.Ia;
 
     MapObject.showRightClickBox({
       x,

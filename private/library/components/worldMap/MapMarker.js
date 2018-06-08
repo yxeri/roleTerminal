@@ -22,7 +22,7 @@ class MapMarker extends MapObject {
     position,
     clickFuncs,
     labelStyle,
-    choosableStyles = {},
+    choosableStyles = [],
     zIndex = 4,
     alwaysShowLabel = false,
     shouldCluster = true,
@@ -30,7 +30,7 @@ class MapMarker extends MapObject {
   }) {
     const { coordinatesHistory } = position;
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
-    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) : {};
+    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) || {} : {};
     const markerStyles = styles;
 
     markerStyles.icon = markerStyles.icon || {};

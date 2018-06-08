@@ -366,8 +366,8 @@ class BaseData {
     sorting,
   }) {
     const sortFunc = (a, b) => {
-      const aParam = a[sorting.paramName] || a[sorting.fallbackParamName];
-      const bParam = b[sorting.paramName] || b[sorting.fallbackParamName];
+      const aParam = (a[sorting.paramName] || a[sorting.fallbackParamName]).toLowerCase();
+      const bParam = (b[sorting.paramName] || b[sorting.fallbackParamName]).toLowerCase();
 
       if (aParam < bParam) {
         return sorting.reverse ? 1 : -1;

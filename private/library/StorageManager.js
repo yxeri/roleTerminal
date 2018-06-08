@@ -371,8 +371,6 @@ class StorageManager {
   }
 
   static setCurrentForum(forumId) {
-    console.log('set current', forumId);
-
     this.setLocalVal('currentForum', forumId);
   }
 

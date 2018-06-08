@@ -46,7 +46,6 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.FULLNAME,
         inputName: 'fullName',
         type: 'text',
-        isRequired: true,
         maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),
@@ -119,11 +118,13 @@ class RegisterDialog extends BaseDialog {
                         break;
                       }
                     }
+                  } else if (error.type === 'invalid characters') {
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
+                  } else {
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
                   }
 
                   return;
-                } else if (error.type === 'invalid characters') {
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
                 }
 
                 this.removeFromView();
@@ -144,3 +145,4 @@ class RegisterDialog extends BaseDialog {
 }
 
 module.exports = RegisterDialog;
+

@@ -20,18 +20,17 @@ const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
-    this.socket = io(); // eslint-disable-line no-undef
+    this.socket = io({ forceNew: true }); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
     this.isOnline = false;
-    this.isLoggedIn = false;
 
     this.EmitTypes = {
       FORUM: 'forum',
       FORUMTHREAD: 'forumThread',
       FORUMPOST: 'forumPost',
-      FOLLOW: 'follow',
+      FOLLOW: 'followRoom',
       USER: 'user',
       CHATMSG: 'chatMsg',
       DEVICE: 'device',
@@ -58,6 +57,7 @@ class SocketManager {
       UPDATEPOSITION: 'updatePosition',
       UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
       UNLOCKDOCFILE: 'unlockDocFile',
+      GETROOMMSGS: 'getMessagesByRoom',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -124,7 +124,7 @@ class SocketManager {
       this.lastAlive = now;
 
       if (offBy > 10000) {
-        this.reconnect();
+        this.reconnect({});
       }
 
       setTimeout(timeoutFunc, 1000);
@@ -134,7 +134,7 @@ class SocketManager {
   }
 
   addEvent(event, callback) {
-    this.socket.on(event, (params) => { console.log('Socket event', event, params); callback(params); });
+    this.socket.on(event, (params) => { console.log(event, params); callback(params); });
   }
 
   addEvents(events) {
@@ -148,16 +148,12 @@ class SocketManager {
       device: { objectId: storageManager.getDeviceId() },
     }, ({ error }) => {
       if (error) {
-        this.isLoggedIn = false;
-
         storageManager.resetUser();
 
         callback({ error });
 
         return;
       }
-
-      this.isLoggedIn = true;
 
       callback({ data: { success: true } });
     });
@@ -172,6 +168,7 @@ class SocketManager {
       this.socket.disconnect();
       this.socket.connect({ forceNew: true });
       this.updateId(() => {
+        this.reconnectDone();
         eventCentral.emitEvent({
           event: eventCentral.Events.RECONNECT,
           params: {},
@@ -179,6 +176,13 @@ class SocketManager {
 
         callback();
       });
+
+      setTimeout(() => {
+        if (this.reconnecting) {
+          this.reconnectDone();
+          this.reconnect({});
+        }
+      }, 2000);
     }
   }
 
@@ -219,7 +223,11 @@ class SocketManager {
     return this.isOnline;
   }
 
-  login({ username, password, callback }) {
+  login({
+    username,
+    password,
+    callback,
+  }) {
     this.emitEvent('login', {
       user: {
         username,
@@ -253,8 +261,6 @@ class SocketManager {
 
         return;
       }
-
-      this.isLoggedIn = false;
 
       storageManager.resetUser();
 

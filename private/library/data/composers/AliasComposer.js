@@ -24,7 +24,6 @@ class AliasComposer extends DataComposer {
 
     const aliases = this.handler.getObjects({
       filter: {
-        orCheck: true,
         rules: [
           { paramName: 'ownerId', paramValue: storageManager.getUserId() },
         ],

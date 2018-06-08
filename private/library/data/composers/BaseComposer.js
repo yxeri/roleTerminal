@@ -25,8 +25,6 @@ class BaseComposer {
       return;
     }
 
-    this.dependencies.forEach((dependency) => { console.log(dependency, dependency.hasFetched); });
-
     this.isComplete = true;
 
     if (this.completionEvent) {

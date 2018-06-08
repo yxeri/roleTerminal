@@ -34,6 +34,7 @@ class ForumList extends List {
       shouldFocusOnClick: true,
       focusedId: storageManager.getCurrentForum(),
       dependencies: [
+        dataHandler.forumPosts,
         dataHandler.forumThreads,
         dataHandler.users,
         dataHandler.teams,

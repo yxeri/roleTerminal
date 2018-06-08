@@ -37,6 +37,7 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
+const userComposer = require('../../data/composers/UserComposer');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -71,6 +72,7 @@ class List extends BaseView {
     appendClasses,
     listItemFieldsClasses,
     sorting,
+    title,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
     dependencies = [],
@@ -84,6 +86,9 @@ class List extends BaseView {
       classes: classes.concat(['list']),
     });
 
+    this.ListTypes = {
+      ROOMS: 'rooms',
+    };
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
     this.collector = collector;
@@ -97,6 +102,7 @@ class List extends BaseView {
     this.filter = filter;
     this.shouldScrollToBottom = shouldScrollToBottom;
     this.sorting = sorting;
+    this.title = title;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -192,16 +198,23 @@ class List extends BaseView {
     this.element.removeChild(existingItem);
   }
 
+  hasAccess({ object, user }) { // eslint-disable-line class-methods-use-this
+    const { accessLevel, objectId } = user;
+
+    return (object && (object.isPublic || (!object.visibility || accessLevel >= object.visibility || object.ownerId === objectId )));
+  }
+
+
   createList() {
-    const userAccessLevel = storageManager.getAccessLevel();
     const listElement = elementCreator.createList({
       elementId: this.elementId,
       classes: this.classes,
     });
     const allObjects = this.getCollectorObjects();
+    const user = userComposer.getCurrentUser();
 
     allObjects.forEach((object) => {
-      if (object && (object.isPublic || (!object.visibility || userAccessLevel >= object.visibility))) {
+      if (this.hasAccess({ object, user })) {
         listElement.appendChild(this.createListItem({ object }));
       }
     });
@@ -225,17 +238,22 @@ class List extends BaseView {
       return;
     }
 
-    const focused = this.getFocusedListItem();
     const toFocus = this.getElement(elementId);
 
-    if (focused) {
-      focused.classList.remove(cssClasses.focusListItem);
-    }
+    this.removeFocusOnItem();
 
     if (toFocus) {
       this.focusedId = elementId;
 
       toFocus.classList.add(cssClasses.focusListItem);
+    }
+  }
+
+  removeFocusOnItem() {
+    const focused = this.getFocusedListItem();
+
+    if (focused) {
+      focused.classList.remove(cssClasses.focusListItem);
     }
   }
 

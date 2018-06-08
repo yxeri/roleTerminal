@@ -35,7 +35,8 @@ class MessageList extends List {
     multiRoom = false,
     shouldSwitchRoom = false,
     roomId,
-    roomListId,
+    roomListId = '',
+    userRoomListId = '',
     classes = [],
     elementId = `mList-${Date.now()}`,
   }) {
@@ -93,14 +94,24 @@ class MessageList extends List {
 
     super(superParams);
 
+    this.userRoomListId = userRoomListId;
     this.roomListId = roomListId;
-    this.roomId = roomId || storageManager.getCurrentRoom();
+    this.roomId = roomId || this.getRoomId();
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.FOLLOWED_ROOM,
+      func: ({ room }) => {
+        if (room.objectId === this.getRoomId()) {
+          this.showMessagesByRoom({ roomId: room.objectId });
+        }
+      },
+    });
 
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if ((!origin && !this.roomListId) || this.roomListId === origin) {
+          if (!origin || (this.roomListId === origin || this.userRoomListId === origin)) {
             this.showMessagesByRoom({ roomId: room.objectId });
           }
         },
@@ -111,6 +122,7 @@ class MessageList extends List {
   showMessagesByRoom({ roomId }) {
     this.roomId = roomId;
     this.filter = { rules: [{ paramName: 'roomId', paramValue: roomId }] };
+
     this.appendList();
   }
 
@@ -118,8 +130,12 @@ class MessageList extends List {
     this.roomListId = id;
   }
 
+  setRoomId(roomId) {
+    this.roomId = roomId;
+  }
+
   getRoomId() {
-    return this.roomId;
+    return this.roomId || storageManager.getCurrentRoom();
   }
 }
 

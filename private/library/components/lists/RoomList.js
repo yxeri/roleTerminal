@@ -19,39 +19,67 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/composers/AliasComposer');
+const roomComposer = require('../../data/composers/RoomComposer');
+const userComposer = require('../../data/composers/UserComposer');
 
 class RoomList extends List {
   constructor({
+    title,
+    whisperText = ' <-> ',
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
     classes.push('roomList');
-
-    const headerFields = [
-      { paramName: 'roomName' },
-    ];
+    classes.push('chatRoomList');
 
     super({
+      title,
       elementId,
       classes,
       filter: {
-        rules: [{ paramName: 'isUser', paramValue: false }],
+        rules: [
+          { paramName: 'isUser', paramValue: false },
+        ],
       },
-      sorting: {
-        paramName: 'roomName',
-        fallbackParamName: 'objectId',
-      },
+      listItemFields: [
+        {
+          paramName: 'objectId',
+          convertFunc: (objectId) => {
+            const room = roomComposer.getRoom({ roomId: objectId });
+            const { isWhisper, participantIds } = room;
+
+            if (room) {
+              if (isWhisper) {
+                console.log('fetched', dataHandler.users.hasFetched);
+                const users = userComposer.getWhisperUsers({ participantIds });
+
+                return `${users[0].username}${whisperText}${users[1].username}`;
+              }
+
+              return room.roomName;
+            }
+
+            return '-----';
+          },
+        },
+      ],
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
+          const roomId = objectId;
+
           eventCentral.emitEvent({
             event: eventCentral.Events.SWITCH_ROOM,
             params: {
+              listType: this.ListTypes.ROOMS,
               origin: this.elementId,
-              room: { objectId },
+              room: {
+                objectId: roomId,
+              },
             },
           });
+
+          roomComposer.follow({ roomId });
         },
       },
       dependencies: [
@@ -61,18 +89,33 @@ class RoomList extends List {
         dataHandler.teams,
       ],
       collector: dataHandler.rooms,
-      listItemFields: headerFields,
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.SWITCH_ROOM,
+      func: ({
+        room,
+        origin,
+        listType = '',
+      }) => {
+        if (origin && origin === this.elementId) {
+          return;
+        } if (listType !== this.ListTypes.ROOMS) {
+          return;
+        }
+
+        const { objectId } = room;
+
+        this.setFocusedListItem(objectId);
+      },
     });
   }
 
-  getCollectorObjects() {
-    const allObjects = this.collector.getObjects({
-      filter: this.filter,
-      sorting: this.sorting,
-    });
-    const aliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+  hasAccess({ object, user }) {
+    const { aliases, followingRooms, objectId: userId } = user;
+    const hasAccess = super.hasAccess({ object, user });
 
-    return allObjects.filter(object => !aliases.includes(object.objectId));
+    return hasAccess || (followingRooms.includes(object.objectId) || object.participantIds.some(participant => aliases.includes(participant)) || object.participantIds.includes(userId));
   }
 }
 

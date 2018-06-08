@@ -20,7 +20,7 @@ const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
-    this.socket = io({ forceNew: true }); // eslint-disable-line no-undef
+    this.socket = io(); // eslint-disable-line no-undef
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
@@ -103,6 +103,14 @@ class SocketManager {
       event: this.EmitTypes.RECONNECT,
       func: () => {
         this.isOnline = true;
+
+        this.updateId(() => {
+          this.reconnectDone();
+          eventCentral.emitEvent({
+            event: eventCentral.Events.RECONNECT,
+            params: {},
+          });
+        });
       },
     }, {
       event: this.EmitTypes.DISCONNECT,
@@ -163,27 +171,10 @@ class SocketManager {
    * Reconnect to socket.io
    */
   reconnect({ callback = () => {} }) {
-    if (!this.reconnecting) {
-      this.reconnecting = true;
-      this.socket.disconnect();
-      this.socket.connect({ forceNew: true });
-      this.updateId(() => {
-        this.reconnectDone();
-        eventCentral.emitEvent({
-          event: eventCentral.Events.RECONNECT,
-          params: {},
-        });
-
-        callback();
-      });
-
-      setTimeout(() => {
-        if (this.reconnecting) {
-          this.reconnectDone();
-          this.reconnect({});
-        }
-      }, 2000);
-    }
+    this.reconnecting = true;
+    this.socket.close();
+    this.socket.disconnect();
+    this.socket.connect();
   }
 
   /**

@@ -51,6 +51,7 @@ html, body {
   color: $text-color;
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
   font-size: .9em;
+  -webkit-overflow-scrolling: touch;
 }
 
 
@@ -69,6 +70,7 @@ h1, h2, h3, h4, h5, h6 {
 
 ul, li {
   list-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 textarea {
@@ -102,6 +104,7 @@ button {
   max-height: calc(99% - 4em);
   max-width: 30em;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background-color: $background-color;
   border: $border-width solid $text-color;
   position: absolute;
@@ -162,7 +165,7 @@ button {
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 3;
+    flex-grow: 4;
   }
 }
 
@@ -260,6 +263,7 @@ $map-box-left: .5em;
   max-height: calc(100% - (#{$top-row-height} + #{$map-box-padding}));
   padding: $map-box-padding;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background-color: $background-color;
   border: $map-box-border;
 
@@ -430,6 +434,7 @@ $forum-padding: .5em;
 
 .column {
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .one {
@@ -465,6 +470,7 @@ $msgList-textarea-border: .3em solid $darker-color;
 .chatView {
   .msgList {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
     li {
       padding-bottom: $msgList-li-padding;
@@ -560,6 +566,7 @@ $msgList-textarea-border: .3em solid $darker-color;
 
 .columnRoomList {
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-top: $padding;
 
   .list {

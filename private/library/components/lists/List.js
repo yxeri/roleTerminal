@@ -109,9 +109,8 @@ class List extends BaseView {
         event: collector.eventTypes.one,
         func: (data) => {
           const object = data[collector.objectTypes.one];
-          const { visibility, isPublic } = object;
           const { changeType } = data;
-          const userAccessLevel = storageManager.getAccessLevel();
+          const user = userComposer.getCurrentUser();
 
           if (this.filter && !this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
             return;
@@ -119,7 +118,7 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (isPublic || userAccessLevel >= visibility) {
+              if (this.hasAccess({ object, user })) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -132,7 +131,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (isPublic || userAccessLevel >= visibility) {
+              if (this.hasAccess({ object, user })) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,

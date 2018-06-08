@@ -277,6 +277,17 @@ $map-box-left: .5em;
   max-width: 15em;
 }
 
+.fallbackMapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  max-width: 15em;
+  padding: .2em;
+  background-color: $background-color;
+  border: $map-box-border;
+}
+
 /**************
  * Forum Feed *
  **************/

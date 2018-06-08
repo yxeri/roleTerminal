@@ -47,7 +47,7 @@ class Tools {
       return params;
     }
 
-    return false;
+    return {};
   }
 }
 

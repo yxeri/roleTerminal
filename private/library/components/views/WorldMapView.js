@@ -271,7 +271,7 @@ class WorldMapView extends BaseView {
 
                     positionComposer.createPosition({
                       position,
-                      callback: ({ data, error }) => {
+                      callback: ({ error }) => {
                         if (error) {
                           console.log('Create position', error);
 

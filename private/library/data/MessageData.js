@@ -17,10 +17,12 @@
 const BaseData = require('./BaseData');
 
 const eventCentral = require('../EventCentral');
-const { EmitTypes } = require('../SocketManager');
+const socketManager = require('../SocketManager');
 
 class MessageData extends BaseData {
   constructor() {
+    const { EmitTypes } = socketManager;
+
     super({
       createEvents: {
         one: 'sendMessage',
@@ -48,6 +50,33 @@ class MessageData extends BaseData {
         EmitTypes.WHISPER,
         EmitTypes.BROADCAST,
       ],
+    });
+
+    socketManager.addEvent(socketManager.EmitTypes.FOLLOW, ({ error, data }) => {
+      if (error) {
+        console.log('follow error', error);
+
+        return;
+      }
+
+      const { room } = data;
+
+      this.fetchObjects({
+        event: socketManager.EmitTypes.GETROOMMSGS,
+        emitParams: { roomId: room.objectId },
+        callback: ({ error: fetchError }) => {
+          if (fetchError) {
+            console.log(fetchError);
+
+            return;
+          }
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.FOLLOWED_ROOM,
+            params: { room },
+          });
+        },
+      });
     });
   }
 }

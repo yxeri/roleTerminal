@@ -34,14 +34,18 @@ class DocFileList extends List {
         convertFunc: (objectId) => {
           const user = userComposer.getUser({ userId: objectId });
 
-          return user ? user.username : objectId;
+          return user ? user.username : '-';
         },
       }, {
         paramName: 'teamId',
         convertFunc: (objectId) => {
           const team = dataHandler.teams.getObject({ objectId });
 
-          return team ? team.teamName : undefined;
+          if (team) {
+            return team.teamName;
+          }
+
+          return '-';
         },
       },
     ];

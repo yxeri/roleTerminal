@@ -78,7 +78,7 @@ class RoomDialog extends BaseDialog {
               return;
             }
 
-            dataHandler.users.createObject({
+            dataHandler.rooms.createObject({
               params: {
                 room: {
                   roomName: this.getInputValue(ids.ROOMNAME),

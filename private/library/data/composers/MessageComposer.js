@@ -38,6 +38,7 @@ class MessageComposer extends DataComposer {
   }
 
   sendMessage({
+    participantIds,
     message,
     callback,
   }) {
@@ -48,7 +49,10 @@ class MessageComposer extends DataComposer {
 
     this.handler.createObject({
       callback,
-      params: { message },
+      params: {
+        participantIds,
+        message,
+      },
     });
   }
 }

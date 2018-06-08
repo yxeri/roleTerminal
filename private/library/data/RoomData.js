@@ -17,7 +17,7 @@
 const BaseData = require('./BaseData');
 
 const eventCentral = require('../EventCentral');
-const { EmitTypes } = require('../SocketManager');
+const socketManager = require('../SocketManager');
 
 class RoomData extends BaseData {
   constructor() {
@@ -43,7 +43,7 @@ class RoomData extends BaseData {
       removeEvents: {
         one: 'removeRoom',
       },
-      emitTypes: [EmitTypes.ROOM],
+      emitTypes: [socketManager.EmitTypes.ROOM],
     });
   }
 }

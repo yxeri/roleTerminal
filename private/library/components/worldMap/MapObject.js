@@ -172,8 +172,6 @@ class MapObject {
 
           return;
         }
-
-        console.log('position updated', data);
       },
     });
   }

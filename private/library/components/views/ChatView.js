@@ -18,9 +18,13 @@ const ViewWrapper = require('../ViewWrapper');
 const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
+const UserRoomList = require('../lists/UserRoomList');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
+const roomComposer = require('../../data/composers/RoomComposer');
+const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -34,9 +38,11 @@ class ChatView extends ViewWrapper {
     elementId = `chView-${Date.now()}`,
   }) {
     const roomList = new RoomList({});
+    const userRoomList = new UserRoomList({});
     const messageList = new MessageList({
       shouldSwitchRoom: true,
       roomListId: roomList.elementId,
+      userRoomListId: userRoomList.elementId,
     });
     const inputArea = new InputArea({
       shouldResize,
@@ -48,17 +54,41 @@ class ChatView extends ViewWrapper {
           return;
         }
 
+        const roomId = messageList.getRoomId();
+        const room = roomComposer.getRoom({ roomId });
+        const participantIds = room.isWhisper ? room.participantIds : [];
+        const message = {
+          text,
+          roomId,
+          messageType: room.isWhisper || room.isUser ? messageComposer.MessageTypes.WHISPER : messageComposer.MessageTypes.CHAT,
+        };
+
+        if (room.isUser) {
+          participantIds.push(storageManager.getAliasId() || storageManager.getUserId());
+          participantIds.push(roomId);
+        } else {
+          message.messageType = messageComposer.MessageTypes.CHAT;
+        }
+
         messageComposer.sendMessage({
-          message: {
-            text,
-            roomId: messageList.getRoomId(),
-            messageType: messageComposer.MessageTypes.CHAT,
-          },
+          message,
+          participantIds,
           callback: ({ error }) => {
             if (error) {
               console.log('sendMessage', error);
 
               return;
+            }
+
+            if (!room.isWhisper && room.isUser) {
+              eventCentral.emitEvent({
+                event: eventCentral.Events.SWITCH_ROOM,
+                params: {
+                  listType: roomList.ListTypes.ROOMS,
+                  origin: this.elementId,
+                  room: { objectId: roomId },
+                },
+              });
             }
 
             this.inputArea.clearInput();
@@ -75,7 +105,10 @@ class ChatView extends ViewWrapper {
       classes: ['columnChat'],
     };
     const roomListComponent = {
-      components: [{ component: roomList }],
+      components: [
+        { component: roomList },
+        { component: userRoomList },
+      ],
       classes: ['columnRoomList'],
     };
 

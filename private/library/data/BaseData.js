@@ -133,10 +133,12 @@ class BaseData {
    * @param {boolean} [params.reset] - Should stored objects be reset?
    */
   fetchObjects({
+    event,
+    callback,
     emitParams = {},
     reset = false,
   }) {
-    socketManager.emitEvent(this.retrieveEvents.many, emitParams, ({ error, data }) => {
+    socketManager.emitEvent(event || this.retrieveEvents.many, emitParams, ({ error, data }) => {
       if (error) {
         const errorParams = {
           event: this.retrieveEvents.many,
@@ -168,10 +170,16 @@ class BaseData {
 
       this.hasFetched = true;
 
-      eventCentral.emitEvent({
-        params,
-        event: this.eventTypes.many,
-      });
+      if (!callback) {
+        eventCentral.emitEvent({
+          params,
+          event: this.eventTypes.many,
+        });
+
+        return;
+      }
+
+      callback({ error, data });
     });
   }
 
@@ -354,7 +362,6 @@ class BaseData {
    * @return {Object} Stored objects.
    */
   getObjects({
-    orCheck,
     filter,
     sorting,
   }) {
@@ -373,12 +380,26 @@ class BaseData {
     const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
 
     if (filter) {
+      const { orCheck } = filter;
+
       const filteredObjects = objects.filter((object) => {
         if (orCheck) {
-          return filter.rules.some(rule => rule.paramValue === object[rule.paramName]);
+          return filter.rules.some((rule) => {
+            if (rule.shouldInclude) {
+              return rule.paramValue.every(value => object[rule.paramName].includes(value));
+            }
+
+            return rule.paramValue === object[rule.paramName];
+          });
         }
 
-        return filter.rules.every(rule => rule.paramValue === object[rule.paramName]);
+        return filter.rules.every((rule) => {
+          if (rule.shouldInclude) {
+            return rule.paramValue.every(value => object[rule.paramName].includes(value));
+          }
+
+          return rule.paramValue === object[rule.paramName];
+        });
       });
 
       return sorting ? filteredObjects.sort(sortFunc) : filteredObjects;

@@ -77,8 +77,8 @@ class PositionComposer extends BaseComposer {
 
   getPositions({ positionTypes = [] }) {
     return this.handler.getObjects({
-      orCheck: true,
       filter: {
+        orCheck: true,
         rules: positionTypes.map((positionType) => {
           return {
             paramName: 'positionType',

@@ -278,8 +278,6 @@ class WorldMapView extends BaseView {
                           return;
                         }
 
-                        console.log('Created position', data);
-
                         dialog.removeFromView();
                       },
                     });
@@ -385,7 +383,6 @@ class WorldMapView extends BaseView {
       event: eventHandler.Events.POSITION,
       func: ({ position }) => {
         this.addMarker({ marker: this.createMarker({ position }) });
-        console.log('event pos', position);
       },
     });
   }

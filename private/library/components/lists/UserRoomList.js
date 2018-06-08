@@ -19,13 +19,16 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const aliasComposer = require('../../data/composers/AliasComposer');
 
 class RoomList extends List {
   constructor({
+    title,
     classes = [],
-    elementId = `rList-${Date.now()}`,
+    elementId = `userRList-${Date.now()}`,
   }) {
     classes.push('roomList');
+    classes.push('userRoomList');
 
     const headerFields = [
       { paramName: 'username' },
@@ -34,6 +37,13 @@ class RoomList extends List {
     super({
       elementId,
       classes,
+      title,
+      dependencies: [
+        dataHandler.rooms,
+        dataHandler.users,
+        dataHandler.teams,
+        dataHandler.aliases,
+      ],
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
@@ -41,14 +51,46 @@ class RoomList extends List {
             event: eventCentral.Events.SWITCH_ROOM,
             params: {
               origin: this.elementId,
-              room: { objectId },
+              listType: this.ListTypes.ROOMS,
+              room: {
+                objectId,
+                isUser: true,
+              },
             },
           });
         },
       },
-      collector: dataHandler.rooms,
+      collector: dataHandler.users,
       listItemFields: headerFields,
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.SWITCH_ROOM,
+      func: ({
+        room,
+        origin,
+        listType = '',
+      }) => {
+        if (origin && origin === this.elementId) {
+          return;
+        } else if (listType !== this.ListTypes.ROOMS) {
+          return;
+        }
+
+        const { objectId } = room;
+
+        this.setFocusedListItem(objectId);
+      },
+    });
+  }
+
+  getCollectorObjects() {
+    const aliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+
+    return this.collector.getObjects({
+      filter: this.filter,
+      sorting: this.sorting,
+    }).filter(object => !aliases.includes(object.objectId));
   }
 }
 

@@ -22,16 +22,22 @@ class MapMarker extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    choosableStyles = {},
     zIndex = 4,
-    icon = {},
     alwaysShowLabel = false,
     shouldCluster = true,
     styles = {},
   }) {
     const { coordinatesHistory } = position;
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
+    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) : {};
+    const markerStyles = styles;
+
+    markerStyles.icon = markerStyles.icon || {};
+    chosenStyle.icon = chosenStyle.icon || {};
 
     super({
+      choosableStyles,
       alwaysShowLabel,
       shouldCluster,
       position,
@@ -47,16 +53,16 @@ class MapMarker extends MapObject {
       },
       mapObject: new google.maps.Marker({
         zIndex,
-        opacity: styles.opacity || 1,
+        opacity: chosenStyle.opacity || styles.opacity || 1,
         position: {
           lat: latestCoordinates.latitude,
           lng: latestCoordinates.longitude,
         },
         icon: {
-          url: icon.url || '/images/mapicon.png',
-          size: icon.size || new google.maps.Size(14, 14),
-          origin: icon.origin || new google.maps.Point(0, 0),
-          anchor: icon.anchor || new google.maps.Point(7, 7),
+          url: chosenStyle.icon.url || markerStyles.icon.url || '/images/mapicon.png',
+          size: chosenStyle.icon.size || markerStyles.icon.size || new google.maps.Size(14, 14),
+          origin: chosenStyle.icon.origin || markerStyles.icon.origin || new google.maps.Point(0, 0),
+          anchor: chosenStyle.icon.anchor || markerStyles.icon.anchor || new google.maps.Point(7, 7),
         },
       }),
     });
@@ -65,6 +71,17 @@ class MapMarker extends MapObject {
       position,
       radius: latestCoordinates.accuracy,
     });
+  }
+
+  changeStyle({ styleName, style }) {
+    const {
+      icon,
+    } = style;
+    const options = {};
+
+    if (icon) { options.icon = icon; }
+
+    super.changeStyle({ styleName, style: options });
   }
 
   setCurrentCoordinates({ coordinates }) {

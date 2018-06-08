@@ -60,12 +60,14 @@ class ChatView extends ViewWrapper {
         const message = {
           text,
           roomId,
-          messageType: room.isWhisper || room.isUser ? messageComposer.MessageTypes.WHISPER : messageComposer.MessageTypes.CHAT,
         };
 
         if (room.isUser) {
+          message.messageType = messageComposer.MessageTypes.WHISPER;
           participantIds.push(storageManager.getAliasId() || storageManager.getUserId());
           participantIds.push(roomId);
+        } else if (room.isWhisper) {
+          message.messageType = messageComposer.MessageTypes.WHISPER;
         } else {
           message.messageType = messageComposer.MessageTypes.CHAT;
         }

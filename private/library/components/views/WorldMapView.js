@@ -232,7 +232,16 @@ class WorldMapView extends BaseView {
   }
 
   showMapRightClickBox({ event }) {
-    const { clientX: x, clientY: y } = event.Ia;
+    const mouseEvent = event.Ha || event.Ia;
+    let x;
+    let y;
+
+    if (mouseEvent) {
+      const { clientX, clientY } = mouseEvent;
+
+      x = clientX;
+      y = clientY;
+    }
 
     const items = [{
       elements: [elementCreator.createSpan({

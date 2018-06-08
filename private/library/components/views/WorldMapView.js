@@ -106,20 +106,25 @@ class WorldMapView extends BaseView {
             break;
           }
           case socketManager.ChangeTypes.UPDATE: {
-            const marker = new MapMarker({
-              position,
-              worldMapView: this,
-            });
             const oldMarker = this.markers[position.objectId];
 
             this.clusterer.removeMarker(oldMarker.mapObject);
             oldMarker.setMap(null);
+
+            const marker = new MapMarker({
+              position,
+              worldMapView: this,
+            });
+
             this.markers[position.objectId] = marker;
 
             break;
           }
           case socketManager.ChangeTypes.REMOVE: {
-            this.markers[position.objectId].setMap(null);
+            const marker = this.markers[position.objectId];
+
+            this.clusterer.removeMarker(marker.mapObject);
+            marker.setMap(null);
             this.markers[position.objectId] = undefined;
 
             break;

@@ -211,7 +211,7 @@ button {
  */
 .focusListItem {
   background-color: $focus-color;
-  font-weight: bold;
+  text-decoration: underline;
 }
 
 /*
@@ -515,7 +515,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 3;
+    flex-grow: 4;
   }
 
   .inputArea {
@@ -536,8 +536,34 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 }
 
+.userRoomList:before {
+  content: '- USERS -\A';
+}
+
+.userRoomList {
+  li:first-child {
+    border-top: $border-width solid $border-color;
+    padding-top: $padding;
+  }
+}
+
 .columnRoomList {
   overflow-y: auto;
+  padding-top: $padding;
+
+  .list {
+    box-sizing: border-box;
+    border-top: $border-width solid $border-color;
+    margin-bottom: $padding;
+  }
+
+  .list:first-child {
+    border-top: none;
+  }
+
+  .list:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .columnRoomList::-webkit-scrollbar {

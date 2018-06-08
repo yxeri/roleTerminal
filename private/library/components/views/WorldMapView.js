@@ -110,7 +110,10 @@ class WorldMapView extends BaseView {
               position,
               worldMapView: this,
             });
+            const oldMarker = this.markers[position.objectId];
 
+            this.clusterer.removeMarker(oldMarker.mapObject);
+            oldMarker.setMap(null);
             this.markers[position.objectId] = marker;
 
             break;

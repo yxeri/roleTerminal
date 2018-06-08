@@ -22,6 +22,11 @@ class MouseHandler {
     window.addEventListener('touchmove', () => {
       this.longClick = false;
     });
+
+    window.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
   }
 
   /**

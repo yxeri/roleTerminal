@@ -15,7 +15,7 @@ const chatView = new ChatView({
 const docFileView = new DocFileView({});
 const worldMapView = new WorldMapView({
   clusterStyle: {
-    gridSize: 50,
+    gridSize: 10,
     maxZoom: 16,
     styles: [{
       width: 24,
@@ -36,7 +36,26 @@ const worldMapView = new WorldMapView({
     strokeColor: '#000000',
     fillColor: '#b40000',
   },
+  markerStyle: {
+    opacity: 0.9,
+    icon: {
+      url: '/images/mapicon-red.png',
+    },
+  },
   choosableStyles: {
+    markers: [
+      {
+        styleName: 'Red',
+        icon: {
+          url: '/images/mapicon-red.png',
+        },
+      }, {
+        styleName: 'Green',
+        icon: {
+          url: '/images/mapicon-green.png',
+        },
+      },
+    ],
     polygons: [
       {
         strokeColor: '#000000',

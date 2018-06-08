@@ -50,7 +50,6 @@ class RoomList extends List {
 
             if (room) {
               if (isWhisper) {
-                console.log('fetched', dataHandler.users.hasFetched);
                 const users = userComposer.getWhisperUsers({ participantIds });
 
                 return `${users[0].username}${whisperText}${users[1].username}`;
@@ -111,11 +110,13 @@ class RoomList extends List {
     });
   }
 
-  hasAccess({ object, user }) {
-    const { aliases, followingRooms, objectId: userId } = user;
+  hasAccess({ object, user = {} }) {
     const hasAccess = super.hasAccess({ object, user });
 
-    return hasAccess || (followingRooms.includes(object.objectId) || object.participantIds.some(participant => aliases.includes(participant)) || object.participantIds.includes(userId));
+    return hasAccess
+      || (user.followingRooms && user.followingRooms.includes(object.objectId))
+      || (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
+      || (user.objectId && object.participantIds.includes(user.objectId));
   }
 }
 

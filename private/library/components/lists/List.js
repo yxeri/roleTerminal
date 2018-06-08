@@ -198,10 +198,10 @@ class List extends BaseView {
     this.element.removeChild(existingItem);
   }
 
-  hasAccess({ object, user }) { // eslint-disable-line class-methods-use-this
-    const { accessLevel, objectId } = user;
+  hasAccess({ object, user = {} }) { // eslint-disable-line class-methods-use-this
+    const accessLevel = storageManager.getAccessLevel();
 
-    return (object && (object.isPublic || (!object.visibility || accessLevel >= object.visibility || object.ownerId === objectId)));
+    return (object && (object.isPublic || (!object.visibility || accessLevel >= object.visibility || (user.objectId && object.ownerId === user.objectId))));
   }
 
 

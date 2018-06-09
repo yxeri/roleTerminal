@@ -48,6 +48,10 @@ class RoomComposer extends DataComposer {
   }) {
     const user = userComposer.getCurrentUser();
 
+    if (!user) {
+      return;
+    }
+
     if (user.followingRooms.includes(roomId)) {
       const room = this.getRoom({ roomId });
 

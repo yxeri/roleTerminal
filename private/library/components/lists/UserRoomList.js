@@ -47,6 +47,10 @@ class RoomList extends List {
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
+          if (storageManager.getAccessLevel() < 1) {
+            return;
+          }
+
           eventCentral.emitEvent({
             event: eventCentral.Events.SWITCH_ROOM,
             params: {

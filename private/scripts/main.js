@@ -179,6 +179,13 @@ const chatWrapper = new ViewWrapper({
     },
   ],
 });
+const fullMapWrapper = new ViewWrapper({
+  topView,
+  title: 'MAPS FOCUS',
+  columns: [{
+    components: [{ component: worldMapView }],
+  }],
+});
 
 topView.setViews({
   viewSwitcher,
@@ -186,6 +193,7 @@ topView.setViews({
     { view: chatWrapper },
     { view: mapWrapper },
     { view: docWrapper },
+    { view: fullMapWrapper },
   ],
 });
 

@@ -170,7 +170,7 @@ class SocketManager {
   /**
    * Reconnect to socket.io
    */
-  reconnect({ callback = () => {} }) {
+  reconnect() {
     this.reconnecting = true;
     this.socket.close();
     this.socket.disconnect();
@@ -205,6 +205,12 @@ class SocketManager {
       this.socket.emit(event, paramsToSend);
     } else {
       this.socket.emit(event, paramsToSend, callback);
+    }
+  }
+
+  checkAndReconnect() {
+    if (!this.isOnline) {
+      this.reconnect();
     }
   }
 

@@ -296,6 +296,8 @@ class List extends BaseView {
         if (this.listItemClickFuncs.leftFunc) {
           this.listItemClickFuncs.leftFunc(objectId);
         }
+
+        socketManager.checkAndReconnect();
       },
     };
 

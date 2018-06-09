@@ -45,20 +45,25 @@ class RoomList extends List {
         {
           paramName: 'objectId',
           convertFunc: (objectId) => {
+            const currentUser = userComposer.getCurrentUser();
             const room = roomComposer.getRoom({ roomId: objectId });
             const { isWhisper, participantIds } = room;
 
             if (room) {
               if (isWhisper) {
+                if (!currentUser) {
+                  return '';
+                }
+
                 const users = userComposer.getWhisperUsers({ participantIds });
 
-                return `${users[0].username}${whisperText}${users[1].username}`;
+                return users.length > 0 ? `${users[0].username}${whisperText}${users[1].username}` : '';
               }
 
               return room.roomName;
             }
 
-            return '-----';
+            return '';
           },
         },
       ],

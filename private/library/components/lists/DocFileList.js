@@ -18,7 +18,7 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
-const userComposer = require('../../data/composers/UserComposer');
+const storageManager = require('../../StorageManager');
 
 class DocFileList extends List {
   constructor({
@@ -28,25 +28,6 @@ class DocFileList extends List {
     const headerFields = [
       {
         paramName: 'title',
-      }, {
-        paramName: 'ownerAliasId',
-        fallbackTo: 'ownerId',
-        convertFunc: (objectId) => {
-          const user = userComposer.getUser({ userId: objectId });
-
-          return user ? user.username : '-';
-        },
-      }, {
-        paramName: 'teamId',
-        convertFunc: (objectId) => {
-          const team = dataHandler.teams.getObject({ objectId });
-
-          if (team) {
-            return team.teamName;
-          }
-
-          return '-';
-        },
       },
     ];
 
@@ -61,9 +42,10 @@ class DocFileList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
+          const userId = storageManager.getUserId();
           const docFile = dataHandler.docFiles.getObject({ objectId });
 
-          if (docFile.code) {
+          if (!docFile.isLocked || docFile.code || docFile.ownerId === userId) {
             eventCentral.emitEvent({
               event: eventCentral.Events.OPEN_DOCFILE,
               params: { docFile },

@@ -19,6 +19,7 @@ const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
 
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
+const userComposer = require('../../data/composers/UserComposer');
 
 /**
  * Create header part of the document.
@@ -27,17 +28,18 @@ const elementCreator = require('../../ElementCreator');
  * @return {HTMLElement} Header paragraph.
  */
 function createHeader({ docFile }) {
+  const user = userComposer.getUser({ userId: docFile.ownerAliasId || docFile.ownerId });
   const elements = [
     elementCreator.createSpan({ text: docFile.title }),
-    elementCreator.createSpan({ text: docFile.ownerAliasId || docFile.ownerId }),
-    elementCreator.createSpan({ text: docFile.code }),
+    elementCreator.createSpan({ text: `Author: ${user.username || 'Unknown author'}` }),
+    elementCreator.createSpan({ text: `Code: ${docFile.code}` }),
   ];
 
   if (docFile.team) {
-    elements.push(elementCreator.createSpan({ text: docFile.team }));
+    elements.push(elementCreator.createSpan({ text: `Team: ${docFile.team}` }));
   }
 
-  return elementCreator.createParagraph({ elements });
+  return elementCreator.createParagraph({ elements, classes: ['docFileHeader'] });
 }
 
 /**

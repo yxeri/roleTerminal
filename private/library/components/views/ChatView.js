@@ -89,7 +89,6 @@ class ChatView extends ViewWrapper {
                 event: eventCentral.Events.SWITCH_ROOM,
                 params: {
                   listType: roomList.ListTypes.ROOMS,
-                  origin: this.elementId,
                   room: { objectId: newMessage.roomId },
                 },
               });

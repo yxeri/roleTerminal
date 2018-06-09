@@ -78,7 +78,7 @@ class MessageList extends List {
           convertFunc: (objectId) => {
             const room = dataHandler.rooms.getObject({ objectId });
 
-            return room ? room.roomName : objectId;
+            return room ? room.roomName.slice(0, 24) : objectId;
           },
         },
       ],

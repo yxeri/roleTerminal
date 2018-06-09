@@ -387,7 +387,10 @@ class WorldMapView extends BaseView {
       },
       right: (event) => {
         MapObject.hideLeftClickBox();
-        this.showMapRightClickBox({ event });
+
+        if (storageManager.getAccessLevel() >= 2) {
+          this.showMapRightClickBox({ event });
+        }
       },
     });
 

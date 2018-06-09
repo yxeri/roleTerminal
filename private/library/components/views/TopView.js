@@ -168,7 +168,7 @@ class TopView extends BaseView {
 
       accessCentral.addAccessElement({
         element: createRoomButton,
-        minimumAccessLevel: 1,
+        minimumAccessLevel: 2,
       });
     }
 
@@ -190,7 +190,7 @@ class TopView extends BaseView {
 
       accessCentral.addAccessElement({
         element: createAliasButton,
-        minimumAccessLevel: 1,
+        minimumAccessLevel: 2,
       });
     }
 

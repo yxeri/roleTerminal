@@ -45,24 +45,29 @@ class UserComposer extends DataComposer {
 
   getWhisperUsers({ participantIds = [0, 1] }) {
     const { objectId, aliases } = this.getCurrentUser();
-    const users = [
-      this.getUser({ userId: participantIds[0] }),
-      this.getUser({ userId: participantIds[1] }),
-    ];
-    const userOrder = [];
-    const { objectId: oneId } = users[0];
 
-    console.log('whisper', participantIds, users);
+    if (objectId) {
+      const users = [
+        this.getUser({ userId: participantIds[0] }),
+        this.getUser({ userId: participantIds[1] }),
+      ];
+      const userOrder = [];
+      const { objectId: oneId } = users[0];
 
-    if (oneId === objectId || aliases.includes(oneId)) {
-      userOrder.push(users[0]);
-      userOrder.push(users[1]);
-    } else {
-      userOrder.push(users[1]);
-      userOrder.push(users[0]);
+      console.log('whisper', participantIds, users);
+
+      if (oneId === objectId || aliases.includes(oneId)) {
+        userOrder.push(users[0]);
+        userOrder.push(users[1]);
+      } else {
+        userOrder.push(users[1]);
+        userOrder.push(users[0]);
+      }
+
+      return userOrder;
     }
 
-    return userOrder;
+    return [];
   }
 }
 

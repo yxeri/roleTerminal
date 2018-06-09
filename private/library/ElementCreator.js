@@ -239,7 +239,7 @@ class ElementCreator {
     classes = [],
   }) {
     const paragraph = createBaseElement({
-      classes: classes.concat(['button']),
+      classes,
       elementType: 'p',
     });
 

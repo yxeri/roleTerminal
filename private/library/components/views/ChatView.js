@@ -75,20 +75,22 @@ class ChatView extends ViewWrapper {
         messageComposer.sendMessage({
           message,
           participantIds,
-          callback: ({ error }) => {
+          callback: ({ error, data }) => {
             if (error) {
               console.log('sendMessage', error);
 
               return;
             }
 
-            if (!room.isWhisper && room.isUser) {
+            const { message: newMessage } = data;
+
+            if (room.isUser) {
               eventCentral.emitEvent({
                 event: eventCentral.Events.SWITCH_ROOM,
                 params: {
                   listType: roomList.ListTypes.ROOMS,
                   origin: this.elementId,
-                  room: { objectId: roomId },
+                  room: { objectId: newMessage.roomId },
                 },
               });
             }

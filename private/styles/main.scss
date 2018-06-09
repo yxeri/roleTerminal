@@ -166,7 +166,25 @@ button {
 
   .oneOfTwo:last-child {
     flex-grow: 4;
+
+    p {
+      padding: $padding $padding;
+    }
   }
+
+  .docFileHeader {
+    border-bottom: $border-width solid $second-color;
+    padding-bottom: $padding;
+    margin-bottom: $padding;
+    display: flex;
+    flex-direction: column;
+
+    span:first-child {
+      font-size: 1.5em;
+    }
+  }
+
+
 }
 
 .forumView {

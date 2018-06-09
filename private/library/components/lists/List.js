@@ -112,8 +112,12 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (this.filter && !this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
-            return;
+          if (this.filter) {
+            if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
+              return;
+            } else if (!this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
+              return;
+            }
           }
 
           switch (changeType) {

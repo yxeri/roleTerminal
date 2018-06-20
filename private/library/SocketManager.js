@@ -102,7 +102,7 @@ class SocketManager {
     }, {
       event: this.EmitTypes.RECONNECT,
       func: () => {
-        this.isOnline = true;
+        this.reconnectDone();
 
         this.updateId(() => {
           this.reconnectDone();
@@ -150,7 +150,11 @@ class SocketManager {
   }
 
   updateId(callback) {
-    console.log('Updating id');
+    if (!storageManager.getUserId()) {
+      callback({ data: { success: true } });
+
+      return;
+    }
 
     this.emitEvent('updateId', {
       device: { objectId: storageManager.getDeviceId() },
@@ -171,10 +175,11 @@ class SocketManager {
    * Reconnect to socket.io
    */
   reconnect() {
-    this.reconnecting = true;
-    this.socket.close();
-    this.socket.disconnect();
-    this.socket.connect();
+    if (!this.reconnecting) {
+      this.socket.close();
+      this.socket.disconnect();
+      this.socket.connect();
+    }
   }
 
   /**
@@ -188,15 +193,13 @@ class SocketManager {
     paramsToSend.token = storageManager.getToken();
 
     if (!this.isOnline) {
-      this.reconnect({
-        callback: () => {
-          if (!callback) {
-            this.socket.emit(event, paramsToSend);
-          } else {
-            this.socket.emit(event, paramsToSend, callback);
-          }
-        },
-      });
+      this.reconnect();
+
+      if (!callback) {
+        this.socket.emit(event, paramsToSend);
+      } else {
+        this.socket.emit(event, paramsToSend, callback);
+      }
 
       return;
     }
@@ -214,7 +217,10 @@ class SocketManager {
     }
   }
 
-  reconnectDone() { this.reconnecting = false; }
+  reconnectDone() {
+    this.reconnecting = false;
+    this.isOnline = true;
+  }
 
   getIsOnline() {
     return this.isOnline;

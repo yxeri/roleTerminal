@@ -25,6 +25,7 @@ const accessCentral = require('../../AccessCentral');
 const roomComposer = require('../../data/composers/RoomComposer');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const textTools = require('../../TextTools');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -50,7 +51,7 @@ class ChatView extends ViewWrapper {
       sendOnEnter,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
-        if (text.join('').length === 0) {
+        if (textTools.trimSpace(text.join('')).length === 0) {
           return;
         }
 

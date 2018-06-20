@@ -98,15 +98,6 @@ class MessageList extends List {
     this.roomListId = roomListId;
     this.roomId = roomId || this.getRoomId();
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.FOLLOWED_ROOM,
-      func: ({ room }) => {
-        if (room.objectId === this.getRoomId()) {
-          this.showMessagesByRoom({ roomId: room.objectId });
-        }
-      },
-    });
-
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,

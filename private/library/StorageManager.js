@@ -152,6 +152,14 @@ class StorageManager {
     return this.getLocalVal('publicRoom') || '111111111111111111111110';
   }
 
+  static setPermissions(permissions = {}) {
+    this.setLocalVal('permissions', permissions);
+  }
+
+  static getPermissions() {
+    return converters.convertToObject(this.getLocalVal('permissions'));
+  }
+
   /**
    * Get device Id.
    * @static

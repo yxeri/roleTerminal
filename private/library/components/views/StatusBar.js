@@ -32,18 +32,18 @@ const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
 
-class TopView extends BaseView {
+class StatusBar extends BaseView {
   constructor({
     title,
     showControls = {},
     showClock = true,
     menuItems = [],
     classes = [],
-    elementId = `topView-${Date.now()}`,
+    elementId = `statusBar-${Date.now()}`,
   }) {
     super({
       elementId,
-      classes: classes.concat(['topView']),
+      classes: classes.concat(['statusBar']),
     });
 
     const controls = showControls;
@@ -228,7 +228,7 @@ class TopView extends BaseView {
         elements: [menuButton],
       });
       const watcherFunc = () => {
-        TopView.setUsername({ button: menuButton });
+        StatusBar.setUsername({ button: menuButton });
       };
 
       this.lists.push(this.currentUserList);
@@ -376,4 +376,4 @@ class TopView extends BaseView {
   }
 }
 
-module.exports = TopView;
+module.exports = StatusBar;

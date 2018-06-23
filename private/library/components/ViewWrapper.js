@@ -4,7 +4,7 @@ const elementCreator = require('../ElementCreator');
 
 class ViewWrapper extends BaseView {
   constructor({
-    topView,
+    statusBar,
     columns,
     title,
     classes = [],
@@ -15,7 +15,7 @@ class ViewWrapper extends BaseView {
     });
 
     this.columnAmount = columns.length;
-    this.topView = topView;
+    this.statusBar = statusBar;
     this.columns = columns;
     this.columnElements = [];
     this.title = title;
@@ -38,8 +38,8 @@ class ViewWrapper extends BaseView {
   }
 
   addToView({ element }) {
-    if (this.topView) {
-      this.topView.addToView({ element: this.element });
+    if (this.statusBar) {
+      this.statusBar.addToView({ element: this.element });
     }
 
     this.attachColumns();
@@ -60,7 +60,7 @@ class ViewWrapper extends BaseView {
       containerClasses.push('one');
     }
 
-    if (this.topView) {
+    if (this.statusBar) {
       containerClasses.push('withTopRow');
     }
 
@@ -94,7 +94,7 @@ class ViewWrapper extends BaseView {
       component.removeFromView();
     });
 
-    if (this.topView) { index += 1; }
+    if (this.statusBar) { index += 1; }
 
     this.element.replaceChild(this.createColumn({ column }), this.element.childNodes[index]);
   }

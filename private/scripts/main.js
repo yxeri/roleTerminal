@@ -3,7 +3,7 @@ require('../library/polyfills');
 const WorldMapView = require('../library/components/views/WorldMapView');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
-const TopView = require('../library/components/views/TopView');
+const TopView = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
@@ -123,7 +123,7 @@ const worldMapView = new WorldMapView({
   ],
 });
 
-const topView = new TopView({
+const statusBar = new TopView({
   viewSwitcher,
   title: 'SISCOM',
   showClock: true,
@@ -137,7 +137,7 @@ const topView = new TopView({
   },
 });
 const mapWrapper = new ViewWrapper({
-  topView,
+  statusBar,
   title: 'MAPS',
   columns: [
     {
@@ -152,7 +152,7 @@ const mapWrapper = new ViewWrapper({
   ],
 });
 const docWrapper = new ViewWrapper({
-  topView,
+  statusBar,
   title: 'DOCS',
   columns: [{
     components: [
@@ -165,7 +165,7 @@ const docWrapper = new ViewWrapper({
   }],
 });
 const chatWrapper = new ViewWrapper({
-  topView,
+  statusBar,
   title: 'COMS',
   columns: [
     {
@@ -180,14 +180,14 @@ const chatWrapper = new ViewWrapper({
   ],
 });
 const fullMapWrapper = new ViewWrapper({
-  topView,
+  statusBar,
   title: 'MAPS FOCUS',
   columns: [{
     components: [{ component: worldMapView }],
   }],
 });
 
-topView.setViews({
+statusBar.setViews({
   viewSwitcher,
   views: [
     { view: chatWrapper },

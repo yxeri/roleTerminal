@@ -68,16 +68,28 @@ class SocketManager {
     this.addEvents([{
       event: this.EmitTypes.STARTUP,
       func: ({ data }) => {
+        const {
+          publicRoomId,
+          defaultLanguage,
+          centerCoordinates,
+          cornerOneCoordinates,
+          cornerTwoCoordinates,
+          defaultZoomLevel,
+          permissions = {},
+        } = data;
+
         if (!storageManager.getDeviceId()) {
           storageManager.setDeviceId(textTools.createAlphaNumbericalString(16));
         }
 
-        if (data.publicRoomId) { storageManager.setPublicRoomId(data.publicRoomId); }
-        if (data.defaultLanguage) { storageManager.setLanguage(data.defaultLanguage); }
-        if (data.centerCoordinates) { storageManager.setCenterCoordinates(data.centerCoordinates); }
-        if (data.cornerOneCoordinates) { storageManager.setCornerOneCoordinates(data.cornerOneCoordinates); }
-        if (data.cornerTwoCoordinates) { storageManager.setCornerTwoCoordinates(data.cornerTwoCoordinates); }
-        if (data.defaultZoomLevel) { storageManager.setDefaultZoomLevel(data.defaultZoomLevel); }
+        if (publicRoomId) { storageManager.setPublicRoomId(publicRoomId); }
+        if (defaultLanguage) { storageManager.setLanguage(defaultLanguage); }
+        if (centerCoordinates) { storageManager.setCenterCoordinates(centerCoordinates); }
+        if (cornerOneCoordinates) { storageManager.setCornerOneCoordinates(cornerOneCoordinates); }
+        if (cornerTwoCoordinates) { storageManager.setCornerTwoCoordinates(cornerTwoCoordinates); }
+        if (defaultZoomLevel) { storageManager.setDefaultZoomLevel(defaultZoomLevel); }
+
+        storageManager.setPermissions(permissions);
 
         if (!this.hasConnected) {
           this.isOnline = true;

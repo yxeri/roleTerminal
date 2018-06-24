@@ -336,12 +336,13 @@ class List extends BaseView {
             const spanParams = {
               text,
               classes: fieldClasses,
-              clickFuncs: {},
             };
 
             if (func) {
-              spanParams.clickFuncs.leftFunc = () => {
-                func(objectId);
+              spanParams.clickFuncs = {
+                leftFunc: () => {
+                  func(objectId);
+                },
               };
             }
 

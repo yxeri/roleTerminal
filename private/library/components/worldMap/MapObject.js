@@ -304,15 +304,20 @@ class MapObject {
     event,
     thisMapObject,
   }) {
+    const {
+      UpdatePosition = { accessLevel: 1 },
+      UpdatePositionCoordinates = { accessLevel: 1 },
+    } = storageManager.getPermissions();
     const userAccessLevel = storageManager.getAccessLevel();
 
-    if (userAccessLevel < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId) {
+    if (userAccessLevel < UpdatePosition.accessLevel
+      || (storageManager.getAccessLevel() < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId)) {
       return;
     }
 
     const items = [];
 
-    if (this.choosableStyles) {
+    if (this.choosableStyles && storageManager) {
       const radioSet = elementCreator.createRadioSet({
         title: 'Choose color scheme:',
         optionName: ids.CHOOSABLE_STYLE,
@@ -370,7 +375,7 @@ class MapObject {
       });
     }
 
-    if (this.canBeDragged) {
+    if (this.canBeDragged && userAccessLevel >= UpdatePositionCoordinates.accessLevel) {
       items.push({
         elements: [elementCreator.createSpan({
           text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'movePosition' }),
@@ -394,11 +399,13 @@ class MapObject {
       y = clientY;
     }
 
-    MapObject.showRightClickBox({
-      x,
-      y,
-      container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
-    });
+    if (items.length > 0) {
+      MapObject.showRightClickBox({
+        x,
+        y,
+        container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
+      });
+    }
   }
 
   static showLeftClickBox({ container }) {
@@ -411,10 +418,6 @@ class MapObject {
     y,
     container,
   }) {
-    if (storageManager.getAccessLevel() < 1) {
-      return;
-    }
-
     elementCreator.replaceFirstChild(MapObject.rightClickBox, container);
 
     if (x && y) {

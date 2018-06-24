@@ -122,7 +122,7 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (this.hasAccess({ object, user })) {
+              if (List.hasAccess({ object, user })) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -135,7 +135,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (this.hasAccess({ object, user })) {
+              if (List.hasAccess({ object, user })) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -199,12 +199,6 @@ class List extends BaseView {
     const existingItem = this.getElement(objectId);
 
     this.element.removeChild(existingItem);
-  }
-
-  hasAccess({ object, user = {} }) { // eslint-disable-line class-methods-use-this
-    const accessLevel = storageManager.getAccessLevel();
-
-    return (object && (object.isPublic || (!object.visibility || accessLevel >= object.visibility || (user.objectId && object.ownerId === user.objectId))));
   }
 
 
@@ -410,6 +404,14 @@ class List extends BaseView {
     setTimeout(() => {
       this.element.removeChild(this.getElement(objectId));
     }, itemChangeTimeout);
+  }
+
+  static hasAccess({
+    object,
+    storedAccessLevel,
+    user = {},
+  }) {
+    return (object && (object.isPublic || (!object.visibility || storedAccessLevel >= object.visibility || (user.objectId && object.ownerId === user.objectId))));
   }
 }
 

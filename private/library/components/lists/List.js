@@ -63,6 +63,7 @@ class List extends BaseView {
    * @param {string} [params.elementId] - Id of the list element.
    * @param {string} [params.focusedId] - Id of the list item that will be focused from the start.
    * @param {Object} [params.dependencies] - Data handler dependencies. The creation of the list will only run when all the handlers have retrieved their objects.
+   * @param {boolean} [params.shouldPaginate] - Should the list be appended in pieces?
    */
   constructor({
     collector,
@@ -73,6 +74,7 @@ class List extends BaseView {
     listItemFieldsClasses,
     sorting,
     title,
+    shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
     dependencies = [],
@@ -103,6 +105,7 @@ class List extends BaseView {
     this.shouldScrollToBottom = shouldScrollToBottom;
     this.sorting = sorting;
     this.title = title;
+    this.shouldPaginate = shouldPaginate;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -189,7 +192,17 @@ class List extends BaseView {
       return;
     }
 
-    const listElement = this.createList();
+    const listElement = elementCreator.createList({
+      elementId: this.elementId,
+      classes: this.classes,
+    });
+    const allObjects = this.getCollectorObjects();
+
+    if (this.shouldPaginate) {
+      listElement.appendChild(this.createListFragment({ objects: allObjects.slice(50, allObjects.length) }));
+    } else {
+      listElement.appendChild(this.createListFragment({ objects: allObjects }));
+    }
 
     this.replaceOnParent({ element: listElement });
     this.scrollList();
@@ -201,22 +214,24 @@ class List extends BaseView {
     this.element.removeChild(existingItem);
   }
 
-
-  createList() {
-    const listElement = elementCreator.createList({
-      elementId: this.elementId,
-      classes: this.classes,
-    });
-    const allObjects = this.getCollectorObjects();
+  createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
+    const storedAccessLevel = storageManager.getAccessLevel();
+    const fragment = document.createDocumentFragment();
 
-    allObjects.forEach((object) => {
-      if (this.hasAccess({ object, user })) {
-        listElement.appendChild(this.createListItem({ object }));
+    objects.forEach((object) => {
+      if (List.hasAccess({
+        storedAccessLevel,
+        object,
+        user,
+      })) {
+        const listItem = this.createListItem({ object });
+
+        fragment.appendChild(listItem);
       }
     });
 
-    return listElement;
+    return fragment;
   }
 
   getCollectorObjects() {

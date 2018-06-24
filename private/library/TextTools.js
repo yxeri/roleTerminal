@@ -187,7 +187,7 @@ class TextTools {
   }
 
   static randomiseCase(string, charToLower) {
-    return Array.from(string).map((char) => {
+    return string.split().map((char) => {
       if (char === charToLower) {
         return char.toLowerCase();
       } else if (Math.random() > 0.5) {
@@ -212,7 +212,7 @@ class TextTools {
   }
 
   static replaceWhitespace(string) {
-    return Array.from(string).map((char) => {
+    return string.split().map((char) => {
       return this.findOneReplace(char, ' ', this.createMixedString(1));
     }).join('');
   }

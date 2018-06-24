@@ -361,19 +361,12 @@ class List extends BaseView {
       if (this.fieldToAppend) {
         const field = object[this.fieldToAppend];
 
-        if (Array.isArray(field)) {
-          field.forEach((value) => {
-            listItemElements.push(elementCreator.createParagraph({
-              classes: this.appendClasses,
-              elements: [elementCreator.createSpan({ text: value })],
-            }));
-          });
-        } else {
+        field.forEach((value) => {
           listItemElements.push(elementCreator.createParagraph({
             classes: this.appendClasses,
-            elements: [elementCreator.createSpan({ text: field })],
+            elements: [elementCreator.createSpan({ text: value })],
           }));
-        }
+        });
       }
     } else { // Fallback. Create list item if none has been created.
       listItemElements.push(elementCreator.createParagraph({

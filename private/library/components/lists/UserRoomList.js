@@ -47,7 +47,9 @@ class RoomList extends List {
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          if (storageManager.getAccessLevel() < 1) {
+          const whisperPermission = storageManager.getPermissions().SendWhisper;
+
+          if (storageManager.getAccessLevel() < whisperPermission ? whisperPermission.accessLevel : 1) {
             return;
           }
 

@@ -115,8 +115,8 @@ class RoomList extends List {
     });
   }
 
-  hasAccess({ object, user = {} }) {
-    const hasAccess = super.hasAccess({ object, user });
+  static hasAccess({ object, user = {} }) {
+    const hasAccess = List.hasAccess({ object, user });
 
     return hasAccess
       || (user.followingRooms && user.followingRooms.includes(object.objectId))

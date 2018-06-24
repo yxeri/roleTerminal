@@ -262,6 +262,9 @@ class WorldMapView extends BaseView {
    * @param {Object} params.event - Click event.
    */
   showMapRightClickBox({ event }) {
+    const {
+      CreatePosition = { accessLevel: 1 },
+    } = storageManager.getPermissions();
     const mouseEvent = event.Ha || event.Ia;
     let x;
     let y;
@@ -273,85 +276,97 @@ class WorldMapView extends BaseView {
       y = clientY;
     }
 
-    const items = [{
-      elements: [elementCreator.createSpan({
-        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPosition' }),
-      })],
-      clickFuncs: {
-        leftFunc: () => {
-          MapObject.hideRightClickBox();
+    const items = [];
 
-          const dialog = new BaseDialog({
-            lowerButtons: [
-              elementCreator.createButton({
-                text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                clickFuncs: {
-                  leftFunc: () => {
-                    dialog.removeFromView();
+    /**
+     * Add create position item, if the user has access to the command.
+     */
+    if (storageManager.getAccessLevel() >= CreatePosition.accessLevel) {
+      items.push({
+        elements: [elementCreator.createSpan({
+          text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPosition' }),
+        })],
+        clickFuncs: {
+          leftFunc: () => {
+            MapObject.hideRightClickBox();
+
+            const dialog = new BaseDialog({
+              lowerButtons: [
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      dialog.removeFromView();
+                    },
                   },
-                },
-              }),
-              elementCreator.createButton({
-                text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
-                clickFuncs: {
-                  leftFunc: () => {
-                    const position = {
-                      coordinates: {
-                        longitude: event.latLng.lng(),
-                        latitude: event.latLng.lat(),
-                      },
-                      positionName: dialog.getInputValue(ids.CREATEPOSITIONNAME),
-                    };
-                    const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
+                }),
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      const position = {
+                        coordinates: {
+                          longitude: event.latLng.lng(),
+                          latitude: event.latLng.lat(),
+                        },
+                        positionName: dialog.getInputValue(ids.CREATEPOSITIONNAME),
+                      };
+                      const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
 
-                    if (description) {
-                      position.description = description;
-                    }
+                      if (description) {
+                        position.description = description;
+                      }
 
-                    positionComposer.createPosition({
-                      position,
-                      callback: ({ error }) => {
-                        if (error) {
-                          console.log('Create position', error);
+                      positionComposer.createPosition({
+                        position,
+                        callback: ({ error }) => {
+                          if (error) {
+                            console.log('Create position', error);
 
-                          return;
-                        }
+                            return;
+                          }
 
-                        dialog.removeFromView();
-                      },
-                    });
+                          dialog.removeFromView();
+                        },
+                      });
+                    },
                   },
-                },
-              }),
-            ],
-            inputs: [
-              elementCreator.createInput({
-                elementId: ids.CREATEPOSITIONNAME,
-                inputName: 'positionName',
-                type: 'text',
-                isRequired: true,
-                placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
-              }),
-              elementCreator.createInput({
-                elementId: ids.CREATEPOSITIONDESCRIPTION,
-                inputName: 'positionDescription',
-                type: 'text',
-                multiLine: true,
-                placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
-              }),
-            ],
-          });
+                }),
+              ],
+              inputs: [
+                elementCreator.createInput({
+                  elementId: ids.CREATEPOSITIONNAME,
+                  inputName: 'positionName',
+                  type: 'text',
+                  isRequired: true,
+                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
+                }),
+                elementCreator.createInput({
+                  elementId: ids.CREATEPOSITIONDESCRIPTION,
+                  inputName: 'positionDescription',
+                  type: 'text',
+                  multiLine: true,
+                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
+                }),
+              ],
+            });
 
-          dialog.addToView({ element: this.element });
+            dialog.addToView({ element: this.element });
+          },
         },
-      },
-    }];
+      });
+    }
 
-    MapObject.showRightClickBox({
-      x,
-      y,
-      container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
-    });
+    /**
+     * Show menu, if there are any items to show.
+     */
+    if (items.length > 0) {
+      MapObject.showRightClickBox({
+        x,
+        y,
+        container: elementCreator.createContainer({ elements: [elementCreator.createList({ items })] }),
+      });
+    }
   }
 
   /**

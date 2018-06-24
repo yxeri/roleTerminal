@@ -159,6 +159,11 @@ class WorldMapView extends BaseView {
     this.worldMap.setCenter(bounds.getCenter());
   }
 
+  /**
+   * Add a marker to the map. It will also be added to the clusterer, if it should be clustered.
+   * @param {Object} params - Parameters.
+   * @param {Object} params.marker - Marker to add.
+   */
   addMarker({ marker }) {
     marker.setMap(this.worldMap);
 
@@ -169,6 +174,12 @@ class WorldMapView extends BaseView {
     }
   }
 
+  /**
+   * Create a marker based on its type.
+   * @param {Object} params - Parameters.
+   * @param {Object} params.position - Position to create a marker for.
+   * @return {Object} The created marker.
+   */
   createMarker({ position }) {
     let newMarker;
 
@@ -214,7 +225,10 @@ class WorldMapView extends BaseView {
     return newMarker;
   }
 
-
+  /**
+   * Markers will be created for all available positions and added to the marker collection.
+   * @return {Object[]} Created markers.
+   */
   createMarkers() {
     const markers = {};
     const positions = positionComposer.getPositions({ positionTypes: this.positionTypes });
@@ -230,6 +244,9 @@ class WorldMapView extends BaseView {
     return markers;
   }
 
+  /**
+   * Clear and then reinsert all markers to the clusterer.
+   */
   resetClusterer() {
     if (!this.clusterer) {
       return;
@@ -239,6 +256,11 @@ class WorldMapView extends BaseView {
     this.clusterer.addMarkers(Object.keys(this.markers).filter(markerId => this.markers[markerId].shouldCluster).map(markerId => this.markers[markerId].mapObject));
   }
 
+  /**
+   * Show the right click menu DOM element on the clicked position on the map.
+   * @param {Object} params - Parameters.
+   * @param {Object} params.event - Click event.
+   */
   showMapRightClickBox({ event }) {
     const mouseEvent = event.Ha || event.Ia;
     let x;
@@ -332,6 +354,9 @@ class WorldMapView extends BaseView {
     });
   }
 
+  /**
+   * Create the map, clusterer, markers and attach listeners.
+   */
   startMap() {
     if (this.worldMap) {
       return;

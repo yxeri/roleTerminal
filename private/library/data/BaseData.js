@@ -58,7 +58,7 @@ class BaseData {
     eventCentral.addWatcher({
       event: eventCentral.Events.LOGIN,
       func: () => {
-        this.fetchObjects({});
+        this.fetchObjects({ reset: true });
       },
     });
 

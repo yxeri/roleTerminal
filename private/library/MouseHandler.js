@@ -18,14 +18,17 @@ class MouseHandler {
   constructor() {
     this.longClick = false;
     this.touchTimeout = 500;
+    this.allowRightClick = false;
 
     window.addEventListener('touchmove', () => {
       this.longClick = false;
     });
 
     window.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+      if (!this.allowRightClick) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     });
   }
 
@@ -105,6 +108,10 @@ class MouseHandler {
         this.longClick = false;
       });
     }
+  }
+
+  setAllowRightClick(allowRightClick) {
+    this.allowRightClick = allowRightClick;
   }
 }
 

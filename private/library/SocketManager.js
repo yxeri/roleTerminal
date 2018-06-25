@@ -98,7 +98,7 @@ class SocketManager {
           this.updateId(() => {
             eventCentral.emitEvent({
               event: eventCentral.Events.STARTUP,
-              params: {},
+              params: { reset: true },
             });
             eventCentral.emitEvent({
               event: eventCentral.Events.ACCESS_CHANGE,

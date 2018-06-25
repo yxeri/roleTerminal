@@ -68,9 +68,29 @@ class LoginDialog extends BaseDialog {
               password: this.getInputValue(ids.PASSWORD),
               callback: ({ error }) => {
                 if (error) {
-                  this.updateLowerText({
-                    text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'incorrect' })],
-                  });
+                  switch (error.type) {
+                    case 'banned': {
+                      this.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'banned' })],
+                      });
+
+                      break;
+                    }
+                    case 'not allowed': {
+                      this.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'unverified' })],
+                      });
+
+                      break;
+                    }
+                    default: {
+                      this.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'incorrect' })],
+                      });
+
+                      break;
+                    }
+                  }
 
                   this.setInputValue({
                     elementId: ids.PASSWORD,

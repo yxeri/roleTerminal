@@ -58,6 +58,10 @@ class SocketManager {
       UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
       UNLOCKDOCFILE: 'unlockDocFile',
       GETROOMMSGS: 'getMessagesByRoom',
+      BANUSER: 'banUser',
+      UNBANUSER: 'unbanUser',
+      VERIFYUSER: 'verifyUser',
+      CHANGEPASSWORD: 'changePassword',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

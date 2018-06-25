@@ -207,7 +207,7 @@ class StatusBar extends BaseView {
       const menuButton = this.createMenuButton({
         list: this.menuList,
         leftFunc: () => { this.menuList.classList.toggle('hide'); },
-        text: labelHandler.getLabel({ baseObject: 'TopView', label: 'menu' }),
+        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'menu' }),
       });
 
       this.lists.push(this.menuList);
@@ -253,7 +253,7 @@ class StatusBar extends BaseView {
 
     if (this.showClock) {
       this.timeSpan = elementCreator.createSpan({
-        text: labelHandler.getLabel({ baseObject: 'TopView', label: 'emptyTime' }),
+        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'emptyTime' }),
       });
 
       this.element.appendChild(this.timeSpan);
@@ -355,7 +355,7 @@ class StatusBar extends BaseView {
     const menuButton = this.createMenuButton({
       list: this.viewList,
       leftFunc: () => { this.viewList.classList.toggle('hide'); },
-      text: labelHandler.getLabel({ baseObject: 'TopView', label: '-----' }),
+      text: labelHandler.getLabel({ baseObject: 'StatusBar', label: '-----' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 

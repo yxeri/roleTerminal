@@ -57,6 +57,7 @@ class List extends BaseView {
    * @param {Object} [params.listItemClickFuncs] - Functions to call on clicks on the list item.
    * @param {Object} [params.listItemClickFuncs.leftFunc] - Function to call on left clicks.
    * @param {Object} [params.listItemClickFuncs.right] - Function to call on right clicks.
+   * @param {Object} [params.listItemSpecificClasses] - CSS classes that will be set on values in the object.
    * @param {Object} [params.filter] - Filters to use on object retrieval.
    * @param {boolean} [params.shouldFocusOnClick] - Should list items that are clicked be focused?
    * @param {string[]} [params.classes] - CSS classes.
@@ -74,6 +75,7 @@ class List extends BaseView {
     listItemFieldsClasses,
     sorting,
     title,
+    listItemSpecificClasses,
     shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
@@ -106,6 +108,7 @@ class List extends BaseView {
     this.sorting = sorting;
     this.title = title;
     this.shouldPaginate = shouldPaginate;
+    this.listItemSpecificClasses = listItemSpecificClasses;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -309,6 +312,19 @@ class List extends BaseView {
         socketManager.checkAndReconnect();
       },
     };
+
+    if (this.listItemSpecificClasses) {
+      this.listItemSpecificClasses.forEach((item) => {
+        const { classes: itemClasses = [], paramName, paramValue } = item;
+        const objectValue = object[paramName];
+
+        if ((objectValue && objectValue === paramValue) || (!objectValue && !paramValue)) {
+          itemClasses.forEach((cssClass) => {
+            classes.push(cssClass);
+          });
+        }
+      });
+    }
 
     if (this.listItemClickFuncs.right) {
       clickFuncs.right = () => {

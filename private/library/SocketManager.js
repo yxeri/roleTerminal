@@ -260,12 +260,12 @@ class SocketManager {
 
       storageManager.setToken(token);
 
+      callback({ data: { success: true } });
+
       eventCentral.emitEvent({
         event: eventCentral.Events.LOGIN,
         params: { user },
       });
-
-      callback({ data: { success: true } });
     });
   }
 

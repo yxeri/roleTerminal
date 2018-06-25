@@ -3,6 +3,7 @@ const DataComposer = require('./BaseComposer');
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const socketManager = require('../../SocketManager');
 
 class UserComposer extends DataComposer {
   constructor() {
@@ -30,6 +31,45 @@ class UserComposer extends DataComposer {
     this.handler.createObject({
       callback,
       params: { user },
+    });
+  }
+
+  banUser({
+    userId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.BANUSER,
+      params: {
+        banUserId: userId,
+      },
+    });
+  }
+
+  unbanUser({
+    userId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.UNBANUSER,
+      params: {
+        bannedUserId: userId,
+      },
+    });
+  }
+
+  verifyUser({
+    userId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.VERIFYUSER,
+      params: {
+        userIdToVerify: userId,
+      },
     });
   }
 
@@ -68,6 +108,21 @@ class UserComposer extends DataComposer {
     }
 
     return [];
+  }
+
+  changePassword({
+    password,
+    userId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.CHANGEPASSWORD,
+      params: {
+        password,
+        userId,
+      },
+    });
   }
 }
 

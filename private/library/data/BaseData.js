@@ -83,7 +83,6 @@ class BaseData {
         const paramsToEmit = {
           changeType,
         };
-        paramsToEmit[this.objectTypes.one] = object;
 
         switch (changeType) {
           case socketManager.ChangeTypes.UPDATE: {
@@ -113,6 +112,8 @@ class BaseData {
             break;
           }
         }
+
+        paramsToEmit[this.objectTypes.one] = this.objects[object.objectId];
 
         eventCentral.emitEvent({
           event: this.eventTypes.one,

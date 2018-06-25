@@ -298,11 +298,20 @@ class BaseData {
         return;
       }
 
+      const dataToReturn = data;
       const object = data[this.objectTypes.one];
 
-      this.objects[object.objectId] = object;
+      if (this.objects[object.objectId]) {
+        Object.keys(object).forEach((param) => {
+          this.objects[object.objectId][param] = object[param];
+        });
+      } else {
+        this.objects[object.objectId] = object;
+      }
 
-      callback({ data });
+      dataToReturn[this.objectTypes.one] = this.objects[object.objectId];
+
+      callback({ data: dataToReturn });
     });
   }
 

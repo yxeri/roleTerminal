@@ -38,7 +38,7 @@ class BaseDialog extends BaseView {
     lowerText,
     upperButtons,
     lowerButtons,
-    inputs,
+    inputs = [],
     classes = [],
     elementId = `elem-${Date.now()}`,
   }) {
@@ -50,7 +50,8 @@ class BaseDialog extends BaseView {
     this.inputs = inputs;
 
     const inputContainer = elementCreator.createContainer({
-      elementId: `${this.elementId}${ids.INPUTCONTAINER}`,
+      elementId: ids.INPUTCONTAINER,
+      classes: [ids.INPUTCONTAINER],
     });
 
     this.inputs.forEach((input) => {
@@ -60,24 +61,29 @@ class BaseDialog extends BaseView {
     this.element.appendChild(elementCreator.createContainer({
       elementId: ids.UPPERBUTTONS,
       elements: upperButtons,
+      classes: [ids.UPPERBUTTONS],
     }));
 
     this.element.appendChild(this.createTextContainer({
       text: upperText,
       elementId: ids.UPPERTEXT,
+      classes: [ids.UPPERTEXT],
     }));
 
     this.element.appendChild(this.createTextContainer({
       text: lowerText,
       elementId: ids.LOWERTEXT,
+      classes: [ids.LOWERTEXT],
     }));
 
     this.element.appendChild(inputContainer);
 
     this.element.appendChild(elementCreator.createContainer({
-      elementId: ids.LOWERBUTTONS,
+      elementId: `${this.elementId}${ids.LOWERBUTTONS}`,
       elements: lowerButtons,
+      classes: [ids.LOWERBUTTONS],
     }));
+
   }
 
   addToView({
@@ -171,6 +177,16 @@ class BaseDialog extends BaseView {
     if (input) {
       input.setAttribute('value', value);
     }
+  }
+
+  addBottomButtons({ buttons = [] }) {
+    const fragment = document.createDocumentFragment();
+
+    buttons.forEach((button) => {
+      fragment.appendChild(button);
+    });
+
+    this.getElement(ids.LOWERBUTTONS).appendChild(fragment);
   }
 }
 

@@ -37,6 +37,13 @@ const labels = {
       en: 'Passwords do not match. Try again.',
       se: 'Lösenorden stämmer inte överens. Försök igen.',
     },
+    ok: (override.BaseDialog && override.BaseDialog.ok) || {
+      en: 'OK!',
+    },
+    failed: (override.BaseDialog && override.BaseDialog.failed) || {
+      en: 'Failed to complete the action! Try again or contact an administrator.',
+      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -138,25 +145,31 @@ const labels = {
     },
   },
   LoginDialog: {
-    username: (override.RoomDialog && override.RoomDialog.username) || {
+    username: (override.LoginDialog && override.LoginDialog.username) || {
       en: 'Your username',
       se: 'Ditt användarnamn',
     },
-    password: (override.RoomDialog && override.RoomDialog.password) || {
+    password: (override.LoginDialog && override.LoginDialog.password) || {
       en: 'Your password',
       se: 'Ditt lösenord',
     },
-    login: (override.RoomDialog && override.RoomDialog.login) || {
+    login: (override.LoginDialog && override.LoginDialog.login) || {
       en: 'Login',
       se: 'Logga in',
     },
-    register: (override.RoomDialog && override.RoomDialog.register) || {
+    register: (override.LoginDialog && override.LoginDialog.register) || {
       en: 'Register',
       se: 'Registrera',
     },
-    incorrect: (override.RoomDialog && override.RoomDialog.incorrect) || {
+    incorrect: (override.LoginDialog && override.LoginDialog.incorrect) || {
       en: 'Incorrect username or password. Try again.',
-      se: 'Fel användarnamn eller lösenord. Försök igen',
+      se: 'Fel användarnamn eller lösenord. Försök igen.',
+    },
+    banned: (override.LoginDialog && override.LoginDialog.banned) || {
+      en: 'The user has been banned.',
+    },
+    unverified: (override.LoginDialog && override.LoginDialog.unverified) || {
+      en: 'The user has not been verified. Contact an administrator.',
     },
   },
   FeedView: {
@@ -229,13 +242,35 @@ const labels = {
       se: 'Byt stil',
     },
   },
-  TopView: {
-    menu: (override.TopView && override.WorldMapView.menu) || {
+  StatusBar: {
+    menu: (override.StatusBar && override.StatusBar.menu) || {
       en: 'Menu',
       se: 'Meny',
     },
-    emptyTime: (override.TopView && override.WorldMapView.emptyTime) || {
+    emptyTime: (override.StatusBar && override.StatusBar.emptyTime) || {
       en: '--:--',
+    },
+  },
+  AdminUserDialog: {
+    ban: (override.AdminUserDialog && override.AdminUserDialog.ban) || {
+      en: 'Ban',
+    },
+    unban: (override.AdminUserDialog && override.AdminUserDialog.unban) || {
+      en: 'Unban',
+    },
+    verify: (override.AdminUserDialog && override.AdminUserDialog.verify) || {
+      en: 'Verify',
+    },
+    updateUser: (override.AdminUserDialog && override.AdminUserDialog.updateUser) || {
+      en: 'Choose an action:',
+    },
+    password: (override.AdminUserDialog && override.AdminUserDialog.password) || {
+      en: 'Reset password',
+      se: 'Återställ lösenordet',
+    },
+    newPassword: (override.AdminUserDialog && override.AdminUserDialog.newPassword) || {
+      en: 'The new password:',
+      se: 'Det nya lösenordet:',
     },
   },
 };

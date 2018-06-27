@@ -362,7 +362,7 @@ class List extends BaseView {
               };
             }
 
-            return elementCreator.createSpan(spanParams);
+            return text !== '' ? elementCreator.createSpan(spanParams) : document.createTextNode('');
           });
 
         listItemElements.push(elementCreator.createParagraph({

@@ -44,6 +44,10 @@ const labels = {
       en: 'Failed to complete the action! Try again or contact an administrator.',
       se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
     },
+    change: (override.BaseDialog && override.BaseDialog.change) || {
+      en: 'Change',
+      se: 'Ändra',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -271,6 +275,12 @@ const labels = {
     newPassword: (override.AdminUserDialog && override.AdminUserDialog.newPassword) || {
       en: 'The new password:',
       se: 'Det nya lösenordet:',
+    },
+    chooseAccess: (override.AdminUserDialog && override.AdminUserDialog.chooseAccess) || {
+      en: 'Choose an access level:',
+    },
+    access: (override.AdminUserDialog && override.AdminUserDialog.access) || {
+      en: 'Change permissions',
     },
   },
 };

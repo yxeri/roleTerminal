@@ -124,6 +124,21 @@ class UserComposer extends DataComposer {
       },
     });
   }
+
+  changeAccessLevel({
+    userId,
+    accessLevel,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.UPDATEUSER,
+      params: {
+        userId,
+        user: { accessLevel },
+      },
+    });
+  }
 }
 
 const userComposer = new UserComposer();

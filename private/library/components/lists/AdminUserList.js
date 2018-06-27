@@ -21,7 +21,7 @@ const dataHandler = require('../../data/DataHandler');
 const userComposer = require('../../data/composers/UserComposer');
 const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
-const eventCentral = require('../../EventCentral');
+const accessCentral = require('../../AccessCentral');
 
 class AdminUserList extends List {
   constructor({
@@ -31,7 +31,48 @@ class AdminUserList extends List {
     classes.push('adminUserList');
 
     const headerFields = [
-      { paramName: 'username' },
+      {
+        paramName: 'username',
+      }, {
+        paramName: 'accessLevel',
+        classes: ['accessLevel'],
+        convertFunc: (accessLevel) => {
+          switch (accessLevel) {
+            case accessCentral.AccessLevels.PRIVILEGED: {
+              return '-Privileged-';
+            }
+            case accessCentral.AccessLevels.MODERATOR: {
+              return '-Moderator-';
+            }
+            case accessCentral.AccessLevels.ADMIN:
+            case accessCentral.AccessLevels.SUPERUSER:
+            case accessCentral.AccessLevels.GOD: {
+              return '-Admin-';
+            }
+            default: {
+              return '-Standard-';
+            }
+          }
+        },
+      }, {
+        paramName: 'isBanned',
+        convertFunc: (isBanned) => {
+          if (!isBanned) {
+            return '';
+          }
+
+          return '[BANNED]';
+        },
+      }, {
+        paramName: 'isVerified',
+        convertFunc: (isVerified) => {
+          if (isVerified) {
+            return '';
+          }
+
+          return '[NOT VERIFIED]';
+        },
+      },
     ];
 
     super({
@@ -160,6 +201,74 @@ class AdminUserList extends List {
               },
             },
           });
+          const changeAccessButton = elementCreator.createButton({
+            text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'access' }),
+            clickFuncs: {
+              leftFunc: () => {
+                const accessDialog = new BaseDialog({
+                  inputs: [
+                    elementCreator.createRadioSet({
+                      title: 'Choose level:',
+                      optionName: 'chooseAccess',
+                      options: [
+                        {
+                          optionId: 'chooseAccessStandard',
+                          optionLabel: 'STANDARD',
+                          value: accessCentral.AccessLevels.STANDARD,
+                        }, {
+                          optionId: 'chooseAccessPrivileged',
+                          optionLabel: 'PRIVILEGED',
+                          value: accessCentral.AccessLevels.PRIVILEGED,
+                        }, {
+                          optionId: 'chooseAccessModerator',
+                          optionLabel: 'MODERATOR',
+                          value: accessCentral.AccessLevels.MODERATOR,
+                        }, {
+                          optionId: 'chooseAccessAdmin',
+                          optionLabel: 'ADMIN',
+                          value: accessCentral.AccessLevels.ADMIN,
+                        },
+                      ],
+                    }),
+                  ],
+                  upperText: [`${labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'chooseAccess' })}`],
+                  lowerButtons: [
+                    elementCreator.createButton({
+                      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                      clickFuncs: {
+                        leftFunc: () => { accessDialog.removeFromView(); },
+                      },
+                    }),
+                    elementCreator.createButton({
+                      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'change' }),
+                      clickFuncs: {
+                        leftFunc: () => {
+                          const chosen = document.querySelector('input[name="chooseAccess"]:checked');
+
+                          userComposer.changeAccessLevel({
+                            userId,
+                            accessLevel: chosen.value,
+                            callback: ({ error }) => {
+                              if (error) {
+                                accessDialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+
+                                return;
+                              }
+
+                              accessDialog.removeFromView();
+                            },
+                          });
+                        },
+                      },
+                    }),
+                  ],
+                });
+
+                dialog.removeFromView();
+                accessDialog.addToView({ element: this.element });
+              },
+            },
+          });
 
           if (isBanned) {
             lowerButtons.push(unbanButton);
@@ -171,7 +280,7 @@ class AdminUserList extends List {
             lowerButtons.push(verifyButton);
           }
 
-          lowerButtons.push(resetPasswordButton);
+          lowerButtons.push(resetPasswordButton, changeAccessButton);
 
           dialog.addToView({ element: this.element });
           dialog.addBottomButtons({ buttons: lowerButtons });

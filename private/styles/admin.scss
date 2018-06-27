@@ -182,6 +182,10 @@ button {
     border-bottom: $border-width solid $border-color;
     border-top: $border-width solid $border-color;
     background-color: $button-background;
+
+    span {
+      padding-right: .4em;
+    }
   }
 
   .unverified {

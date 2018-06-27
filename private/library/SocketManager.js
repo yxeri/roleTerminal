@@ -62,6 +62,7 @@ class SocketManager {
       UNBANUSER: 'unbanUser',
       VERIFYUSER: 'verifyUser',
       CHANGEPASSWORD: 'changePassword',
+      UPDATEUSER: 'updateUser',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

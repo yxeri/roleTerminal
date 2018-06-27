@@ -20,6 +20,7 @@ const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ eleme
 const elementCreator = require('../library/ElementCreator');
 const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
+const accessCentral = require('../library/AccessCentral');
 
 const statusBar = new StatusBar({
   viewSwitcher,
@@ -65,7 +66,7 @@ statusBar.setViews({
 eventCentral.addWatcher({
   event: eventCentral.Events.ACCESS_CHANGE,
   func: ({ accessLevel }) => {
-    if (accessLevel >= 3) {
+    if (accessLevel >= accessCentral.AccessLevels.MODERATOR) {
       viewSwitcher.switchView({ view: userWrapper });
     } else {
       viewSwitcher.switchView({ view: notAllowedWrapper });

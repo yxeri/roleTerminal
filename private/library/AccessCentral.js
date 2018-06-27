@@ -48,7 +48,9 @@ class AccessCentral {
     minimumAccessLevel = 0,
     maxAccessLevel = 999,
   }) {
-    if (!this.accessElements[minimumAccessLevel]) { this.accessElements[minimumAccessLevel] = []; }
+    if (!this.accessElements[minimumAccessLevel]) {
+      this.accessElements[minimumAccessLevel] = [];
+    }
 
     this.accessElements[minimumAccessLevel].push({
       element,
@@ -61,7 +63,9 @@ class AccessCentral {
     minimumAccessLevel,
     element,
   }) {
-    if (!this.accessElements[minimumAccessLevel]) { this.accessElements[minimumAccessLevel] = []; }
+    if (!this.accessElements[minimumAccessLevel]) {
+      this.accessElements[minimumAccessLevel] = [];
+    }
 
     const levelElements = this.accessElements[minimumAccessLevel];
 

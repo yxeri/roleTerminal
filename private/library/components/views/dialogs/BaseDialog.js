@@ -83,7 +83,6 @@ class BaseDialog extends BaseView {
       elements: lowerButtons,
       classes: [ids.LOWERBUTTONS],
     }));
-
   }
 
   addToView({

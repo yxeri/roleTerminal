@@ -163,9 +163,11 @@ class MapObject {
   }
 
   updatePositionCoordinates() {
-    positionComposer.updatePositionCoordinates({
+    positionComposer.updatePosition({
       positionId: this.position.objectId,
-      coordinates: this.currentCoordinates,
+      position: {
+        coordinates: this.currentCoordinates,
+      },
       callback: ({ error }) => {
         if (error) {
           console.log('position error', this.position, error);

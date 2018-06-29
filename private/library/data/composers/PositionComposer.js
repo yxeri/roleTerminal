@@ -2,7 +2,6 @@ const BaseComposer = require('./BaseComposer');
 
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../DataHandler');
-const socketManager = require('../../SocketManager');
 
 class PositionComposer extends BaseComposer {
   constructor() {
@@ -56,21 +55,6 @@ class PositionComposer extends BaseComposer {
       params: {
         positionId,
         position,
-      },
-    });
-  }
-
-  updatePositionCoordinates({
-    positionId,
-    coordinates,
-    callback,
-  }) {
-    this.handler.updateObject({
-      callback,
-      event: socketManager.EmitTypes.UPDATEPOSITIONCOORDINATES,
-      params: {
-        positionId,
-        coordinates,
       },
     });
   }

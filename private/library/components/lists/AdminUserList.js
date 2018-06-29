@@ -22,6 +22,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');
+const walletComposer = require('../../data/composers/WalletComposer');
 
 class AdminUserList extends List {
   constructor({
@@ -269,6 +270,59 @@ class AdminUserList extends List {
               },
             },
           });
+          const walletButton = elementCreator.createButton({
+            text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'wallet' }),
+            clickFuncs: {
+              leftFunc: () => {
+                const walletDialog = new BaseDialog({
+                  inputs: [elementCreator.createInput({
+                    elementId: 'walletAmount',
+                    inputName: 'walletAmount',
+                    isRequired: true,
+                    maxLength: 6,
+                    type: 'number',
+                    placeholder: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'amountPlaceholder' }),
+                  })],
+                  upperText: [`${labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'walletAmount' })}`],
+                  lowerButtons: [
+                    elementCreator.createButton({
+                      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                      clickFuncs: {
+                        leftFunc: () => { walletDialog.removeFromView(); },
+                      },
+                    }),
+                    elementCreator.createButton({
+                      text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'sendAmount' }),
+                      clickFuncs: {
+                        leftFunc: () => {
+                          if (walletDialog.hasEmptyRequiredInputs()) {
+                            return;
+                          }
+
+                          walletComposer.changeWalletAmount({
+                            walletId: userId,
+                            amount: walletDialog.getInputValue('walletAmount'),
+                            callback: ({ error }) => {
+                              if (error) {
+                                dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+
+                                return;
+                              }
+
+                              walletDialog.removeFromView();
+                            },
+                          });
+                        },
+                      },
+                    }),
+                  ],
+                });
+
+                dialog.removeFromView();
+                walletDialog.addToView({ element: this.element });
+              },
+            },
+          });
 
           if (isBanned) {
             lowerButtons.push(unbanButton);
@@ -280,7 +334,7 @@ class AdminUserList extends List {
             lowerButtons.push(verifyButton);
           }
 
-          lowerButtons.push(resetPasswordButton, changeAccessButton);
+          lowerButtons.push(resetPasswordButton, changeAccessButton, walletButton);
 
           dialog.addToView({ element: this.element });
           dialog.addBottomButtons({ buttons: lowerButtons });

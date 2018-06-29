@@ -282,6 +282,18 @@ const labels = {
     access: (override.AdminUserDialog && override.AdminUserDialog.access) || {
       en: 'Change permissions',
     },
+    wallet: (override.AdminUserDialog && override.AdminUserDialog.wallet) || {
+      en: 'Transfer currency',
+    },
+    walletAmount: (override.AdminUserDialog && override.AdminUserDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer to the wallet',
+    },
+    amountPlaceholder: (override.AdminUserDialog && override.AdminUserDialog.amountPlaceholder) || {
+      en: 'Enter amount',
+    },
+    sendAmount: (override.AdminUserDialog && override.AdminUserDialog.sendAmount) || {
+      en: 'Transfer',
+    },
   },
 };
 

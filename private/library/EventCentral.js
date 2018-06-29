@@ -76,6 +76,7 @@ class EventCentral {
       COMPLETE_USER: 'User dependencies fetched',
       COMPLETE_DOCFILE: 'Doc file dependencies fetched',
       COMPLETE_ROOM: 'Room dependencies fetched',
+      COMPLETE_WALLET: 'Wallet dependencies fetched',
     };
     this.eventWatchers = {};
   }

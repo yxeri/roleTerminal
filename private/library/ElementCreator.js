@@ -303,8 +303,14 @@ class ElementCreator {
     return input;
   }
 
-  static createHeader({ elements }) {
-    const header = createBaseElement({ elementType: 'header' });
+  static createHeader({
+    elements,
+    clickFuncs,
+  }) {
+    const header = createBaseElement({
+      clickFuncs,
+      elementType: 'header',
+    });
 
     if (elements) {
       elements.forEach(element => header.appendChild(element));

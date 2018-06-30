@@ -75,6 +75,7 @@ class List extends BaseView {
     listItemFieldsClasses,
     sorting,
     title,
+    shouldToggle,
     listItemSpecificClasses,
     shouldPaginate = false,
     shouldScrollToBottom = false,
@@ -109,6 +110,7 @@ class List extends BaseView {
     this.title = title;
     this.shouldPaginate = shouldPaginate;
     this.listItemSpecificClasses = listItemSpecificClasses;
+    this.shouldToggle = shouldToggle;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -175,8 +177,8 @@ class List extends BaseView {
   }
 
   scrollList() {
-    if (this.shouldScrollToBottom && this.element.lastElementChild) {
-      this.element.lastElementChild.scrollIntoView();
+    if (this.shouldScrollToBottom && this.listElement.lastElementChild) {
+      this.listElement.lastElementChild.scrollIntoView();
     }
   }
 
@@ -195,26 +197,53 @@ class List extends BaseView {
       return;
     }
 
-    const listElement = elementCreator.createList({
+    const elements = [];
+    const listClasses = [];
+
+    if (this.shouldToggle) {
+      listClasses.push('hide');
+    }
+
+    if (this.title) {
+      const clickFuncs = {
+        leftFunc: () => {
+          this.listElement.classList.toggle('hide');
+        },
+      };
+
+      elements.push(elementCreator.createHeader({
+        clickFuncs: this.shouldToggle ? clickFuncs : undefined,
+        elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
+      }));
+    }
+
+    this.listElement = elementCreator.createList({
+      classes: listClasses,
+    });
+
+    elements.push(this.listElement);
+
+    const container = elementCreator.createContainer({
+      elements,
       elementId: this.elementId,
       classes: this.classes,
     });
     const allObjects = this.getCollectorObjects();
 
     if (this.shouldPaginate) {
-      listElement.appendChild(this.createListFragment({ objects: allObjects.slice(50, allObjects.length) }));
+      this.listElement.appendChild(this.createListFragment({ objects: allObjects.slice(50, allObjects.length) }));
     } else {
-      listElement.appendChild(this.createListFragment({ objects: allObjects }));
+      this.listElement.appendChild(this.createListFragment({ objects: allObjects }));
     }
 
-    this.replaceOnParent({ element: listElement });
+    this.replaceOnParent({ element: container });
     this.scrollList();
   }
 
   removeListItem({ objectId }) {
     const existingItem = this.getElement(objectId);
 
-    this.element.removeChild(existingItem);
+    this.listElement.removeChild(existingItem);
   }
 
   createListFragment({ objects }) {
@@ -412,9 +441,9 @@ class List extends BaseView {
     }
 
     if (shouldReplace) {
-      this.element.replaceChild(newItem, this.getElement(objectId));
+      this.listElement.replaceChild(newItem, this.getElement(objectId));
     } else {
-      this.element.appendChild(newItem);
+      this.listElement.appendChild(newItem);
     }
   }
 
@@ -427,7 +456,7 @@ class List extends BaseView {
     toRemove.classList.add(cssClasses.removeListItem);
 
     setTimeout(() => {
-      this.element.removeChild(this.getElement(objectId));
+      this.listElement.removeChild(this.getElement(objectId));
     }, itemChangeTimeout);
   }
 

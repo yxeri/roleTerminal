@@ -79,6 +79,8 @@ class AdminUserList extends List {
     super({
       elementId,
       classes,
+      shouldToggle: true,
+      title: 'Users',
       listItemSpecificClasses: [
         {
           paramName: 'isVerified',

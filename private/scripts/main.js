@@ -17,7 +17,7 @@ const docFileView = new DocFileView({});
 const worldMapView = new WorldMapView({
   clusterStyle: {
     gridSize: 10,
-    maxZoom: 16,
+    maxZoom: 19,
     styles: [{
       width: 24,
       height: 24,

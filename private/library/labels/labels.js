@@ -286,7 +286,7 @@ const labels = {
       en: 'Transfer currency',
     },
     walletAmount: (override.AdminUserDialog && override.AdminUserDialog.walletAmount) || {
-      en: 'Enter the amount that you want to transfer to the wallet',
+      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet.',
     },
     amountPlaceholder: (override.AdminUserDialog && override.AdminUserDialog.amountPlaceholder) || {
       en: 'Enter amount',

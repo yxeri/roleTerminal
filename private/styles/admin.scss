@@ -192,6 +192,13 @@ button {
     }
   }
 
+  header {
+    background-color: $button-background;
+    color: $text-color;
+    width: 100%;
+    -webkit-user-select: none
+  }
+
   .unverified {
     background-color: $unverified;
   }
@@ -203,4 +210,8 @@ button {
   .banned {
     background-color: $banned;
   }
+}
+
+.column {
+  margin-top: .2em;
 }

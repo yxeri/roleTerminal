@@ -62,7 +62,11 @@ class MessageList extends List {
           convertFunc: (objectId) => {
             const user = dataHandler.users.getObject({ objectId });
 
-            return user ? user.username : objectId;
+            if (user) {
+              return user.username;
+            }
+
+            return objectId;
           },
         }, {
           paramName: 'customTimeCreated',
@@ -78,7 +82,11 @@ class MessageList extends List {
           convertFunc: (objectId) => {
             const room = dataHandler.rooms.getObject({ objectId });
 
-            return room ? room.roomName.slice(0, 24) : objectId;
+            if (room) {
+              return room.roomName.slice(0, 24);
+            }
+
+            return objectId;
           },
         },
       ],

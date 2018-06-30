@@ -21,7 +21,7 @@ class UserComposer extends DataComposer {
   getCurrentUser() {
     const userId = storageManager.getUserId();
 
-    return userId ? this.handler.getObject({ objectId: userId }) : undefined;
+    return userId && this.handler.getObject({ objectId: userId });
   }
 
   createUser({
@@ -76,7 +76,11 @@ class UserComposer extends DataComposer {
   getUsername({ userId }) {
     const user = this.handler.getObject({ objectId: userId });
 
-    return user ? user.username : '';
+    if (user) {
+      return user.username;
+    }
+
+    return '';
   }
 
   getUser({ userId }) {

@@ -26,15 +26,22 @@ class MapMarker extends MapObject {
     zIndex = 4,
     alwaysShowLabel = false,
     shouldCluster = true,
-    styles = {},
+    styles = {
+      icon: {},
+    },
   }) {
     const { coordinatesHistory } = position;
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
-    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) || {} : {};
     const markerStyles = styles;
+    let chosenStyle = {};
 
-    markerStyles.icon = markerStyles.icon || {};
-    chosenStyle.icon = chosenStyle.icon || {};
+    if (position.styleName) {
+      chosenStyle = choosableStyles.find(style => style.styleName === position.styleName);
+
+      chosenStyle.icon = chosenStyle.icon ||
+    } else {
+      chosenStyle = { icon: {} };
+    }
 
     super({
       choosableStyles,

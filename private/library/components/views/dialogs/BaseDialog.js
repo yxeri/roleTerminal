@@ -167,7 +167,16 @@ class BaseDialog extends BaseView {
   getInputValue(elementId) {
     const input = this.getElement(elementId);
 
-    return input ? input.value || input.checked || '' : '';
+    if (input) {
+      const {
+        checked,
+        value,
+      } = input;
+
+      return value || checked || '';
+    }
+
+    return '';
   }
 
   setInputValue({ elementId, value }) {

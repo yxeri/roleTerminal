@@ -392,7 +392,7 @@ class StorageManager {
    * @returns {number} Access level.
    */
   static getAccessLevel() {
-    return converters.convertToInt(this.getLocalVal('accessLevel'));
+    return converters.convertToInt(this.getLocalVal('accessLevel')) || 0;
   }
 
   /**

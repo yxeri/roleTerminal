@@ -38,6 +38,7 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
+const storageManager = require('../../StorageManager');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -77,6 +78,7 @@ class List extends BaseView {
     title,
     shouldToggle,
     listItemSpecificClasses,
+    minAccessLevel = accessCentral.AccessLevels.ANONYMOUS,
     shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
@@ -111,6 +113,7 @@ class List extends BaseView {
     this.shouldPaginate = shouldPaginate;
     this.listItemSpecificClasses = listItemSpecificClasses;
     this.shouldToggle = shouldToggle;
+    this.minAccessLevel = minAccessLevel;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -255,6 +258,7 @@ class List extends BaseView {
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
     const fragment = document.createDocumentFragment();
+    const accessLevel = storageManager.getAccessLevel();
 
     objects.forEach((object) => {
       const {
@@ -264,7 +268,7 @@ class List extends BaseView {
         toAuth: user,
       });
 
-      if (canSee) {
+      if (canSee && accessLevel >= this.minAccessLevel) {
         const listItem = this.createListItem({ object });
 
         fragment.appendChild(listItem);

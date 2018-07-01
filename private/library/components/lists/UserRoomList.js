@@ -20,6 +20,7 @@ const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
+const accessCentral = require('../../AccessCentral');
 
 class RoomList extends List {
   constructor({
@@ -38,6 +39,7 @@ class RoomList extends List {
       elementId,
       classes,
       title,
+      minAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.rooms,
         dataHandler.users,

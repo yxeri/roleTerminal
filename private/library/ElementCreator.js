@@ -14,211 +14,430 @@
  limitations under the License.
  */
 
-const soundLibrary = require('./audio/SoundLibrary');
-const eventCentral = require('./EventCentral');
-const storageManager = require('./StorageManager');
+const mouseHandler = require('./MouseHandler');
+
+const cssClasses = {
+  emptyInput: 'emptyInput',
+  clickable: 'clickable',
+};
+
+/**
+ * Set an Id on the element.
+ * @param {HTMLElement} element - Element to add an Id to.
+ * @param {string} id - Id to add.
+ */
+function setElementId(element, id) {
+  if (id) {
+    element.setAttribute('id', id);
+  }
+}
+
+/**
+ * Set a name on the element.
+ * @param {HTMLElement} element - Element to add a name to.
+ * @param {string} name - Name to add.
+ */
+function setName(element, name) {
+  if (name) {
+    element.setAttribute('name', name);
+  }
+}
+
+/**
+ * Set classes on the element.
+ * @param {HTMLElement} element - Element to add classes to.
+ * @param {string[]} classes - Classes to add.
+ */
+function setClasses(element, classes = []) {
+  classes.forEach(cssClass => element.classList.add(cssClass));
+}
+
+/**
+ * Set click listeners on the element.
+ * @param {HTMLElement} element - Element to add click listeners to.
+ * @param {Object} clickFuncs - Functions to call on clicks.
+ * @param {Function} clickFuncs.leftFunc - Function that is called on left click.
+ * @param {Function} clickFuncs.right - Function that is called on right click.
+ */
+function setClickFuncs(element, clickFuncs) {
+  if (clickFuncs && (clickFuncs.leftFunc || clickFuncs.right)) {
+    const params = clickFuncs;
+    params.element = element;
+
+    mouseHandler.addClickListener(params);
+
+    element.classList.add(cssClasses.clickable);
+  }
+}
+
+/**
+ * Create an element and set the set parameters.
+ * @param {Object} params - Parameters.
+ * @param {string} params.elementType - Type of element to create.
+ * @param {string} [params.elementId] - Id of the element.
+ * @param {string[]} [params.classes] - CSS classes.
+ * @param {Function} [params.clickFuncs] - Functions called on clicks.
+ * @param {string} [params.name] - Name of the element.
+ * @return {HTMLElement} The created element.
+ */
+function createBaseElement({
+  elementId,
+  classes,
+  elementType,
+  clickFuncs,
+  name,
+}) {
+  const element = document.createElement(elementType);
+
+  setClasses(element, classes);
+  setElementId(element, elementId);
+  setClickFuncs(element, clickFuncs);
+  setName(element, name);
+
+  return element;
+}
 
 class ElementCreator {
-  static createContainer({ classes = [], elementId }) {
-    const container = document.createElement('DIV');
-    this.setClasses(container, classes);
-    this.setElementId(container, elementId);
-
-    return container;
-  }
-
-  static createListItem({ element, func, classes }) {
-    const listItem = document.createElement('LI');
-
-    if (element) {
-      listItem.appendChild(element);
-    }
-
-    if (func) {
-      listItem.addEventListener('click', func);
-    }
-
-    this.setClasses(listItem, classes);
-
-    return listItem;
-  }
-
-  static createButton({ func = () => {}, rightFunc = () => {}, text, data, classes = [], elementId }) {
-    const button = document.createElement('BUTTON');
-    let longClick = false;
-    button.appendChild(document.createTextNode(text));
-    this.setClasses(button, classes);
-
-    button.addEventListener('click', (event) => {
-      soundLibrary.playSound('button');
-      func(event);
-    });
-    button.addEventListener('contextmenu', (event) => {
-      soundLibrary.playSound('button');
-      rightFunc(event);
-    });
-    button.addEventListener('mousedown', (event) => {
-      setTimeout(() => {
-        if (longClick) {
-          soundLibrary.playSound('button');
-          rightFunc(event);
-        }
-      }, 500);
-    });
-    button.addEventListener('mouseup', () => {
-      longClick = false;
+  static createList({
+    elementId,
+    clickFuncs,
+    items = [],
+    classes = [],
+  }) {
+    const list = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: 'ul',
     });
 
-    if (data) {
-      button.setAttribute('data', data);
-    }
-
-    if (elementId) {
-      button.setAttribute('id', elementId);
-    }
-
-    return button;
-  }
-
-  static createList({ elements = [], classes = [], elementId }) {
-    const list = document.createElement('UL');
-    this.setClasses(list, classes);
-
-    if (elementId) {
-      list.setAttribute('id', elementId);
-    }
-
-    elements.forEach((item) => {
-      list.appendChild(this.createListItem({ element: item }));
+    items.forEach((item) => {
+      list.appendChild(this.createListItem(item));
     });
 
     return list;
   }
 
-  static createParagraph({ text, classes = [] }) {
-    const paragraph = document.createElement('P');
-    this.setClasses(paragraph, classes);
-    paragraph.appendChild(document.createTextNode(text));
+  static createPicture({
+    picture,
+    clickFuncs,
+    classes,
+    elementId,
+  }) {
+    const pictureElement = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: 'img',
+    });
+
+    pictureElement.setAttribute('src', picture.url);
+
+    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width};`); }
+    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height};`); }
+
+    return pictureElement;
+  }
+
+  static createListItem({
+    elements,
+    clickFuncs,
+    classes,
+    elementId,
+  }) {
+    const listItem = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: 'li',
+    });
+
+    if (elements) {
+      elements.forEach(element => listItem.appendChild(element));
+    }
+
+    return listItem;
+  }
+
+  static createSpan({
+    text,
+    clickFuncs,
+    elementId,
+    classes,
+    spanType,
+  }) {
+    const span = createBaseElement({
+      elementId,
+      classes,
+      clickFuncs,
+      elementType: spanType || 'span',
+    });
+
+    if (text) {
+      span.appendChild(document.createTextNode(text));
+    }
+
+    return span;
+  }
+
+  static createButton({
+    text,
+    clickFuncs,
+    elementId,
+    classes = [],
+  }) {
+    const span = this.createSpan({
+      classes: classes.concat(['button', 'clickable']),
+    });
+    const button = createBaseElement({
+      elementId,
+      clickFuncs,
+      classes,
+      elementType: 'button',
+    });
+
+    button.appendChild(document.createTextNode(text));
+    span.appendChild(button);
+
+    return span;
+  }
+
+  static createContainer({
+    elementId,
+    classes,
+    elements,
+    name,
+    clickFuncs,
+  }) {
+    const container = createBaseElement({
+      elementId,
+      classes,
+      name,
+      clickFuncs,
+      elementType: 'div',
+    });
+
+    if (elements) {
+      elements.forEach(element => container.appendChild(element));
+    }
+
+    return container;
+  }
+
+  /**
+   * Create a paragraph element.
+   * Setting elements will attach them to the paragraph. Otherwise, text will be used to attach a text node.
+   * @param {Object} params - Parameters.
+   * @param {Object[]} [params.elements] - Elements to attach.
+   * @param {string} [params.text] - Text to add to the paragraph. It is overriden by elements.
+   * @param {string[]} [params.classes] - Css classes.
+   * @return {HTMLElement} Paragraph element.
+   */
+  static createParagraph({
+    elements,
+    text,
+    classes = [],
+  }) {
+    const paragraph = createBaseElement({
+      classes,
+      elementType: 'p',
+    });
+
+    if (elements) {
+      elements.forEach(element => paragraph.appendChild(element));
+    } else {
+      paragraph.appendChild(document.createTextNode(text));
+    }
 
     return paragraph;
   }
 
-  static createRadioSet({ title, optionName, options = [] }) {
-    const fieldset = document.createElement('FIELDSET');
-    const legend = document.createElement('LEGEND');
+  static createInput({
+    type,
+    inputName,
+    isRequired,
+    multiLine,
+    maxLength,
+    elementId,
+    classes,
+    shouldResize,
+    placeholder = '',
+  }) {
+    const input = createBaseElement({
+      elementId,
+      classes,
+      name: inputName,
+      elementType: multiLine ? 'textarea' : 'input',
+    });
+
+    input.setAttribute('placeholder', placeholder);
+
+    if (maxLength) { input.setAttribute('maxlength', maxLength); }
+
+    if (type) {
+      input.setAttribute('type', type);
+    } else {
+      input.setAttribute('type', 'text');
+    }
+
+    if (isRequired) {
+      input.addEventListener('blur', () => {
+        if (input.value === '') { input.classList.add(cssClasses.emptyInput); }
+      });
+      input.setAttribute('required', 'true');
+    }
+
+    if (isRequired || (multiLine && shouldResize)) {
+      input.addEventListener('input', () => {
+        if (isRequired) {
+          input.classList.remove(cssClasses.emptyInput);
+        }
+
+        if (multiLine && shouldResize) {
+          input.style.height = 'auto';
+          input.style.height = `${input.scrollHeight}px`;
+        }
+      });
+    }
+
+    return input;
+  }
+
+  static createHeader({
+    elements,
+    clickFuncs,
+  }) {
+    const header = createBaseElement({
+      clickFuncs,
+      elementType: 'header',
+    });
+
+    if (elements) {
+      elements.forEach(element => header.appendChild(element));
+    }
+
+    return header;
+  }
+
+  static createArticle({
+    classes,
+    elements,
+    footerElement,
+    headerElement,
+    elementId,
+  }) {
+    const article = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'article',
+    });
+
+    if (headerElement) {
+      const header = createBaseElement({ elementType: 'header' });
+
+      header.appendChild(headerElement);
+      article.appendChild(header);
+    }
+
+    if (elements) {
+      elements.forEach(element => article.appendChild(element));
+    }
+
+    if (footerElement) {
+      const footer = createBaseElement({ elementType: 'footer' });
+
+      footer.appendChild(footerElement);
+      article.appendChild(footer);
+    }
+
+    return article;
+  }
+
+  static createSection({
+    classes,
+    elements,
+    footerElement,
+    headerElement,
+    elementId,
+  }) {
+    const section = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'section',
+    });
+
+    if (headerElement) {
+      const header = createBaseElement({ elementType: 'header' });
+
+      header.appendChild(headerElement);
+      section.appendChild(header);
+    }
+
+    if (elements) {
+      elements.forEach(element => section.appendChild(element));
+    }
+
+    if (footerElement) {
+      const footer = createBaseElement({ elementType: 'footer' });
+
+      footer.appendChild(footerElement);
+      section.appendChild(footer);
+    }
+
+    return section;
+  }
+
+  static createRadioSet({
+    classes,
+    elementId,
+    title,
+    optionName,
+    options = [],
+  }) {
+    const fieldset = createBaseElement({
+      elementId,
+      classes,
+      elementType: 'fieldset',
+    });
+    const legend = document.createElement('legend');
+
     legend.appendChild(document.createTextNode(title));
     fieldset.appendChild(legend);
 
     options.forEach((option) => {
-      const inputLabel = document.createElement('LABEL');
-      inputLabel.setAttribute('for', option.optionId);
-      const input = document.createElement('INPUT');
-      input.setAttribute('type', 'radio');
-      input.setAttribute('id', option.optionId);
-      input.setAttribute('name', optionName);
+      const {
+        optionId,
+        value,
+        isDefault,
+        optionLabel,
+      } = option;
+      const inputLabel = document.createElement('label');
+      const input = document.createElement('input');
 
-      if (option.default) {
+      inputLabel.setAttribute('for', optionId);
+      input.setAttribute('type', 'radio');
+      input.setAttribute('id', optionId);
+      input.setAttribute('name', optionName);
+      input.setAttribute('value', value);
+
+      if (isDefault) {
         input.setAttribute('checked', 'true');
       }
 
-      if (option.requiresTeam) {
-        if (!storageManager.getTeam()) {
-          inputLabel.classList.add('hide');
-        }
-
-        eventCentral.addWatcher({
-          watcherParent: option,
-          event: eventCentral.Events.TEAM,
-          func: ({ team }) => {
-            if (team) {
-              inputLabel.classList.remove('hide');
-            } else {
-              inputLabel.classList.add('hide');
-            }
-          },
-        });
-      }
-
       inputLabel.appendChild(input);
-      inputLabel.appendChild(document.createElement('SPAN'));
-      inputLabel.appendChild(document.createTextNode(option.optionLabel));
+      inputLabel.appendChild(document.createElement('span'));
+      inputLabel.appendChild(document.createTextNode(optionLabel));
       fieldset.appendChild(inputLabel);
     });
 
     return fieldset;
   }
 
-  static createInput({ type, placeholder, inputName, isRequired, classes = [], multiLine, maxLength, inputId }) {
-    const input = multiLine ? document.createElement('TEXTAREA') : document.createElement('INPUT');
-
-    input.setAttribute('placeholder', placeholder);
-    input.setAttribute('name', inputName);
-    input.setAttribute('type', 'text');
-
-    if (maxLength) { input.setAttribute('maxlength', maxLength); }
-    if (type) { input.setAttribute('type', type); }
-    if (inputId) { input.setAttribute('id', inputId); }
-
-    if (isRequired) {
-      input.addEventListener('blur', () => {
-        if (input.value === '') { input.classList.add('markedInput'); }
-      });
-      input.addEventListener('input', () => { input.classList.remove('markedInput'); });
-
-      input.setAttribute('required', 'true');
-    }
-
-    this.setClasses(input, classes);
-
-    return input;
-  }
-
-  static createSpan({ text, classes = [], func }) {
-    const span = document.createElement('SPAN');
-
-    if (text) {
-      span.appendChild(document.createTextNode(text));
-    }
-
-    if (func) {
-      span.addEventListener('click', () => {
-        soundLibrary.playSound('button');
-        func();
-      });
-    }
-
-    this.setClasses(span, classes);
-
-    return span;
-  }
-
-  static createLink({ text, href, target }) {
-    const link = document.createElement('A');
-    link.appendChild(document.createTextNode(text));
-    link.setAttribute('href', href);
-
-    if (target) {
-      link.setAttribute('target', target);
-    }
-
-    return link;
-  }
-
-  static setElementId(element, id) {
-    if (id) { element.setAttribute('id', id); }
-  }
-
-  static setButtonText(button, text) { this.replaceOnlyChild(button, document.createTextNode(text)); }
-
-  static setClasses(element, classes = []) {
-    classes.forEach(cssClass => element.classList.add(cssClass));
-  }
-
-  static replaceOnlyChild(element, newChild) {
-    if (element.firstChild) {
-      element.replaceChild(newChild, element.firstChild);
+  static replaceFirstChild(parentElement, newChild) {
+    if (parentElement.firstElementChild) {
+      parentElement.replaceChild(newChild, parentElement.firstElementChild);
     } else {
-      element.appendChild(newChild);
+      parentElement.appendChild(newChild);
     }
   }
 }

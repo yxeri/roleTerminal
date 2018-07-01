@@ -16,6 +16,7 @@
 
 const storageManager = require('./StorageManager');
 const eventCentral = require('./EventCentral');
+const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
@@ -23,14 +24,124 @@ class SocketManager {
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
+    this.isOnline = false;
+
+    this.EmitTypes = {
+      FORUM: 'forum',
+      FORUMTHREAD: 'forumThread',
+      FORUMPOST: 'forumPost',
+      FOLLOW: 'followRoom',
+      USER: 'user',
+      CHATMSG: 'chatMsg',
+      DEVICE: 'device',
+      DOCFILE: 'docFile',
+      WHISPER: 'whisper',
+      BROADCAST: 'broadcast',
+      GAMECODE: 'gameCode',
+      ALIAS: 'alias',
+      CREATEPOSITION: 'createPosition',
+      POSITION: 'position',
+      ROOM: 'room',
+      FOLLOWER: 'follower',
+      TEAM: 'team',
+      INVITATION: 'invitation',
+      TEAMMEMBER: 'team member',
+      LOGOUT: 'logout',
+      BAN: 'ban',
+      WALLET: 'wallet',
+      TRANSACTION: 'transaction',
+      DISCONNECT: 'disconnect',
+      RECONNECT: 'reconnect',
+      STARTUP: 'startup',
+      SENDMSG: 'sendMessage',
+      UPDATEPOSITION: 'updatePosition',
+      UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
+      UNLOCKDOCFILE: 'unlockDocFile',
+      GETROOMMSGS: 'getMessagesByRoom',
+      BANUSER: 'banUser',
+      UNBANUSER: 'unbanUser',
+      VERIFYUSER: 'verifyUser',
+      CHANGEPASSWORD: 'changePassword',
+      UPDATEUSER: 'updateUser',
+      UPDATEWALLET: 'updateWallet',
+    };
+    this.ChangeTypes = {
+      UPDATE: 'update',
+      CREATE: 'create',
+      REMOVE: 'remove',
+    };
+
+    this.addEvents([{
+      event: this.EmitTypes.STARTUP,
+      func: ({ data }) => {
+        const {
+          publicRoomId,
+          defaultLanguage,
+          centerCoordinates,
+          cornerOneCoordinates,
+          cornerTwoCoordinates,
+          defaultZoomLevel,
+          permissions = {},
+        } = data;
+
+        if (!storageManager.getDeviceId()) {
+          storageManager.setDeviceId(textTools.createAlphaNumbericalString(16));
+        }
+
+        if (publicRoomId) { storageManager.setPublicRoomId(publicRoomId); }
+        if (defaultLanguage) { storageManager.setLanguage(defaultLanguage); }
+        if (centerCoordinates) { storageManager.setCenterCoordinates(centerCoordinates); }
+        if (cornerOneCoordinates) { storageManager.setCornerOneCoordinates(cornerOneCoordinates); }
+        if (cornerTwoCoordinates) { storageManager.setCornerTwoCoordinates(cornerTwoCoordinates); }
+        if (defaultZoomLevel) { storageManager.setDefaultZoomLevel(defaultZoomLevel); }
+
+        storageManager.setPermissions(permissions);
+
+        if (!this.hasConnected) {
+          this.isOnline = true;
+          this.hasConnected = true;
+
+          this.updateId(() => {
+            eventCentral.emitEvent({
+              event: eventCentral.Events.STARTUP,
+              params: { reset: true },
+            });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.ACCESS_CHANGE,
+              params: { accessLevel: storageManager.getAccessLevel() },
+            });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.USER_CHANGE,
+              params: {},
+            });
+          });
+        }
+      },
+    }, {
+      event: this.EmitTypes.RECONNECT,
+      func: () => {
+        this.reconnectDone();
+
+        this.updateId(() => {
+          this.reconnectDone();
+          eventCentral.emitEvent({
+            event: eventCentral.Events.RECONNECT,
+            params: {},
+          });
+        });
+      },
+    }, {
+      event: this.EmitTypes.DISCONNECT,
+      func: () => {
+        this.isOnline = false;
+      },
+    }]);
 
     /**
      * Checks if the screen has been unresponsive for some time.
-     * Some devices disable Javascript when screen is off (iOS)
-     * They also fail to notice that they have been disconnected
-     * We check the time between heartbeats and if the time i
-     * over 10 seconds (example: when screen is turned off and then on)
-     * we force them to reconnect
+     * Some devices disable Javascript when screen is off (iOS).
+     * They also fail to notice that they have been disconnected.
+     * The time between heartbeats is checked and a forced reconnect will be done if it's over 10 seconds.
      */
     const timeoutFunc = () => {
       const now = (new Date()).getTime();
@@ -39,7 +150,7 @@ class SocketManager {
       this.lastAlive = now;
 
       if (offBy > 10000) {
-        this.reconnect();
+        this.reconnect({});
       }
 
       setTimeout(timeoutFunc, 1000);
@@ -49,84 +160,32 @@ class SocketManager {
   }
 
   addEvent(event, callback) {
-    this.socket.on(event, callback);
+    this.socket.on(event, (params) => { console.log(event, params); callback(params); });
   }
 
   addEvents(events) {
     events.forEach(event => this.addEvent(event.event, event.func));
   }
 
-  updateId() {
-    this.emitEvent('updateDevice', {
-      device: { deviceId: storageManager.getDeviceId() },
-      callback: () => {},
-    });
+  updateId(callback) {
+    if (!storageManager.getUserId()) {
+      callback({ data: { success: true } });
+
+      return;
+    }
+
     this.emitEvent('updateId', {
-      device: {
-        deviceId: storageManager.getDeviceId(),
-      },
-    }, ({ error, data }) => {
+      device: { objectId: storageManager.getDeviceId() },
+    }, ({ error }) => {
       if (error) {
-        eventCentral.triggerEvent({
-          event: eventCentral.Events.LOGOUT,
-          params: {},
-        });
+        storageManager.resetUser();
+
+        callback({ error });
 
         return;
       }
 
-      const { blockedBy, user: { userName, accessLevel, aliases, team, shortTeam, creatorAliases }, lanternStats } = data;
-      const { teams, stations, round, timeLeft } = lanternStats;
-
-      storageManager.setUserName(userName);
-      storageManager.setAccessLevel(accessLevel);
-      storageManager.setAliases(aliases);
-      storageManager.setCreatorAliases(creatorAliases);
-      storageManager.setTeam(team, shortTeam);
-      this.setConnected();
-
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.SWITCHROOM,
-        params: { roomName: storageManager.getRoom() } });
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.SIGNALBLOCK,
-        params: { blockedBy },
-      });
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.USER,
-        params: {
-          changedUser: userName,
-          firstConnection: !this.hasConnected,
-        },
-      });
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.LANTERNTEAMS,
-        params: { teams },
-      });
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.LANTERNROUND,
-        params: { round, timeLeft },
-      });
-      eventCentral.triggerEvent({
-        event: eventCentral.Events.LANTERNSTATIONS,
-        params: { stations },
-      });
-
-      this.emitEvent('getProfileGameCode', { owner: storageManager.getUserName() }, ({ error: codeError, data: codeData }) => {
-        if (codeError) {
-          console.log(codeError);
-
-          return;
-        }
-
-        const { gameCode } = codeData;
-
-        storageManager.setGameCode(gameCode);
-        eventCentral.triggerEvent({
-          event: eventCentral.Events.GAMECODE,
-          params: { gameCode },
-        });
-      });
+      callback({ data: { success: true } });
     });
   }
 
@@ -135,32 +194,105 @@ class SocketManager {
    */
   reconnect() {
     if (!this.reconnecting) {
-      this.reconnecting = true;
+      this.socket.close();
       this.socket.disconnect();
-      this.socket.connect({ forceNew: true });
-      this.updateId();
+      this.socket.connect();
     }
   }
 
   /**
-   * Emit event through socket.io
-   * @param {string} event Event to emit
-   * @param {Object} [params] Parameters to send in the emit
-   * @param {Function} [callback] Callback
+   * Emit event through socket.io.
+   * @param {string} event - Event to emit.
+   * @param {Object} [params] - Parameters to send in the emit.
+   * @param {Function} [callback] - Callback.
    */
-  emitEvent(event, params, callback) {
-    params.token = storageManager.getToken() || '';
+  emitEvent(event, params = {}, callback) {
+    const paramsToSend = params;
+    paramsToSend.token = storageManager.getToken();
+
+    if (!this.isOnline) {
+      this.reconnect();
+
+      if (!callback) {
+        this.socket.emit(event, paramsToSend);
+      } else {
+        this.socket.emit(event, paramsToSend, callback);
+      }
+
+      return;
+    }
 
     if (!callback) {
-      this.socket.emit(event, params);
+      this.socket.emit(event, paramsToSend);
     } else {
-      this.socket.emit(event, params, callback);
+      this.socket.emit(event, paramsToSend, callback);
     }
   }
 
-  reconnectDone() { this.reconnecting = false; }
+  checkAndReconnect() {
+    if (!this.isOnline) {
+      this.reconnect();
+    }
+  }
 
-  setConnected() { this.hasConnected = true; }
+  reconnectDone() {
+    this.reconnecting = false;
+    this.isOnline = true;
+  }
+
+  getIsOnline() {
+    return this.isOnline;
+  }
+
+  login({
+    username,
+    password,
+    callback,
+  }) {
+    this.emitEvent('login', {
+      user: {
+        username,
+        password,
+      },
+      device: { objectId: storageManager.getDeviceId() },
+    }, ({ error, data }) => {
+      if (error) {
+        callback({ error });
+
+        return;
+      }
+
+      const { token, user } = data;
+
+      storageManager.setToken(token);
+
+      callback({ data: { success: true } });
+
+      eventCentral.emitEvent({
+        event: eventCentral.Events.LOGIN,
+        params: { user },
+      });
+    });
+  }
+
+  logout({ callback }) {
+    this.emitEvent('logout', {}, ({ error }) => {
+      if (error) {
+        callback({ error });
+
+        return;
+      }
+
+      storageManager.resetUser();
+
+      eventCentral.emitEvent({
+        event: eventCentral.Events.LOGOUT,
+        params: {},
+      });
+
+      callback({ data: { success: true } });
+    });
+  }
 }
 
 const socketManager = new SocketManager();

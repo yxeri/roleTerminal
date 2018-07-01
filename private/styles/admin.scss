@@ -1,0 +1,217 @@
+/*
+ Copyright 2018 Aleksandar Jankovic
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+$background-color: #4b4b4b;
+$text-color: white;
+$border-color: #cdcdcd;
+$border-width: .1em;
+$button-background: black;
+$unverified: #b0b000;
+$verified: green;
+$banned: #c50000;
+
+html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: .9em;
+  -webkit-overflow-scrolling: touch;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+ul, li {
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+textarea {
+  width: 100%;
+  border-radius: 0;
+}
+
+button {
+  color: $text-color;
+  box-sizing: border-box;
+  border: $border-width solid $text-color;
+  padding: .3em;
+  background-color: $button-background;
+  font-weight: bold;
+}
+
+.hide {
+  display: none;
+}
+
+.statusBar {
+  order: 1;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: $border-width solid $text-color;
+  display: flex;
+  z-index: 8;
+
+  > span {
+    margin-right: .5em;
+  }
+
+  > span:last-child {
+    margin-right: 0;
+  }
+
+  > div {
+    margin-right: .5em;
+  }
+
+  .clickable {
+    text-decoration: none;
+  }
+
+  .topMenuButton:before {
+    content: '| ';
+  }
+
+  .topMenuButton:after {
+    content: ' |';
+  }
+
+  .topMenuButton {
+    background-color: $button-background;
+    font-weight: bold;
+  }
+
+  .topMenu {
+    position: absolute;
+    max-width: 12em;
+    z-index: 9;
+
+    button {
+      width: 100%;
+    }
+
+    p {
+      color: $text-color;
+      box-sizing: border-box;
+      border: $border-width solid $text-color;
+      width: 100%;
+      padding: .3em 0;
+      text-align: center;
+
+      span {
+        padding: 0 .3em;
+      }
+    }
+  }
+}
+
+.cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.dialog {
+  max-height: calc(99% - 4em);
+  max-width: 30em;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: $background-color;
+  border: $border-width solid $text-color;
+  position: absolute;
+  top: 2em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: .5em;
+  z-index: 10;
+
+  input {
+    width: 99%;
+    padding: .1em;
+  }
+
+  input:last-child {
+    margin-bottom: 0;
+  }
+
+  .lowerButtons {
+    float: right;
+
+    span {
+      margin-right: .4em;
+    }
+
+    span:last-child {
+      margin-right: 0;
+    }
+
+    button {
+      margin-top: .4em;
+    }
+  }
+}
+
+.list {
+  li {
+    padding: .2em 0 .2em .2em;
+    margin: .2em 0 .2em 0;
+    border-bottom: $border-width solid $border-color;
+    border-top: $border-width solid $border-color;
+    background-color: $button-background;
+
+    span {
+      padding-right: .4em;
+    }
+  }
+
+  header {
+    background-color: $button-background;
+    color: $text-color;
+    width: 100%;
+    -webkit-user-select: none
+  }
+
+  .unverified {
+    background-color: $unverified;
+  }
+
+  .verified {
+    background-color: $verified;
+  }
+
+  .banned {
+    background-color: $banned;
+  }
+}
+
+.column {
+  margin-top: .2em;
+}

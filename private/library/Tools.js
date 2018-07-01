@@ -39,15 +39,15 @@ class Tools {
       const params = {};
 
       query.split('?')[1].split('&').forEach((combo) => {
-        const split = combo.split('=');
+        const [key, value] = combo.split('=');
 
-        params[split[0]] = split[1];
+        params[key] = value;
       });
 
       return params;
     }
 
-    return false;
+    return {};
   }
 }
 

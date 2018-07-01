@@ -1,0 +1,313 @@
+const override = {};
+
+// try {
+//   override = require('../../override/labels'); // eslint-disable-line import/no-unresolved, global-require
+// } catch (err) {
+//   console.log('Did not find override labels. Using defaults');
+// }
+
+const labels = {
+  General: {
+
+  },
+  Button: {
+    logout: (override.Button && override.Button.logout) || {
+      en: 'Log out',
+      se: 'Logga ut',
+    },
+    login: (override.Button && override.Button.login) || {
+      en: 'Log in',
+      se: 'Logga in',
+    },
+    register: (override.Button && override.Button.register) || {
+      en: 'Register user',
+      se: 'Registrera användare',
+    },
+  },
+  BaseDialog: {
+    cancel: (override.BaseDialog && override.BaseDialog.cancel) || {
+      en: 'Cancel',
+      se: 'Avbryt',
+    },
+    create: (override.BaseDialog && override.BaseDialog.create) || {
+      en: 'Create',
+      se: 'Skapa',
+    },
+    notMatchingPassword: (override.BaseDialog && override.BaseDialog.notMatchingPassword) || {
+      en: 'Passwords do not match. Try again.',
+      se: 'Lösenorden stämmer inte överens. Försök igen.',
+    },
+    ok: (override.BaseDialog && override.BaseDialog.ok) || {
+      en: 'OK!',
+    },
+    failed: (override.BaseDialog && override.BaseDialog.failed) || {
+      en: 'Failed to complete the action! Try again or contact an administrator.',
+      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
+    },
+    change: (override.BaseDialog && override.BaseDialog.change) || {
+      en: 'Change',
+      se: 'Ändra',
+    },
+  },
+  LockedDocFileDialog: {
+    unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
+      en: 'Unlock',
+      se: 'Lås upp',
+    },
+    isLocked: (override.LockedDocFileDialog && override.LockedDocFileDialog.isLocked) || {
+      en: 'is locked.',
+      se: 'är låst',
+    },
+    enterCode: (override.LockedDocFileDialog && override.LockedDocFileDialog.enterCode) || {
+      en: 'Enter the document code to access it.',
+      se: 'Skriv in dokumentets kod för att låsa upp det.',
+    },
+    incorrectCode: (override.LockedDocFileDialog && override.LockedDocFileDialog.enterCode) || {
+      en: 'Incorrect code. Try again.',
+      se: 'Fel kod. Försök igen',
+    },
+  },
+  DocFileDialog: {
+    title: (override.DocFileDialog && override.DocFileDialog.title) || {
+      en: 'Title',
+      se: 'Titel',
+    },
+    code: (override.DocFileDialog && override.DocFileDialog.code) || {
+      en: 'Code to access document',
+      se: 'Kod för att komma åt dokumentet',
+    },
+    text: (override.DocFileDialog && override.DocFileDialog.text) || {
+      en: 'Text',
+    },
+    titleLength: (override.DocFileDialog && override.DocFileDialog.titleLength) || {
+
+    },
+  },
+  AliasDialog: {
+    aliasName: (override.AliasDialog && override.AliasDialog.aliasName) || {
+      en: 'Alias',
+    },
+    aliasNameLength: (override.AliasDialog && override.AliasDialog.aliasNameLength) || {
+      en: 'Alias must be 2 - 40 characters long',
+      se: 'Alias måste vara 2 - 40 tecken långt.',
+    },
+    fullName: (override.AliasDialog && override.AliasDialog.fullName) || {
+      en: 'Full name',
+      se: 'Hela namnet',
+    },
+  },
+  RegisterDialog: {
+    username: (override.RegisterDialog && override.RegisterDialog.username) || {
+      en: 'Username [a-z 0-9 -_]',
+      se: 'Användarnamn [a-z 0-9 -_]',
+    },
+    fullName: (override.RegisterDialog && override.RegisterDialog.fullName) || {
+      en: 'Full name [a-z 0-9]',
+      se: 'Hela namnet [a-z 0-9]',
+    },
+    password: (override.RegisterDialog && override.RegisterDialog.password) || {
+      en: 'Password',
+      se: 'Lösenord',
+    },
+    repeatPassword: (override.RegisterDialog && override.RegisterDialog.repeatPassword) || {
+      en: 'Repeat password',
+      se: 'Repetera lösenordet',
+    },
+    register: (override.RegisterDialog && override.RegisterDialog.register) || {
+      en: 'Register user',
+      se: 'Skapa användaren',
+    },
+    exists: (override.RegisterDialog && override.RegisterDialog.exists) || {
+      en: 'User already exists.',
+      se: 'Användare existerar redan.',
+    },
+    usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
+      en: 'The user name must be be 2 - 40 characters long.',
+      se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
+    },
+    passwordLength: (override.RegisterDialog && override.RegisterDialog.passwordLength) || {
+      en: 'The password must be be 4 - 40 characters long.',
+      se: 'Lösenordet måste vara 4 - 40 tecken långt.',
+    },
+    invalidCharacters: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
+      en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',
+      se: 'Otillåtna tecken i användarnamnet/hela namnet. Tillåtna tecken: a-z 0-9 -_',
+    },
+  },
+  RoomDialog: {
+    password: (override.RoomDialog && override.RoomDialog.invalidCharacters) || {
+      en: 'Password to access the room',
+      se: 'Lösenordet för att komma åt rummet',
+    },
+    repeatPassword: (override.RoomDialog && override.RoomDialog.repeatPassword) || {
+      en: 'Repeat password',
+      se: 'Skriv in lösenordet igen',
+    },
+    roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
+      en: 'Name of the room',
+      se: 'Rummets namn',
+    },
+  },
+  LoginDialog: {
+    username: (override.LoginDialog && override.LoginDialog.username) || {
+      en: 'Your username',
+      se: 'Ditt användarnamn',
+    },
+    password: (override.LoginDialog && override.LoginDialog.password) || {
+      en: 'Your password',
+      se: 'Ditt lösenord',
+    },
+    login: (override.LoginDialog && override.LoginDialog.login) || {
+      en: 'Login',
+      se: 'Logga in',
+    },
+    register: (override.LoginDialog && override.LoginDialog.register) || {
+      en: 'Register',
+      se: 'Registrera',
+    },
+    incorrect: (override.LoginDialog && override.LoginDialog.incorrect) || {
+      en: 'Incorrect username or password. Try again.',
+      se: 'Fel användarnamn eller lösenord. Försök igen.',
+    },
+    banned: (override.LoginDialog && override.LoginDialog.banned) || {
+      en: 'The user has been banned.',
+    },
+    unverified: (override.LoginDialog && override.LoginDialog.unverified) || {
+      en: 'The user has not been verified. Contact an administrator.',
+    },
+  },
+  FeedView: {
+    messageListTitle: (override.FeedView && override.FeedView.messageListTitle) || {
+      en: 'Members',
+      se: 'Medlemmar',
+    },
+  },
+  List: {
+    removedItem: (override.List && override.List.invalidCharacters) || {
+      en: 'The item has been removed.',
+      se: 'Raden har raderats.',
+    },
+  },
+  ForumView: {
+    removedForum: (override.ForumView && override.ForumView.removedForum) || {
+      en: 'The forum no longer exists.',
+      se: 'Forumet existerar inte.',
+    },
+    likeButton: (override.ForumView && override.ForumView.likeButton) || {
+      en: '+1',
+      se: '+1',
+    },
+    likes: (override.ForumView && override.ForumView.likes) || {
+      en: '',
+      se: '',
+    },
+    timeCreated: (override.ForumView && override.ForumView.timeCreated) || {
+      en: 'Created:',
+      se: 'Skapad:',
+    },
+    lastUpdated: (override.ForumView && override.ForumView.lastUpdated) || {
+      en: 'Updated:',
+      se: 'Uppdaterad:',
+    },
+    edit: (override.ForumView && override.ForumView.edit) || {
+      en: 'Edit',
+      se: 'Ändra',
+    },
+  },
+  WorldMapView: {
+    noName: (override.WorldMapView && override.WorldMapView.noName) || {
+      en: 'Unknown position.',
+      se: 'Okänd plats.',
+    },
+    noDescription: (override.WorldMapView && override.WorldMapView.noDescription) || {
+      en: 'No information found.',
+      se: 'Ingen information kunde hittas.',
+    },
+  },
+  MapObject: {
+    createPosition: (override.MapObject && override.WorldMapView.createPosition) || {
+      en: 'Create position',
+      se: 'Skapa en plats',
+    },
+    createPositionName: (override.MapObject && override.WorldMapView.createPositionName) || {
+      en: 'Position name',
+      se: 'Platsens namn',
+    },
+    createPositionDescription: (override.MapObject && override.WorldMapView.createPositionDescription) || {
+      en: 'Position description',
+      se: 'Platsens beskrivning',
+    },
+    movePosition: (override.MapObject && override.WorldMapView.movePosition) || {
+      en: 'Move position',
+      se: 'Flytta platsen',
+    },
+    changeStyle: (override.MapObject && override.WorldMapView.changeStyle) || {
+      en: 'Change style',
+      se: 'Byt stil',
+    },
+  },
+  StatusBar: {
+    menu: (override.StatusBar && override.StatusBar.menu) || {
+      en: 'Menu',
+      se: 'Meny',
+    },
+    emptyTime: (override.StatusBar && override.StatusBar.emptyTime) || {
+      en: '--:--',
+    },
+  },
+  AdminUserDialog: {
+    ban: (override.AdminUserDialog && override.AdminUserDialog.ban) || {
+      en: 'Ban',
+    },
+    unban: (override.AdminUserDialog && override.AdminUserDialog.unban) || {
+      en: 'Unban',
+    },
+    verify: (override.AdminUserDialog && override.AdminUserDialog.verify) || {
+      en: 'Verify',
+    },
+    updateUser: (override.AdminUserDialog && override.AdminUserDialog.updateUser) || {
+      en: 'Choose an action:',
+    },
+    password: (override.AdminUserDialog && override.AdminUserDialog.password) || {
+      en: 'Reset password',
+      se: 'Återställ lösenordet',
+    },
+    newPassword: (override.AdminUserDialog && override.AdminUserDialog.newPassword) || {
+      en: 'The new password:',
+      se: 'Det nya lösenordet:',
+    },
+    chooseAccess: (override.AdminUserDialog && override.AdminUserDialog.chooseAccess) || {
+      en: 'Choose an access level:',
+    },
+    access: (override.AdminUserDialog && override.AdminUserDialog.access) || {
+      en: 'Change permissions',
+    },
+    wallet: (override.AdminUserDialog && override.AdminUserDialog.wallet) || {
+      en: 'Transfer currency',
+    },
+    walletAmount: (override.AdminUserDialog && override.AdminUserDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet.',
+    },
+    amountPlaceholder: (override.AdminUserDialog && override.AdminUserDialog.amountPlaceholder) || {
+      en: 'Enter amount',
+    },
+    sendAmount: (override.AdminUserDialog && override.AdminUserDialog.sendAmount) || {
+      en: 'Transfer',
+    },
+  },
+};
+
+/**
+ * Add new base objects from override, if they don't already exists.
+ * You can use this to introduce new objects and create their corresponding labels without having to hardcode them.
+ */
+
+const baseKeys = Object.keys(labels);
+
+Object.keys(override).forEach((baseKey) => {
+  if (!baseKeys.includes(baseKey)) {
+    labels[baseKeys] = override[baseKey];
+  }
+});
+
+module.exports = labels;

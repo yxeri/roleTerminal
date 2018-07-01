@@ -14,9 +14,11 @@
  limitations under the License.
  */
 
+const Tools = require('./Tools');
+
 class ViewTools {
   /**
-   * Is the element inside the view or close to the end of the view?
+   * Is the element inside the view or close to the end of the views?
    * @static
    * @param {HTMLElement} element - The element that will be checked
    * @param {number} [newElementHeight] - Value will be added to check if an element is close to the edge
@@ -33,7 +35,13 @@ class ViewTools {
    * This is not supported in iOS Safari
    * @static
    */
-  static goFullScreen() {
+  static goFullScreen({ queryBypass }) {
+    const parameters = Tools.getQueryParameters();
+
+    if (parameters[queryBypass]) {
+      return;
+    }
+
     const element = document.documentElement;
 
     if (element.requestFullscreen) {

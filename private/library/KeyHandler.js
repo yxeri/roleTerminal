@@ -37,8 +37,6 @@
 //   }
 // }
 
-const soundLibrary = require('./audio/SoundLibrary');
-
 class KeyHandler {
   constructor() {
     this.keys = [];
@@ -56,11 +54,6 @@ class KeyHandler {
         event.stopPropagation();
 
         return;
-      }
-
-      // Will not play sound if shift is pressed (16)
-      if (!this.triggerKeyPressed && sentKeyCode !== 16 && sentKeyCode !== this.triggerKey) {
-        soundLibrary.playSound('keyInput');
       }
 
       if (sentKeyCode === this.triggerKey) {

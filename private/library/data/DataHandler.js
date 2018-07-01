@@ -1,0 +1,16 @@
+exports.aliases = require('./AliasData');
+exports.devices = require('./DeviceData');
+exports.docFiles = require('./DocFileData');
+exports.forums = require('./ForumData');
+exports.forumPosts = require('./ForumPostData');
+exports.forumThreads = require('./ForumThreadData');
+exports.gameCodes = require('./GameCodeData');
+exports.invitations = require('./InvitationData');
+exports.messages = require('./MessageData');
+exports.positions = require('./PositionData');
+exports.rooms = require('./RoomData');
+exports.simpleMsgs = require('./SimpleMsgData');
+exports.teams = require('./TeamData');
+exports.transactions = require('./TransactionData');
+exports.users = require('./UserData');
+exports.wallets = require('./WalletData');

@@ -7,7 +7,6 @@ const TopView = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
-const viewTools = require('../library/ViewTools');
 
 const chatView = new ChatView({
   sendOnEnter: true,
@@ -15,9 +14,10 @@ const chatView = new ChatView({
 });
 const docFileView = new DocFileView({});
 const worldMapView = new WorldMapView({
+  maxZoom: 19,
   clusterStyle: {
     gridSize: 10,
-    maxZoom: 19,
+    maxZoom: 15,
     styles: [{
       width: 24,
       height: 24,
@@ -30,8 +30,7 @@ const worldMapView = new WorldMapView({
   },
   backgroundColor: '#11433e',
   positionTypes: [
-    'zones',
-    'missions',
+    'housing',
   ],
   polygonStyle: {
     strokeColor: '#000000',
@@ -96,7 +95,7 @@ const worldMapView = new WorldMapView({
     }, {
       featureType: 'landscape.man_made',
       stylers: [
-        { color: '#bababa' },
+        { color: '#11433e' },
       ],
     }, {
       featureType: 'landscape.natural.terrain',

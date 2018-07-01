@@ -21,7 +21,7 @@ class Converters {
    * @param {string} value - Value to be converted
    * @returns {Object|null} Converted object. null if the value was not set
    */
-  static convertToObject(value) { return value && value !== null ? JSON.parse(value) : null; }
+  static convertToObject(value) { return value && value !== null ? JSON.parse(value) : {}; }
 
   /**
    * Convert string to boolean

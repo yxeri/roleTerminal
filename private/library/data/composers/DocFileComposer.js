@@ -8,7 +8,7 @@ class DocFileComposer extends DataComposer {
   constructor() {
     super({
       handler: dataHandler.docFiles,
-      completionEvent: eventCentral.Events.COMPLETE_ALIAS,
+      completionEvent: eventCentral.Events.COMPLETE_DOCFILE,
       dependencies: [
         dataHandler.docFiles,
         dataHandler.aliases,

@@ -11,6 +11,8 @@
  limitations under the License.
  */
 
+require('../library/polyfills');
+
 const StatusBar = require('../library/components/views/StatusBar');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const AdminUserList = require('../library/components/lists/AdminUserList');

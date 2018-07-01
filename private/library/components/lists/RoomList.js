@@ -114,15 +114,6 @@ class RoomList extends List {
       },
     });
   }
-
-  static hasAccess({ object, user = {} }) {
-    const hasAccess = List.hasAccess({ object, user });
-
-    return hasAccess
-      || (user.followingRooms && user.followingRooms.includes(object.objectId))
-      || (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
-      || (user.objectId && object.participantIds.includes(user.objectId));
-  }
 }
 
 module.exports = RoomList;

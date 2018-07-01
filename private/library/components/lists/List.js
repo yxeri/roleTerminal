@@ -36,8 +36,8 @@ const BaseView = require('../views/BaseView');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
-const storageManager = require('../../StorageManager');
 const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -119,6 +119,12 @@ class List extends BaseView {
           const object = data[collector.objectTypes.one];
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
+          const {
+            canSee,
+          } = accessCentral.hasAccessTo({
+            objectToAccess: object,
+            toAuth: user,
+          });
 
           if (this.filter) {
             if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
@@ -130,7 +136,7 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (List.hasAccess({ object, user })) {
+              if (canSee) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -143,7 +149,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (List.hasAccess({ object, user })) {
+              if (canSee) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -248,15 +254,17 @@ class List extends BaseView {
 
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
-    const storedAccessLevel = storageManager.getAccessLevel();
     const fragment = document.createDocumentFragment();
 
     objects.forEach((object) => {
-      if (List.hasAccess({
-        storedAccessLevel,
-        object,
-        user,
-      })) {
+      const {
+        canSee,
+      } = accessCentral.hasAccessTo({
+        objectToAccess: object,
+        toAuth: user,
+      });
+
+      if (canSee) {
         const listItem = this.createListItem({ object });
 
         fragment.appendChild(listItem);
@@ -458,14 +466,6 @@ class List extends BaseView {
     setTimeout(() => {
       this.listElement.removeChild(this.getElement(objectId));
     }, itemChangeTimeout);
-  }
-
-  static hasAccess({
-    object,
-    storedAccessLevel,
-    user = {},
-  }) {
-    return (object && (object.isPublic || (!object.visibility || storedAccessLevel >= object.visibility || (user.objectId && object.ownerId === user.objectId))));
   }
 }
 

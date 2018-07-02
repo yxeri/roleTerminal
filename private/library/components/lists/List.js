@@ -124,10 +124,7 @@ class List extends BaseView {
           const user = userComposer.getCurrentUser();
           const {
             canSee,
-          } = accessCentral.hasAccessTo({
-            objectToAccess: object,
-            toAuth: user,
-          });
+          } = List.hasAccess({ object, user });
 
           if (this.filter) {
             if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
@@ -255,18 +252,20 @@ class List extends BaseView {
     this.listElement.removeChild(existingItem);
   }
 
+  static hasAccess({ object, user }) {
+    return accessCentral.hasAccessTo({
+      objectToAccess: object,
+      toAuth: user,
+    });
+  }
+
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
     const fragment = document.createDocumentFragment();
     const accessLevel = storageManager.getAccessLevel();
 
     objects.forEach((object) => {
-      const {
-        canSee,
-      } = accessCentral.hasAccessTo({
-        objectToAccess: object,
-        toAuth: user,
-      });
+      const { canSee } = List.hasAccess({ object, user });
 
       if (canSee && accessLevel >= this.minAccessLevel) {
         const listItem = this.createListItem({ object });

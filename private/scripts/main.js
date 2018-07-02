@@ -31,10 +31,14 @@ const worldMapView = new WorldMapView({
   backgroundColor: '#11433e',
   positionTypes: [
     'housing',
+    'roads',
   ],
   polygonStyle: {
-    strokeColor: '#000000',
+    strokeColor: '#b40000',
     fillColor: '#b40000',
+    opacity: 1,
+    strokeOpacity: 1,
+    fillOpacity: 1,
   },
   markerStyle: {
     opacity: 0.9,
@@ -69,7 +73,8 @@ const worldMapView = new WorldMapView({
     ],
   },
   lineStyle: {
-    strokeColor: '#FFFFFF',
+    strokeColor: '#7f7f7f',
+    strokeWeight: 2,
   },
   mapStyles: [
     {

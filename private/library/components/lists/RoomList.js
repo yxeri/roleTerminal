@@ -57,7 +57,9 @@ class RoomList extends List {
 
                 const users = userComposer.getWhisperUsers({ participantIds });
 
-                return users.length > 0 ? `${users[0].username}${whisperText}${users[1].username}` : '';
+                return users.length > 0 ?
+                  `${users[0].username}${whisperText}${users[1].username}` :
+                  '';
               }
 
               return room.roomName;

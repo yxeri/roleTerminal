@@ -32,7 +32,9 @@ class MapPolygon extends MapObject {
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
     const allPoints = [new google.maps.LatLng(latestCoordinates.latitude, latestCoordinates.longitude)]
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
-    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) : {};
+    const chosenStyle = choosableStyles && position.styleName ?
+      choosableStyles.find(style => style.styleName === position.styleName) :
+      {};
 
     super({
       choosableStyles,

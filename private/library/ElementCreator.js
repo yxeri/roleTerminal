@@ -267,7 +267,9 @@ class ElementCreator {
       elementId,
       classes,
       name: inputName,
-      elementType: multiLine ? 'textarea' : 'input',
+      elementType: multiLine ?
+        'textarea' :
+        'input',
     });
 
     input.setAttribute('placeholder', placeholder);

@@ -21,7 +21,11 @@ class Converters {
    * @param {string} value - Value to be converted
    * @returns {Object|null} Converted object. null if the value was not set
    */
-  static convertToObject(value) { return value && value !== null ? JSON.parse(value) : {}; }
+  static convertToObject(value) {
+    return value && value !== null ?
+      JSON.parse(value) :
+      {};
+  }
 
   /**
    * Convert string to boolean
@@ -46,7 +50,9 @@ class Converters {
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToInt(value) {
-    if (Number.isNaN(value)) { return null; }
+    if (Number.isNaN(value)) {
+      return null;
+    }
 
     return parseInt(value, 10);
   }
@@ -58,7 +64,9 @@ class Converters {
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToFloat(value) {
-    if (Number.isNaN(value)) { return null; }
+    if (Number.isNaN(value)) {
+      return null;
+    }
 
     return parseFloat(value);
   }
@@ -69,7 +77,9 @@ class Converters {
    * @param {Object} value - Object to stringify
    * @returns {string} Stringified object
    */
-  static stringifyObject(value) { return JSON.stringify(value); }
+  static stringifyObject(value) {
+    return JSON.stringify(value);
+  }
 }
 
 module.exports = Converters;

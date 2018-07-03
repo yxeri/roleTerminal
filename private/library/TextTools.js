@@ -52,7 +52,9 @@ class TextTools {
    * @returns {Number|string} - Single number or string with 0 + number
    */
   static beautifyNumber(number) {
-    return number > 9 ? number : `0${number}`;
+    return number > 9 ?
+      number :
+      `0${number}`;
   }
 
   static getHoursAndMinutes(time) {
@@ -205,7 +207,9 @@ class TextTools {
     for (let i = 0; i < length; i += 1) {
       const randomVal = Math.round(Math.random() * (randomLength - 1));
 
-      result += Math.random() > 0.5 ? selection[randomVal].toUpperCase() : selection[randomVal];
+      result += Math.random() > 0.5 ?
+        selection[randomVal].toUpperCase() :
+        selection[randomVal];
     }
 
     return result;
@@ -224,7 +228,9 @@ class TextTools {
    * @returns {string} - String copy.
    */
   static copyString(string) {
-    return string && string !== null ? JSON.parse(JSON.stringify(string)) : '';
+    return string && string !== null ?
+      JSON.parse(JSON.stringify(string)) :
+      '';
   }
 
   static isInternationalAllowed(text) {

@@ -57,7 +57,9 @@ class ChatView extends ViewWrapper {
 
         const roomId = messageList.getRoomId();
         const room = roomComposer.getRoom({ roomId });
-        const participantIds = room.isWhisper ? room.participantIds : [];
+        const participantIds = room.isWhisper ?
+          room.participantIds :
+          [];
         const message = {
           text,
           roomId,
@@ -165,7 +167,9 @@ class ChatView extends ViewWrapper {
 
     accessCentral.addAccessElement({
       element: this.inputArea.element,
-      minimumAccessLevel: storageManager.getPermissions().SendMessage ? storageManager.getPermissions().SendMessage.accessLevel : 1,
+      minimumAccessLevel: storageManager.getPermissions().SendMessage ?
+        storageManager.getPermissions().SendMessage.accessLevel :
+        1,
     });
   }
 

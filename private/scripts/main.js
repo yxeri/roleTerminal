@@ -34,8 +34,8 @@ const worldMapView = new WorldMapView({
     'roads',
   ],
   polygonStyle: {
-    strokeColor: '#b40000',
-    fillColor: '#b40000',
+    strokeColor: '#000000',
+    fillColor: '#0c9e00',
     opacity: 1,
     strokeOpacity: 1,
     fillOpacity: 1,
@@ -47,84 +47,78 @@ const worldMapView = new WorldMapView({
     },
   },
   choosableStyles: {
-    markers: [
-      {
-        styleName: 'Red',
-        icon: {
-          url: '/images/mapicon-red.png',
-        },
-      }, {
-        styleName: 'Green',
-        icon: {
-          url: '/images/mapicon-green.png',
-        },
+    markers: [{
+      styleName: 'Red',
+      icon: {
+        url: '/images/mapicon-red.png',
       },
-    ],
-    polygons: [
-      {
-        strokeColor: '#000000',
-        fillColor: '#9b0000',
-        styleName: 'Red',
-      }, {
-        styleName: 'Green',
-        strokeColor: '#000000',
-        fillColor: '#00b402',
+    }, {
+      styleName: 'Green',
+      icon: {
+        url: '/images/mapicon-green.png',
       },
-    ],
+    }],
+    polygons: [{
+      strokeColor: '#000000',
+      fillColor: '#9b0000',
+      styleName: 'Red',
+    }, {
+      styleName: 'Green',
+      strokeColor: '#000000',
+      fillColor: '#00b402',
+    }],
   },
   lineStyle: {
     strokeColor: '#7f7f7f',
     strokeWeight: 2,
   },
-  mapStyles: [
-    {
-      elementType: 'geometry',
-      stylers: [
-        { color: '#11433e' },
-      ],
-    }, {
-      elementType: 'labels',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'poi',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'administrative',
-      stylers: [
-        { color: '#000000' },
-      ],
-    }, {
-      featureType: 'landscape.man_made',
-      stylers: [
-        { color: '#11433e' },
-      ],
-    }, {
-      featureType: 'landscape.natural.terrain',
-      stylers: [
-        { color: '#1a6962' },
-      ],
-    }, {
-      featureType: 'road',
-      stylers: [
-        { color: '#696969' },
-        { weight: 0.5 },
-      ],
-    }, {
-      featureType: 'transit',
-      stylers: [
-        { visibility: 'off' },
-      ],
-    }, {
-      featureType: 'water',
-      stylers: [
-        { color: '#092522' },
-      ],
-    },
-  ],
+  mapStyles: [{
+    elementType: 'geometry',
+    stylers: [
+      { color: '#11433e' },
+    ],
+  }, {
+    elementType: 'labels',
+    stylers: [
+      { visibility: 'off' },
+    ],
+  }, {
+    featureType: 'poi',
+    stylers: [
+      { visibility: 'off' },
+    ],
+  }, {
+    featureType: 'administrative',
+    stylers: [
+      { color: '#000000' },
+    ],
+  }, {
+    featureType: 'landscape.man_made',
+    stylers: [
+      { color: '#11433e' },
+    ],
+  }, {
+    featureType: 'landscape.natural.terrain',
+    stylers: [
+      { color: '#1a6962' },
+    ],
+  }, {
+    featureType: 'road',
+    stylers: [
+      { color: '#696969' },
+      { weight: 0.5 },
+    ],
+  }, {
+    featureType: 'transit',
+    stylers: [
+      { visibility: 'off' },
+    ],
+  }, {
+    featureType: 'water',
+    stylers: [
+      { color: '#092522' },
+    ],
+  }],
 });
 
 const statusBar = new TopView({
@@ -143,17 +137,15 @@ const statusBar = new TopView({
 const mapWrapper = new ViewWrapper({
   statusBar,
   title: 'MAPS',
-  columns: [
-    {
-      components: [
-        { component: worldMapView },
-      ],
-    }, {
-      components: [
-        { component: chatView },
-      ],
-    },
-  ],
+  columns: [{
+    components: [
+      { component: worldMapView },
+    ],
+  }, {
+    components: [
+      { component: chatView },
+    ],
+  }],
 });
 const docWrapper = new ViewWrapper({
   statusBar,
@@ -171,17 +163,15 @@ const docWrapper = new ViewWrapper({
 const chatWrapper = new ViewWrapper({
   statusBar,
   title: 'COMS',
-  columns: [
-    {
-      components: [
-        { component: chatView },
-      ],
-    }, {
-      components: [
-        { component: worldMapView },
-      ],
-    },
-  ],
+  columns: [{
+    components: [
+      { component: chatView },
+    ],
+  }, {
+    components: [
+      { component: worldMapView },
+    ],
+  }],
 });
 const fullMapWrapper = new ViewWrapper({
   statusBar,

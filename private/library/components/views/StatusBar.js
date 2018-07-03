@@ -46,6 +46,8 @@ class StatusBar extends BaseView {
       classes: classes.concat(['statusBar']),
     });
 
+    const permissions = storageManager.getPermissions();
+
     const controls = showControls;
     controls.user = controls.user || true;
     controls.alias = controls.alias || true;
@@ -101,15 +103,17 @@ class StatusBar extends BaseView {
       });
 
       accessCentral.addAccessElement({
-        maxAccessLevel: 0,
+        maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
         element: loginButton,
       });
       accessCentral.addAccessElement({
-        minimumAccessLevel: 1,
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
         element: logoutButton,
       });
       accessCentral.addAccessElement({
-        maxAccessLevel: 0,
+        maxAccessLevel: permissions.CreateUser ?
+          permissions.CreateUser.accessLevel :
+          accessCentral.AccessLevels.ANONYMOUS,
         element: registerButton,
       });
 
@@ -146,7 +150,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createDocFileButton,
-        minimumAccessLevel: 1,
+        minimumAccessLevel: permissions.CreateDocFile ?
+          permissions.CreateDocFile.accessLevel :
+          accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -168,7 +174,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createRoomButton,
-        minimumAccessLevel: 2,
+        minimumAccessLevel: permissions.CreateRoom ?
+          permissions.CreateRoom.accessLevel :
+          accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -190,7 +198,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createAliasButton,
-        minimumAccessLevel: 2,
+        minimumAccessLevel: permissions.CreateAlias ?
+          permissions.CreateAlias.accessLevel :
+          accessCentral.AccessLevels.STANDARD,
       });
     }
 

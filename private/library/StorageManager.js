@@ -162,6 +162,13 @@ class StorageManager {
     return converters.convertToObject(this.getLocalVal('permissions'));
   }
 
+  static addPermission(permission = {}) {
+    const permissions = StorageManager.getPermissions();
+    permissions[permission.name] = permissions;
+
+    StorageManager.setPermissions(permissions);
+  }
+
   /**
    * Get device Id.
    * @static

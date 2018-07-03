@@ -169,7 +169,7 @@ class ChatView extends ViewWrapper {
       element: this.inputArea.element,
       minimumAccessLevel: storageManager.getPermissions().SendMessage ?
         storageManager.getPermissions().SendMessage.accessLevel :
-        1,
+        accessCentral.AccessLevels.STANDARD,
     });
   }
 

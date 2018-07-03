@@ -218,7 +218,9 @@ class List extends BaseView {
       };
 
       elements.push(elementCreator.createHeader({
-        clickFuncs: this.shouldToggle ? clickFuncs : undefined,
+        clickFuncs: this.shouldToggle ?
+          clickFuncs :
+          undefined,
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
       }));
     }
@@ -338,7 +340,9 @@ class List extends BaseView {
 
   createListItem({ object }) {
     const { objectId } = object;
-    const classes = this.focusedId === objectId ? [cssClasses.focusListItem] : [];
+    const classes = this.focusedId === objectId ?
+      [cssClasses.focusListItem] :
+      [];
     const listItemElements = [];
     const clickFuncs = {
       leftFunc: () => {
@@ -388,7 +392,9 @@ class List extends BaseView {
               classes: fieldClasses,
             } = field;
             const value = object[paramName] || object[fallbackTo];
-            const text = convertFunc ? convertFunc(value) : value;
+            const text = convertFunc ?
+              convertFunc(value) :
+              value;
             const spanParams = {
               text,
               classes: fieldClasses,
@@ -402,7 +408,9 @@ class List extends BaseView {
               };
             }
 
-            return text !== '' ? elementCreator.createSpan(spanParams) : document.createTextNode('');
+            return text !== '' ?
+              elementCreator.createSpan(spanParams) :
+              document.createTextNode('');
           });
 
         listItemElements.push(elementCreator.createParagraph({

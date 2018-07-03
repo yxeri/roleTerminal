@@ -430,8 +430,12 @@ class MapObject {
       const rightOverflow = bound.right - window.innerWidth;
 
       if (bound.bottom > window.innerHeight || bound.right > window.innerWidth) {
-        const newX = bottomOverflow < 0 ? x - rightOverflow : x;
-        const newY = rightOverflow < 0 ? y - bottomOverflow : y;
+        const newX = bottomOverflow < 0 ?
+          x - rightOverflow :
+          x;
+        const newY = rightOverflow < 0 ?
+          y - bottomOverflow :
+          y;
 
         MapObject.rightClickBox.setAttribute('style', `left: ${newX}px; top: ${newY}px;`);
       }

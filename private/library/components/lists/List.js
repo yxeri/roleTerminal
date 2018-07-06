@@ -38,7 +38,6 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
-const storageManager = require('../../StorageManager');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -78,6 +77,7 @@ class List extends BaseView {
     title,
     shouldToggle,
     listItemSpecificClasses,
+    onCreateFunc = () => {},
     minAccessLevel = accessCentral.AccessLevels.ANONYMOUS,
     shouldPaginate = false,
     shouldScrollToBottom = false,
@@ -93,6 +93,7 @@ class List extends BaseView {
       classes: classes.concat(['list']),
     });
 
+    this.onCreateFunc = onCreateFunc;
     this.ListTypes = {
       ROOMS: 'rooms',
     };
@@ -124,7 +125,11 @@ class List extends BaseView {
           const user = userComposer.getCurrentUser();
           const {
             canSee,
-          } = List.hasAccess({ object, user });
+          } = this.hasAccess({ object, user });
+
+          if (changeType === socketManager.ChangeTypes.CREATE) {
+            this.onCreateFunc({ object });
+          }
 
           if (this.filter) {
             if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
@@ -155,6 +160,7 @@ class List extends BaseView {
                   shouldAnimate: true,
                 });
                 this.scrollList();
+                this.onCreateFunc({ object });
               }
 
               break;
@@ -180,6 +186,13 @@ class List extends BaseView {
         },
       });
     }
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.RECONNECT,
+      func: () => {
+        this.appendList();
+      },
+    });
   }
 
   scrollList() {
@@ -254,7 +267,7 @@ class List extends BaseView {
     this.listElement.removeChild(existingItem);
   }
 
-  static hasAccess({ object, user }) {
+  hasAccess({ object, user }) { // eslint-disable-line
     return accessCentral.hasAccessTo({
       objectToAccess: object,
       toAuth: user,
@@ -264,12 +277,11 @@ class List extends BaseView {
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
     const fragment = document.createDocumentFragment();
-    const accessLevel = storageManager.getAccessLevel();
 
     objects.forEach((object) => {
-      const { canSee } = List.hasAccess({ object, user });
+      const { canSee } = this.hasAccess({ object, user });
 
-      if (canSee && accessLevel >= this.minAccessLevel) {
+      if (canSee) {
         const listItem = this.createListItem({ object });
 
         fragment.appendChild(listItem);
@@ -477,6 +489,15 @@ class List extends BaseView {
     setTimeout(() => {
       this.listElement.removeChild(this.getElement(objectId));
     }, itemChangeTimeout);
+  }
+
+  animateItem({ elementId }) {
+    const element = this.getElement(elementId);
+
+    if (element) {
+      element.classList.add(cssClasses.newListItem);
+      setTimeout(() => { element.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+    }
   }
 }
 

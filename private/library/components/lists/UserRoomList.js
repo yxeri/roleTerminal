@@ -31,9 +31,10 @@ class RoomList extends List {
     classes.push('roomList');
     classes.push('userRoomList');
 
-    const headerFields = [
-      { paramName: 'username' },
-    ];
+    const headerFields = [{
+      paramName: 'username',
+      fallbackTo: 'aliasName',
+    }];
 
     super({
       elementId,
@@ -46,7 +47,6 @@ class RoomList extends List {
         dataHandler.teams,
         dataHandler.aliases,
       ],
-      focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
           const whisperPermission = storageManager.getPermissions().SendWhisper || { accessLevel: 1 };
@@ -93,12 +93,24 @@ class RoomList extends List {
   }
 
   getCollectorObjects() {
-    const aliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
-
-    return this.collector.getObjects({
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+    const allAliases = aliasComposer.getAllAliases();
+    const allUsers = this.collector.getObjects({
       filter: this.filter,
-      sorting: this.sorting,
-    }).filter(object => !aliases.includes(object.objectId));
+    });
+
+    return allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId)).sort((a, b) => {
+      const aParam = (a.username || a.aliasName).toLowerCase();
+      const bParam = (b.username || b.aliasName).toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      } else if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
+    });
   }
 }
 

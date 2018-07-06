@@ -568,10 +568,6 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 }
 
-.userRoomList:before {
-  content: '- USERS -\A';
-}
-
 .userRoomList {
   li:first-child {
     border-top: $border-width solid $border-color;

@@ -30,8 +30,13 @@ const worldMapView = new WorldMapView({
   },
   backgroundColor: '#11433e',
   positionTypes: [
+    'user',
+    'device',
+    'lantern',
     'housing',
+    'world',
     'roads',
+    'drivable-roads',
   ],
   polygonStyle: {
     strokeColor: '#000000',

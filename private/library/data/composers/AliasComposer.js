@@ -52,6 +52,14 @@ class AliasComposer extends DataComposer {
 
     return alias.aliasName;
   }
+
+  getAlias({ aliasId }) {
+    return this.handler.getObject({ objectId: aliasId });
+  }
+
+  getAllAliases() {
+    return this.handler.getObjects({});
+  }
 }
 
 const aliasComposer = new AliasComposer();

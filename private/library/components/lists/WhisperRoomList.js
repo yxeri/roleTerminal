@@ -20,15 +20,17 @@ const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
+const userComposer = require('../../data/composers/UserComposer');
 
 class RoomList extends List {
   constructor({
     title,
+    whisperText = ' <-> ',
     classes = [],
-    elementId = `rList-${Date.now()}`,
+    elementId = `wRList-${Date.now()}`,
   }) {
     classes.push('roomList');
-    classes.push('chatRoomList');
+    classes.push('whisperRoomList');
 
     super({
       title,
@@ -36,21 +38,34 @@ class RoomList extends List {
       classes,
       filter: {
         rules: [
-          { paramName: 'isUser', paramValue: false },
-          { paramName: 'isWhisper', paramValue: false },
+          { paramName: 'isWhisper', paramValue: true },
         ],
       },
       listItemFields: [
         {
           paramName: 'objectId',
           convertFunc: (objectId) => {
+            const currentUser = userComposer.getCurrentUser();
             const room = roomComposer.getRoom({ roomId: objectId });
+            const { isWhisper, participantIds } = room;
 
             if (room) {
+              if (isWhisper) {
+                if (!currentUser) {
+                  return '';
+                }
+
+                const identities = userComposer.getWhisperIdentities({ participantIds });
+
+                return identities.length > 0 ?
+                  `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}` :
+                  '';
+              }
+
               return room.roomName;
             }
 
-            return objectId;
+            return '';
           },
         },
       ],
@@ -100,6 +115,17 @@ class RoomList extends List {
         this.setFocusedListItem(objectId);
       },
     });
+  }
+
+  hasAccess({ object, user = {} }) {
+    const access = super.hasAccess({ object, user });
+
+    return {
+      canSee:
+      (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant))) ||
+      (user.objectId && object.participantIds.includes(user.objectId)) ||
+      access.canSee,
+    };
   }
 }
 

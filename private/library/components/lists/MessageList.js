@@ -20,6 +20,7 @@ const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
+const userComposer = require('../../data/composers/UserComposer');
 
 class MessageList extends List {
   /**
@@ -35,8 +36,8 @@ class MessageList extends List {
     multiRoom = false,
     shouldSwitchRoom = false,
     roomId,
-    roomListId = '',
-    userRoomListId = '',
+    whisperText = ' - ',
+    roomLists = [],
     classes = [],
     elementId = `mList-${Date.now()}`,
   }) {
@@ -60,10 +61,10 @@ class MessageList extends List {
           paramName: 'ownerAliasId',
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
-            const user = dataHandler.users.getObject({ objectId });
+            const identity = userComposer.getIdentity({ objectId });
 
-            if (user) {
-              return user.username;
+            if (identity) {
+              return identity.username || identity.aliasName;
             }
 
             return objectId;
@@ -83,6 +84,16 @@ class MessageList extends List {
             const room = dataHandler.rooms.getObject({ objectId });
 
             if (room) {
+              const { isWhisper, participantIds } = room;
+
+              if (isWhisper) {
+                const identities = userComposer.getWhisperIdentities({ participantIds });
+
+                return identities.length > 0 ?
+                  `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}` :
+                  '';
+              }
+
               return room.roomName.slice(0, 24);
             }
 
@@ -102,15 +113,28 @@ class MessageList extends List {
 
     super(superParams);
 
-    this.userRoomListId = userRoomListId;
-    this.roomListId = roomListId;
+    this.onCreateFunc = ({ object }) => {
+      this.roomLists.every((roomList) => {
+        const rooms = roomList.getCollectorObjects();
+        const foundRoom = rooms.find(room => object.roomId === room.objectId);
+
+        if (foundRoom) {
+          roomList.animateItem({ elementId: foundRoom.objectId });
+
+          return false;
+        }
+
+        return true;
+      });
+    };
+    this.roomLists = roomLists;
     this.roomId = roomId || this.getRoomId();
 
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || (this.roomListId === origin || this.userRoomListId === origin)) {
+          if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
             this.showMessagesByRoom({ roomId: room.objectId });
           }
         },

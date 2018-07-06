@@ -120,7 +120,7 @@ class AccessCentral {
     const isAdmin = ownerId === authUserId || hasFullAccess || accessLevel >= this.AccessLevels.ADMIN;
 
     return {
-      canSee: isAdmin || isPublic || accessLevel >= visibility,
+      canSee: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess || accessLevel >= visibility,
       hasAccess: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess,
       hasFullAccess: isAdmin || userHasAdminAccess || teamHasAdminAccess || aliasHasAdminAccess,
     };

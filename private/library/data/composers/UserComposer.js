@@ -4,6 +4,7 @@ const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
+const aliasComposer = require('./AliasComposer');
 
 class UserComposer extends DataComposer {
   constructor() {
@@ -91,18 +92,16 @@ class UserComposer extends DataComposer {
     return this.handler.getObject({ objectId: userId });
   }
 
-  getWhisperUsers({ participantIds = [0, 1] }) {
+  getWhisperIdentities({ participantIds = [0, 1] }) {
     const { objectId, aliases } = this.getCurrentUser();
 
     if (objectId) {
       const users = [
-        this.getUser({ userId: participantIds[0] }),
-        this.getUser({ userId: participantIds[1] }),
+        this.getUser({ userId: participantIds[0] }) || aliasComposer.getAlias({ aliasId: participantIds[0] }),
+        this.getUser({ userId: participantIds[1] }) || aliasComposer.getAlias({ aliasId: participantIds[1] }),
       ];
       const userOrder = [];
       const { objectId: oneId } = users[0];
-
-      console.log('whisper', participantIds, users);
 
       if (oneId === objectId || aliases.includes(oneId)) {
         userOrder.push(users[0]);
@@ -116,6 +115,10 @@ class UserComposer extends DataComposer {
     }
 
     return [];
+  }
+
+  getIdentity({ objectId }) {
+    return this.getUser({ userId: objectId }) || aliasComposer.getAlias({ aliasId: objectId });
   }
 
   changePassword({

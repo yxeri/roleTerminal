@@ -19,6 +19,7 @@ const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
 const UserRoomList = require('../lists/UserRoomList');
+const WhisperRoomList = require('../lists/WhisperRoomList');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -38,12 +39,22 @@ class ChatView extends ViewWrapper {
     inputPlacement = 'bottom',
     elementId = `chView-${Date.now()}`,
   }) {
-    const roomList = new RoomList({});
-    const userRoomList = new UserRoomList({});
+    const roomList = new RoomList({
+      title: 'room',
+    });
+    const whisperRoomList = new WhisperRoomList({
+      title: 'whisper',
+    });
+    const userRoomList = new UserRoomList({
+      title: 'user',
+    });
     const messageList = new MessageList({
       shouldSwitchRoom: true,
-      roomListId: roomList.elementId,
-      userRoomListId: userRoomList.elementId,
+      roomLists: [
+        roomList,
+        whisperRoomList,
+        userRoomList,
+      ],
     });
     const inputArea = new InputArea({
       shouldResize,
@@ -113,6 +124,7 @@ class ChatView extends ViewWrapper {
     const roomListComponent = {
       components: [
         { component: roomList },
+        { component: whisperRoomList },
         { component: userRoomList },
       ],
       classes: ['columnRoomList'],
@@ -160,7 +172,10 @@ class ChatView extends ViewWrapper {
       classes: classes.concat(['chatView']),
     });
 
-    if (!hideRoomList) { this.roomList = roomList; }
+    if (!hideRoomList) {
+      this.roomList = roomList;
+      this.whisperRoomList = whisperRoomList;
+    }
 
     this.inputArea = inputArea;
     this.messageList = messageList;

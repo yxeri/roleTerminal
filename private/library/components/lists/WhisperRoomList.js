@@ -106,7 +106,7 @@ class RoomList extends List {
       }) => {
         if (origin && origin === this.elementId) {
           return;
-        } if (listType !== this.ListTypes.ROOMS) {
+        } else if (listType !== this.ListTypes.ROOMS) {
           return;
         }
 

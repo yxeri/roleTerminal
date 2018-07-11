@@ -324,6 +324,8 @@ class List extends BaseView {
     if (focused) {
       focused.classList.remove(cssClasses.focusListItem);
     }
+
+    this.focusedId = undefined;
   }
 
   markListItem(elementId) {

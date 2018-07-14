@@ -14,11 +14,11 @@ You should set these environmental variable before deploying the app:
 
 ## Project owner
 
-* Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
+* Carmilla Mina Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 
 ## Development contributors
 
-* Aleksandar Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
+* Carmilla Mina Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 * Stanislav B - [Github](https://github.com/stanislavb)
 * Sebastian Streiffert
 

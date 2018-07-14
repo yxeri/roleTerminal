@@ -2,7 +2,7 @@
   "name": "roleTerminal",
   "version": "1.0.15",
   "description": "In-game tool/game for use at Blodsband Reloaded event. Dependency: roleHaven",
-  "author": "Aleksandar Jankovic <aleksonline@icloud.com>",
+  "author": "Carmilla Mina Jankovic <aleksonline@icloud.com>",
   "private": true,
   "scripts": {
     "test": "DEBUG=eslint:cli-engine eslint ./",

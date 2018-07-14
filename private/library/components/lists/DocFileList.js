@@ -39,6 +39,7 @@ class DocFileList extends List {
         dataHandler.aliases,
         dataHandler.users,
         dataHandler.teams,
+        dataHandler.transactions,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {

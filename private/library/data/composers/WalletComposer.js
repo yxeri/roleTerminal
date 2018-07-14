@@ -3,6 +3,8 @@ const DataComposer = require('./BaseComposer');
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
+const userComposer = require('./UserComposer');
+const teamComposer = require('./TeamComposer');
 
 class WalletComposer extends DataComposer {
   constructor() {
@@ -14,6 +16,7 @@ class WalletComposer extends DataComposer {
         dataHandler.teams,
         dataHandler.aliases,
         dataHandler.wallets,
+        dataHandler.transactions,
       ],
     });
   }
@@ -35,6 +38,19 @@ class WalletComposer extends DataComposer {
     });
   }
 
+  getWallet({ walletId }) {
+    return this.handler.getObject({ objectId: walletId });
+  }
+
+  getWalletOwnerName({
+    walletId,
+  }) {
+    const wallet = this.getWallet({ walletId });
+    const walletOwner = userComposer.getIdentity({ objectId: wallet.ownerAliasId || wallet.ownerId }) || teamComposer.getTeam({ teamId: walletId });
+
+    return walletOwner.aliasName || walletOwner.username || walletOwner.teamName;
+  }
+
   changeWalletAmount({
     walletId,
     amount,
@@ -42,8 +58,6 @@ class WalletComposer extends DataComposer {
     shouldDecreaseAmount = false,
     resetAmount = false,
   }) {
-    console.log(walletId, amount);
-
     this.handler.updateObject({
       callback,
       event: socketManager.EmitTypes.UPDATEWALLET,
@@ -58,6 +72,16 @@ class WalletComposer extends DataComposer {
         },
       },
     });
+  }
+
+  getWalletAmount({ walletId }) {
+    const wallet = this.handler.getObject({ objectId: walletId });
+
+    if (wallet) {
+      return wallet.amount;
+    }
+
+    return -1;
   }
 }
 

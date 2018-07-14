@@ -79,9 +79,9 @@ class TransactionList extends List {
         dataHandler.wallets,
       ],
       listItemClickFuncs: {
-        leftFunc: (objectId) => {
-
-        },
+        // leftFunc: (objectId) => {
+        //
+        // },
       },
       collector: dataHandler.transactions,
       listItemFields: headerFields,

@@ -1,6 +1,6 @@
 {
   "name": "roleTerminal",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "In-game tool/game for use at Blodsband Reloaded event. Dependency: roleHaven",
   "author": "Carmilla Mina Jankovic <aleksonline@icloud.com>",
   "private": true,

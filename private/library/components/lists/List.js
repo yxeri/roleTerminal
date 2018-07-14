@@ -475,6 +475,14 @@ class List extends BaseView {
 
     if (shouldReplace) {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
+    } else if (this.sorting && this.sorting.reverse) {
+      const firstChild = this.listElement.firstElementChild;
+
+      if (firstChild) {
+        this.listElement.insertBefore(newItem, firstChild);
+      } else {
+        this.listElement.appendChild(newItem);
+      }
     } else {
       this.listElement.appendChild(newItem);
     }

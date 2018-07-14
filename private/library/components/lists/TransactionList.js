@@ -22,6 +22,7 @@ const labelHandler = require('../../labels/LabelHandler');
 
 class TransactionList extends List {
   constructor({
+    reverseSorting = true,
     toText = '->',
     classes = [],
     elementId = `tList-${Date.now()}`,
@@ -64,6 +65,11 @@ class TransactionList extends List {
 
     super({
       elementId,
+      sorting: {
+        paramName: 'cutomTimeCreated',
+        fallbackParamName: 'timeCreated',
+        reverse: reverseSorting,
+      },
       classes: classes.concat(['transactionList']),
       dependencies: [
         dataHandler.transactions,

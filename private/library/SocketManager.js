@@ -64,6 +64,8 @@ class SocketManager {
       CHANGEPASSWORD: 'changePassword',
       UPDATEUSER: 'updateUser',
       UPDATEWALLET: 'updateWallet',
+      UNFOLLOW: 'unfollowRoom',
+      CREATETRANSACTION: 'createTransaction',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -273,7 +273,7 @@ class AdminUserList extends List {
             },
           });
           const walletButton = elementCreator.createButton({
-            text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'wallet' }),
+            text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'wallet' }),
             clickFuncs: {
               leftFunc: () => {
                 const walletDialog = new BaseDialog({
@@ -283,7 +283,7 @@ class AdminUserList extends List {
                     isRequired: true,
                     maxLength: 6,
                     type: 'number',
-                    placeholder: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'amountPlaceholder' }),
+                    placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
                   })],
                   upperText: [`${labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'walletAmount' })}`],
                   lowerButtons: [
@@ -294,7 +294,7 @@ class AdminUserList extends List {
                       },
                     }),
                     elementCreator.createButton({
-                      text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'sendAmount' }),
+                      text: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendAmount' }),
                       clickFuncs: {
                         leftFunc: () => {
                           if (walletDialog.hasEmptyRequiredInputs()) {

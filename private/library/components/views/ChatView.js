@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
 const UserRoomList = require('../lists/UserRoomList');
 const WhisperRoomList = require('../lists/WhisperRoomList');
+const RoomFollowingList = require('../lists/RoomFollowingList');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -42,6 +43,9 @@ class ChatView extends ViewWrapper {
     const roomList = new RoomList({
       title: 'room',
     });
+    const roomFollowingList = new RoomFollowingList({
+      title: 'following',
+    });
     const whisperRoomList = new WhisperRoomList({
       title: 'whisper',
     });
@@ -51,6 +55,7 @@ class ChatView extends ViewWrapper {
     const messageList = new MessageList({
       shouldSwitchRoom: true,
       roomLists: [
+        roomFollowingList,
         roomList,
         whisperRoomList,
         userRoomList,
@@ -123,6 +128,7 @@ class ChatView extends ViewWrapper {
     };
     const roomListComponent = {
       components: [
+        { component: roomFollowingList },
         { component: roomList },
         { component: whisperRoomList },
         { component: userRoomList },
@@ -175,6 +181,7 @@ class ChatView extends ViewWrapper {
     if (!hideRoomList) {
       this.roomList = roomList;
       this.whisperRoomList = whisperRoomList;
+      this.roomFollowingList = roomFollowingList;
     }
 
     this.inputArea = inputArea;

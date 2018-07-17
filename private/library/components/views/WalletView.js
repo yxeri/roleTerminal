@@ -15,26 +15,26 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
-const DocFileList = require('../lists/DocFileList');
-const DocFilePage = require('./DocFilePage');
+const TransactionList = require('../lists/TransactionList');
+const UserList = require('../lists/UserList');
 
-class DocFileView extends ViewWrapper {
+class WalletView extends ViewWrapper {
   constructor({
     classes = [],
-    elementId = `dFView-${Date.now()}`,
+    elementId = `wView-${Date.now()}`,
   }) {
-    const docFileList = new DocFileList({});
-    const docFilePage = new DocFilePage({});
+    const transactionList = new TransactionList({});
+    const userList = new UserList({});
 
     super({
       elementId,
       columns: [
-        { components: [{ component: docFileList }] },
-        { components: [{ component: docFilePage }] },
+        { components: [{ component: userList }] },
+        { components: [{ component: transactionList }] },
       ],
-      classes: classes.concat(['docFileView']),
+      classes: classes.concat(['walletView']),
     });
   }
 }
 
-module.exports = DocFileView;
+module.exports = WalletView;

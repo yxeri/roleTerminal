@@ -15,21 +15,20 @@
  */
 
 const List = require('./List');
+const UserDialog = require('../views/dialogs/UserDialog');
 
 const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
 
-class RoomList extends List {
+class UserList extends List {
   constructor({
     title,
     classes = [],
-    elementId = `userRList-${Date.now()}`,
+    elementId = `userList-${Date.now()}`,
   }) {
-    classes.push('roomList');
-    classes.push('userRoomList');
+    classes.push('userList');
 
     const headerFields = [{
       paramName: 'username',
@@ -49,46 +48,15 @@ class RoomList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const whisperPermission = storageManager.getPermissions().SendWhisper || { accessLevel: 1 };
-
-          if (storageManager.getAccessLevel() < whisperPermission.accessLevel) {
-            return;
-          }
-
-          eventCentral.emitEvent({
-            event: eventCentral.Events.SWITCH_ROOM,
-            params: {
-              origin: this.elementId,
-              listType: this.ListTypes.ROOMS,
-              room: {
-                objectId,
-                isUser: true,
-              },
-            },
+          const userDialog = new UserDialog({
+            identityId: objectId,
           });
+
+          userDialog.addToView({ element: this.getParentElement() });
         },
       },
       collector: dataHandler.users,
       listItemFields: headerFields,
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.SWITCH_ROOM,
-      func: ({
-        room,
-        origin,
-        listType = '',
-      }) => {
-        if (origin && origin === this.elementId) {
-          return;
-        } else if (listType !== this.ListTypes.ROOMS) {
-          return;
-        }
-
-        const { objectId } = room;
-
-        this.setFocusedListItem(objectId);
-      },
     });
   }
 
@@ -114,4 +82,4 @@ class RoomList extends List {
   }
 }
 
-module.exports = RoomList;
+module.exports = UserList;

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ class List extends BaseView {
                   shouldAnimate: true,
                 });
                 this.scrollList();
-                this.onCreateFunc({ object });
+                // this.onCreateFunc({ object });
               }
 
               break;
@@ -324,6 +324,8 @@ class List extends BaseView {
     if (focused) {
       focused.classList.remove(cssClasses.focusListItem);
     }
+
+    this.focusedId = undefined;
   }
 
   markListItem(elementId) {
@@ -473,6 +475,14 @@ class List extends BaseView {
 
     if (shouldReplace) {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
+    } else if (this.sorting && this.sorting.reverse) {
+      const firstChild = this.listElement.firstElementChild;
+
+      if (firstChild) {
+        this.listElement.insertBefore(newItem, firstChild);
+      } else {
+        this.listElement.appendChild(newItem);
+      }
     } else {
       this.listElement.appendChild(newItem);
     }

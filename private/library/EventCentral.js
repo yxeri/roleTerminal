@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2016 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -77,6 +77,8 @@ class EventCentral {
       COMPLETE_DOCFILE: 'Doc file dependencies fetched',
       COMPLETE_ROOM: 'Room dependencies fetched',
       COMPLETE_WALLET: 'Wallet dependencies fetched',
+      COMPLETE_TRANSACTION: 'Transaction dependencies fetched',
+      COMPLETE_TEAM: 'Team dependencies fetched',
     };
     this.eventWatchers = {};
   }

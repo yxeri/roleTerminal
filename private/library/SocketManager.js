@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Aleksandar Jankovic
+ Copyright 2015 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -64,6 +64,8 @@ class SocketManager {
       CHANGEPASSWORD: 'changePassword',
       UPDATEUSER: 'updateUser',
       UPDATEWALLET: 'updateWallet',
+      UNFOLLOW: 'unfollowRoom',
+      CREATETRANSACTION: 'createTransaction',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

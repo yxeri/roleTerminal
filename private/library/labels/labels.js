@@ -48,6 +48,15 @@ const labels = {
       en: 'Change',
       se: 'Ändra',
     },
+    wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
+      en: 'Transfer currency',
+    },
+    currency: (override.BaseDialog && override.BaseDialog.currency) || {
+      en: 'currency',
+    },
+    unknown: (override.BaseDialog && override.BaseDialog.unknown) || {
+      en: 'Unknown',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -282,17 +291,68 @@ const labels = {
     access: (override.AdminUserDialog && override.AdminUserDialog.access) || {
       en: 'Change permissions',
     },
-    wallet: (override.AdminUserDialog && override.AdminUserDialog.wallet) || {
-      en: 'Transfer currency',
+    walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet and won\'t show up in the user\'s transaction list.',
     },
-    walletAmount: (override.AdminUserDialog && override.AdminUserDialog.walletAmount) || {
-      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet.',
+  },
+  WalletDialog: {
+    walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer.',
     },
-    amountPlaceholder: (override.AdminUserDialog && override.AdminUserDialog.amountPlaceholder) || {
+    amountPlaceholder: (override.WalletDialog && override.WalletDialog.amountPlaceholder) || {
       en: 'Enter amount',
     },
-    sendAmount: (override.AdminUserDialog && override.AdminUserDialog.sendAmount) || {
+    sendAmount: (override.WalletDialog && override.WalletDialog.sendAmount) || {
       en: 'Transfer',
+    },
+    youHave: (override.WalletDialog && override.WalletDialog.youHave) || {
+      en: 'You have',
+    },
+    sendingTo: (override.WalletDialog && override.WalletDialog.sendingTo) || {
+      en: 'You are transferring to user',
+    },
+    sendingToTeam: (override.WalletDialog && override.WalletDialog.sendingToTeam) || {
+      en: 'You are transferring to team',
+    },
+  },
+  UserDialog: {
+    userInfo: (override.UserDialog && override.UserDialog.userInfo) || {
+      en: 'User information',
+    },
+    partOfTeam: (override.UserDialog && override.UserDialog.partOfTeam) || {
+      en: 'Part of teams',
+    },
+    position: (override.UserDialog && override.UserDialog.position) || {
+      en: 'Tracking coordinates',
+    },
+    lastSeenAt: (override.UserDialog && override.UserDialog.lastSeenAt) || {
+      en: 'Last seen at',
+    },
+    amountPlaceholder: (override.UserDialog && override.UserDialog.amountPlaceholder) || {
+      en: 'Enter amount',
+    },
+    sendAmount: (override.UserDialog && override.UserDialog.sendAmount) || {
+      en: 'Transfer',
+    },
+    youHave: (override.UserDialog && override.UserDialog.youHave) || {
+      en: 'You have',
+    },
+    sendingTo: (override.UserDialog && override.UserDialog.sendingTo) || {
+      en: 'You are transferring to user',
+    },
+    sendingToTeam: (override.UserDialog && override.UserDialog.sendingToTeam) || {
+      en: 'You are transferring to team',
+    },
+    trackPosition: (override.UserDialog && override.UserDialog.trackPosition) || {
+      en: 'Track user',
+    },
+  },
+  TransactionList: {
+    amount: (override.TransactionList && override.TransactionList.amount) || {
+      en: 'Amount',
+    },
+    sentFrom: (override.TransactionList && override.TransactionList.sentFrom) || {
+      en: 'Sent from',
     },
   },
 };

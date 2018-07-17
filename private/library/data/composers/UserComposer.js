@@ -29,6 +29,19 @@ class UserComposer extends DataComposer {
     return {};
   }
 
+  getCurrentIdentity() {
+    const userId = storageManager.getUserId();
+    const aliasId = storageManager.getAliasId();
+
+    if (aliasId) {
+      return aliasComposer.getAlias({ aliasId });
+    } else if (userId) {
+      return this.handler.getObject({ objectId: userId });
+    }
+
+    return {};
+  }
+
   createUser({
     user,
     callback,
@@ -119,6 +132,16 @@ class UserComposer extends DataComposer {
 
   getIdentity({ objectId }) {
     return this.getUser({ userId: objectId }) || aliasComposer.getAlias({ aliasId: objectId });
+  }
+
+  getIdentityName({ objectId }) {
+    const identity = this.getUser({ userId: objectId }) || aliasComposer.getAlias({ aliasId: objectId });
+
+    if (identity) {
+      return identity.aliasName || identity.username;
+    }
+
+    return '';
   }
 
   changePassword({

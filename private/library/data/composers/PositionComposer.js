@@ -67,6 +67,10 @@ class PositionComposer extends BaseComposer {
     });
   }
 
+  getPosition({ positionId }) {
+    return this.handler.getObject({ objectId: positionId });
+  }
+
   createPosition({
     position,
     callback,

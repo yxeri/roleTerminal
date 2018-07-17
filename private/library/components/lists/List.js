@@ -160,7 +160,7 @@ class List extends BaseView {
                   shouldAnimate: true,
                 });
                 this.scrollList();
-                this.onCreateFunc({ object });
+                // this.onCreateFunc({ object });
               }
 
               break;

@@ -20,6 +20,7 @@ const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
+const userComposer = require('../../data/composers/UserComposer');
 
 class RoomList extends List {
   constructor({
@@ -72,6 +73,11 @@ class RoomList extends List {
 
           roomComposer.follow({ roomId });
         },
+        right: (objectId) => {
+          roomComposer.unfollow({
+            roomId: objectId,
+          });
+        },
       },
       dependencies: [
         dataHandler.rooms,
@@ -99,6 +105,32 @@ class RoomList extends List {
 
         this.setFocusedListItem(objectId);
       },
+    });
+  }
+
+  getCollectorObjects() {
+    const currentUser = userComposer.getCurrentUser();
+
+    if (!currentUser) {
+      return [];
+    }
+
+    const allRooms = this.collector.getObjects({
+      filter: this.filter,
+    });
+    const { followingRooms = [] } = currentUser;
+
+    return allRooms.filter(object => !followingRooms.includes(object.objectId)).sort((a, b) => {
+      const aParam = a.roomName.toLowerCase();
+      const bParam = b.roomName.toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      } else if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
     });
   }
 }

@@ -23,7 +23,7 @@ class TransactionComposer extends DataComposer {
     transaction,
     callback,
   }) {
-    this.handler.updateObject({
+    this.handler.createObject({
       callback,
       event: socketManager.EmitTypes.CREATETRANSACTION,
       params: {

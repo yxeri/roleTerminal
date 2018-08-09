@@ -15,16 +15,43 @@
  */
 
 const eventCentral = require('./EventCentral');
+const storageManager = require('./StorageManager');
 
 let currentView;
 
 class ViewSwitcher {
   constructor() {
+    this.ViewTypes = {
+      CHAT: 'chat',
+      WORLDMAP: 'worldMap',
+      DOCS: 'docs',
+      WALLET: 'wallet',
+    };
     this.parentElement = undefined;
+    this.availableTypes = [];
+    this.defaultView = undefined;
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        storageManager.removeDefaultViewType();
+
+        this.switchView({ view: this.defaultView });
+      },
+    });
   }
 
-  switchView({ view }) {
-    if (view === currentView) {
+  switchView({
+    view,
+    setToDefault = false,
+  }) {
+    const defaultViewType = storageManager.getDefaultViewType();
+
+    if (setToDefault && defaultViewType && this.availableTypes.includes(defaultViewType)) {
+      this.switchViewByType({ type: defaultViewType });
+
+      return;
+    } else if (view === currentView) {
       return;
     }
 
@@ -32,9 +59,10 @@ class ViewSwitcher {
       currentView.removeFromView();
     }
 
-    view.addToView({ element: this.parentElement });
-
     currentView = view;
+
+    view.addToView({ element: this.parentElement });
+    storageManager.setDefaultViewType(view.viewType);
 
     eventCentral.emitEvent({
       event: eventCentral.Events.VIEW_SWITCHED,
@@ -42,10 +70,25 @@ class ViewSwitcher {
     });
   }
 
+  switchViewByType({ type }) { // eslint-disable-line class-methods-use-this
+    eventCentral.emitEvent({
+      event: eventCentral.Events.TRY_VIEW_SWITCH,
+      params: { type },
+    });
+  }
+
   setParentElement({ element }) {
     this.parentElement = element;
 
     return this;
+  }
+
+  addAvailableTypes({ types = [] }) {
+    this.availableTypes = this.availableTypes.concat(types);
+  }
+
+  setDefaultView({ view }) {
+    this.defaultView = view;
   }
 }
 

@@ -134,6 +134,7 @@ class StorageManager {
     this.setAccessLevel(0);
     this.removeCurrentForum();
     this.removeUserId();
+    this.removeDefaultViewType();
 
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
@@ -418,7 +419,19 @@ class StorageManager {
   }
 
   static getLanguage() {
-    this.getLocalVal('language');
+    return this.getLocalVal('language');
+  }
+
+  static setDefaultViewType(type) {
+    this.setLocalVal('defaultViewType', type);
+  }
+
+  static getDefaultViewType() {
+    return this.getLocalVal('defaultViewType');
+  }
+
+  static removeDefaultViewType() {
+    this.removeLocalVal('defaultViewType');
   }
 }
 

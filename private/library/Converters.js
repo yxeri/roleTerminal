@@ -22,9 +22,9 @@ class Converters {
    * @returns {Object|null} Converted object. null if the value was not set
    */
   static convertToObject(value) {
-    return value && value !== null ?
-      JSON.parse(value) :
-      {};
+    return value && value !== null
+      ? JSON.parse(value)
+      : {};
   }
 
   /**

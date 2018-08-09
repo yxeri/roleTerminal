@@ -51,7 +51,9 @@ class KeyHandler {
         event.which :
         event.keyCode;
 
-      if (this.paused || this.ignoredKeys[sentKeyCode]) {
+      if (this.paused) {
+        return;
+      } else if (this.ignoredKeys[sentKeyCode]) {
         event.preventDefault();
         event.stopPropagation();
 

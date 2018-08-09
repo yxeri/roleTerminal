@@ -78,7 +78,7 @@ class List extends BaseView {
     shouldToggle,
     listItemSpecificClasses,
     onCreateFunc = () => {},
-    minAccessLevel = accessCentral.AccessLevels.ANONYMOUS,
+    minAccessLevel,
     shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
@@ -90,6 +90,7 @@ class List extends BaseView {
   }) {
     super({
       elementId,
+      minAccessLevel,
       classes: classes.concat(['list']),
     });
 
@@ -114,7 +115,6 @@ class List extends BaseView {
     this.shouldPaginate = shouldPaginate;
     this.listItemSpecificClasses = listItemSpecificClasses;
     this.shouldToggle = shouldToggle;
-    this.minAccessLevel = minAccessLevel;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -123,25 +123,30 @@ class List extends BaseView {
           const object = data[collector.objectTypes.one];
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
-          const {
-            canSee,
-          } = this.hasAccess({ object, user });
 
-          if (changeType === socketManager.ChangeTypes.CREATE) {
-            this.onCreateFunc({ object });
-          }
+          if (changeType !== socketManager.ChangeTypes.REMOVE && this.filter) {
+            const filterFunc = (rule) => {
+              if (rule.shouldInclude) {
+                return rule.userRule ?
+                  user[rule.paramName].includes(rule.paramValue) :
+                  object[rule.paramName].includes(rule.paramValue);
+              }
 
-          if (this.filter) {
-            if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
+              return rule.userRule ?
+                rule.paramValue === user[rule.paramName] :
+                rule.paramValue === object[rule.paramName];
+            };
+
+            if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
               return;
-            } else if (!this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
+            } else if (!this.filter.rules.every(filterFunc)) {
               return;
             }
           }
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (canSee) {
+              if (this.hasAccess({ object, user }).canSee) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
@@ -154,18 +159,21 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (canSee) {
+              if (this.hasAccess({ object, user }).canSee) {
+                this.onCreateFunc({ object });
+
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
                 });
                 this.scrollList();
-                // this.onCreateFunc({ object });
               }
 
               break;
             }
             case socketManager.ChangeTypes.REMOVE: {
+              console.log('going to remove object', object, collector.objectTypes.one);
+
               this.removeOneItem({ object });
 
               break;
@@ -196,7 +204,7 @@ class List extends BaseView {
   }
 
   scrollList() {
-    if (this.shouldScrollToBottom && this.listElement.lastElementChild) {
+    if (this.shouldScrollToBottom && this.listElement && this.listElement.lastElementChild) {
       this.listElement.lastElementChild.scrollIntoView();
     }
   }
@@ -427,10 +435,16 @@ class List extends BaseView {
               document.createTextNode('');
           });
 
-        listItemElements.push(elementCreator.createParagraph({
+        const paragraphParams = {
           elements,
           classes: this.listItemFieldsClasses,
-        }));
+        };
+
+        if (this.listItemClickFuncs.onlyListItemFields) {
+          paragraphParams.clickFuncs = clickFuncs;
+        }
+
+        listItemElements.push(elementCreator.createParagraph(paragraphParams));
       }
 
       /**
@@ -452,12 +466,17 @@ class List extends BaseView {
       }));
     }
 
-    return elementCreator.createListItem({
+    const listItemParams = {
       classes,
-      clickFuncs,
       elementId: `${this.elementId}${objectId}`,
       elements: listItemElements,
-    });
+    };
+
+    if (!this.listItemClickFuncs.onlyListItemFields) {
+      listItemParams.clickFuncs = clickFuncs;
+    }
+
+    return elementCreator.createListItem(listItemParams);
   }
 
   addOneItem({
@@ -488,16 +507,18 @@ class List extends BaseView {
     }
   }
 
-  removeOneItem({
-    object,
-  }) {
+  removeOneItem({ object }) {
     const { objectId } = object;
     const toRemove = this.getElement(objectId);
 
     toRemove.classList.add(cssClasses.removeListItem);
 
     setTimeout(() => {
-      this.listElement.removeChild(this.getElement(objectId));
+      const element = this.getElement(objectId);
+
+      if (element) {
+        this.listElement.removeChild(element);
+      }
     }, itemChangeTimeout);
   }
 

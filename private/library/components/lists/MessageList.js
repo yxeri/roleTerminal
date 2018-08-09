@@ -15,12 +15,15 @@
  */
 
 const List = require('./List');
+const MessageDialog = require('../views/dialogs/MessageDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
 const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
+const messageComposer = require('../../data/composers/MessageComposer');
 
 class MessageList extends List {
   /**
@@ -33,9 +36,9 @@ class MessageList extends List {
    * @param {string} [params.elementId] - Id of the list element.
    */
   constructor({
+    roomId,
     multiRoom = false,
     shouldSwitchRoom = false,
-    roomId,
     whisperText = ' - ',
     roomLists = [],
     classes = [],
@@ -43,6 +46,29 @@ class MessageList extends List {
   }) {
     const superParams = {
       elementId,
+      listItemClickFuncs: {
+        onlyListItemFields: true,
+        leftFunc: (objectId) => {
+          const message = messageComposer.getMessage({ messageId: objectId });
+          const {
+            hasFullAccess,
+          } = accessCentral.hasAccessTo({
+            objectToAccess: message,
+            toAuth: userComposer.getCurrentUser(),
+          });
+
+          if (hasFullAccess) {
+            const messageDialog = new MessageDialog({
+              messageId: message.objectId,
+              text: message.text,
+            });
+
+            messageDialog.addToView({
+              element: this.getParentElement(),
+            });
+          }
+        },
+      },
       shouldScrollToBottom: true,
       classes: classes.concat(['msgList']),
       dependencies: [
@@ -135,6 +161,13 @@ class MessageList extends List {
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
           if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
+            this.getParentElement().classList.remove('flash');
+            this.getParentElement().classList.add('flash');
+
+            setTimeout(() => {
+              this.getParentElement().classList.remove('flash');
+            }, 400);
+
             this.showMessagesByRoom({ roomId: room.objectId });
           }
         },

@@ -33,6 +33,7 @@ class MapLine extends MapObject {
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
 
     super({
+      labelStyle,
       alwaysShowLabel,
       shouldCluster,
       position,
@@ -58,19 +59,12 @@ class MapLine extends MapObject {
         });
       },
       mapObject: new google.maps.Polyline({
-        labelStyle,
         zIndex,
         path: new google.maps.MVCArray(allPoints),
         strokeColor: styles.strokeColor || '#000000',
         strokeOpacity: styles.strokeOpacity || 0.8,
         strokeWeight: styles.strokeWeight || 3,
         opacity: styles.opacity || 1,
-        // icon: {
-        //   url: icon.url || '/images/mapicon.png',
-        //   size: icon.size || new google.maps.Size(14, 14),
-        //   origin: icon.origin || new google.maps.Point(0, 0),
-        //   anchor: icon.anchor || new google.maps.Point(7, 7),
-        // },
       }),
     });
   }

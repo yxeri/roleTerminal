@@ -123,7 +123,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -142,7 +142,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -161,7 +161,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -180,7 +180,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error, data }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -253,7 +253,7 @@ class AdminUserList extends List {
                             accessLevel: chosen.value,
                             callback: ({ error }) => {
                               if (error) {
-                                accessDialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                                accessDialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                                 return;
                               }
@@ -273,7 +273,7 @@ class AdminUserList extends List {
             },
           });
           const walletButton = elementCreator.createButton({
-            text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'wallet' }),
+            text: labelHandler.getLabel({ baseObject: 'Transaction', label: 'wallet' }),
             clickFuncs: {
               leftFunc: () => {
                 const walletDialog = new BaseDialog({
@@ -306,7 +306,7 @@ class AdminUserList extends List {
                             amount: walletDialog.getInputValue('walletAmount'),
                             callback: ({ error }) => {
                               if (error) {
-                                dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                                dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Transaction', label: 'failed' })] });
 
                                 return;
                               }

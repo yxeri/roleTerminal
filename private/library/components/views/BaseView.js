@@ -15,18 +15,29 @@
  */
 
 const elementCreator = require('../../ElementCreator');
+const accessCentral = require('../../AccessCentral');
+const storageManager = require('../../StorageManager');
 
 class BaseView {
   constructor({
     classes,
+    minAccessLevel,
     elementId = `elem-${Date.now()}`,
   }) {
+    this.minAccessLevel = minAccessLevel;
     this.classes = classes;
     this.elementId = elementId;
     this.element = elementCreator.createContainer({
       classes,
       elementId,
     });
+
+    if (minAccessLevel) {
+      accessCentral.addAccessElement({
+        element: this.element,
+        minimumAccessLevel: this.minAccessLevel,
+      });
+    }
   }
 
   replaceOnParent({ element }) {
@@ -72,6 +83,12 @@ class BaseView {
   }
 
   showView() {
+    console.log('access show', this.minAccessLevel, this.element);
+
+    if (this.minAccessLevel && this.minAccessLevel > storageManager.getAccessLevel()) {
+      return;
+    }
+
     this.element.classList.remove('hide');
   }
 
@@ -80,6 +97,12 @@ class BaseView {
   }
 
   toggleView() {
+    console.log('access toggle', this.minAccessLevel, this.element);
+
+    if (this.minAccessLevel && this.minAccessLevel > storageManager.getAccessLevel()) {
+      return;
+    }
+
     this.element.classList.toggle('hide');
   }
 

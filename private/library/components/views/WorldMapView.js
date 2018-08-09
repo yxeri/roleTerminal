@@ -30,6 +30,7 @@ class WorldMapView extends BaseView {
     labelStyle,
     listId,
     clusterStyle,
+    triggeredStyles = {},
     choosableStyles = {},
     alwaysShowLabels = {},
     classes = [],
@@ -68,6 +69,7 @@ class WorldMapView extends BaseView {
     this.labelStyle = labelStyle;
     this.alwaysShowLabels = alwaysShowLabels;
     this.choosableStyles = choosableStyles;
+    this.triggeredStyles = triggeredStyles;
 
     this.element.appendChild(MapObject.leftClickBox);
     this.element.appendChild(MapObject.rightClickBox);
@@ -78,63 +80,51 @@ class WorldMapView extends BaseView {
         this.startMap();
       },
     });
+  }
 
-    eventHandler.addWatcher({
-      event: eventHandler.Events.FOCUS_MAPPOSITION,
-      func: ({ origin, position }) => {
+  insertPosition({
+    position,
+    changeType,
+  }) {
+    if (!this.worldMap || position.coordinatesHistory.length === 0) {
+      return;
+    }
+
+    switch (changeType) {
+      case socketManager.ChangeTypes.CREATE:
+      case socketManager.ChangeTypes.UPDATE: {
+        const oldMarker = this.markers[position.objectId];
+
+        if (oldMarker) {
+          this.clusterer.removeMarker(oldMarker.mapObject);
+          oldMarker.setMap(null);
+        }
+
+        const newMarker = this.createMarker({ position });
+        this.markers[position.objectId] = newMarker;
+
+        newMarker.setMap(this.worldMap);
+
+        if (newMarker.shouldCluster) {
+          this.clusterer.addMarker(newMarker.mapObject);
+        }
+
+        break;
+      }
+      case socketManager.ChangeTypes.REMOVE: {
         const marker = this.markers[position.objectId];
 
-        if (marker && (!listId || listId === origin)) {
-          this.realignMap({ markers: [marker] });
-        }
-      },
-    });
+        this.clusterer.removeMarker(marker.mapObject);
+        marker.setMap(null);
 
-    eventHandler.addWatcher({
-      event: eventHandler.Events.POSITION,
-      func: (data) => {
-        const { position, changeType } = data;
-        switch (changeType) {
-          case socketManager.ChangeTypes.CREATE: {
-            const marker = new MapMarker({
-              position,
-              worldMapView: this,
-            });
+        this.markers[position.objectId] = undefined;
 
-            this.markers[position.objectId] = marker;
-
-            break;
-          }
-          case socketManager.ChangeTypes.UPDATE: {
-            const oldMarker = this.markers[position.objectId];
-
-            this.clusterer.removeMarker(oldMarker.mapObject);
-            oldMarker.setMap(null);
-
-            const marker = new MapMarker({
-              position,
-              worldMapView: this,
-            });
-
-            this.markers[position.objectId] = marker;
-
-            break;
-          }
-          case socketManager.ChangeTypes.REMOVE: {
-            const marker = this.markers[position.objectId];
-
-            this.clusterer.removeMarker(marker.mapObject);
-            marker.setMap(null);
-            this.markers[position.objectId] = undefined;
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      },
-    });
+        break;
+      }
+      default: {
+        break;
+      }
+    }
   }
 
   realignMap({ markers }) {
@@ -160,21 +150,6 @@ class WorldMapView extends BaseView {
   }
 
   /**
-   * Add a marker to the map. It will also be added to the clusterer, if it should be clustered.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.marker - Marker to add.
-   */
-  addMarker({ marker }) {
-    marker.setMap(this.worldMap);
-
-    this.markers[marker.position.objectId] = marker;
-
-    if (marker.shouldCluster) {
-      this.clusterer.addMarker(marker.mapObject);
-    }
-  }
-
-  /**
    * Create a marker based on its type.
    * @param {Object} params - Parameters.
    * @param {Object} params.position - Position to create a marker for.
@@ -190,6 +165,7 @@ class WorldMapView extends BaseView {
       case positionComposer.PositionStructures.LINE: {
         newMarker = new MapLine({
           position,
+          triggeredStyles: this.triggeredStyles.lines,
           choosableStyles: this.choosableStyles.lines,
           alwaysShowLabel: this.alwaysShowLabels.line,
           labelStyle: this.labelStyle,
@@ -201,6 +177,7 @@ class WorldMapView extends BaseView {
       case positionComposer.PositionStructures.POLYGON: {
         newMarker = new MapPolygon({
           position,
+          triggeredStyles: this.triggeredStyles.polygons,
           choosableStyles: this.choosableStyles.polygons,
           alwaysShowLabel: this.alwaysShowLabels.polygon,
           labelStyle: this.labelStyle,
@@ -212,6 +189,7 @@ class WorldMapView extends BaseView {
       default: {
         newMarker = new MapMarker({
           position,
+          triggeredStyles: this.triggeredStyles.markers,
           choosableStyles: this.choosableStyles.markers,
           alwaysShowLabel: this.alwaysShowLabels.marker,
           labelStyle: this.labelStyle,
@@ -227,21 +205,16 @@ class WorldMapView extends BaseView {
 
   /**
    * Markers will be created for all available positions and added to the marker collection.
-   * @return {Object[]} Created markers.
    */
   createMarkers() {
-    const markers = {};
     const positions = positionComposer.getPositions({ positionTypes: this.positionTypes });
 
     positions.forEach((position) => {
-      const marker = this.createMarker({ position });
-
-      if (marker) {
-        markers[position.objectId] = this.createMarker({ position });
-      }
+      this.insertPosition({
+        position,
+        changeType: socketManager.ChangeTypes.CREATE,
+      });
     });
-
-    return markers;
   }
 
   /**
@@ -403,14 +376,8 @@ class WorldMapView extends BaseView {
     });
     this.clusterer = new MarkerClusterer(this.worldMap, [], this.clusterStyle);
 
-    this.markers = this.createMarkers();
-
-    Object.keys(this.markers).forEach((markerId) => {
-      const marker = this.markers[markerId];
-
-      if (marker) {
-        marker.setMap(this.worldMap);
-      }
+    this.createMarkers({
+      worldMap: this.worldMap,
     });
 
     this.resetClusterer();
@@ -436,10 +403,66 @@ class WorldMapView extends BaseView {
       MapObject.hideRightClickBox();
     });
 
+    google.maps.event.addListener(this.worldMap, 'zoom_changed', () => {
+      eventHandler.emitEvent({
+        event: eventHandler.Events.ZOOM_WORLDMAP,
+        params: {
+          map: this.worldMap,
+          zoomLevel: this.worldMap.getZoom(),
+        },
+      });
+    });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.FOCUS_MAPPOSITION,
+      func: ({ origin, position }) => {
+        const marker = this.markers[position.objectId];
+
+        if (marker && (!this.listId || this.listId === origin)) {
+          this.realignMap({ markers: [marker] });
+        }
+      },
+    });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.FOCUS_USER_MAPPOSITION,
+      func: ({ userId }) => {
+        const marker = Object.keys(this.markers).find((key) => {
+          const { connectedUser } = this.markers[key];
+
+          return connectedUser && connectedUser === userId;
+        });
+
+        this.realignMap({ markers: [marker] });
+      },
+    });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.POSITIONS,
+      func: (data) => {
+        const {
+          changeType,
+          positions = [],
+        } = data;
+
+        positions.forEach((position) => {
+          this.insertPosition({
+            position,
+            changeType,
+          });
+        });
+      },
+    });
+
     eventHandler.addWatcher({
       event: eventHandler.Events.POSITION,
-      func: ({ position }) => {
-        this.addMarker({ marker: this.createMarker({ position }) });
+      func: (data) => {
+        const { position, changeType } = data;
+
+        this.insertPosition({
+          position,
+          changeType,
+        });
       },
     });
   }

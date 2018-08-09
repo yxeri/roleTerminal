@@ -236,10 +236,12 @@ class ElementCreator {
   static createParagraph({
     elements,
     text,
+    clickFuncs,
     classes = [],
   }) {
     const paragraph = createBaseElement({
       classes,
+      clickFuncs,
       elementType: 'p',
     });
 
@@ -261,6 +263,8 @@ class ElementCreator {
     elementId,
     classes,
     shouldResize,
+    text,
+    isLocked,
     placeholder = '',
   }) {
     const input = createBaseElement({
@@ -272,7 +276,17 @@ class ElementCreator {
         'input',
     });
 
-    input.setAttribute('placeholder', placeholder);
+    if (text) {
+      if (multiLine) {
+        input.value = text.join('\n').replace(/''/g, '\n');
+      } else {
+        const [value] = text;
+
+        input.value = value;
+      }
+    } else {
+      input.setAttribute('placeholder', placeholder);
+    }
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
 
@@ -300,6 +314,10 @@ class ElementCreator {
           input.style.height = `${input.scrollHeight}px`;
         }
       });
+    }
+
+    if (isLocked) {
+      input.setAttribute('readonly', 'true');
     }
 
     return input;

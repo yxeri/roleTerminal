@@ -51,8 +51,32 @@ class MessageComposer extends DataComposer {
       callback,
       params: {
         participantIds,
+        message: messageToSend,
+      },
+    });
+  }
+
+  updateMessage({
+    message,
+    messageId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        messageId,
         message,
       },
+    });
+  }
+
+  removeMessage({
+    messageId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { messageId },
     });
   }
 }

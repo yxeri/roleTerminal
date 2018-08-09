@@ -21,43 +21,43 @@ const eventCentral = require('../../EventCentral');
 const worldMapHandler = require('../../data/composers/PositionComposer');
 
 class PositionList extends List {
-  constructor({
-    classes = [],
-    positionTypes = Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]),
-    elementId = `pList-${Date.now()}`,
-  }) {
-    super({
-      elementId,
-      classes: classes.concat(['positionList']),
-      filter: {
-        orCheck: true,
-        rules: positionTypes.map((positionType) => {
-          return { paramName: 'positionType', paramValue: positionType };
-        }),
+  constructor(params) {
+    const listParams = params;
+    listParams.positionTypes = listParams.positionTypes || Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]);
+    listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
+    listParams.classes = listParams.classes ?
+      listParams.classes.concat(['positionList']) :
+      [];
+    listParams.filter = {
+      orCheck: true,
+      rules: listParams.positionTypes.map((positionType) => {
+        return { paramName: 'positionType', paramValue: positionType };
+      }),
+    };
+    listParams.dependencies = [
+      dataHandler.users,
+      dataHandler.teams,
+      dataHandler.positions,
+    ];
+    listParams.listItemClickFuncs = {
+      leftFunc: (objectId) => {
+        eventCentral.emitEvent({
+          event: eventCentral.Events.FOCUS_MAPPOSITION,
+          params: {
+            origin: this.elementId,
+            position: { objectId },
+          },
+        });
       },
-      dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.positions,
-      ],
-      listItemClickFuncs: {
-        leftFunc: (objectId) => {
-          eventCentral.emitEvent({
-            event: eventCentral.Events.FOCUS_MAPPOSITION,
-            params: {
-              origin: this.elementId,
-              position: { objectId },
-            },
-          });
-        },
-      },
-      collector: dataHandler.positions,
-      listItemFields: [
-        { paramName: 'positionName' },
-      ],
-    });
+    };
+    listParams.collector = dataHandler.positions;
+    listParams.listItemFields = [
+      { paramName: 'positionName' },
+    ];
 
-    this.positionTypes = positionTypes;
+    super(listParams);
+
+    this.positionTypes = listParams.positionTypes;
   }
 }
 

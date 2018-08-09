@@ -21,16 +21,25 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const userComposer = require('../../../data/composers/UserComposer');
 const positionComposer = require('../../../data/composers/PositionComposer');
+const invititationComposer = require('../../../data/composers/InvitationComposer');
+const teamComposer = require('../../../data/composers/TeamComposer');
+const eventCentral = require('../../../EventCentral');
+const storageManager = require('../../../StorageManager');
+const accessCentral = require('../../../AccessCentral');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 class UserDialog extends BaseDialog {
   constructor({
     identityId,
+    origin,
     classes = [],
     elementId = `uDialog-${Date.now()}`,
   }) {
     const identity = userComposer.getCurrentIdentity();
     const chosenIdentity = userComposer.getIdentity({ objectId: identityId });
-    const partOfTeams = chosenIdentity.partOfTeams && chosenIdentity.partOfTeams.length > 0 ?
+    const identityName = chosenIdentity.aliasName || chosenIdentity.username;
+    const { partOfTeams } = chosenIdentity;
+    const partOfTeamsText = partOfTeams && partOfTeams.length > 0 ?
       chosenIdentity.partOfTeams :
       [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
     const userPosition = positionComposer.getPosition({ positionId: identityId });
@@ -49,7 +58,7 @@ class UserDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'wallet' }),
+        text: labelHandler.getLabel({ baseObject: 'Transaction', label: 'wallet' }),
         clickFuncs: {
           leftFunc: () => {
             const walletDialog = new WalletDialog({
@@ -65,12 +74,72 @@ class UserDialog extends BaseDialog {
       }),
     ];
 
+    if (storageManager.getAccessLevel() >= storageManager.getPermissions().SendWhisper ?
+      storageManager.getPermissions().SendWhisper.accessLevel :
+      { accessLevel: 1 }) {
+      lowerButtons.push(elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'message' }),
+        clickFuncs: {
+          leftFunc: () => {
+            viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT });
+
+            eventCentral.emitEvent({
+              event: eventCentral.Events.SWITCH_ROOM,
+              params: {
+                origin,
+                listType: 'rooms',
+                room: {
+                  objectId: identityId,
+                  isUser: true,
+                },
+              },
+            });
+
+            this.removeFromView();
+          },
+        },
+      }));
+    }
+
+    if (userComposer.getCurrentTeams().length > 0 && userComposer.getUser({ userId: identity })) {
+      const team = teamComposer.getTeam({ teamId: partOfTeams[0] });
+      const { hasFullAccess } = accessCentral.hasAccessTo({
+        objectToAccess: team,
+        toAuth: identity,
+      });
+
+      if (hasFullAccess) {
+        lowerButtons.push(elementCreator.createButton({
+          text: labelHandler.getLabel({ baseObject: 'Button', label: 'inviteTeam' }),
+          clickFuncs: {
+            leftFunc: () => {
+              invititationComposer.inviteToTeam({
+                memberId: identityId,
+                teamId: partOfTeams[0],
+                callback: () => {
+                },
+              });
+
+              this.removeFromView();
+            },
+          },
+        }));
+      }
+    }
+
     if (userPosition) {
       lowerButtons.push(elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
         clickFuncs: {
           leftFunc: () => {
-            // this.removeFromView();
+            viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
+
+            eventCentral.emitEvent({
+              event: eventCentral.Events.FOCUS_USER_MAPPOSITION,
+              params: { userId: identityId },
+            });
+
+            this.removeFromView();
           },
         },
       }));
@@ -79,7 +148,8 @@ class UserDialog extends BaseDialog {
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
       '',
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeams}`,
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`,
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`,
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`,
     ];
 

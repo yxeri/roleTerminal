@@ -18,7 +18,7 @@ const BaseDialog = require('./BaseDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
-const dataHandler = require('../../../data/DataHandler');
+const roomComposer = require('../../../data/composers/RoomComposer');
 
 const ids = {
   ROOMNAME: 'roomName',
@@ -78,12 +78,10 @@ class RoomDialog extends BaseDialog {
               return;
             }
 
-            dataHandler.rooms.createObject({
-              params: {
-                room: {
-                  roomName: this.getInputValue(ids.ROOMNAME),
-                  password: this.getInputValue(ids.PASSWORD),
-                },
+            roomComposer.createRoom({
+              room: {
+                roomName: this.getInputValue(ids.ROOMNAME),
+                password: this.getInputValue(ids.PASSWORD),
               },
               callback: ({ error }) => {
                 if (error) {
@@ -100,7 +98,7 @@ class RoomDialog extends BaseDialog {
                         break;
                       }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }

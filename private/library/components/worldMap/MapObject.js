@@ -19,6 +19,7 @@ const labelHandler = require('../../labels/LabelHandler');
 const elementCreator = require('../../ElementCreator');
 const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
+const eventHandler = require('../../EventCentral');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -85,6 +86,7 @@ class MapObject {
     position,
     labelStyle,
     choosableStyles,
+    triggeredStyles,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
@@ -99,6 +101,8 @@ class MapObject {
     this.currentCoordinates = this.getLatestCoordinates();
     this.shouldCluster = shouldCluster;
     this.alwaysShowLabel = alwaysShowLabel;
+    this.triggeredStyles = triggeredStyles;
+    this.labelStyle = labelStyle;
     this.label = label || new Label({
       labelStyle,
       coordinates: this.getCenter(),
@@ -159,6 +163,54 @@ class MapObject {
           this.hideLabel();
         },
       });
+    } else if (labelStyle.minZoomLevel) {
+      eventHandler.addWatcher({
+        event: eventHandler.Events.ZOOM_WORLDMAP,
+        func: ({
+          zoomLevel,
+          map: worldMap,
+        }) => {
+          if (zoomLevel >= labelStyle.minZoomLevel) {
+            this.showLabel(worldMap);
+          } else {
+            this.hideLabel();
+          }
+        },
+      });
+    }
+
+    if (triggeredStyles) {
+      const styleObj = triggeredStyles.find((styleRule) => {
+        const {
+          paramName,
+          type,
+          minLength,
+        } = styleRule;
+        const param = this.position[paramName];
+
+        switch (type) {
+          case 'string': {
+            return param && typeof param === 'string' && param.length >= minLength;
+          }
+          case 'array': {
+            return param && Array.isArray(param) && param.length >= minLength;
+          }
+          default: {
+            return false;
+          }
+        }
+      });
+
+      if (styleObj) {
+        const { style } = styleObj;
+        const { styleName } = style;
+
+        this.changeStyle({
+          styleName,
+          style,
+          shouldEmit: false,
+        });
+      }
     }
   }
 
@@ -206,7 +258,7 @@ class MapObject {
     this.worldMap = map;
     this.mapObject.setMap(map);
 
-    if (this.alwaysShowLabel) {
+    if (!this.labelStyle.minZoomLevel && this.alwaysShowLabel) {
       this.showLabel();
     }
   }
@@ -216,7 +268,7 @@ class MapObject {
   }
 
   hideLabel() {
-    if (!this.alwaysShowLabel) {
+    if (this.labelStyle.minZoomLevel || !this.alwaysShowLabel) {
       this.label.hideLabel();
     }
   }
@@ -258,29 +310,43 @@ class MapObject {
     return this.position.positionType;
   }
 
-  changeStyle({ styleName, style }) {
-    positionComposer.updatePosition({
-      positionId: this.position.objectId,
-      position: {
-        styleName,
-      },
-      callback: ({ error }) => {
-        if (error) {
-          console.log(error);
+  changeStyle({
+    styleName,
+    style,
+    shouldEmit = true,
+  }) {
+    if (shouldEmit) {
+      positionComposer.updatePosition({
+        positionId: this.position.objectId,
+        position: {
+          styleName,
+        },
+        callback: ({ error }) => {
+          if (error) {
+            console.log(error);
 
-          return;
-        }
+            return;
+          }
 
-        this.mapObject.setOptions(style);
-      },
-    });
+          this.mapObject.setOptions(style);
+        },
+      });
+
+      return;
+    }
+
+    this.mapObject.setOptions(style);
   }
 
   static buildLeftClickBox({ thisMapObject }) {
     const {
       positionName,
-      description = [labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noDescription' })],
+      description = [],
     } = thisMapObject.position;
+
+    if (description.length === 0) {
+      return;
+    }
 
     const descriptionContainer = elementCreator.createContainer({
       elements: [elementCreator.createArticle({
@@ -319,7 +385,7 @@ class MapObject {
 
     const items = [];
 
-    if (this.choosableStyles && storageManager) {
+    if (this.choosableStyles) {
       const radioSet = elementCreator.createRadioSet({
         title: 'Choose color scheme:',
         optionName: ids.CHOOSABLE_STYLE,

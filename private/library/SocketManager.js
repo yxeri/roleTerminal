@@ -66,6 +66,8 @@ class SocketManager {
       UPDATEWALLET: 'updateWallet',
       UNFOLLOW: 'unfollowRoom',
       CREATETRANSACTION: 'createTransaction',
+      INVITETEAM: 'inviteToTeam',
+      LEAVETEAM: 'leaveTeam',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

@@ -23,6 +23,52 @@ const labels = {
       en: 'Register user',
       se: 'Registrera användare',
     },
+    createRoom: (override.Button && override.Button.createRoom) || {
+      en: 'Create room',
+      se: 'Skapa rum',
+    },
+    createDocument: (override.Button && override.Button.createDocument) || {
+      en: 'Create document',
+      se: 'Skapa sokument',
+    },
+    createTeam: (override.Button && override.Button.createTeam) || {
+      en: 'Create team',
+      se: 'Skapa grupp',
+    },
+    inviteTeam: (override.Button && override.Button.inviteTeam) || {
+      en: 'Invite to team',
+      se: 'Bjud in till grupp',
+    },
+    leaveTeam: (override.Button && override.Button.leaveTeam) || {
+      en: 'Leave team',
+      se: 'Lämna gruppen',
+    },
+    message: (override.Button && override.Button.message) || {
+      en: 'Message',
+      se: 'Meddelande',
+    },
+    createAlias: (override.Button && override.Button.createAlias) || {
+      en: 'Create alias',
+      se: 'Skapa alias',
+    },
+    confirm: (override.Button && override.Button.confirm) || {
+      en: 'Confirm',
+    },
+    edit: (override.Button && override.Button.edit) || {
+      en: 'Edit',
+    },
+  },
+  Transaction: {
+    failed: (override.Transaction && override.Transaction.failed) || {
+      en: 'Failed to complete the action! Try again or contact an administrator.',
+      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
+    },
+    wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
+      en: 'Transfer currency',
+    },
+    currency: (override.BaseDialog && override.BaseDialog.currency) || {
+      en: 'currency',
+    },
   },
   BaseDialog: {
     cancel: (override.BaseDialog && override.BaseDialog.cancel) || {
@@ -40,22 +86,31 @@ const labels = {
     ok: (override.BaseDialog && override.BaseDialog.ok) || {
       en: 'OK!',
     },
-    failed: (override.BaseDialog && override.BaseDialog.failed) || {
-      en: 'Failed to complete the action! Try again or contact an administrator.',
-      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
-    },
     change: (override.BaseDialog && override.BaseDialog.change) || {
       en: 'Change',
       se: 'Ändra',
     },
-    wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
-      en: 'Transfer currency',
-    },
-    currency: (override.BaseDialog && override.BaseDialog.currency) || {
-      en: 'currency',
-    },
     unknown: (override.BaseDialog && override.BaseDialog.unknown) || {
       en: 'Unknown',
+    },
+    error: (override.BaseDialog && override.BaseDialog.error) || {
+      en: 'Something went wrong',
+      se: 'Något gick fel',
+    },
+    areYouSure: (override.BaseDialog && override.BaseDialog.areYouSure) || {
+      en: 'Are you sure?',
+    },
+    remove: (override.BaseDialog && override.BaseDialog.remove) || {
+      en: 'Remove',
+    },
+    update: (override.BaseDialog && override.BaseDialog.update) || {
+      en: 'Update',
+    },
+    yes: (override.BaseDialog && override.BaseDialog.yes) || {
+      en: 'Yes',
+    },
+    no: (override.BaseDialog && override.BaseDialog.no) || {
+      en: 'No',
     },
   },
   LockedDocFileDialog: {
@@ -89,7 +144,13 @@ const labels = {
       en: 'Text',
     },
     titleLength: (override.DocFileDialog && override.DocFileDialog.titleLength) || {
-
+      en: 'The title is too long',
+    },
+    codeLength: (override.DocFileDialog && override.DocFileDialog.codeLength) || {
+      en: 'The code is too long',
+    },
+    textLength: (override.DocFileDialog && override.DocFileDialog.textLength) || {
+      en: 'The text is too long',
     },
   },
   AliasDialog: {
@@ -308,6 +369,9 @@ const labels = {
     youHave: (override.WalletDialog && override.WalletDialog.youHave) || {
       en: 'You have',
     },
+    sendingFrom: (override.WalletDialog && override.WalletDialog.sendingFrom) || {
+      en: 'Using wallet for',
+    },
     sendingTo: (override.WalletDialog && override.WalletDialog.sendingTo) || {
       en: 'You are transferring to user',
     },
@@ -346,6 +410,23 @@ const labels = {
     trackPosition: (override.UserDialog && override.UserDialog.trackPosition) || {
       en: 'Track user',
     },
+    username: (override.UserDialog && override.UserDialog.username) || {
+      en: 'Username',
+    },
+  },
+  TeamDialog: {
+    tag: (override.TeamDialog && override.TeamDialog.tag) || {
+      en: 'Short name',
+    },
+    teamName: (override.TeamDialog && override.TeamDialog.teamName) || {
+      en: 'Team name',
+    },
+    teamNameLength: (override.TeamDialog && override.TeamDialog.teamNameLength) || {
+      en: 'The name is too long',
+    },
+    shortNameLength: (override.TeamDialog && override.TeamDialog.shortNameLength) || {
+      en: 'The short name is too long',
+    },
   },
   TransactionList: {
     amount: (override.TransactionList && override.TransactionList.amount) || {
@@ -353,6 +434,11 @@ const labels = {
     },
     sentFrom: (override.TransactionList && override.TransactionList.sentFrom) || {
       en: 'Sent from',
+    },
+  },
+  MessageDialog: {
+    textLength: (override.MessageDialog && override.MessageDialog.textLength) || {
+      en: 'The message is too long',
     },
   },
 };

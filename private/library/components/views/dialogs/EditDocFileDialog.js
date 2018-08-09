@@ -15,11 +15,11 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const VerifyDialog = require('./VerifyDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const docFileComposer = require('../../../data/composers/DocFileComposer');
-const storageManager = require('../../../StorageManager');
 
 const ids = {
   TITLE: 'title',
@@ -30,13 +30,17 @@ const ids = {
   VISIBILITY_PRIVATE: 'private',
 };
 
-class DocFileDialog extends BaseDialog {
+class EditDocFileDialog extends BaseDialog {
   constructor({
+    docFileId,
     classes = [],
     elementId = `docDialog-${Date.now()}`,
   }) {
+    const docFile = docFileComposer.getDocFile({ docFileId });
+
     const inputs = [
       elementCreator.createInput({
+        text: [docFile.title],
         elementId: ids.TITLE,
         inputName: 'title',
         type: 'text',
@@ -45,13 +49,15 @@ class DocFileDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'title' }),
       }),
       elementCreator.createInput({
+        isLocked: true,
+        text: [docFile.code],
         elementId: ids.CODE,
         inputName: 'code',
-        type: 'password',
         maxLength: 10,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'code' }),
       }),
       elementCreator.createInput({
+        text: docFile.text,
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
@@ -69,11 +75,12 @@ class DocFileDialog extends BaseDialog {
             optionId: ids.VISIBILITY_PUBLIC,
             optionLabel: 'Everyone',
             value: 'public',
-            isDefault: true,
+            isDefault: docFile.isPublic,
           }, {
             optionId: ids.VISIBILITY_PRIVATE,
             optionLabel: 'Only those with the correct code',
             value: 'private',
+            isDefault: docFile.isPublic,
           },
         ],
       }),
@@ -88,18 +95,53 @@ class DocFileDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'remove' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const parentElement = this.getParentElement();
+
+            const verifyDialog = new VerifyDialog({
+              callback: ({ confirmed }) => {
+                if (!confirmed) {
+                  this.addToView({
+                    element: parentElement,
+                  });
+
+                  return;
+                }
+
+                docFileComposer.removeDocFile({
+                  docFileId,
+                  callback: ({ error: docFileError }) => {
+                    if (docFileError) {
+                      console.log('doc file error', docFileError);
+                    }
+
+                    verifyDialog.removeFromView();
+                  },
+                });
+              },
+            });
+
+            verifyDialog.addToView({
+              element: this.getParentElement(),
+            });
+
+            this.removeFromView();
+          },
+        },
+      }),
+      elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
         clickFuncs: {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
             }
 
-            docFileComposer.createDocFile({
+            docFileComposer.updateDocFile({
               docFile: {
-                ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
-                code: this.getInputValue(ids.CODE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
@@ -109,11 +151,6 @@ class DocFileDialog extends BaseDialog {
                     switch (error.extraData.param) {
                       case 'title': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'titleLength' })] });
-
-                        break;
-                      }
-                      case 'code': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'codeLength' })] });
 
                         break;
                       }
@@ -152,4 +189,4 @@ class DocFileDialog extends BaseDialog {
   }
 }
 
-module.exports = DocFileDialog;
+module.exports = EditDocFileDialog;

@@ -46,13 +46,17 @@ class RoomComposer extends DataComposer {
   follow({ // eslint-disable-line class-methods-use-this
     roomId,
   }) {
+    console.log('follow', roomId);
+
     const user = userComposer.getCurrentUser();
 
     if (!user) {
       return;
     }
 
-    if (user.followingRooms.includes(roomId)) {
+    const { followingRooms = [] } = user;
+
+    if (followingRooms.includes(roomId)) {
       const room = this.getRoom({ roomId });
 
       eventCentral.emitEvent({
@@ -72,6 +76,37 @@ class RoomComposer extends DataComposer {
       if (error) {
         console.log('follow error', error);
       }
+    });
+  }
+
+  unfollow({ // eslint-disable-line class-methods-use-this
+    roomId,
+  }) {
+    const user = userComposer.getCurrentUser();
+
+    if (!user) {
+      return;
+    }
+
+    const params = {
+      roomId,
+      aliasId: storageManager.getAliasId(),
+    };
+
+    socketManager.emitEvent(socketManager.EmitTypes.UNFOLLOW, params, ({ error }) => {
+      if (error) {
+        console.log('unfollow error', error);
+      }
+    });
+  }
+
+  createRoom({
+    room,
+    callback,
+  }) {
+    this.handler.createObject({
+      callback,
+      params: { room },
     });
   }
 }

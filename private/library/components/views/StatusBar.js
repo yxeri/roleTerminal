@@ -21,6 +21,9 @@ const CurrentUserList = require('../../components/lists/CurrentUserList');
 const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
+// const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
+const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
+// const TeamDialog = require('../../components/views/dialogs/TeamDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -31,6 +34,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
+// const teamComposer = require('../../data/composers/TeamComposer');
 
 class StatusBar extends BaseView {
   constructor({
@@ -125,16 +129,9 @@ class StatusBar extends BaseView {
       lastItems.push({ elements: [logoutButton] });
     }
 
-    /**
-     * elements,
-     clickFuncs,
-     classes,
-     elementId,
-     */
-
     if (showControls.docFile) {
       const createDocFileButton = elementCreator.createButton({
-        text: 'Create document',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createDocument' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new DocFileDialog({});
@@ -158,7 +155,7 @@ class StatusBar extends BaseView {
 
     if (showControls.room) {
       const createRoomButton = elementCreator.createButton({
-        text: 'Create room',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createRoom' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new RoomDialog({});
@@ -182,7 +179,7 @@ class StatusBar extends BaseView {
 
     if (showControls.alias) {
       const createAliasButton = elementCreator.createButton({
-        text: 'Create alias',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createAlias' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new AliasDialog({});
@@ -200,6 +197,76 @@ class StatusBar extends BaseView {
         element: createAliasButton,
         minimumAccessLevel: permissions.CreateAlias ?
           permissions.CreateAlias.accessLevel :
+          accessCentral.AccessLevels.STANDARD,
+      });
+    }
+
+    if (showControls.team) {
+      const createTeamButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createTeam' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new TeamCreateDialog({});
+
+            dialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
+      // const leaveTeamButton = elementCreator.createButton({
+      //   text: labelHandler.getLabel({ baseObject: 'Button', label: 'leaveTeam' }),
+      //   clickFuncs: {
+      //     leftFunc: () => {
+      //       const dialog = new TeamDialog({
+      //         callback: () => {
+      //           const dialog = new TeamDialog({
+      //             text: [],
+      //             callback: ({ confirmed }) => {
+      //               if (!confirmed) {
+      //                 dialog.removeFromView();
+      //
+      //                 return;
+      //               }
+      //
+      //               teamComposer.leaveTeam({
+      //                 teamId,
+      //                 callback: ({ error: teamError }) => {
+      //                   if (teamError) {
+      //                     console.log('team error', teamError);
+      //
+      //                     return;
+      //                   }
+      //
+      //                   dialog.removeFromView();
+      //                 },
+      //               });
+      //             },
+      //           });
+      //
+      //           dialog.addToView({
+      //             element: this.getParentElement(),
+      //           });
+      //         },
+      //       });
+      //
+      //       dialog.addToView({
+      //         element: this.getParentElement(),
+      //       });
+      //     },
+      //   },
+      // });
+
+      items.push({
+        elements: [
+          createTeamButton,
+        ],
+      });
+
+      accessCentral.addAccessElement({
+        element: createTeamButton,
+        minimumAccessLevel: permissions.CreateTeam ?
+          permissions.CreateTeam.accessLevel :
           accessCentral.AccessLevels.STANDARD,
       });
     }

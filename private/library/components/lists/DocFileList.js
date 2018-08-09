@@ -18,21 +18,22 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
 
 class DocFileList extends List {
   constructor({
+    title,
+    sorting,
+    listItemFields = [{
+      paramName: 'title',
+    }],
     classes = [],
     elementId = `dFList-${Date.now()}`,
   }) {
-    const headerFields = [
-      {
-        paramName: 'title',
-      },
-    ];
-
     super({
+      title,
       elementId,
+      sorting,
+      listItemFields,
       classes: classes.concat(['docFileList']),
       dependencies: [
         dataHandler.docFiles,
@@ -43,10 +44,9 @@ class DocFileList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const userId = storageManager.getUserId();
           const docFile = dataHandler.docFiles.getObject({ objectId });
 
-          if (!docFile.isLocked || docFile.code || docFile.ownerId === userId) {
+          if (!docFile.isLocked || docFile.code) {
             eventCentral.emitEvent({
               event: eventCentral.Events.OPEN_DOCFILE,
               params: { docFile },
@@ -60,7 +60,6 @@ class DocFileList extends List {
         },
       },
       collector: dataHandler.docFiles,
-      listItemFields: headerFields,
     });
   }
 }

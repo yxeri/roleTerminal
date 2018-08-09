@@ -1,12 +1,15 @@
 const BaseView = require('./views/BaseView');
 
 const elementCreator = require('../ElementCreator');
+const eventCentral = require('../EventCentral');
+const viewSwitcher = require('../ViewSwitcher');
 
 class ViewWrapper extends BaseView {
   constructor({
     statusBar,
     columns,
     title,
+    viewType,
     classes = [],
   }) {
     super({
@@ -14,11 +17,21 @@ class ViewWrapper extends BaseView {
       classes: classes.concat(['viewWrapper']),
     });
 
+    this.viewType = viewType;
     this.columnAmount = columns.length;
     this.statusBar = statusBar;
     this.columns = columns;
     this.columnElements = [];
     this.title = title;
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.TRY_VIEW_SWITCH,
+      func: ({ type }) => {
+        if (type === this.viewType) {
+          viewSwitcher.switchView({ view: this });
+        }
+      },
+    });
   }
 
   attachColumns() {

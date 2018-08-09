@@ -21,7 +21,7 @@ class MapCircle extends MapObject {
     position,
     clickFuncs,
     pulseOptions,
-    zIndex = 3,
+    zIndex = 4,
     radius = 10,
     styles = {},
     alwaysShowLabel = false,

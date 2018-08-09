@@ -36,7 +36,7 @@ class Label {
   }) {
     this.mapLabel = new MapLabel({
       map,
-      text,
+      text: `< ${text}`,
       align: labelStyle.align || 'right',
       fontFamily: labelStyle.fontFamily || 'monospace',
       fontColor: labelStyle.fontColor || '#ffffff',

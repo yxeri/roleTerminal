@@ -74,6 +74,7 @@ class InputArea extends BaseView {
 
   setKeyListener() {
     keyhandler.addKey(13, () => {
+      console.log('enter', this.isFocused);
       if (this.isFocused) {
         this.triggerCallback({ text: this.getSplitInputValue() });
       }

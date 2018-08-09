@@ -18,33 +18,34 @@ const BaseDialog = require('./BaseDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
-const aliasComposer = require('../../../data/composers/AliasComposer');
+const teamComposer = require('../../../data/composers/TeamComposer');
 
 const ids = {
-  FULLNAME: 'fullName',
-  ALIASNAME: 'aliasname',
+  TEAMNAME: 'teamName',
+  TAG: 'tag',
 };
 
-class AliasDialog extends BaseDialog {
+class TeamCreateDialog extends BaseDialog {
   constructor({
     classes = [],
-    elementId = `aDialog-${Date.now()}`,
+    elementId = `tCDialog-${Date.now()}`,
   }) {
     const inputs = [
       elementCreator.createInput({
-        elementId: ids.ALIASNAME,
-        inputName: 'aliasName',
+        elementId: ids.TEAMNAME,
+        inputName: ids.TEAMNAME,
         type: 'text',
         isRequired: true,
         maxLength: 20,
-        placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasName' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamName' }),
       }),
       elementCreator.createInput({
-        elementId: ids.FULLNAME,
-        inputName: 'fullName',
+        elementId: ids.TAG,
+        inputName: ids.TAG,
         type: 'text',
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullName' }),
+        isRequired: true,
+        maxLength: 5,
+        placeholder: labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'tag' }),
       }),
     ];
     const lowerButtons = [
@@ -62,22 +63,22 @@ class AliasDialog extends BaseDialog {
               return;
             }
 
-            aliasComposer.createAlias({
-              alias: {
-                aliasName: this.getInputValue(ids.ALIASNAME),
-                fullName: this.getInputValue(ids.FULLNAME),
+            teamComposer.createTeam({
+              team: {
+                teamName: this.getInputValue(ids.TEAMNAME),
+                shortName: this.getInputValue(ids.TAG),
               },
               callback: ({ error }) => {
                 if (error) {
                   if (error.type === 'invalid length') {
                     switch (error.extraData.param) {
-                      case 'aliasName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasNameLength' })] });
+                      case 'teamName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamNameLength' })] });
 
                         break;
                       }
-                      case 'fullName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullNameLength' })] });
+                      case 'shortName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'shortNameLength' })] });
 
                         break;
                       }
@@ -104,9 +105,9 @@ class AliasDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['AliasDialog']),
+      classes: classes.concat(['TeamDialog']),
     });
   }
 }
 
-module.exports = AliasDialog;
+module.exports = TeamCreateDialog;

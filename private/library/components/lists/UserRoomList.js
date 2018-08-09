@@ -15,6 +15,7 @@
  */
 
 const List = require('./List');
+const UserDialog = require('../views/dialogs/UserDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
@@ -49,23 +50,16 @@ class RoomList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const whisperPermission = storageManager.getPermissions().SendWhisper || { accessLevel: 1 };
-
-          if (storageManager.getAccessLevel() < whisperPermission.accessLevel) {
-            return;
-          }
-
-          eventCentral.emitEvent({
-            event: eventCentral.Events.SWITCH_ROOM,
-            params: {
-              origin: this.elementId,
-              listType: this.ListTypes.ROOMS,
-              room: {
-                objectId,
-                isUser: true,
-              },
-            },
+          const userDialog = new UserDialog({
+            identityId: objectId,
+            origin: this.elementId,
           });
+
+          userDialog.addToView({
+            element: this.element,
+          });
+
+          this.removeFocusOnItem();
         },
       },
       collector: dataHandler.users,
@@ -93,7 +87,7 @@ class RoomList extends List {
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,

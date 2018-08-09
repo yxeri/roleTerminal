@@ -39,6 +39,12 @@ class UserList extends List {
       elementId,
       classes,
       title,
+      filter: {
+        rules: [
+          { paramName: 'isBanned', paramValue: false },
+          { paramName: 'isVerified', paramValue: true },
+        ],
+      },
       minAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.rooms,
@@ -50,6 +56,7 @@ class UserList extends List {
         leftFunc: (objectId) => {
           const userDialog = new UserDialog({
             identityId: objectId,
+            origin: this.elementId,
           });
 
           userDialog.addToView({ element: this.getParentElement() });
@@ -61,7 +68,7 @@ class UserList extends List {
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases());
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,

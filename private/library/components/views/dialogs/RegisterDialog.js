@@ -113,7 +113,7 @@ class RegisterDialog extends BaseDialog {
                         break;
                       }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }
@@ -121,7 +121,7 @@ class RegisterDialog extends BaseDialog {
                   } else if (error.type === 'invalid characters') {
                     this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
                   } else {
-                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
                   }
 
                   return;

@@ -2,6 +2,7 @@ const DataComposer = require('./BaseComposer');
 
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
+const socketManager = require('../../SocketManager');
 
 class TeamComposer extends DataComposer {
   constructor() {
@@ -28,6 +29,27 @@ class TeamComposer extends DataComposer {
     }
 
     return '';
+  }
+
+  createTeam({
+    team,
+    callback,
+  }) {
+    this.handler.createObject({
+      callback,
+      params: { team },
+    });
+  }
+
+  leaveTeam({
+    teamId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.LEAVETEAM,
+      params: { teamId },
+    });
   }
 }
 

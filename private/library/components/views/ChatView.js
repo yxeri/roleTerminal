@@ -28,11 +28,13 @@ const roomComposer = require('../../data/composers/RoomComposer');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class ChatView extends ViewWrapper {
   constructor({
     shouldResize,
     placeholder,
+    title,
     sendOnEnter = true,
     hideRoomList = false,
     classes = [],
@@ -101,6 +103,8 @@ class ChatView extends ViewWrapper {
               return;
             }
 
+            this.inputArea.clearInput();
+
             const { message: newMessage } = data;
 
             if (room.isUser) {
@@ -112,8 +116,6 @@ class ChatView extends ViewWrapper {
                 },
               });
             }
-
-            this.inputArea.clearInput();
           },
         });
       },
@@ -175,16 +177,13 @@ class ChatView extends ViewWrapper {
     super({
       elementId,
       columns,
+      title,
       classes: classes.concat(['chatView']),
     });
 
-    if (!hideRoomList) {
-      this.roomList = roomList;
-      this.whisperRoomList = whisperRoomList;
-      this.roomFollowingList = roomFollowingList;
-    }
-
     this.inputArea = inputArea;
+    this.whisperRoomList = whisperRoomList;
+    this.userRoomList = userRoomList;
     this.messageList = messageList;
 
     accessCentral.addAccessElement({
@@ -192,6 +191,15 @@ class ChatView extends ViewWrapper {
       minimumAccessLevel: storageManager.getPermissions().SendMessage ?
         storageManager.getPermissions().SendMessage.accessLevel :
         accessCentral.AccessLevels.STANDARD,
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.VIEW_SWITCHED,
+      func: ({ view }) => {
+        if (view.viewType === viewSwitcher.ViewTypes.CHAT) {
+          this.messageList.scrollList();
+        }
+      },
     });
   }
 

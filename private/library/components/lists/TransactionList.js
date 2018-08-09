@@ -19,6 +19,7 @@ const List = require('./List');
 const dataHandler = require('../../data/DataHandler');
 const walletComposer = require('../../data/composers/WalletComposer');
 const labelHandler = require('../../labels/LabelHandler');
+const textTools = require('../../TextTools');
 
 class TransactionList extends List {
   constructor({
@@ -32,7 +33,9 @@ class TransactionList extends List {
         paramName: 'customTimeCreated',
         fallbackTo: 'timeCreated',
         convertFunc: (time) => {
-          return time;
+          const timestamp = textTools.generateTimestamp({ date: time });
+
+          return `${timestamp.fullDate} - ${timestamp.fullTime}`;
         },
       }, {
         paramName: 'fromWalletId',

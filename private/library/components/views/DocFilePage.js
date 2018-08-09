@@ -16,10 +16,44 @@
 
 const BaseView = require('./BaseView');
 const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
+const EditDocFileDialog = require('./dialogs/EditDocFileDialog');
 
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
+const labelHandler = require('../../labels/LabelHandler');
+
+/**
+ * Create fragment with admin buttons for the document.
+ * @param {Object} params Parameters.
+ * @param {HTMLElement} params.parentElement Parent element to add the fragment to.
+ * @param {Object} params.docFile Doc file.
+ * @return {DocumentFragment} Fragment with admin buttons.
+ */
+function createControls({
+  parentElement,
+  docFile,
+}) {
+  const fragment = document.createDocumentFragment();
+
+  fragment.appendChild(elementCreator.createButton({
+    text: labelHandler.getLabel({ baseObject: 'Button', label: 'edit' }),
+    clickFuncs: {
+      leftFunc: () => {
+        const dialog = new EditDocFileDialog({
+          docFileId: docFile.objectId,
+        });
+
+        dialog.addToView({
+          element: parentElement,
+        });
+      },
+    },
+  }));
+
+  return fragment;
+}
 
 /**
  * Create header part of the document.
@@ -28,11 +62,16 @@ const userComposer = require('../../data/composers/UserComposer');
  * @return {HTMLElement} Header paragraph.
  */
 function createHeader({ docFile }) {
-  const user = userComposer.getUser({ userId: docFile.ownerAliasId || docFile.ownerId });
+  const idName = userComposer.getIdentityName({ objectId: docFile.ownerAliasId || docFile.ownerId });
   const elements = [
     elementCreator.createSpan({ text: docFile.title }),
-    elementCreator.createSpan({ text: `Author: ${user.username || 'Unknown author'}` }),
+    elementCreator.createSpan({ text: `Author: ${idName || 'Unknown author'}` }),
     elementCreator.createSpan({ text: `Code: ${docFile.code}` }),
+    elementCreator.createSpan({
+      text: `Public: ${docFile.isPublic ?
+        labelHandler.getLabel({ baseObject: 'Button', label: 'yes' }) :
+        labelHandler.getLabel({ baseObject: 'Button', label: 'no' })}`,
+    }),
   ];
 
   if (docFile.team) {
@@ -75,6 +114,17 @@ class DocFilePage extends BaseView {
           elementId,
           classes,
         });
+        const { hasFullAccess } = accessCentral.hasAccessTo({
+          objectToAccess: docFile,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          newElement.appendChild(createControls({
+            docFile,
+            parentElement: this.getParentElement(),
+          }));
+        }
 
         newElement.appendChild(createHeader({ docFile }));
         newElement.appendChild(createBody({ docFile }));

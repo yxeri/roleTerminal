@@ -106,8 +106,8 @@ class AccessCentral {
     const {
       hasFullAccess,
       accessLevel = this.AccessLevels.ANONYMOUS,
+      objectId: authUserId,
       teamIds: authTeamIds = [],
-      objectId: authUserId = [],
       aliases = [],
     } = toAuth;
 

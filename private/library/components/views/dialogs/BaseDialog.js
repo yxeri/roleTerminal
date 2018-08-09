@@ -17,6 +17,7 @@
 const BaseView = require('../BaseView');
 
 const elementCreator = require('../../../ElementCreator');
+const keyHandler = require('../../../KeyHandler');
 
 const ids = {
   UPPERTEXT: 'upperText',
@@ -95,6 +96,11 @@ class BaseDialog extends BaseView {
       insertBeforeElement,
       shouldPrepend,
     });
+    keyHandler.pause();
+
+    if (this.inputs.length > 0) {
+      this.inputs[0].focus();
+    }
 
     element.appendChild(elementCreator.createContainer({
       elementId: ids.COVER,
@@ -106,6 +112,7 @@ class BaseDialog extends BaseView {
     const parentElement = this.getParentElement();
 
     super.removeFromView();
+    keyHandler.unpause();
 
     parentElement.removeChild(document.getElementById(ids.COVER));
   }

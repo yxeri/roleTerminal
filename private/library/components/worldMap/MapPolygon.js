@@ -22,8 +22,9 @@ class MapPolygon extends MapObject {
     clickFuncs,
     labelStyle,
     choosableStyles,
-    zIndex = 1,
-    descriptionOnClick = false,
+    triggeredStyles,
+    zIndex = 3,
+    descriptionOnClick,
     alwaysShowLabel = false,
     shouldCluster = false,
     styles = {},
@@ -44,6 +45,7 @@ class MapPolygon extends MapObject {
       position,
       clickFuncs,
       labelStyle,
+      triggeredStyles,
       // TODO Combine with MapLine
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -75,7 +77,11 @@ class MapPolygon extends MapObject {
     });
   }
 
-  changeStyle({ styleName, style }) {
+  changeStyle({
+    styleName,
+    style,
+    shouldEmit,
+  }) {
     const {
       strokeColor,
       strokeOpacity,
@@ -93,7 +99,11 @@ class MapPolygon extends MapObject {
     if (fillOpacity) { options.fillOpacity = fillOpacity; }
     if (opacity) { options.opacity = opacity; }
 
-    super.changeStyle({ styleName, style: options });
+    super.changeStyle({
+      styleName,
+      shouldEmit,
+      style: options,
+    });
   }
 
   // TODO Combine with MapLine

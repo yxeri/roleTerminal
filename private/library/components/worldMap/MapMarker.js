@@ -22,6 +22,7 @@ class MapMarker extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    descriptionOnClick = true,
     choosableStyles = [],
     zIndex = 4,
     alwaysShowLabel = false,
@@ -50,6 +51,7 @@ class MapMarker extends MapObject {
       position,
       clickFuncs,
       labelStyle,
+      descriptionOnClick,
       dragEndFunc: () => {
         this.setCurrentCoordinates({
           coordinates: {
@@ -80,7 +82,11 @@ class MapMarker extends MapObject {
     });
   }
 
-  changeStyle({ styleName, style }) {
+  changeStyle({
+    styleName,
+    style,
+    shouldEmit,
+  }) {
     const {
       icon,
     } = style;
@@ -88,7 +94,11 @@ class MapMarker extends MapObject {
 
     if (icon) { options.icon = icon; }
 
-    super.changeStyle({ styleName, style: options });
+    super.changeStyle({
+      styleName,
+      shouldEmit,
+      style: options,
+    });
   }
 
   setCurrentCoordinates({ coordinates }) {

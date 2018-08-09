@@ -42,6 +42,12 @@ class UserComposer extends DataComposer {
     return {};
   }
 
+  getCurrentTeams() {
+    const user = this.getCurrentUser();
+
+    return user.partOfTeams;
+  }
+
   createUser({
     user,
     callback,

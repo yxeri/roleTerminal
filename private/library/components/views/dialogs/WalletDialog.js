@@ -32,10 +32,11 @@ class WalletDialog extends BaseDialog {
     classes = [],
     elementId = `wDialog-${Date.now()}`,
   }) {
-    const identityName = isTeam ?
-      teamComposer.getTeamName({ teamId: sendToId }) :
-      userComposer.getIdentityName({ objectId: sendFromId });
+    const identityName = isTeam
+      ? teamComposer.getTeamName({ teamId: sendToId })
+      : userComposer.getIdentityName({ objectId: sendToId });
     const walletAmount = walletComposer.getWalletAmount({ walletId: sendFromId });
+    const thisIdentityName = userComposer.getIdentityName({ objectId: sendFromId }) || teamComposer.getTeamName({ teamId: sendFromId });
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -62,7 +63,7 @@ class WalletDialog extends BaseDialog {
               },
               callback: ({ error }) => {
                 if (error) {
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Transaction', label: 'failed' })] });
 
                   return;
                 }
@@ -85,6 +86,7 @@ class WalletDialog extends BaseDialog {
       }),
     ];
     const upperText = [
+      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingFrom', appendSpace: true })}${thisIdentityName}.`,
       `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave', appendSpace: true })}${walletAmount}.`,
       isTeam ?
         `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam', appendSpace: true })}${identityName}.` :

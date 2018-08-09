@@ -113,7 +113,9 @@ class BaseData {
           }
         }
 
-        paramsToEmit[this.objectTypes.one] = this.objects[object.objectId];
+        paramsToEmit[this.objectTypes.one] = changeType === socketManager.ChangeTypes.REMOVE ?
+          { objectId: object.objectId } :
+          this.objects[object.objectId];
 
         eventCentral.emitEvent({
           event: this.eventTypes.one,
@@ -270,6 +272,11 @@ class BaseData {
 
       this.objects[object.objectId] = object;
 
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
+      });
+
       callback({ data });
     });
   }
@@ -312,7 +319,12 @@ class BaseData {
 
       dataToReturn[this.objectTypes.one] = this.objects[object.objectId];
 
-      callback({ data: dataToReturn });
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
+      });
+
+      callback({ data });
     });
   }
 
@@ -343,9 +355,12 @@ class BaseData {
 
       this.objects[object.objectId] = undefined;
 
-      callback({
-        data: { success: true },
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
       });
+
+      callback({ data });
     });
   }
 

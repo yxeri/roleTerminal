@@ -25,6 +25,11 @@ class MapPolygon extends MapObject {
     triggeredStyles,
     zIndex = 3,
     descriptionOnClick,
+    markedStyle = {
+      strokeColor: '#009100',
+      fillColor: '#009100',
+      styleName: 'Marked',
+    },
     alwaysShowLabel = false,
     shouldCluster = false,
     styles = {},
@@ -36,6 +41,18 @@ class MapPolygon extends MapObject {
     const chosenStyle = choosableStyles && position.styleName ?
       choosableStyles.find(style => style.styleName === position.styleName) :
       {};
+    const style = {
+      opacity: chosenStyle.opacity || styles.opacity || 1,
+      strokeColor: chosenStyle.strokeColor || styles.strokeColor || '#000000',
+      strokeOpacity: chosenStyle.strokeOpacity || styles.strokeOpacity || 0.8,
+      strokeWeight: chosenStyle.strokeWeight || styles.strokeWeight || 1,
+      fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
+      fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
+    };
+    const options = Object.assign({
+      zIndex,
+      paths: new google.maps.MVCArray(allPoints),
+    }, style);
 
     super({
       choosableStyles,
@@ -46,6 +63,8 @@ class MapPolygon extends MapObject {
       clickFuncs,
       labelStyle,
       triggeredStyles,
+      markedStyle,
+      style,
       // TODO Combine with MapLine
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -64,22 +83,14 @@ class MapPolygon extends MapObject {
           },
         });
       },
-      mapObject: new google.maps.Polygon({
-        zIndex,
-        paths: new google.maps.MVCArray(allPoints),
-        opacity: chosenStyle.opacity || styles.opacity || 1,
-        strokeColor: chosenStyle.strokeColor || styles.strokeColor || '#000000',
-        strokeOpacity: chosenStyle.strokeOpacity || styles.strokeOpacity || 0.8,
-        strokeWeight: chosenStyle.strokeWeight || styles.strokeWeight || 1,
-        fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
-        fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
-      }),
+      mapObject: new google.maps.Polygon(options),
     });
   }
 
   changeStyle({
     styleName,
     style,
+    setCurrentStyle,
     shouldEmit,
   }) {
     const {
@@ -102,6 +113,7 @@ class MapPolygon extends MapObject {
     super.changeStyle({
       styleName,
       shouldEmit,
+      setCurrentStyle,
       style: options,
     });
   }

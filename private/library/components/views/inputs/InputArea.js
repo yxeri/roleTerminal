@@ -5,6 +5,7 @@ const keyhandler = require('../../../KeyHandler');
 class InputArea extends BaseView {
   constructor({
     sendOnEnter,
+    minAccessLevel,
     classes = [],
     placeholder = '',
     shouldResize = true,
@@ -14,6 +15,7 @@ class InputArea extends BaseView {
     inputCallback = () => {},
   }) {
     super({
+      minAccessLevel,
       classes: classes.concat(['inputArea']),
       elementId: `inputArea-${Date.now()}`,
     });

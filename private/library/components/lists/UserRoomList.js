@@ -50,6 +50,10 @@ class RoomList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
+          if (storageManager.getAccessLevel() <= accessCentral.AccessLevels.ANONYMOUS) {
+            return;
+          }
+
           const userDialog = new UserDialog({
             identityId: objectId,
             origin: this.elementId,

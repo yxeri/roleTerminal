@@ -203,6 +203,9 @@ const labels = {
       en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',
       se: 'Otillåtna tecken i användarnamnet/hela namnet. Tillåtna tecken: a-z 0-9 -_',
     },
+    alreadyExists: (override.RegisterDialog && override.RegisterDialog.alreadyExists) || {
+      en: 'User already exists',
+    },
   },
   RoomDialog: {
     password: (override.RoomDialog && override.RoomDialog.invalidCharacters) || {

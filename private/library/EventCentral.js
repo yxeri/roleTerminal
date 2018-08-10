@@ -60,7 +60,7 @@ class EventCentral {
       ACCESS_DOCFILE: 'Access file',
       SWITCH_ROOM: 'Switched room',
       SWITCH_FORUM: 'Switched forum',
-      TRY_VIEW_SWITCH: 'Tring to switch view',
+      TRY_VIEW_SWITCH: 'Trying to switch view',
       SWITCH_LANGUAGE: 'Switched language',
       WORLDMAP: 'World map created',
       FOCUS_MAPPOSITION: 'Focus on map position',
@@ -86,6 +86,7 @@ class EventCentral {
       COMPLETE_INVITATION: 'Invitation dependencies fetched',
       LEFT_TEAM: 'Left team',
       MY_POSITION: 'User position',
+      SHOW_MAP_CLICK_BOX: 'Map box is shown',
     };
     this.eventWatchers = {};
   }

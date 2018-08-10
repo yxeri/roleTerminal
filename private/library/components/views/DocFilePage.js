@@ -23,6 +23,7 @@ const elementCreator = require('../../ElementCreator');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
 const labelHandler = require('../../labels/LabelHandler');
+const socketManager = require('../../SocketManager');
 
 /**
  * Create fragment with admin buttons for the document.
@@ -107,29 +108,17 @@ class DocFilePage extends BaseView {
       classes: classes.concat(['docFilePage']),
     });
 
+    this.openDocFileId = undefined;
+
     eventCentral.addWatcher({
       event: eventCentral.Events.OPEN_DOCFILE,
       func: ({ docFile }) => {
-        const newElement = elementCreator.createContainer({
+        this.createDocument({
           elementId,
           classes,
+          docFile,
         });
-        const { hasFullAccess } = accessCentral.hasAccessTo({
-          objectToAccess: docFile,
-          toAuth: userComposer.getCurrentUser(),
-        });
-
-        if (hasFullAccess) {
-          newElement.appendChild(createControls({
-            docFile,
-            parentElement: this.getParentElement(),
-          }));
-        }
-
-        newElement.appendChild(createHeader({ docFile }));
-        newElement.appendChild(createBody({ docFile }));
-
-        this.replaceOnParent({ element: newElement });
+        this.openDocFileId = docFile.objectId;
       },
     });
 
@@ -145,6 +134,49 @@ class DocFilePage extends BaseView {
         dialog.addToView({ element: this.getParentElement() });
       },
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.DOCFILE,
+      func: ({
+        docFile,
+        changeType,
+      }) => {
+        if (changeType === socketManager.ChangeTypes.UPDATE && this.openDocFileId && this.openDocFileId === docFile.objectId) {
+          this.createDocument({
+            elementId,
+            classes,
+            docFile,
+          });
+        }
+      },
+    });
+  }
+
+  createDocument({
+    elementId,
+    classes,
+    docFile,
+  }) {
+    const newElement = elementCreator.createContainer({
+      elementId,
+      classes,
+    });
+    const { hasFullAccess } = accessCentral.hasAccessTo({
+      objectToAccess: docFile,
+      toAuth: userComposer.getCurrentUser(),
+    });
+
+    if (hasFullAccess) {
+      newElement.appendChild(createControls({
+        docFile,
+        parentElement: this.getParentElement(),
+      }));
+    }
+
+    newElement.appendChild(createHeader({ docFile }));
+    newElement.appendChild(createBody({ docFile }));
+
+    this.replaceOnParent({ element: newElement });
   }
 }
 

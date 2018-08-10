@@ -67,6 +67,9 @@ class ChatView extends ViewWrapper {
       shouldResize,
       placeholder,
       sendOnEnter,
+      minAccessLevel: storageManager.getPermissions().SendMessage ?
+        storageManager.getPermissions().SendMessage.accessLevel :
+        accessCentral.AccessLevels.STANDARD,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
         if (textTools.trimSpace(text.join('')).length === 0) {

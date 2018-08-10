@@ -97,8 +97,6 @@ class BaseView {
   }
 
   toggleView() {
-    console.log('access toggle', this.minAccessLevel, this.element);
-
     if (this.minAccessLevel && this.minAccessLevel > storageManager.getAccessLevel()) {
       return;
     }

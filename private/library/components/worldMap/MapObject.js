@@ -87,12 +87,15 @@ class MapObject {
     labelStyle,
     choosableStyles,
     triggeredStyles,
+    style,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
+    markedStyle,
   }) {
+    this.markedStyle = markedStyle;
     this.canBeDragged = canBeDragged;
     this.choosableStyles = choosableStyles;
     this.isDraggable = false;
@@ -108,6 +111,7 @@ class MapObject {
       coordinates: this.getCenter(),
       text: this.position.positionName,
     });
+    this.style = style;
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
@@ -202,12 +206,12 @@ class MapObject {
       });
 
       if (styleObj) {
-        const { style } = styleObj;
-        const { styleName } = style;
+        const { style: triggeredStyle } = styleObj;
+        const { styleName } = triggeredStyle;
 
         this.changeStyle({
           styleName,
-          style,
+          style: triggeredStyle,
           shouldEmit: false,
         });
       }
@@ -313,6 +317,7 @@ class MapObject {
   changeStyle({
     styleName,
     style,
+    setCurrentStyle = true,
     shouldEmit = true,
   }) {
     if (shouldEmit) {
@@ -329,6 +334,10 @@ class MapObject {
           }
 
           this.mapObject.setOptions(style);
+
+          if (setCurrentStyle) {
+            this.style = style;
+          }
         },
       });
 
@@ -336,6 +345,29 @@ class MapObject {
     }
 
     this.mapObject.setOptions(style);
+
+    if (setCurrentStyle) {
+      this.style = style;
+    }
+  }
+
+  markPosition({ style }) {
+    if (!this.markedStyle) {
+      return;
+    }
+
+    this.changeStyle({
+      style: this.markedStyle,
+      shouldEmit: false,
+      setCurrentStyle: false,
+    });
+
+    setTimeout(() => {
+      this.changeStyle({
+        style: style || this.style,
+        shouldEmit: false,
+      });
+    }, 1000);
   }
 
   static buildLeftClickBox({ thisMapObject }) {
@@ -477,6 +509,11 @@ class MapObject {
   }
 
   static showLeftClickBox({ container }) {
+    eventHandler.emitEvent({
+      event: eventHandler.Events.SHOW_MAP_CLICK_BOX,
+      params: {},
+    });
+
     elementCreator.replaceFirstChild(MapObject.leftClickBox, container);
     MapObject.leftClickBox.classList.remove('hide');
   }
@@ -486,6 +523,11 @@ class MapObject {
     y,
     container,
   }) {
+    eventHandler.emitEvent({
+      event: eventHandler.Events.SHOW_MAP_CLICK_BOX,
+      params: {},
+    });
+
     elementCreator.replaceFirstChild(MapObject.rightClickBox, container);
 
     if (x && y) {

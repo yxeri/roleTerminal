@@ -34,8 +34,6 @@ class ViewSwitcher {
     eventCentral.addWatcher({
       event: eventCentral.Events.LOGOUT,
       func: () => {
-        storageManager.removeDefaultViewType();
-
         this.switchView({ view: this.defaultView });
       },
     });

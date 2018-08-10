@@ -101,7 +101,7 @@ class UserDialog extends BaseDialog {
       }));
     }
 
-    if (userComposer.getCurrentTeams().length > 0 && userComposer.getUser({ userId: identity })) {
+    if (userComposer.getUser({ userId: identity }) && userComposer.getCurrentTeams().length > 0) {
       const team = teamComposer.getTeam({ teamId: partOfTeams[0] });
       const { hasFullAccess } = accessCentral.hasAccessTo({
         objectToAccess: team,

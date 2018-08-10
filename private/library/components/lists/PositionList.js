@@ -23,6 +23,7 @@ const worldMapHandler = require('../../data/composers/PositionComposer');
 class PositionList extends List {
   constructor(params) {
     const listParams = params;
+    listParams.shouldToggle = true;
     listParams.positionTypes = listParams.positionTypes || Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
     listParams.classes = listParams.classes ?
@@ -51,7 +52,7 @@ class PositionList extends List {
       },
     };
     listParams.collector = dataHandler.positions;
-    listParams.listItemFields = [
+    listParams.listItemFields = listParams.listItemFields || [
       { paramName: 'positionName' },
     ];
 

@@ -1,22 +1,19 @@
 require('../library/polyfills');
 
 const WorldMapView = require('../library/components/views/WorldMapView');
+const WorldMapPage = require('../library/components/views/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const TopView = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 
+const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 
-const chatView = new ChatView({
-  sendOnEnter: true,
-  placeholder: 'Enter your message',
-});
-const docFileView = new DocFileView({});
-const worldMapView = new WorldMapView({
+const worldMapParams = {
   alwaysShowLabels: {
     line: true,
   },
@@ -82,6 +79,13 @@ const worldMapView = new WorldMapView({
       minLength: 1,
     }],
   },
+  markedStyles: {
+    polygons: {
+      strokeColor: '#009100',
+      fillColor: '#009100',
+      styleName: 'Marked',
+    },
+  },
   choosableStyles: {
     markers: [{
       styleName: 'Red',
@@ -102,6 +106,10 @@ const worldMapView = new WorldMapView({
       strokeColor: '#787878',
       fillColor: '#787878',
       styleName: 'Grey',
+    }, {
+      strokeColor: '#009100',
+      fillColor: '#009100',
+      styleName: 'Marked',
     }, {
       strokeColor: '#ff00d7',
       fillColor: '#00ffef',
@@ -144,7 +152,7 @@ const worldMapView = new WorldMapView({
   }, {
     featureType: 'road',
     stylers: [
-      { color: '#555555' },
+      { color: '#414141' },
       { weight: 0.5 },
     ],
   }, {
@@ -158,8 +166,55 @@ const worldMapView = new WorldMapView({
       { color: '#7d006c' },
     ],
   }],
+  lists: [{
+    elementId: 'housingList',
+    title: 'Housing',
+    positionTypes: ['housing'],
+  }, {
+    elementId: 'lanternList',
+    title: 'LANTERN',
+    positionTypes: ['lantern'],
+  }, {
+    elementId: 'userList',
+    title: 'Users',
+    positionTypes: ['user'],
+    listItemFields: [{
+      paramName: 'objectId',
+      convertFunc: (objectId) => {
+        const user = userComposer.getUser({ userId: objectId });
+
+        if (user) {
+          return user.username;
+        }
+
+        return objectId.slice(0, 10);
+      },
+    }],
+  }, {
+    elementId: 'roadList',
+    title: 'Roads',
+    positionTypes: [
+      'drivable-roads',
+      'roads',
+    ],
+  }, {
+    elementId: 'deviceList',
+    title: 'Device',
+    positionTypes: ['device'],
+  }, {
+    elementId: 'worldList',
+    title: 'World',
+    positionTypes: ['world'],
+  }],
+};
+const chatView = new ChatView({
+  sendOnEnter: true,
+  placeholder: 'Enter your message',
 });
+const docFileView = new DocFileView({});
+const worldMapView = new WorldMapView(worldMapParams);
 const walletView = new WalletView({});
+const worldMapPage = new WorldMapPage(worldMapParams);
 
 const statusBar = new TopView({
   viewSwitcher,
@@ -185,7 +240,7 @@ const docWrapper = new ViewWrapper({
     ],
   }, {
     components: [
-      { component: worldMapView },
+      { component: worldMapPage },
     ],
   }],
 });
@@ -199,7 +254,7 @@ const chatWrapper = new ViewWrapper({
     ],
   }, {
     components: [
-      { component: worldMapView },
+      { component: worldMapPage },
     ],
   }],
 });
@@ -221,7 +276,7 @@ const walletWrapper = new ViewWrapper({
     ],
   }, {
     components: [
-      { component: worldMapView },
+      { component: worldMapPage },
     ],
   }],
 });
@@ -237,7 +292,7 @@ statusBar.setViews({
 });
 
 document.addEventListener('click', () => {
-  viewTools.goFullScreen({});
+  // viewTools.goFullScreen({});
 });
 
 viewSwitcher.addAvailableTypes({

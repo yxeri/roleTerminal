@@ -20,6 +20,7 @@ $darker-color: #23001e;
 $darkest-color: #23001e;
 $warning-color: #910001;
 $greyed-out: #6f6f6f;
+$dark-border-color: #730066;
 $focus-color: #000691;
 $new-color: #009100;
 $header-color: #2e001a;
@@ -30,6 +31,8 @@ $map-box-padding: .5em;
 $padding: .3em;
 $border-color: #ff00d7;
 $border: $border-width solid $border-color;
+$menu-min-width: 7em;
+$menu-max-width: 11em;
 
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
@@ -185,10 +188,12 @@ header {
 
   .oneOfTwo:first-child {
     flex-grow: 1;
+    min-width: $menu-min-width;
+    max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 4;
+    flex-grow: 5;
 
     p {
       padding: $padding $padding;
@@ -315,10 +320,11 @@ header {
 
 $map-box-border-weight: .1em;
 $map-box-border: $map-box-border-weight solid $second-color;
-$map-box-left: .5em;
+$map-box-left: .2em;
+$map-padding-fix: 2em;
 
-.worldMapView {
-  padding-top: 2em; // Gmaps fix
+.worldMapPage {
+  padding-top: $map-padding-fix; // Gmaps fix
   overflow: hidden;
   height: 100%;
   width: 100%;
@@ -335,7 +341,7 @@ $map-box-left: .5em;
   left: $map-box-left;
   width: calc(100% - ((#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
   max-width: 30em;
-  max-height: calc(100% - (#{$top-row-height} + #{$map-box-padding}));
+  max-height: calc(100% - (#{$map-padding-fix * 1.5} + (#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
   padding: $map-box-padding;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -371,6 +377,10 @@ $map-box-left: .5em;
   padding: .2em;
   background-color: $background-color;
   border: $map-box-border;
+}
+
+.mapLeftClickBox::-webkit-scrollbar, .mapRightClickBox::-webkit-scrollbar, .fallbackMapRightClickBox::-webkit-scrollbar {
+  display: none;
 }
 
 /**************
@@ -547,10 +557,28 @@ $forum-padding: .5em;
 
   .oneOfTwo:first-child {
     flex-grow: 1;
+    min-width: $menu-min-width;
+    max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 4;
+    flex-grow: 5;
+  }
+}
+
+.worldMapView {
+  .oneOfTwo {
+    width: 0;
+  }
+
+  .oneOfTwo:first-child {
+    flex-grow: 1;
+    min-width: $menu-min-width;
+    max-width: $menu-max-width;
+  }
+
+  .oneOfTwo:last-child {
+    flex-grow: 5;
   }
 }
 
@@ -626,10 +654,12 @@ $msgList-textarea-border: .3em solid $darker-color;
 
   .oneOfTwo:first-child {
     flex-grow: 1;
+    min-width: $menu-min-width;
+    max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 4;
+    flex-grow: 5;
   }
 
   .inputArea {
@@ -656,7 +686,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 }
 
-.columnRoomList {
+.columnRoomList, .columnPositionList {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-top: $padding;
@@ -668,9 +698,16 @@ $msgList-textarea-border: .3em solid $darker-color;
   .list:last-child {
     margin-bottom: 0;
   }
+
+  li {
+    border-bottom: $border;
+    border-color: $dark-border-color;
+    padding-top: .1em;
+    padding-bottom: .1em;
+  }
 }
 
-.columnRoomList::-webkit-scrollbar {
+.columnRoomList::-webkit-scrollbar, .columnPositionList::-webkit-scrollbar {
   display: none;
 }
 

@@ -8,7 +8,12 @@ const override = {};
 
 const labels = {
   General: {
-
+    yes: (override.General && override.General.yes) || {
+      en: 'Yes',
+    },
+    no: (override.General && override.General.no) || {
+      en: 'No',
+    },
   },
   Button: {
     logout: (override.Button && override.Button.logout) || {

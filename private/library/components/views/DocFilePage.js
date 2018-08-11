@@ -70,8 +70,8 @@ function createHeader({ docFile }) {
     elementCreator.createSpan({ text: `Code: ${docFile.code}` }),
     elementCreator.createSpan({
       text: `Public: ${docFile.isPublic ?
-        labelHandler.getLabel({ baseObject: 'Button', label: 'yes' }) :
-        labelHandler.getLabel({ baseObject: 'Button', label: 'no' })}`,
+        labelHandler.getLabel({ baseObject: 'General', label: 'yes' }) :
+        labelHandler.getLabel({ baseObject: 'General', label: 'no' })}`,
     }),
   ];
 
@@ -141,12 +141,30 @@ class DocFilePage extends BaseView {
         docFile,
         changeType,
       }) => {
-        if (changeType === socketManager.ChangeTypes.UPDATE && this.openDocFileId && this.openDocFileId === docFile.objectId) {
-          this.createDocument({
-            elementId,
-            classes,
-            docFile,
-          });
+        console.log('doc file page', changeType, docFile, this.openDocFileId);
+
+        switch (changeType) {
+          case socketManager.ChangeTypes.REMOVE: {
+            if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
+              this.replaceOnParent({ element: elementCreator.createContainer({}) });
+            }
+
+            break;
+          }
+          case socketManager.ChangeTypes.UPDATE: {
+            if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
+              this.createDocument({
+                elementId,
+                classes,
+                docFile,
+              });
+            }
+
+            break;
+          }
+          default: {
+            break;
+          }
         }
       },
     });

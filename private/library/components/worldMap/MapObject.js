@@ -367,7 +367,7 @@ class MapObject {
         style: style || this.style,
         shouldEmit: false,
       });
-    }, 1000);
+    }, 1200);
   }
 
   static buildLeftClickBox({ thisMapObject }) {

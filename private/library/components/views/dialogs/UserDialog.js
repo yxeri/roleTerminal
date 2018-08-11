@@ -43,10 +43,10 @@ class UserDialog extends BaseDialog {
       chosenIdentity.partOfTeams :
       [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
     const userPosition = positionComposer.getPosition({ positionId: identityId });
-    const positionLabel = userPosition ?
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
-      (${userPosition.lastUpdated}): Lat ${userPosition.coordinates.latitude} Long ${userPosition.coordinates.longitude}` :
-      labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
+    const positionLabel = userPosition && userPosition.coordinates
+      ? `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
+      (${userPosition.lastUpdated}): Lat ${userPosition.coordinates.latitude} Long ${userPosition.coordinates.longitude}`
+      : labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
 
     const lowerButtons = [
       elementCreator.createButton({

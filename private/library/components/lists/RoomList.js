@@ -41,6 +41,14 @@ class RoomList extends List {
           { paramName: 'isWhisper', paramValue: false },
         ],
       },
+      userFilter: {
+        rules: [{
+          paramName: 'followingRooms',
+          shouldInclude: true,
+          objectParamName: 'objectId',
+          shouldBeTrue: false,
+        }],
+      },
       listItemFields: [
         {
           paramName: 'objectId',
@@ -60,18 +68,25 @@ class RoomList extends List {
         leftFunc: (objectId) => {
           const roomId = objectId;
 
-          eventCentral.emitEvent({
-            event: eventCentral.Events.SWITCH_ROOM,
-            params: {
-              listType: this.ListTypes.ROOMS,
-              origin: this.elementId,
-              room: {
-                objectId: roomId,
-              },
+          roomComposer.follow({
+            roomId,
+            callback: ({ error }) => {
+              if (error) {
+                return;
+              }
+
+              eventCentral.emitEvent({
+                event: eventCentral.Events.SWITCH_ROOM,
+                params: {
+                  listType: this.ListTypes.ROOMS,
+                  origin: this.elementId,
+                  room: {
+                    objectId: roomId,
+                  },
+                },
+              });
             },
           });
-
-          roomComposer.follow({ roomId });
         },
         right: (objectId) => {
           roomComposer.unfollow({
@@ -89,21 +104,11 @@ class RoomList extends List {
     });
 
     eventCentral.addWatcher({
-      event: eventCentral.Events.SWITCH_ROOM,
+      event: eventCentral.Events.FOLLOWED_ROOM,
       func: ({
         room,
-        origin,
-        listType = '',
       }) => {
-        if (origin && origin === this.elementId) {
-          return;
-        } else if (listType !== this.ListTypes.ROOMS) {
-          return;
-        }
-
-        const { objectId } = room;
-
-        this.setFocusedListItem(objectId);
+        this.removeListItem({ objectId: room.objectId });
       },
     });
   }

@@ -22,7 +22,7 @@ const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 
-class RoomList extends List {
+class RoomFollowingList extends List {
   constructor({
     title,
     classes = [],
@@ -35,16 +35,20 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      listType: 'followedRooms',
       filter: {
         rules: [
           { paramName: 'isUser', paramValue: false },
           { paramName: 'isWhisper', paramValue: false },
-          // {
-          //   userRule: true,
-          //   shouldInclude: true,
-          //   paramName: 'followingRooms',
-          // },
         ],
+      },
+      userFilter: {
+        rules: [{
+          paramName: 'followingRooms',
+          shouldInclude: true,
+          shouldBeTrue: true,
+          objectParamName: 'objectId',
+        }],
       },
       listItemFields: [
         {
@@ -63,20 +67,16 @@ class RoomList extends List {
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const roomId = objectId;
-
           eventCentral.emitEvent({
             event: eventCentral.Events.SWITCH_ROOM,
             params: {
               listType: this.ListTypes.ROOMS,
               origin: this.elementId,
               room: {
-                objectId: roomId,
+                objectId,
               },
             },
           });
-
-          roomComposer.follow({ roomId });
         },
         right: (objectId) => {
           roomComposer.unfollow({
@@ -94,21 +94,45 @@ class RoomList extends List {
     });
 
     eventCentral.addWatcher({
-      event: eventCentral.Events.FOLLOWED_ROOM,
+      event: eventCentral.Events.SWITCH_ROOM,
       func: ({
         room,
         origin,
-        listType = '',
       }) => {
-        if (origin && origin === this.elementId) {
-          return;
-        } else if (listType !== this.ListTypes.ROOMS) {
+        const { objectId } = room;
+
+        this.unmarkItem({ objectId });
+
+        if (!origin || origin !== this.elementId) {
+          this.removeFocusOnItem();
+        }
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.FOLLOWED_ROOM,
+      func: ({
+        room,
+      }) => {
+        const { objectId } = room;
+
+        this.addOneItem({ object: room });
+        this.setFocusedListItem(objectId);
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.MESSAGE,
+      func: ({
+        message,
+      }) => {
+        const { roomId } = message;
+
+        if (storageManager.getCurrentRoom() === roomId) {
           return;
         }
 
-        const { objectId } = room;
-
-        this.setFocusedListItem(objectId);
+        this.markItem({ objectId: roomId });
       },
     });
   }
@@ -140,4 +164,4 @@ class RoomList extends List {
   }
 }
 
-module.exports = RoomList;
+module.exports = RoomFollowingList;

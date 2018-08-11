@@ -18,7 +18,7 @@ const ViewWrapper = require('../ViewWrapper');
 const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
-const UserRoomList = require('../lists/UserRoomList');
+const UserList = require('../lists/UserList');
 const WhisperRoomList = require('../lists/WhisperRoomList');
 const RoomFollowingList = require('../lists/RoomFollowingList');
 
@@ -43,24 +43,25 @@ class ChatView extends ViewWrapper {
     elementId = `chView-${Date.now()}`,
   }) {
     const roomList = new RoomList({
-      title: 'room',
+      title: 'Rooms',
     });
     const roomFollowingList = new RoomFollowingList({
-      title: 'following',
+      title: 'Following',
     });
     const whisperRoomList = new WhisperRoomList({
-      title: 'whisper',
+      title: 'Whispers',
     });
-    const userRoomList = new UserRoomList({
-      title: 'user',
+    const userList = new UserList({
+      title: 'Users',
+      shouldFocusOnClick: false,
     });
     const messageList = new MessageList({
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,
-        roomList,
         whisperRoomList,
-        userRoomList,
+        roomList,
+        userList,
       ],
     });
     const inputArea = new InputArea({
@@ -78,9 +79,9 @@ class ChatView extends ViewWrapper {
 
         const roomId = messageList.getRoomId();
         const room = roomComposer.getRoom({ roomId });
-        const participantIds = room.isWhisper ?
-          room.participantIds :
-          [];
+        const participantIds = room.isWhisper
+          ? room.participantIds
+          : [];
         const message = {
           text,
           roomId,
@@ -136,7 +137,7 @@ class ChatView extends ViewWrapper {
         { component: roomFollowingList },
         { component: roomList },
         { component: whisperRoomList },
-        { component: userRoomList },
+        { component: userList },
       ],
       classes: ['columnRoomList'],
     };
@@ -186,7 +187,7 @@ class ChatView extends ViewWrapper {
 
     this.inputArea = inputArea;
     this.whisperRoomList = whisperRoomList;
-    this.userRoomList = userRoomList;
+    this.userRoomList = userList;
     this.messageList = messageList;
 
     accessCentral.addAccessElement({

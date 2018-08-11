@@ -135,6 +135,7 @@ class StorageManager {
     this.removeCurrentForum();
     this.removeUserId();
     this.removeDefaultViewType();
+    this.removeMarked();
 
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
@@ -432,6 +433,45 @@ class StorageManager {
 
   static removeDefaultViewType() {
     this.removeLocalVal('defaultViewType');
+  }
+
+  static getMarked() {
+    return converters.convertToObject(this.getLocalVal('marked'));
+  }
+
+  static addMarked({ listType, objectId }) {
+    const marked = StorageManager.getMarked();
+    let items = marked[listType];
+
+    if (!items) {
+      items = [];
+    }
+
+    items.push({ objectId });
+    marked[listType] = items;
+
+    StorageManager.setMarked({ marked });
+  }
+
+  static pullMarked({ listType, objectId }) {
+    const marked = StorageManager.getMarked();
+    const items = marked[listType];
+
+    if (items) {
+      items.splice(items.findIndex(item => item.objectId === objectId), 1);
+
+      marked[listType] = items;
+    }
+
+    this.setMarked({ marked });
+  }
+
+  static setMarked({ marked = {} }) {
+    this.setLocalVal('marked', marked);
+  }
+
+  static removeMarked() {
+    this.removeLocalVal('marked');
   }
 }
 

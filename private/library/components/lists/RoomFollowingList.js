@@ -98,7 +98,6 @@ class RoomFollowingList extends List {
       func: ({
         room,
         origin,
-        listType = '',
       }) => {
         const { objectId } = room;
 

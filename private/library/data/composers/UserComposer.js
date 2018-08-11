@@ -5,6 +5,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const socketManager = require('../../SocketManager');
 const aliasComposer = require('./AliasComposer');
+const accessCentral = require('../../AccessCentral');
 
 class UserComposer extends DataComposer {
   constructor() {
@@ -26,7 +27,10 @@ class UserComposer extends DataComposer {
       return this.handler.getObject({ objectId: userId });
     }
 
-    return {};
+    return {
+      followingRooms: [storageManager.getPublicRoomId()],
+      accessLevel: accessCentral.AccessLevels.ANONYMOUS,
+    };
   }
 
   getCurrentIdentity() {

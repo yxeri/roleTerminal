@@ -25,6 +25,7 @@ const accessCentral = require('../../AccessCentral');
 class UserList extends List {
   constructor({
     title,
+    shouldFocusOnClick,
     classes = [],
     elementId = `userList-${Date.now()}`,
   }) {
@@ -39,6 +40,7 @@ class UserList extends List {
       elementId,
       classes,
       title,
+      shouldFocusOnClick,
       filter: {
         rules: [
           { paramName: 'isBanned', paramValue: false },

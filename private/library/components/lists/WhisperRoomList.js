@@ -21,6 +21,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const aliasComposer = require('../../data/composers/AliasComposer');
 
 class RoomList extends List {
   constructor({
@@ -36,6 +37,7 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      listType: 'whisperRooms',
       filter: {
         rules: [
           { paramName: 'isWhisper', paramValue: true },
@@ -72,20 +74,16 @@ class RoomList extends List {
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const roomId = objectId;
-
           eventCentral.emitEvent({
             event: eventCentral.Events.SWITCH_ROOM,
             params: {
               listType: this.ListTypes.ROOMS,
               origin: this.elementId,
               room: {
-                objectId: roomId,
+                objectId,
               },
             },
           });
-
-          roomComposer.follow({ roomId });
         },
       },
       dependencies: [
@@ -104,15 +102,36 @@ class RoomList extends List {
         origin,
         listType = '',
       }) => {
+        const { objectId } = room;
+
+        this.unmarkItem({ objectId });
+
         if (origin && origin === this.elementId) {
           return;
         } else if (listType !== this.ListTypes.ROOMS) {
           return;
         }
 
-        const { objectId } = room;
+        if (!origin || origin !== this.elementId) {
+          this.removeFocusOnItem();
+        }
 
         this.setFocusedListItem(objectId);
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.MESSAGE,
+      func: ({
+        message,
+      }) => {
+        const { roomId } = message;
+
+        if (storageManager.getCurrentRoom() === roomId) {
+          return;
+        }
+
+        this.markItem({ objectId: roomId });
       },
     });
   }
@@ -126,6 +145,33 @@ class RoomList extends List {
       (user.objectId && object.participantIds.includes(user.objectId)) ||
       access.canSee,
     };
+  }
+
+  getCollectorObjects() {
+    const userId = storageManager.getUserId();
+    const userAliases = [userId].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const allRooms = this.collector.getObjects({
+      filter: this.filter,
+    });
+
+    if (!userId) {
+      return [];
+    }
+
+    return allRooms.filter((room) => {
+      return userAliases.find(objectId => room.participantIds.includes(objectId));
+    }).sort((a, b) => {
+      const aParam = a.roomName.toLowerCase();
+      const bParam = b.roomName.toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      } else if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
+    });
   }
 }
 

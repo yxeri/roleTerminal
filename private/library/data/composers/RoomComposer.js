@@ -45,9 +45,8 @@ class RoomComposer extends DataComposer {
 
   follow({ // eslint-disable-line class-methods-use-this
     roomId,
+    callback,
   }) {
-    console.log('follow', roomId);
-
     const user = userComposer.getCurrentUser();
 
     if (!user) {
@@ -57,12 +56,7 @@ class RoomComposer extends DataComposer {
     const { followingRooms = [] } = user;
 
     if (followingRooms.includes(roomId)) {
-      const room = this.getRoom({ roomId });
-
-      eventCentral.emitEvent({
-        event: eventCentral.Events.FOLLOWED_ROOM,
-        params: { room },
-      });
+      callback({});
 
       return;
     }
@@ -76,6 +70,8 @@ class RoomComposer extends DataComposer {
       if (error) {
         console.log('follow error', error);
       }
+
+      callback({ error });
     });
   }
 

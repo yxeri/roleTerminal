@@ -59,6 +59,24 @@ class PositionList extends List {
     super(listParams);
 
     this.positionTypes = listParams.positionTypes;
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.FOCUS_MAPPOSITION,
+      func: ({
+        origin,
+        position,
+      }) => {
+        if (!origin || origin !== this.elementId) {
+          this.removeFocusOnItem();
+
+          return;
+        }
+
+        const { objectId } = position;
+
+        this.setFocusedListItem(objectId);
+      },
+    });
   }
 }
 

@@ -24,7 +24,9 @@ class WalletView extends ViewWrapper {
     elementId = `wView-${Date.now()}`,
   }) {
     const transactionList = new TransactionList({});
-    const userList = new UserList({});
+    const userList = new UserList({
+      title: 'Users',
+    });
 
     super({
       elementId,

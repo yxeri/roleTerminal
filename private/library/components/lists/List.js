@@ -38,6 +38,7 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
+const storageManager = require('../../StorageManager');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -77,8 +78,10 @@ class List extends BaseView {
     title,
     shouldToggle,
     listItemSpecificClasses,
-    onCreateFunc = () => {},
+    userFilter,
     minAccessLevel,
+    listType,
+    onCreateFunc = () => {},
     shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
@@ -97,6 +100,8 @@ class List extends BaseView {
     this.onCreateFunc = onCreateFunc;
     this.ListTypes = {
       ROOMS: 'rooms',
+      FOLLOWEDROOMS: 'followedRooms',
+      WHISPERROOMS: 'whisperRooms',
     };
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
@@ -109,12 +114,14 @@ class List extends BaseView {
     this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
+    this.userFilter = userFilter;
     this.shouldScrollToBottom = shouldScrollToBottom;
     this.sorting = sorting;
     this.title = title;
     this.shouldPaginate = shouldPaginate;
     this.listItemSpecificClasses = listItemSpecificClasses;
     this.shouldToggle = shouldToggle;
+    this.listType = listType;
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -124,23 +131,52 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (changeType !== socketManager.ChangeTypes.REMOVE && this.filter) {
+          if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
             const filterFunc = (rule) => {
               if (rule.shouldInclude) {
-                return rule.userRule ?
-                  user[rule.paramName].includes(rule.paramValue) :
-                  object[rule.paramName].includes(rule.paramValue);
+                return object[rule.paramName].includes(rule.paramValue);
               }
 
-              return rule.userRule ?
-                rule.paramValue === user[rule.paramName] :
-                rule.paramValue === object[rule.paramName];
+              return rule.paramValue === object[rule.paramName];
+            };
+            const userFilterFunc = (rule) => {
+              const {
+                shouldInclude,
+                paramValue,
+                paramName,
+                objectParamName,
+                shouldBeTrue = true,
+              } = rule;
+
+              if (shouldInclude) {
+                const isIncluded = user[paramName].includes(object[objectParamName]);
+
+                return shouldBeTrue
+                  ? isIncluded
+                  : !isIncluded;
+              }
+
+              const isIncluded = paramValue === object[objectParamName];
+
+              return shouldBeTrue
+                ? isIncluded
+                : !isIncluded;
             };
 
-            if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
-              return;
-            } else if (!this.filter.rules.every(filterFunc)) {
-              return;
+            if (this.filter) {
+              if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
+                return;
+              } else if (!this.filter.rules.every(filterFunc)) {
+                return;
+              }
+            }
+
+            if (this.userFilter) {
+              if (this.userFilter.orCheck && !this.userFilter.rules.some(userFilterFunc)) {
+                return;
+              } else if (!this.userFilter.rules.every(userFilterFunc)) {
+                return;
+              }
             }
           }
 
@@ -285,12 +321,20 @@ class List extends BaseView {
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
     const fragment = document.createDocumentFragment();
+    const marked = storageManager.getMarked();
+
+    console.log('marked', marked, marked[this.listType], this.listType);
 
     objects.forEach((object) => {
       const { canSee } = this.hasAccess({ object, user });
 
       if (canSee) {
-        const listItem = this.createListItem({ object });
+        const listItem = this.createListItem({
+          object,
+          isMarked: marked[this.listType]
+            ? marked[this.listType].map(mark => mark.objectId).includes(object.objectId)
+            : false,
+        });
 
         fragment.appendChild(listItem);
       }
@@ -301,6 +345,7 @@ class List extends BaseView {
 
   getCollectorObjects() {
     return this.collector.getObjects({
+      user: userComposer.getCurrentUser(),
       filter: this.filter,
       sorting: this.sorting,
     });
@@ -360,7 +405,10 @@ class List extends BaseView {
     }
   }
 
-  createListItem({ object }) {
+  createListItem({
+    object,
+    isMarked = false,
+  }) {
     const { objectId } = object;
     const classes = this.focusedId === objectId ?
       [cssClasses.focusListItem] :
@@ -476,6 +524,10 @@ class List extends BaseView {
       listItemParams.clickFuncs = clickFuncs;
     }
 
+    if (isMarked) {
+      listItemParams.classes.push(cssClasses.markListItem);
+    }
+
     return elementCreator.createListItem(listItemParams);
   }
 
@@ -528,6 +580,33 @@ class List extends BaseView {
     if (element) {
       element.classList.add(cssClasses.newListItem);
       setTimeout(() => { element.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+    }
+  }
+
+  markItem({ objectId }) {
+    const element = this.getElement(objectId);
+
+    if (element) {
+      storageManager.addMarked({
+        objectId,
+        listType: this.listType,
+      });
+
+      this.animateItem({ elementId: objectId });
+      element.classList.add(cssClasses.markListItem);
+    }
+  }
+
+  unmarkItem({ objectId }) {
+    const element = this.getElement(objectId);
+
+    if (element) {
+      storageManager.pullMarked({
+        objectId,
+        listType: this.listType,
+      });
+
+      element.classList.remove(cssClasses.markListItem);
     }
   }
 }

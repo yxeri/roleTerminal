@@ -23,6 +23,7 @@ $greyed-out: #6f6f6f;
 $dark-border-color: #730066;
 $focus-color: #000691;
 $new-color: #009100;
+$darker-new-color: #005f00;
 $header-color: #2e001a;
 $p-margin: .4em;
 $border-width: .1em;
@@ -234,7 +235,7 @@ header {
 /*
  * A list of rooms.
  */
-.roomList {
+.roomList, .userList {
   li:hover {
     background-color: $second-color;
   }
@@ -271,7 +272,7 @@ header {
  * A list item will be marked when the object that it's connected to is updated.
  */
 .markListItem {
-  background-color: yellow;
+  background-color: $darker-new-color;
 }
 
 /**
@@ -736,6 +737,10 @@ $msgList-textarea-border: .3em solid $darker-color;
       border-right: $border;
     }
   }
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .statusBar {

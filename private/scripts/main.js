@@ -292,7 +292,7 @@ statusBar.setViews({
 });
 
 document.addEventListener('click', () => {
-  // viewTools.goFullScreen({});
+  viewTools.goFullScreen({});
 });
 
 viewSwitcher.addAvailableTypes({

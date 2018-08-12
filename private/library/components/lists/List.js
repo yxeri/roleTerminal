@@ -275,9 +275,9 @@ class List extends BaseView {
       };
 
       elements.push(elementCreator.createHeader({
-        clickFuncs: this.shouldToggle ?
-          clickFuncs :
-          undefined,
+        clickFuncs: this.shouldToggle
+          ? clickFuncs
+          : undefined,
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
       }));
     }
@@ -322,8 +322,6 @@ class List extends BaseView {
     const user = userComposer.getCurrentUser();
     const fragment = document.createDocumentFragment();
     const marked = storageManager.getMarked();
-
-    console.log('marked', marked, marked[this.listType], this.listType);
 
     objects.forEach((object) => {
       const { canSee } = this.hasAccess({ object, user });
@@ -381,30 +379,6 @@ class List extends BaseView {
     this.focusedId = undefined;
   }
 
-  markListItem(elementId) {
-    const toMark = this.getElement(elementId);
-
-    if (toMark) {
-      toMark.classList.add(cssClasses.markListItem);
-
-      if (!this.markedIds.includes(elementId)) {
-        this.markedIds.push(elementId);
-      }
-    }
-  }
-
-  unmarkListItem(elementId) {
-    const markedIndex = this.markedIds.indexOf(elementId);
-
-    if (markedIndex > -1) {
-      const element = this.getElement(elementId);
-
-      element.classList.remove(cssClasses.markListItem);
-
-      this.markedIds.splice(markedIndex, 1);
-    }
-  }
-
   createListItem({
     object,
     isMarked = false,
@@ -417,7 +391,7 @@ class List extends BaseView {
     const clickFuncs = {
       leftFunc: () => {
         this.setFocusedListItem(objectId);
-        this.unmarkListItem(objectId);
+        this.unmarkItem(objectId);
 
         if (this.listItemClickFuncs.leftFunc) {
           this.listItemClickFuncs.leftFunc(objectId);

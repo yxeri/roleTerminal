@@ -36,7 +36,7 @@ class TeamCreateDialog extends BaseDialog {
         inputName: ids.TEAMNAME,
         type: 'text',
         isRequired: true,
-        maxLength: 20,
+        maxLength: 10,
         placeholder: labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamName' }),
       }),
       elementCreator.createInput({

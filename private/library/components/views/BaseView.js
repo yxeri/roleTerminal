@@ -21,10 +21,10 @@ const storageManager = require('../../StorageManager');
 class BaseView {
   constructor({
     classes,
-    minAccessLevel,
+    minimumAccessLevel,
     elementId = `elem-${Date.now()}`,
   }) {
-    this.minAccessLevel = minAccessLevel;
+    this.minimumAccessLevel = minimumAccessLevel;
     this.classes = classes;
     this.elementId = elementId;
     this.element = elementCreator.createContainer({
@@ -32,10 +32,10 @@ class BaseView {
       elementId,
     });
 
-    if (minAccessLevel) {
+    if (minimumAccessLevel) {
       accessCentral.addAccessElement({
         element: this.element,
-        minimumAccessLevel: this.minAccessLevel,
+        minimumAccessLevel: this.minimumAccessLevel,
       });
     }
   }
@@ -83,9 +83,9 @@ class BaseView {
   }
 
   showView() {
-    console.log('access show', this.minAccessLevel, this.element);
+    console.log('access show', this.minimumAccessLevel, this.element);
 
-    if (this.minAccessLevel && this.minAccessLevel > storageManager.getAccessLevel()) {
+    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
       return;
     }
 
@@ -97,7 +97,7 @@ class BaseView {
   }
 
   toggleView() {
-    if (this.minAccessLevel && this.minAccessLevel > storageManager.getAccessLevel()) {
+    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
       return;
     }
 

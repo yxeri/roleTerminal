@@ -34,6 +34,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 // const teamComposer = require('../../data/composers/TeamComposer');
 
 class StatusBar extends BaseView {
@@ -137,7 +138,7 @@ class StatusBar extends BaseView {
             const dialog = new DocFileDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           },
         },
@@ -161,7 +162,7 @@ class StatusBar extends BaseView {
             const dialog = new RoomDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           },
         },
@@ -185,7 +186,7 @@ class StatusBar extends BaseView {
             const dialog = new AliasDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           },
         },
@@ -209,53 +210,11 @@ class StatusBar extends BaseView {
             const dialog = new TeamCreateDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           },
         },
       });
-      // const leaveTeamButton = elementCreator.createButton({
-      //   text: labelHandler.getLabel({ baseObject: 'Button', label: 'leaveTeam' }),
-      //   clickFuncs: {
-      //     leftFunc: () => {
-      //       const dialog = new TeamDialog({
-      //         callback: () => {
-      //           const dialog = new TeamDialog({
-      //             text: [],
-      //             callback: ({ confirmed }) => {
-      //               if (!confirmed) {
-      //                 dialog.removeFromView();
-      //
-      //                 return;
-      //               }
-      //
-      //               teamComposer.leaveTeam({
-      //                 teamId,
-      //                 callback: ({ error: teamError }) => {
-      //                   if (teamError) {
-      //                     console.log('team error', teamError);
-      //
-      //                     return;
-      //                   }
-      //
-      //                   dialog.removeFromView();
-      //                 },
-      //               });
-      //             },
-      //           });
-      //
-      //           dialog.addToView({
-      //             element: this.getParentElement(),
-      //           });
-      //         },
-      //       });
-      //
-      //       dialog.addToView({
-      //         element: this.getParentElement(),
-      //       });
-      //     },
-      //   },
-      // });
 
       items.push({
         elements: [

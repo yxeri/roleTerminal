@@ -118,6 +118,14 @@ class RoomFollowingList extends List {
 
         this.addOneItem({ object: room });
         this.setFocusedListItem(objectId);
+
+        eventCentral.emitEvent({
+          event: eventCentral.Events.SWITCH_ROOM,
+          params: {
+            room,
+            origin: this.elementId,
+          },
+        });
       },
     });
 

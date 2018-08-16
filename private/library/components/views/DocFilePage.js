@@ -24,6 +24,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
 const labelHandler = require('../../labels/LabelHandler');
 const socketManager = require('../../SocketManager');
+const viewSwitcher = require('../../ViewSwitcher');
 
 /**
  * Create fragment with admin buttons for the document.
@@ -47,7 +48,7 @@ function createControls({
         });
 
         dialog.addToView({
-          element: parentElement,
+          element: viewSwitcher.getParentElement(),
         });
       },
     },
@@ -131,7 +132,7 @@ class DocFilePage extends BaseView {
           docFileId: objectId,
         });
 
-        dialog.addToView({ element: this.getParentElement() });
+        dialog.addToView({ element: viewSwitcher.getParentElement() });
       },
     });
 

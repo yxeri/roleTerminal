@@ -21,11 +21,13 @@ const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class UserList extends List {
   constructor({
     title,
     shouldFocusOnClick,
+    minimumAccessLevel,
     classes = [],
     elementId = `userList-${Date.now()}`,
   }) {
@@ -47,7 +49,7 @@ class UserList extends List {
           { paramName: 'isVerified', paramValue: true },
         ],
       },
-      minAccessLevel: accessCentral.AccessLevels.STANDARD,
+      minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.rooms,
         dataHandler.users,
@@ -65,7 +67,7 @@ class UserList extends List {
             origin: this.elementId,
           });
 
-          userDialog.addToView({ element: this.getParentElement() });
+          userDialog.addToView({ element: viewSwitcher.getParentElement() });
         },
       },
       collector: dataHandler.users,

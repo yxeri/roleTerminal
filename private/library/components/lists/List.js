@@ -79,7 +79,7 @@ class List extends BaseView {
     shouldToggle,
     listItemSpecificClasses,
     userFilter,
-    minAccessLevel,
+    minimumAccessLevel,
     listType,
     onCreateFunc = () => {},
     shouldPaginate = false,
@@ -93,7 +93,7 @@ class List extends BaseView {
   }) {
     super({
       elementId,
-      minAccessLevel,
+      minimumAccessLevel,
       classes: classes.concat(['list']),
     });
 
@@ -512,13 +512,14 @@ class List extends BaseView {
   }) {
     const { objectId } = object;
     const newItem = this.createListItem({ object });
+    const element = this.getElement(objectId);
 
     if (shouldAnimate) {
       newItem.classList.add(cssClasses.newListItem);
       setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
     }
 
-    if (shouldReplace) {
+    if (shouldReplace && element) {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
     } else if (this.sorting && this.sorting.reverse) {
       const firstChild = this.listElement.firstElementChild;

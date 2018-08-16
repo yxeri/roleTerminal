@@ -183,6 +183,20 @@ class UserComposer extends DataComposer {
       },
     });
   }
+
+  updateUsername({
+    userId,
+    username,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        userId,
+        user: { username },
+      },
+    });
+  }
 }
 
 const userComposer = new UserComposer();

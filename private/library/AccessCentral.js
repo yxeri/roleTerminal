@@ -39,12 +39,13 @@ class AccessCentral {
             const {
               minimumAccessLevel,
               maxAccessLevel,
+              element,
             } = accessElement;
 
             if (accessLevel >= minimumAccessLevel && accessLevel <= maxAccessLevel) {
-              accessElement.element.classList.remove('hide');
+              element.classList.remove('hide');
             } else {
-              accessElement.element.classList.add('hide');
+              element.classList.add('hide');
             }
           });
         });

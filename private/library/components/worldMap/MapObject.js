@@ -20,6 +20,7 @@ const elementCreator = require('../../ElementCreator');
 const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
+const viewSwitcher = require('../../ViewSwitcher');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -469,7 +470,7 @@ class MapObject {
               ],
             });
 
-            dialog.addToView({ element: this.worldMap.getDiv().parentElement });
+            dialog.addToView({ element: viewSwitcher.getParentElement() });
           },
         },
       });

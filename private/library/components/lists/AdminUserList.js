@@ -23,6 +23,7 @@ const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');
 const walletComposer = require('../../data/composers/WalletComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class AdminUserList extends List {
   constructor({
@@ -338,7 +339,7 @@ class AdminUserList extends List {
 
           lowerButtons.push(resetPasswordButton, changeAccessButton, walletButton);
 
-          dialog.addToView({ element: this.element });
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
           dialog.addBottomButtons({ buttons: lowerButtons });
         },
       },

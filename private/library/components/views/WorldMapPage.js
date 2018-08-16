@@ -12,6 +12,7 @@ const socketManager = require('../../SocketManager');
 const mouseHandler = require('../../MouseHandler');
 const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
+const viewSwitcher = require('../../ViewSwitcher');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -336,7 +337,7 @@ class WorldMapPage extends BaseView {
               ],
             });
 
-            dialog.addToView({ element: this.element });
+            dialog.addToView({ element: viewSwitcher.getParentElement() });
           },
         },
       });

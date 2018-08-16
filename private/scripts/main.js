@@ -12,6 +12,8 @@ const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
+const tools = require('../library/Tools');
+const accessCentral = require('../library/AccessCentral');
 
 const worldMapParams = {
   alwaysShowLabels: {
@@ -291,10 +293,6 @@ statusBar.setViews({
   ],
 });
 
-document.addEventListener('click', () => {
-  viewTools.goFullScreen({});
-});
-
 viewSwitcher.addAvailableTypes({
   types: [
     chatWrapper.viewType,
@@ -310,3 +308,9 @@ viewSwitcher.switchView({
 });
 
 positionTracker.startTracker();
+
+if (!tools.getQueryParameters().noFullscreen) {
+  document.addEventListener('click', () => {
+    viewTools.goFullScreen({});
+  });
+}

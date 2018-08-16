@@ -81,6 +81,10 @@ class ViewSwitcher {
     return this;
   }
 
+  getParentElement() {
+    return this.parentElement;
+  }
+
   addAvailableTypes({ types = [] }) {
     this.availableTypes = this.availableTypes.concat(types);
   }

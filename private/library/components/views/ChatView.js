@@ -43,15 +43,19 @@ class ChatView extends ViewWrapper {
     elementId = `chView-${Date.now()}`,
   }) {
     const roomList = new RoomList({
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Rooms',
     });
     const roomFollowingList = new RoomFollowingList({
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Following',
     });
     const whisperRoomList = new WhisperRoomList({
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Whispers',
     });
     const userList = new UserList({
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Users',
       shouldFocusOnClick: false,
     });
@@ -68,7 +72,7 @@ class ChatView extends ViewWrapper {
       shouldResize,
       placeholder,
       sendOnEnter,
-      minAccessLevel: storageManager.getPermissions().SendMessage ?
+      minimumAccessLevel: storageManager.getPermissions().SendMessage ?
         storageManager.getPermissions().SendMessage.accessLevel :
         accessCentral.AccessLevels.STANDARD,
       classes: [inputPlacement],
@@ -189,13 +193,7 @@ class ChatView extends ViewWrapper {
     this.whisperRoomList = whisperRoomList;
     this.userRoomList = userList;
     this.messageList = messageList;
-
-    accessCentral.addAccessElement({
-      element: this.inputArea.element,
-      minimumAccessLevel: storageManager.getPermissions().SendMessage ?
-        storageManager.getPermissions().SendMessage.accessLevel :
-        accessCentral.AccessLevels.STANDARD,
-    });
+    this.roomList = roomList;
 
     eventCentral.addWatcher({
       event: eventCentral.Events.VIEW_SWITCHED,

@@ -3,6 +3,7 @@ const DataComposer = require('./BaseComposer');
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const socketManager = require('../../SocketManager');
 
 class MessageComposer extends DataComposer {
   constructor() {
@@ -35,6 +36,35 @@ class MessageComposer extends DataComposer {
     }
 
     return message;
+  }
+
+  fetchMessagesByRoom({
+    roomId,
+    callback,
+  }) {
+    this.handler.fetchObjects({
+      event: socketManager.EmitTypes.GETROOMMSGS,
+      emitParams: { roomId },
+      callback: ({ error: getError }) => {
+        if (getError) {
+          console.log('get messages error', getError);
+        }
+
+        callback({ error: getError });
+      },
+    });
+  }
+
+  getMessagesByRoom({
+    roomId,
+  }) {
+    return this.handler.getObjects({
+      filter: {
+        rules: [
+          { paramName: 'roomId', paramValue: roomId },
+        ],
+      },
+    });
   }
 
   sendMessage({

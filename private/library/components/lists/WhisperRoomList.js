@@ -22,10 +22,12 @@ const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const aliasComposer = require('../../data/composers/AliasComposer');
+const accessCentral = require('../../AccessCentral');
 
 class RoomList extends List {
   constructor({
     title,
+    minimumAccessLevel,
     whisperText = ' <-> ',
     classes = [],
     elementId = `wRList-${Date.now()}`,
@@ -37,6 +39,7 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       listType: 'whisperRooms',
       filter: {
         rules: [

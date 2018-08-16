@@ -1,11 +1,12 @@
 const BaseView = require('../BaseView');
 const elementCreator = require('../../../ElementCreator');
 const keyhandler = require('../../../KeyHandler');
+const accessCentral = require('../../../AccessCentral');
 
 class InputArea extends BaseView {
   constructor({
     sendOnEnter,
-    minAccessLevel,
+    minimumAccessLevel,
     classes = [],
     placeholder = '',
     shouldResize = true,
@@ -15,7 +16,7 @@ class InputArea extends BaseView {
     inputCallback = () => {},
   }) {
     super({
-      minAccessLevel,
+      minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       classes: classes.concat(['inputArea']),
       elementId: `inputArea-${Date.now()}`,
     });

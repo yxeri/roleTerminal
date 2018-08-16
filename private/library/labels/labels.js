@@ -117,6 +117,12 @@ const labels = {
     no: (override.BaseDialog && override.BaseDialog.no) || {
       en: 'No',
     },
+    none: (override.BaseDialog && override.BaseDialog.none) || {
+      en: '-',
+    },
+    done: (override.BaseDialog && override.BaseDialog.done) || {
+      en: 'Done',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -134,6 +140,24 @@ const labels = {
     incorrectCode: (override.LockedDocFileDialog && override.LockedDocFileDialog.enterCode) || {
       en: 'Incorrect code. Try again.',
       se: 'Fel kod. Försök igen',
+    },
+  },
+  LockedRoomDialog: {
+    isLocked: (override.LockedRoomDialog && override.LockedRoomDialog.isLocked) || {
+      en: 'is password protected.',
+    },
+    enterPassword: (override.LockedRoomDialog && override.LockedRoomDialog.enterPassword) || {
+      en: 'Enter the password',
+    },
+    password: (override.LockedRoomDialog && override.LockedRoomDialog.password) || {
+      en: 'Password',
+    },
+    unlock: (override.LockedRoomDialog && override.LockedRoomDialog.unlock) || {
+      en: 'Unlock',
+      se: 'Lås upp',
+    },
+    accessDenied: (override.LockedRoomDialog && override.LockedRoomDialog.accessDenied) || {
+      en: 'Access denied',
     },
   },
   DocFileDialog: {

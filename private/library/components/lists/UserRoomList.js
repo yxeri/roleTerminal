@@ -42,7 +42,7 @@ class RoomList extends List {
       classes,
       title,
       shouldFocusOnClick: false,
-      minAccessLevel: accessCentral.AccessLevels.STANDARD,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.rooms,
         dataHandler.users,

@@ -15,16 +15,20 @@
  */
 
 const List = require('./List');
+const LockedRoomDialog = require('../views/dialogs/LockedRoomDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const viewSwitcher = require('../../ViewSwitcher');
+const accessCentral = require('../../AccessCentral');
 
 class RoomList extends List {
   constructor({
     title,
+    minimumAccessLevel,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -35,6 +39,7 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       filter: {
         rules: [
           { paramName: 'isUser', paramValue: false },
@@ -66,31 +71,51 @@ class RoomList extends List {
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const roomId = objectId;
+          const {
+            roomName,
+            objectId: roomId,
+          } = roomComposer.getRoom({ roomId: objectId });
 
           roomComposer.follow({
             roomId,
             callback: ({ error }) => {
               if (error) {
+                if (error.type === 'not allowed' && error.extraData.param === 'password') {
+                  const lockedDialog = new LockedRoomDialog({
+                    roomId,
+                    roomName,
+                    listId: this.elementId,
+                    listType: this.listType,
+                  });
+
+                  lockedDialog.addToView({
+                    element: viewSwitcher.getParentElement(),
+                  });
+
+                  return;
+                }
+
                 return;
               }
 
+              // eventCentral.emitEvent({
+              //   event: eventCentral.Events.SWITCH_ROOM,
+              //   params: {
+              //     listType: this.ListTypes.ROOMS,
+              //     origin: this.elementId,
+              //     room: {
+              //       objectId: roomId,
+              //     },
+              //   },
+              // });
+
               eventCentral.emitEvent({
-                event: eventCentral.Events.SWITCH_ROOM,
+                event: eventCentral.Events.FOLLOWED_ROOM,
                 params: {
-                  listType: this.ListTypes.ROOMS,
-                  origin: this.elementId,
-                  room: {
-                    objectId: roomId,
-                  },
+                  room: { objectId: roomId },
                 },
               });
             },
-          });
-        },
-        right: (objectId) => {
-          roomComposer.unfollow({
-            roomId: objectId,
           });
         },
       },

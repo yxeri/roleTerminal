@@ -5,6 +5,7 @@ const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const userComposer = require('../../data/composers/UserComposer');
+const messageComposer = require('./MessageComposer');
 
 class RoomComposer extends DataComposer {
   constructor() {
@@ -45,6 +46,7 @@ class RoomComposer extends DataComposer {
 
   follow({ // eslint-disable-line class-methods-use-this
     roomId,
+    password,
     callback,
   }) {
     const user = userComposer.getCurrentUser();
@@ -63,15 +65,29 @@ class RoomComposer extends DataComposer {
 
     const params = {
       roomId,
+      password,
       aliasId: storageManager.getAliasId(),
     };
 
     socketManager.emitEvent(socketManager.EmitTypes.FOLLOW, params, ({ error }) => {
       if (error) {
         console.log('follow error', error);
+
+        callback({ error });
+
+        return;
       }
 
-      callback({ error });
+      messageComposer.fetchMessagesByRoom({
+        roomId,
+        callback: ({ error: fetchError }) => {
+          if (fetchError) {
+            console.log('follow get messages', fetchError);
+          }
+
+          callback({ error: fetchError });
+        },
+      });
     });
   }
 

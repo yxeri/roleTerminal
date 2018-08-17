@@ -7,7 +7,7 @@ const socketManager = require('../../SocketManager');
 class TransactionComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.wallets,
+      handler: dataHandler.transactions,
       completionEvent: eventCentral.Events.COMPLETE_TRANSACTION,
       dependencies: [
         dataHandler.users,

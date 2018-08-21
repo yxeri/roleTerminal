@@ -21,6 +21,7 @@ class MapLine extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    hoverExcludeRule,
     zIndex = 2,
     descriptionOnClick = false,
     alwaysShowLabel = false,
@@ -33,6 +34,7 @@ class MapLine extends MapObject {
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
 
     super({
+      hoverExcludeRule,
       labelStyle,
       alwaysShowLabel,
       shouldCluster,

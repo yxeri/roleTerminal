@@ -31,9 +31,11 @@ class Label {
   constructor({
     coordinates,
     text,
+    shouldShowLabel = true,
     labelStyle = {},
     map = null,
   }) {
+    this.shouldShowLabel = shouldShowLabel;
     this.mapLabel = new MapLabel({
       map,
       text: `< ${text}`,
@@ -55,7 +57,9 @@ class Label {
   }
 
   showLabel(map) {
-    this.mapLabel.setMap(map);
+    if (this.shouldShowLabel) {
+      this.mapLabel.setMap(map);
+    }
   }
 
   setCurrentCoordinates({ coordinates }) {

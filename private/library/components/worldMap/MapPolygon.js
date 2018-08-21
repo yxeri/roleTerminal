@@ -23,8 +23,13 @@ class MapPolygon extends MapObject {
     labelStyle,
     choosableStyles,
     triggeredStyles,
-    zIndex = 3,
+    hoverExcludeRule = {
+      paramName: 'positionName',
+      paramRegExp: /^polygon/ig,
+      shouldBeFalse: true,
+    },
     descriptionOnClick,
+    zIndex = 3,
     markedStyle = {
       strokeColor: '#009100',
       fillColor: '#009100',
@@ -55,6 +60,7 @@ class MapPolygon extends MapObject {
     }, style);
 
     super({
+      hoverExcludeRule,
       choosableStyles,
       descriptionOnClick,
       alwaysShowLabel,

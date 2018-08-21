@@ -21,6 +21,7 @@ class MapCircle extends MapObject {
     position,
     clickFuncs,
     pulseOptions,
+    hoverExcludeRule,
     zIndex = 4,
     radius = 10,
     styles = {},
@@ -31,6 +32,7 @@ class MapCircle extends MapObject {
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
 
     super({
+      hoverExcludeRule,
       alwaysShowLabel,
       shouldCluster,
       position,

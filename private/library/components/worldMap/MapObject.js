@@ -89,12 +89,13 @@ class MapObject {
     choosableStyles,
     triggeredStyles,
     style,
+    markedStyle,
+    hoverExcludeRule,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
-    markedStyle,
   }) {
     this.markedStyle = markedStyle;
     this.canBeDragged = canBeDragged;
@@ -113,6 +114,7 @@ class MapObject {
       text: this.position.positionName,
     });
     this.style = style;
+    this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
@@ -269,7 +271,9 @@ class MapObject {
   }
 
   showLabel() {
-    this.label.showLabel(this.mapObject.getMap());
+    if (this.showLabelOnHover) {
+      this.label.showLabel(this.mapObject.getMap());
+    }
   }
 
   hideLabel() {
@@ -368,7 +372,7 @@ class MapObject {
         style: style || this.style,
         shouldEmit: false,
       });
-    }, 1200);
+    }, 1500);
   }
 
   static buildLeftClickBox({ thisMapObject }) {

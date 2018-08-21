@@ -31,6 +31,7 @@ class WorldMapPage extends BaseView {
     labelStyle,
     listId,
     clusterStyle,
+    hoverExcludeRule = {},
     triggeredStyles = {},
     choosableStyles = {},
     alwaysShowLabels = {},
@@ -71,6 +72,7 @@ class WorldMapPage extends BaseView {
     this.alwaysShowLabels = alwaysShowLabels;
     this.choosableStyles = choosableStyles;
     this.triggeredStyles = triggeredStyles;
+    this.hoverExcludeRule = hoverExcludeRule;
 
     this.element.appendChild(MapObject.leftClickBox);
     this.element.appendChild(MapObject.rightClickBox);
@@ -178,6 +180,7 @@ class WorldMapPage extends BaseView {
       case positionComposer.PositionStructures.LINE: {
         newMarker = new MapLine({
           position,
+          hoverExcludeRule: this.hoverExcludeRule.lines,
           triggeredStyles: this.triggeredStyles.lines,
           choosableStyles: this.choosableStyles.lines,
           alwaysShowLabel: this.alwaysShowLabels.line,
@@ -190,6 +193,7 @@ class WorldMapPage extends BaseView {
       case positionComposer.PositionStructures.POLYGON: {
         newMarker = new MapPolygon({
           position,
+          hoverExcludeRule: this.hoverExcludeRule.polygons,
           triggeredStyles: this.triggeredStyles.polygons,
           choosableStyles: this.choosableStyles.polygons,
           alwaysShowLabel: this.alwaysShowLabels.polygon,
@@ -202,6 +206,7 @@ class WorldMapPage extends BaseView {
       default: {
         newMarker = new MapMarker({
           position,
+          hoverExcludeRule: this.hoverExcludeRule.markers,
           triggeredStyles: this.triggeredStyles.markers,
           choosableStyles: this.choosableStyles.markers,
           alwaysShowLabel: this.alwaysShowLabels.marker,

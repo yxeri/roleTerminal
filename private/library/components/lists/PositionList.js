@@ -26,9 +26,9 @@ class PositionList extends List {
     listParams.shouldToggle = true;
     listParams.positionTypes = listParams.positionTypes || Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
-    listParams.classes = listParams.classes ?
-      listParams.classes.concat(['positionList']) :
-      [];
+    listParams.classes = listParams.classes
+      ? listParams.classes.concat(['positionList'])
+      : [];
     listParams.filter = {
       orCheck: true,
       rules: listParams.positionTypes.map((positionType) => {

@@ -22,6 +22,7 @@ class MapMarker extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    hoverExcludeRule,
     descriptionOnClick = true,
     choosableStyles = [],
     zIndex = 4,
@@ -45,6 +46,7 @@ class MapMarker extends MapObject {
     }
 
     super({
+      hoverExcludeRule,
       choosableStyles,
       alwaysShowLabel,
       shouldCluster,

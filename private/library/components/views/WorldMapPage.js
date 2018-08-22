@@ -368,6 +368,12 @@ class WorldMapPage extends BaseView {
       return;
     }
 
+    if (typeof google === 'undefined' || typeof MarkerClusterer === 'undefined' || typeof MapLabel === 'undefined') {
+      setTimeout(this.startMap, 1000);
+
+      return;
+    }
+
     const centerCoordinates = storageManager.getCenterCoordinates();
 
     this.worldMap = new google.maps.Map(this.element, {

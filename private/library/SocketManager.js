@@ -68,6 +68,7 @@ class SocketManager {
       CREATETRANSACTION: 'createTransaction',
       INVITETEAM: 'inviteToTeam',
       LEAVETEAM: 'leaveTeam',
+      SIMPLEMSG: 'simpleMsg',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

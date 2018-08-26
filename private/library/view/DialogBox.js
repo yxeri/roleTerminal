@@ -27,10 +27,10 @@ class DialogBox extends View {
 
     if (leftCharCode === rightCharCode) { rightCharCode = buttons.right.text.toUpperCase().charCodeAt(1); }
 
-    this.addKeyTrigger({ charCode: leftCharCode, func: buttons.left.eventFunc });
-    this.addKeyTrigger({ charCode: rightCharCode, func: buttons.right.eventFunc });
+    // this.addKeyTrigger({ charCode: leftCharCode, func: buttons.left.eventFunc });
+    // this.addKeyTrigger({ charCode: rightCharCode, func: buttons.right.eventFunc });
 
-    this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
+    // this.keyTriggers.forEach(({ charCode, func }) => keyHandler.addKey(charCode, func));
 
     this.descriptionContainer = document.createElement('DIV');
     this.descriptionContainer.classList.add('description');

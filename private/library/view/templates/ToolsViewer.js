@@ -301,6 +301,10 @@ class ToolsViewer extends StandardView {
                       createDialog.changeExtraDescription({ text: ['Alias already exists'] });
 
                       return;
+                    } else if (createError.type === 'not allowed') {
+                      createDialog.changeExtraDescription({ text: ['Not allowed to create alias'] });
+
+                      return;
                     }
 
                     createDialog.changeExtraDescription({ text: ['Something went wrong.', 'Unable to create alias'] });
@@ -368,6 +372,10 @@ class ToolsViewer extends StandardView {
 
                     if (createError.type === 'already exists') {
                       createDialog.changeExtraDescription({ text: ['Alias already exists'] });
+
+                      return;
+                    } else if (createError.type === 'not allowed') {
+                      createDialog.changeExtraDescription({ text: ['Not allowed to create alias'] });
 
                       return;
                     }

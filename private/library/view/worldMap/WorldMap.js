@@ -1098,8 +1098,8 @@ class WorldMap extends View {
 
         this.markers[positionName] = new MapMarker({
           coordinates: {
-            latitude: center.lat,
-            longitude: center.lng,
+            latitude: center.lat(),
+            longitude: center.lng(),
           },
           icon: {
             url: markerType === 'custom' || markerType === 'lantern' ? 'images/mapiconcreated.png' : 'images/mapicon.png',

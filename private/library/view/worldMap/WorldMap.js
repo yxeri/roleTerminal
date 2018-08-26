@@ -1082,13 +1082,27 @@ class WorldMap extends View {
           });
         }
       } else if (markerType) {
+        const bounds = new google.maps.LatLngBounds();
+
+        if (coordinates.coordsCollection) {
+          coordinates.coordsCollection.forEach((coords) => {
+            bounds.extend(new google.maps.LatLng(coords.latitude, coords.longitude));
+          });
+        }
+
+        if (longitude && latitude) {
+          bounds.extend(new google.maps.LatLng(latitude, longitude));
+        }
+
+        const center = bounds.getCenter();
+
         this.markers[positionName] = new MapMarker({
           coordinates: {
-            latitude,
-            longitude,
+            latitude: center.lat,
+            longitude: center.lng,
           },
           icon: {
-            url: markerType === 'custom' ? 'images/mapiconcreated.png' : 'images/mapicon.png',
+            url: markerType === 'custom' || markerType === 'lantern' ? 'images/mapiconcreated.png' : 'images/mapicon.png',
           },
           map: this.map,
           worldMap: this,

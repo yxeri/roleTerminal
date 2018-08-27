@@ -18,13 +18,13 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "eslint": "4.16.0",
-    "eslint-config-airbnb": "16.1.0",
-    "eslint-config-airbnb-base": "12.1.0",
-    "eslint-plugin-import": "2.8.0",
-    "eslint-plugin-jsx-a11y": "6.0.3",
-    "eslint-plugin-mocha": "4.11.0",
-    "eslint-plugin-react": "7.5.1"
+    "eslint": "5.4.0",
+    "eslint-config-airbnb": "17.1.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-jsx-a11y": "6.1.1",
+    "eslint-plugin-mocha": "5.2.0",
+    "eslint-plugin-react": "7.11.1"
   },
   "dependencies": {
     "roleHaven": "git://github.com/yxeri/roleHaven.git"

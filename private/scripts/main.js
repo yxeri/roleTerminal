@@ -43,7 +43,7 @@ const worldMapParams = {
     'user',
     'device',
     'lantern',
-    'housing',
+    'local',
     'world',
     'roads',
     'drivable-roads',

@@ -247,7 +247,7 @@ class WorldMapPage extends BaseView {
    * @param {Object} params - Parameters.
    * @param {Object} params.event - Click event.
    */
-  showMapRightClickBox({ event }) {
+  showMapRightClickBox({ event }) { // eslint-disable-line
     const {
       CreatePosition = { accessLevel: 1 },
     } = storageManager.getPermissions();

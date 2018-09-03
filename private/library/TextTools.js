@@ -52,9 +52,9 @@ class TextTools {
    * @returns {Number|string} - Single number or string with 0 + number
    */
   static beautifyNumber(number) {
-    return number > 9 ?
-      number :
-      `0${number}`;
+    return number > 9
+      ? number
+      : `0${number}`;
   }
 
   static getHoursAndMinutes(time) {
@@ -192,7 +192,9 @@ class TextTools {
     return string.split().map((char) => {
       if (char === charToLower) {
         return char.toLowerCase();
-      } else if (Math.random() > 0.5) {
+      }
+
+      if (Math.random() > 0.5) {
         return char.toUpperCase();
       }
 
@@ -207,9 +209,9 @@ class TextTools {
     for (let i = 0; i < length; i += 1) {
       const randomVal = Math.round(Math.random() * (randomLength - 1));
 
-      result += Math.random() > 0.5 ?
-        selection[randomVal].toUpperCase() :
-        selection[randomVal];
+      result += Math.random() > 0.5
+        ? selection[randomVal].toUpperCase()
+        : selection[randomVal];
     }
 
     return result;
@@ -228,9 +230,9 @@ class TextTools {
    * @returns {string} - String copy.
    */
   static copyString(string) {
-    return string && string !== null ?
-      JSON.parse(JSON.stringify(string)) :
-      '';
+    return string && string !== null
+      ? JSON.parse(JSON.stringify(string))
+      : '';
   }
 
   static isInternationalAllowed(text) {
@@ -243,9 +245,13 @@ class TextTools {
 
     if (modTen === 1 && modHundred !== 11) {
       return `${number}st`;
-    } else if (modTen === 2 && modHundred !== 12) {
+    }
+
+    if (modTen === 2 && modHundred !== 12) {
       return `${number}nd`;
-    } else if (modTen === 3 && modHundred !== 13) {
+    }
+
+    if (modTen === 3 && modHundred !== 13) {
       return `${number}rd`;
     }
 

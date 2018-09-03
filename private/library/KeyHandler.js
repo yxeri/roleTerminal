@@ -47,13 +47,15 @@ class KeyHandler {
     this.ignoredKeys = {};
 
     window.addEventListener('keydown', (event) => {
-      const sentKeyCode = typeof event.which === 'number' ?
-        event.which :
-        event.keyCode;
+      const sentKeyCode = typeof event.which === 'number'
+        ? event.which
+        : event.keyCode;
 
       if (this.paused) {
         return;
-      } else if (this.ignoredKeys[sentKeyCode]) {
+      }
+
+      if (this.ignoredKeys[sentKeyCode]) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -79,9 +81,9 @@ class KeyHandler {
         return;
       }
 
-      const keyCode = typeof event.which === 'number' ?
-        event.which :
-        event.keyCode;
+      const keyCode = typeof event.which === 'number'
+        ? event.which
+        : event.keyCode;
 
       if (keyCode === this.triggerKey) {
         this.triggerKeyPressed = false;

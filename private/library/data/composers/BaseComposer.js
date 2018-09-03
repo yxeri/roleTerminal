@@ -40,7 +40,9 @@ class BaseComposer {
 
     if (!user) {
       return object.ownerAliasId || object.ownerId;
-    } else if (full) {
+    }
+
+    if (full) {
       return user.fullName || user.username;
     }
 

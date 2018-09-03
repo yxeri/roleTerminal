@@ -23,9 +23,9 @@ const eventCentral = require('./EventCentral');
  * @return {{longitude: Number, latitude: Number}} Coordinates.
  */
 function createCoordinates(coordinates) {
-  return coordinates ?
-    { longitude: parseFloat(coordinates.longitude), latitude: parseFloat(coordinates.latitude) } :
-    {};
+  return coordinates
+    ? { longitude: parseFloat(coordinates.longitude), latitude: parseFloat(coordinates.latitude) }
+    : {};
 }
 
 class StorageManager {

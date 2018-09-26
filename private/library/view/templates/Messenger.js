@@ -125,7 +125,7 @@ class Messenger extends StandardView {
     this.element.setAttribute('id', 'messenger');
     this.inputField = document.createElement('TEXTAREA');
     this.inputField.setAttribute('rows', '3');
-    this.inputField.setAttribute('placeholder', 'Input message. alt+enter to send');
+    this.inputField.setAttribute('placeholder', 'input message. alt+enter to send');
     this.inputField.addEventListener('input', () => { this.resizeInputField(); });
     this.selectedItem = null;
 
@@ -402,7 +402,7 @@ class Messenger extends StandardView {
   populate() {
     const createButton = elementCreator.createButton({
       classes: ['hide'],
-      text: 'Create room',
+      text: 'create_room',
       func: () => {
         this.lists.forEach(list => list.hideList());
 
@@ -468,8 +468,8 @@ class Messenger extends StandardView {
             inputName: 'password',
             type: 'password',
           }],
-          description: ['Employees are strictly prohibited from having more than 5% fun in their group room.'],
-          extraDescription: ['Enter a name and optional password for the room', 'Allowed characters in the name: a-z 0-9'],
+          description: ['room creation tool'],
+          extraDescription: ['enter a name and optional password for the room', 'allowed characters in the name: a-z 0-9'],
         });
         createDialog.appendTo(this.element.parentElement);
       },

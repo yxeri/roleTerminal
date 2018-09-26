@@ -484,16 +484,16 @@ class DirViewer extends StandardView {
             maxLength: 10,
           }],
           description: [
-            'Retrieve a document from the archives',
+            'retrieve a document from the archives',
           ],
-          extraDescription: ['Enter the ID of the document'],
+          extraDescription: ['enter the id of the document'],
         });
         idDialog.appendTo(this.element.parentElement);
       },
     });
     const createButton = elementCreator.createButton({
       classes: ['hide'],
-      text: 'Create doc',
+      text: 'create_doc',
       func: () => {
         this.lists.forEach(list => list.hideList());
         this.editDocFile();

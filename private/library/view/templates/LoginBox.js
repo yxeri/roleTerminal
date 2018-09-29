@@ -175,7 +175,7 @@ class LoginBox extends DialogBox {
             } else {
               this.changeExtraDescription({
                 text: [
-                  'Your user has been registered. You may now login. Welcome to the Oracle, employee.',
+                  'Your user has been registered. You may now login.',
                 ],
               });
             }

@@ -113,9 +113,9 @@ class BaseData {
           }
         }
 
-        paramsToEmit[this.objectTypes.one] = changeType === socketManager.ChangeTypes.REMOVE ?
-          { objectId: object.objectId } :
-          this.objects[object.objectId];
+        paramsToEmit[this.objectTypes.one] = changeType === socketManager.ChangeTypes.REMOVE
+          ? { objectId: object.objectId }
+          : this.objects[object.objectId];
 
         eventCentral.emitEvent({
           event: this.eventTypes.one,
@@ -395,13 +395,15 @@ class BaseData {
       const bParam = (b[sorting.paramName] || b[sorting.fallbackParamName]).toLowerCase();
 
       if (aParam < bParam) {
-        return sorting.reverse ?
-          1 :
-          -1;
-      } else if (aParam > bParam) {
-        return sorting.reverse ?
-          -1 :
-          1;
+        return sorting.reverse
+          ? 1
+          : -1;
+      }
+
+      if (aParam > bParam) {
+        return sorting.reverse
+          ? -1
+          : 1;
       }
 
       return 0;
@@ -431,14 +433,14 @@ class BaseData {
         });
       });
 
-      return sorting ?
-        filteredObjects.sort(sortFunc) :
-        filteredObjects;
+      return sorting
+        ? filteredObjects.sort(sortFunc)
+        : filteredObjects;
     }
 
-    return sorting ?
-      objects.sort(sortFunc) :
-      objects;
+    return sorting
+      ? objects.sort(sortFunc)
+      : objects;
   }
 }
 

@@ -20,8 +20,6 @@ const positionComposer = require('./data/composers/PositionComposer');
  * @returns {Object} Converted position
  */
 function convertPosition(position) {
-  console.log('converting position', position);
-
   if (position.coordinates) {
     return {
       coordinates: position.coordinates,
@@ -121,7 +119,9 @@ class Tracker {
       || !this.latestBestPosition.coordinates.longitude
       || !this.latestBestPosition.coordinates.accuracy) {
       return;
-    } else if (this.latestBestPosition.coordinates.accuracy > 150) {
+    }
+
+    if (this.latestBestPosition.coordinates.accuracy > 150) {
       return;
     }
 

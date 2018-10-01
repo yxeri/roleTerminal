@@ -39,7 +39,9 @@ class UserComposer extends DataComposer {
 
     if (aliasId) {
       return aliasComposer.getAlias({ aliasId });
-    } else if (userId) {
+    }
+
+    if (userId) {
       return this.handler.getObject({ objectId: userId });
     }
 

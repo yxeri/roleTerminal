@@ -49,7 +49,9 @@ class ViewSwitcher {
       this.switchViewByType({ type: defaultViewType });
 
       return;
-    } else if (view === currentView) {
+    }
+
+    if (view === currentView) {
       return;
     }
 

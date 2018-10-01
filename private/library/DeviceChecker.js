@@ -30,7 +30,9 @@ class DeviceChecker {
     this.deviceType = (() => {
       if (userAgent.match(/iP(hone|ad|od)/i) !== null) {
         return this.DeviceEnum.IOS;
-      } else if (userAgent.match(/Android/i) !== null) {
+      }
+
+      if (userAgent.match(/Android/i) !== null) {
         return this.DeviceEnum.ANDROID;
       }
 

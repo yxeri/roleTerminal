@@ -5,6 +5,7 @@
   "author": "Carmilla Mina Jankovic <aleksonline@icloud.com>",
   "private": true,
   "scripts": {
+    "prestart": "rsync -aP --exclude=.git --exclude=.idea --exclude=.DS_Store ../roleHaven ./node_modules && ./node_modules/roleHaven/start.sh",
     "test": "DEBUG=eslint:cli-engine eslint ./",
     "start": "node app",
     "nsp": "nsp check"
@@ -27,6 +28,6 @@
     "eslint-plugin-react": "7.11.1"
   },
   "dependencies": {
-    "roleHaven": "git://github.com/yxeri/roleHaven.git#bbr-new"
+    "roleHaven": "git://github.com/yxeri/roleHaven.git"
   }
 }

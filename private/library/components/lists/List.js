@@ -166,7 +166,9 @@ class List extends BaseView {
             if (this.filter) {
               if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
                 return;
-              } else if (!this.filter.rules.every(filterFunc)) {
+              }
+
+              if (!this.filter.rules.every(filterFunc)) {
                 return;
               }
             }
@@ -174,7 +176,9 @@ class List extends BaseView {
             if (this.userFilter) {
               if (this.userFilter.orCheck && !this.userFilter.rules.some(userFilterFunc)) {
                 return;
-              } else if (!this.userFilter.rules.every(userFilterFunc)) {
+              }
+
+              if (!this.userFilter.rules.every(userFilterFunc)) {
                 return;
               }
             }
@@ -410,9 +414,9 @@ class List extends BaseView {
     isMarked = false,
   }) {
     const { objectId } = object;
-    const classes = this.focusedId === objectId ?
-      [cssClasses.focusListItem] :
-      [];
+    const classes = this.focusedId === objectId
+      ? [cssClasses.focusListItem]
+      : [];
     const listItemElements = [];
     const clickFuncs = {
       leftFunc: () => {
@@ -587,12 +591,12 @@ class List extends BaseView {
   markItem({ objectId }) {
     const element = this.getElement(objectId);
 
-    if (element) {
-      storageManager.addMarked({
-        objectId,
-        listType: this.listType,
-      });
+    storageManager.addMarked({
+      objectId,
+      listType: this.listType,
+    });
 
+    if (element) {
       this.animateItem({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
     }

@@ -78,9 +78,7 @@ class RoomList extends List {
         origin,
         listType = '',
       }) => {
-        if (origin && origin === this.elementId) {
-          return;
-        } else if (listType !== this.ListTypes.ROOMS) {
+        if ((origin && origin === this.elementId) || listType !== this.ListTypes.ROOMS) {
           return;
         }
 
@@ -104,7 +102,9 @@ class RoomList extends List {
 
       if (aParam < bParam) {
         return -1;
-      } else if (aParam > bParam) {
+      }
+
+      if (aParam > bParam) {
         return 1;
       }
 

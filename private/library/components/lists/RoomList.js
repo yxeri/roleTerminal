@@ -156,7 +156,9 @@ class RoomList extends List {
 
       if (aParam < bParam) {
         return -1;
-      } else if (aParam > bParam) {
+      }
+
+      if (aParam > bParam) {
         return 1;
       }
 

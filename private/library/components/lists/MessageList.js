@@ -115,9 +115,9 @@ class MessageList extends List {
               if (isWhisper) {
                 const identities = userComposer.getWhisperIdentities({ participantIds });
 
-                return identities.length > 0 ?
-                  `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}` :
-                  '';
+                return identities.length > 0
+                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  : '';
               }
 
               return room.roomName.slice(0, 24);

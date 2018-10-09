@@ -18,9 +18,9 @@ const BaseView = require('./BaseView');
 const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
 
 const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
-const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
+// const elementCreator = require('../../ElementCreator');
+// const userComposer = require('../../data/composers/UserComposer');
+// const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 
 class TeamPage extends BaseView {
@@ -33,28 +33,28 @@ class TeamPage extends BaseView {
       classes: classes.concat(['teamPage']),
     });
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.OPEN_TEAM,
-      func: ({ docFile }) => {
-        const newElement = elementCreator.createContainer({
-          elementId,
-          classes,
-        });
-        const { hasFullAccess } = accessCentral.hasAccessTo({
-          objectToAccess: docFile,
-          toAuth: userComposer.getCurrentUser(),
-        });
-
-        if (hasFullAccess) {
-          newElement.appendChild(createControls({ docFile }));
-        }
-
-        newElement.appendChild(createHeader({ docFile }));
-        newElement.appendChild(createBody({ docFile }));
-
-        this.replaceOnParent({ element: newElement });
-      },
-    });
+    // eventCentral.addWatcher({
+    //   event: eventCentral.Events.OPEN_TEAM,
+    //   func: ({ docFile }) => {
+    //     const newElement = elementCreator.createContainer({
+    //       elementId,
+    //       classes,
+    //     });
+    //     const { hasFullAccess } = accessCentral.hasAccessTo({
+    //       objectToAccess: docFile,
+    //       toAuth: userComposer.getCurrentUser(),
+    //     });
+    //
+    //     if (hasFullAccess) {
+    //       newElement.appendChild(createControls({ docFile }));
+    //     }
+    //
+    //     newElement.appendChild(createHeader({ docFile }));
+    //     newElement.appendChild(createBody({ docFile }));
+    //
+    //     this.replaceOnParent({ element: newElement });
+    //   },
+    // });
 
     eventCentral.addWatcher({
       event: eventCentral.Events.ACCESS_DOCFILE,

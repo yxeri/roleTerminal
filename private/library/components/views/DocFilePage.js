@@ -34,7 +34,7 @@ const viewSwitcher = require('../../ViewSwitcher');
  * @return {DocumentFragment} Fragment with admin buttons.
  */
 function createControls({
-  parentElement,
+  // parentElement,
   docFile,
 }) {
   const fragment = document.createDocumentFragment();
@@ -70,9 +70,9 @@ function createHeader({ docFile }) {
     elementCreator.createSpan({ text: `Author: ${idName || 'Unknown author'}` }),
     elementCreator.createSpan({ text: `Code: ${docFile.code}` }),
     elementCreator.createSpan({
-      text: `Public: ${docFile.isPublic ?
-        labelHandler.getLabel({ baseObject: 'General', label: 'yes' }) :
-        labelHandler.getLabel({ baseObject: 'General', label: 'no' })}`,
+      text: `Public: ${docFile.isPublic
+        ? labelHandler.getLabel({ baseObject: 'General', label: 'yes' })
+        : labelHandler.getLabel({ baseObject: 'General', label: 'no' })}`,
     }),
   ];
 

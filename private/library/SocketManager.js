@@ -125,8 +125,6 @@ class SocketManager {
     }, {
       event: this.EmitTypes.RECONNECT,
       func: () => {
-        this.reconnectDone();
-
         this.updateId(() => {
           this.reconnectDone();
           eventCentral.emitEvent({

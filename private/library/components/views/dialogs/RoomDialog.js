@@ -68,7 +68,9 @@ class RoomDialog extends BaseDialog {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
-            } else if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+            }
+
+            if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
               BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
               BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
 

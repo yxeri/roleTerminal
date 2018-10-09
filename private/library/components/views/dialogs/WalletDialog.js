@@ -88,9 +88,9 @@ class WalletDialog extends BaseDialog {
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingFrom', appendSpace: true })}${thisIdentityName}.`,
       `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave', appendSpace: true })}${walletAmount}.`,
-      isTeam ?
-        `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam', appendSpace: true })}${identityName}.` :
-        `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingTo', appendSpace: true })}${identityName}.`,
+      isTeam
+        ? `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam', appendSpace: true })}${identityName}.`
+        : `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingTo', appendSpace: true })}${identityName}.`,
     ];
 
     super({

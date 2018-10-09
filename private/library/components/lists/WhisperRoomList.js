@@ -62,9 +62,9 @@ class RoomList extends List {
 
                 const identities = userComposer.getWhisperIdentities({ participantIds });
 
-                return identities.length > 0 ?
-                  `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}` :
-                  '';
+                return identities.length > 0
+                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  : '';
               }
 
               return room.roomName;
@@ -109,9 +109,7 @@ class RoomList extends List {
 
         this.unmarkItem({ objectId });
 
-        if (origin && origin === this.elementId) {
-          return;
-        } else if (listType !== this.ListTypes.ROOMS) {
+        if ((origin && origin === this.elementId) || listType !== this.ListTypes.ROOMS) {
           return;
         }
 
@@ -144,9 +142,9 @@ class RoomList extends List {
 
     return {
       canSee:
-      (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant))) ||
-      (user.objectId && object.participantIds.includes(user.objectId)) ||
-      access.canSee,
+      (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
+      || (user.objectId && object.participantIds.includes(user.objectId))
+      || access.canSee,
     };
   }
 
@@ -169,7 +167,9 @@ class RoomList extends List {
 
       if (aParam < bParam) {
         return -1;
-      } else if (aParam > bParam) {
+      }
+
+      if (aParam > bParam) {
         return 1;
       }
 

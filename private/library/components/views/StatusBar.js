@@ -34,12 +34,12 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
-const viewSwitcher = require('../../ViewSwitcher');
 // const teamComposer = require('../../data/composers/TeamComposer');
 
 class StatusBar extends BaseView {
   constructor({
     title,
+    viewSwitcher,
     showControls = {},
     showClock = true,
     menuItems = [],
@@ -60,6 +60,7 @@ class StatusBar extends BaseView {
     const items = [];
     const lastItems = [];
 
+    this.viewSwitcher = viewSwitcher;
     this.showClock = showClock;
     this.lists = [];
 
@@ -116,9 +117,9 @@ class StatusBar extends BaseView {
         element: logoutButton,
       });
       accessCentral.addAccessElement({
-        maxAccessLevel: permissions.CreateUser ?
-          permissions.CreateUser.accessLevel :
-          accessCentral.AccessLevels.ANONYMOUS,
+        maxAccessLevel: permissions.CreateUser
+          ? permissions.CreateUser.accessLevel
+          : accessCentral.AccessLevels.ANONYMOUS,
         element: registerButton,
       });
 
@@ -138,7 +139,7 @@ class StatusBar extends BaseView {
             const dialog = new DocFileDialog({});
 
             dialog.addToView({
-              element: viewSwitcher.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -148,9 +149,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createDocFileButton,
-        minimumAccessLevel: permissions.CreateDocFile ?
-          permissions.CreateDocFile.accessLevel :
-          accessCentral.AccessLevels.STANDARD,
+        minimumAccessLevel: permissions.CreateDocFile
+          ? permissions.CreateDocFile.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -162,7 +163,7 @@ class StatusBar extends BaseView {
             const dialog = new RoomDialog({});
 
             dialog.addToView({
-              element: viewSwitcher.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -172,9 +173,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createRoomButton,
-        minimumAccessLevel: permissions.CreateRoom ?
-          permissions.CreateRoom.accessLevel :
-          accessCentral.AccessLevels.STANDARD,
+        minimumAccessLevel: permissions.CreateRoom
+          ? permissions.CreateRoom.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -186,7 +187,7 @@ class StatusBar extends BaseView {
             const dialog = new AliasDialog({});
 
             dialog.addToView({
-              element: viewSwitcher.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -196,9 +197,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createAliasButton,
-        minimumAccessLevel: permissions.CreateAlias ?
-          permissions.CreateAlias.accessLevel :
-          accessCentral.AccessLevels.STANDARD,
+        minimumAccessLevel: permissions.CreateAlias
+          ? permissions.CreateAlias.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -210,7 +211,7 @@ class StatusBar extends BaseView {
             const dialog = new TeamCreateDialog({});
 
             dialog.addToView({
-              element: viewSwitcher.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -224,9 +225,9 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createTeamButton,
-        minimumAccessLevel: permissions.CreateTeam ?
-          permissions.CreateTeam.accessLevel :
-          accessCentral.AccessLevels.STANDARD,
+        minimumAccessLevel: permissions.CreateTeam
+          ? permissions.CreateTeam.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
       });
     }
 
@@ -358,13 +359,13 @@ class StatusBar extends BaseView {
     }, 100);
   }
 
-  setViews({ views, viewSwitcher }) {
+  setViews({ views }) {
     views.forEach((viewObject) => {
       const viewObjectToAdd = viewObject;
 
       viewObjectToAdd.clickFuncs = {
         leftFunc: () => {
-          viewSwitcher.switchView({ view: viewObjectToAdd.view });
+          this.viewSwitcher.switchView({ view: viewObjectToAdd.view });
         },
       };
     });

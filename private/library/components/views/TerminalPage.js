@@ -18,11 +18,11 @@ const BaseView = require('./BaseView');
 const List = require('../lists/List');
 const InputArea = require('../views/inputs/InputArea');
 
-const eventCentral = require('../../EventCentral');
+// const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
-const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
-const labelHandler = require('../../labels/LabelHandler');
+// const userComposer = require('../../data/composers/UserComposer');
+// const accessCentral = require('../../AccessCentral');
+// const labelHandler = require('../../labels/LabelHandler');
 const socketManager = require('../../SocketManager');
 const textTools = require('../../TextTools');
 
@@ -53,7 +53,9 @@ class TerminalPage extends BaseView {
 
       if (simpleMsg.type !== 'terminal') {
         return;
-      } else if (error) {
+      }
+
+      if (error) {
         console.log('simple msg', error);
 
         return;
@@ -64,18 +66,18 @@ class TerminalPage extends BaseView {
       });
     });
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.SIMPLEMSG,
-      func: ({ docFile }) => {
-        const { title, objectId } = docFile;
-        const dialog = new LockedDocFileDialog({
-          title,
-          docFileId: objectId,
-        });
-
-        dialog.addToView({ element: this.getParentElement() });
-      },
-    });
+    // eventCentral.addWatcher({
+    //   event: eventCentral.Events.SIMPLEMSG,
+    //   func: ({ docFile }) => {
+    //     const { title, objectId } = docFile;
+    //     const dialog = new LockedDocFileDialog({
+    //       title,
+    //       docFileId: objectId,
+    //     });
+    //
+    //     dialog.addToView({ element: this.getParentElement() });
+    //   },
+    // });
   }
 
   getCommandNames() {
@@ -90,21 +92,12 @@ class TerminalPage extends BaseView {
     const commands = this.getCommandNames();
     const matched = [];
     const inputValue = this.getInput().toLowerCase();
-    let matches;
 
     commands.forEach((commandName) => {
       const lowerCommand = commandName.toLowerCase();
-      matches = false;
-
-      for (let j = 0; j < inputValue.length; j += 1) {
-        if (inputValue.charAt(j) === lowerCommand.charAt(j)) {
-          matches = true;
-        } else {
-          matches = false;
-
-          break;
-        }
-      }
+      const matches = inputValue.split().every((char, index) => {
+        return char === lowerCommand.charAt(index);
+      });
 
       if (matches) {
         matched.push(commandName);
@@ -112,7 +105,7 @@ class TerminalPage extends BaseView {
     });
 
     if (matched.length === 1) {
-      this.terminalInput.value = matched[0];
+      this.inputArea.setInputValue({ value: matched[0] });
     } else if (matched.length > 0) {
       this.queueMessage({
         message: {

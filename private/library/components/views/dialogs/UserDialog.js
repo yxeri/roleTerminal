@@ -39,9 +39,9 @@ class UserDialog extends BaseDialog {
     const chosenIdentity = userComposer.getIdentity({ objectId: identityId });
     const identityName = chosenIdentity.aliasName || chosenIdentity.username;
     const { partOfTeams } = chosenIdentity;
-    const partOfTeamsText = partOfTeams && partOfTeams.length > 0 ?
-      chosenIdentity.partOfTeams :
-      [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
+    const partOfTeamsText = partOfTeams && partOfTeams.length > 0
+      ? chosenIdentity.partOfTeams
+      : [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
     const userPosition = positionComposer.getPosition({ positionId: identityId });
     const positionLabel = userPosition && userPosition.coordinates
       ? `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
@@ -74,9 +74,9 @@ class UserDialog extends BaseDialog {
       }),
     ];
 
-    if (storageManager.getAccessLevel() >= storageManager.getPermissions().SendWhisper ?
-      storageManager.getPermissions().SendWhisper.accessLevel :
-      { accessLevel: 1 }) {
+    if (storageManager.getAccessLevel() >= storageManager.getPermissions().SendWhisper
+      ? storageManager.getPermissions().SendWhisper.accessLevel
+      : { accessLevel: 1 }) {
       lowerButtons.push(elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'message' }),
         clickFuncs: {

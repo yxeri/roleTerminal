@@ -94,6 +94,10 @@ class InputArea extends BaseView {
 
     keyhandler.removeKey(13);
   }
+
+  setInputValue({ value }) {
+    this.textArea.value = value;
+  }
 }
 
 module.exports = InputArea;

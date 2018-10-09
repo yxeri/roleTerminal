@@ -21,11 +21,11 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const userComposer = require('../../../data/composers/UserComposer');
 const positionComposer = require('../../../data/composers/PositionComposer');
-const invititationComposer = require('../../../data/composers/InvitationComposer');
-const teamComposer = require('../../../data/composers/TeamComposer');
+// const invititationComposer = require('../../../data/composers/InvitationComposer');
+// const teamComposer = require('../../../data/composers/TeamComposer');
 const eventCentral = require('../../../EventCentral');
-const storageManager = require('../../../StorageManager');
-const accessCentral = require('../../../AccessCentral');
+// const storageManager = require('../../../StorageManager');
+// const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
 
 class UserSelfDialog extends BaseDialog {

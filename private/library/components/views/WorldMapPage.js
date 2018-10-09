@@ -440,27 +440,16 @@ class WorldMapPage extends BaseView {
 
     eventHandler.addWatcher({
       event: eventHandler.Events.FOCUS_MAPPOSITION,
-      func: ({ origin, position }) => {
+      func: ({
+        origin,
+        position,
+      }) => {
         const marker = this.markers[position.objectId];
 
         if (marker && (!this.listId || this.listId === origin)) {
           this.realignMap({ markers: [marker] });
           marker.markPosition({});
         }
-      },
-    });
-
-    eventHandler.addWatcher({
-      event: eventHandler.Events.FOCUS_USER_MAPPOSITION,
-      func: ({ userId }) => {
-        const marker = Object.keys(this.markers).find((key) => {
-          const { connectedUser } = this.markers[key];
-
-          return connectedUser && connectedUser === userId;
-        });
-
-        this.realignMap({ markers: [marker] });
-        marker.markPosition({});
       },
     });
 

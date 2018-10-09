@@ -43,9 +43,8 @@ class UserDialog extends BaseDialog {
       ? chosenIdentity.partOfTeams
       : [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
     const userPosition = positionComposer.getPosition({ positionId: identityId });
-    const positionLabel = userPosition && userPosition.coordinates
-      ? `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
-      (${userPosition.lastUpdated}): Lat ${userPosition.coordinates.latitude} Long ${userPosition.coordinates.longitude}`
+    const positionLabel = userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]
+      ? `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`
       : labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
 
     const lowerButtons = [
@@ -135,8 +134,8 @@ class UserDialog extends BaseDialog {
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
 
             eventCentral.emitEvent({
-              event: eventCentral.Events.FOCUS_USER_MAPPOSITION,
-              params: { userId: identityId },
+              event: eventCentral.Events.FOCUS_MAPPOSITION,
+              params: { position: userPosition },
             });
 
             this.removeFromView();

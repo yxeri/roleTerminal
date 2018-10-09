@@ -15,11 +15,12 @@
  */
 
 const List = require('./List');
+const TeamDialog = require('../views/dialogs/TeamDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const accessCentral = require('../../AccessCentral');
-// const teamComposer = require('../../data/composers/TeamComposer');
-// const storageManager = require('../../StorageManager');
+const viewSwitcher = require('../../ViewSwitcher');
+const storageManager = require('../../StorageManager');
 
 class TeamList extends List {
   constructor({
@@ -53,15 +54,20 @@ class TeamList extends List {
           { paramName: 'isPermissionsOnly', paramValue: false },
         ],
       },
-      // listItemClickFuncs: {
-      //   leftFunc: (objectId) => {
-      //     if (storageManager.getAccessLevel() <= accessCentral.AccessLevels.ANONYMOUS) {
-      //       return;
-      //     }
-      //
-      //     const team = teamComposer.getTeam({ teamId: objectId });
-      //   },
-      // },
+      listItemClickFuncs: {
+        leftFunc: (objectId) => {
+          if (storageManager.getAccessLevel() <= accessCentral.AccessLevels.ANONYMOUS) {
+            return;
+          }
+
+          const teamDialog = new TeamDialog({
+            identityId: objectId,
+            origin: this.elementId,
+          });
+
+          teamDialog.addToView({ element: viewSwitcher.getParentElement() });
+        },
+      },
     });
   }
 }

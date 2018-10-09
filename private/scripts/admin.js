@@ -59,7 +59,6 @@ const notAllowedWrapper = new ViewWrapper({
 
 mouseHandler.setAllowRightClick(true);
 statusBar.setViews({
-  viewSwitcher,
   views: [
     { view: userWrapper },
   ],

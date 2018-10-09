@@ -15,24 +15,24 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
-// const TeamList = require('../lists/TeamList');
-const DocFilePage = require('./DocFilePage');
+const TeamList = require('../lists/TeamList');
+const TeamPage = require('./TeamPage');
 
 class TeamView extends ViewWrapper {
   constructor({
     classes = [],
-    elementId = `dFView-${Date.now()}`,
+    elementId = `tView-${Date.now()}`,
   }) {
-    // const docFileList = new DocFileList({});
-    const docFilePage = new DocFilePage({});
+    const teamList = new TeamList({});
+    const teamPage = new TeamPage({});
 
     super({
       elementId,
       columns: [
-        // { components: [{ component: docFileList }] },
-        { components: [{ component: docFilePage }] },
+        { components: [{ component: teamList }] },
+        { components: [{ component: teamPage }] },
       ],
-      classes: classes.concat(['docFileView']),
+      classes: classes.concat(['teamView']),
     });
   }
 }

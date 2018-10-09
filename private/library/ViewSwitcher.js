@@ -26,6 +26,7 @@ class ViewSwitcher {
       WORLDMAP: 'worldMap',
       DOCS: 'docs',
       WALLET: 'wallet',
+      TEAM: 'team',
     };
     this.parentElement = undefined;
     this.availableTypes = [];

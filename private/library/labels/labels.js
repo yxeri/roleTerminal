@@ -453,6 +453,12 @@ const labels = {
     teamName: (override.TeamDialog && override.TeamDialog.teamName) || {
       en: 'Team name',
     },
+    members: (override.TeamDialog && override.TeamDialog.members) || {
+      en: 'Members',
+    },
+    location: (override.TeamDialog && override.TeamDialog.location) || {
+      en: 'Location',
+    },
     teamNameLength: (override.TeamDialog && override.TeamDialog.teamNameLength) || {
       en: 'The name is too long',
     },

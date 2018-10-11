@@ -20,21 +20,20 @@ const WalletDialog = require('./WalletDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const teamComposer = require('../../../data/composers/TeamComposer');
+const userComposer = require('../../../data/composers/UserComposer');
 
 class TeamDialog extends BaseDialog {
   constructor({
-    identity,
     teamId,
     classes = [],
     elementId = `tDialog-${Date.now()}`,
   }) {
-    const team = teamComposer.getTeam({ teamId });
     const {
       members,
       teamName,
       shortName,
       locationName,
-    } = team;
+    } = teamComposer.getTeam({ teamId });
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -48,9 +47,9 @@ class TeamDialog extends BaseDialog {
         clickFuncs: {
           leftFunc: () => {
             const walletDialog = new WalletDialog({
-              sendFromId: identity.objectId,
+              sendFromId: userComposer.getCurrentIdentity().objectId,
               sendToId: teamId,
-              isTeam: false,
+              isTeam: true,
             });
 
             walletDialog.addToView({ element: this.getParentElement() });
@@ -63,8 +62,8 @@ class TeamDialog extends BaseDialog {
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamInfo' })}`,
       '',
-      `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamName' })}: ${teamName} - ${shortName}`,
-      `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'members' })}: ${members.join(' ')}`,
+      `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamName' })}: ${teamName} [${shortName}]`,
+      `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'members' })}: ${members.map(member => userComposer.getIdentityName({ objectId: member })).join(', ')}`,
       `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'location' })}: ${locationName || 'unknown'}`,
     ];
 

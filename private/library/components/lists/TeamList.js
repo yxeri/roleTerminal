@@ -61,7 +61,7 @@ class TeamList extends List {
           }
 
           const teamDialog = new TeamDialog({
-            identityId: objectId,
+            teamId: objectId,
             origin: this.elementId,
           });
 

@@ -7,13 +7,13 @@ const ChatView = require('../library/components/views/ChatView');
 const TopView = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
+const TeamView = require('../library/components/views/TeamView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const tools = require('../library/Tools');
-const accessCentral = require('../library/AccessCentral');
 
 const worldMapParams = {
   alwaysShowLabels: {
@@ -217,6 +217,7 @@ const docFileView = new DocFileView({});
 const worldMapView = new WorldMapView(worldMapParams);
 const walletView = new WalletView({});
 const worldMapPage = new WorldMapPage(worldMapParams);
+const teamView = new TeamView({});
 
 const statusBar = new TopView({
   viewSwitcher,
@@ -282,6 +283,20 @@ const walletWrapper = new ViewWrapper({
     ],
   }],
 });
+const teamWrapper = new ViewWrapper({
+  statusBar,
+  viewType: viewSwitcher.ViewTypes.TEAM,
+  title: 'Teams',
+  columns: [{
+    components: [
+      { component: teamView },
+    ],
+  }, {
+    components: [
+      { component: worldMapPage },
+    ],
+  }],
+});
 
 statusBar.setViews({
   viewSwitcher,
@@ -290,6 +305,7 @@ statusBar.setViews({
     { view: docWrapper },
     { view: fullMapWrapper },
     { view: walletWrapper },
+    { view: teamWrapper },
   ],
 });
 
@@ -299,6 +315,7 @@ viewSwitcher.addAvailableTypes({
     fullMapWrapper.viewType,
     walletWrapper.viewType,
     docWrapper.viewType,
+    teamWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

@@ -27,6 +27,7 @@ const eventCentral = require('../../../EventCentral');
 const storageManager = require('../../../StorageManager');
 const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
+const roomComposer = require('../../../data/composers/RoomComposer');
 
 class UserDialog extends BaseDialog {
   constructor({
@@ -80,6 +81,13 @@ class UserDialog extends BaseDialog {
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'message' }),
         clickFuncs: {
           leftFunc: () => {
+            const whisperRoom = roomComposer.getWhisperRoom({
+              participantIds: [
+                identityId,
+                userComposer.getCurrentIdentity().objectId,
+              ],
+            });
+
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT });
 
             eventCentral.emitEvent({
@@ -87,10 +95,14 @@ class UserDialog extends BaseDialog {
               params: {
                 origin,
                 listType: 'rooms',
-                room: {
-                  objectId: identityId,
-                  isUser: true,
-                },
+                room: whisperRoom
+                  ? {
+                    objectId: whisperRoom.objectId,
+                  }
+                  : {
+                    objectId: identityId,
+                    isUser: true,
+                  },
               },
             });
 

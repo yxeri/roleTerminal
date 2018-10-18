@@ -21,6 +21,7 @@ const InputArea = require('./inputs/InputArea');
 const UserList = require('../lists/UserList');
 const WhisperRoomList = require('../lists/WhisperRoomList');
 const RoomFollowingList = require('../lists/RoomFollowingList');
+const RoomInfo = require('./RoomInfo');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -131,9 +132,10 @@ class ChatView extends ViewWrapper {
       blurCallback: () => {},
       inputCallback: () => {},
     });
+    const roomInfo = new RoomInfo({});
     const columns = [];
     const mainColumn = {
-      components: [],
+      components: [{ component: roomInfo }],
       classes: ['columnChat'],
     };
     const roomListComponent = {

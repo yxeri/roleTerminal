@@ -7,14 +7,21 @@ const viewSwitcher = require('../ViewSwitcher');
 class ViewWrapper extends BaseView {
   constructor({
     statusBar,
-    columns,
     title,
     viewType,
+    useDefaultCss = true,
+    columns = [],
     classes = [],
   }) {
+    const cssClasses = classes;
+
+    if (useDefaultCss) {
+      cssClasses.push('viewWrapper');
+    }
+
     super({
       elementId: `wrap${Date.now()}`,
-      classes: classes.concat(['viewWrapper']),
+      classes: cssClasses,
     });
 
     this.viewType = viewType;

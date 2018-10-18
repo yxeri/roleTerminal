@@ -370,7 +370,36 @@ class BaseData {
    * @param {string} params.objectId - Id of the object.
    * @return {Object} Found object.
    */
-  getObject({ objectId }) {
+  getObject({
+    objectId,
+    filter,
+  }) {
+    // TODO Duplicate code. Similar to getObjects()
+    if (filter) {
+      const { orCheck } = filter;
+      const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
+
+      return objects.filter((object) => {
+        if (orCheck) {
+          return filter.rules.some((rule) => {
+            if (rule.shouldInclude) {
+              return rule.paramValue.every(value => object[rule.paramName].includes(value));
+            }
+
+            return rule.paramValue === object[rule.paramName];
+          });
+        }
+
+        return filter.rules.every((rule) => {
+          if (rule.shouldInclude) {
+            return rule.paramValue.every(value => object[rule.paramName].includes(value));
+          }
+
+          return rule.paramValue === object[rule.paramName];
+        });
+      })[0];
+    }
+
     return this.objects[objectId];
   }
 

@@ -139,8 +139,8 @@ class ChatView extends ViewWrapper {
     const roomListComponent = {
       components: [
         { component: roomFollowingList },
-        { component: roomList },
         { component: whisperRoomList },
+        { component: roomList },
         { component: userList },
       ],
       classes: ['columnRoomList'],

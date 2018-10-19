@@ -43,6 +43,10 @@ class UserList extends List {
       classes,
       title,
       shouldFocusOnClick,
+      sorting: {
+        paramName: 'username',
+        fallbackParamName: 'aliasName',
+      },
       filter: {
         rules: [
           { paramName: 'isBanned', paramValue: false },

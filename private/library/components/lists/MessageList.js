@@ -49,7 +49,6 @@ class MessageList extends List {
       sorting: {
         paramName: 'customTimeCreated',
         fallbackParamName: 'timeCreated',
-        reverse: true,
       },
       listItemClickFuncs: {
         onlyListItemFields: true,

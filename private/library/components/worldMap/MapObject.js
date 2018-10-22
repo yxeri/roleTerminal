@@ -21,6 +21,7 @@ const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const viewSwitcher = require('../../ViewSwitcher');
+const userComposer = require('../../data/composers/UserComposer');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -111,7 +112,9 @@ class MapObject {
     this.label = label || new Label({
       labelStyle,
       coordinates: this.getCenter(),
-      text: this.position.positionName,
+      text: this.position.connectedToUser
+        ? (userComposer.getIdentityName({ objectId: this.position.connectedToUser }) || this.position.positionName)
+        : this.position.positionName,
     });
     this.style = style;
     this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);

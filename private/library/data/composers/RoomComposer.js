@@ -121,6 +121,20 @@ class RoomComposer extends DataComposer {
       params: { room },
     });
   }
+
+  updateRoom({
+    room,
+    roomId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        roomId,
+        room,
+      },
+    });
+  }
 }
 
 const roomComposer = new RoomComposer();

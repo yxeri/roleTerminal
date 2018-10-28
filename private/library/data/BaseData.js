@@ -379,7 +379,7 @@ class BaseData {
       const { orCheck } = filter;
       const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
 
-      return objects.filter((object) => {
+      return objects.findOne((object) => {
         if (orCheck) {
           return filter.rules.some((rule) => {
             if (rule.shouldInclude) {
@@ -397,7 +397,7 @@ class BaseData {
 
           return rule.paramValue === object[rule.paramName];
         });
-      })[0];
+      });
     }
 
     return this.objects[objectId];

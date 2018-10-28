@@ -249,6 +249,16 @@ const labels = {
       en: 'Name of the room',
       se: 'Rummets namn',
     },
+    changePassword: (override.RoomDialog && override.RoomDialog.changePassword) || {
+      en: 'Change password',
+      se: 'Ändra lösenordet',
+    },
+    roomInfo: (override.RoomDialog && override.RoomDialog.roomInfo) || {
+      en: 'Room information',
+    },
+    roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
+      en: 'Name',
+    },
   },
   LoginDialog: {
     username: (override.LoginDialog && override.LoginDialog.username) || {

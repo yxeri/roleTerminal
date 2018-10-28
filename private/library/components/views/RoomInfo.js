@@ -15,12 +15,14 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
+const EditRoomDialog = require('./dialogs/EditRoomDialog');
 
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
+const accessCentral = require('../../AccessCentral');
 
 class RoomInfo extends ViewWrapper {
   constructor({
@@ -30,6 +32,18 @@ class RoomInfo extends ViewWrapper {
     elementId = `rInfo-${Date.now()}`,
   }) {
     const nameSpan = elementCreator.createSpan({ text: 'room' });
+    const editButton = elementCreator.createButton({
+      text: 'Edit',
+      clickFuncs: {
+        leftFunc: () => {
+          const dialog = new EditRoomDialog({
+            roomId,
+          });
+
+          dialog.addToView({});
+        },
+      },
+    });
     const setNameFunc = ({
       isUser,
       roomId,
@@ -65,6 +79,11 @@ class RoomInfo extends ViewWrapper {
     });
 
     this.element.appendChild(nameSpan);
+
+    accessCentral.addAccessElement({
+      element: editButton,
+      minimumAccessLevel: 1,
+    });
 
     eventCentral.addWatcher({
       event: eventCentral.Events.COMPLETE_ROOM,

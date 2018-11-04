@@ -525,14 +525,69 @@ class List extends BaseView {
 
     if (shouldReplace && element) {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
+    } else if (this.sorting && this.sorting.paramName) {
+      const firstChild = this.listElement.firstElementChild;
+
+      if (!firstChild) {
+        this.listElement.appendChild(newItem);
+
+        return;
+      }
+
+      const {
+        paramName,
+        fallbackParamName,
+        reverse,
+      } = this.sorting;
+      const isNumber = typeof paramName === 'number';
+      const targetVar = object[paramName] || object[fallbackParamName];
+
+      const objects = this.getCollectorObjects();
+      const closest = isNumber
+        ? objects.reduce((previous, current) => {
+          const prevVar = previous[paramName] || previous[fallbackParamName];
+          const currVar = current[paramName] || current[fallbackParamName];
+
+          if (reverse) {
+            return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+              ? previous
+              : current;
+          }
+
+          return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+            ? current
+            : previous;
+        })
+        : objects.find((closeObject, index) => {
+          if (index >= (objects.length - 1)) {
+            return true;
+          }
+
+          const closeVar = objects[index][paramName] || objects[index][fallbackParamName];
+
+          if (reverse) {
+            return closeVar < targetVar;
+          }
+
+          return closeVar > targetVar;
+        });
+      const closestElement = this.getElement(closest.objectId);
+
+      if (reverse) {
+        this.listElement.insertBefore(newItem, closestElement);
+      } else {
+        this.listElement.insertBefore(newItem, closestElement);
+      }
     } else if (this.sorting && this.sorting.reverse) {
       const firstChild = this.listElement.firstElementChild;
 
-      if (firstChild) {
-        this.listElement.insertBefore(newItem, firstChild);
-      } else {
+      if (!firstChild) {
         this.listElement.appendChild(newItem);
+
+        return;
       }
+
+      this.listElement.insertBefore(newItem, firstChild);
     } else {
       this.listElement.appendChild(newItem);
     }

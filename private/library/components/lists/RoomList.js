@@ -39,6 +39,9 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      sorting: {
+        paramName: 'roomName',
+      },
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       filter: {
         rules: [

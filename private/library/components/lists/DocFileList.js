@@ -22,7 +22,9 @@ const eventCentral = require('../../EventCentral');
 class DocFileList extends List {
   constructor({
     title,
-    sorting,
+    sorting = {
+      paramName: 'title',
+    },
     listItemFields = [{
       paramName: 'title',
     }],

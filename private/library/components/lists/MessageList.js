@@ -46,6 +46,10 @@ class MessageList extends List {
   }) {
     const superParams = {
       elementId,
+      sorting: {
+        paramName: 'customTimeCreated',
+        fallbackParamName: 'timeCreated',
+      },
       listItemClickFuncs: {
         onlyListItemFields: true,
         leftFunc: (objectId) => {

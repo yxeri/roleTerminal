@@ -8,6 +8,7 @@ const TopView = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
+const ForumView = require('../library/components/views/ForumView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -218,6 +219,7 @@ const worldMapView = new WorldMapView(worldMapParams);
 const walletView = new WalletView({});
 const worldMapPage = new WorldMapPage(worldMapParams);
 const teamView = new TeamView({});
+const forumView = new ForumView({});
 
 const statusBar = new TopView({
   viewSwitcher,
@@ -297,6 +299,16 @@ const teamWrapper = new ViewWrapper({
     ],
   }],
 });
+const forumWrapper = new ViewWrapper({
+  statusBar,
+  viewType: viewSwitcher.ViewTypes.FORUM,
+  title: 'Forums',
+  columns: [{
+    components: [
+      { component: forumView },
+    ],
+  }],
+});
 
 statusBar.setViews({
   viewSwitcher,
@@ -306,6 +318,7 @@ statusBar.setViews({
     { view: fullMapWrapper },
     { view: walletWrapper },
     { view: teamWrapper },
+    { view: forumWrapper },
   ],
 });
 
@@ -316,6 +329,7 @@ viewSwitcher.addAvailableTypes({
     walletWrapper.viewType,
     docWrapper.viewType,
     teamWrapper.viewType,
+    forumWrapper.viewType
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

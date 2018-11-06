@@ -27,6 +27,7 @@ class ViewSwitcher {
       DOCS: 'docs',
       WALLET: 'wallet',
       TEAM: 'team',
+      FORUM: 'forum',
     };
     this.parentElement = undefined;
     this.availableTypes = [];

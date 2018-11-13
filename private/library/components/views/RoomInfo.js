@@ -104,6 +104,15 @@ class RoomInfo extends ViewWrapper {
         });
       },
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ROOM,
+      func: ({ room }) => {
+        if (this.roomId && room.objectId === this.roomId) {
+          setNameFunc({ roomId: this.roomId });
+        }
+      },
+    });
   }
 }
 

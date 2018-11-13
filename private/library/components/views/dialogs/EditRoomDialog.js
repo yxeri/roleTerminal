@@ -23,6 +23,7 @@ const roomComposer = require('../../../data/composers/RoomComposer');
 const ids = {
   ROOMNAME: 'roomName',
   PASSWORD: 'password',
+  REPEATPASSWORD: 'repeatPassword',
 };
 
 class EditRoomDialog extends BaseDialog {
@@ -35,13 +36,25 @@ class EditRoomDialog extends BaseDialog {
 
     const inputs = [
       elementCreator.createInput({
-        text: [roomName],
-        elementId: ids.TITLE,
+        elementId: ids.ROOMNAME,
         inputName: 'roomName',
         type: 'text',
-        isRequired: true,
         maxLength: 20,
-        placeholder: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'roomName' }),
+      }),
+      elementCreator.createInput({
+        elementId: ids.PASSWORD,
+        inputName: 'password',
+        type: 'password',
+        maxLength: 40,
+        placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'password' }),
+      }),
+      elementCreator.createInput({
+        elementId: ids.REPEATPASSWORD,
+        inputName: 'repeatPassword',
+        type: 'password',
+        maxLength: 40,
+        placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'repeatPassword' }),
       }),
     ];
 
@@ -55,53 +68,52 @@ class EditRoomDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'changePassword' }),
+        text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'removePassword' }),
         clickFuncs: {
           leftFunc: () => {
-            const dialog = new BaseDialog({
-              inputs: [],
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      this.removeFromView();
-                    },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'removePassword' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      this.removeFromView();
-                    },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'change' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      this.removeFromView();
-                    },
-                  },
-                }),
-              ],
-            });
+            roomComposer.resetPassword({
+              roomId,
+              callback: ({ error }) => {
+                if (error) {
+                  console.log(error);
 
-            dialog.addToView({ element: this.getParentElement() });
+                  return;
+                }
+
+                this.setInputValue({ elementId: ids.PASSWORD, value: '' });
+                this.setInputValue({ elementId: ids.REPEATPASSWORD, value: '' });
+              },
+            });
           },
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'change' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
         clickFuncs: {
           leftFunc: () => {
+            if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+              BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
+              BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
+
+              this.setInputValue({ elementId: ids.PASSWORD, value: '' });
+              this.setInputValue({ elementId: ids.REPEATPASSWORD, value: '' });
+
+              return;
+            }
+
             roomComposer.updateRoom({
               roomId,
               room: {
                 roomName: this.getInputValue(ids.ROOMNAME),
+                password: this.getInputValue(ids.PASSWORD),
               },
-              callback: () => {
+              callback: ({ error }) => {
+                if (error) {
+                  console.log(error);
+
+                  return;
+                }
+
                 this.removeFromView();
               },
             });
@@ -111,8 +123,6 @@ class EditRoomDialog extends BaseDialog {
     ];
 
     const upperText = [
-      `${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomInfo' })}`,
-      '',
       `${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' })}: ${roomName}`,
     ];
 

@@ -123,6 +123,9 @@ const labels = {
     done: (override.BaseDialog && override.BaseDialog.done) || {
       en: 'Done',
     },
+    set: (override.BaseDialog && override.BaseDialog.set) || {
+      en: 'Set',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -256,8 +259,20 @@ const labels = {
     roomInfo: (override.RoomDialog && override.RoomDialog.roomInfo) || {
       en: 'Room information',
     },
-    roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
-      en: 'Name',
+    removePassword: (override.RoomDialog && override.RoomDialog.removePassword) || {
+      en: 'Remove password',
+      se: 'Ta bort lösenordet',
+    },
+  },
+  RoomUpdateDialog: {
+    password: (override.RoomUpdateDialog && override.RoomUpdateDialog.newPassword) || {
+      en: 'New password',
+    },
+    repeatPassword: (override.RoomUpdateDialog && override.RoomUpdateDialog.repeatPassword) || {
+      en: 'Repeat new password',
+    },
+    roomName: (override.RoomUpdateDialog && override.RoomUpdateDialog.roomName) || {
+      en: 'New name',
     },
   },
   LoginDialog: {

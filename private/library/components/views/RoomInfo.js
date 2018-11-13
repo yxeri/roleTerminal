@@ -22,7 +22,6 @@ const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
-const accessCentral = require('../../AccessCentral');
 
 class RoomInfo extends ViewWrapper {
   constructor({
@@ -32,25 +31,14 @@ class RoomInfo extends ViewWrapper {
     elementId = `rInfo-${Date.now()}`,
   }) {
     const nameSpan = elementCreator.createSpan({ text: 'room' });
-    const editButton = elementCreator.createButton({
-      text: 'Edit',
-      clickFuncs: {
-        leftFunc: () => {
-          const dialog = new EditRoomDialog({
-            roomId,
-          });
-
-          dialog.addToView({});
-        },
-      },
-    });
     const setNameFunc = ({
       isUser,
       roomId,
     }) => {
-      nameSpan.innerHTML = '';
-
       const foundRoom = roomComposer.getRoom({ roomId });
+      this.roomId = roomId;
+
+      nameSpan.innerHTML = '';
 
       if (isUser || foundRoom.isUser) {
         nameSpan.appendChild(document.createTextNode(`${userText}${userComposer.getIdentityName({ objectId: roomId })}`));
@@ -75,14 +63,23 @@ class RoomInfo extends ViewWrapper {
     super({
       elementId,
       useDefaultCss: false,
-      classes: classes.concat(['roomInfo']),
+      classes: classes.concat([
+        'roomInfo',
+        'clickable',
+      ]),
     });
 
-    this.element.appendChild(nameSpan);
+    this.roomId = null;
 
-    accessCentral.addAccessElement({
-      element: editButton,
-      minimumAccessLevel: 1,
+    this.element.appendChild(nameSpan);
+    this.element.addEventListener('click', () => {
+      if (this.roomId) {
+        const dialog = new EditRoomDialog({
+          roomId: this.roomId,
+        });
+
+        dialog.addToView({});
+      }
     });
 
     eventCentral.addWatcher({

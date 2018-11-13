@@ -282,7 +282,9 @@ class ElementCreator {
       } else {
         const [value] = text;
 
-        input.value = value;
+        if (value) {
+          input.value = value;
+        }
       }
     } else {
       input.setAttribute('placeholder', placeholder);

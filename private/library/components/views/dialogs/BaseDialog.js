@@ -18,6 +18,7 @@ const BaseView = require('../BaseView');
 
 const elementCreator = require('../../../ElementCreator');
 const keyHandler = require('../../../KeyHandler');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 const ids = {
   UPPERTEXT: 'upperText',
@@ -87,9 +88,9 @@ class BaseDialog extends BaseView {
   }
 
   addToView({
-    element,
     insertBeforeElement,
     shouldPrepend,
+    element = viewSwitcher.getParentElement(),
   }) {
     super.addToView({
       element,

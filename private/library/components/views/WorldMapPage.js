@@ -41,11 +41,8 @@ class WorldMapPage extends BaseView {
     backgroundColor = '#000000',
     minZoom = 4,
     maxZoom = 15,
-    centerCoordinates = storageManager.getCenterCoordinates(),
-    cornerCoordinates = {
-      upperLeft: storageManager.getCornerOneCoordinates(),
-      bottomRight: storageManager.getCornerTwoCoordinates(),
-    },
+    centerCoordinates,
+    cornerCoordinates,
   }) {
     super({
       elementId,
@@ -155,9 +152,14 @@ class WorldMapPage extends BaseView {
         bounds.extend(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
       });
     } else {
+      const cornerCoordinates = this.cornerCoordinates || {
+        upperLeft: storageManager.getCornerOneCoordinates(),
+        bottomRight: storageManager.getCornerTwoCoordinates(),
+      };
+
       this.worldMap.setZoom(this.maxZoom);
-      bounds.extend(new google.maps.LatLng(this.cornerCoordinates.upperLeft.latitude, this.cornerCoordinates.upperLeft.longitude));
-      bounds.extend(new google.maps.LatLng(this.cornerCoordinates.bottomRight.latitude, this.cornerCoordinates.bottomRight.longitude));
+      bounds.extend(new google.maps.LatLng(cornerCoordinates.upperLeft.latitude, cornerCoordinates.upperLeft.longitude));
+      bounds.extend(new google.maps.LatLng(cornerCoordinates.bottomRight.latitude, cornerCoordinates.bottomRight.longitude));
     }
 
     this.worldMap.fitBounds(bounds);
@@ -374,7 +376,7 @@ class WorldMapPage extends BaseView {
       return;
     }
 
-    const centerCoordinates = storageManager.getCenterCoordinates();
+    const centerCoordinates = this.centerCoordinates || storageManager.getCenterCoordinates();
 
     this.worldMap = new google.maps.Map(this.element, {
       disableDefaultUI: true,
@@ -433,7 +435,7 @@ class WorldMapPage extends BaseView {
         event: eventHandler.Events.ZOOM_WORLDMAP,
         params: {
           map: this.worldMap,
-          zoomLevel: this.worldMap.getZoom(),
+          zoomLevel: this.worldMap.getZoom() || this.minZoom,
         },
       });
     });

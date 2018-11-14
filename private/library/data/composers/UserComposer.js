@@ -30,6 +30,8 @@ class UserComposer extends DataComposer {
     return {
       followingRooms: [storageManager.getPublicRoomId()],
       accessLevel: accessCentral.AccessLevels.ANONYMOUS,
+      objectId: -1,
+      aliases: [],
     };
   }
 

@@ -142,7 +142,6 @@ class List extends BaseView {
             const userFilterFunc = (rule) => {
               const {
                 shouldInclude,
-                paramValue,
                 paramName,
                 objectParamName,
                 shouldBeTrue = true,
@@ -151,16 +150,12 @@ class List extends BaseView {
               if (shouldInclude) {
                 const isIncluded = user[paramName].includes(object[objectParamName]);
 
-                return shouldBeTrue
-                  ? isIncluded
-                  : !isIncluded;
+                return isIncluded === shouldBeTrue;
               }
 
-              const isIncluded = paramValue === object[objectParamName];
+              const isIncluded = user[paramName] === object[objectParamName];
 
-              return shouldBeTrue
-                ? isIncluded
-                : !isIncluded;
+              return isIncluded === shouldBeTrue;
             };
 
             if (this.filter) {

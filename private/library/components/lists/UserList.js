@@ -53,6 +53,15 @@ class UserList extends List {
           { paramName: 'isVerified', paramValue: true },
         ],
       },
+      userFilter: {
+        rules: [
+          {
+            paramName: 'objectId',
+            shouldBeTrue: false,
+            objectParamName: 'objectId',
+          },
+        ],
+      },
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.rooms,

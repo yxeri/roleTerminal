@@ -17,6 +17,7 @@
 const ViewWrapper = require('../ViewWrapper');
 const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
+const TeamList = require('../lists/TeamList');
 
 class WalletView extends ViewWrapper {
   constructor({
@@ -27,12 +28,18 @@ class WalletView extends ViewWrapper {
     const userList = new UserList({
       title: 'Users',
     });
+    const teamList = new TeamList({
+      title: 'Teams',
+    });
 
     super({
       elementId,
       columns: [
         {
-          components: [{ component: userList }],
+          components: [
+            { component: teamList },
+            { component: userList },
+          ],
           classes: [
             'columnList',
             'columnWalletList',

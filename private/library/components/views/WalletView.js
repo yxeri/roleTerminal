@@ -31,7 +31,13 @@ class WalletView extends ViewWrapper {
     super({
       elementId,
       columns: [
-        { components: [{ component: userList }], classes: ['columnWalletList'] },
+        {
+          components: [{ component: userList }],
+          classes: [
+            'columnList',
+            'columnWalletList',
+          ],
+        },
         { components: [{ component: transactionList }], classes: ['columnTransactionList'] },
       ],
       classes: classes.concat(['walletView']),

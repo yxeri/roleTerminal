@@ -72,7 +72,10 @@ class WorldMapView extends ViewWrapper {
 
       columns.push({
         components,
-        classes: ['columnPositionList'],
+        classes: [
+          'columnList',
+          'columnPositionList',
+        ],
       });
     }
 

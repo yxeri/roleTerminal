@@ -145,7 +145,10 @@ class ChatView extends ViewWrapper {
         { component: roomList },
         { component: userList },
       ],
-      classes: ['columnRoomList'],
+      classes: [
+        'columnList',
+        'columnRoomList',
+      ],
     };
 
     switch (inputPlacement) {

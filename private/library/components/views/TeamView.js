@@ -29,7 +29,10 @@ class TeamView extends ViewWrapper {
     super({
       elementId,
       columns: [
-        { components: [{ component: teamList }] },
+        {
+          components: [{ component: teamList }],
+          classes: ['columnList'],
+        },
         { components: [{ component: teamPage }] },
       ],
       classes: classes.concat(['teamView']),

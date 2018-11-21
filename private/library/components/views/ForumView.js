@@ -38,6 +38,7 @@ class ForumView extends ViewWrapper {
             { component: forumList },
             { component: userList },
           ],
+          classes: ['columnList'],
         },
         { components: [{ component: forumPage }] },
       ],

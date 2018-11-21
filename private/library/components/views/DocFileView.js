@@ -29,7 +29,10 @@ class DocFileView extends ViewWrapper {
     super({
       elementId,
       columns: [
-        { components: [{ component: docFileList }] },
+        {
+          components: [{ component: docFileList }],
+          classes: ['columnList'],
+        },
         { components: [{ component: docFilePage }] },
       ],
       classes: classes.concat(['docFileView']),

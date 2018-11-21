@@ -45,6 +45,7 @@ function convertPosition(position) {
       accuracy,
       altitude,
       altitudeAccuracy,
+      timeCreated: new Date(position.timestamp),
     },
   };
 }

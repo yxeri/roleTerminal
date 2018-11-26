@@ -124,6 +124,7 @@ class RoomComposer extends DataComposer {
 
   updateRoom({
     room,
+    options,
     roomId,
     callback,
   }) {
@@ -132,6 +133,22 @@ class RoomComposer extends DataComposer {
       params: {
         roomId,
         room,
+        options,
+      },
+    });
+  }
+
+  resetPassword({
+    roomId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        roomId,
+        options: {
+          resetPassword: true,
+        },
       },
     });
   }

@@ -15,21 +15,19 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
-const TransactionList = require('../lists/TransactionList');
+const ForumList = require('../lists/ForumList');
+const ForumPage = require('./ForumPage');
 const UserList = require('../lists/UserList');
-const TeamList = require('../lists/TeamList');
 
-class WalletView extends ViewWrapper {
+class ForumView extends ViewWrapper {
   constructor({
     classes = [],
-    elementId = `wView-${Date.now()}`,
+    elementId = `fView-${Date.now()}`,
   }) {
-    const transactionList = new TransactionList({});
+    const forumList = new ForumList({});
+    const forumPage = new ForumPage({});
     const userList = new UserList({
       title: 'Users',
-    });
-    const teamList = new TeamList({
-      title: 'Teams',
     });
 
     super({
@@ -37,19 +35,16 @@ class WalletView extends ViewWrapper {
       columns: [
         {
           components: [
-            { component: teamList },
+            { component: forumList },
             { component: userList },
           ],
-          classes: [
-            'columnList',
-            'columnWalletList',
-          ],
+          classes: ['columnList'],
         },
-        { components: [{ component: transactionList }], classes: ['columnTransactionList'] },
+        { components: [{ component: forumPage }] },
       ],
-      classes: classes.concat(['walletView']),
+      classes: classes.concat(['docFileView']),
     });
   }
 }
 
-module.exports = WalletView;
+module.exports = ForumView;

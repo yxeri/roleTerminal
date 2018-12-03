@@ -37,7 +37,6 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
 const storageManager = require('../../StorageManager');
 
 const cssClasses = {
@@ -46,7 +45,6 @@ const cssClasses = {
   newListItem: 'newListItem',
   removeListItem: 'removeListItem',
 };
-const itemChangeTimeout = 800;
 
 class List extends BaseView {
   /**
@@ -131,70 +129,30 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
-            const filterFunc = (rule) => {
-              if (rule.shouldInclude) {
-                return object[rule.paramName].includes(rule.paramValue);
-              }
-
-              return rule.paramValue === object[rule.paramName];
-            };
-            const userFilterFunc = (rule) => {
-              const {
-                shouldInclude,
-                paramName,
-                objectParamName,
-                shouldBeTrue = true,
-              } = rule;
-
-              if (shouldInclude) {
-                const isIncluded = user[paramName].includes(object[objectParamName]);
-
-                return isIncluded === shouldBeTrue;
-              }
-
-              const isIncluded = user[paramName] === object[objectParamName];
-
-              return isIncluded === shouldBeTrue;
-            };
-
-            if (this.filter) {
-              if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
-                return;
-              }
-
-              if (!this.filter.rules.every(filterFunc)) {
-                return;
-              }
-            }
-
-            if (this.userFilter) {
-              if (this.userFilter.orCheck && !this.userFilter.rules.some(userFilterFunc)) {
-                return;
-              }
-
-              if (!this.userFilter.rules.every(userFilterFunc)) {
-                return;
-              }
-            }
+          if (!this.shouldFilterItem({
+            changeType,
+            object,
+            user,
+          })) {
+            return;
           }
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (BaseView.hasAccess({ object, user }).canSee) {
                 this.addOneItem({
                   object,
                   shouldAnimate: true,
                   shouldReplace: true,
                 });
               } else {
-                this.removeOneItem({ object });
+                this.removeElement({ object });
               }
 
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (BaseView.hasAccess({ object, user }).canSee) {
                 this.onCreateFunc({ object });
 
                 this.addOneItem({
@@ -209,7 +167,7 @@ class List extends BaseView {
             case socketManager.ChangeTypes.REMOVE: {
               console.log('going to remove object', object, collector.objectTypes.one);
 
-              this.removeOneItem({ object });
+              this.removeElement({ object });
 
               break;
             }
@@ -304,16 +262,11 @@ class List extends BaseView {
     this.scrollList();
   }
 
-  removeListItem({ objectId }) {
-    const existingItem = this.getElement(objectId);
-
-    this.listElement.removeChild(existingItem);
-  }
-
-  hasAccess({ object, user }) { // eslint-disable-line
-    return accessCentral.hasAccessTo({
-      objectToAccess: object,
-      toAuth: user,
+  removeListItem(object) {
+    super.removeElement({
+      object,
+      shouldAnimate: false,
+      parentElement: this.listElement,
     });
   }
 
@@ -323,7 +276,7 @@ class List extends BaseView {
     const marked = storageManager.getMarked();
 
     objects.forEach((object) => {
-      const { canSee } = this.hasAccess({ object, user });
+      const { canSee } = BaseView.hasAccess({ object, user });
 
       if (canSee) {
         const listItem = this.createListItem({
@@ -481,6 +434,10 @@ class List extends BaseView {
           }));
         });
       }
+
+      if (this.elementToAppend) {
+        listItemElements.push(this.elementToAppend);
+      }
     } else { // Fallback. Create list item if none has been created.
       listItemElements.push(elementCreator.createParagraph({
         elements: [elementCreator.createSpan({ text: objectId })],
@@ -515,7 +472,7 @@ class List extends BaseView {
 
     if (shouldAnimate) {
       newItem.classList.add(cssClasses.newListItem);
-      setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+      setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, this.itemChangeTimeout);
     }
 
     if (shouldReplace && element) {
@@ -534,45 +491,16 @@ class List extends BaseView {
         fallbackParamName,
         reverse,
       } = this.sorting;
-      const isNumber = typeof paramName === 'number';
-      const targetVar = object[paramName] || object[fallbackParamName];
 
-      const objects = this.getCollectorObjects();
-      const closest = isNumber
-        ? objects.reduce((previous, current) => {
-          const prevVar = previous[paramName] || previous[fallbackParamName];
-          const currVar = current[paramName] || current[fallbackParamName];
+      const closestElement = this.getElement(BaseView.findClosestElementId({
+        paramName,
+        fallbackParamName,
+        reverse,
+        targetVar: object[paramName] || object[fallbackParamName],
+        objects: this.getCollectorObjects(),
+      }));
 
-          if (reverse) {
-            return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
-              ? previous
-              : current;
-          }
-
-          return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
-            ? current
-            : previous;
-        })
-        : objects.find((closeObject, index) => {
-          if (index >= (objects.length - 1)) {
-            return true;
-          }
-
-          const closeVar = objects[index][paramName] || objects[index][fallbackParamName];
-
-          if (reverse) {
-            return closeVar < targetVar;
-          }
-
-          return closeVar > targetVar;
-        });
-      const closestElement = this.getElement(closest.objectId);
-
-      if (reverse) {
-        this.listElement.insertBefore(newItem, closestElement);
-      } else {
-        this.listElement.insertBefore(newItem, closestElement);
-      }
+      this.listElement.insertBefore(newItem, closestElement);
     } else if (this.sorting && this.sorting.reverse) {
       const firstChild = this.listElement.firstElementChild;
 
@@ -588,30 +516,6 @@ class List extends BaseView {
     }
   }
 
-  removeOneItem({ object }) {
-    const { objectId } = object;
-    const toRemove = this.getElement(objectId);
-
-    toRemove.classList.add(cssClasses.removeListItem);
-
-    setTimeout(() => {
-      const element = this.getElement(objectId);
-
-      if (element) {
-        this.listElement.removeChild(element);
-      }
-    }, itemChangeTimeout);
-  }
-
-  animateItem({ elementId }) {
-    const element = this.getElement(elementId);
-
-    if (element) {
-      element.classList.add(cssClasses.newListItem);
-      setTimeout(() => { element.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
-    }
-  }
-
   markItem({ objectId }) {
     const element = this.getElement(objectId);
 
@@ -621,7 +525,7 @@ class List extends BaseView {
     });
 
     if (element) {
-      this.animateItem({ elementId: objectId });
+      this.animateElement({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
     }
   }
@@ -637,6 +541,62 @@ class List extends BaseView {
 
       element.classList.remove(cssClasses.markListItem);
     }
+  }
+
+  shouldFilterItem({
+    changeType,
+    object,
+    user,
+  }) {
+    if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
+      const filterFunc = (rule) => {
+        if (rule.shouldInclude) {
+          return object[rule.paramName].includes(rule.paramValue);
+        }
+
+        return rule.paramValue === object[rule.paramName];
+      };
+      const userFilterFunc = (rule) => {
+        const {
+          shouldInclude,
+          paramName,
+          objectParamName,
+          shouldBeTrue = true,
+        } = rule;
+
+        if (shouldInclude) {
+          const isIncluded = user[paramName].includes(object[objectParamName]);
+
+          return isIncluded === shouldBeTrue;
+        }
+
+        const isIncluded = user[paramName] === object[objectParamName];
+
+        return isIncluded === shouldBeTrue;
+      };
+
+      if (this.filter) {
+        if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
+          return false;
+        }
+
+        if (!this.filter.rules.every(filterFunc)) {
+          return false;
+        }
+      }
+
+      if (this.userFilter) {
+        if (this.userFilter.orCheck && !this.userFilter.rules.some(userFilterFunc)) {
+          return false;
+        }
+
+        if (!this.userFilter.rules.every(userFilterFunc)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }
 

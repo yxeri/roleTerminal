@@ -24,6 +24,7 @@ class BaseView {
     minimumAccessLevel,
     elementId = `elem-${Date.now()}`,
   }) {
+    this.itemChangeTimeout = 800;
     this.minimumAccessLevel = minimumAccessLevel;
     this.classes = classes;
     this.elementId = elementId;
@@ -110,6 +111,91 @@ class BaseView {
 
   getElementId() {
     return this.elementId;
+  }
+
+  static hasAccess({ object, user }) {
+    return accessCentral.hasAccessTo({
+      objectToAccess: object,
+      toAuth: user,
+    });
+  }
+
+  static findClosestElementId({
+    paramName,
+    fallbackParamName,
+    objects,
+    reverse,
+    targetVar,
+  }) {
+    const isNumber = typeof paramName === 'number';
+    const closest = isNumber
+      ? objects.reduce((previous, current) => {
+        const prevVar = previous[paramName] || previous[fallbackParamName];
+        const currVar = current[paramName] || current[fallbackParamName];
+
+        if (reverse) {
+          return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+            ? previous
+            : current;
+        }
+
+        return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+          ? current
+          : previous;
+      })
+      : objects.find((closeObject, index) => {
+        if (index >= (objects.length - 1)) {
+          return true;
+        }
+
+        const closeVar = objects[index][paramName] || objects[index][fallbackParamName];
+
+        if (reverse) {
+          return closeVar < targetVar;
+        }
+
+        return closeVar > targetVar;
+      });
+
+    return closest.objectId;
+  }
+
+  removeElement({
+    object,
+    parentElement,
+    shouldAnimate = false,
+  }) {
+    const { objectId } = object;
+    const toRemove = this.getElement(objectId);
+    const removeFrom = parentElement || this.element;
+
+    if (shouldAnimate) {
+      toRemove.classList.add(cssClasses.removeListItem);
+
+      setTimeout(() => {
+        const element = this.getElement(objectId);
+
+        if (element) {
+          removeFrom.removeChild(element);
+        }
+      }, this.itemChangeTimeout / 4);
+
+      return;
+    }
+
+    removeFrom.removeChild(toRemove);
+  }
+
+  animateElement({
+    elementId,
+    element,
+  }) {
+    const elementToAnimate = element || this.getElement(elementId);
+
+    if (elementToAnimate) {
+      elementToAnimate.classList.add(cssClasses.newListItem);
+      setTimeout(() => { elementToAnimate.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+    }
   }
 }
 

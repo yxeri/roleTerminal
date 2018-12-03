@@ -149,7 +149,7 @@ class MessageList extends List {
         const foundRoom = rooms.find(room => object.roomId === room.objectId);
 
         if (foundRoom) {
-          roomList.animateItem({ elementId: foundRoom.objectId });
+          roomList.animateElement({ elementId: foundRoom.objectId });
 
           return false;
         }

@@ -18,6 +18,13 @@ const elementCreator = require('../../ElementCreator');
 const accessCentral = require('../../AccessCentral');
 const storageManager = require('../../StorageManager');
 
+const cssClasses = {
+  focusElement: 'focusElement',
+  markElement: 'markElement',
+  newElement: 'newElement',
+  removeElement: 'removeElement',
+};
+
 class BaseView {
   constructor({
     classes,
@@ -170,7 +177,7 @@ class BaseView {
     const removeFrom = parentElement || this.element;
 
     if (shouldAnimate) {
-      toRemove.classList.add(cssClasses.removeListItem);
+      toRemove.classList.add(cssClasses.removeElement);
 
       setTimeout(() => {
         const element = this.getElement(objectId);
@@ -193,8 +200,8 @@ class BaseView {
     const elementToAnimate = element || this.getElement(elementId);
 
     if (elementToAnimate) {
-      elementToAnimate.classList.add(cssClasses.newListItem);
-      setTimeout(() => { elementToAnimate.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+      elementToAnimate.classList.add(cssClasses.newElement);
+      setTimeout(() => { elementToAnimate.classList.remove(cssClasses.newElement); }, this.itemChangeTimeout);
     }
   }
 }

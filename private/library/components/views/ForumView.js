@@ -42,7 +42,7 @@ class ForumView extends ViewWrapper {
         },
         { components: [{ component: forumPage }] },
       ],
-      classes: classes.concat(['docFileView']),
+      classes: classes.concat(['forumView']),
     });
   }
 }

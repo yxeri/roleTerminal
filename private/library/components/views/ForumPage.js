@@ -23,6 +23,9 @@ const labelHandler = require('../../labels/LabelHandler');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 const forumComposer = require('../../data/composers/ForumComposer');
+const dataHandler = require('../../data/DataHandler');
+// const accessCentral = require('../../AccessCentral');
+const userComposer = require('../../data/composers/UserComposer');
 
 const cssClasses = {
   subPost: 'subPost',
@@ -42,7 +45,7 @@ const cssClasses = {
   timestamp: 'timestamp',
   pictureContainer: 'pictureContainer',
   contentEnd: 'contentEnd',
-
+  threadContainer: 'threadContainer',
 };
 const ids = {
   postContent: 'poCon',
@@ -52,6 +55,7 @@ const ids = {
   subpostContainer: 'suContainer',
   forumContent: 'foCon',
   contentEnd: 'coEnd',
+  threadContainer: 'thContainer',
 };
 const elementChangeTimeout = 800;
 let disableVoting = false;
@@ -74,7 +78,7 @@ function createPictureContainer({ object }) {
  * Create a header paragraph.
  * @param {Object} params - Parameters.
  * @param {Object} params.object - Thread/post to create a header for.
- * @return {HTMLParagraphElement} Header element.
+ * @return {HTMLElement} Header element.
  */
 function createHeader({ object }) {
   return elementCreator.createParagraph({
@@ -82,7 +86,7 @@ function createHeader({ object }) {
     elements: [
       elementCreator.createSpan({
         classes: [cssClasses.username],
-        text: object.creatorName,
+        text: object.creatorName || userComposer.getIdentityName({ objectId: object.ownerAliasId || object.ownerId }),
       }),
     ],
   });
@@ -92,7 +96,7 @@ function createHeader({ object }) {
  * Create human-readable dates for when the item was created and last updated.
  * @param {Object} params - Parameters.
  * @param {Object} params.object - Post/subpost/thread.
- * @return {HTMLParagraphElement} Paragraph with dates.
+ * @return {HTMLElement} Paragraph with dates.
  */
 function createTimestamp({ object }) {
   const timeCreated = object.customTimeCreated || object.timeCreated;
@@ -149,6 +153,26 @@ function createPostHeader({ post }) {
     elements: [
       createHeader({ object: post }),
     ],
+    clickFuncs: {
+      leftFunc: () => {
+        // const {
+        //   hasFullAccess,
+        // } = accessCentral.hasAccessTo({
+        //   objectToAccess: post,
+        //   toAuth: userComposer.getCurrentUser(),
+        // });
+        //
+        // if (hasFullAccess) {
+        //   const postDialog = new EditForumThreadDialog({
+        //     postId: post.objectId,
+        //   });
+        //
+        //   postDialog.addToView({
+        //     element: this.getParentElement(),
+        //   });
+        // }
+      },
+    },
   });
 }
 
@@ -215,10 +239,9 @@ function createPost({
 }) {
   const elements = [createPostContent({ post, elementId: `${elementId}${post.objectId}` })];
   const fullElementId = `${elementId}${post.objectId}`;
+  const { subPosts = [] } = post;
 
   if (!ignoreSubPosts) {
-    const { subPosts } = post;
-
     elements.push(elementCreator.createContainer({
       classes: [cssClasses.subpostContainer],
       elementId: `${fullElementId}${ids.subpostContainer}`,
@@ -250,6 +273,26 @@ function createThreadHeader({ thread }) {
       }),
       createHeader({ object: thread }),
     ],
+    clickFuncs: {
+      leftFunc: () => {
+        // const {
+        //   hasFullAccess,
+        // } = accessCentral.hasAccessTo({
+        //   objectToAccess: thread,
+        //   toAuth: userComposer.getCurrentUser(),
+        // });
+        //
+        // if (hasFullAccess) {
+        //   const threadDialog = new EditForumThreadDialog({
+        //     threadId: thread.objectId,
+        //   });
+        //
+        //   threadDialog.addToView({
+        //     element: this.getParentElement(),
+        //   });
+        // }
+      },
+    },
   });
 }
 
@@ -305,7 +348,10 @@ function createThread({
   thread,
   elementId,
 }) {
-  const { objectId: threadId, posts } = thread;
+  const {
+    objectId: threadId,
+    posts = [],
+  } = thread;
   const elements = [];
   const fullElementId = `${elementId}${threadId}`;
 
@@ -333,6 +379,14 @@ function createThread({
 class ForumView extends BaseView {
   constructor({
     forumId,
+    dependencies = [
+      dataHandler.users,
+      dataHandler.teams,
+      dataHandler.aliases,
+      dataHandler.forumPosts,
+      dataHandler.forums,
+      dataHandler.forumThreads,
+    ],
     shouldDisableVoting = false,
     lockedToForum = false,
     shouldDisablePictures = false,
@@ -348,140 +402,143 @@ class ForumView extends BaseView {
     });
 
     this.currentForum = forumId;
-
-    if (!lockedToForum) {
-      eventCentral.addWatcher({
-        event: eventCentral.Events.SWITCH_FORUM,
-        func: ({ forum }) => {
-          if (!forumComposer.isComplete) {
-            return;
-          }
-
-          this.currentForum = forum.objectId;
-
-          this.showForum({ forumId: this.getCurrentForumId() });
-        },
-      });
-    }
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.FORUMTHREAD,
-      func: ({ thread, changeType }) => {
-        if (!forumComposer.isComplete) {
-          return;
-        }
-
-        const { objectId } = thread;
-
-        switch (changeType) {
-          case socketManager.ChangeTypes.UPDATE: {
-            this.updateThread({ thread });
-
-            break;
-          }
-          case socketManager.ChangeTypes.CREATE: {
-            const newThread = createThread({ thread, elementId: this.elementId });
-
-            this.element.insertBefore(newThread, this.getThisElement().firstElementChild);
-
-            break;
-          }
-          case socketManager.ChangeTypes.REMOVE: {
-            const toRemove = this.getElement({ objectId: thread.objectId });
-
-            toRemove.classList.add(cssClasses.removeListItem);
-
-            setTimeout(() => {
-              this.element.removeChild(this.getElement({ objectId }));
-            }, elementChangeTimeout);
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      },
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.FORUMPOST,
-      func: ({ post, changeType }) => {
-        if (!forumComposer.isComplete) {
-          return;
-        }
-
-        const { parentPostId, objectId } = post;
-
-        switch (changeType) {
-          case socketManager.ChangeTypes.UPDATE: {
-            this.updatePost({ post });
-
-            break;
-          }
-          case socketManager.ChangeTypes.CREATE: {
-            if (parentPostId) {
-              const newPost = createSubPost({ subPost: post, elementId: this.elementId });
-              const parentPostContainer = this.getElement({ objectId: `${parentPostId}${ids.subpostContainer}` });
-
-              parentPostContainer.appendChild(newPost);
-            } else {
-              const newPost = createPost({ post, elementId: this.elementId });
-              const postContainer = this.getElement({ objectId: `${post.threadId}${ids.postContainer}` });
-
-              postContainer.insertBefore(newPost, postContainer.lastElementChild);
-            }
-
-            break;
-          }
-          case socketManager.ChangeTypes.REMOVE: {
-            const toRemove = this.getElement({ objectId });
-            const thread = this.getElement({ objectId: post.threadId });
-
-            toRemove.classList.add(cssClasses.removeListItem);
-
-            setTimeout(() => {
-              thread.removeChild(this.getElement({ objectId }));
-            }, elementChangeTimeout);
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      },
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.FORUM,
-      func: ({ forum, changeType }) => {
-        if (!forumComposer.isComplete) {
-          return;
-        }
-
-        switch (changeType) {
-          case socketManager.ChangeTypes.UPDATE: {
-            this.updateForum({ forum });
-
-            break;
-          }
-          case socketManager.ChangeTypes.REMOVE: {
-            this.showForum({ forumId: '' });
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      },
-    });
+    this.dependencies = dependencies;
 
     eventCentral.addWatcher({
       event: eventCentral.Events.COMPLETE_FORUM,
       func: () => {
         this.showForum({ forumId: this.getCurrentForumId() });
+
+        if (!lockedToForum) {
+          eventCentral.addWatcher({
+            event: eventCentral.Events.SWITCH_FORUM,
+            func: ({ forum }) => {
+              this.currentForum = forum.objectId;
+
+              this.showForum({ forumId: this.getCurrentForumId() });
+            },
+          });
+        }
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.FORUMTHREAD,
+          func: ({ thread, changeType }) => {
+            if (this.getCurrentForumId() !== thread.forumId) {
+              return;
+            }
+
+            const { objectId } = thread;
+
+            switch (changeType) {
+              case socketManager.ChangeTypes.UPDATE: {
+                this.updateThread({ thread });
+
+                break;
+              }
+              case socketManager.ChangeTypes.CREATE: {
+                const threadContainer = this.getElement(ids.threadContainer);
+                const newThread = createThread({ thread, elementId: this.elementId });
+
+                threadContainer.insertBefore(newThread, threadContainer.firstElementChild);
+
+                break;
+              }
+              case socketManager.ChangeTypes.REMOVE: {
+                const toRemove = this.getElement(thread.objectId);
+
+                toRemove.classList.add(cssClasses.removeListItem);
+
+                setTimeout(() => {
+                  this.element.removeChild(this.getElement(objectId));
+                }, elementChangeTimeout);
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+          },
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.FORUMPOST,
+          func: ({ post, changeType }) => {
+            const parentThread = forumComposer.getThread({ threadId: post.threadId });
+
+            if (this.getCurrentForumId() !== parentThread.forumId) {
+              return;
+            }
+
+            const { parentPostId, objectId } = post;
+
+            switch (changeType) {
+              case socketManager.ChangeTypes.UPDATE: {
+                this.updatePost({ post });
+                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId }) });
+
+                break;
+              }
+              case socketManager.ChangeTypes.CREATE: {
+                if (parentPostId) {
+                  const newPost = createSubPost({ subPost: post, elementId: this.elementId });
+                  const parentPostContainer = this.getElement(`${parentPostId}${ids.subpostContainer}`);
+
+                  parentPostContainer.appendChild(newPost);
+                } else {
+                  const newPost = createPost({ post, elementId: this.elementId });
+                  const postContainer = this.getElement(`${post.threadId}${ids.postContainer}`);
+
+                  postContainer.insertBefore(newPost, postContainer.lastElementChild);
+                }
+
+                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId }) });
+
+                break;
+              }
+              case socketManager.ChangeTypes.REMOVE: {
+                const toRemove = this.getElement(objectId);
+                const thread = this.getElement(post.threadId);
+
+                toRemove.classList.add(cssClasses.removeListItem);
+
+                setTimeout(() => {
+                  thread.removeChild(this.getElement(objectId));
+                }, elementChangeTimeout);
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+          },
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.FORUM,
+          func: ({ forum, changeType }) => {
+            if (this.getCurrentForumId() !== forum.objectId) {
+              return;
+            }
+
+            switch (changeType) {
+              case socketManager.ChangeTypes.UPDATE: {
+                this.updateForum({ forum });
+
+                break;
+              }
+              case socketManager.ChangeTypes.REMOVE: {
+                this.showForum({ forumId: '' });
+
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+          },
+        });
       },
     });
   }
@@ -495,43 +552,37 @@ class ForumView extends BaseView {
   // }
 
   updateThread({ thread }) {
-    const existingThread = this.getElement({ objectId: thread.objectId });
-    const threadContent = this.getElement({ objectId: `${thread.objectId}${ids.threadContent}` });
-    const forum = this.getThisElement();
-    const forumContent = this.getElement({ objectId: ids.forumContent });
-
-    forum.insertBefore(existingThread, forumContent.nextSibling);
+    const existingThread = this.getElement(thread.objectId);
+    const threadContent = this.getElement(`${thread.objectId}${ids.threadContent}`);
 
     existingThread.replaceChild(
       elementCreator.createHeader({ elements: [createThreadHeader({ thread })] }),
       existingThread.getElementsByTagName('header')[0],
     );
     existingThread.replaceChild(
-      threadContent,
       createThreadContent({ thread, elementId: `${this.elementId}${thread.objectId}` }),
+      threadContent,
     );
   }
 
   updatePost({ post }) {
-    const existingPost = this.getElement({ objectId: post.objectId });
-    const postContent = this.getElement({ objectId: `${post.objectId}${ids.postContent}` });
+    const existingPost = this.getElement(post.objectId);
+    const postContent = this.getElement(`${post.objectId}${ids.postContent}`);
 
-    // if (post.parentPostId) {
-    //
-    // } else {
-    existingPost.replaceChild(
-      elementCreator.createHeader({ elements: [createHeader({ object: post })] }),
-      existingPost.getElementsByTagName('header')[0],
-    );
-    existingPost.replaceChild(
-      postContent,
-      createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
-    );
-    // }
-  }
+    if (post.parentPostId) {
+      const subContainer = this.getElement(`${post.parentPostId}${ids.subpostContainer}`);
 
-  getElement({ objectId }) {
-    return document.getElementById(`${this.elementId}${objectId}`);
+      subContainer.replaceChild(createSubPost({ subPost: post, elementId: this.elementId }), existingPost);
+    } else {
+      existingPost.replaceChild(
+        elementCreator.createHeader({ elements: [createHeader({ object: post })] }),
+        existingPost.getElementsByTagName('header')[0],
+      );
+      existingPost.replaceChild(
+        createPostContent({ post, elementId: `${this.elementId}${post.objectId}` }),
+        postContent,
+      );
+    }
   }
 
   showForum({ forumId }) {
@@ -540,6 +591,7 @@ class ForumView extends BaseView {
     }
 
     const forum = forumComposer.getForum({ forumId });
+    const { threads = [] } = forum;
 
     if (!forum) {
       this.replaceOnParent({
@@ -563,9 +615,13 @@ class ForumView extends BaseView {
       }),
     ];
 
-    forum.threads.forEach((thread) => {
-      forumElements.push(createThread({ thread, elementId: this.elementId }));
-    });
+    forumElements.push(elementCreator.createContainer({
+      classes: [cssClasses.threadContainer],
+      elementId: `${this.elementId}${ids.threadContainer}`,
+      elements: threads.map((thread) => {
+        return createThread({ thread, elementId: this.elementId });
+      }),
+    }));
 
     this.replaceOnParent({
       element: elementCreator.createArticle({

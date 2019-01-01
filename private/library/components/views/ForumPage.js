@@ -15,6 +15,8 @@
  */
 
 const BaseView = require('./BaseView');
+const EditForumThreadDialog = require('./dialogs/EditForumThreadDialog');
+const EditForumPostDialog = require('./dialogs/EditForumPostDialog');
 
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
@@ -24,7 +26,7 @@ const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 const forumComposer = require('../../data/composers/ForumComposer');
 const dataHandler = require('../../data/DataHandler');
-// const accessCentral = require('../../AccessCentral');
+const accessCentral = require('../../AccessCentral');
 const userComposer = require('../../data/composers/UserComposer');
 
 const cssClasses = {
@@ -155,22 +157,22 @@ function createPostHeader({ post }) {
     ],
     clickFuncs: {
       leftFunc: () => {
-        // const {
-        //   hasFullAccess,
-        // } = accessCentral.hasAccessTo({
-        //   objectToAccess: post,
-        //   toAuth: userComposer.getCurrentUser(),
-        // });
-        //
-        // if (hasFullAccess) {
-        //   const postDialog = new EditForumThreadDialog({
-        //     postId: post.objectId,
-        //   });
-        //
-        //   postDialog.addToView({
-        //     element: this.getParentElement(),
-        //   });
-        // }
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: post,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const postDialog = new EditForumPostDialog({
+            postId: post.objectId,
+          });
+
+          postDialog.addToView({
+            element: this.getParentElement(),
+          });
+        }
       },
     },
   });
@@ -275,22 +277,22 @@ function createThreadHeader({ thread }) {
     ],
     clickFuncs: {
       leftFunc: () => {
-        // const {
-        //   hasFullAccess,
-        // } = accessCentral.hasAccessTo({
-        //   objectToAccess: thread,
-        //   toAuth: userComposer.getCurrentUser(),
-        // });
-        //
-        // if (hasFullAccess) {
-        //   const threadDialog = new EditForumThreadDialog({
-        //     threadId: thread.objectId,
-        //   });
-        //
-        //   threadDialog.addToView({
-        //     element: this.getParentElement(),
-        //   });
-        // }
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: thread,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const threadDialog = new EditForumThreadDialog({
+            threadId: thread.objectId,
+          });
+
+          threadDialog.addToView({
+            element: this.getParentElement(),
+          });
+        }
       },
     },
   });

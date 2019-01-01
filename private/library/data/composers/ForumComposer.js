@@ -173,6 +173,54 @@ class ForumComposer extends DataComposer {
       params: { thread },
     });
   }
+
+  removeThread({
+    threadId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { threadId },
+    });
+  }
+
+  removePost({
+    postId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { postId },
+    });
+  }
+
+  updatePost({
+    post,
+    postId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        postId,
+        post,
+      },
+    });
+  }
+
+  updateThread({
+    thread,
+    threadId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        threadId,
+        thread,
+      },
+    });
+  }
 }
 
 const forumComposer = new ForumComposer();

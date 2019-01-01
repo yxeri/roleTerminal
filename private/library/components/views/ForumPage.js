@@ -28,6 +28,7 @@ const forumComposer = require('../../data/composers/ForumComposer');
 const dataHandler = require('../../data/DataHandler');
 const accessCentral = require('../../AccessCentral');
 const userComposer = require('../../data/composers/UserComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 
 const cssClasses = {
   subPost: 'subPost',
@@ -48,6 +49,7 @@ const cssClasses = {
   pictureContainer: 'pictureContainer',
   contentEnd: 'contentEnd',
   threadContainer: 'threadContainer',
+  removeListItem: 'removeListItem',
 };
 const ids = {
   postContent: 'poCon',
@@ -170,7 +172,7 @@ function createPostHeader({ post }) {
           });
 
           postDialog.addToView({
-            element: this.getParentElement(),
+            element: viewSwitcher.getParentElement(),
           });
         }
       },
@@ -290,7 +292,7 @@ function createThreadHeader({ thread }) {
           });
 
           threadDialog.addToView({
-            element: this.getParentElement(),
+            element: viewSwitcher.getParentElement(),
           });
         }
       },
@@ -425,7 +427,7 @@ class ForumView extends BaseView {
         eventCentral.addWatcher({
           event: eventCentral.Events.FORUMTHREAD,
           func: ({ thread, changeType }) => {
-            if (this.getCurrentForumId() !== thread.forumId) {
+            if (changeType !== socketManager.ChangeTypes.REMOVE && this.getCurrentForumId() !== thread.forumId) {
               return;
             }
 
@@ -448,10 +450,14 @@ class ForumView extends BaseView {
               case socketManager.ChangeTypes.REMOVE: {
                 const toRemove = this.getElement(thread.objectId);
 
+                if (!toRemove) {
+                  return;
+                }
+
                 toRemove.classList.add(cssClasses.removeListItem);
 
                 setTimeout(() => {
-                  this.element.removeChild(this.getElement(objectId));
+                  toRemove.parentElement.removeChild(this.getElement(objectId));
                 }, elementChangeTimeout);
 
                 break;
@@ -466,9 +472,9 @@ class ForumView extends BaseView {
         eventCentral.addWatcher({
           event: eventCentral.Events.FORUMPOST,
           func: ({ post, changeType }) => {
-            const parentThread = forumComposer.getThread({ threadId: post.threadId });
+            const parentThread = forumComposer.getThread({ threadId: post.threadId, full: false });
 
-            if (this.getCurrentForumId() !== parentThread.forumId) {
+            if (changeType !== socketManager.ChangeTypes.REMOVE && (!parentThread || this.getCurrentForumId() !== parentThread.forumId)) {
               return;
             }
 
@@ -477,7 +483,7 @@ class ForumView extends BaseView {
             switch (changeType) {
               case socketManager.ChangeTypes.UPDATE: {
                 this.updatePost({ post });
-                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId }) });
+                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId, full: false }) });
 
                 break;
               }
@@ -494,18 +500,21 @@ class ForumView extends BaseView {
                   postContainer.insertBefore(newPost, postContainer.lastElementChild);
                 }
 
-                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId }) });
+                this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId, full: false }) });
 
                 break;
               }
               case socketManager.ChangeTypes.REMOVE: {
                 const toRemove = this.getElement(objectId);
-                const thread = this.getElement(post.threadId);
+
+                if (!toRemove) {
+                  return;
+                }
 
                 toRemove.classList.add(cssClasses.removeListItem);
 
                 setTimeout(() => {
-                  thread.removeChild(this.getElement(objectId));
+                  toRemove.parentElement.removeChild(this.getElement(objectId));
                 }, elementChangeTimeout);
 
                 break;

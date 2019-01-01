@@ -329,7 +329,7 @@ viewSwitcher.addAvailableTypes({
     walletWrapper.viewType,
     docWrapper.viewType,
     teamWrapper.viewType,
-    forumWrapper.viewType
+    forumWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

@@ -25,7 +25,7 @@ const ids = {
   TEXT: 'text',
 };
 
-class EditDocFileDialog extends BaseDialog {
+class EditForumPostDialog extends BaseDialog {
   constructor({
     postId,
     classes = [],
@@ -148,4 +148,4 @@ class EditDocFileDialog extends BaseDialog {
   }
 }
 
-module.exports = EditDocFileDialog;
+module.exports = EditForumPostDialog;

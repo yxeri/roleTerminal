@@ -15,7 +15,6 @@
  */
 
 const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -26,17 +25,15 @@ const ids = {
   TEXT: 'text',
 };
 
-class EditForumThreadDialog extends BaseDialog {
+class EditDocFileDialog extends BaseDialog {
   constructor({
-    threadId,
+    forumId,
     classes = [],
     elementId = `threadDialog-${Date.now()}`,
   }) {
-    const thread = forumComposer.getThread({ threadId, full: false });
-
     const inputs = [
       elementCreator.createInput({
-        text: [thread.title],
+        text: [],
         elementId: ids.TITLE,
         inputName: 'title',
         type: 'text',
@@ -45,7 +42,7 @@ class EditForumThreadDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'title' }),
       }),
       elementCreator.createInput({
-        text: thread.text,
+        text: [],
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
@@ -65,53 +62,18 @@ class EditForumThreadDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'remove' }),
-        clickFuncs: {
-          leftFunc: () => {
-            const parentElement = this.getParentElement();
-
-            const verifyDialog = new VerifyDialog({
-              callback: ({ confirmed }) => {
-                if (!confirmed) {
-                  this.addToView({
-                    element: parentElement,
-                  });
-
-                  return;
-                }
-
-                forumComposer.removeThread({
-                  threadId,
-                  callback: ({ error: threadError }) => {
-                    if (threadError) {
-                      console.log('Forum thread error', threadError);
-                    }
-
-                    verifyDialog.removeFromView();
-                  },
-                });
-              },
-            });
-
-            verifyDialog.addToView({
-              element: this.getParentElement(),
-            });
-
-            this.removeFromView();
-          },
-        },
-      }),
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
         clickFuncs: {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
             }
 
-            forumComposer.updateThread({
-              threadId,
+            console.log('creating thread for forum', forumId);
+
+            forumComposer.createThread({
               thread: {
+                forumId,
                 title: this.getInputValue(ids.TITLE),
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
@@ -159,4 +121,4 @@ class EditForumThreadDialog extends BaseDialog {
   }
 }
 
-module.exports = EditForumThreadDialog;
+module.exports = EditDocFileDialog;

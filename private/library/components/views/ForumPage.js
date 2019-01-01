@@ -17,6 +17,8 @@
 const BaseView = require('./BaseView');
 const EditForumThreadDialog = require('./dialogs/EditForumThreadDialog');
 const EditForumPostDialog = require('./dialogs/EditForumPostDialog');
+const ForumThreadDialog = require('./dialogs/ForumThreadDialog');
+const ForumPostDialog = require('./dialogs/ForumPostDialog');
 
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
@@ -50,6 +52,9 @@ const cssClasses = {
   contentEnd: 'contentEnd',
   threadContainer: 'threadContainer',
   removeListItem: 'removeListItem',
+  newThreadButton: 'newThreadButton',
+  newPostButton: 'newPostButton',
+  newSubPostButton: 'newSubPostButton',
 };
 const ids = {
   postContent: 'poCon',
@@ -128,7 +133,7 @@ function createTimestamp({ object }) {
  * Create element that will be added to the end of the content.
  * @param {Object} params - Parameters.
  * @param {Object} params.object - Object to use to create the content end.
- * @return {HTMLParagraphElement} Paragraph.
+ * @return {HTMLElement} Paragraph.
  */
 function createContentEnd({ object }) {
   const timeStamp = createTimestamp({ object });
@@ -255,6 +260,25 @@ function createPost({
     }));
   }
 
+  if (!post.parentPostId) {
+    elements.push(elementCreator.createButton({
+      classes: [cssClasses.newSubPostButton],
+      text: 'Create sub post',
+      clickFuncs: {
+        leftFunc: () => {
+          const postDialog = new ForumPostDialog({
+            threadId: post.threadId,
+            parentPostId: post.objectId,
+          });
+
+          postDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        },
+      },
+    }));
+  }
+
   return elementCreator.createSection({
     elements,
     classes: [cssClasses.post],
@@ -362,6 +386,22 @@ function createThread({
   elements.push(createThreadContent({
     thread,
     elementId: fullElementId,
+  }));
+
+  elements.push(elementCreator.createButton({
+    classes: [cssClasses.newPostButton],
+    text: 'Create post',
+    clickFuncs: {
+      leftFunc: () => {
+        const postDialog = new ForumPostDialog({
+          threadId,
+        });
+
+        postDialog.addToView({
+          element: viewSwitcher.getParentElement(),
+        });
+      },
+    },
   }));
 
   elements.push(elementCreator.createContainer({
@@ -497,7 +537,7 @@ class ForumView extends BaseView {
                   const newPost = createPost({ post, elementId: this.elementId });
                   const postContainer = this.getElement(`${post.threadId}${ids.postContainer}`);
 
-                  postContainer.insertBefore(newPost, postContainer.lastElementChild);
+                  postContainer.appendChild(newPost);
                 }
 
                 this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId, full: false }) });
@@ -625,6 +665,22 @@ class ForumView extends BaseView {
         elementId: this.elementId,
       }),
     ];
+
+    forumElements.push(elementCreator.createButton({
+      classes: [cssClasses.newThreadButton],
+      text: 'Create thread',
+      clickFuncs: {
+        leftFunc: () => {
+          const threadDialog = new ForumThreadDialog({
+            forumId: this.getCurrentForumId(),
+          });
+
+          threadDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        },
+      },
+    }));
 
     forumElements.push(elementCreator.createContainer({
       classes: [cssClasses.threadContainer],

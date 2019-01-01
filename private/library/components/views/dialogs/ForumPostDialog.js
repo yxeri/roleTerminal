@@ -15,44 +15,44 @@
  */
 
 const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const forumComposer = require('../../../data/composers/ForumComposer');
 
 const ids = {
-  TITLE: 'title',
   TEXT: 'text',
 };
 
-class EditForumThreadDialog extends BaseDialog {
+class ForumPostDialog extends BaseDialog {
   constructor({
     threadId,
+    parentPostId,
     classes = [],
-    elementId = `threadDialog-${Date.now()}`,
+    elementId = `postDialog-${Date.now()}`,
   }) {
-    const thread = forumComposer.getThread({ threadId, full: false });
+    const parentPost = forumComposer.getPost({ postId: parentPostId || -1, full: false });
+    const threadIdToSend = threadId || parentPost.threadId;
+    const thread = forumComposer.getThread({ threadId: threadIdToSend, full: false });
+
+    let upperText = [
+      `${thread.title}`,
+    ].concat(thread.text);
+
+    if (parentPost) {
+      upperText = upperText.concat(['Post:'], parentPost.text);
+    }
 
     const inputs = [
       elementCreator.createInput({
-        text: [thread.title],
-        elementId: ids.TITLE,
-        inputName: 'title',
-        type: 'text',
-        isRequired: true,
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'title' }),
-      }),
-      elementCreator.createInput({
-        text: thread.text,
+        text: [],
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
         maxLength: 3500,
         multiLine: true,
         shouldResize: true,
-        placeholder: labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'text' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'text' }),
       }),
     ];
     const lowerButtons = [
@@ -65,54 +65,17 @@ class EditForumThreadDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'remove' }),
-        clickFuncs: {
-          leftFunc: () => {
-            const parentElement = this.getParentElement();
-
-            const verifyDialog = new VerifyDialog({
-              callback: ({ confirmed }) => {
-                if (!confirmed) {
-                  this.addToView({
-                    element: parentElement,
-                  });
-
-                  return;
-                }
-
-                forumComposer.removeThread({
-                  threadId,
-                  callback: ({ error: threadError }) => {
-                    if (threadError) {
-                      console.log('Forum thread error', threadError);
-                    }
-
-                    verifyDialog.removeFromView();
-                  },
-                });
-              },
-            });
-
-            verifyDialog.addToView({
-              element: this.getParentElement(),
-            });
-
-            this.removeFromView();
-          },
-        },
-      }),
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
         clickFuncs: {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
             }
 
-            forumComposer.updateThread({
-              threadId,
-              thread: {
-                title: this.getInputValue(ids.TITLE),
+            forumComposer.createPost({
+              post: {
+                parentPostId,
+                threadId: threadIdToSend,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
               callback: ({ error }) => {
@@ -120,12 +83,12 @@ class EditForumThreadDialog extends BaseDialog {
                   if (error.type === 'invalid length' && error.extraData) {
                     switch (error.extraData.param) {
                       case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'titleLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'titleLength' })] });
 
                         break;
                       }
                       case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'textLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'textLength' })] });
 
                         break;
                       }
@@ -154,9 +117,10 @@ class EditForumThreadDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['ForumThreadDialog']),
+      upperText,
+      classes: classes.concat(['ForumPostDialog']),
     });
   }
 }
 
-module.exports = EditForumThreadDialog;
+module.exports = ForumPostDialog;

@@ -111,7 +111,7 @@ class EditDocFileDialog extends BaseDialog {
 
             forumComposer.updateThread({
               threadId,
-              docFile: {
+              thread: {
                 title: this.getInputValue(ids.TITLE),
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },

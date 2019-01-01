@@ -52,7 +52,10 @@ class ForumComposer extends DataComposer {
 
   getPostsByThread({
     threadId,
-    sorting,
+    sorting = {
+      paramName: 'customTimeCreated',
+      fallbackParamName: 'timeCreated',
+    },
     full = true,
   }) {
     const allPosts = this.forumPostHandler.getObjects({
@@ -178,7 +181,7 @@ class ForumComposer extends DataComposer {
     threadId,
     callback,
   }) {
-    this.handler.removeObject({
+    this.forumThreadHandler.removeObject({
       callback,
       params: { threadId },
     });
@@ -188,7 +191,7 @@ class ForumComposer extends DataComposer {
     postId,
     callback,
   }) {
-    this.handler.removeObject({
+    this.forumPostHandler.removeObject({
       callback,
       params: { postId },
     });
@@ -199,7 +202,7 @@ class ForumComposer extends DataComposer {
     postId,
     callback,
   }) {
-    this.handler.updateObject({
+    this.forumPostHandler.updateObject({
       callback,
       params: {
         postId,
@@ -213,7 +216,7 @@ class ForumComposer extends DataComposer {
     threadId,
     callback,
   }) {
-    this.handler.updateObject({
+    this.forumThreadHandler.updateObject({
       callback,
       params: {
         threadId,

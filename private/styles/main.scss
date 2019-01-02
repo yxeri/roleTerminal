@@ -104,6 +104,10 @@ header {
   color: $second-text-color;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 .msgInfo {
   background-color: $header-color;
   color: $second-text-color;
@@ -182,7 +186,7 @@ header {
  * Views *
  *********/
 
-.docFileView {
+.docFileView, .forumView, .walletView, .worldMapView, .teamView {
   .oneOfTwo {
     width: 0;
   }
@@ -195,12 +199,10 @@ header {
 
   .oneOfTwo:last-child {
     flex-grow: 5;
-
-    p {
-      padding: $padding $padding;
-    }
   }
+}
 
+.docFileView {
   .docFileHeader {
     border-bottom: $border-width solid $second-color;
     padding-bottom: $padding;
@@ -213,11 +215,119 @@ header {
     }
   }
 
-
+  .oneOfTwo:last-child {
+    p {
+      padding: $padding $padding;
+    }
+  }
 }
 
 .forumView {
+  .column {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 
+/*************
+ * Chat View *
+ *************/
+
+$msgList-msgInfo-border: .1em solid $second-color;
+$msgList-li-padding: .5em;
+$msgList-msgLine-side-padding: .2em;
+$msgList-msgInfo-padding: .1em;
+$msgList-textarea-border: .3em solid $darker-color;
+
+.chatView {
+  .msgList {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    li {
+      padding-bottom: $msgList-li-padding;
+    }
+
+    .msgInfo {
+      border-top: $msgList-msgInfo-border;
+      border-bottom: $msgList-msgInfo-border;
+      padding: $msgList-msgInfo-padding ($msgList-msgLine-side-padding / 2);
+      margin-bottom: $p-margin;
+
+      span {
+        padding: 0 .2em;
+      }
+
+      span:first-child {
+        padding-left: 0;
+      }
+
+      span:last-child {
+        padding-right: 0;
+      }
+    }
+
+    .msgLine {
+      padding: 0 $msgList-msgLine-side-padding;
+      margin-bottom: $p-margin;
+    }
+
+    .msgLine:last-child {
+      margin-bottom: 0;
+    }
+
+    .msgRoomName:before {
+      content: '[';
+    }
+
+    .msgRoomName:after {
+      content: ']';
+    }
+  }
+
+  .inputArea {
+    padding-top: .5em;
+    margin-top: auto;
+
+    textarea {
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2));
+      padding: 0 $msgList-msgLine-side-padding;
+      border-top: $msgList-textarea-border;
+      border-bottom: $msgList-textarea-border;
+    }
+  }
+
+  .columnChat {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.userRoomList {
+  li:first-child {
+    padding-top: $padding;
+  }
+}
+
+.columnRoomList, .columnPositionList {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: $padding;
+
+  .list {
+    margin-bottom: $padding;
+  }
+
+  .list:last-child {
+    margin-bottom: 0;
+  }
+
+  li {
+    border-bottom: $border;
+    border-color: $dark-border-color;
+    padding-top: .1em;
+    padding-bottom: .1em;
+  }
 }
 
 /*********
@@ -239,18 +349,6 @@ header {
   li:hover {
     background-color: $second-color;
   }
-}
-
-/*
- * A list of messages.
- */
-.msgList {
-}
-
-/*
- * A list of files.
- */
-.docFileList {
 }
 
 .positionList {
@@ -313,6 +411,7 @@ header {
  */
 .removeListItem {
   background-color: $warning-color;
+  color: $warning-color;
 }
 
 /*************
@@ -380,137 +479,6 @@ $map-padding-fix: 2em;
   border: $map-box-border;
 }
 
-.mapLeftClickBox::-webkit-scrollbar, .mapRightClickBox::-webkit-scrollbar, .fallbackMapRightClickBox::-webkit-scrollbar {
-  display: none;
-}
-
-/**************
- * Forum Feed *
- **************/
-
-$forum-pieces-background-color: #ffffff;
-$border-radius: .3em;
-$forum-pieces-bottom-margin: .5em;
-$post-padding: .5em;
-$forum-padding: .5em;
-
-.feedWrapper {
-  margin-left: auto;
-  margin-right: auto;
-
-  > div {
-    width: 40em;
-  }
-
-  > div:first-child {
-    width: 15em;
-  }
-
-  > div:last-child {
-    width: 15em;
-  }
-
-  .forum {
-    > header {
-      border-top: $border;
-      border-right: $border;
-      border-left: $border;
-    }
-
-    img {
-      max-width: 100%;
-    }
-
-    .timeCreated, .lastUpdated {
-      color: #90949c
-    }
-
-    .username {
-      color: #3f9946;
-      font-weight: bold;
-    }
-
-    .forumList {
-    }
-
-    .contentEnd {
-      font-size: .9em;
-
-      span {
-        margin-right: .5em;
-      }
-    }
-
-    .forumContent {
-      border-bottom: $border;
-      border-right: $border;
-      border-left: $border;
-      margin-bottom: $forum-pieces-bottom-margin;
-    }
-
-    .thread {
-      border: $border;
-      -webkit-border-radius: $border-radius;
-      -moz-border-radius: $border-radius;
-      margin-bottom: $forum-pieces-bottom-margin;
-      background-color: $forum-pieces-background-color;
-
-      > header {
-        padding: 0 $forum-padding;
-      }
-    }
-
-    .threadContent {
-      padding: 0 $forum-padding;
-      border-bottom: $border-width solid #e5e5e5;
-    }
-
-    .post {
-      -webkit-border-radius: $border-radius;
-      -moz-border-radius: $border-radius;
-      margin: 0 $forum-padding;
-
-      > header {
-        -webkit-border-top-left-radius: $border-radius;
-        -webkit-border-top-right-radius: $border-radius;
-        background-color: $forum-pieces-background-color;
-        padding: 0 $post-padding 0 $post-padding;
-      }
-    }
-
-    .postContent {
-      -webkit-border-bottom-left-radius: $border-radius;
-      -webkit-border-bottom-right-radius: $border-radius;
-      background-color: $forum-pieces-background-color;
-      margin-bottom: $forum-pieces-bottom-margin;
-      padding: 0 $post-padding 0 $post-padding;
-    }
-
-    .postContainer {
-      padding-top: $forum-pieces-bottom-margin;
-      border-bottom: $border;
-      background-color: #f2f3f5;
-    }
-
-    .subPost {
-      -webkit-border-radius: $border-radius;
-      background-color: $forum-pieces-background-color;
-      padding: $post-padding $post-padding 0 $post-padding;
-      margin: 0 0 $forum-pieces-bottom-margin $forum-padding * 2;
-    }
-
-    .subContainer {
-    }
-
-    .pictureContainer {
-    }
-  }
-
-  .msgList {
-    list-style: none;
-  }
-}
-
 /****************
  * View Wrapper *
  ****************/
@@ -544,183 +512,6 @@ $forum-padding: .5em;
 .withTopRow {
   height: calc(100% - #{$top-row-height});
   order: 2;
-}
-
-.walletView {
-  .one {
-    //padding: $column-padding;
-  }
-
-  .oneOfTwo {
-    width: 0;
-    //padding: $column-padding;
-  }
-
-  .oneOfTwo:first-child {
-    flex-grow: 1;
-    min-width: $menu-min-width;
-    max-width: $menu-max-width;
-  }
-
-  .oneOfTwo:last-child {
-    flex-grow: 5;
-  }
-}
-
-.worldMapView {
-  .oneOfTwo {
-    width: 0;
-  }
-
-  .oneOfTwo:first-child {
-    flex-grow: 1;
-    min-width: $menu-min-width;
-    max-width: $menu-max-width;
-  }
-
-  .oneOfTwo:last-child {
-    flex-grow: 5;
-  }
-}
-
-.forumView {
-  .column {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .column::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/*************
- * Chat View *
- *************/
-
-//$column-padding: .4em;
-$msgList-msgInfo-border: .1em solid $second-color;
-$msgList-li-padding: .5em;
-$msgList-msgLine-side-padding: .2em;
-$msgList-msgInfo-padding: .1em;
-$msgList-textarea-border: .3em solid $darker-color;
-
-.chatView {
-  .msgList {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-
-    li {
-      padding-bottom: $msgList-li-padding;
-    }
-
-    .msgInfo {
-      border-top: $msgList-msgInfo-border;
-      border-bottom: $msgList-msgInfo-border;
-      padding: $msgList-msgInfo-padding ($msgList-msgLine-side-padding / 2);
-      margin-bottom: $p-margin;
-
-      span {
-        padding: 0 .2em;
-      }
-
-      span:first-child {
-        padding-left: 0;
-      }
-
-      span:last-child {
-        padding-right: 0;
-      }
-    }
-
-    .msgLine {
-      padding: 0 $msgList-msgLine-side-padding;
-      margin-bottom: $p-margin;
-    }
-
-    .msgLine:last-child {
-      margin-bottom: 0;
-    }
-
-    .msgRoomName:before {
-      content: '[';
-    }
-
-    .msgRoomName:after {
-      content: ']';
-    }
-  }
-
-  .msgList::-webkit-scrollbar {
-    display: none;
-  }
-
-  .one {
-    //padding: $column-padding;
-  }
-
-  .oneOfTwo {
-    width: 0;
-    //padding: $column-padding;
-  }
-
-  .oneOfTwo:first-child {
-    flex-grow: 1;
-    min-width: $menu-min-width;
-    max-width: $menu-max-width;
-  }
-
-  .oneOfTwo:last-child {
-    flex-grow: 5;
-  }
-
-  .inputArea {
-    padding-top: .5em;
-    margin-top: auto;
-
-    textarea {
-      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2));
-      padding: 0 $msgList-msgLine-side-padding;
-      border-top: $msgList-textarea-border;
-      border-bottom: $msgList-textarea-border;
-    }
-  }
-
-  .columnChat {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-.userRoomList {
-  li:first-child {
-    padding-top: $padding;
-  }
-}
-
-.columnRoomList, .columnPositionList {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-top: $padding;
-
-  .list {
-    margin-bottom: $padding;
-  }
-
-  .list:last-child {
-    margin-bottom: 0;
-  }
-
-  li {
-    border-bottom: $border;
-    border-color: $dark-border-color;
-    padding-top: .1em;
-    padding-bottom: .1em;
-  }
-}
-
-.columnRoomList::-webkit-scrollbar, .columnPositionList::-webkit-scrollbar {
-  display: none;
 }
 
 /********

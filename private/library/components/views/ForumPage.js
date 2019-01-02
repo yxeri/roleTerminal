@@ -142,10 +142,21 @@ function createContentEnd({ object }) {
   timeStamp.setAttribute('id', ids.contentEnd);
 
   if (!disableVoting) {
-    timeStamp.insertBefore(elementCreator.createSpan({
+    const likeContainer = elementCreator.createContainer({
       classes: [cssClasses.likes],
-      text: `${object.likes}${labelHandler.getLabel({ baseObject: 'ForumView', label: 'likes', prependSpace: true })}`,
-    }), timeStamp.firstElementChild);
+    });
+
+    likeContainer.appendChild(elementCreator.createSpan({
+      text: ((object.likes || 0) - (object.dislikes || 0)).toString(10),
+    }));
+    likeContainer.appendChild(elementCreator.createButton({
+      text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'likeButton' }),
+    }));
+    likeContainer.appendChild(elementCreator.createButton({
+      text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'dislikeButton' }),
+    }));
+
+    timeStamp.insertBefore(likeContainer, timeStamp.firstElementChild);
   }
 
   return timeStamp;
@@ -263,7 +274,7 @@ function createPost({
   if (!post.parentPostId) {
     elements.push(elementCreator.createButton({
       classes: [cssClasses.newSubPostButton],
-      text: 'Create sub post',
+      text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createSubPost' }),
       clickFuncs: {
         leftFunc: () => {
           const postDialog = new ForumPostDialog({
@@ -390,7 +401,7 @@ function createThread({
 
   elements.push(elementCreator.createButton({
     classes: [cssClasses.newPostButton],
-    text: 'Create post',
+    text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createPost' }),
     clickFuncs: {
       leftFunc: () => {
         const postDialog = new ForumPostDialog({
@@ -598,10 +609,6 @@ class ForumView extends BaseView {
     return this.currentForum || storageManager.getCurrentForum();
   }
 
-  // updateForum({ forum }) {
-  //
-  // }
-
   updateThread({ thread }) {
     const existingThread = this.getElement(thread.objectId);
     const threadContent = this.getElement(`${thread.objectId}${ids.threadContent}`);
@@ -668,7 +675,7 @@ class ForumView extends BaseView {
 
     forumElements.push(elementCreator.createButton({
       classes: [cssClasses.newThreadButton],
-      text: 'Create thread',
+      text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createThread' }),
       clickFuncs: {
         leftFunc: () => {
           const threadDialog = new ForumThreadDialog({

@@ -322,11 +322,15 @@ const labels = {
     },
     likeButton: (override.ForumView && override.ForumView.likeButton) || {
       en: '+1',
-      se: '+1',
     },
     likes: (override.ForumView && override.ForumView.likes) || {
-      en: '',
-      se: '',
+      en: ':)',
+    },
+    dislikeButton: (override.ForumView && override.ForumView.likeButton) || {
+      en: '-1',
+    },
+    dislikes: (override.ForumView && override.ForumView.dislikes) || {
+      en: ':(',
     },
     timeCreated: (override.ForumView && override.ForumView.timeCreated) || {
       en: 'Created:',
@@ -339,6 +343,15 @@ const labels = {
     edit: (override.ForumView && override.ForumView.edit) || {
       en: 'Edit',
       se: 'Ändra',
+    },
+    createThread: (override.ForumView && override.ForumView.createThread) || {
+      en: '+Thread',
+    },
+    createPost: (override.ForumView && override.ForumView.createPost) || {
+      en: '+Post',
+    },
+    createSubPost: (override.ForumView && override.ForumView.createSubPost) || {
+      en: '+Sub-post',
     },
   },
   WorldMapView: {

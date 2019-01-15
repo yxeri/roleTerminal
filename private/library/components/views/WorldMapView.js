@@ -16,7 +16,7 @@
 
 const ViewWrapper = require('../ViewWrapper');
 const PositionList = require('../lists/PositionList');
-const WorldMapPage = require('./WorldMapPage');
+const WorldMapPage = require('./pages/WorldMapPage');
 
 class WorldMapView extends ViewWrapper {
   constructor({

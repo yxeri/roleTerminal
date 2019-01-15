@@ -16,7 +16,7 @@
 
 const ViewWrapper = require('../ViewWrapper');
 const DocFileList = require('../lists/DocFileList');
-const DocFilePage = require('./DocFilePage');
+const DocFilePage = require('./pages/DocFilePage');
 
 class DocFileView extends ViewWrapper {
   constructor({

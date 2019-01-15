@@ -15,7 +15,7 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
-const TerminalPage = require('./TerminalPage');
+const TerminalPage = require('./pages/TerminalPage');
 
 class TerminalView extends ViewWrapper {
   constructor({

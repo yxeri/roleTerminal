@@ -1,7 +1,7 @@
 require('../library/polyfills');
 
 const WorldMapView = require('../library/components/views/WorldMapView');
-const WorldMapPage = require('../library/components/views/WorldMapPage');
+const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const TopView = require('../library/components/views/StatusBar');

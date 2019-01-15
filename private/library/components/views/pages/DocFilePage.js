@@ -14,17 +14,17 @@
  limitations under the License.
  */
 
-const BaseView = require('./BaseView');
-const LockedDocFileDialog = require('./dialogs/LockedDocFileDialog');
-const EditDocFileDialog = require('./dialogs/EditDocFileDialog');
+const BaseView = require('../BaseView');
+const LockedDocFileDialog = require('../dialogs/LockedDocFileDialog');
+const EditDocFileDialog = require('../dialogs/EditDocFileDialog');
 
-const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
-const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
-const labelHandler = require('../../labels/LabelHandler');
-const socketManager = require('../../SocketManager');
-const viewSwitcher = require('../../ViewSwitcher');
+const eventCentral = require('../../../EventCentral');
+const elementCreator = require('../../../ElementCreator');
+const userComposer = require('../../../data/composers/UserComposer');
+const accessCentral = require('../../../AccessCentral');
+const labelHandler = require('../../../labels/LabelHandler');
+const socketManager = require('../../../SocketManager');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 /**
  * Create fragment with admin buttons for the document.

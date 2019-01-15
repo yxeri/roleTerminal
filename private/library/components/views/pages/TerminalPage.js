@@ -14,17 +14,17 @@
  limitations under the License.
  */
 
-const BaseView = require('./BaseView');
-const List = require('../lists/List');
-const InputArea = require('../views/inputs/InputArea');
+const BaseView = require('../BaseView');
+const List = require('../../lists/List');
+const InputArea = require('../inputs/InputArea');
 
 // const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
+const elementCreator = require('../../../ElementCreator');
 // const userComposer = require('../../data/composers/UserComposer');
 // const accessCentral = require('../../AccessCentral');
 // const labelHandler = require('../../labels/LabelHandler');
-const socketManager = require('../../SocketManager');
-const textTools = require('../../TextTools');
+const socketManager = require('../../../SocketManager');
+const textTools = require('../../../TextTools');
 
 class TerminalPage extends BaseView {
   constructor({

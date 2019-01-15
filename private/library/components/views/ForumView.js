@@ -16,7 +16,7 @@
 
 const ViewWrapper = require('../ViewWrapper');
 const ForumList = require('../lists/ForumList');
-const ForumPage = require('./ForumPage');
+const ForumPage = require('./pages/ForumPage');
 const UserList = require('../lists/UserList');
 
 class ForumView extends ViewWrapper {

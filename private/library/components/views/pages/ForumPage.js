@@ -14,23 +14,23 @@
  limitations under the License.
  */
 
-const BaseView = require('./BaseView');
-const EditForumThreadDialog = require('./dialogs/EditForumThreadDialog');
-const EditForumPostDialog = require('./dialogs/EditForumPostDialog');
-const ForumThreadDialog = require('./dialogs/ForumThreadDialog');
-const ForumPostDialog = require('./dialogs/ForumPostDialog');
+const BaseView = require('../BaseView');
+const EditForumThreadDialog = require('../dialogs/EditForumThreadDialog');
+const EditForumPostDialog = require('../dialogs/EditForumPostDialog');
+const ForumThreadDialog = require('../dialogs/ForumThreadDialog');
+const ForumPostDialog = require('../dialogs/ForumPostDialog');
 
-const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
-const socketManager = require('../../SocketManager');
-const labelHandler = require('../../labels/LabelHandler');
-const storageManager = require('../../StorageManager');
-const textTools = require('../../TextTools');
-const forumComposer = require('../../data/composers/ForumComposer');
-const dataHandler = require('../../data/DataHandler');
-const accessCentral = require('../../AccessCentral');
-const userComposer = require('../../data/composers/UserComposer');
-const viewSwitcher = require('../../ViewSwitcher');
+const eventCentral = require('../../../EventCentral');
+const elementCreator = require('../../../ElementCreator');
+const socketManager = require('../../../SocketManager');
+const labelHandler = require('../../../labels/LabelHandler');
+const storageManager = require('../../../StorageManager');
+const textTools = require('../../../TextTools');
+const forumComposer = require('../../../data/composers/ForumComposer');
+const dataHandler = require('../../../data/DataHandler');
+const accessCentral = require('../../../AccessCentral');
+const userComposer = require('../../../data/composers/UserComposer');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 const cssClasses = {
   subPost: 'subPost',

@@ -1,18 +1,18 @@
-const BaseView = require('./BaseView');
-const MapMarker = require('../worldMap/MapMarker');
-const MapLine = require('../worldMap/MapLine');
-const MapPolygon = require('../worldMap/MapPolygon');
-const MapObject = require('../worldMap/MapObject');
-const BaseDialog = require('../views/dialogs/BaseDialog');
+const BaseView = require('../BaseView');
+const MapMarker = require('../../worldMap/MapMarker');
+const MapLine = require('../../worldMap/MapLine');
+const MapPolygon = require('../../worldMap/MapPolygon');
+const MapObject = require('../../worldMap/MapObject');
+const BaseDialog = require('../dialogs/BaseDialog');
 
-const positionComposer = require('../../data/composers/PositionComposer');
-const storageManager = require('../../StorageManager');
-const eventHandler = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const mouseHandler = require('../../MouseHandler');
-const elementCreator = require('../../ElementCreator');
-const labelHandler = require('../../labels/LabelHandler');
-const viewSwitcher = require('../../ViewSwitcher');
+const positionComposer = require('../../../data/composers/PositionComposer');
+const storageManager = require('../../../StorageManager');
+const eventHandler = require('../../../EventCentral');
+const socketManager = require('../../../SocketManager');
+const mouseHandler = require('../../../MouseHandler');
+const elementCreator = require('../../../ElementCreator');
+const labelHandler = require('../../../labels/LabelHandler');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',

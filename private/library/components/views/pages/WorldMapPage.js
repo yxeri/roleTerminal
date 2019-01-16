@@ -307,7 +307,7 @@ class WorldMapPage extends BaseView {
                       const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
 
                       if (description) {
-                        position.description = description;
+                        position.description = description.split('\n');
                       }
 
                       positionComposer.createPosition({

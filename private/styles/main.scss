@@ -186,7 +186,7 @@ header {
  * Views *
  *********/
 
-.docFileView, .forumView, .walletView, .worldMapView, .teamView {
+.docFileView, .forumView, .walletView, .worldMapView, .teamView, .chatView {
   .oneOfTwo {
     width: 0;
   }
@@ -216,16 +216,32 @@ header {
   }
 
   .oneOfTwo:last-child {
+    word-wrap: break-word;
+
     p {
       padding: $padding $padding;
     }
   }
 }
 
-.forumView {
+.forumView, .docFileView {
   .column {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/**************
+ * Forum View *
+ **************/
+
+.forum {
+  .postContainer {
+    padding-left: 1em;
+  }
+
+  .subContainer {
+    padding-left: 1em;
   }
 }
 
@@ -243,6 +259,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   .msgList {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
 
     li {
       padding-bottom: $msgList-li-padding;

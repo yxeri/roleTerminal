@@ -169,12 +169,10 @@ class BaseView {
 
   removeElement({
     object,
-    parentElement,
     shouldAnimate = false,
   }) {
     const { objectId } = object;
     const toRemove = this.getElement(objectId);
-    const removeFrom = parentElement || this.element;
 
     if (shouldAnimate) {
       toRemove.classList.add(cssClasses.removeElement);
@@ -183,14 +181,14 @@ class BaseView {
         const element = this.getElement(objectId);
 
         if (element) {
-          removeFrom.removeChild(element);
+          toRemove.parentElement.removeChild(element);
         }
       }, this.itemChangeTimeout / 4);
 
       return;
     }
 
-    removeFrom.removeChild(toRemove);
+    toRemove.parentElement.removeChild(toRemove);
   }
 
   animateElement({

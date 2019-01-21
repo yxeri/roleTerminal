@@ -11,26 +11,26 @@
  limitations under the License.
  */
 
-$background-color: #23001e;
+$background-color: rgba(0, 0, 0, 0.98);
 $second-background-color: #23001e;
 $text-color: white;
 $second-text-color: #00ffef;
 $second-color: #ff00d7;
 $darker-color: #23001e;
-$darkest-color: #23001e;
 $warning-color: #910001;
 $greyed-out: #6f6f6f;
-$dark-border-color: #730066;
 $focus-color: #000691;
 $new-color: #009100;
 $darker-new-color: #005f00;
 $header-color: #2e001a;
+$border-color: #ff00d7;
+$dark-border-color: #730066;
+
 $p-margin: .4em;
 $border-width: .1em;
 $top-row-height: 1.3em;
 $map-box-padding: .5em;
 $padding: .3em;
-$border-color: #ff00d7;
 $border: $border-width solid $border-color;
 $menu-min-width: 7em;
 $menu-max-width: 11em;

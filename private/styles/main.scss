@@ -127,6 +127,40 @@ header {
   height: 100%;
 }
 
+/****************
+ * View Wrapper *
+ ****************/
+
+.column {
+  overflow: hidden;
+}
+
+.viewWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: row wrap;
+}
+
+.one {
+  width: 100%;
+}
+
+.oneOfTwo {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.oneOfThree {
+  width: 33%;
+  box-sizing: border-box;
+}
+
+.withTopRow {
+  height: calc(100% - #{$top-row-height});
+  order: 2;
+}
+
 /**********
  * Dialog *
  **********/
@@ -231,6 +265,11 @@ header {
   }
 }
 
+.columnList {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
 /**************
  * Forum View *
  **************/
@@ -315,6 +354,7 @@ $msgList-textarea-border: .3em solid $darker-color;
   }
 
   .columnChat {
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
   }
@@ -327,8 +367,6 @@ $msgList-textarea-border: .3em solid $darker-color;
 }
 
 .columnRoomList, .columnPositionList {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding-top: $padding;
 
   .list {
@@ -494,41 +532,6 @@ $map-padding-fix: 2em;
   padding: .2em;
   background-color: $background-color;
   border: $map-box-border;
-}
-
-/****************
- * View Wrapper *
- ****************/
-
-.viewWrapper {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  flex-flow: row wrap;
-}
-
-.column {
-  overflow: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-
-.one {
-  width: 100%;
-}
-
-.oneOfTwo {
-  width: 50%;
-  box-sizing: border-box;
-}
-
-.oneOfThree {
-  width: 33%;
-  box-sizing: border-box;
-}
-
-.withTopRow {
-  height: calc(100% - #{$top-row-height});
-  order: 2;
 }
 
 /********

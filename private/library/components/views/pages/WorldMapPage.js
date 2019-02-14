@@ -168,8 +168,8 @@ class WorldMapPage extends BaseView {
 
   /**
    * Create a marker based on its type.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.position - Position to create a marker for.
+   * @param {Object} params Parameters.
+   * @param {Object} params.position Position to create a marker for.
    * @return {Object} The created marker.
    */
   createMarker({ position }) {
@@ -251,8 +251,8 @@ class WorldMapPage extends BaseView {
 
   /**
    * Show the right click menu DOM element on the clicked position on the map.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.event - Click event.
+   * @param {Object} params Parameters.
+   * @param {Object} params.event Click event.
    */
   showMapRightClickBox({ event }) { // eslint-disable-line
     const {

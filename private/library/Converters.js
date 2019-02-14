@@ -18,7 +18,7 @@ class Converters {
   /**
    * Convert string representation to object
    * @static
-   * @param {string} value - Value to be converted
+   * @param {string} value Value to be converted
    * @returns {Object|null} Converted object. null if the value was not set
    */
   static convertToObject(value) {
@@ -30,7 +30,7 @@ class Converters {
   /**
    * Convert string to boolean
    * @static
-   * @param {string} value - Value to be converted
+   * @param {string} value Value to be converted
    * @returns {boolean|null} Converted boolean. null if the value was not a boolean
    */
   static convertToBoolean(value) {
@@ -48,7 +48,7 @@ class Converters {
   /**
    * Convert string to int
    * @static
-   * @param {string} value - Value to be converted
+   * @param {string} value Value to be converted
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToInt(value) {
@@ -62,7 +62,7 @@ class Converters {
   /**
    * Convert string to float
    * @static
-   * @param {string} value - Value to be converted
+   * @param {string} value Value to be converted
    * @returns {number|null} Converted number. null if the value was not a number
    */
   static convertToFloat(value) {
@@ -76,7 +76,7 @@ class Converters {
   /**
    * Stringifies object for JSON storageManager
    * @static
-   * @param {Object} value - Object to stringify
+   * @param {Object} value Object to stringify
    * @returns {string} Stringified object
    */
   static stringifyObject(value) {

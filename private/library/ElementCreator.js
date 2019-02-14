@@ -23,8 +23,8 @@ const cssClasses = {
 
 /**
  * Set an Id on the element.
- * @param {HTMLElement} element - Element to add an Id to.
- * @param {string} id - Id to add.
+ * @param {HTMLElement} element Element to add an Id to.
+ * @param {string} id Id to add.
  */
 function setElementId(element, id) {
   if (id) {
@@ -34,8 +34,8 @@ function setElementId(element, id) {
 
 /**
  * Set a name on the element.
- * @param {HTMLElement} element - Element to add a name to.
- * @param {string} name - Name to add.
+ * @param {HTMLElement} element Element to add a name to.
+ * @param {string} name Name to add.
  */
 function setName(element, name) {
   if (name) {
@@ -45,8 +45,8 @@ function setName(element, name) {
 
 /**
  * Set classes on the element.
- * @param {HTMLElement} element - Element to add classes to.
- * @param {string[]} classes - Classes to add.
+ * @param {HTMLElement} element Element to add classes to.
+ * @param {string[]} classes Classes to add.
  */
 function setClasses(element, classes = []) {
   classes.forEach(cssClass => element.classList.add(cssClass));
@@ -54,10 +54,10 @@ function setClasses(element, classes = []) {
 
 /**
  * Set click listeners on the element.
- * @param {HTMLElement} element - Element to add click listeners to.
- * @param {Object} clickFuncs - Functions to call on clicks.
- * @param {Function} clickFuncs.leftFunc - Function that is called on left click.
- * @param {Function} clickFuncs.right - Function that is called on right click.
+ * @param {HTMLElement} element Element to add click listeners to.
+ * @param {Object} clickFuncs Functions to call on clicks.
+ * @param {Function} clickFuncs.leftFunc Function that is called on left click.
+ * @param {Function} clickFuncs.right Function that is called on right click.
  */
 function setClickFuncs(element, clickFuncs) {
   if (clickFuncs && (clickFuncs.leftFunc || clickFuncs.right)) {
@@ -72,12 +72,12 @@ function setClickFuncs(element, clickFuncs) {
 
 /**
  * Create an element and set the set parameters.
- * @param {Object} params - Parameters.
- * @param {string} params.elementType - Type of element to create.
- * @param {string} [params.elementId] - Id of the element.
- * @param {string[]} [params.classes] - CSS classes.
- * @param {Function} [params.clickFuncs] - Functions called on clicks.
- * @param {string} [params.name] - Name of the element.
+ * @param {Object} params Parameters.
+ * @param {string} params.elementType Type of element to create.
+ * @param {string} [params.elementId] Id of the element.
+ * @param {string[]} [params.classes] CSS classes.
+ * @param {Function} [params.clickFuncs] Functions called on clicks.
+ * @param {string} [params.name] Name of the element.
  * @return {HTMLElement} The created element.
  */
 function createBaseElement({
@@ -227,10 +227,10 @@ class ElementCreator {
   /**
    * Create a paragraph element.
    * Setting elements will attach them to the paragraph. Otherwise, text will be used to attach a text node.
-   * @param {Object} params - Parameters.
-   * @param {Object[]} [params.elements] - Elements to attach.
-   * @param {string} [params.text] - Text to add to the paragraph. It is overriden by elements.
-   * @param {string[]} [params.classes] - Css classes.
+   * @param {Object} params Parameters.
+   * @param {Object[]} [params.elements] Elements to attach.
+   * @param {string} [params.text] Text to add to the paragraph. It is overriden by elements.
+   * @param {string[]} [params.classes] Css classes.
    * @return {HTMLElement} Paragraph element.
    */
   static createParagraph({

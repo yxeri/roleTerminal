@@ -48,8 +48,8 @@ class TextTools {
   /**
    * Beautifies number by adding a 0 before the number if it is lower than 10
    * @static
-   * @param {Number} number - Number to be beautified
-   * @returns {Number|string} - Single number or string with 0 + number
+   * @param {Number} number Number to be beautified
+   * @returns {Number|string} Single number or string with 0 + number
    */
   static beautifyNumber(number) {
     return number > 9
@@ -67,10 +67,10 @@ class TextTools {
   /**
    * Takes date and returns shorter human-readable time.
    * @static
-   * @param {Object} params - Parameters.
-   * @param {Date|number} params.date - Date.
-   * @param {Number} [params.offset] - Should hours be modified from the final time?
-   * @param {boolean} [params.lockDate] - Should the year stay unmodified?
+   * @param {Object} params Parameters.
+   * @param {Date|number} params.date Date.
+   * @param {Number} [params.offset] Should hours be modified from the final time?
+   * @param {boolean} [params.lockDate] Should the year stay unmodified?
    * @returns {Object} Human-readable time and date.
    */
   static generateTimestamp({ date, offset, lockDate }) {
@@ -110,18 +110,18 @@ class TextTools {
   /**
    * Does the string contain only legal (a-zA-z0-9) alphanumerics?
    * @static
-   * @param {string} text - String to be checked
-   * @returns {boolean} - Does string contain only legal (a-zA-z0-9) alphanumerics?
+   * @param {string} text String to be checked
+   * @returns {boolean} Does string contain only legal (a-zA-z0-9) alphanumerics?
    */
   static isTextAllowed(text) { return allowedRegex.test(text); }
 
   /**
    * Replaces part of the sent string and returns it
    * @static
-   * @param {string} text - Original string
-   * @param {string} find - Substring to replace
-   * @param {string} replaceWith - String that will replace the found substring
-   * @returns {string} - Modified string
+   * @param {string} text Original string
+   * @param {string} find Substring to replace
+   * @param {string} replaceWith String that will replace the found substring
+   * @returns {string} Modified string
    */
   static findOneReplace(text, find, replaceWith) {
     return text.replace(new RegExp(find), replaceWith);
@@ -131,16 +131,16 @@ class TextTools {
    * Trims whitespaces from beginning and end of the string
    * Needed for Android 2.1. trim() is not supported
    * @static
-   * @param {string} sentText - String to be trimmed
-   * @returns {string} - String with no whitespaces in the beginning and end
+   * @param {string} sentText String to be trimmed
+   * @returns {string} String with no whitespaces in the beginning and end
    */
   static trimSpace(sentText) { return this.findOneReplace(sentText, /^\s+|\s+$/, ''); }
 
   /**
    * Creates and returns a randomised string
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createCharString(length) {
     return this.createRandString({
@@ -152,8 +152,8 @@ class TextTools {
   /**
    * Creates and returns a alphanumerical randomised string
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createAlphaNumbericalString(length) {
     return this.createRandString({
@@ -165,8 +165,8 @@ class TextTools {
   /**
    * Creates and returns a randomised string, only containing 0 and 1
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createBinaryString(length) {
     return this.createRandString({
@@ -178,8 +178,8 @@ class TextTools {
   /**
    * Creates and returns a randomised string, containing alphanumeric and special characters
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createMixedString(length) {
     return this.createRandString({
@@ -226,8 +226,8 @@ class TextTools {
   /**
    * Copies string to avoid the original being consumed.
    * @static
-   * @param {string} string - String to copy.
-   * @returns {string} - String copy.
+   * @param {string} string String to copy.
+   * @returns {string} String copy.
    */
   static copyString(string) {
     return string && string !== null

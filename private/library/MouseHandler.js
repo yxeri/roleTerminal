@@ -34,10 +34,10 @@ class MouseHandler {
 
   /**
    * Add a left and/or right click listener to the element. Right clicks on touch devices are simulated by holding the touch down for a set amount of time.
-   * @param {Object} params - Parameters.
-   * @param {HTMLElement} params.element - Element to add the listeners to.
-   * @param {Function} [params.leftFunc] - Function that will be called on a left click.
-   * @param {Function} [params.right] - Function that will be called on a right click
+   * @param {Object} params Parameters.
+   * @param {HTMLElement} params.element Element to add the listeners to.
+   * @param {Function} [params.leftFunc] Function that will be called on a left click.
+   * @param {Function} [params.right] Function that will be called on a right click
    */
   addClickListener({
     element,

@@ -86,10 +86,10 @@ class AccessCentral {
 
   /**
    * Checks if user has access, is admin or can see the object.
-   * @param {Object} params - Parameter.
-   * @param {Object} params.objectToAccess - Object to access.
-   * @param {Object} params.toAuth - Object to auth.
-   * @returns {boolean} - Does the user have access to the object?
+   * @param {Object} params Parameter.
+   * @param {Object} params.objectToAccess Object to access.
+   * @param {Object} params.toAuth Object to auth.
+   * @returns {boolean} Does the user have access to the object?
    */
   hasAccessTo({
     objectToAccess,

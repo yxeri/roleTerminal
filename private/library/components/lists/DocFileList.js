@@ -22,6 +22,7 @@ const eventCentral = require('../../EventCentral');
 class DocFileList extends List {
   constructor({
     title,
+    effect,
     sorting = {
       paramName: 'title',
     },
@@ -35,6 +36,7 @@ class DocFileList extends List {
       title,
       elementId,
       sorting,
+      effect,
       listItemFields,
       classes: classes.concat(['docFileList']),
       dependencies: [

@@ -38,6 +38,7 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');
+const textTools = require('../../TextTools');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -79,6 +80,7 @@ class List extends BaseView {
     userFilter,
     minimumAccessLevel,
     listType,
+    effect,
     onCreateFunc = () => {},
     shouldPaginate = false,
     shouldScrollToBottom = false,
@@ -101,6 +103,7 @@ class List extends BaseView {
       FOLLOWEDROOMS: 'followedRooms',
       WHISPERROOMS: 'whisperRooms',
     };
+    this.effect = effect;
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
     this.collector = collector;
@@ -120,6 +123,7 @@ class List extends BaseView {
     this.listItemSpecificClasses = listItemSpecificClasses;
     this.shouldToggle = shouldToggle;
     this.listType = listType;
+    this.itemQueue = [];
 
     if (collector.eventTypes.one) {
       eventCentral.addWatcher({
@@ -142,7 +146,7 @@ class List extends BaseView {
               if (BaseView.hasAccess({ object, user }).canSee) {
                 this.addOneItem({
                   object,
-                  shouldAnimate: true,
+                  shouldFlash: true,
                   shouldReplace: true,
                 });
               } else {
@@ -157,7 +161,8 @@ class List extends BaseView {
 
                 this.addOneItem({
                   object,
-                  shouldAnimate: true,
+                  effect: this.effect,
+                  shouldFlash: true,
                 });
                 this.scrollList();
               }
@@ -198,7 +203,7 @@ class List extends BaseView {
 
   scrollList() {
     if (this.shouldScrollToBottom && this.listElement && this.listElement.lastElementChild) {
-      this.listElement.lastElementChild.scrollIntoView();
+      this.listElement.lastElementChild.scrollIntoView(false);
     }
   }
 
@@ -265,7 +270,7 @@ class List extends BaseView {
   removeListItem(object) {
     super.removeElement({
       object,
-      shouldAnimate: false,
+      shouldFlash: false,
       parentElement: this.listElement,
     });
   }
@@ -489,14 +494,26 @@ class List extends BaseView {
 
   addOneItem({
     object,
+    effect,
     shouldReplace = false,
-    shouldAnimate = false,
+    shouldFlash = false,
   }) {
     const { objectId } = object;
     const newItem = this.createListItem({ object });
     const element = this.getElement(objectId);
 
-    if (shouldAnimate) {
+    if (effect) {
+      const children = Array.from(newItem.childNodes);
+      const dumpFragment = document.createDocumentFragment();
+
+      children.forEach(child => dumpFragment.appendChild(child));
+
+      textTools.typewriter({
+        paragraphs: children,
+        target: newItem,
+        paragraphFunc: () => { this.scrollList(); },
+      });
+    } else if (shouldFlash) {
       newItem.classList.add(cssClasses.newListItem);
       setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, this.itemChangeTimeout);
     }

@@ -37,6 +37,7 @@ class MessageList extends List {
    */
   constructor({
     roomId,
+    effect,
     multiRoom = false,
     shouldSwitchRoom = false,
     whisperText = ' - ',
@@ -46,6 +47,7 @@ class MessageList extends List {
   }) {
     const superParams = {
       elementId,
+      effect,
       sorting: {
         paramName: 'customTimeCreated',
         fallbackParamName: 'timeCreated',

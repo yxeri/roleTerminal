@@ -20,11 +20,12 @@ const DocFilePage = require('./pages/DocFilePage');
 
 class DocFileView extends ViewWrapper {
   constructor({
+    effect,
     classes = [],
     elementId = `dFView-${Date.now()}`,
   }) {
     const docFileList = new DocFileList({});
-    const docFilePage = new DocFilePage({});
+    const docFilePage = new DocFilePage({ effect });
 
     super({
       elementId,

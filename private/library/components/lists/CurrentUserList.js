@@ -23,6 +23,7 @@ const userComposer = require('../../data/composers/UserComposer');
 
 class CurrentUserList extends List {
   constructor({
+    effect,
     classes = [],
     elementId = `cUserList-${Date.now()}`,
   }) {
@@ -35,6 +36,7 @@ class CurrentUserList extends List {
     super({
       elementId,
       classes,
+      effect,
       sorting: {
         paramName: 'aliasName',
         fallbackParamName: 'username',

@@ -22,11 +22,13 @@ const storageManager = require('../../StorageManager');
 
 class ForumList extends List {
   constructor({
+    effect,
     classes = [],
     elementId = `fList-${Date.now()}`,
   }) {
     super({
       elementId,
+      effect,
       listItemFields: [
         { paramName: 'title' },
       ],

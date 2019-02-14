@@ -72,8 +72,8 @@ let disablePictures = false;
 
 /**
  * Create a picture container.
- * @param {Object} params - Parameters.
- * @param {Object} params.object - Post/thread/subpost that contains pictures.
+ * @param {Object} params Parameters.
+ * @param {Object} params.object Post/thread/subpost that contains pictures.
  * @return {HTMLElement} Container with the pictures.
  */
 function createPictureContainer({ object }) {
@@ -85,8 +85,8 @@ function createPictureContainer({ object }) {
 
 /**
  * Create a header paragraph.
- * @param {Object} params - Parameters.
- * @param {Object} params.object - Thread/post to create a header for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.object Thread/post to create a header for.
  * @return {HTMLElement} Header element.
  */
 function createHeader({ object }) {
@@ -103,8 +103,8 @@ function createHeader({ object }) {
 
 /**
  * Create human-readable dates for when the item was created and last updated.
- * @param {Object} params - Parameters.
- * @param {Object} params.object - Post/subpost/thread.
+ * @param {Object} params Parameters.
+ * @param {Object} params.object Post/subpost/thread.
  * @return {HTMLElement} Paragraph with dates.
  */
 function createTimestamp({ object }) {
@@ -131,8 +131,8 @@ function createTimestamp({ object }) {
 
 /**
  * Create element that will be added to the end of the content.
- * @param {Object} params - Parameters.
- * @param {Object} params.object - Object to use to create the content end.
+ * @param {Object} params Parameters.
+ * @param {Object} params.object Object to use to create the content end.
  * @return {HTMLElement} Paragraph.
  */
 function createContentEnd({ object }) {
@@ -164,8 +164,8 @@ function createContentEnd({ object }) {
 
 /**
  * Create a post header.
- * @param {Object} params - Parameters.
- * @param {Object} params.post - Post to create a header for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.post Post to create a header for.
  * @return {HTMLElement} Header container.
  */
 function createPostHeader({ post }) {
@@ -198,8 +198,8 @@ function createPostHeader({ post }) {
 
 /**
  * Create a sub post section.
- * @param {Object} params - Parameters.
- * @param {Object} params.subPost - Sub post to create an element from.
+ * @param {Object} params Parameters.
+ * @param {Object} params.subPost Sub post to create an element from.
  * @return {HTMLElement} Sub post element.
  */
 function createSubPost({ subPost, elementId }) {
@@ -223,9 +223,9 @@ function createSubPost({ subPost, elementId }) {
 
 /**
  * Create a post content container.
- * @param {Object} params - Parameters.
- * @param {Object} params.post - Post to create a content container for.
- * @param {string} params.elementId - Base Id of the element.
+ * @param {Object} params Parameters.
+ * @param {Object} params.post Post to create a content container for.
+ * @param {string} params.elementId Base Id of the element.
  * @return {HTMLElement} Thread container.
  */
 function createPostContent({ post, elementId }) {
@@ -248,8 +248,8 @@ function createPostContent({ post, elementId }) {
 
 /**
  * Create a post section. It will include any sub posts to the post.
- * @param {Object} params - Parameters.
- * @param {Object} params.post - Post to create an element from.
+ * @param {Object} params Parameters.
+ * @param {Object} params.post Post to create an element from.
  * @return {HTMLElement} Post element.
  */
 function createPost({
@@ -300,8 +300,8 @@ function createPost({
 
 /**
  * Create a thread header.
- * @param {Object} params - Parameters.
- * @param {Object} params.thread - Thread to create a header for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.thread Thread to create a header for.
  * @return {HTMLElement} Header container.
  */
 function createThreadHeader({ thread }) {
@@ -337,9 +337,9 @@ function createThreadHeader({ thread }) {
 
 /**
  * Create a thread content container.
- * @param {Object} params - Parameters.
- * @param {Object} params.thread - Thread to create a container for.
- * @param {string} params.elementId - Base Id of the element.
+ * @param {Object} params Parameters.
+ * @param {Object} params.thread Thread to create a container for.
+ * @param {string} params.elementId Base Id of the element.
  * @return {HTMLElement} Thread container.
  */
 function createThreadContent({ thread, elementId }) {
@@ -362,9 +362,9 @@ function createThreadContent({ thread, elementId }) {
 
 /**
  * Create a forum content container.
- * @param {Object} params - Parameters.
- * @param {Object} params.forum - Forum to create a container for.
- * @param {string} params.elementId - Base Id of the element.
+ * @param {Object} params Parameters.
+ * @param {Object} params.forum Forum to create a container for.
+ * @param {string} params.elementId Base Id of the element.
  * @return {HTMLElement} Thread container.
  */
 function createForumContent({ forum, elementId }) {
@@ -379,8 +379,8 @@ function createForumContent({ forum, elementId }) {
 
 /**
  * Create a thread article. It will include any posts connected to the thread.
- * @param {Object} params - Parameters.
- * @param {string} params.thread - The thread to create an element from.
+ * @param {Object} params Parameters.
+ * @param {string} params.thread The thread to create an element from.
  * @return {HTMLElement} Thread element.
  */
 function createThread({

@@ -25,6 +25,7 @@ const accessCentral = require('../../../AccessCentral');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const viewSwitcher = require('../../../ViewSwitcher');
+const textTools = require('../../../TextTools');
 
 /**
  * Create fragment with admin buttons for the document.
@@ -59,8 +60,8 @@ function createControls({
 
 /**
  * Create header part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create header for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.docFile Document to create header for.
  * @return {HTMLElement} Header paragraph.
  */
 function createHeader({ docFile }) {
@@ -85,15 +86,17 @@ function createHeader({ docFile }) {
 
 /**
  * Create body part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create body for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.docFile Document to create body for.
  * @return {DocumentFragment} Body fragment.
  */
 function createBody({ docFile }) {
   const fragment = document.createDocumentFragment();
 
   docFile.text.forEach((section) => {
-    fragment.appendChild(elementCreator.createParagraph({ text: section }));
+    fragment.appendChild(elementCreator.createParagraph({
+      elements: [elementCreator.createSpan({ text: section })],
+    }));
   });
 
   return fragment;
@@ -101,6 +104,7 @@ function createBody({ docFile }) {
 
 class DocFilePage extends BaseView {
   constructor({
+    effect,
     classes = [],
     elementId = `dFPage-${Date.now()}`,
   }) {
@@ -118,6 +122,9 @@ class DocFilePage extends BaseView {
           elementId,
           classes,
           docFile,
+          effect: this.openDocFileId === docFile.objectId
+            ? false
+            : effect,
         });
         this.openDocFileId = docFile.objectId;
       },
@@ -175,6 +182,7 @@ class DocFilePage extends BaseView {
     elementId,
     classes,
     docFile,
+    effect,
   }) {
     const newElement = elementCreator.createContainer({
       elementId,
@@ -192,8 +200,21 @@ class DocFilePage extends BaseView {
       }));
     }
 
-    newElement.appendChild(createHeader({ docFile }));
-    newElement.appendChild(createBody({ docFile }));
+    if (effect) {
+      const children = ([createHeader({ docFile })]).concat(Array.from(createBody({ docFile }).childNodes));
+      const dumpFragment = document.createDocumentFragment();
+
+      children.forEach(child => dumpFragment.appendChild(child));
+
+      textTools.typewriter({
+        amount: 7,
+        paragraphs: children,
+        target: newElement,
+      });
+    } else {
+      newElement.appendChild(createHeader({ docFile }));
+      newElement.appendChild(createBody({ docFile }));
+    }
 
     this.replaceOnParent({ element: newElement });
   }

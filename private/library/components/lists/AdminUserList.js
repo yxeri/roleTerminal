@@ -27,6 +27,7 @@ const viewSwitcher = require('../../ViewSwitcher');
 
 class AdminUserList extends List {
   constructor({
+    effect,
     classes = [],
     elementId = `aUserList-${Date.now()}`,
   }) {
@@ -80,6 +81,7 @@ class AdminUserList extends List {
     super({
       elementId,
       classes,
+      effect,
       shouldToggle: true,
       title: 'Users',
       listItemSpecificClasses: [

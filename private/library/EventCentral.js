@@ -93,9 +93,9 @@ class EventCentral {
 
   /**
    * Adds a watcher for events.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Name of the event to listen for.
-   * @param {Function} params.func - Function to call.
+   * @param {Object} params Parameters.
+   * @param {string} params.event Name of the event to listen for.
+   * @param {Function} params.func Function to call.
    */
   addWatcher({ event, func }) {
     if (!this.eventWatchers[event]) {
@@ -107,9 +107,9 @@ class EventCentral {
 
   /**
    * Emit event.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Event to emit.
-   * @param {Object} [params.params] - Parameters to send.
+   * @param {Object} params Parameters.
+   * @param {string} params.event Event to emit.
+   * @param {Object} [params.params] Parameters to send.
    */
   emitEvent({
     event,

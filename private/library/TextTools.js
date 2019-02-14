@@ -257,6 +257,82 @@ class TextTools {
 
     return `${number}th`;
   }
+
+  static typewriter({
+    paragraphs,
+    target,
+    amount = 2,
+    paragraphFunc = () => {},
+  }) {
+    const paragraph = paragraphs.shift();
+    let spans;
+
+    const charAnimator = ({
+      span,
+      text,
+    }) => {
+      const characters = text.splice(0, amount);
+
+      if (characters[0]) {
+        const fragment = document.createDocumentFragment();
+
+        characters.forEach((char) => {
+          if (char) {
+            fragment.appendChild(document.createTextNode(char));
+          }
+        });
+
+        span.appendChild(fragment);
+
+        setTimeout(() => {
+          charAnimator({
+            span,
+            text,
+          });
+        }, 15);
+      } else {
+        setTimeout(() => {
+          spanAnimator(); // eslint-disable-line
+        }, 15);
+      }
+    };
+    const spanAnimator = () => {
+      const span = spans.shift();
+
+      if (span) {
+        const text = span.textContent.split('');
+
+        span.textContent = '';
+        paragraph.appendChild(span);
+        paragraphFunc();
+
+        charAnimator({
+          span,
+          text,
+        });
+      } else {
+        setTimeout(() => {
+          this.typewriter({
+            paragraphs,
+            target,
+            paragraphFunc,
+          });
+        }, 25);
+      }
+    };
+
+    if (paragraph) {
+      const dumpFragment = document.createDocumentFragment();
+      spans = Array.from(paragraph.getElementsByTagName('span'));
+
+      spans.forEach(child => dumpFragment.appendChild(child));
+      target.appendChild(paragraph);
+
+      spanAnimator({
+        target: paragraph,
+      });
+    }
+  }
 }
 
 module.exports = TextTools;

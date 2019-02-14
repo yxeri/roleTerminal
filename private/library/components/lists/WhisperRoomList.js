@@ -28,6 +28,7 @@ class RoomList extends List {
   constructor({
     title,
     minimumAccessLevel,
+    effect,
     whisperText = ' <-> ',
     classes = [],
     elementId = `wRList-${Date.now()}`,
@@ -39,6 +40,7 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      effect,
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       listType: 'whisperRooms',
       filter: {

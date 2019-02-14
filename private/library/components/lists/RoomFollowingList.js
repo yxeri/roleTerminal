@@ -25,6 +25,7 @@ const userComposer = require('../../data/composers/UserComposer');
 class RoomFollowingList extends List {
   constructor({
     title,
+    effect,
     classes = [],
     elementId = `rFList-${Date.now()}`,
   }) {
@@ -35,6 +36,7 @@ class RoomFollowingList extends List {
       title,
       elementId,
       classes,
+      effect,
       listType: 'followedRooms',
       filter: {
         rules: [

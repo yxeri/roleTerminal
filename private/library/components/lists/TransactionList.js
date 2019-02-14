@@ -23,6 +23,7 @@ const textTools = require('../../TextTools');
 
 class TransactionList extends List {
   constructor({
+    effect,
     reverseSorting = true,
     toText = '->',
     classes = [],
@@ -68,6 +69,7 @@ class TransactionList extends List {
 
     super({
       elementId,
+      effect,
       sorting: {
         paramName: 'cutomTimeCreated',
         fallbackParamName: 'timeCreated',

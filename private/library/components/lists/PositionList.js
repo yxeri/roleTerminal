@@ -78,6 +78,10 @@ class PositionList extends List {
       },
     });
   }
+
+  getCollectorObjects() {
+    return super.getCollectorObjects().filter(position => !/(^polygon)|(^line)/ig.test(position.positionName));
+  }
 }
 
 module.exports = PositionList;

@@ -29,6 +29,7 @@ class RoomList extends List {
   constructor({
     title,
     minimumAccessLevel,
+    effect,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -39,6 +40,7 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      effect,
       sorting: {
         paramName: 'roomName',
       },

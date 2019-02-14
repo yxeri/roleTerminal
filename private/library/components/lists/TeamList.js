@@ -25,6 +25,7 @@ const storageManager = require('../../StorageManager');
 class TeamList extends List {
   constructor({
     title,
+    effect,
     classes = [],
     elementId = `teamList-${Date.now()}`,
   }) {
@@ -38,6 +39,7 @@ class TeamList extends List {
       elementId,
       classes,
       title,
+      effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.users,

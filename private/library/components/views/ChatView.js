@@ -33,6 +33,7 @@ const viewSwitcher = require('../../ViewSwitcher');
 
 class ChatView extends ViewWrapper {
   constructor({
+    effect,
     shouldResize,
     placeholder,
     title,
@@ -44,23 +45,28 @@ class ChatView extends ViewWrapper {
     elementId = `chView-${Date.now()}`,
   }) {
     const roomList = new RoomList({
+      effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Rooms',
     });
     const roomFollowingList = new RoomFollowingList({
+      effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Following',
     });
     const whisperRoomList = new WhisperRoomList({
+      effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Whispers',
     });
     const userList = new UserList({
+      effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: 'Users',
       shouldFocusOnClick: false,
     });
     const messageList = new MessageList({
+      effect,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,

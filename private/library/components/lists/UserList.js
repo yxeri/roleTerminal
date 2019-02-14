@@ -28,6 +28,7 @@ class UserList extends List {
     title,
     shouldFocusOnClick,
     minimumAccessLevel,
+    effect,
     classes = [],
     elementId = `userList-${Date.now()}`,
   }) {
@@ -43,6 +44,7 @@ class UserList extends List {
       classes,
       title,
       shouldFocusOnClick,
+      effect,
       sorting: {
         paramName: 'username',
         fallbackParamName: 'aliasName',

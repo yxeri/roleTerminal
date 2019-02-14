@@ -529,10 +529,6 @@ class List extends BaseView {
           }));
         });
       }
-
-      if (this.elementToAppend) {
-        listItemElements.push(this.elementToAppend);
-      }
     } else { // Fallback. Create list item if none has been created.
       listItemElements.push(elementCreator.createParagraph({
         elements: [elementCreator.createSpan({ text: objectId })],

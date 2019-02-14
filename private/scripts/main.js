@@ -172,7 +172,7 @@ const worldMapParams = {
   lists: [{
     elementId: 'housingList',
     title: 'Housing',
-    positionTypes: ['housing'],
+    positionTypes: ['local'],
   }, {
     elementId: 'lanternList',
     title: 'LANTERN',
@@ -211,10 +211,13 @@ const worldMapParams = {
   }],
 };
 const chatView = new ChatView({
+  effect: true,
   sendOnEnter: true,
   placeholder: 'Enter your message',
 });
-const docFileView = new DocFileView({});
+const docFileView = new DocFileView({
+  effect: true,
+});
 const worldMapView = new WorldMapView(worldMapParams);
 const walletView = new WalletView({});
 const worldMapPage = new WorldMapPage(worldMapParams);

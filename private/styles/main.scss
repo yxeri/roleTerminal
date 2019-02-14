@@ -104,6 +104,10 @@ header {
   color: $second-text-color;
 }
 
+span, p {
+  min-height: 1em;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }

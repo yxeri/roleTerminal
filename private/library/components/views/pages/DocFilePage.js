@@ -59,8 +59,8 @@ function createControls({
 
 /**
  * Create header part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create header for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.docFile Document to create header for.
  * @return {HTMLElement} Header paragraph.
  */
 function createHeader({ docFile }) {
@@ -85,8 +85,8 @@ function createHeader({ docFile }) {
 
 /**
  * Create body part of the document.
- * @param {Object} params - Parameters.
- * @param {Object} params.docFile - Document to create body for.
+ * @param {Object} params Parameters.
+ * @param {Object} params.docFile Document to create body for.
  * @return {DocumentFragment} Body fragment.
  */
 function createBody({ docFile }) {

@@ -35,11 +35,11 @@ const cssClasses = {
 
 /**
  * Create functions for hovering and mouse out on MapObjects
- * @param {Object} params - Parameters.
- * @param {HTMLElement} params.element - DOM element.
- * @param {Function} params.hoverFunc - Function to call on hover.
- * @param {Function} [params.outFunc] - Function to call on mouse out.
- * @param {Boolean} [params.shouldOutOnDrag] - Should the mouse out function be called when a user starts dragging?
+ * @param {Object} params Parameters.
+ * @param {HTMLElement} params.element DOM element.
+ * @param {Function} params.hoverFunc Function to call on hover.
+ * @param {Function} [params.outFunc] Function to call on mouse out.
+ * @param {Boolean} [params.shouldOutOnDrag] Should the mouse out function be called when a user starts dragging?
  */
 function addGMapsHoverListeners({
   element,

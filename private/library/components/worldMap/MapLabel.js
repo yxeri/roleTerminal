@@ -18,15 +18,15 @@ class Label {
   /**
    * Creates a label at the location of another object.
    * The name of the position will be used as text for the label.
-   * @param {Object} params - Parameters.
-   * @param {{latitude: number, longitude: number}} params.coordinates - Long and lat coordinates of the label.
-   * @param {string} params.text - Text that will be printed.
-   * @param {string} [params.align] - Text alignment (left|right).
-   * @param {string} [params.fontFamily] - Font family.
-   * @param {string} [params.fontColor] - Font color.
-   * @param {string} [params.strokeColor] - Stroke color (around the text).
-   * @param {number} [params.fontSize] - Font size.
-   * @param {WorldMap} [params.map] - Map that the label should be attached to.
+   * @param {Object} params Parameters.
+   * @param {{latitude: number, longitude: number}} params.coordinates Long and lat coordinates of the label.
+   * @param {string} params.text Text that will be printed.
+   * @param {string} [params.align] Text alignment (left|right).
+   * @param {string} [params.fontFamily] Font family.
+   * @param {string} [params.fontColor] Font color.
+   * @param {string} [params.strokeColor] Stroke color (around the text).
+   * @param {number} [params.fontSize] Font size.
+   * @param {WorldMap} [params.map] Map that the label should be attached to.
    */
   constructor({
     coordinates,

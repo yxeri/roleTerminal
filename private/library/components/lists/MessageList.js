@@ -28,12 +28,12 @@ const messageComposer = require('../../data/composers/MessageComposer');
 class MessageList extends List {
   /**
    * MessageList constructor.
-   * @param {Object} params - Parameters.
-   * @param {boolean} [params.multiRoom] - Should messages from all rooms be retrieved and shown in the list?
-   * @param {boolean} [params.shouldSwitchRoom] - Should the messages only be retrieved from the user's current room?
-   * @param {string} [params.roomId] - Id of the room to retrieve messages from.
-   * @param {string[]} [params.classes] - CSS classes.
-   * @param {string} [params.elementId] - Id of the list element.
+   * @param {Object} params Parameters.
+   * @param {boolean} [params.multiRoom] Should messages from all rooms be retrieved and shown in the list?
+   * @param {boolean} [params.shouldSwitchRoom] Should the messages only be retrieved from the user's current room?
+   * @param {string} [params.roomId] Id of the room to retrieve messages from.
+   * @param {string[]} [params.classes] CSS classes.
+   * @param {string} [params.elementId] Id of the list element.
    */
   constructor({
     roomId,

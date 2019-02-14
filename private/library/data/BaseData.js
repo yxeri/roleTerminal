@@ -17,8 +17,8 @@
 /**
  * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
  * @typedef {Object} Filter
- * @property {string} paramName - Name of the parameter.
- * @property {string} paramValue - Value of the parameter.
+ * @property {string} paramName Name of the parameter.
+ * @property {string} paramValue Value of the parameter.
  */
 
 const socketManager = require('../SocketManager');
@@ -131,9 +131,9 @@ class BaseData {
 
   /**
    * Retrieves objects from server.
-   * @param {Object} params - Parameters.
-   * @param {Object} [params.emitParams] - Data to send to the server.
-   * @param {boolean} [params.reset] - Should stored objects be reset?
+   * @param {Object} params Parameters.
+   * @param {Object} [params.emitParams] Data to send to the server.
+   * @param {boolean} [params.reset] Should stored objects be reset?
    */
   fetchObjects({
     event,
@@ -188,10 +188,10 @@ class BaseData {
 
   /**
    * Retrieve object from server.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send to the server.
-   * @param {boolean} [params.noEmit] - Should the event emit be suppressed?
-   * @param {Function} [params.callback] - Callback.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send to the server.
+   * @param {boolean} [params.noEmit] Should the event emit be suppressed?
+   * @param {Function} [params.callback] Callback.
    */
   fetchObject({
     params,
@@ -245,10 +245,10 @@ class BaseData {
 
   /**
    * Craete an object on the server and return the created object.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
-   * @param {string} [params.event] - Event type to emit. Will override the default one.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
+   * @param {string} [params.event] Event type to emit. Will override the default one.
    */
   createObject({
     params,
@@ -283,10 +283,10 @@ class BaseData {
 
   /**
    * Update an object on the server and return the updated object.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
-   * @param {string} [params.event] - Event type to emit. Will override the default one.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
+   * @param {string} [params.event] Event type to emit. Will override the default one.
    */
   updateObject({
     params,
@@ -330,9 +330,9 @@ class BaseData {
 
   /**
    * Remove an object from the server and local.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
    */
   removeObject({
     params,
@@ -366,8 +366,8 @@ class BaseData {
 
   /**
    * Get locally stored object.
-   * @param {Object} params - Parameters.
-   * @param {string} params.objectId - Id of the object.
+   * @param {Object} params Parameters.
+   * @param {string} params.objectId Id of the object.
    * @return {Object} Found object.
    */
   getObject({
@@ -406,13 +406,13 @@ class BaseData {
   /**
    * Get locally stored objects.
    * Setting paramName and value will retrieve objects matching them.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.filter - Filter to check against.
-   * @param {boolean} [params.orCheck] - Is it enough for only one sent value to match?
-   * @param {Object} [params.sorting] - Sorting of the returned objects.
-   * @param {string} params.sorting.paramName - Name of the parameter to sort by.
-   * @param {string} [params.sorting.fallbackParamName] - Name of the parameter to sort by, if paramName is not found.
-   * @param {boolean} [params.sorting.reverse] - Should the sort order be reversed?
+   * @param {Object} params Parameters.
+   * @param {Object} params.filter Filter to check against.
+   * @param {boolean} [params.filter.orCheck] Is it enough for only one sent value to match?
+   * @param {Object} [params.sorting] Sorting of the returned objects.
+   * @param {string} params.sorting.paramName Name of the parameter to sort by.
+   * @param {string} [params.sorting.fallbackParamName] Name of the parameter to sort by, if paramName is not found.
+   * @param {boolean} [params.sorting.reverse] Should the sort order be reversed?
    * @return {Object} Stored objects.
    */
   getObjects({

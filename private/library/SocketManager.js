@@ -205,9 +205,9 @@ class SocketManager {
 
   /**
    * Emit event through socket.io.
-   * @param {string} event - Event to emit.
-   * @param {Object} [params] - Parameters to send in the emit.
-   * @param {Function} [callback] - Callback.
+   * @param {string} event Event to emit.
+   * @param {Object} [params] Parameters to send in the emit.
+   * @param {Function} [callback] Callback.
    */
   emitEvent(event, params = {}, callback) {
     const paramsToSend = params;

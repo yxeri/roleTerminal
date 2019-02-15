@@ -335,14 +335,6 @@ $msgList-textarea-border: .3em solid $darker-color;
     .msgLine:last-child {
       margin-bottom: 0;
     }
-
-    .msgRoomName:before {
-      content: '[';
-    }
-
-    .msgRoomName:after {
-      content: ']';
-    }
   }
 
   .inputArea {
@@ -638,6 +630,81 @@ $map-padding-fix: 2em;
 
 .hideOverflow {
   overflow: hidden;
+}
+
+.baseGlitch {
+  content: attr(subMsg);
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-bottom: 1px dashed;
+}
+
+.fastGlitch, .normalGlitch, .slowGlitch {
+  position: relative;
+}
+
+.fastGlitch:before {
+  @extend .baseGlitch;
+  -webkit-animation: brightness 20s linear infinite 5s;
+  animation: brightness 20s linear infinite 5s;
+}
+
+.normalGlitch:before {
+  @extend .baseGlitch;
+  -webkit-animation: brightness 31s linear infinite 6s;
+  animation: brightness 31s linear infinite 6s;
+}
+
+.slowGlitch:before {
+  @extend .baseGlitch;
+  -webkit-animation: brightness 52s linear infinite 7s;
+  animation: brightness 52s linear infinite 7s;
+}
+
+@-webkit-keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  0.5% {
+    opacity: 1;
+  }
+  0.8% {
+    opacity: 1;
+  }
+  1% {
+    opacity: 1;
+  }
+  1.4% {
+    opacity: 1;
+  }
+  1.7% {
+    opacity: 0;
+  }
+}
+
+@keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  0.5% {
+    opacity: 1;
+  }
+  0.8% {
+    opacity: 1;
+  }
+  1% {
+    opacity: 1;
+  }
+  1.4% {
+    opacity: 1;
+  }
+  1.7% {
+    opacity: 0;
+  }
 }
 
 @media (orientation: portrait) {

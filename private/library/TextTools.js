@@ -43,6 +43,7 @@ const specials = '!;#&()[]';
 const binary = '01';
 const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
 const internationalRegex = /^[\w\d]+$/;
+const glitchSigns = [']', '+', '!', '#', ' ', '?', '•'];
 
 class TextTools {
   /**
@@ -137,7 +138,20 @@ class TextTools {
   static trimSpace(sentText) { return this.findOneReplace(sentText, /^\s+|\s+$/, ''); }
 
   /**
-   * Creates and returns a randomised string
+   * Creates and returns a randomised glitch string.
+   * @static
+   * @param {Number} length Length of randomised string.
+   * @returns {string} Randomised string.
+   */
+  static createGlitchString(length) {
+    return this.createRandString({
+      length,
+      selection: glitchSigns,
+    });
+  }
+
+  /**
+   * Creates and returns a randomised character string.
    * @static
    * @param {Number} length Length of randomised string
    * @returns {string} Randomised string

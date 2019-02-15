@@ -77,7 +77,7 @@ class List extends BaseView {
    * @param {string[]} [params.classes] CSS classes.
    * @param {string} [params.elementId] Id of the list element.
    * @param {string} [params.focusedId] Id of the list item that will be focused from the start.
-   * @param {Object} [params.dependencies] Data handler dependencies. The creation of the list will only run when all the handlers have retrieved their objects.
+   * @param {Object[]} [params.dependencies] Data handler dependencies. The creation of the list will only run when all the handlers have retrieved their objects.
    * @param {boolean} [params.shouldPaginate] Should the list be appended in pieces?
    */
   constructor({

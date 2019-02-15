@@ -632,6 +632,16 @@ $map-padding-fix: 2em;
   overflow: hidden;
 }
 
+#screenFilter {
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  position: absolute;
+  background-color: rgba(255, 236, 5, 0.08);
+  animation: screenFilter 20s linear infinite 5s;
+  z-index: 11;
+}
+
 .baseGlitch {
   content: attr(subMsg);
   opacity: 0;
@@ -663,6 +673,30 @@ $map-padding-fix: 2em;
   @extend .baseGlitch;
   -webkit-animation: brightness 52s linear infinite 7s;
   animation: brightness 52s linear infinite 7s;
+}
+
+@-webkit-keyframes screenFilter {
+  15% {
+    background-color: rgba(255, 236, 5, 0.15);
+  }
+  40% {
+    background-color: rgba(255, 236, 5, 0.03);
+  }
+  80% {
+    background-color: rgba(255, 236, 5, 0.15);
+  }
+}
+
+@keyframes screenFilter {
+  15% {
+    background-color: rgba(255, 236, 5, 0.15);
+  }
+  40% {
+    background-color: rgba(255, 236, 5, 0.03);
+  }
+  80% {
+    background-color: rgba(255, 236, 5, 0.15);
+  }
 }
 
 @-webkit-keyframes brightness {

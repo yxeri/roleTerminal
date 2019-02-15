@@ -207,7 +207,7 @@ class DocFilePage extends BaseView {
       children.forEach(child => dumpFragment.appendChild(child));
 
       textTools.typewriter({
-        amount: 7,
+        amount: 15,
         paragraphs: children,
         target: newElement,
       });

@@ -185,7 +185,11 @@ class ElementCreator {
     }
 
     if (effect && Math.random() > 0.85) {
-      span.setAttribute('subMsg', textTools.createGlitchString(text.length));
+      const maxLength = text.length > 20
+        ? 20
+        : text.length;
+
+      span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
       span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
     }
 

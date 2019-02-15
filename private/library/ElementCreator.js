@@ -15,11 +15,17 @@
  */
 
 const mouseHandler = require('./MouseHandler');
+const textTools = require('./TextTools');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
   clickable: 'clickable',
 };
+const glitchClasses = [
+  'fastGlitch',
+  'slowGlitch',
+  'normalGlitch',
+];
 
 /**
  * Set an Id on the element.
@@ -165,6 +171,7 @@ class ElementCreator {
     elementId,
     classes,
     spanType,
+    effect,
   }) {
     const span = createBaseElement({
       elementId,
@@ -175,6 +182,11 @@ class ElementCreator {
 
     if (text) {
       span.appendChild(document.createTextNode(text));
+    }
+
+    if (effect && Math.random() > 0.85) {
+      span.setAttribute('subMsg', textTools.createGlitchString(text.length));
+      span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
     }
 
     return span;

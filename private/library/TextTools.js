@@ -275,7 +275,7 @@ class TextTools {
   static typewriter({
     paragraphs,
     target,
-    amount = 2,
+    amount = 5,
     paragraphFunc = () => {},
   }) {
     const paragraph = paragraphs.shift();
@@ -288,15 +288,7 @@ class TextTools {
       const characters = text.splice(0, amount);
 
       if (characters[0]) {
-        const fragment = document.createDocumentFragment();
-
-        characters.forEach((char) => {
-          if (char) {
-            fragment.appendChild(document.createTextNode(char));
-          }
-        });
-
-        span.appendChild(fragment);
+        span.appendChild(document.createTextNode(characters.join('')));
 
         setTimeout(() => {
           charAnimator({
@@ -327,11 +319,12 @@ class TextTools {
       } else {
         setTimeout(() => {
           this.typewriter({
+            amount,
             paragraphs,
             target,
             paragraphFunc,
           });
-        }, 25);
+        }, 50);
       }
     };
 
@@ -342,9 +335,7 @@ class TextTools {
       spans.forEach(child => dumpFragment.appendChild(child));
       target.appendChild(paragraph);
 
-      spanAnimator({
-        target: paragraph,
-      });
+      spanAnimator();
     }
   }
 }

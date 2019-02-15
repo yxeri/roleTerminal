@@ -17,8 +17,19 @@
 /**
  * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
  * @typedef {Object} Filter
- * @property {string} paramName Name of the parameter.
- * @property {string} paramValue Value of the parameter.
+ * @property {boolean} [orCheck] Is it enough for only one sent value to match?
+ * @property {Object[]} rules Rules.
+ * @property {string} rules.paramName Name of the parameter.
+ * @property {string} rules.paramValue Value of the parameter.
+ * @property {boolean} [rules.shouldInclude] Should a collection include the sent value?
+ */
+
+/**
+ * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
+ * @typedef {Object} Sorting
+ * @property {string} paramName Name of the parameter to sort by.
+ * @property {string} [fallbackParamName] Name of the parameter to sort by, if paramName is not found.
+ * @property {boolean} [reverse] Should the sorting be reversed?
  */
 
 const socketManager = require('../SocketManager');
@@ -407,12 +418,8 @@ class BaseData {
    * Get locally stored objects.
    * Setting paramName and value will retrieve objects matching them.
    * @param {Object} params Parameters.
-   * @param {Object} params.filter Filter to check against.
-   * @param {boolean} [params.filter.orCheck] Is it enough for only one sent value to match?
-   * @param {Object} [params.sorting] Sorting of the returned objects.
-   * @param {string} params.sorting.paramName Name of the parameter to sort by.
-   * @param {string} [params.sorting.fallbackParamName] Name of the parameter to sort by, if paramName is not found.
-   * @param {boolean} [params.sorting.reverse] Should the sort order be reversed?
+   * @param {Filter} params.filter Filter to check against.
+   * @param {Sorting} [params.sorting] Sorting of the returned objects.
    * @return {Object} Stored objects.
    */
   getObjects({

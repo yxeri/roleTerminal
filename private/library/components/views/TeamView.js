@@ -20,11 +20,12 @@ const TeamPage = require('./TeamPage');
 
 class TeamView extends ViewWrapper {
   constructor({
+    effect,
     classes = [],
     elementId = `tView-${Date.now()}`,
   }) {
-    const teamList = new TeamList({});
-    const teamPage = new TeamPage({});
+    const teamList = new TeamList({ effect });
+    const teamPage = new TeamPage({ effect });
 
     super({
       elementId,

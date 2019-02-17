@@ -21,11 +21,12 @@ const UserList = require('../lists/UserList');
 
 class ForumView extends ViewWrapper {
   constructor({
+    effect,
     classes = [],
     elementId = `fView-${Date.now()}`,
   }) {
-    const forumList = new ForumList({});
-    const forumPage = new ForumPage({});
+    const forumList = new ForumList({ effect });
+    const forumPage = new ForumPage({ effect });
     const userList = new UserList({
       title: 'Users',
     });

@@ -185,8 +185,8 @@ class ElementCreator {
     }
 
     if (effect && Math.random() > 0.85) {
-      const maxLength = text.length > 20
-        ? 20
+      const maxLength = text.length > 50
+        ? 50
         : text.length;
 
       span.setAttribute('subMsg', textTools.createGlitchString(maxLength));

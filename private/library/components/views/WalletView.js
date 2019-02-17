@@ -21,14 +21,17 @@ const TeamList = require('../lists/TeamList');
 
 class WalletView extends ViewWrapper {
   constructor({
+    effect,
     classes = [],
     elementId = `wView-${Date.now()}`,
   }) {
-    const transactionList = new TransactionList({});
+    const transactionList = new TransactionList({ effect });
     const userList = new UserList({
+      effect,
       title: 'Users',
     });
     const teamList = new TeamList({
+      effect,
       title: 'Teams',
     });
 

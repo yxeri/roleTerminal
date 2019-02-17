@@ -43,7 +43,7 @@ const specials = '!;#&()[]';
 const binary = '01';
 const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
 const internationalRegex = /^[\w\d]+$/;
-const glitchSigns = [']', '+', '!', '#', ' ', '?', '•'];
+const glitchSigns = ['░', '▒', '▓', '█'];
 
 class TextTools {
   /**

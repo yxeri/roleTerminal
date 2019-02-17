@@ -32,6 +32,14 @@ class InputArea extends BaseView {
     this.inputCallback = inputCallback;
     this.triggerCallback = triggerCallback;
     this.sendOnEnter = sendOnEnter;
+    this.sendButton = elementCreator.createButton({
+      text: 'Send',
+      clickFuncs: {
+        leftFunc: () => {
+          this.triggerCallback({ text: this.getSplitInputValue() });
+        },
+      },
+    });
 
     this.textArea.addEventListener('focus', () => {
       this.isFocused = true;
@@ -54,6 +62,7 @@ class InputArea extends BaseView {
     });
 
     this.element.appendChild(this.textArea);
+    this.element.appendChild(this.sendButton);
   }
 
   resizeInput() {

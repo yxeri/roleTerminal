@@ -43,7 +43,7 @@ class KeyHandler {
     this.keyPressed = false;
     this.triggerKeyPressed = false;
     this.paused = false;
-    this.triggerKey = 16; // Alt
+    this.triggerKey = 18; // Alt
     this.ignoredKeys = {};
 
     window.addEventListener('keydown', (event) => {

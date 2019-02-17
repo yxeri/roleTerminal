@@ -173,14 +173,17 @@ const worldMapParams = {
     elementId: 'housingList',
     title: 'Housing',
     positionTypes: ['local'],
+    effect: true,
   }, {
     elementId: 'lanternList',
     title: 'LANTERN',
     positionTypes: ['lantern'],
+    effect: true,
   }, {
     elementId: 'userList',
     title: 'Users',
     positionTypes: ['user'],
+    effect: true,
     listItemFields: [{
       paramName: 'objectId',
       convertFunc: (objectId) => {
@@ -200,14 +203,17 @@ const worldMapParams = {
       'drivable-roads',
       'roads',
     ],
+    effect: true,
   }, {
     elementId: 'deviceList',
     title: 'Device',
     positionTypes: ['device'],
+    effect: true,
   }, {
     elementId: 'worldList',
     title: 'World',
     positionTypes: ['world'],
+    effect: true,
   }],
 };
 const chatView = new ChatView({
@@ -219,10 +225,16 @@ const docFileView = new DocFileView({
   effect: true,
 });
 const worldMapView = new WorldMapView(worldMapParams);
-const walletView = new WalletView({});
+const walletView = new WalletView({
+  effect: true,
+});
 const worldMapPage = new WorldMapPage(worldMapParams);
-const teamView = new TeamView({});
-const forumView = new ForumView({});
+const teamView = new TeamView({
+  effect: true,
+});
+const forumView = new ForumView({
+  effect: true,
+});
 
 const statusBar = new TopView({
   viewSwitcher,

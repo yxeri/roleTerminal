@@ -648,16 +648,15 @@ $map-padding-fix: 2em;
   content: attr(subMsg);
   opacity: 0;
   position: absolute;
-  left: 1px;
+  left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  border-bottom: 1px dashed;
+  font-size: .9em;
 }
 
 .fastGlitch, .normalGlitch, .slowGlitch {
   position: relative;
-  width: 100%;
 }
 
 .fastGlitch:before {

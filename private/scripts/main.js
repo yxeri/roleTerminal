@@ -218,8 +218,7 @@ const worldMapParams = {
 };
 const chatView = new ChatView({
   effect: true,
-  sendOnEnter: true,
-  placeholder: 'Enter your message',
+  placeholder: 'Alt+Enter to send message',
 });
 const docFileView = new DocFileView({
   effect: true,

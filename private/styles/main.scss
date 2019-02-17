@@ -58,6 +58,7 @@ html, body {
   font-family: monospace;
   font-size: 1em;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 
@@ -137,6 +138,7 @@ span, p {
 
 .column {
   overflow: hidden;
+  height: 100%;
 }
 
 .viewWrapper {
@@ -174,6 +176,7 @@ span, p {
   max-width: 30em;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   background-color: $background-color;
   border: $border-width solid $text-color;
   position: absolute;
@@ -266,12 +269,14 @@ span, p {
   .column {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 }
 
 .columnList {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 /**************
@@ -296,12 +301,13 @@ $msgList-msgInfo-border: .1em solid $second-color;
 $msgList-li-padding: .5em;
 $msgList-msgLine-side-padding: .2em;
 $msgList-msgInfo-padding: .1em;
-$msgList-textarea-border: .3em solid $darker-color;
+$msgList-textarea-border: .1em solid $border-color;
 
 .chatView {
   .msgList {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     word-wrap: break-word;
 
     li {
@@ -342,10 +348,17 @@ $msgList-textarea-border: .3em solid $darker-color;
     margin-top: auto;
 
     textarea {
-      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2));
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
       padding: 0 $msgList-msgLine-side-padding;
       border-top: $msgList-textarea-border;
       border-bottom: $msgList-textarea-border;
+      display: inline-block;
+    }
+
+    .button {
+      width: 3em;
+      display: inline-block;
+      vertical-align: top;
     }
   }
 
@@ -496,6 +509,7 @@ $map-padding-fix: 2em;
   padding: $map-box-padding;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   background-color: $background-color;
   border: $map-box-border;
 

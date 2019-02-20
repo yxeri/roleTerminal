@@ -615,9 +615,15 @@ $map-padding-fix: 2em;
     background-color: $second-background-color;
     max-width: 12em;
     z-index: 9;
+    border-bottom: $border;
+    max-height: calc(100% - 1.5em);
+    overflow-y: scroll;
+    border: $border;
 
     button {
       width: 100%;
+      border-left: 0;
+      border-right: 0;
     }
 
     p {
@@ -625,14 +631,18 @@ $map-padding-fix: 2em;
       color: $text-color;
       box-sizing: border-box;
       border-bottom: $border;
-      border-left: $border;
-      border-right: $border;
       width: 100%;
       padding: .3em 0;
       text-align: center;
 
       span {
         padding: 0 .3em;
+      }
+    }
+
+    li:last-child {
+      p {
+        border-bottom: 0;
       }
     }
   }

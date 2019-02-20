@@ -246,7 +246,7 @@ const statusBar = new TopView({
     room: true,
     view: true,
     docFile: true,
-    // team: true,
+    team: true,
   },
 });
 const docWrapper = new ViewWrapper({

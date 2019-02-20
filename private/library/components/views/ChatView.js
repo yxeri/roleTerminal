@@ -37,7 +37,7 @@ class ChatView extends ViewWrapper {
     shouldResize,
     placeholder,
     title,
-    sendOnEnter = true,
+    sendOnEnter = false,
     hideRoomList = false,
     classes = [],
     roomListPlacement = 'left',

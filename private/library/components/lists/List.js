@@ -322,8 +322,6 @@ class List extends BaseView {
     const fragment = document.createDocumentFragment();
     const marked = storageManager.getMarked();
 
-    console.log('marked', marked, marked[this.listType], this.listType);
-
     objects.forEach((object) => {
       const { canSee } = BaseView.hasAccess({ object, user });
 

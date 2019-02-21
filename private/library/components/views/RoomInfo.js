@@ -22,6 +22,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomInfo extends ViewWrapper {
   constructor({
@@ -51,13 +52,13 @@ class RoomInfo extends ViewWrapper {
         const identities = userComposer.getWhisperIdentities({ participantIds });
 
         nameSpan.appendChild(document.createTextNode(identities.length > 0
-          ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+          ? `${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'whisper' })}: ${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
           : ''));
 
         return;
       }
 
-      nameSpan.appendChild(document.createTextNode(foundRoom.roomName));
+      nameSpan.appendChild(document.createTextNode(`${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'room' })}: ${foundRoom.roomName}`));
     };
 
     super({

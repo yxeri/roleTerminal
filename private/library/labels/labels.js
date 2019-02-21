@@ -126,6 +126,9 @@ const labels = {
     set: (override.BaseDialog && override.BaseDialog.set) || {
       en: 'Set',
     },
+    send: (override.BaseDialog && override.BaseDialog.send) || {
+      en: 'Send',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -273,6 +276,14 @@ const labels = {
     },
     roomName: (override.RoomUpdateDialog && override.RoomUpdateDialog.roomName) || {
       en: 'New name',
+    },
+  },
+  RoomInfo: {
+    whisper: (override.RoomInfo && override.RoomInfo.whisper) || {
+      en: 'Whisper',
+    },
+    room: (override.RoomInfo && override.RoomInfo.room) || {
+      en: 'Room',
     },
   },
   LoginDialog: {

@@ -64,6 +64,12 @@ class StatusBar extends BaseView {
     this.showClock = showClock;
     this.lists = [];
 
+    viewSwitcher.parentElement.addEventListener('click', () => {
+      this.menuList.classList.add('hide');
+      this.viewList.classList.add('hide');
+      this.currentUserList.hideView();
+    });
+
     if (controls.user) {
       const logoutButton = elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'logout' }),
@@ -243,7 +249,11 @@ class StatusBar extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.menuList,
-        leftFunc: () => { this.menuList.classList.toggle('hide'); },
+        leftFunc: (event) => {
+          this.menuList.classList.toggle('hide');
+
+          event.stopPropagation();
+        },
         text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'menu' }),
       });
 
@@ -259,7 +269,11 @@ class StatusBar extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.currentUserList,
-        leftFunc: () => { this.currentUserList.toggleView(); },
+        leftFunc: (event) => {
+          this.currentUserList.toggleView();
+
+          event.stopPropagation();
+        },
       });
       const container = elementCreator.createContainer({
         elements: [menuButton],
@@ -319,8 +333,8 @@ class StatusBar extends BaseView {
       text,
       classes: ['topMenuButton'].concat(classes),
       clickFuncs: {
-        leftFunc: () => {
-          leftFunc();
+        leftFunc: (event) => {
+          leftFunc(event);
 
           this.hideLists({ currentList: list });
         },
@@ -391,7 +405,11 @@ class StatusBar extends BaseView {
 
     const menuButton = this.createMenuButton({
       list: this.viewList,
-      leftFunc: () => { this.viewList.classList.toggle('hide'); },
+      leftFunc: (event) => {
+        this.viewList.classList.toggle('hide');
+
+        event.stopPropagation();
+      },
       text: labelHandler.getLabel({ baseObject: 'StatusBar', label: '-----' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });

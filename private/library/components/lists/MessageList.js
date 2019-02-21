@@ -24,6 +24,7 @@ const textTools = require('../../TextTools');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
 const messageComposer = require('../../data/composers/MessageComposer');
+const teamComposer = require('../../data/composers/TeamComposer');
 
 class MessageList extends List {
   /**
@@ -94,9 +95,11 @@ class MessageList extends List {
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
             const identity = userComposer.getIdentity({ objectId });
+            const teamIds = identity.partOfTeams || [];
+            const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
 
             if (identity) {
-              return identity.username || identity.aliasName;
+              return `${identity.username || identity.aliasName} [${shortNames.join('/')}]`;
             }
 
             return objectId;

@@ -15,6 +15,8 @@ const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const tools = require('../library/Tools');
+const voiceCommander = require('../library/VoiceCommander');
+const labelHandler = require('../library/labels/LabelHandler');
 
 const worldMapParams = {
   alwaysShowLabels: {
@@ -359,3 +361,47 @@ if (!tools.getQueryParameters().noFullscreen) {
     viewTools.goFullScreen({});
   });
 }
+
+voiceCommander.start();
+voiceCommander.addCommands({
+  activationString: labelHandler.getLabel({ baseObject: 'VoiceCommands', label: 'viewSwitch' }),
+  commands: [
+    {
+      strings: [
+        'chat',
+        'coms',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT }); },
+    }, {
+      strings: [
+        'docs',
+        'documents',
+        'files',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.DOCS }); },
+    }, {
+      strings: [
+        'map',
+        'maps',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP }); },
+    }, {
+      strings: [
+        'wallet',
+        'vcaps',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WALLET }); },
+    }, {
+      strings: [
+        'teams',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.TEAM }); },
+    }, {
+      strings: [
+        'forum',
+        'forums',
+      ],
+      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.FORUM }); },
+    },
+  ],
+});

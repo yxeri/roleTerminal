@@ -528,6 +528,11 @@ const labels = {
       en: 'The message is too long',
     },
   },
+  VoiceCommands: {
+    viewSwitch: (override.VoiceCommands && override.VoiceCommands.viewSwitch) || {
+      en: 'switch',
+    },
+  },
 };
 
 /**

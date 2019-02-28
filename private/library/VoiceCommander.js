@@ -16,7 +16,7 @@
 
 class VoiceCommander {
   constructor() {
-    this.voiceListener = annyang;
+    this.voiceListener = annyang; // eslint-disable-line
   }
 
   start() {

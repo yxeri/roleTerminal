@@ -21,11 +21,11 @@ const cssClasses = {
   emptyInput: 'emptyInput',
   clickable: 'clickable',
 };
-const glitchClasses = [
-  'fastGlitch',
-  'slowGlitch',
-  'normalGlitch',
-];
+// const glitchClasses = [
+//   'fastGlitch',
+//   'slowGlitch',
+//   'normalGlitch',
+// ];
 
 /**
  * Set an Id on the element.

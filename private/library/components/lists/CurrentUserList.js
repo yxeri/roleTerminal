@@ -41,7 +41,6 @@ class CurrentUserList extends List {
         paramName: 'aliasName',
         fallbackParamName: 'username',
       },
-      focusedId: storageManager.getAliasId() || storageManager.getUserId(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
           if (objectId === storageManager.getUserId()) {

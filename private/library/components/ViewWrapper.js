@@ -59,10 +59,16 @@ class ViewWrapper extends BaseView {
 
   addToView({ element }) {
     if (this.statusBar) {
-      this.statusBar.addToView({ element: this.element });
+      if (this.statusBar.appendTop) {
+        this.statusBar.addToView({ element: this.element });
+        this.attachColumns();
+      } else {
+        this.attachColumns();
+        this.statusBar.addToView({ element: this.element });
+      }
+    } else {
+      this.attachColumns();
     }
-
-    this.attachColumns();
 
     super.addToView({ element });
   }
@@ -81,7 +87,7 @@ class ViewWrapper extends BaseView {
     }
 
     if (this.statusBar) {
-      containerClasses.push('withTopRow');
+      containerClasses.push('withStatusBar');
     }
 
     const container = elementCreator.createContainer({ classes: containerClasses });

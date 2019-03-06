@@ -184,13 +184,13 @@ class ElementCreator {
       span.appendChild(document.createTextNode(text));
     }
 
-    if (effect && Math.random() > 0.85) {
+    if (effect && Math.random() > 0.90) {
       const maxLength = text.length > 50
         ? 50
         : text.length;
 
       span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
-      span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
+      // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
     }
 
     return span;
@@ -344,9 +344,11 @@ class ElementCreator {
   static createHeader({
     elements,
     clickFuncs,
+    classes,
   }) {
     const header = createBaseElement({
       clickFuncs,
+      classes,
       elementType: 'header',
     });
 

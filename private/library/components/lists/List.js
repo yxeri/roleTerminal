@@ -270,9 +270,8 @@ class List extends BaseView {
       };
 
       elements.push(elementCreator.createHeader({
-        clickFuncs: this.shouldToggle
-          ? clickFuncs
-          : undefined,
+        clickFuncs,
+        classes: ['toggle'],
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
       }));
     }

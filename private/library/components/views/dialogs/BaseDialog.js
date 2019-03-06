@@ -93,6 +93,11 @@ class BaseDialog extends BaseView {
     shouldPrepend,
     element = viewSwitcher.getParentElement(),
   }) {
+    element.appendChild(elementCreator.createContainer({
+      elementId: ids.COVER,
+      classes: [cssClasses.COVER],
+    }));
+
     super.addToView({
       element,
       insertBeforeElement,
@@ -104,21 +109,14 @@ class BaseDialog extends BaseView {
     if (this.inputs.length > 0) {
       this.inputs[0].focus();
     }
-
-    element.appendChild(elementCreator.createContainer({
-      elementId: ids.COVER,
-      classes: [cssClasses.COVER],
-    }));
   }
 
   removeFromView() {
-    const parentElement = this.getParentElement();
+    this.getParentElement().removeChild(document.getElementById(ids.COVER));
 
     super.removeFromView();
     keyHandler.unpause();
     voiceCommander.unpause();
-
-    parentElement.removeChild(document.getElementById(ids.COVER));
   }
 
   createTextContainer({ elementId, text = [] }) {

@@ -81,7 +81,7 @@ class ViewWrapper extends BaseView {
     }
 
     if (this.statusBar) {
-      containerClasses.push('withTopRow');
+      containerClasses.push('withStatusBar');
     }
 
     const container = elementCreator.createContainer({ classes: containerClasses });

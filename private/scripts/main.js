@@ -4,7 +4,7 @@ const WorldMapView = require('../library/components/views/WorldMapView');
 const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
-const TopView = require('../library/components/views/StatusBar');
+const StatusBar = require('../library/components/views/StatusBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
@@ -237,7 +237,7 @@ const forumView = new ForumView({
   effect: true,
 });
 
-const statusBar = new TopView({
+const statusBar = new StatusBar({
   viewSwitcher,
   title: 'O3C',
   showClock: true,

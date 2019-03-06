@@ -22,6 +22,7 @@ class MapLine extends MapObject {
     clickFuncs,
     labelStyle,
     hoverExcludeRule,
+    overlay,
     zIndex = 2,
     descriptionOnClick = false,
     alwaysShowLabel = false,
@@ -42,6 +43,7 @@ class MapLine extends MapObject {
       clickFuncs,
       descriptionOnClick,
       zIndex,
+      overlay,
       // TODO Combine with MapPolygon
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();

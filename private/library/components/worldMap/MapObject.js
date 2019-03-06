@@ -92,12 +92,14 @@ class MapObject {
     style,
     markedStyle,
     hoverExcludeRule,
+    overlay,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
   }) {
+    this.overlay = overlay;
     this.markedStyle = markedStyle;
     this.canBeDragged = canBeDragged;
     this.choosableStyles = choosableStyles;
@@ -409,7 +411,6 @@ class MapObject {
   }
 
   showPositionRightClickBox({
-    event,
     thisMapObject,
   }) {
     const {
@@ -496,16 +497,8 @@ class MapObject {
       });
     }
 
-    const mouseEvent = event.Ha || event.Ia;
-    let x;
-    let y;
-
-    if (mouseEvent) {
-      const { clientX, clientY } = mouseEvent;
-
-      x = clientX;
-      y = clientY;
-    }
+    const coordinates = this.getCenter();
+    const { x, y } = this.overlay.getProjection().fromLatLngToContainerPixel(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
 
     if (items.length > 0) {
       MapObject.showRightClickBox({

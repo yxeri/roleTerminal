@@ -52,6 +52,7 @@ class WorldMapPage extends BaseView {
     this.markers = {};
     this.worldMap = undefined;
     this.clusterer = undefined;
+    this.overlay = undefined;
     this.backgroundColor = backgroundColor;
     this.polygonStyle = polygonStyle;
     this.lineStyle = lineStyle;
@@ -182,6 +183,7 @@ class WorldMapPage extends BaseView {
       case positionComposer.PositionStructures.LINE: {
         newMarker = new MapLine({
           position,
+          overlay: this.overlay,
           hoverExcludeRule: this.hoverExcludeRule.lines,
           triggeredStyles: this.triggeredStyles.lines,
           choosableStyles: this.choosableStyles.lines,
@@ -195,6 +197,7 @@ class WorldMapPage extends BaseView {
       case positionComposer.PositionStructures.POLYGON: {
         newMarker = new MapPolygon({
           position,
+          overlay: this.overlay,
           hoverExcludeRule: this.hoverExcludeRule.polygons,
           triggeredStyles: this.triggeredStyles.polygons,
           choosableStyles: this.choosableStyles.polygons,
@@ -208,6 +211,7 @@ class WorldMapPage extends BaseView {
       default: {
         newMarker = new MapMarker({
           position,
+          overlay: this.overlay,
           hoverExcludeRule: this.hoverExcludeRule.markers,
           triggeredStyles: this.triggeredStyles.markers,
           choosableStyles: this.choosableStyles.markers,
@@ -246,7 +250,9 @@ class WorldMapPage extends BaseView {
     }
 
     this.clusterer.clearMarkers();
-    this.clusterer.addMarkers(Object.keys(this.markers).filter(markerId => this.markers[markerId].shouldCluster).map(markerId => this.markers[markerId].mapObject));
+    this.clusterer.addMarkers(Object.keys(this.markers)
+      .filter(markerId => this.markers[markerId].shouldCluster)
+      .map(markerId => this.markers[markerId].mapObject));
   }
 
   /**
@@ -258,17 +264,7 @@ class WorldMapPage extends BaseView {
     const {
       CreatePosition = { accessLevel: 1 },
     } = storageManager.getPermissions();
-    const mouseEvent = event.Ha || event.Ia;
-    let x;
-    let y;
-
-    if (mouseEvent) {
-      const { clientX, clientY } = mouseEvent;
-
-      x = clientX;
-      y = clientY;
-    }
-
+    const { x, y } = event.pixel;
     const items = [];
 
     /**
@@ -401,6 +397,8 @@ class WorldMapPage extends BaseView {
       styles: this.mapStyles,
     });
     this.clusterer = new MarkerClusterer(this.worldMap, [], this.clusterStyle);
+    this.overlay = new google.maps.OverlayView();
+    this.overlay.setMap(this.worldMap);
 
     this.createMarkers({
       worldMap: this.worldMap,

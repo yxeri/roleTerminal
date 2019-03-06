@@ -41,6 +41,7 @@ class StatusBar extends BaseView {
   constructor({
     title,
     viewSwitcher,
+    appendTop = false,
     showControls = {},
     showClock = true,
     menuItems = [],
@@ -64,6 +65,7 @@ class StatusBar extends BaseView {
     this.viewSwitcher = viewSwitcher;
     this.showClock = showClock;
     this.lists = [];
+    this.appendTop = appendTop;
 
     viewSwitcher.parentElement.addEventListener('click', () => {
       this.menuList.classList.add('hide');

@@ -344,9 +344,11 @@ class ElementCreator {
   static createHeader({
     elements,
     clickFuncs,
+    classes,
   }) {
     const header = createBaseElement({
       clickFuncs,
+      classes,
       elementType: 'header',
     });
 

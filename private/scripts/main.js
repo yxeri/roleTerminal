@@ -239,6 +239,7 @@ const forumView = new ForumView({
 
 const statusBar = new StatusBar({
   viewSwitcher,
+  appendTop: false,
   title: 'O3C',
   showClock: true,
   showControls: {

@@ -19,6 +19,7 @@ const BaseView = require('../BaseView');
 const elementCreator = require('../../../ElementCreator');
 const keyHandler = require('../../../KeyHandler');
 const viewSwitcher = require('../../../ViewSwitcher');
+const voiceCommander = require('../../../VoiceCommander');
 
 const ids = {
   UPPERTEXT: 'upperText',
@@ -98,6 +99,7 @@ class BaseDialog extends BaseView {
       shouldPrepend,
     });
     keyHandler.pause();
+    voiceCommander.pause();
 
     if (this.inputs.length > 0) {
       this.inputs[0].focus();
@@ -114,6 +116,7 @@ class BaseDialog extends BaseView {
 
     super.removeFromView();
     keyHandler.unpause();
+    voiceCommander.unpause();
 
     parentElement.removeChild(document.getElementById(ids.COVER));
   }

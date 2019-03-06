@@ -17,14 +17,21 @@
 class VoiceCommander {
   constructor() {
     this.voiceListener = annyang; // eslint-disable-line
+    this.commands = {};
   }
 
   start() {
+    if (!this.voiceListener) {
+      setTimeout(this.start, 1000);
+
+      return;
+    }
+
     this.voiceListener.start({
       autoRestart: true,
       continuous: false,
     });
-    this.commands = {};
+    this.voiceListener.addCommands(this.commands);
   }
 
   addCommands({
@@ -49,7 +56,17 @@ class VoiceCommander {
       });
     });
 
-    this.voiceListener.addCommands(commandsObj);
+    if (this.voiceListener) {
+      this.voiceListener.addCommands(commandsObj);
+    }
+  }
+
+  pause() {
+    this.voiceListener.pause();
+  }
+
+  unpause() {
+    this.voiceListener.resume();
   }
 }
 

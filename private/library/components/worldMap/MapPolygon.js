@@ -23,6 +23,7 @@ class MapPolygon extends MapObject {
     labelStyle,
     choosableStyles,
     triggeredStyles,
+    overlay,
     hoverExcludeRule = {
       paramName: 'positionName',
       paramRegExp: /^polygon/ig,
@@ -71,6 +72,7 @@ class MapPolygon extends MapObject {
       triggeredStyles,
       markedStyle,
       style,
+      overlay,
       // TODO Combine with MapLine
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();

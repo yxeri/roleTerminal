@@ -35,6 +35,7 @@ const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
 // const teamComposer = require('../../data/composers/TeamComposer');
+const voiceCommander = require('../../VoiceCommander');
 
 class StatusBar extends BaseView {
   constructor({
@@ -135,6 +136,46 @@ class StatusBar extends BaseView {
         elements: [registerButton],
       });
       lastItems.push({ elements: [logoutButton] });
+
+      voiceCommander.addCommands({
+        activationString: 'menu',
+        commands: [
+          {
+            strings: ['logout'],
+            func: () => {
+              socketManager.logout({
+                callback: ({ error }) => {
+                  if (error) {
+                    console.log('Failed to logout');
+
+                    return;
+                  }
+
+                  console.log('Logged out');
+                },
+              });
+            },
+          }, {
+            strings: ['login'],
+            func: () => {
+              const login = new LoginDialog({});
+
+              login.addToView({
+                element: this.getParentElement(),
+              });
+            },
+          }, {
+            strings: ['register'],
+            func: () => {
+              const register = new RegisterDialog({});
+
+              register.addToView({
+                element: this.getParentElement(),
+              });
+            },
+          },
+        ],
+      });
     }
 
     if (showControls.docFile) {
@@ -158,6 +199,23 @@ class StatusBar extends BaseView {
         minimumAccessLevel: permissions.CreateDocFile
           ? permissions.CreateDocFile.accessLevel
           : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'file',
+            'document',
+          ],
+          func: () => {
+            const dialog = new DocFileDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 
@@ -183,6 +241,23 @@ class StatusBar extends BaseView {
           ? permissions.CreateRoom.accessLevel
           : accessCentral.AccessLevels.STANDARD,
       });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'room',
+            'chat room',
+          ],
+          func: () => {
+            const dialog = new RoomDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
+      });
     }
 
     if (showControls.alias) {
@@ -206,6 +281,23 @@ class StatusBar extends BaseView {
         minimumAccessLevel: permissions.CreateAlias
           ? permissions.CreateAlias.accessLevel
           : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'alias',
+            'alter ego',
+          ],
+          func: () => {
+            const dialog = new AliasDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 
@@ -234,6 +326,23 @@ class StatusBar extends BaseView {
         minimumAccessLevel: permissions.CreateTeam
           ? permissions.CreateTeam.accessLevel
           : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'team',
+            'group',
+          ],
+          func: () => {
+            const dialog = new TeamCreateDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 

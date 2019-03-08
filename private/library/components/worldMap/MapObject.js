@@ -555,7 +555,7 @@ class MapObject {
     }
 
     /**
-     * Fallback if Google Maps mouse event changes var name
+     * Fallback for missing x and y
      */
     MapObject.rightClickBox.classList.add('fallbackMapRightClickBox');
 

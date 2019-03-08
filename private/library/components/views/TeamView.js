@@ -16,7 +16,7 @@
 
 const ViewWrapper = require('../ViewWrapper');
 const TeamList = require('../lists/TeamList');
-const TeamPage = require('./TeamPage');
+const TeamPage = require('./pages/TeamPage');
 
 class TeamView extends ViewWrapper {
   constructor({

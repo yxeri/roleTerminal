@@ -16,6 +16,7 @@
 
 class MouseHandler {
   constructor() {
+    this.rightClicked = false;
     this.longClick = false;
     this.touchTimeout = 500;
     this.allowRightClick = false;
@@ -80,7 +81,13 @@ class MouseHandler {
     right,
   }) {
     if (leftFunc) {
-      google.maps.event.addListener(element, 'click', leftFunc);
+      google.maps.event.addListener(element, 'click', (event) => {
+        if (!this.rightClicked) {
+          leftFunc(event);
+        }
+
+        this.rightClicked = false;
+      });
     }
 
     if (right) {
@@ -95,6 +102,8 @@ class MouseHandler {
 
         setTimeout(() => {
           if (this.longClick) {
+            this.rightClicked = true;
+
             right(event);
           }
         }, this.touchTimeout);

@@ -746,7 +746,15 @@ $map-padding-fix: 2em;
 @media (orientation: portrait) {
   #main {
     > .viewWrapper {
-      > .oneOfTwo:last-child {
+      > .oneOfTwo:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(3) {
         display: none;
       }
 

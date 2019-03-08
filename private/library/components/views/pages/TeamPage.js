@@ -14,31 +14,25 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const TeamList = require('../lists/TeamList');
-const TeamPage = require('./pages/TeamPage');
+const BaseView = require('../BaseView');
+const TeamList = require('../../lists/TeamList');
 
-class TeamView extends ViewWrapper {
+class TeamPage extends BaseView {
   constructor({
     effect,
     classes = [],
-    elementId = `tView-${Date.now()}`,
+    elementId = `tPage-${Date.now()}`,
   }) {
-    const teamList = new TeamList({ effect });
-    const teamPage = new TeamPage({ effect });
-
     super({
       elementId,
-      columns: [
-        {
-          components: [{ component: teamList }],
-          classes: ['columnList'],
-        },
-        { components: [{ component: teamPage }] },
-      ],
-      classes: classes.concat(['teamView']),
+      classes: classes.concat(['teamPage']),
+    });
+
+    const teamList = new TeamList({
+      effect,
+
     });
   }
 }
 
-module.exports = TeamView;
+module.exports = TeamPage;

@@ -4,7 +4,7 @@ const WorldMapView = require('../library/components/views/WorldMapView');
 const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
-const StatusBar = require('../library/components/views/StatusBar');
+const MenuBar = require('../library/components/views/MenuBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
@@ -237,7 +237,7 @@ const forumView = new ForumView({
   effect: true,
 });
 
-const statusBar = new StatusBar({
+const menuBar = new MenuBar({
   viewSwitcher,
   appendTop: false,
   title: 'O3C',
@@ -253,7 +253,7 @@ const statusBar = new StatusBar({
   },
 });
 const docWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.DOCS,
   title: 'Docs',
   columns: [{
@@ -267,7 +267,7 @@ const docWrapper = new ViewWrapper({
   }],
 });
 const chatWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.CHAT,
   title: 'Coms',
   columns: [{
@@ -281,7 +281,7 @@ const chatWrapper = new ViewWrapper({
   }],
 });
 const fullMapWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.WORLDMAP,
   title: 'Maps',
   columns: [{
@@ -289,7 +289,7 @@ const fullMapWrapper = new ViewWrapper({
   }],
 });
 const walletWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.WALLET,
   title: 'Vcaps',
   columns: [{
@@ -303,7 +303,7 @@ const walletWrapper = new ViewWrapper({
   }],
 });
 const teamWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.TEAM,
   title: 'Teams',
   columns: [{
@@ -317,7 +317,7 @@ const teamWrapper = new ViewWrapper({
   }],
 });
 const forumWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   viewType: viewSwitcher.ViewTypes.FORUM,
   title: 'Forums',
   columns: [{
@@ -327,7 +327,7 @@ const forumWrapper = new ViewWrapper({
   }],
 });
 
-statusBar.setViews({
+menuBar.setViews({
   viewSwitcher,
   views: [
     { view: chatWrapper },
@@ -354,8 +354,6 @@ viewSwitcher.switchView({
   setToDefault: true,
   view: chatWrapper,
 });
-
-positionTracker.startTracker();
 
 if (!tools.getQueryParameters().noFullscreen) {
   document.addEventListener('click', () => {
@@ -406,3 +404,12 @@ voiceCommander.addCommands({
     },
   ],
 });
+
+if (window.cordova) {
+  document.addEventListener('deviceready', () => {
+    StatusBar.hide();
+    positionTracker.startTracker({ standalone: true });
+  }, false);
+} else {
+  positionTracker.startTracker({});
+}

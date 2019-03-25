@@ -170,7 +170,7 @@ span, p {
   box-sizing: border-box;
 }
 
-.withStatusBar {
+.withMenuBar {
   height: calc(100% - #{$status-bar-height});
   order: 1;
 }
@@ -580,7 +580,7 @@ $map-padding-fix: 2em;
   cursor: pointer;
 }
 
-.statusBar {
+.menuBar {
   order: 2;
   width: 100%;
   box-sizing: border-box;

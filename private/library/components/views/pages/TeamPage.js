@@ -30,7 +30,10 @@ class TeamPage extends BaseView {
 
     const teamList = new TeamList({
       effect,
+    });
 
+    teamList.addToView({
+      element: this.element,
     });
   }
 }

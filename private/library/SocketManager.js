@@ -20,7 +20,9 @@ const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
-    this.socket = io(); // eslint-disable-line no-undef
+    this.socket = io(typeof ioUri !== 'undefined' // eslint-disable-line no-undef
+      ? ioUri
+      : '/');
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;

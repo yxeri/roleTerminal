@@ -56,36 +56,66 @@ class Tracker {
     this.latestPositions = [];
   }
 
-  startTracker() {
-    const staticPosition = storageManager.getStaticPosition();
+  startTracker({ standalone = false }) {
+    if (standalone) {
+      const backgroundGeo = window.BackgroundGeolocation;
 
-    if (staticPosition.coordinates) {
-      if (this.watchId) {
-        navigator.geolocation.clearWatch(this.watchId);
+      if (!backgroundGeo) {
+        setTimeout(() => {
+          this.startTracker({ standalone: true });
+        }, 1000);
       }
 
-      positionComposer.updatePosition({
-        positionId: storageManager.getUserId(),
-        position: convertPosition(staticPosition),
-        callback: ({ error }) => {
-          if (error) {
-            console.log('static position update failed', error);
-          }
-        },
-      });
-    } else {
-      this.watchId = navigator.geolocation.watchPosition((position) => {
+      backgroundGeo.onLocation((position) => {
         if (position) {
           this.latestPositions.push(convertPosition(position));
+          this.sendBestPosition();
         }
-      }, (err) => {
-        console.log(err);
-      }, { enableHighAccuracy: true });
+      });
+
+      backgroundGeo.ready({
+        reset: true,
+        desiredAccuracy: backgroundGeo.DESIRED_ACCURACY_HIGH,
+        distanceFilter: 10,
+        autoSync: true,
+        stopOnTerminate: false,
+        startOnBoot: true,
+      }, (state) => {
+        if (!state.enabled) {
+          backgroundGeo.start();
+        }
+      });
+    } else {
+      const staticPosition = storageManager.getStaticPosition();
+
+      if (staticPosition.coordinates) {
+        if (this.watchId) {
+          navigator.geolocation.clearWatch(this.watchId);
+        }
+
+        positionComposer.updatePosition({
+          positionId: storageManager.getUserId(),
+          position: convertPosition(staticPosition),
+          callback: ({ error }) => {
+            if (error) {
+              console.log('static position update failed', error);
+            }
+          },
+        });
+      } else {
+        this.watchId = navigator.geolocation.watchPosition((position) => {
+          if (position) {
+            this.latestPositions.push(convertPosition(position));
+          }
+        }, (err) => {
+          console.log(err);
+        }, { enableHighAccuracy: true });
+      }
+
+      this.latestPositions = [];
+
+      this.startSendTimeout();
     }
-
-    this.latestPositions = [];
-
-    this.startSendTimeout();
   }
 
   startSendTimeout() {

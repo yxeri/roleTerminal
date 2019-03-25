@@ -397,12 +397,12 @@ const labels = {
       se: 'Byt stil',
     },
   },
-  StatusBar: {
-    menu: (override.StatusBar && override.StatusBar.menu) || {
+  MenuBar: {
+    menu: (override.MenuBar && override.MenuBar.menu) || {
       en: 'Menu',
       se: 'Meny',
     },
-    emptyTime: (override.StatusBar && override.StatusBar.emptyTime) || {
+    emptyTime: (override.MenuBar && override.MenuBar.emptyTime) || {
       en: '--:--',
     },
   },

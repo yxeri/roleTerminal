@@ -37,7 +37,7 @@ const userComposer = require('../../data/composers/UserComposer');
 // const teamComposer = require('../../data/composers/TeamComposer');
 const voiceCommander = require('../../VoiceCommander');
 
-class StatusBar extends BaseView {
+class MenuBar extends BaseView {
   constructor({
     title,
     viewSwitcher,
@@ -46,11 +46,11 @@ class StatusBar extends BaseView {
     showClock = true,
     menuItems = [],
     classes = [],
-    elementId = `statusBar-${Date.now()}`,
+    elementId = `menuBar-${Date.now()}`,
   }) {
     super({
       elementId,
-      classes: classes.concat(['statusBar']),
+      classes: classes.concat(['menuBar']),
     });
 
     const permissions = storageManager.getPermissions();
@@ -365,7 +365,7 @@ class StatusBar extends BaseView {
 
           event.stopPropagation();
         },
-        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'menu' }),
+        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'menu' }),
       });
 
       this.lists.push(this.menuList);
@@ -390,7 +390,7 @@ class StatusBar extends BaseView {
         elements: [menuButton],
       });
       const watcherFunc = () => {
-        StatusBar.setUsername({ button: menuButton });
+        MenuBar.setUsername({ button: menuButton });
       };
 
       this.lists.push(this.currentUserList);
@@ -415,7 +415,7 @@ class StatusBar extends BaseView {
 
     if (this.showClock) {
       this.timeSpan = elementCreator.createSpan({
-        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'emptyTime' }),
+        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'emptyTime' }),
       });
 
       this.element.appendChild(this.timeSpan);
@@ -521,7 +521,7 @@ class StatusBar extends BaseView {
 
         event.stopPropagation();
       },
-      text: labelHandler.getLabel({ baseObject: 'StatusBar', label: '-----' }),
+      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: '-----' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 
@@ -542,4 +542,4 @@ class StatusBar extends BaseView {
   }
 }
 
-module.exports = StatusBar;
+module.exports = MenuBar;

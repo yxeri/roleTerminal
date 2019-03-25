@@ -6,7 +6,7 @@ const viewSwitcher = require('../ViewSwitcher');
 
 class ViewWrapper extends BaseView {
   constructor({
-    statusBar,
+    menuBar,
     title,
     viewType,
     useDefaultCss = true,
@@ -26,7 +26,7 @@ class ViewWrapper extends BaseView {
 
     this.viewType = viewType;
     this.columnAmount = columns.length;
-    this.statusBar = statusBar;
+    this.menuBar = menuBar;
     this.columns = columns;
     this.columnElements = [];
     this.title = title;
@@ -58,13 +58,13 @@ class ViewWrapper extends BaseView {
   }
 
   addToView({ element }) {
-    if (this.statusBar) {
-      if (this.statusBar.appendTop) {
-        this.statusBar.addToView({ element: this.element });
+    if (this.menuBar) {
+      if (this.menuBar.appendTop) {
+        this.menuBar.addToView({ element: this.element });
         this.attachColumns();
       } else {
         this.attachColumns();
-        this.statusBar.addToView({ element: this.element });
+        this.menuBar.addToView({ element: this.element });
       }
     } else {
       this.attachColumns();
@@ -86,8 +86,8 @@ class ViewWrapper extends BaseView {
       containerClasses.push('one');
     }
 
-    if (this.statusBar) {
-      containerClasses.push('withStatusBar');
+    if (this.menuBar) {
+      containerClasses.push('withMenuBar');
     }
 
     const container = elementCreator.createContainer({ classes: containerClasses });
@@ -120,7 +120,7 @@ class ViewWrapper extends BaseView {
       component.removeFromView();
     });
 
-    if (this.statusBar) { index += 1; }
+    if (this.menuBar) { index += 1; }
 
     this.element.replaceChild(this.createColumn({ column }), this.element.childNodes[index]);
   }

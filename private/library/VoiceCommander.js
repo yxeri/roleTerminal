@@ -62,10 +62,18 @@ class VoiceCommander {
   }
 
   pause() {
+    if (!this.voiceListener) {
+      return;
+    }
+
     this.voiceListener.pause();
   }
 
   unpause() {
+    if (!this.voiceListener) {
+      return;
+    }
+
     this.voiceListener.resume();
   }
 }

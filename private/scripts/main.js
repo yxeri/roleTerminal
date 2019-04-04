@@ -38,7 +38,7 @@ const worldMapParams = {
   },
   labelStyle: {
     fontColor: '#00ffef',
-    minZoomLevel: 19,
+    minZoomLevel: 18,
     fontSize: 11,
   },
   backgroundColor: '#23001e',
@@ -176,11 +176,13 @@ const worldMapParams = {
     title: 'Housing',
     positionTypes: ['local'],
     effect: true,
+    zoomLevel: 18,
   }, {
     elementId: 'lanternList',
     title: 'LANTERN',
     positionTypes: ['lantern'],
     effect: true,
+    zoomLevel: 16,
   }, {
     elementId: 'userList',
     title: 'Users',
@@ -198,6 +200,7 @@ const worldMapParams = {
         return objectId.slice(0, 10);
       },
     }],
+    zoomLevel: 18,
   }, {
     elementId: 'roadList',
     title: 'Roads',
@@ -206,16 +209,19 @@ const worldMapParams = {
       'roads',
     ],
     effect: true,
+    zoomLevel: 18,
   }, {
     elementId: 'deviceList',
     title: 'Device',
     positionTypes: ['device'],
     effect: true,
+    zoomLevel: 18,
   }, {
     elementId: 'worldList',
     title: 'World',
     positionTypes: ['world'],
     effect: true,
+    zoomLevel: 11,
   }],
 };
 const chatView = new ChatView({

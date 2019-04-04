@@ -18,13 +18,13 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
-const worldMapHandler = require('../../data/composers/PositionComposer');
+const positionComposer = require('../../data/composers/PositionComposer');
 
 class PositionList extends List {
   constructor(params) {
     const listParams = params;
     listParams.shouldToggle = true;
-    listParams.positionTypes = listParams.positionTypes || Object.keys(worldMapHandler.PositionTypes).map(positionType => worldMapHandler.PositionTypes[positionType]);
+    listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map(positionType => positionComposer.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
     listParams.classes = listParams.classes
       ? listParams.classes.concat(['positionList'])

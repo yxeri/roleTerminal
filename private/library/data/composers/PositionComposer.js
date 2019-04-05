@@ -81,6 +81,16 @@ class PositionComposer extends BaseComposer {
     });
   }
 
+  removePosition({
+    positionId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { positionId },
+    });
+  }
+
   addPositionTypes(positionTypes = []) {
     positionTypes.forEach((positionType) => {
       this.PositionTypes[positionType] = positionType;

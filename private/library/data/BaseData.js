@@ -390,7 +390,7 @@ class BaseData {
       const { orCheck } = filter;
       const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
 
-      return objects.findOne((object) => {
+      return objects.find((object) => {
         if (orCheck) {
           return filter.rules.some((rule) => {
             if (rule.shouldInclude) {

@@ -3,7 +3,7 @@ const MapMarker = require('../../worldMap/MapMarker');
 const MapLine = require('../../worldMap/MapLine');
 const MapPolygon = require('../../worldMap/MapPolygon');
 const MapObject = require('../../worldMap/MapObject');
-const BaseDialog = require('../dialogs/BaseDialog');
+const PositionDialog = require('../dialogs/PositionDialog');
 
 const positionComposer = require('../../../data/composers/PositionComposer');
 const storageManager = require('../../../StorageManager');
@@ -279,65 +279,9 @@ class WorldMapPage extends BaseView {
           leftFunc: () => {
             MapObject.hideRightClickBox();
 
-            const dialog = new BaseDialog({
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      dialog.removeFromView();
-                    },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      const position = {
-                        coordinates: {
-                          longitude: event.latLng.lng(),
-                          latitude: event.latLng.lat(),
-                        },
-                        positionName: dialog.getInputValue(ids.CREATEPOSITIONNAME),
-                      };
-                      const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
-
-                      if (description) {
-                        position.description = description.split('\n');
-                      }
-
-                      positionComposer.createPosition({
-                        position,
-                        callback: ({ error }) => {
-                          if (error) {
-                            console.log('Create position', error);
-
-                            return;
-                          }
-
-                          dialog.removeFromView();
-                        },
-                      });
-                    },
-                  },
-                }),
-              ],
-              inputs: [
-                elementCreator.createInput({
-                  elementId: ids.CREATEPOSITIONNAME,
-                  inputName: 'positionName',
-                  type: 'text',
-                  isRequired: true,
-                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
-                }),
-                elementCreator.createInput({
-                  elementId: ids.CREATEPOSITIONDESCRIPTION,
-                  inputName: 'positionDescription',
-                  type: 'text',
-                  multiLine: true,
-                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
-                }),
-              ],
+            const dialog = new PositionDialog({
+              latitude: event.latLng.lat(),
+              longitude: event.latLng.lng(),
             });
 
             dialog.addToView({ element: viewSwitcher.getParentElement() });

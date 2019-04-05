@@ -121,6 +121,10 @@ class MessageList extends List {
           convertFunc: (objectId) => {
             const room = dataHandler.rooms.getObject({ objectId });
 
+            if (!multiRoom) {
+              return '';
+            }
+
             if (room) {
               const { isWhisper, participantIds } = room;
 

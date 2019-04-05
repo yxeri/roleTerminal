@@ -41,6 +41,7 @@ class MenuBar extends BaseView {
   constructor({
     title,
     viewSwitcher,
+    image,
     appendTop = false,
     showControls = {},
     showClock = true,
@@ -66,6 +67,7 @@ class MenuBar extends BaseView {
     this.showClock = showClock;
     this.lists = [];
     this.appendTop = appendTop;
+    this.image = image;
 
     viewSwitcher.parentElement.addEventListener('click', () => {
       this.menuList.classList.add('hide');
@@ -411,6 +413,12 @@ class MenuBar extends BaseView {
         event: eventCentral.Events.CHANGED_ALIAS,
         func: watcherFunc,
       });
+    }
+
+    if (image) {
+      this.element.appendChild(elementCreator.createPicture({
+        picture: image,
+      }));
     }
 
     if (this.showClock) {

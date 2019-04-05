@@ -4,6 +4,7 @@ const MapLine = require('../../worldMap/MapLine');
 const MapPolygon = require('../../worldMap/MapPolygon');
 const MapObject = require('../../worldMap/MapObject');
 const PositionDialog = require('../dialogs/PositionDialog');
+const MapCircle = require('../../worldMap/MapCircle');
 
 const positionComposer = require('../../../data/composers/PositionComposer');
 const storageManager = require('../../../StorageManager');
@@ -176,6 +177,16 @@ class WorldMapPage extends BaseView {
 
     switch (position.positionStructure) {
       case positionComposer.PositionStructures.CIRCLE: {
+        newMarker = new MapCircle({
+          position,
+          overlay: this.overlay,
+          hoverExcludeRule: this.hoverExcludeRule.circles,
+          triggeredStyles: this.triggeredStyles.circles,
+          choosableStyles: this.choosableStyles.circles,
+          alwaysShowLabel: this.alwaysShowLabels.circle,
+          labelStyle: this.labelStyle,
+          styles: this.circleStyle,
+        });
         break;
       }
       case positionComposer.PositionStructures.LINE: {

@@ -135,6 +135,7 @@ class WorldMapPage extends BaseView {
 
   realignMap({
     markers,
+    zoomLevel,
     useDefaultCoordinates = false,
   }) {
     const bounds = new google.maps.LatLngBounds();
@@ -151,13 +152,17 @@ class WorldMapPage extends BaseView {
         bottomRight: storageManager.getCornerTwoCoordinates(),
       };
 
-      this.worldMap.setZoom(this.maxZoom);
+      this.worldMap.setZoom(zoomLevel || this.maxZoom);
       bounds.extend(new google.maps.LatLng(cornerCoordinates.upperLeft.latitude, cornerCoordinates.upperLeft.longitude));
       bounds.extend(new google.maps.LatLng(cornerCoordinates.bottomRight.latitude, cornerCoordinates.bottomRight.longitude));
     }
 
     this.worldMap.fitBounds(bounds);
     this.worldMap.setCenter(bounds.getCenter());
+
+    if (zoomLevel) {
+      this.worldMap.setZoom(zoomLevel);
+    }
   }
 
   /**
@@ -380,11 +385,15 @@ class WorldMapPage extends BaseView {
       func: ({
         origin,
         position,
+        zoomLevel,
       }) => {
         const marker = this.markers[position.objectId];
 
         if (marker && (!this.listId || this.listId === origin)) {
-          this.realignMap({ markers: [marker] });
+          this.realignMap({
+            zoomLevel,
+            markers: [marker],
+          });
           marker.markPosition({});
         }
       },

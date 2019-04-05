@@ -93,7 +93,7 @@ class WorldMapPage extends BaseView {
     position,
     changeType,
   }) {
-    if (!this.worldMap || position.coordinatesHistory.length === 0) {
+    if (!this.worldMap || (position.coordinatesHistory && position.coordinatesHistory.length === 0)) {
       return;
     }
 

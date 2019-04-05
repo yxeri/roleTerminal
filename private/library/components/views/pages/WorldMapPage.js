@@ -383,6 +383,7 @@ class WorldMapPage extends BaseView {
     eventHandler.addWatcher({
       event: eventHandler.Events.FOCUS_MAPPOSITION,
       func: ({
+        showDescription,
         origin,
         position,
         zoomLevel,
@@ -395,6 +396,10 @@ class WorldMapPage extends BaseView {
             markers: [marker],
           });
           marker.markPosition({});
+        }
+
+        if (showDescription) {
+          MapObject.buildLeftClickBox({ position: positionComposer.getPosition({ positionId: position.objectId }) });
         }
       },
     });

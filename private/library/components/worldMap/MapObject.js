@@ -13,6 +13,7 @@
 
 const Label = require('./MapLabel');
 const BaseDialog = require('../views/dialogs/BaseDialog');
+const VerifyDialog = require('../views/dialogs/VerifyDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
@@ -142,7 +143,7 @@ class MapObject {
           if (clickFuncs.leftFunc) {
             clickFuncs.leftFunc(event);
           } else if (descriptionOnClick) {
-            MapObject.buildLeftClickBox({ thisMapObject: this });
+            MapObject.buildLeftClickBox({ position: this.position });
           }
 
           return;
@@ -380,11 +381,11 @@ class MapObject {
     }, 1500);
   }
 
-  static buildLeftClickBox({ thisMapObject }) {
+  static buildLeftClickBox({ position }) {
     const {
       positionName,
       description = [],
-    } = thisMapObject.position;
+    } = position;
 
     if (description.length === 0) {
       return;
@@ -497,6 +498,39 @@ class MapObject {
       });
     }
 
+    items.push({
+      elements: [elementCreator.createSpan({
+        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'removePosition' }),
+      })],
+      clickFuncs: {
+        leftFunc: () => {
+          const dialog = new VerifyDialog({
+            text: ['Are you sure you want to remove the position?'],
+            callback: ({ confirmed }) => {
+              if (!confirmed) {
+                return;
+              }
+
+              positionComposer.removePosition({
+                positionId: this.position.objectId,
+                callback: ({ error }) => {
+                  if (error) {
+                    console.log('Failed to remove the position', error);
+
+                    return;
+                  }
+
+                  dialog.removeFromView();
+                },
+              });
+            },
+          });
+
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
+        },
+      },
+    });
+
     const coordinates = this.getCenter();
     const { x, y } = this.overlay.getProjection().fromLatLngToContainerPixel(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
 
@@ -555,10 +589,9 @@ class MapObject {
     }
 
     /**
-     * Fallback for missing x and y
+     * Fallback for missing x or y
      */
     MapObject.rightClickBox.classList.add('fallbackMapRightClickBox');
-
     MapObject.rightClickBox.classList.remove('hide');
     MapObject.rightClickBox.removeAttribute('style');
   }

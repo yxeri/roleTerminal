@@ -14,13 +14,6 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const viewSwitcher = require('../../../ViewSwitcher');
 
-const ids = {
-  RIGHTCLICKBOX: 'rMapBox',
-  LEFTCLICKBOX: 'lMapBox',
-  CREATEPOSITIONNAME: 'createPositionName',
-  CREATEPOSITIONDESCRIPTION: 'createPositionDescription',
-};
-
 class WorldMapPage extends BaseView {
   constructor({
     mapStyles,

@@ -45,8 +45,10 @@ class PositionList extends List {
         eventCentral.emitEvent({
           event: eventCentral.Events.FOCUS_MAPPOSITION,
           params: {
+            showDescription: true,
             origin: this.elementId,
             position: { objectId },
+            zoomLevel: params.zoomLevel,
           },
         });
       },

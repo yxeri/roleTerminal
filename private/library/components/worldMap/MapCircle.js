@@ -23,8 +23,9 @@ class MapCircle extends MapObject {
     pulseOptions,
     hoverExcludeRule,
     overlay,
+    labelStyle,
     zIndex = 4,
-    radius = 10,
+    radius = 40,
     styles = {},
     alwaysShowLabel = false,
     shouldCluster = false,
@@ -39,6 +40,7 @@ class MapCircle extends MapObject {
       position,
       clickFuncs,
       overlay,
+      labelStyle,
       dragEndFunc: () => {
         this.currentCoordinates({
           coordinates: {
@@ -85,10 +87,6 @@ class MapCircle extends MapObject {
     if (pulseOptions) {
       setTimeout(pulse, 20);
     }
-  }
-
-  getCenter() {
-    return this.mapObject.getCenter();
   }
 
   setCurrentCoordinates({ coordinates }) {

@@ -3,7 +3,8 @@ const MapMarker = require('../../worldMap/MapMarker');
 const MapLine = require('../../worldMap/MapLine');
 const MapPolygon = require('../../worldMap/MapPolygon');
 const MapObject = require('../../worldMap/MapObject');
-const BaseDialog = require('../dialogs/BaseDialog');
+const PositionDialog = require('../dialogs/PositionDialog');
+const MapCircle = require('../../worldMap/MapCircle');
 
 const positionComposer = require('../../../data/composers/PositionComposer');
 const storageManager = require('../../../StorageManager');
@@ -13,13 +14,6 @@ const mouseHandler = require('../../../MouseHandler');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const viewSwitcher = require('../../../ViewSwitcher');
-
-const ids = {
-  RIGHTCLICKBOX: 'rMapBox',
-  LEFTCLICKBOX: 'lMapBox',
-  CREATEPOSITIONNAME: 'createPositionName',
-  CREATEPOSITIONDESCRIPTION: 'createPositionDescription',
-};
 
 class WorldMapPage extends BaseView {
   constructor({
@@ -99,7 +93,7 @@ class WorldMapPage extends BaseView {
     position,
     changeType,
   }) {
-    if (!this.worldMap || position.coordinatesHistory.length === 0) {
+    if (!this.worldMap || (position.coordinatesHistory && position.coordinatesHistory.length === 0)) {
       return;
     }
 
@@ -142,6 +136,7 @@ class WorldMapPage extends BaseView {
 
   realignMap({
     markers,
+    zoomLevel,
     useDefaultCoordinates = false,
   }) {
     const bounds = new google.maps.LatLngBounds();
@@ -158,13 +153,17 @@ class WorldMapPage extends BaseView {
         bottomRight: storageManager.getCornerTwoCoordinates(),
       };
 
-      this.worldMap.setZoom(this.maxZoom);
+      this.worldMap.setZoom(zoomLevel || this.maxZoom);
       bounds.extend(new google.maps.LatLng(cornerCoordinates.upperLeft.latitude, cornerCoordinates.upperLeft.longitude));
       bounds.extend(new google.maps.LatLng(cornerCoordinates.bottomRight.latitude, cornerCoordinates.bottomRight.longitude));
     }
 
     this.worldMap.fitBounds(bounds);
     this.worldMap.setCenter(bounds.getCenter());
+
+    if (zoomLevel) {
+      this.worldMap.setZoom(zoomLevel);
+    }
   }
 
   /**
@@ -178,6 +177,16 @@ class WorldMapPage extends BaseView {
 
     switch (position.positionStructure) {
       case positionComposer.PositionStructures.CIRCLE: {
+        newMarker = new MapCircle({
+          position,
+          overlay: this.overlay,
+          hoverExcludeRule: this.hoverExcludeRule.circles,
+          triggeredStyles: this.triggeredStyles.circles,
+          choosableStyles: this.choosableStyles.circles,
+          alwaysShowLabel: this.alwaysShowLabels.circle,
+          labelStyle: this.labelStyle,
+          styles: this.circleStyle,
+        });
         break;
       }
       case positionComposer.PositionStructures.LINE: {
@@ -279,65 +288,9 @@ class WorldMapPage extends BaseView {
           leftFunc: () => {
             MapObject.hideRightClickBox();
 
-            const dialog = new BaseDialog({
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      dialog.removeFromView();
-                    },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      const position = {
-                        coordinates: {
-                          longitude: event.latLng.lng(),
-                          latitude: event.latLng.lat(),
-                        },
-                        positionName: dialog.getInputValue(ids.CREATEPOSITIONNAME),
-                      };
-                      const description = dialog.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
-
-                      if (description) {
-                        position.description = description.split('\n');
-                      }
-
-                      positionComposer.createPosition({
-                        position,
-                        callback: ({ error }) => {
-                          if (error) {
-                            console.log('Create position', error);
-
-                            return;
-                          }
-
-                          dialog.removeFromView();
-                        },
-                      });
-                    },
-                  },
-                }),
-              ],
-              inputs: [
-                elementCreator.createInput({
-                  elementId: ids.CREATEPOSITIONNAME,
-                  inputName: 'positionName',
-                  type: 'text',
-                  isRequired: true,
-                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
-                }),
-                elementCreator.createInput({
-                  elementId: ids.CREATEPOSITIONDESCRIPTION,
-                  inputName: 'positionDescription',
-                  type: 'text',
-                  multiLine: true,
-                  placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
-                }),
-              ],
+            const dialog = new PositionDialog({
+              latitude: event.latLng.lat(),
+              longitude: event.latLng.lng(),
             });
 
             dialog.addToView({ element: viewSwitcher.getParentElement() });
@@ -441,14 +394,23 @@ class WorldMapPage extends BaseView {
     eventHandler.addWatcher({
       event: eventHandler.Events.FOCUS_MAPPOSITION,
       func: ({
+        showDescription,
         origin,
         position,
+        zoomLevel,
       }) => {
         const marker = this.markers[position.objectId];
 
         if (marker && (!this.listId || this.listId === origin)) {
-          this.realignMap({ markers: [marker] });
+          this.realignMap({
+            zoomLevel,
+            markers: [marker],
+          });
           marker.markPosition({});
+        }
+
+        if (showDescription) {
+          MapObject.buildLeftClickBox({ position: positionComposer.getPosition({ positionId: position.objectId }) });
         }
       },
     });

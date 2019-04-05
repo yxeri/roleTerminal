@@ -389,12 +389,14 @@ const labels = {
       se: 'Platsens beskrivning',
     },
     movePosition: (override.MapObject && override.WorldMapView.movePosition) || {
-      en: 'Move position',
-      se: 'Flytta platsen',
+      en: 'Move',
+      se: 'Flytta',
     },
     changeStyle: (override.MapObject && override.WorldMapView.changeStyle) || {
-      en: 'Change style',
-      se: 'Byt stil',
+      en: 'Styling',
+    },
+    removePosition: (override.MapObject && override.MapObject.removePosition) || {
+      en: 'Remove',
     },
   },
   MenuBar: {

@@ -39,6 +39,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    fullDate = true,
     multiRoom = false,
     shouldSwitchRoom = false,
     whisperText = ' - ',
@@ -110,13 +111,19 @@ class MessageList extends List {
           convertFunc: (date) => {
             const timestamp = textTools.generateTimestamp({ date });
 
-            return `${timestamp.fullTime} ${timestamp.fullDate}`;
+            return fullDate
+              ? `${timestamp.fullTime} ${timestamp.fullDate}`
+              : `${timestamp.fullTime} ${timestamp.halfDate}`;
           },
         }, {
           classes: ['msgRoomName'],
           paramName: 'roomId',
           convertFunc: (objectId) => {
             const room = dataHandler.rooms.getObject({ objectId });
+
+            if (!multiRoom) {
+              return '';
+            }
 
             if (room) {
               const { isWhisper, participantIds } = room;

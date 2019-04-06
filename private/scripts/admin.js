@@ -13,7 +13,7 @@
 
 require('../library/polyfills');
 
-const StatusBar = require('../library/components/views/StatusBar');
+const MenuBar = require('../library/components/views/MenuBar');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const AdminUserList = require('../library/components/lists/AdminUserList');
 const BaseView = require('../library/components/views/BaseView');
@@ -24,7 +24,7 @@ const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
 const accessCentral = require('../library/AccessCentral');
 
-const statusBar = new StatusBar({
+const menuBar = new MenuBar({
   viewSwitcher,
   showClock: true,
   showControls: {
@@ -38,7 +38,7 @@ const statusBar = new StatusBar({
 });
 const adminUserList = new AdminUserList({});
 const userWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   columns: [{
     components: [{ component: adminUserList }],
   }],
@@ -51,14 +51,14 @@ const notAllowedView = new BaseView({
 notAllowedView.element.appendChild(elementCreator.createSpan({ text: 'You do not have permission to access the admin controls. Login to an admin account to proceed.' }));
 
 const notAllowedWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   columns: [{
     components: [{ component: notAllowedView }],
   }],
 });
 
 mouseHandler.setAllowRightClick(true);
-statusBar.setViews({
+menuBar.setViews({
   views: [
     { view: userWrapper },
   ],

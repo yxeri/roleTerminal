@@ -57,11 +57,11 @@ viewSwitcher.switchView({
   view: chatWrapper,
 });
 
-if (!tools.getQueryParameters().noFullscreen) {
-  document.addEventListener('click', () => {
-    viewTools.goFullScreen({});
-  });
-}
+// if (!tools.getQueryParameters().noFullscreen) {
+//   document.addEventListener('click', () => {
+//     viewTools.goFullScreen({});
+//   });
+// }
 
 voiceCommander.start();
 voiceCommander.addCommands({

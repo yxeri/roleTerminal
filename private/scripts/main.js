@@ -3,10 +3,10 @@ require('../library/polyfills');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const MenuBar = require('../library/components/views/MenuBar');
-const positionTracker = require('../library/PositionTracker');
-const viewTools = require('../library/ViewTools');
+// const positionTracker = require('../library/PositionTracker');
+// const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
-const tools = require('../library/Tools');
+// const tools = require('../library/Tools');
 const voiceCommander = require('../library/VoiceCommander');
 const labelHandler = require('../library/labels/LabelHandler');
 
@@ -80,8 +80,9 @@ voiceCommander.addCommands({
 if (window.cordova) {
   document.addEventListener('deviceready', () => {
     StatusBar.hide();
-    positionTracker.startTracker({ standalone: true });
+    // positionTracker.startTracker({ standalone: true });
   }, false);
-} else {
-  positionTracker.startTracker({});
 }
+// else {
+//   positionTracker.startTracker({});
+// }

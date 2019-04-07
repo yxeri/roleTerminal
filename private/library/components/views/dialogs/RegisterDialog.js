@@ -30,6 +30,7 @@ const ids = {
 
 class RegisterDialog extends BaseDialog {
   constructor({
+    requireFullName = false,
     classes = [],
     elementId = `rDialog-${Date.now()}`,
   }) {
@@ -39,7 +40,7 @@ class RegisterDialog extends BaseDialog {
         inputName: 'username',
         type: 'text',
         isRequired: true,
-        maxLength: 10,
+        maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'username' }),
       }),
       elementCreator.createInput({
@@ -47,6 +48,7 @@ class RegisterDialog extends BaseDialog {
         inputName: 'fullName',
         type: 'text',
         maxLength: 20,
+        isRequired: requireFullName,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),
       elementCreator.createInput({

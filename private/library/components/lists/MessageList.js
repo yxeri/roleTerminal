@@ -39,6 +39,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    showTeam = true,
     fullDate = true,
     multiRoom = false,
     shouldSwitchRoom = false,
@@ -100,7 +101,13 @@ class MessageList extends List {
             const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
 
             if (identity) {
-              return `${identity.username || identity.aliasName} [${shortNames.join('/')}]`;
+              let name = identity.username || identity.aliasName;
+
+              if (showTeam) {
+                name += `[${shortNames.join('/')}]`;
+              }
+
+              return name;
             }
 
             return objectId;

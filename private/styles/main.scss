@@ -389,3 +389,9 @@ button {
   word-wrap: break-word;
   overflow-y: auto;
 }
+
+.UserDialog {
+  .lowerButtons span:nth-child(2) {
+    display: none;
+  }
+}

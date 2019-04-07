@@ -71,7 +71,11 @@ class MenuBar extends BaseView {
 
     viewSwitcher.parentElement.addEventListener('click', () => {
       this.menuList.classList.add('hide');
-      this.viewList.classList.add('hide');
+
+      if (this.viewList) {
+        this.viewList.classList.add('hide');
+      }
+
       this.currentUserList.hideView();
     });
 

@@ -37,6 +37,14 @@ class ChatView extends ViewWrapper {
     shouldResize,
     placeholder,
     title,
+    whisperText,
+    showTeam,
+    titles = {
+      rooms: 'Rooms',
+      following: 'Following',
+      whispers: 'Whispers',
+      users: 'Users',
+    },
     sendOnEnter = false,
     hideRoomList = false,
     classes = [],
@@ -47,26 +55,29 @@ class ChatView extends ViewWrapper {
     const roomList = new RoomList({
       effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: 'Rooms',
+      title: titles.rooms,
     });
     const roomFollowingList = new RoomFollowingList({
       effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: 'Following',
+      title: titles.following,
     });
     const whisperRoomList = new WhisperRoomList({
       effect,
+      whisperText,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: 'Whispers',
+      title: titles.whispers,
     });
     const userList = new UserList({
       effect,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: 'Users',
+      title: titles.users,
       shouldFocusOnClick: false,
     });
     const messageList = new MessageList({
       effect,
+      whisperText,
+      showTeam,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,
@@ -138,7 +149,9 @@ class ChatView extends ViewWrapper {
       blurCallback: () => {},
       inputCallback: () => {},
     });
-    const roomInfo = new RoomInfo({});
+    const roomInfo = new RoomInfo({
+      whisperText,
+    });
     const columns = [];
     const mainColumn = {
       components: [{ component: roomInfo }],

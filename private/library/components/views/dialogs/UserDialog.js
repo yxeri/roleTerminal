@@ -160,9 +160,13 @@ class UserDialog extends BaseDialog {
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
       '',
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`,
     ];
+
+    if (partOfTeams && partOfTeams.length > 0) {
+      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`);
+    }
+
+    upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
 
     super({
       elementId,

@@ -120,7 +120,7 @@ class BaseView {
     return this.elementId;
   }
 
-  static hasAccess({ object, user }) {
+  hasAccess({ object, user }) { // eslint-disable-line
     return accessCentral.hasAccessTo({
       objectToAccess: object,
       toAuth: user,

@@ -160,7 +160,7 @@ class List extends BaseView {
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (BaseView.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee) {
                 this.addOneItem({
                   object,
                   shouldFlash: true,
@@ -173,7 +173,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (BaseView.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee) {
                 this.onCreateFunc({ object });
 
                 this.addOneItem({
@@ -322,7 +322,7 @@ class List extends BaseView {
     const marked = storageManager.getMarked();
 
     objects.forEach((object) => {
-      const { canSee } = BaseView.hasAccess({ object, user });
+      const { canSee } = this.hasAccess({ object, user });
 
       if (canSee) {
         const listItem = this.createListItem({

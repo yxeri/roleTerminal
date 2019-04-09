@@ -147,20 +147,20 @@ class RoomList extends List {
 
     return {
       canSee:
-      (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
-      || (user.objectId && object.participantIds.includes(user.objectId))
-      || access.canSee,
+        (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
+        || (user.objectId && object.participantIds.includes(user.objectId))
+        || access.canSee,
     };
   }
 
   getCollectorObjects() {
-    const userId = storageManager.getUserId();
-    const userAliases = [userId].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const currentUser = userComposer.getCurrentUser();
+    const userAliases = [currentUser.objectId].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
     const allRooms = this.collector.getObjects({
       filter: this.filter,
     });
 
-    if (!userId) {
+    if (!currentUser) {
       return [];
     }
 

@@ -124,10 +124,12 @@ class MapObject {
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
+        const center = this.mapObject.getCenter();
+
         this.setCurrentCoordinates({
           coordinates: {
-            longitude: this.mapObject.position.lng(),
-            latitude: this.mapObject.position.lat(),
+            longitude: center.lng(),
+            latitude: center.lat(),
           },
         });
         this.updatePositionCoordinates();

@@ -226,6 +226,9 @@ const labels = {
       en: 'User already exists.',
       se: 'Användare existerar redan.',
     },
+    description: (override.RegisterDialog && override.RegisterDialog.description) || {
+      en: 'Intro',
+    },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
       en: 'The user name must be be 2 - 40 characters long.',
       se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
@@ -233,6 +236,9 @@ const labels = {
     passwordLength: (override.RegisterDialog && override.RegisterDialog.passwordLength) || {
       en: 'The password must be be 4 - 40 characters long.',
       se: 'Lösenordet måste vara 4 - 40 tecken långt.',
+    },
+    descriptionLength: (override.RegisterDialog && override.RegisterDialog.descriptionLength) || {
+      en: 'The description cannot be more than 500 characters',
     },
     invalidCharacters: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
       en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',

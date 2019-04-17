@@ -26,6 +26,8 @@ const ids = {
   USERNAME: 'username',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
+  DESCRIPTION: 'description',
+  PICTURE: 'picture',
 };
 
 class RegisterDialog extends BaseDialog {
@@ -67,6 +69,20 @@ class RegisterDialog extends BaseDialog {
         maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'repeatPassword' }),
       }),
+      elementCreator.createInput({
+        elementId: ids.DESCRIPTION,
+        inputName: 'description',
+        type: 'text',
+        multiLine: true,
+        maxLength: 500,
+        shouldResize: true,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
+      }),
+      elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+      }),
     ];
     const lowerButtons = [
       elementCreator.createButton({
@@ -95,7 +111,7 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
-            userComposer.createUser({
+            const params = {
               user: {
                 username: this.getInputValue(ids.USERNAME),
                 fullName: this.getInputValue(ids.FULLNAME),
@@ -113,6 +129,11 @@ class RegisterDialog extends BaseDialog {
                       }
                       case 'password': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'passwordLength' })] });
+
+                        break;
+                      }
+                      case 'description': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'descriptionLength' })] });
 
                         break;
                       }
@@ -135,7 +156,19 @@ class RegisterDialog extends BaseDialog {
 
                 this.removeFromView();
               },
-            });
+            };
+            const imagePreview = document.getElementById('imagePreview');
+
+            if (imagePreview.getAttribute('src')) {
+              params.image = {
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              };
+            }
+
+            userComposer.createUser(params);
           },
         },
       }),

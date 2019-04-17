@@ -113,6 +113,10 @@ span, p {
   min-height: 1em;
 }
 
+img {
+  max-width: 100%;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }

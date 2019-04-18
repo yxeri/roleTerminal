@@ -413,7 +413,7 @@ voiceCommander.addCommands({
 
 if (window.cordova) {
   document.addEventListener('deviceready', () => {
-    StatusBar.hide();
+    StatusBar.hide(); // eslint-disable-line
     positionTracker.startTracker({ standalone: true });
   }, false);
 } else {

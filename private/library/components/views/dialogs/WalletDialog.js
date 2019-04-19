@@ -23,6 +23,7 @@ const transactionComposer = require('../../../data/composers/TransactionComposer
 const userComposer = require('../../../data/composers/UserComposer');
 const teamComposer = require('../../../data/composers/TeamComposer');
 const storageManager = require('../../../StorageManager');
+const tracker = require('../../../PositionTracker');
 
 class WalletDialog extends BaseDialog {
   constructor({
@@ -57,6 +58,7 @@ class WalletDialog extends BaseDialog {
 
             transactionComposer.createTransaction({
               transaction: {
+                coordinates: tracker.getBestPosition(),
                 fromWalletId: storageManager.getAliasId() || storageManager.getUserId(),
                 toWalletId: sendToId,
                 amount: this.getInputValue('walletAmount'),

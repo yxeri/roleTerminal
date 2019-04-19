@@ -27,6 +27,6 @@
     "eslint-plugin-react": "7.11.1"
   },
   "dependencies": {
-    "roleHaven": "git://github.com/yxeri/roleHaven.git"
+    "rolehaven": "git://github.com/yxeri/roleHaven.git"
   }
 }

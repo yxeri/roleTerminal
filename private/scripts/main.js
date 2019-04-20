@@ -5,10 +5,10 @@ const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const MenuBar = require('../library/components/views/MenuBar');
-const DocFileView = require('../library/components/views/DocFileView');
-const WalletView = require('../library/components/views/WalletView');
-const TeamView = require('../library/components/views/TeamView');
-const ForumView = require('../library/components/views/ForumView');
+// const DocFileView = require('../library/components/views/DocFileView');
+// const WalletView = require('../library/components/views/WalletView');
+// const TeamView = require('../library/components/views/TeamView');
+// const ForumView = require('../library/components/views/ForumView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -229,20 +229,20 @@ const chatView = new ChatView({
   effect: true,
   placeholder: 'Alt+Enter to send message',
 });
-const docFileView = new DocFileView({
-  effect: true,
-});
+// const docFileView = new DocFileView({
+//   effect: true,
+// });
 const worldMapView = new WorldMapView(worldMapParams);
-const walletView = new WalletView({
-  effect: true,
-});
+// const walletView = new WalletView({
+//   effect: true,
+// });
 const worldMapPage = new WorldMapPage(worldMapParams);
-const teamView = new TeamView({
-  effect: true,
-});
-const forumView = new ForumView({
-  effect: true,
-});
+// const teamView = new TeamView({
+//   effect: true,
+// });
+// const forumView = new ForumView({
+//   effect: true,
+// });
 
 const menuBar = new MenuBar({
   viewSwitcher,
@@ -259,20 +259,20 @@ const menuBar = new MenuBar({
     // team: true,
   },
 });
-const docWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.DOCS,
-  title: 'Docs',
-  columns: [{
-    components: [
-      { component: docFileView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
-});
+// const docWrapper = new ViewWrapper({
+//   menuBar,
+//   viewType: viewSwitcher.ViewTypes.DOCS,
+//   title: 'Docs',
+//   columns: [{
+//     components: [
+//       { component: docFileView },
+//     ],
+//   }, {
+//     components: [
+//       { component: worldMapPage },
+//     ],
+//   }],
+// });
 const chatWrapper = new ViewWrapper({
   menuBar,
   viewType: viewSwitcher.ViewTypes.CHAT,
@@ -295,44 +295,44 @@ const fullMapWrapper = new ViewWrapper({
     components: [{ component: worldMapView }],
   }],
 });
-const walletWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.WALLET,
-  title: 'Vcaps',
-  columns: [{
-    components: [
-      { component: walletView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
-});
-const teamWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.TEAM,
-  title: 'Teams',
-  columns: [{
-    components: [
-      { component: teamView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
-});
-const forumWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.FORUM,
-  title: 'Forums',
-  columns: [{
-    components: [
-      { component: forumView },
-    ],
-  }],
-});
+// const walletWrapper = new ViewWrapper({
+//   menuBar,
+//   viewType: viewSwitcher.ViewTypes.WALLET,
+//   title: 'Vcaps',
+//   columns: [{
+//     components: [
+//       { component: walletView },
+//     ],
+//   }, {
+//     components: [
+//       { component: worldMapPage },
+//     ],
+//   }],
+// });
+// const teamWrapper = new ViewWrapper({
+//   menuBar,
+//   viewType: viewSwitcher.ViewTypes.TEAM,
+//   title: 'Teams',
+//   columns: [{
+//     components: [
+//       { component: teamView },
+//     ],
+//   }, {
+//     components: [
+//       { component: worldMapPage },
+//     ],
+//   }],
+// });
+// const forumWrapper = new ViewWrapper({
+//   menuBar,
+//   viewType: viewSwitcher.ViewTypes.FORUM,
+//   title: 'Forums',
+//   columns: [{
+//     components: [
+//       { component: forumView },
+//     ],
+//   }],
+// });
 
 menuBar.setViews({
   viewSwitcher,

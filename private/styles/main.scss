@@ -1,0 +1,794 @@
+/*
+ Copyright 2018 Aleksandar Jankovic
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+$background-color: rgba(0, 0, 0, 0.98);
+$second-background-color: #002301;
+$text-color: #37ff00;
+$second-text-color: #37ff00;
+$second-color: #176a00;
+$darker-color: #002e03;
+$warning-color: #37ff00;
+$greyed-out: #002301;
+$focus-color: #176a00;
+$new-color: #25c300;
+$darker-new-color: #25c300;
+$header-color: #002e03;
+$border-color: #176a00;
+$dark-border-color: #176A00;
+
+$p-margin: .4em;
+$border-width: .1em;
+$status-bar-height: 1.3em;
+$map-box-padding: .5em;
+$padding: .3em;
+$border: $border-width solid $border-color;
+$menu-min-width: 7em;
+$menu-max-width: 11em;
+
+html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: none;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: monospace;
+  font-size: 1em;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+
+span.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+ul, li {
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+textarea {
+  width: 100%;
+  border-radius: 0;
+  background-color: $darker-color;
+  color: $text-color;
+}
+
+textarea[readonly], input[readonly] {
+  background-color: $greyed-out;
+}
+
+button {
+  background-color: $darker-color;
+  color: $second-text-color;
+  box-sizing: border-box;
+  border: $border;
+  padding: $padding;
+}
+
+button:hover {
+  background-color: $second-color;
+}
+
+header {
+  background-color: $header-color;
+  box-sizing: border-box;
+  border-top: $border;
+  border-bottom: $border;
+  color: $second-text-color;
+}
+
+span, p {
+  min-height: 1em;
+}
+
+img {
+  max-width: 100%;
+}
+
+input {
+  background-color: $darker-color;
+  color: $text-color;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.msgInfo {
+  //background-color: $header-color;
+  color: $second-text-color;
+}
+
+.msgInfo:hover {
+  background-color: $second-color;
+}
+
+.cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toggle:hover {
+  background-color: $second-color;
+}
+
+/****************
+ * View Wrapper *
+ ****************/
+
+.column {
+  overflow: hidden;
+  height: 100%;
+}
+
+.viewWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: row wrap;
+}
+
+.one {
+  width: 100%;
+}
+
+.oneOfTwo {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.oneOfThree {
+  width: 33%;
+  box-sizing: border-box;
+}
+
+.withMenuBar {
+  height: calc(100% - #{$status-bar-height});
+  order: 1;
+}
+
+/**********
+ * Dialog *
+ **********/
+
+.dialog {
+  max-height: calc(99% - 4em);
+  max-width: 30em;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background-color: $background-color;
+  border: $border-width solid $text-color;
+  position: absolute;
+  top: 2em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: .5em;
+  z-index: 10;
+  box-shadow: 2px 0 5px black;
+  -webkit-box-shadow: 2px 0 5px black;
+
+  input {
+    width: 99%;
+    padding: .1em;
+    margin-bottom: $p-margin;
+  }
+
+  input:last-child {
+    margin-bottom: 0;
+  }
+
+  #lowerButtons {
+    float: right;
+    padding-top: $p-margin;
+
+    span {
+      margin-right: $p-margin;
+    }
+
+    span:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+/**********
+ * Inputs *
+ **********/
+
+/*
+ * A required input field that has been left empty.
+ * The class is most commonly added when the input is blurred.
+ */
+.emptyInput {
+  background-color: $warning-color;
+}
+
+/*********
+ * Views *
+ *********/
+
+.docFileView, .forumView, .walletView, .worldMapView, .teamView, .chatView {
+  .oneOfTwo {
+    width: 0;
+  }
+
+  .oneOfTwo:first-child {
+    flex-grow: 1;
+    min-width: $menu-min-width;
+    max-width: $menu-max-width;
+  }
+
+  .oneOfTwo:last-child {
+    flex-grow: 5;
+  }
+}
+
+.docFileView {
+  .docFileHeader {
+    border-bottom: $border-width solid $second-color;
+    padding-bottom: $padding;
+    margin-bottom: $padding;
+    display: flex;
+    flex-direction: column;
+
+    span:first-child {
+      font-size: 1.5em;
+    }
+  }
+
+  .oneOfTwo:last-child {
+    word-wrap: break-word;
+
+    p {
+      padding: $padding $padding;
+    }
+  }
+}
+
+.forumView, .docFileView {
+  .column {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+}
+
+.columnList {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/**************
+ * Forum View *
+ **************/
+
+.forum {
+  .postContainer {
+    padding-left: 1em;
+  }
+
+  .subContainer {
+    padding-left: 1em;
+  }
+}
+
+/*************
+ * Chat View *
+ *************/
+
+$msgList-msgInfo-border: .1em solid $dark-border-color;
+$msgList-li-padding: .5em;
+$msgList-msgLine-side-padding: .2em;
+$msgList-msgInfo-padding: .1em;
+$msgList-textarea-border: .1em solid $dark-border-color;
+
+.chatView {
+  .msgList {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    word-wrap: break-word;
+
+    li {
+      padding-bottom: $msgList-li-padding;
+    }
+
+    .msgInfo {
+      border-top: $msgList-msgInfo-border;
+      //border-bottom: $msgList-msgInfo-border;
+      padding: $msgList-msgInfo-padding ($msgList-msgLine-side-padding / 2);
+      margin-bottom: $p-margin;
+
+      span {
+        padding: 0 .2em;
+      }
+
+      span:first-child {
+        padding-left: 0;
+      }
+
+      span:last-child {
+        padding-right: 0;
+      }
+    }
+
+    .msgLine {
+      padding: 0 $msgList-msgLine-side-padding;
+      margin-bottom: $p-margin;
+    }
+
+    .msgLine:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .inputArea {
+    padding-top: .5em;
+    margin-top: auto;
+
+    textarea {
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
+      padding: 0 $msgList-msgLine-side-padding;
+      border-top: $msgList-textarea-border;
+      border-bottom: $msgList-textarea-border;
+      display: inline-block;
+    }
+
+    .button {
+      width: 3em;
+      display: inline-block;
+      vertical-align: top;
+    }
+  }
+
+  .columnChat {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.userRoomList {
+  li:first-child {
+    padding-top: $padding;
+  }
+}
+
+.list {
+  padding-top: $padding;
+  margin-bottom: $padding;
+
+  li {
+    padding: .1em .2em;
+  }
+
+  header {
+    padding: 0 .2em;
+  }
+}
+
+.list:last-child {
+  padding-bottom: 0;
+}
+
+/*********
+ * Lists *
+ *********/
+
+/*
+ * Generic list.
+ */
+
+.list {
+  word-wrap: break-word;
+}
+
+.columnList {
+  li:hover {
+    background-color: $second-color;
+  }
+}
+
+//.positionList {
+//  display: inline-block;
+//  border-bottom: 10px $darker-color solid;
+//  width: 20%;
+//}
+
+/*
+ * A list item that has focus in a list.
+ */
+.focusListItem {
+  background-color: $focus-color;
+  text-decoration: underline;
+}
+
+/*
+ * A marked list item in a list.
+ * A list item will be marked when the object that it's connected to is updated.
+ */
+.markListItem {
+  background-color: $darker-new-color;
+}
+
+/**
+ * A new list item in the list.
+ * A list item added to a list will temporarily have the newListItem class.
+ * The class is removed after a set amount of time.
+ */
+.newListItem {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+.flash {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+@keyframes flash {
+  0% {
+    background-color: $new-color;
+    color: $new-color;
+  }
+
+  100% {
+    color: inherit;
+    background-color: inherit;
+    text-shadow: inherit;
+  }
+}
+
+/**
+ * A list item that will be removed from a list.
+ * The class is removed after a set amount of time.
+ */
+.removeListItem {
+  background-color: $warning-color;
+  color: $warning-color;
+}
+
+/*************
+ * World Map *
+ *************/
+
+$map-box-border-weight: .1em;
+$map-box-border: $map-box-border-weight solid $second-color;
+$map-box-left: .2em;
+$map-padding-fix: 2em;
+
+.worldMapPage {
+  padding-top: $map-padding-fix; // Gmaps fix
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  a {
+    display: none !important;
+  }
+}
+
+.mapLeftClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  width: calc(100% - ((#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
+  max-width: 30em;
+  max-height: calc(100% - (#{$map-padding-fix * 1.5} + (#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
+  padding: $map-box-padding;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background-color: $background-color;
+  border: $map-box-border;
+
+  header {
+    border: 0;
+    background-color: inherit;
+    font-size: 1.1em;
+  }
+
+  p {
+    margin-bottom: $p-margin;
+  }
+}
+
+.mapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  background-color: $background-color;
+  border: $map-box-border;
+  padding: .2em;
+  max-width: 15em;
+}
+
+.fallbackMapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  max-width: 15em;
+  padding: .2em;
+  background-color: $background-color;
+  border: $map-box-border;
+}
+
+/********
+ * Misc *
+ ********/
+
+#main {
+  height: 100%;
+  width: 100%;
+
+  .viewWrapper {
+    > .oneOfTwo {
+      border-right: $border;
+    }
+
+    > .oneOfTwo:nth-child(2) {
+      border-right: 0;
+    }
+
+    > .oneOfThree {
+      border-right: $border;
+    }
+
+    > .oneOfThree:nth-child(3) {
+      border-right: $border;
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.menuBar {
+  order: 2;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: $border;
+  background-color: $header-color;
+  display: flex;
+  z-index: 8;
+  color: $text-color;
+  font-size: 1.1em;
+  height: 1.2em;
+
+  > span {
+    margin-right: .5em;
+  }
+
+  > span:last-child {
+    margin-right: 0;
+  }
+
+  > div {
+    margin-right: .5em;
+  }
+
+  .clickable {
+    text-decoration: none;
+  }
+
+  .topMenuButton {
+    font-weight: bold;
+    background-color: $text-color;
+    color: $darker-color;
+    padding-left: .1em;
+    padding-right: .1em;
+  }
+
+  .topMenu {
+    position: absolute;
+    background-color: $second-background-color;
+    max-width: 12em;
+    z-index: 9;
+    border-bottom: $border;
+    max-height: calc(100% - 1.5em);
+    overflow-y: scroll;
+    border: $border;
+    bottom: 1.2em;
+    box-shadow: 2px 0 5px black;
+    -webkit-box-shadow: 2px 0 5px black;
+
+    button {
+      width: 100%;
+      border-left: 0;
+      border-right: 0;
+    }
+
+    p {
+      background-color: $darker-color;
+      color: $second-text-color;
+      box-sizing: border-box;
+      border-bottom: $border;
+      padding: $padding;
+    }
+
+    li:last-child {
+      p {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+.hide {
+  display: none;
+}
+
+.hideOverflow {
+  overflow: hidden;
+}
+
+.currentUserList {
+  margin-bottom: 0;
+  padding-top: 0;
+
+  li {
+    padding: 0;
+  }
+}
+
+#screenFilter {
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  position: absolute;
+  background-color: rgba(255, 236, 5, 0.08);
+  animation: screenFilter 20s linear infinite 5s;
+  z-index: 11;
+  -webkit-box-shadow: inset 0 0 10px rgba(255, 238, 5, 0.18);
+  box-shadow: inset 0 0 10px rgba(255, 238, 5, 0.18);
+}
+
+.baseGlitch {
+  content: attr(subMsg);
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-size: .9em;
+}
+
+.fastGlitch, .normalGlitch, .slowGlitch {
+  position: relative;
+}
+
+.fastGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 10s linear infinite 3s;
+}
+
+.normalGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 16s linear infinite 4s;
+}
+
+.slowGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 21s linear infinite 5s;
+}
+
+@keyframes screenFilter {
+  15% {
+    background-color: rgba(255, 236, 5, 0.10);
+  }
+  40% {
+    background-color: rgba(255, 236, 5, 0.03);
+  }
+  80% {
+    background-color: rgba(255, 236, 5, 0.10);
+  }
+}
+
+@keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  0.5% {
+    opacity: 0.8;
+  }
+  0.8% {
+    opacity: 0.8;
+  }
+  1% {
+    opacity: 0.8;
+  }
+  1.4% {
+    opacity: 0.8;
+  }
+  1.7% {
+    opacity: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  #main {
+    > .viewWrapper {
+      > .oneOfTwo:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(3) {
+        display: none;
+      }
+
+      > .oneOfTwo {
+        border-right: 0;
+      }
+
+      > .oneOfThree {
+        border-right: 0;
+      }
+    }
+  }
+
+  .viewWrapper {
+    width: 100%;
+  }
+
+  .oneOfTwo {
+    width: 100%;
+  }
+
+  .mapLeftClickBox {
+    left: 0;
+    width: calc(100% - ((#{$map-box-padding} * 2) + (#{$map-box-border-weight} * 2)));
+  }
+}

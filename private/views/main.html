@@ -1,0 +1,39 @@
+<!--
+ Copyright 2019 Carmilla Mina Jankovic
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!doctype html>
+<html lang="en" id="html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content = "telephone=no">
+  <meta property="og:title" content="The Oracle" />
+  <meta property="og:description" content="Tools and games for all your roleplaying needs" />
+  <meta property="og:image" content="https://thethirdgift.com/images/facebookImage.png" />
+  <link rel="stylesheet" type="text/css" href="{{mainCss}}"/>
+  <title>{{title}}</title>
+</head>
+<body>
+<div id="screenFilter"></div>
+<div id="main">
+</div>
+<script src="scripts/annyang.js" defer></script>
+<script src={{socketPath}} defer></script>
+<script src="{{mainJs}}" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{gMapsKey}}&libraries=geometry&v=3.33" defer></script>
+<script src="scripts/maplabel.js" defer></script>
+<script src="scripts/markerclusterer.js" defer></script>
+</body>
+</html>

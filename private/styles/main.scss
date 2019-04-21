@@ -124,6 +124,29 @@ input {
   color: $text-color;
 }
 
+input[type=radio] {
+  display: none;
+}
+
+input[type="radio"]:checked + span {
+  background-color: $border-color;
+}
+
+label {
+  display: block;
+
+  span {
+    border: $border;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    cursor: pointer;
+    margin-right: .3em;
+    margin-bottom: $border-width;
+  }
+}
+
 ::-webkit-scrollbar {
   display: none;
 }

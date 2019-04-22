@@ -65,6 +65,12 @@ const worldMapParams = {
       url: '/images/mapicon-red.png',
     },
   },
+  circleStyle: {
+    strokeColor: '#15ff00',
+    fillColor: '#15ff00',
+    strokeOpacity: 1,
+    fillOpacity: 0.7,
+  },
   triggeredStyles: {
     polygons: [{
       paramName: 'description',

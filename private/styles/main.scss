@@ -11,7 +11,7 @@
  limitations under the License.
  */
 
-$background-color: rgba(0, 0, 0, 0.98);
+$background-color: rgb(0, 0, 0);
 $second-background-color: #002301;
 $text-color: #37ff00;
 $second-text-color: #37ff00;
@@ -149,6 +149,10 @@ label {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+::-webkit-input-placeholder {
+  color: $second-color;
 }
 
 .msgInfo {

@@ -41,7 +41,7 @@ const worldMapParams = {
     minZoomLevel: 18,
     fontSize: 11,
   },
-  backgroundColor: '#012300',
+  backgroundColor: '#000000',
   positionTypes: [
     'user',
     'device',
@@ -132,7 +132,7 @@ const worldMapParams = {
   mapStyles: [{
     elementType: 'geometry',
     stylers: [
-      { color: '#002301' },
+      { color: '#000000' },
     ],
   }, {
     elementType: 'labels',

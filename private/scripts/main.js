@@ -11,6 +11,7 @@ const voiceCommander = require('../library/VoiceCommander');
 const labelHandler = require('../library/labels/LabelHandler');
 
 const chatView = new ChatView({
+  allowImages: true,
   titles: {
     following: 'Chats',
     rooms: 'Rooms',

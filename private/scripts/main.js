@@ -11,6 +11,7 @@ const voiceCommander = require('../library/VoiceCommander');
 const labelHandler = require('../library/labels/LabelHandler');
 
 const chatView = new ChatView({
+  hideDate: true,
   allowImages: true,
   titles: {
     following: 'Chats',
@@ -25,7 +26,7 @@ const chatView = new ChatView({
 const menuBar = new MenuBar({
   viewSwitcher,
   image: {
-    url: 'images/grumsnet.gif',
+    fileName: 'grumsnet.gif',
   },
   appendTop: true,
   showClock: true,

@@ -186,7 +186,7 @@ class UserDialog extends BaseDialog {
       lowerButtons,
       upperText,
       images,
-      classes: classes.concat(['UserDialog']),
+      classes: classes.concat(['userDialog']),
     });
   }
 }

@@ -231,6 +231,7 @@ const worldMapParams = {
   }],
 };
 const chatView = new ChatView({
+  allowImages: true,
   hideRoomList: true,
   effect: true,
   placeholder: 'Alt+Enter to send message',

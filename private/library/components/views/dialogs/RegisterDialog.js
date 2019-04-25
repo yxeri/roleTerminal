@@ -82,6 +82,7 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
+        previewId: 'imagePreview-register',
       }),
     ];
     const lowerButtons = [
@@ -157,7 +158,7 @@ class RegisterDialog extends BaseDialog {
                 this.removeFromView();
               },
             };
-            const imagePreview = document.getElementById('imagePreview');
+            const imagePreview = document.getElementById('imagePreview-register');
 
             if (imagePreview.getAttribute('src')) {
               params.image = {
@@ -178,7 +179,7 @@ class RegisterDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['RegisterDialog']),
+      classes: classes.concat(['registerDialog']),
     });
   }
 }

@@ -39,6 +39,7 @@ class ChatView extends ViewWrapper {
     title,
     whisperText,
     showTeam,
+    allowImages,
     titles = {
       rooms: 'Rooms',
       following: 'Following',
@@ -90,6 +91,7 @@ class ChatView extends ViewWrapper {
       shouldResize,
       placeholder,
       sendOnEnter,
+      allowImages,
       minimumAccessLevel: storageManager.getPermissions().SendMessage
         ? storageManager.getPermissions().SendMessage.accessLevel
         : accessCentral.AccessLevels.STANDARD,
@@ -119,8 +121,21 @@ class ChatView extends ViewWrapper {
           message.messageType = messageComposer.MessageTypes.CHAT;
         }
 
+        const imagePreview = document.getElementById('imagePreview-input');
+        let image;
+
+        if (imagePreview.getAttribute('src')) {
+          image = {
+            source: imagePreview.getAttribute('src'),
+            imageName: imagePreview.getAttribute('name'),
+            width: imagePreview.naturalWidth,
+            height: imagePreview.naturalHeight,
+          };
+        }
+
         messageComposer.sendMessage({
           message,
+          image,
           participantIds,
           callback: ({ error, data }) => {
             if (error) {

@@ -89,6 +89,7 @@ class MessageList extends List {
       shouldFocusOnClick: false,
       collector: dataHandler.messages,
       fieldToAppend: 'text',
+      shouldAppendImage: true,
       appendClasses: ['msgLine'],
       listItemFieldsClasses: ['msgInfo'],
       listItemFields: [

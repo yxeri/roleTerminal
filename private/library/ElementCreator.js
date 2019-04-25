@@ -129,6 +129,7 @@ class ElementCreator {
     clickFuncs,
     classes,
     elementId,
+    isUploaded = true,
   }) {
     const pictureElement = createBaseElement({
       elementId,
@@ -136,11 +137,14 @@ class ElementCreator {
       clickFuncs,
       elementType: 'img',
     });
+    const path = isUploaded
+      ? `/images/upload/${picture.fileName}`
+      : `/images/${picture.fileName}`;
 
-    pictureElement.setAttribute('src', picture.url);
+    pictureElement.setAttribute('src', path);
 
-    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width};`); }
-    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height};`); }
+    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
+    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
 
     return pictureElement;
   }
@@ -339,6 +343,55 @@ class ElementCreator {
     }
 
     return input;
+  }
+
+  static createImageInput({
+    inputName,
+    elementId,
+    classes,
+    previewId = 'imagePreview',
+    previewContainer = document.createElement('img'),
+    appendPreview = false,
+  }) {
+    const container = this.createContainer({
+      classes,
+      elementId,
+      name: inputName,
+    });
+    const imageInput = document.createElement('input');
+    imageInput.classList.add('hide');
+    imageInput.setAttribute('type', 'file');
+    imageInput.setAttribute('accept', 'image/png, image/jpeg');
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        previewContainer.classList.remove('hide');
+        previewContainer.setAttribute('src', reader.result);
+        previewContainer.setAttribute('name', file.name);
+      });
+
+      reader.readAsDataURL(file);
+    });
+
+    previewContainer.setAttribute('id', previewId);
+
+    container.appendChild(this.createButton({
+      text: 'Image',
+      clickFuncs: {
+        leftFunc: () => {
+          imageInput.click();
+        },
+      },
+    }));
+
+    if (appendPreview) {
+      previewContainer.classList.add('hide');
+      container.appendChild(previewContainer);
+    }
+
+    return container;
   }
 
   static createHeader({

@@ -16,7 +16,9 @@
 
 class VoiceCommander {
   constructor() {
-    this.voiceListener = annyang; // eslint-disable-line
+    if (typeof annyang !== 'undefined') { // eslint-disable-line
+      this.voiceListener = annyang; // eslint-disable-line
+    }
     this.commands = {};
   }
 

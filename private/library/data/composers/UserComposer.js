@@ -58,11 +58,15 @@ class UserComposer extends DataComposer {
 
   createUser({
     user,
+    image,
     callback,
   }) {
     this.handler.createObject({
       callback,
-      params: { user },
+      params: {
+        user,
+        image,
+      },
     });
   }
 

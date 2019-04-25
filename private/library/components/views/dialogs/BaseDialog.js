@@ -28,6 +28,7 @@ const ids = {
   LOWERBUTTONS: 'lowerButtons',
   INPUTCONTAINER: 'inContainer',
   COVER: 'dialogCover',
+  IMAGES: 'imagesContainer',
 };
 
 const cssClasses = {
@@ -41,6 +42,7 @@ class BaseDialog extends BaseView {
     lowerText,
     upperButtons,
     lowerButtons,
+    images = [],
     inputs = [],
     classes = [],
     elementId = `elem-${Date.now()}`,
@@ -71,6 +73,12 @@ class BaseDialog extends BaseView {
       text: upperText,
       elementId: ids.UPPERTEXT,
       classes: [ids.UPPERTEXT],
+    }));
+
+    this.element.appendChild(elementCreator.createContainer({
+      elementId: ids.IMAGES,
+      elements: images,
+      classes: [ids.IMAGES],
     }));
 
     this.element.appendChild(this.createTextContainer({

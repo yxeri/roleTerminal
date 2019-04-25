@@ -40,13 +40,7 @@ class UserDialog extends BaseDialog {
     const chosenIdentity = userComposer.getIdentity({ objectId: identityId });
     const identityName = chosenIdentity.aliasName || chosenIdentity.username;
     const { partOfTeams } = chosenIdentity;
-    const partOfTeamsText = partOfTeams && partOfTeams.length > 0
-      ? chosenIdentity.partOfTeams
-      : [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' })];
     const userPosition = positionComposer.getPosition({ positionId: identityId });
-    const positionLabel = userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]
-      ? `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`
-      : labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -159,20 +153,40 @@ class UserDialog extends BaseDialog {
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
       '',
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`,
     ];
 
-    if (partOfTeams && partOfTeams.length > 0) {
-      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`);
+    if (chosenIdentity.fullName) {
+      upperText.push(chosenIdentity.fullName);
     }
 
-    upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+    upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`);
+
+    if (partOfTeams && partOfTeams.length > 0) {
+      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${chosenIdentity.partOfTeams}`);
+    }
+
+    if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
+      const positionLabel = `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
+
+      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+    }
+
+    const images = [];
+
+    if (chosenIdentity.image) {
+      images.push(elementCreator.createPicture({
+        picture: chosenIdentity.image,
+      }));
+    }
+
+    console.log('user', identity);
 
     super({
       elementId,
       lowerButtons,
       upperText,
-      classes: classes.concat(['UserDialog']),
+      images,
+      classes: classes.concat(['userDialog']),
     });
   }
 }

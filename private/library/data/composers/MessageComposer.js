@@ -70,6 +70,7 @@ class MessageComposer extends DataComposer {
   sendMessage({
     participantIds,
     message,
+    image,
     callback,
   }) {
     const aliasId = storageManager.getAliasId();
@@ -81,6 +82,7 @@ class MessageComposer extends DataComposer {
       callback,
       params: {
         participantIds,
+        image,
         message: messageToSend,
       },
     });

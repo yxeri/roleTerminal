@@ -129,6 +129,7 @@ class ElementCreator {
     clickFuncs,
     classes,
     elementId,
+    isUploaded = true,
   }) {
     const pictureElement = createBaseElement({
       elementId,
@@ -136,8 +137,11 @@ class ElementCreator {
       clickFuncs,
       elementType: 'img',
     });
+    const path = isUploaded
+      ? `/images/upload/${picture.fileName}`
+      : `/images/${picture.fileName}`;
 
-    pictureElement.setAttribute('src', `/images/${picture.fileName}`);
+    pictureElement.setAttribute('src', path);
 
     if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
     if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
@@ -345,6 +349,7 @@ class ElementCreator {
     inputName,
     elementId,
     classes,
+    previewId = 'imagePreview',
     previewContainer = document.createElement('img'),
     appendPreview = false,
   }) {
@@ -370,7 +375,7 @@ class ElementCreator {
       reader.readAsDataURL(file);
     });
 
-    previewContainer.setAttribute('id', 'imagePreview');
+    previewContainer.setAttribute('id', previewId);
 
     container.appendChild(this.createButton({
       text: 'Image',

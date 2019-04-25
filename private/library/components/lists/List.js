@@ -84,6 +84,7 @@ class List extends BaseView {
     collector,
     listItemFields,
     fieldToAppend,
+    shouldAppendImage,
     filter,
     appendClasses,
     listItemFieldsClasses,
@@ -125,6 +126,7 @@ class List extends BaseView {
     this.listItemFields = listItemFields;
     this.appendClasses = appendClasses;
     this.fieldToAppend = fieldToAppend;
+    this.shouldAppendImage = shouldAppendImage;
     this.focusedId = focusedId;
     this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
@@ -512,6 +514,13 @@ class List extends BaseView {
         }
 
         listItemElements.push(elementCreator.createParagraph(paragraphParams));
+      }
+
+      if (this.shouldAppendImage && object.image && object.image.imageName) {
+        listItemElements.push(elementCreator.createPicture({
+          picture: object.image,
+          classes: ['attachedImage'],
+        }));
       }
 
       /**

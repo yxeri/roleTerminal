@@ -34,6 +34,21 @@ html, body {
   background-color: lightgrey;
 }
 
+img {
+  max-width: 100%;
+  object-fit: scale-down;
+  background-color: black;
+}
+
+
+.userDialog, .registerDialog {
+  img {
+    max-height: 200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 /**
  * Effect container.
  * Container that covers the whole page and lives outside of the main view.
@@ -306,6 +321,18 @@ button {
       textarea {
         width: calc(100% - 3em);
       }
+
+      .buttonContainer {
+        position: relative;
+
+        img {
+          max-width: 150px;
+          max-height: 100px;
+          vertical-align: bottom;
+          border: 2px solid;
+        }
+      }
+
     }
   }
 

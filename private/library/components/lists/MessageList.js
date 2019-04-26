@@ -39,6 +39,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    hideDate = false,
     showTeam = true,
     fullDate = true,
     multiRoom = false,
@@ -118,6 +119,10 @@ class MessageList extends List {
           fallbackTo: 'timeCreated',
           convertFunc: (date) => {
             const timestamp = textTools.generateTimestamp({ date });
+
+            if (hideDate) {
+              return timestamp.fullTime;
+            }
 
             return fullDate
               ? `${timestamp.fullTime} ${timestamp.fullDate}`

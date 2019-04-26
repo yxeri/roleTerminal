@@ -422,6 +422,7 @@ class MenuBar extends BaseView {
     if (image) {
       this.element.appendChild(elementCreator.createPicture({
         picture: image,
+        isUploaded: false,
       }));
     }
 

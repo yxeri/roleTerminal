@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,20 +15,30 @@
  */
 
 /**
- * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
- * @typedef {Object} Filter
- * @property {string} paramName - Name of the parameter.
- * @property {string} paramValue - Value of the parameter.
+ * A list item field is a value that will be printed into an element in the list.
+ * @typedef {Object} ListItemField
+ * @property {string} paramName Name of the parameter to retrieve the value from and print.
+ * @property {string} [fallbackTo] Name of the parameter that will be used if paramName does not exist in the object.
+ * @property {Function} [func] Function that will be called if the item is clicked.
+ * @property {Function} [convertFunc] Function that will be called when printing the field. It can be used to convert IDs of objects to human-readable names.
  */
 
 /**
  * A list item field is a value that will be printed into an element in the list.
- * @typedef {Object} ListItemField
- * @property {string} paramName - Name of the parameter to retrieve the value from and print.
- * @property {string} [fallbackTo] - Name of the parameter that will be used if paramName does not exist in the object.
- * @property {Function} [func] - Function that will be called if the item is clicked.
- * @property {Function} [convertFunc] - Function that will be called when printing the field. It can be used to convert IDs of objects to human-readable names.
- *
+ * @typedef {Object} ListItemClickFuncs
+ * @property {Function} [params.listItemClickFuncs.leftFunc] Function to call on left clicks.
+ * @property {Function} [params.listItemClickFuncs.right] Function to call on right clicks.
+ */
+
+/**
+ * A filter will be used to filter out the items shown against the current user's properties. Only those who match the filter will be accepted.
+ * @typedef {Object} UserFilter
+ * @property {boolean} [orCheck] Is it enough for only one sent value to match?
+ * @property {Object[]} rules Rules.
+ * @property {string} rules.paramName Name of the parameter on the user.
+ * @property {string} rules.objectParamName Name of the parameter on the object.
+ * @property {boolean} [rules.shouldInclude] Should a collection include the sent value?
+ * @property {boolean} [rules.shouldBeTrue] Should the test be true?
  */
 
 const BaseView = require('../views/BaseView');
@@ -36,8 +46,9 @@ const BaseView = require('../views/BaseView');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
-const storageManager = require('../../StorageManager');
 const userComposer = require('../../data/composers/UserComposer');
+const storageManager = require('../../StorageManager');
+const textTools = require('../../TextTools');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -45,38 +56,47 @@ const cssClasses = {
   newListItem: 'newListItem',
   removeListItem: 'removeListItem',
 };
-const itemChangeTimeout = 800;
 
 class List extends BaseView {
   /**
    * List constructor.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.collector - Data handler to use for object retrieval.
-   * @param {ListItemField[]} [params.listItemFields] - The object parameters to get and output. Leaving this and fieldToAppend empty will output a list of objectIds.
-   * @param {string} [params.fieldToAppend] - The object parameter to output after listItemFields. Leaving this and listItemFields will output a list of objectIds.
-   * @param {Object} [params.listItemClickFuncs] - Functions to call on clicks on the list item.
-   * @param {Object} [params.listItemClickFuncs.leftFunc] - Function to call on left clicks.
-   * @param {Object} [params.listItemClickFuncs.right] - Function to call on right clicks.
-   * @param {Object} [params.listItemSpecificClasses] - CSS classes that will be set on values in the object.
-   * @param {Object} [params.filter] - Filters to use on object retrieval.
-   * @param {boolean} [params.shouldFocusOnClick] - Should list items that are clicked be focused?
-   * @param {string[]} [params.classes] - CSS classes.
-   * @param {string} [params.elementId] - Id of the list element.
-   * @param {string} [params.focusedId] - Id of the list item that will be focused from the start.
-   * @param {Object} [params.dependencies] - Data handler dependencies. The creation of the list will only run when all the handlers have retrieved their objects.
-   * @param {boolean} [params.shouldPaginate] - Should the list be appended in pieces?
+   * @param {Object} params Parameters.
+   * @param {Object} params.collector Data handler to use for object retrieval.
+   * @param {number} [params.minimumAccessLevel] Minimum required acccess level for the current user to see the list.
+   * @param {UserFilter} [params.userFilter] Filter to check against the current user's properties.
+   * @param {string} [params.listType] Type of list. Available choices: rooms, followedRooms, whisperRooms.
+   * @param {string} [params.title] Title that will be shown with the list.
+   * @param {boolean} [params.effect] Should all printed text have a typewriter effect?
+   * @param {boolean} [params.shouldToggle] Should the visibility of the list toggle on clicks?
+   * @param {ListItemField[]} [params.listItemFields] The object parameters to get and output. Leaving this and fieldToAppend empty will output a list of objectIds.
+   * @param {string} [params.fieldToAppend] The object parameter to output after listItemFields. Leaving this and listItemFields will output a list of objectIds.
+   * @param {ListItemClickFuncs} [params.listItemClickFuncs] Functions to call on clicks on the list item.
+   * @param {Object} [params.listItemSpecificClasses] CSS classes that will be set on values in the object.
+   * @param {Filter} [params.filter] Filters to use on object retrieval.
+   * @param {boolean} [params.shouldFocusOnClick] Should list items that are clicked be focused?
+   * @param {string[]} [params.classes] CSS classes.
+   * @param {string} [params.elementId] Id of the list element.
+   * @param {string} [params.focusedId] Id of the list item that will be focused from the start.
+   * @param {Object[]} [params.dependencies] Data handler dependencies. The creation of the list will only run when all the handlers have retrieved their objects.
+   * @param {boolean} [params.shouldPaginate] Should the list be appended in pieces?
    */
   constructor({
     collector,
     listItemFields,
     fieldToAppend,
+    shouldAppendImage,
     filter,
     appendClasses,
     listItemFieldsClasses,
     sorting,
     title,
-    shouldToggle,
     listItemSpecificClasses,
+    userFilter,
+    minimumAccessLevel,
+    listType,
+    effect = false,
+    shouldToggle = false,
+    onCreateFunc = () => {},
     shouldPaginate = false,
     shouldScrollToBottom = false,
     listItemClickFuncs = {},
@@ -88,12 +108,17 @@ class List extends BaseView {
   }) {
     super({
       elementId,
+      minimumAccessLevel,
       classes: classes.concat(['list']),
     });
 
+    this.onCreateFunc = onCreateFunc;
     this.ListTypes = {
       ROOMS: 'rooms',
+      FOLLOWEDROOMS: 'followedRooms',
+      WHISPERROOMS: 'whisperRooms',
     };
+    this.effect = effect;
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
     this.collector = collector;
@@ -101,18 +126,25 @@ class List extends BaseView {
     this.listItemFields = listItemFields;
     this.appendClasses = appendClasses;
     this.fieldToAppend = fieldToAppend;
+    this.shouldAppendImage = shouldAppendImage;
     this.focusedId = focusedId;
     this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
+    this.userFilter = userFilter;
     this.shouldScrollToBottom = shouldScrollToBottom;
     this.sorting = sorting;
     this.title = title;
     this.shouldPaginate = shouldPaginate;
     this.listItemSpecificClasses = listItemSpecificClasses;
     this.shouldToggle = shouldToggle;
+    this.listType = listType;
+    this.itemQueue = [];
 
     if (collector.eventTypes.one) {
+      /**
+       * On one new event (update/create/remove)
+       */
       eventCentral.addWatcher({
         event: collector.eventTypes.one,
         func: (data) => {
@@ -120,33 +152,36 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (this.filter) {
-            if (this.filter.orCheck && !this.filter.rules.some(rule => rule.paramValue === object[rule.paramName])) {
-              return;
-            } else if (!this.filter.rules.every(rule => rule.paramValue === object[rule.paramName])) {
-              return;
-            }
+          if (!this.shouldFilterItem({
+            changeType,
+            object,
+            user,
+          })) {
+            return;
           }
 
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (List.hasAccess({ object, user })) {
+              if (this.hasAccess({ object, user }).canSee) {
                 this.addOneItem({
                   object,
-                  shouldAnimate: true,
+                  shouldFlash: true,
                   shouldReplace: true,
                 });
               } else {
-                this.removeOneItem({ object });
+                this.removeElement({ object });
               }
 
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (List.hasAccess({ object, user })) {
+              if (this.hasAccess({ object, user }).canSee) {
+                this.onCreateFunc({ object });
+
                 this.addOneItem({
                   object,
-                  shouldAnimate: true,
+                  effect: this.effect,
+                  shouldFlash: true,
                 });
                 this.scrollList();
               }
@@ -154,7 +189,9 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.REMOVE: {
-              this.removeOneItem({ object });
+              console.log('going to remove object', object, collector.objectTypes.one);
+
+              this.removeElement({ object });
 
               break;
             }
@@ -167,6 +204,9 @@ class List extends BaseView {
     }
 
     if (collector.eventTypes.many) {
+      /**
+       * On multiple events
+       */
       eventCentral.addWatcher({
         event: collector.eventTypes.many,
         func: () => {
@@ -174,20 +214,40 @@ class List extends BaseView {
         },
       });
     }
+
+    /**
+     * On reconnect
+     */
+    eventCentral.addWatcher({
+      event: eventCentral.Events.RECONNECT,
+      func: () => {
+        this.appendList();
+      },
+    });
   }
 
+  /**
+   * Scroll the list to the bottom item.
+   */
   scrollList() {
-    if (this.shouldScrollToBottom && this.listElement.lastElementChild) {
-      this.listElement.lastElementChild.scrollIntoView();
+    if (this.shouldScrollToBottom && this.listElement && this.listElement.lastElementChild) {
+      this.listElement.lastElementChild.scrollIntoView(false);
     }
   }
 
+  /**
+   * Add the list to the view.
+   * @param {Object} params Params.
+   */
   addToView(params) {
     this.appendList();
 
     super.addToView(params);
   }
 
+  /**
+   * Build and attach the DOM for the list.
+   */
   appendList() {
     if (!this.dependencies.every(dependency => dependency.hasFetched)) {
       setTimeout(() => {
@@ -212,7 +272,8 @@ class List extends BaseView {
       };
 
       elements.push(elementCreator.createHeader({
-        clickFuncs: this.shouldToggle ? clickFuncs : undefined,
+        clickFuncs,
+        classes: ['toggle'],
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
       }));
     }
@@ -240,24 +301,38 @@ class List extends BaseView {
     this.scrollList();
   }
 
-  removeListItem({ objectId }) {
-    const existingItem = this.getElement(objectId);
-
-    this.listElement.removeChild(existingItem);
+  /**
+   * Remove one list item.
+   * @param {Object} object Object to remove.
+   */
+  removeListItem(object) {
+    super.removeElement({
+      object,
+      shouldFlash: false,
+      parentElement: this.listElement,
+    });
   }
 
+  /**
+   * Create document fragment with list items.
+   * @param {Object[]} objects Objects to add as list items.
+   * @return {DocumentFragment} Document fragment with list items.
+   */
   createListFragment({ objects }) {
     const user = userComposer.getCurrentUser();
-    const storedAccessLevel = storageManager.getAccessLevel();
     const fragment = document.createDocumentFragment();
+    const marked = storageManager.getMarked();
 
     objects.forEach((object) => {
-      if (List.hasAccess({
-        storedAccessLevel,
-        object,
-        user,
-      })) {
-        const listItem = this.createListItem({ object });
+      const { canSee } = this.hasAccess({ object, user });
+
+      if (canSee) {
+        const listItem = this.createListItem({
+          object,
+          isMarked: marked[this.listType]
+            ? marked[this.listType].map(mark => mark.objectId).includes(object.objectId)
+            : false,
+        });
 
         fragment.appendChild(listItem);
       }
@@ -266,17 +341,30 @@ class List extends BaseView {
     return fragment;
   }
 
+  /**
+   * Get stored objects.
+   * @return {Object[]} Stored objects.
+   */
   getCollectorObjects() {
     return this.collector.getObjects({
+      user: userComposer.getCurrentUser(),
       filter: this.filter,
       sorting: this.sorting,
     });
   }
 
+  /**
+   * Get the list item that is focused.
+   * @return {HTMLElement} Focused list item.
+   */
   getFocusedListItem() {
     return this.getElement(this.focusedId);
   }
 
+  /**
+   * Set focused list item.
+   * @param {string} elementId Id of the item.
+   */
   setFocusedListItem(elementId) {
     if (!this.shouldFocusOnClick) {
       return;
@@ -293,12 +381,17 @@ class List extends BaseView {
     }
   }
 
+  /**
+   * Remove focus from list item.
+   */
   removeFocusOnItem() {
     const focused = this.getFocusedListItem();
 
     if (focused) {
       focused.classList.remove(cssClasses.focusListItem);
     }
+
+    this.focusedId = undefined;
   }
 
   markListItem(elementId) {
@@ -325,9 +418,21 @@ class List extends BaseView {
     }
   }
 
-  createListItem({ object }) {
+  /**
+   * Create a list item.
+   * @param {Object} params Parameters.
+   * @param {Object} params.object Object to create a list item for.
+   * @param {boolean} [params.isMarked] Should the list item be visually marked?
+   * @return {HTMLElement} List item.
+   */
+  createListItem({
+    object,
+    isMarked = false,
+  }) {
     const { objectId } = object;
-    const classes = this.focusedId === objectId ? [cssClasses.focusListItem] : [];
+    const classes = this.focusedId === objectId
+      ? [cssClasses.focusListItem]
+      : [];
     const listItemElements = [];
     const clickFuncs = {
       leftFunc: () => {
@@ -377,7 +482,9 @@ class List extends BaseView {
               classes: fieldClasses,
             } = field;
             const value = object[paramName] || object[fallbackTo];
-            const text = convertFunc ? convertFunc(value) : value;
+            const text = convertFunc
+              ? convertFunc(value)
+              : value;
             const spanParams = {
               text,
               classes: fieldClasses,
@@ -391,12 +498,27 @@ class List extends BaseView {
               };
             }
 
-            return text !== '' ? elementCreator.createSpan(spanParams) : document.createTextNode('');
+            return text !== ''
+              ? elementCreator.createSpan(spanParams)
+              : document.createTextNode('');
           });
 
-        listItemElements.push(elementCreator.createParagraph({
+        const paragraphParams = {
           elements,
           classes: this.listItemFieldsClasses,
+        };
+
+        if (this.listItemClickFuncs.onlyListItemFields) {
+          paragraphParams.clickFuncs = clickFuncs;
+        }
+
+        listItemElements.push(elementCreator.createParagraph(paragraphParams));
+      }
+
+      if (this.shouldAppendImage && object.image && object.image.imageName) {
+        listItemElements.push(elementCreator.createPicture({
+          picture: object.image,
+          classes: ['attachedImage'],
         }));
       }
 
@@ -419,53 +541,197 @@ class List extends BaseView {
       }));
     }
 
-    return elementCreator.createListItem({
+    const listItemParams = {
       classes,
-      clickFuncs,
       elementId: `${this.elementId}${objectId}`,
       elements: listItemElements,
-    });
+    };
+
+    if (!this.listItemClickFuncs.onlyListItemFields) {
+      listItemParams.clickFuncs = clickFuncs;
+    }
+
+    if (isMarked) {
+      listItemParams.classes.push(cssClasses.markListItem);
+    }
+
+    return elementCreator.createListItem(listItemParams);
   }
 
+  /**
+   * Add one new list item to the list.
+   * @param {Object} params Parameters.
+   * @param {Object} params.object Object to create an item from.
+   * @param {boolean} [params.effect] Should the text printed have a typewriter effect?
+   * @param {boolean} [params.shouldReplace] Should the list item replace an existing item?
+   * @param {boolean} [params.shouldFlash] Should the list item visually flash when added to the DOM?
+   */
   addOneItem({
     object,
+    effect,
     shouldReplace = false,
-    shouldAnimate = false,
+    shouldFlash = false,
   }) {
     const { objectId } = object;
     const newItem = this.createListItem({ object });
+    const element = this.getElement(objectId);
 
-    if (shouldAnimate) {
+    if (effect) {
+      const children = Array.from(newItem.childNodes);
+      const dumpFragment = document.createDocumentFragment();
+
+      children.forEach(child => dumpFragment.appendChild(child));
+
+      textTools.typewriter({
+        paragraphs: children,
+        target: newItem,
+        paragraphFunc: () => { this.scrollList(); },
+      });
+    } else if (shouldFlash) {
       newItem.classList.add(cssClasses.newListItem);
-      setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, itemChangeTimeout);
+      setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, this.itemChangeTimeout);
     }
 
-    if (shouldReplace) {
+    if (shouldReplace && element) {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
+    } else if (this.sorting && this.sorting.paramName) {
+      const firstChild = this.listElement.firstElementChild;
+
+      if (!firstChild) {
+        this.listElement.appendChild(newItem);
+
+        return;
+      }
+
+      const {
+        paramName,
+        fallbackParamName,
+        reverse,
+      } = this.sorting;
+
+      const closestElement = this.getElement(BaseView.findClosestElementId({
+        paramName,
+        fallbackParamName,
+        reverse,
+        targetVar: object[paramName] || object[fallbackParamName],
+        objects: this.getCollectorObjects(),
+      }));
+
+      this.listElement.insertBefore(newItem, closestElement);
+    } else if (this.sorting && this.sorting.reverse) {
+      const firstChild = this.listElement.firstElementChild;
+
+      if (!firstChild) {
+        this.listElement.appendChild(newItem);
+
+        return;
+      }
+
+      this.listElement.insertBefore(newItem, firstChild);
     } else {
       this.listElement.appendChild(newItem);
     }
   }
 
-  removeOneItem({
-    object,
-  }) {
-    const { objectId } = object;
-    const toRemove = this.getElement(objectId);
+  /**
+   * Visually mark a list item.
+   * @param {Object} params Parameters.
+   * @param {string} params.objectId Id of the object.
+   */
+  markItem({ objectId }) {
+    const element = this.getElement(objectId);
 
-    toRemove.classList.add(cssClasses.removeListItem);
+    storageManager.addMarked({
+      objectId,
+      listType: this.listType,
+    });
 
-    setTimeout(() => {
-      this.listElement.removeChild(this.getElement(objectId));
-    }, itemChangeTimeout);
+    if (element) {
+      this.animateElement({ elementId: objectId });
+      element.classList.add(cssClasses.markListItem);
+    }
   }
 
-  static hasAccess({
+  /**
+   * Visually unmark a list item.
+   * @param {Object} params Parameters.
+   * @param {string} params.objectId Id of the object.
+   */
+  unmarkItem({ objectId }) {
+    const element = this.getElement(objectId);
+
+    if (element) {
+      storageManager.pullMarked({
+        objectId,
+        listType: this.listType,
+      });
+
+      element.classList.remove(cssClasses.markListItem);
+    }
+  }
+
+  /**
+   * Check if the object should be shown for the user.
+   * @param {Object} params Parameters.
+   * @param {string} params.changeType Event change type (create/update/remove).
+   * @param {Object} params.object Object.
+   * @param {Object} params.user Current user.
+   * @return {boolean} Should the object be shown?
+   */
+  shouldFilterItem({
+    changeType,
     object,
-    storedAccessLevel,
-    user = {},
+    user,
   }) {
-    return (object && (object.isPublic || (!object.visibility || storedAccessLevel >= object.visibility || (user.objectId && object.ownerId === user.objectId))));
+    if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
+      const filterFunc = (rule) => {
+        if (rule.shouldInclude) {
+          return object[rule.paramName].includes(rule.paramValue);
+        }
+
+        return rule.paramValue === object[rule.paramName];
+      };
+      const userFilterFunc = (rule) => {
+        const {
+          shouldInclude,
+          paramName,
+          objectParamName,
+          shouldBeTrue = true,
+        } = rule;
+
+        if (shouldInclude) {
+          const isIncluded = user[paramName].includes(object[objectParamName]);
+
+          return isIncluded === shouldBeTrue;
+        }
+
+        const isIncluded = user[paramName] === object[objectParamName];
+
+        return isIncluded === shouldBeTrue;
+      };
+
+      if (this.filter) {
+        if (this.filter.orCheck && !this.filter.rules.some(filterFunc)) {
+          return false;
+        }
+
+        if (!this.filter.rules.every(filterFunc)) {
+          return false;
+        }
+      }
+
+      if (this.userFilter) {
+        if (this.userFilter.orCheck && !this.userFilter.rules.some(userFilterFunc)) {
+          return false;
+        }
+
+        if (!this.userFilter.rules.every(userFilterFunc)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }
 

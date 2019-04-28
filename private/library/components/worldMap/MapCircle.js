@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -21,8 +21,11 @@ class MapCircle extends MapObject {
     position,
     clickFuncs,
     pulseOptions,
-    zIndex = 3,
-    radius = 10,
+    hoverExcludeRule,
+    overlay,
+    labelStyle,
+    zIndex = 4,
+    radius = 50,
     styles = {},
     alwaysShowLabel = false,
     shouldCluster = false,
@@ -31,10 +34,13 @@ class MapCircle extends MapObject {
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
 
     super({
+      hoverExcludeRule,
       alwaysShowLabel,
       shouldCluster,
       position,
       clickFuncs,
+      overlay,
+      labelStyle,
       dragEndFunc: () => {
         this.currentCoordinates({
           coordinates: {
@@ -81,10 +87,6 @@ class MapCircle extends MapObject {
     if (pulseOptions) {
       setTimeout(pulse, 20);
     }
-  }
-
-  getCenter() {
-    return this.mapObject.getCenter();
   }
 
   setCurrentCoordinates({ coordinates }) {

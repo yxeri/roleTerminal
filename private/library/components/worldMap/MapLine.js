@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -21,6 +21,8 @@ class MapLine extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    hoverExcludeRule,
+    overlay,
     zIndex = 2,
     descriptionOnClick = false,
     alwaysShowLabel = false,
@@ -33,12 +35,15 @@ class MapLine extends MapObject {
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
 
     super({
+      hoverExcludeRule,
+      labelStyle,
       alwaysShowLabel,
       shouldCluster,
       position,
       clickFuncs,
       descriptionOnClick,
       zIndex,
+      overlay,
       // TODO Combine with MapPolygon
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -58,19 +63,12 @@ class MapLine extends MapObject {
         });
       },
       mapObject: new google.maps.Polyline({
-        labelStyle,
         zIndex,
         path: new google.maps.MVCArray(allPoints),
         strokeColor: styles.strokeColor || '#000000',
         strokeOpacity: styles.strokeOpacity || 0.8,
         strokeWeight: styles.strokeWeight || 3,
         opacity: styles.opacity || 1,
-        // icon: {
-        //   url: icon.url || '/images/mapicon.png',
-        //   size: icon.size || new google.maps.Size(14, 14),
-        //   origin: icon.origin || new google.maps.Point(0, 0),
-        //   anchor: icon.anchor || new google.maps.Point(7, 7),
-        // },
       }),
     });
   }

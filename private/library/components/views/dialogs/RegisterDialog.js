@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -26,10 +26,13 @@ const ids = {
   USERNAME: 'username',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
+  DESCRIPTION: 'description',
+  PICTURE: 'picture',
 };
 
 class RegisterDialog extends BaseDialog {
   constructor({
+    requireFullName = false,
     classes = [],
     elementId = `rDialog-${Date.now()}`,
   }) {
@@ -46,7 +49,8 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.FULLNAME,
         inputName: 'fullName',
         type: 'text',
-        maxLength: 40,
+        maxLength: 20,
+        isRequired: requireFullName,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),
       elementCreator.createInput({
@@ -65,6 +69,21 @@ class RegisterDialog extends BaseDialog {
         maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'repeatPassword' }),
       }),
+      elementCreator.createInput({
+        elementId: ids.DESCRIPTION,
+        inputName: 'description',
+        type: 'text',
+        multiLine: true,
+        maxLength: 500,
+        shouldResize: true,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
+      }),
+      elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-register',
+      }),
     ];
     const lowerButtons = [
       elementCreator.createButton({
@@ -79,7 +98,9 @@ class RegisterDialog extends BaseDialog {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
-            } else if (this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+            }
+
+            if (this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
               BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
               BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
 
@@ -91,7 +112,7 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
-            userComposer.createUser({
+            const params = {
               user: {
                 username: this.getInputValue(ids.USERNAME),
                 fullName: this.getInputValue(ids.FULLNAME),
@@ -112,16 +133,23 @@ class RegisterDialog extends BaseDialog {
 
                         break;
                       }
+                      case 'description': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'descriptionLength' })] });
+
+                        break;
+                      }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }
                     }
                   } else if (error.type === 'invalid characters') {
                     this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
+                  } else if (error.type === 'already exists') {
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'alreadyExists' })] });
                   } else {
-                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'error' })] });
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
                   }
 
                   return;
@@ -129,7 +157,19 @@ class RegisterDialog extends BaseDialog {
 
                 this.removeFromView();
               },
-            });
+            };
+            const imagePreview = document.getElementById('imagePreview-register');
+
+            if (imagePreview.getAttribute('src')) {
+              params.image = {
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              };
+            }
+
+            userComposer.createUser(params);
           },
         },
       }),
@@ -139,10 +179,9 @@ class RegisterDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['RegisterDialog']),
+      classes: classes.concat(['registerDialog']),
     });
   }
 }
 
 module.exports = RegisterDialog;
-

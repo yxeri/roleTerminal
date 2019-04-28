@@ -8,7 +8,12 @@ const override = {};
 
 const labels = {
   General: {
-
+    yes: (override.General && override.General.yes) || {
+      en: 'Yes',
+    },
+    no: (override.General && override.General.no) || {
+      en: 'No',
+    },
   },
   Button: {
     logout: (override.Button && override.Button.logout) || {
@@ -22,6 +27,52 @@ const labels = {
     register: (override.Button && override.Button.register) || {
       en: 'Register user',
       se: 'Registrera användare',
+    },
+    createRoom: (override.Button && override.Button.createRoom) || {
+      en: 'Create room',
+      se: 'Skapa rum',
+    },
+    createDocument: (override.Button && override.Button.createDocument) || {
+      en: 'Create document',
+      se: 'Skapa sokument',
+    },
+    createTeam: (override.Button && override.Button.createTeam) || {
+      en: 'Create team',
+      se: 'Skapa grupp',
+    },
+    inviteTeam: (override.Button && override.Button.inviteTeam) || {
+      en: 'Invite to team',
+      se: 'Bjud in till grupp',
+    },
+    leaveTeam: (override.Button && override.Button.leaveTeam) || {
+      en: 'Leave team',
+      se: 'Lämna gruppen',
+    },
+    message: (override.Button && override.Button.message) || {
+      en: 'Message',
+      se: 'Meddelande',
+    },
+    createAlias: (override.Button && override.Button.createAlias) || {
+      en: 'Create alias',
+      se: 'Skapa alias',
+    },
+    confirm: (override.Button && override.Button.confirm) || {
+      en: 'Confirm',
+    },
+    edit: (override.Button && override.Button.edit) || {
+      en: 'Edit',
+    },
+  },
+  Transaction: {
+    failed: (override.Transaction && override.Transaction.failed) || {
+      en: 'Failed to complete the action! Try again or contact an administrator.',
+      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
+    },
+    wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
+      en: 'Transfer currency',
+    },
+    currency: (override.BaseDialog && override.BaseDialog.currency) || {
+      en: 'currency',
     },
   },
   BaseDialog: {
@@ -40,13 +91,43 @@ const labels = {
     ok: (override.BaseDialog && override.BaseDialog.ok) || {
       en: 'OK!',
     },
-    failed: (override.BaseDialog && override.BaseDialog.failed) || {
-      en: 'Failed to complete the action! Try again or contact an administrator.',
-      se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
-    },
     change: (override.BaseDialog && override.BaseDialog.change) || {
       en: 'Change',
       se: 'Ändra',
+    },
+    unknown: (override.BaseDialog && override.BaseDialog.unknown) || {
+      en: 'Unknown',
+    },
+    error: (override.BaseDialog && override.BaseDialog.error) || {
+      en: 'Something went wrong',
+      se: 'Något gick fel',
+    },
+    areYouSure: (override.BaseDialog && override.BaseDialog.areYouSure) || {
+      en: 'Are you sure?',
+    },
+    remove: (override.BaseDialog && override.BaseDialog.remove) || {
+      en: 'Remove',
+    },
+    update: (override.BaseDialog && override.BaseDialog.update) || {
+      en: 'Update',
+    },
+    yes: (override.BaseDialog && override.BaseDialog.yes) || {
+      en: 'Yes',
+    },
+    no: (override.BaseDialog && override.BaseDialog.no) || {
+      en: 'No',
+    },
+    none: (override.BaseDialog && override.BaseDialog.none) || {
+      en: '-',
+    },
+    done: (override.BaseDialog && override.BaseDialog.done) || {
+      en: 'Done',
+    },
+    set: (override.BaseDialog && override.BaseDialog.set) || {
+      en: 'Set',
+    },
+    send: (override.BaseDialog && override.BaseDialog.send) || {
+      en: 'Send',
     },
   },
   LockedDocFileDialog: {
@@ -67,6 +148,24 @@ const labels = {
       se: 'Fel kod. Försök igen',
     },
   },
+  LockedRoomDialog: {
+    isLocked: (override.LockedRoomDialog && override.LockedRoomDialog.isLocked) || {
+      en: 'is password protected.',
+    },
+    enterPassword: (override.LockedRoomDialog && override.LockedRoomDialog.enterPassword) || {
+      en: 'Enter the password',
+    },
+    password: (override.LockedRoomDialog && override.LockedRoomDialog.password) || {
+      en: 'Password',
+    },
+    unlock: (override.LockedRoomDialog && override.LockedRoomDialog.unlock) || {
+      en: 'Unlock',
+      se: 'Lås upp',
+    },
+    accessDenied: (override.LockedRoomDialog && override.LockedRoomDialog.accessDenied) || {
+      en: 'Access denied',
+    },
+  },
   DocFileDialog: {
     title: (override.DocFileDialog && override.DocFileDialog.title) || {
       en: 'Title',
@@ -80,7 +179,13 @@ const labels = {
       en: 'Text',
     },
     titleLength: (override.DocFileDialog && override.DocFileDialog.titleLength) || {
-
+      en: 'The title is too long',
+    },
+    codeLength: (override.DocFileDialog && override.DocFileDialog.codeLength) || {
+      en: 'The code is too long',
+    },
+    textLength: (override.DocFileDialog && override.DocFileDialog.textLength) || {
+      en: 'The text is too long',
     },
   },
   AliasDialog: {
@@ -121,6 +226,9 @@ const labels = {
       en: 'User already exists.',
       se: 'Användare existerar redan.',
     },
+    description: (override.RegisterDialog && override.RegisterDialog.description) || {
+      en: 'Intro',
+    },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
       en: 'The user name must be be 2 - 40 characters long.',
       se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
@@ -129,9 +237,15 @@ const labels = {
       en: 'The password must be be 4 - 40 characters long.',
       se: 'Lösenordet måste vara 4 - 40 tecken långt.',
     },
+    descriptionLength: (override.RegisterDialog && override.RegisterDialog.descriptionLength) || {
+      en: 'The description cannot be more than 500 characters',
+    },
     invalidCharacters: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
       en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',
       se: 'Otillåtna tecken i användarnamnet/hela namnet. Tillåtna tecken: a-z 0-9 -_',
+    },
+    alreadyExists: (override.RegisterDialog && override.RegisterDialog.alreadyExists) || {
+      en: 'User already exists',
     },
   },
   RoomDialog: {
@@ -146,6 +260,36 @@ const labels = {
     roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
       en: 'Name of the room',
       se: 'Rummets namn',
+    },
+    changePassword: (override.RoomDialog && override.RoomDialog.changePassword) || {
+      en: 'Change password',
+      se: 'Ändra lösenordet',
+    },
+    roomInfo: (override.RoomDialog && override.RoomDialog.roomInfo) || {
+      en: 'Room information',
+    },
+    removePassword: (override.RoomDialog && override.RoomDialog.removePassword) || {
+      en: 'Remove password',
+      se: 'Ta bort lösenordet',
+    },
+  },
+  RoomUpdateDialog: {
+    password: (override.RoomUpdateDialog && override.RoomUpdateDialog.newPassword) || {
+      en: 'New password',
+    },
+    repeatPassword: (override.RoomUpdateDialog && override.RoomUpdateDialog.repeatPassword) || {
+      en: 'Repeat new password',
+    },
+    roomName: (override.RoomUpdateDialog && override.RoomUpdateDialog.roomName) || {
+      en: 'New name',
+    },
+  },
+  RoomInfo: {
+    whisper: (override.RoomInfo && override.RoomInfo.whisper) || {
+      en: 'Whisper',
+    },
+    room: (override.RoomInfo && override.RoomInfo.room) || {
+      en: 'Room',
     },
   },
   LoginDialog: {
@@ -195,11 +339,15 @@ const labels = {
     },
     likeButton: (override.ForumView && override.ForumView.likeButton) || {
       en: '+1',
-      se: '+1',
     },
     likes: (override.ForumView && override.ForumView.likes) || {
-      en: '',
-      se: '',
+      en: ':)',
+    },
+    dislikeButton: (override.ForumView && override.ForumView.likeButton) || {
+      en: '-1',
+    },
+    dislikes: (override.ForumView && override.ForumView.dislikes) || {
+      en: ':(',
     },
     timeCreated: (override.ForumView && override.ForumView.timeCreated) || {
       en: 'Created:',
@@ -212,6 +360,15 @@ const labels = {
     edit: (override.ForumView && override.ForumView.edit) || {
       en: 'Edit',
       se: 'Ändra',
+    },
+    createThread: (override.ForumView && override.ForumView.createThread) || {
+      en: '+Thread',
+    },
+    createPost: (override.ForumView && override.ForumView.createPost) || {
+      en: '+Post',
+    },
+    createSubPost: (override.ForumView && override.ForumView.createSubPost) || {
+      en: '+Sub-post',
     },
   },
   WorldMapView: {
@@ -238,20 +395,22 @@ const labels = {
       se: 'Platsens beskrivning',
     },
     movePosition: (override.MapObject && override.WorldMapView.movePosition) || {
-      en: 'Move position',
-      se: 'Flytta platsen',
+      en: 'Move',
+      se: 'Flytta',
     },
     changeStyle: (override.MapObject && override.WorldMapView.changeStyle) || {
-      en: 'Change style',
-      se: 'Byt stil',
+      en: 'Styling',
+    },
+    removePosition: (override.MapObject && override.MapObject.removePosition) || {
+      en: 'Remove',
     },
   },
-  StatusBar: {
-    menu: (override.StatusBar && override.StatusBar.menu) || {
+  MenuBar: {
+    menu: (override.MenuBar && override.MenuBar.menu) || {
       en: 'Menu',
       se: 'Meny',
     },
-    emptyTime: (override.StatusBar && override.StatusBar.emptyTime) || {
+    emptyTime: (override.MenuBar && override.MenuBar.emptyTime) || {
       en: '--:--',
     },
   },
@@ -282,17 +441,104 @@ const labels = {
     access: (override.AdminUserDialog && override.AdminUserDialog.access) || {
       en: 'Change permissions',
     },
-    wallet: (override.AdminUserDialog && override.AdminUserDialog.wallet) || {
-      en: 'Transfer currency',
+    walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet and won\'t show up in the user\'s transaction list.',
     },
-    walletAmount: (override.AdminUserDialog && override.AdminUserDialog.walletAmount) || {
-      en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet.',
+  },
+  WalletDialog: {
+    walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
+      en: 'Enter the amount that you want to transfer.',
     },
-    amountPlaceholder: (override.AdminUserDialog && override.AdminUserDialog.amountPlaceholder) || {
+    amountPlaceholder: (override.WalletDialog && override.WalletDialog.amountPlaceholder) || {
       en: 'Enter amount',
     },
-    sendAmount: (override.AdminUserDialog && override.AdminUserDialog.sendAmount) || {
+    sendAmount: (override.WalletDialog && override.WalletDialog.sendAmount) || {
       en: 'Transfer',
+    },
+    youHave: (override.WalletDialog && override.WalletDialog.youHave) || {
+      en: 'You have',
+    },
+    sendingFrom: (override.WalletDialog && override.WalletDialog.sendingFrom) || {
+      en: 'Using wallet for',
+    },
+    sendingTo: (override.WalletDialog && override.WalletDialog.sendingTo) || {
+      en: 'You are transferring to user',
+    },
+    sendingToTeam: (override.WalletDialog && override.WalletDialog.sendingToTeam) || {
+      en: 'You are transferring to team',
+    },
+  },
+  UserDialog: {
+    userInfo: (override.UserDialog && override.UserDialog.userInfo) || {
+      en: 'User information',
+    },
+    partOfTeam: (override.UserDialog && override.UserDialog.partOfTeam) || {
+      en: 'Part of teams',
+    },
+    position: (override.UserDialog && override.UserDialog.position) || {
+      en: 'Tracking coordinates',
+    },
+    lastSeenAt: (override.UserDialog && override.UserDialog.lastSeenAt) || {
+      en: 'Last seen at',
+    },
+    amountPlaceholder: (override.UserDialog && override.UserDialog.amountPlaceholder) || {
+      en: 'Enter amount',
+    },
+    sendAmount: (override.UserDialog && override.UserDialog.sendAmount) || {
+      en: 'Transfer',
+    },
+    youHave: (override.UserDialog && override.UserDialog.youHave) || {
+      en: 'You have',
+    },
+    sendingTo: (override.UserDialog && override.UserDialog.sendingTo) || {
+      en: 'You are transferring to user',
+    },
+    sendingToTeam: (override.UserDialog && override.UserDialog.sendingToTeam) || {
+      en: 'You are transferring to team',
+    },
+    trackPosition: (override.UserDialog && override.UserDialog.trackPosition) || {
+      en: 'Track user',
+    },
+    username: (override.UserDialog && override.UserDialog.username) || {
+      en: 'Username',
+    },
+  },
+  TeamDialog: {
+    tag: (override.TeamDialog && override.TeamDialog.tag) || {
+      en: 'Short name',
+    },
+    teamName: (override.TeamDialog && override.TeamDialog.teamName) || {
+      en: 'Team name',
+    },
+    members: (override.TeamDialog && override.TeamDialog.members) || {
+      en: 'Members',
+    },
+    location: (override.TeamDialog && override.TeamDialog.location) || {
+      en: 'Location',
+    },
+    teamNameLength: (override.TeamDialog && override.TeamDialog.teamNameLength) || {
+      en: 'The name is too long',
+    },
+    shortNameLength: (override.TeamDialog && override.TeamDialog.shortNameLength) || {
+      en: 'The short name is too long',
+    },
+  },
+  TransactionList: {
+    amount: (override.TransactionList && override.TransactionList.amount) || {
+      en: 'Amount',
+    },
+    sentFrom: (override.TransactionList && override.TransactionList.sentFrom) || {
+      en: 'Sent from',
+    },
+  },
+  MessageDialog: {
+    textLength: (override.MessageDialog && override.MessageDialog.textLength) || {
+      en: 'The message is too long',
+    },
+  },
+  VoiceCommands: {
+    viewSwitch: (override.VoiceCommands && override.VoiceCommands.viewSwitch) || {
+      en: 'switch',
     },
   },
 };

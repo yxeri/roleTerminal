@@ -6,5 +6,5 @@ COPY . /usr/src/app
 
 RUN npm prune && npm install
 
-RUN /usr/src/app/node_modules/roleHaven/start.sh
+RUN /usr/src/app/node_modules/rolehaven/start.sh
 CMD ["npm", "start"]

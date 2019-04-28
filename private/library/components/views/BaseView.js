@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,18 +15,37 @@
  */
 
 const elementCreator = require('../../ElementCreator');
+const accessCentral = require('../../AccessCentral');
+const storageManager = require('../../StorageManager');
+
+const cssClasses = {
+  focusElement: 'focusElement',
+  markElement: 'markElement',
+  newElement: 'newElement',
+  removeElement: 'removeElement',
+};
 
 class BaseView {
   constructor({
     classes,
+    minimumAccessLevel,
     elementId = `elem-${Date.now()}`,
   }) {
+    this.itemChangeTimeout = 800;
+    this.minimumAccessLevel = minimumAccessLevel;
     this.classes = classes;
     this.elementId = elementId;
     this.element = elementCreator.createContainer({
       classes,
       elementId,
     });
+
+    if (minimumAccessLevel) {
+      accessCentral.addAccessElement({
+        element: this.element,
+        minimumAccessLevel: this.minimumAccessLevel,
+      });
+    }
   }
 
   replaceOnParent({ element }) {
@@ -72,6 +91,12 @@ class BaseView {
   }
 
   showView() {
+    console.log('access show', this.minimumAccessLevel, this.element);
+
+    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
+      return;
+    }
+
     this.element.classList.remove('hide');
   }
 
@@ -80,6 +105,10 @@ class BaseView {
   }
 
   toggleView() {
+    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
+      return;
+    }
+
     this.element.classList.toggle('hide');
   }
 
@@ -89,6 +118,89 @@ class BaseView {
 
   getElementId() {
     return this.elementId;
+  }
+
+  hasAccess({ object, user }) { // eslint-disable-line
+    return accessCentral.hasAccessTo({
+      objectToAccess: object,
+      toAuth: user,
+    });
+  }
+
+  static findClosestElementId({
+    paramName,
+    fallbackParamName,
+    objects,
+    reverse,
+    targetVar,
+  }) {
+    const isNumber = typeof paramName === 'number';
+    const closest = isNumber
+      ? objects.reduce((previous, current) => {
+        const prevVar = previous[paramName] || previous[fallbackParamName];
+        const currVar = current[paramName] || current[fallbackParamName];
+
+        if (reverse) {
+          return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+            ? previous
+            : current;
+        }
+
+        return (Math.abs(currVar - targetVar) < Math.abs(prevVar - targetVar))
+          ? current
+          : previous;
+      })
+      : objects.find((closeObject, index) => {
+        if (index >= (objects.length - 1)) {
+          return true;
+        }
+
+        const closeVar = objects[index][paramName] || objects[index][fallbackParamName];
+
+        if (reverse) {
+          return closeVar < targetVar;
+        }
+
+        return closeVar > targetVar;
+      });
+
+    return closest.objectId;
+  }
+
+  removeElement({
+    object,
+    shouldAnimate = false,
+  }) {
+    const { objectId } = object;
+    const toRemove = this.getElement(objectId);
+
+    if (shouldAnimate) {
+      toRemove.classList.add(cssClasses.removeElement);
+
+      setTimeout(() => {
+        const element = this.getElement(objectId);
+
+        if (element) {
+          toRemove.parentElement.removeChild(element);
+        }
+      }, this.itemChangeTimeout / 4);
+
+      return;
+    }
+
+    toRemove.parentElement.removeChild(toRemove);
+  }
+
+  animateElement({
+    elementId,
+    element,
+  }) {
+    const elementToAnimate = element || this.getElement(elementId);
+
+    if (elementToAnimate) {
+      elementToAnimate.classList.add(cssClasses.newElement);
+      setTimeout(() => { elementToAnimate.classList.remove(cssClasses.newElement); }, this.itemChangeTimeout);
+    }
   }
 }
 

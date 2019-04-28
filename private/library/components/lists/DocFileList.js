@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,34 +18,39 @@ const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
 
 class DocFileList extends List {
   constructor({
+    title,
+    effect,
+    sorting = {
+      paramName: 'title',
+    },
+    listItemFields = [{
+      paramName: 'title',
+    }],
     classes = [],
     elementId = `dFList-${Date.now()}`,
   }) {
-    const headerFields = [
-      {
-        paramName: 'title',
-      },
-    ];
-
     super({
+      title,
       elementId,
+      sorting,
+      effect,
+      listItemFields,
       classes: classes.concat(['docFileList']),
       dependencies: [
         dataHandler.docFiles,
         dataHandler.aliases,
         dataHandler.users,
         dataHandler.teams,
+        dataHandler.transactions,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const userId = storageManager.getUserId();
           const docFile = dataHandler.docFiles.getObject({ objectId });
 
-          if (!docFile.isLocked || docFile.code || docFile.ownerId === userId) {
+          if (!docFile.isLocked || docFile.code) {
             eventCentral.emitEvent({
               event: eventCentral.Events.OPEN_DOCFILE,
               params: { docFile },
@@ -59,7 +64,6 @@ class DocFileList extends List {
         },
       },
       collector: dataHandler.docFiles,
-      listItemFields: headerFields,
     });
   }
 }

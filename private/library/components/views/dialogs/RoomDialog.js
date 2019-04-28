@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ const BaseDialog = require('./BaseDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
-const dataHandler = require('../../../data/DataHandler');
+const roomComposer = require('../../../data/composers/RoomComposer');
 
 const ids = {
   ROOMNAME: 'roomName',
@@ -68,7 +68,9 @@ class RoomDialog extends BaseDialog {
           leftFunc: () => {
             if (this.hasEmptyRequiredInputs()) {
               return;
-            } else if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+            }
+
+            if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
               BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
               BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
 
@@ -78,12 +80,10 @@ class RoomDialog extends BaseDialog {
               return;
             }
 
-            dataHandler.rooms.createObject({
-              params: {
-                room: {
-                  roomName: this.getInputValue(ids.ROOMNAME),
-                  password: this.getInputValue(ids.PASSWORD),
-                },
+            roomComposer.createRoom({
+              room: {
+                roomName: this.getInputValue(ids.ROOMNAME),
+                password: this.getInputValue(ids.PASSWORD),
               },
               callback: ({ error }) => {
                 if (error) {
@@ -100,7 +100,7 @@ class RoomDialog extends BaseDialog {
                         break;
                       }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }

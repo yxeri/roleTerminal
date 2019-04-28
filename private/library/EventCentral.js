@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2016 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -60,15 +60,19 @@ class EventCentral {
       ACCESS_DOCFILE: 'Access file',
       SWITCH_ROOM: 'Switched room',
       SWITCH_FORUM: 'Switched forum',
+      TRY_VIEW_SWITCH: 'Trying to switch view',
       SWITCH_LANGUAGE: 'Switched language',
       WORLDMAP: 'World map created',
       FOCUS_MAPPOSITION: 'Focus on map position',
+      FOCUS_USER_MAPPOSITION: 'Focus on user map position',
+      ZOOM_WORLDMAP: 'Changed zoom level on world map',
       ACCESS_CHANGE: 'Access level has changed',
       MARKER_DESCRIPTION: 'Map marker description',
       USER_CHANGE: 'User has logged in/logged out/reconnected',
       CHANGED_ALIAS: 'Changed current alias',
       VIEW_SWITCHED: 'View has changed',
       FOLLOWED_ROOM: 'Followed new room',
+      OPEN_TEAM: 'Open team',
       COMPLETE_FORUM: 'Forum dependencies fetched',
       COMPLETE_MESSAGE: 'Message dependencies fetched',
       COMPLETE_POSITION: 'Position dependencies fetched',
@@ -77,15 +81,21 @@ class EventCentral {
       COMPLETE_DOCFILE: 'Doc file dependencies fetched',
       COMPLETE_ROOM: 'Room dependencies fetched',
       COMPLETE_WALLET: 'Wallet dependencies fetched',
+      COMPLETE_TRANSACTION: 'Transaction dependencies fetched',
+      COMPLETE_TEAM: 'Team dependencies fetched',
+      COMPLETE_INVITATION: 'Invitation dependencies fetched',
+      LEFT_TEAM: 'Left team',
+      MY_POSITION: 'User position',
+      SHOW_MAP_CLICK_BOX: 'Map box is shown',
     };
     this.eventWatchers = {};
   }
 
   /**
    * Adds a watcher for events.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Name of the event to listen for.
-   * @param {Function} params.func - Function to call.
+   * @param {Object} params Parameters.
+   * @param {string} params.event Name of the event to listen for.
+   * @param {Function} params.func Function to call.
    */
   addWatcher({ event, func }) {
     if (!this.eventWatchers[event]) {
@@ -97,9 +107,9 @@ class EventCentral {
 
   /**
    * Emit event.
-   * @param {Object} params - Parameters.
-   * @param {string} params.event - Event to emit.
-   * @param {Object} [params.params] - Parameters to send.
+   * @param {Object} params Parameters.
+   * @param {string} params.event Event to emit.
+   * @param {Object} [params.params] Parameters to send.
    */
   emitEvent({
     event,

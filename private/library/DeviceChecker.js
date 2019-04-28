@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2016 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@ class DeviceChecker {
     this.deviceType = (() => {
       if (userAgent.match(/iP(hone|ad|od)/i) !== null) {
         return this.DeviceEnum.IOS;
-      } else if (userAgent.match(/Android/i) !== null) {
+      }
+
+      if (userAgent.match(/Android/i) !== null) {
         return this.DeviceEnum.ANDROID;
       }
 

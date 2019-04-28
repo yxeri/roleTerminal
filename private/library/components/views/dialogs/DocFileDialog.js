@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const docFileComposer = require('../../../data/composers/DocFileComposer');
+const storageManager = require('../../../StorageManager');
 
 const ids = {
   TITLE: 'title',
@@ -59,6 +60,12 @@ class DocFileDialog extends BaseDialog {
         shouldResize: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
+      elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-docFile',
+      }),
       elementCreator.createRadioSet({
         elementId: ids.VISIBILITY,
         title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
@@ -81,7 +88,9 @@ class DocFileDialog extends BaseDialog {
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
         clickFuncs: {
-          leftFunc: () => { this.removeFromView(); },
+          leftFunc: () => {
+            this.removeFromView();
+          },
         },
       }),
       elementCreator.createButton({
@@ -92,8 +101,9 @@ class DocFileDialog extends BaseDialog {
               return;
             }
 
-            docFileComposer.createDocFile({
+            const params = {
               docFile: {
+                ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
                 code: this.getInputValue(ids.CODE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
@@ -119,21 +129,33 @@ class DocFileDialog extends BaseDialog {
                         break;
                       }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }
                     }
                   }
 
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'error' })] });
+                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                   return;
                 }
 
                 this.removeFromView();
               },
-            });
+            };
+            const imagePreview = document.getElementById('imagePreview-docFile');
+
+            if (imagePreview.getAttribute('src')) {
+              params.images = [{
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              }];
+            }
+
+            docFileComposer.createDocFile(params);
           },
         },
       }),

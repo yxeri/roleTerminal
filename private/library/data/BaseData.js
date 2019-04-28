@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,8 +17,19 @@
 /**
  * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
  * @typedef {Object} Filter
- * @property {string} paramName - Name of the parameter.
- * @property {string} paramValue - Value of the parameter.
+ * @property {boolean} [orCheck] Is it enough for only one sent value to match?
+ * @property {Object[]} rules Rules.
+ * @property {string} rules.paramName Name of the parameter.
+ * @property {string} rules.paramValue Value of the parameter.
+ * @property {boolean} [rules.shouldInclude] Should a collection include the sent value?
+ */
+
+/**
+ * A filter will be used to filter out the objects retrieved or received. Only those who match the filter will be accepted.
+ * @typedef {Object} Sorting
+ * @property {string} paramName Name of the parameter to sort by.
+ * @property {string} [fallbackParamName] Name of the parameter to sort by, if paramName is not found.
+ * @property {boolean} [reverse] Should the sorting be reversed?
  */
 
 const socketManager = require('../SocketManager');
@@ -113,7 +124,9 @@ class BaseData {
           }
         }
 
-        paramsToEmit[this.objectTypes.one] = this.objects[object.objectId];
+        paramsToEmit[this.objectTypes.one] = changeType === socketManager.ChangeTypes.REMOVE
+          ? { objectId: object.objectId }
+          : this.objects[object.objectId];
 
         eventCentral.emitEvent({
           event: this.eventTypes.one,
@@ -129,9 +142,9 @@ class BaseData {
 
   /**
    * Retrieves objects from server.
-   * @param {Object} params - Parameters.
-   * @param {Object} [params.emitParams] - Data to send to the server.
-   * @param {boolean} [params.reset] - Should stored objects be reset?
+   * @param {Object} params Parameters.
+   * @param {Object} [params.emitParams] Data to send to the server.
+   * @param {boolean} [params.reset] Should stored objects be reset?
    */
   fetchObjects({
     event,
@@ -186,10 +199,10 @@ class BaseData {
 
   /**
    * Retrieve object from server.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send to the server.
-   * @param {boolean} [params.noEmit] - Should the event emit be suppressed?
-   * @param {Function} [params.callback] - Callback.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send to the server.
+   * @param {boolean} [params.noEmit] Should the event emit be suppressed?
+   * @param {Function} [params.callback] Callback.
    */
   fetchObject({
     params,
@@ -243,10 +256,10 @@ class BaseData {
 
   /**
    * Craete an object on the server and return the created object.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
-   * @param {string} [params.event] - Event type to emit. Will override the default one.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
+   * @param {string} [params.event] Event type to emit. Will override the default one.
    */
   createObject({
     params,
@@ -270,16 +283,21 @@ class BaseData {
 
       this.objects[object.objectId] = object;
 
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
+      });
+
       callback({ data });
     });
   }
 
   /**
    * Update an object on the server and return the updated object.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
-   * @param {string} [params.event] - Event type to emit. Will override the default one.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
+   * @param {string} [params.event] Event type to emit. Will override the default one.
    */
   updateObject({
     params,
@@ -312,15 +330,20 @@ class BaseData {
 
       dataToReturn[this.objectTypes.one] = this.objects[object.objectId];
 
-      callback({ data: dataToReturn });
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
+      });
+
+      callback({ data });
     });
   }
 
   /**
    * Remove an object from the server and local.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.params - Parameters to send.
-   * @param {Function} params.callback - Callback.
+   * @param {Object} params Parameters.
+   * @param {Object} params.params Parameters to send.
+   * @param {Function} params.callback Callback.
    */
   removeObject({
     params,
@@ -343,32 +366,60 @@ class BaseData {
 
       this.objects[object.objectId] = undefined;
 
-      callback({
-        data: { success: true },
+      eventCentral.emitEvent({
+        event: this.eventTypes.one,
+        params: data,
       });
+
+      callback({ data });
     });
   }
 
   /**
    * Get locally stored object.
-   * @param {Object} params - Parameters.
-   * @param {string} params.objectId - Id of the object.
+   * @param {Object} params Parameters.
+   * @param {string} params.objectId Id of the object.
    * @return {Object} Found object.
    */
-  getObject({ objectId }) {
+  getObject({
+    objectId,
+    filter,
+  }) {
+    // TODO Duplicate code. Similar to getObjects()
+    if (filter) {
+      const { orCheck } = filter;
+      const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
+
+      return objects.find((object) => {
+        if (orCheck) {
+          return filter.rules.some((rule) => {
+            if (rule.shouldInclude) {
+              return rule.paramValue.every(value => object[rule.paramName].includes(value));
+            }
+
+            return rule.paramValue === object[rule.paramName];
+          });
+        }
+
+        return filter.rules.every((rule) => {
+          if (rule.shouldInclude) {
+            return rule.paramValue.every(value => object[rule.paramName].includes(value));
+          }
+
+          return rule.paramValue === object[rule.paramName];
+        });
+      });
+    }
+
     return this.objects[objectId];
   }
 
   /**
    * Get locally stored objects.
    * Setting paramName and value will retrieve objects matching them.
-   * @param {Object} params - Parameters.
-   * @param {Object} params.filter - Filter to check against.
-   * @param {boolean} [params.orCheck] - Is it enough for only one sent value to match?
-   * @param {Object} [params.sorting] - Sorting of the returned objects.
-   * @param {string} params.sorting.paramName - Name of the parameter to sort by.
-   * @param {string} [params.sorting.fallbackParamName] - Name of the parameter to sort by, if paramName is not found.
-   * @param {boolean} [params.sorting.reverse] - Should the sort order be reversed?
+   * @param {Object} params Parameters.
+   * @param {Filter} params.filter Filter to check against.
+   * @param {Sorting} [params.sorting] Sorting of the returned objects.
    * @return {Object} Stored objects.
    */
   getObjects({
@@ -380,9 +431,15 @@ class BaseData {
       const bParam = (b[sorting.paramName] || b[sorting.fallbackParamName]).toLowerCase();
 
       if (aParam < bParam) {
-        return sorting.reverse ? 1 : -1;
-      } else if (aParam > bParam) {
-        return sorting.reverse ? -1 : 1;
+        return sorting.reverse
+          ? 1
+          : -1;
+      }
+
+      if (aParam > bParam) {
+        return sorting.reverse
+          ? -1
+          : 1;
       }
 
       return 0;
@@ -412,10 +469,14 @@ class BaseData {
         });
       });
 
-      return sorting ? filteredObjects.sort(sortFunc) : filteredObjects;
+      return sorting
+        ? filteredObjects.sort(sortFunc)
+        : filteredObjects;
     }
 
-    return sorting ? objects.sort(sortFunc) : objects;
+    return sorting
+      ? objects.sort(sortFunc)
+      : objects;
   }
 }
 

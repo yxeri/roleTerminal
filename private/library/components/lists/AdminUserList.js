@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ const elementCreator = require('../../ElementCreator');
 const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');
 const walletComposer = require('../../data/composers/WalletComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class AdminUserList extends List {
   constructor({
+    effect,
     classes = [],
     elementId = `aUserList-${Date.now()}`,
   }) {
@@ -79,6 +81,7 @@ class AdminUserList extends List {
     super({
       elementId,
       classes,
+      effect,
       shouldToggle: true,
       title: 'Users',
       listItemSpecificClasses: [
@@ -123,7 +126,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -142,7 +145,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -161,7 +164,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -180,7 +183,7 @@ class AdminUserList extends List {
                   userId,
                   callback: ({ error, data }) => {
                     if (error) {
-                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                      dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                       return;
                     }
@@ -253,7 +256,7 @@ class AdminUserList extends List {
                             accessLevel: chosen.value,
                             callback: ({ error }) => {
                               if (error) {
-                                accessDialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                                accessDialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                                 return;
                               }
@@ -273,7 +276,7 @@ class AdminUserList extends List {
             },
           });
           const walletButton = elementCreator.createButton({
-            text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'wallet' }),
+            text: labelHandler.getLabel({ baseObject: 'Transaction', label: 'wallet' }),
             clickFuncs: {
               leftFunc: () => {
                 const walletDialog = new BaseDialog({
@@ -283,7 +286,7 @@ class AdminUserList extends List {
                     isRequired: true,
                     maxLength: 6,
                     type: 'number',
-                    placeholder: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'amountPlaceholder' }),
+                    placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
                   })],
                   upperText: [`${labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'walletAmount' })}`],
                   lowerButtons: [
@@ -294,7 +297,7 @@ class AdminUserList extends List {
                       },
                     }),
                     elementCreator.createButton({
-                      text: labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'sendAmount' }),
+                      text: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendAmount' }),
                       clickFuncs: {
                         leftFunc: () => {
                           if (walletDialog.hasEmptyRequiredInputs()) {
@@ -306,7 +309,7 @@ class AdminUserList extends List {
                             amount: walletDialog.getInputValue('walletAmount'),
                             callback: ({ error }) => {
                               if (error) {
-                                dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'failed' })] });
+                                dialog.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Transaction', label: 'failed' })] });
 
                                 return;
                               }
@@ -338,7 +341,7 @@ class AdminUserList extends List {
 
           lowerButtons.push(resetPasswordButton, changeAccessButton, walletButton);
 
-          dialog.addToView({ element: this.element });
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
           dialog.addBottomButtons({ buttons: lowerButtons });
         },
       },

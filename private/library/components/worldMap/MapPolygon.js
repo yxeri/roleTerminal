@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -22,8 +22,20 @@ class MapPolygon extends MapObject {
     clickFuncs,
     labelStyle,
     choosableStyles,
-    zIndex = 1,
-    descriptionOnClick = false,
+    triggeredStyles,
+    overlay,
+    hoverExcludeRule = {
+      paramName: 'positionName',
+      paramRegExp: /^polygon/ig,
+      shouldBeFalse: true,
+    },
+    descriptionOnClick,
+    zIndex = 3,
+    markedStyle = {
+      strokeColor: '#009100',
+      fillColor: '#009100',
+      styleName: 'Marked',
+    },
     alwaysShowLabel = false,
     shouldCluster = false,
     styles = {},
@@ -32,9 +44,24 @@ class MapPolygon extends MapObject {
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
     const allPoints = [new google.maps.LatLng(latestCoordinates.latitude, latestCoordinates.longitude)]
       .concat(latestCoordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
-    const chosenStyle = choosableStyles && position.styleName ? choosableStyles.find(style => style.styleName === position.styleName) : {};
+    const chosenStyle = choosableStyles && position.styleName
+      ? choosableStyles.find(style => style.styleName === position.styleName)
+      : {};
+    const style = {
+      opacity: chosenStyle.opacity || styles.opacity || 1,
+      strokeColor: chosenStyle.strokeColor || styles.strokeColor || '#000000',
+      strokeOpacity: chosenStyle.strokeOpacity || styles.strokeOpacity || 0.8,
+      strokeWeight: chosenStyle.strokeWeight || styles.strokeWeight || 1,
+      fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
+      fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
+    };
+    const options = Object.assign({
+      zIndex,
+      paths: new google.maps.MVCArray(allPoints),
+    }, style);
 
     super({
+      hoverExcludeRule,
       choosableStyles,
       descriptionOnClick,
       alwaysShowLabel,
@@ -42,6 +69,10 @@ class MapPolygon extends MapObject {
       position,
       clickFuncs,
       labelStyle,
+      triggeredStyles,
+      markedStyle,
+      style,
+      overlay,
       // TODO Combine with MapLine
       dragEndFunc: () => {
         const extraCoordinates = this.mapObject.getPath().getArray();
@@ -60,20 +91,16 @@ class MapPolygon extends MapObject {
           },
         });
       },
-      mapObject: new google.maps.Polygon({
-        zIndex,
-        paths: new google.maps.MVCArray(allPoints),
-        opacity: chosenStyle.opacity || styles.opacity || 1,
-        strokeColor: chosenStyle.strokeColor || styles.strokeColor || '#000000',
-        strokeOpacity: chosenStyle.strokeOpacity || styles.strokeOpacity || 0.8,
-        strokeWeight: chosenStyle.strokeWeight || styles.strokeWeight || 1,
-        fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
-        fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
-      }),
+      mapObject: new google.maps.Polygon(options),
     });
   }
 
-  changeStyle({ styleName, style }) {
+  changeStyle({
+    styleName,
+    style,
+    setCurrentStyle,
+    shouldEmit,
+  }) {
     const {
       strokeColor,
       strokeOpacity,
@@ -91,7 +118,12 @@ class MapPolygon extends MapObject {
     if (fillOpacity) { options.fillOpacity = fillOpacity; }
     if (opacity) { options.opacity = opacity; }
 
-    super.changeStyle({ styleName, style: options });
+    super.changeStyle({
+      styleName,
+      shouldEmit,
+      setCurrentStyle,
+      style: options,
+    });
   }
 
   // TODO Combine with MapLine

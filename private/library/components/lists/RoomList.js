@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,17 +15,21 @@
  */
 
 const List = require('./List');
+const LockedRoomDialog = require('../views/dialogs/LockedRoomDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const viewSwitcher = require('../../ViewSwitcher');
+const accessCentral = require('../../AccessCentral');
 
 class RoomList extends List {
   constructor({
     title,
-    whisperText = ' <-> ',
+    minimumAccessLevel,
+    effect,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -36,54 +40,88 @@ class RoomList extends List {
       title,
       elementId,
       classes,
+      effect,
+      sorting: {
+        paramName: 'roomName',
+      },
+      minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       filter: {
         rules: [
           { paramName: 'isUser', paramValue: false },
+          { paramName: 'isWhisper', paramValue: false },
         ],
+      },
+      userFilter: {
+        rules: [{
+          paramName: 'followingRooms',
+          shouldInclude: true,
+          objectParamName: 'objectId',
+          shouldBeTrue: false,
+        }],
       },
       listItemFields: [
         {
           paramName: 'objectId',
           convertFunc: (objectId) => {
-            const currentUser = userComposer.getCurrentUser();
             const room = roomComposer.getRoom({ roomId: objectId });
-            const { isWhisper, participantIds } = room;
 
             if (room) {
-              if (isWhisper) {
-                if (!currentUser) {
-                  return '';
-                }
-
-                const users = userComposer.getWhisperUsers({ participantIds });
-
-                return users.length > 0 ? `${users[0].username}${whisperText}${users[1].username}` : '';
-              }
-
               return room.roomName;
             }
 
-            return '';
+            return objectId;
           },
         },
       ],
       focusedId: storageManager.getCurrentRoom(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const roomId = objectId;
+          const {
+            roomName,
+            objectId: roomId,
+          } = roomComposer.getRoom({ roomId: objectId });
 
-          eventCentral.emitEvent({
-            event: eventCentral.Events.SWITCH_ROOM,
-            params: {
-              listType: this.ListTypes.ROOMS,
-              origin: this.elementId,
-              room: {
-                objectId: roomId,
-              },
+          roomComposer.follow({
+            roomId,
+            callback: ({ error }) => {
+              if (error) {
+                if (error.type === 'not allowed' && error.extraData.param === 'password') {
+                  const lockedDialog = new LockedRoomDialog({
+                    roomId,
+                    roomName,
+                    listId: this.elementId,
+                    listType: this.listType,
+                  });
+
+                  lockedDialog.addToView({
+                    element: viewSwitcher.getParentElement(),
+                  });
+
+                  return;
+                }
+
+                return;
+              }
+
+              // eventCentral.emitEvent({
+              //   event: eventCentral.Events.SWITCH_ROOM,
+              //   params: {
+              //     listType: this.ListTypes.ROOMS,
+              //     origin: this.elementId,
+              //     room: {
+              //       objectId: roomId,
+              //     },
+              //   },
+              // });
+
+              eventCentral.emitEvent({
+                event: eventCentral.Events.FOLLOWED_ROOM,
+                params: {
+                  room: { objectId: roomId },
+                },
+              });
             },
           });
-
-          roomComposer.follow({ roomId });
         },
       },
       dependencies: [
@@ -96,32 +134,41 @@ class RoomList extends List {
     });
 
     eventCentral.addWatcher({
-      event: eventCentral.Events.SWITCH_ROOM,
+      event: eventCentral.Events.FOLLOWED_ROOM,
       func: ({
         room,
-        origin,
-        listType = '',
       }) => {
-        if (origin && origin === this.elementId) {
-          return;
-        } if (listType !== this.ListTypes.ROOMS) {
-          return;
-        }
-
-        const { objectId } = room;
-
-        this.setFocusedListItem(objectId);
+        this.removeListItem({ objectId: room.objectId });
       },
     });
   }
 
-  static hasAccess({ object, user = {} }) {
-    const hasAccess = List.hasAccess({ object, user });
+  getCollectorObjects() {
+    const currentUser = userComposer.getCurrentUser();
 
-    return hasAccess
-      || (user.followingRooms && user.followingRooms.includes(object.objectId))
-      || (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
-      || (user.objectId && object.participantIds.includes(user.objectId));
+    if (!currentUser) {
+      return [];
+    }
+
+    const allRooms = this.collector.getObjects({
+      filter: this.filter,
+    });
+    const { followingRooms = [] } = currentUser;
+
+    return allRooms.filter(object => !followingRooms.includes(object.objectId)).sort((a, b) => {
+      const aParam = a.roomName.toLowerCase();
+      const bParam = b.roomName.toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      }
+
+      if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
+    });
   }
 }
 

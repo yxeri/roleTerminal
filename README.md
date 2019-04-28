@@ -18,11 +18,11 @@ See https://github.com/yxeri/roleHaven/blob/master/README.md#api.
 
 ## Project owner
 
-* Carmilla Mina Jankovic - [Github](https://github.com/yxeri)
+* Carmilla Mina Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 
 ## Development contributors
 
-* Carmilla Mina Jankovic - [Github](https://github.com/yxeri)
+* Carmilla Mina Jankovic - [Github](https://github.com/yxeri) [Twitter](https://twitter.com/yxeri)
 * Stanislav B - [Github](https://github.com/stanislavb)
 * Sebastian Streiffert
 * Johnathan Browall

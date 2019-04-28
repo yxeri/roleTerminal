@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 class MouseHandler {
   constructor() {
+    this.rightClicked = false;
     this.longClick = false;
     this.touchTimeout = 500;
     this.allowRightClick = false;
@@ -34,10 +35,10 @@ class MouseHandler {
 
   /**
    * Add a left and/or right click listener to the element. Right clicks on touch devices are simulated by holding the touch down for a set amount of time.
-   * @param {Object} params - Parameters.
-   * @param {HTMLElement} params.element - Element to add the listeners to.
-   * @param {Function} [params.leftFunc] - Function that will be called on a left click.
-   * @param {Function} [params.right] - Function that will be called on a right click
+   * @param {Object} params Parameters.
+   * @param {HTMLElement} params.element Element to add the listeners to.
+   * @param {Function} [params.leftFunc] Function that will be called on a left click.
+   * @param {Function} [params.right] Function that will be called on a right click
    */
   addClickListener({
     element,
@@ -80,7 +81,13 @@ class MouseHandler {
     right,
   }) {
     if (leftFunc) {
-      google.maps.event.addListener(element, 'click', leftFunc);
+      google.maps.event.addListener(element, 'click', (event) => {
+        if (!this.rightClicked) {
+          leftFunc(event);
+        }
+
+        this.rightClicked = false;
+      });
     }
 
     if (right) {
@@ -95,6 +102,8 @@ class MouseHandler {
 
         setTimeout(() => {
           if (this.longClick) {
+            this.rightClicked = true;
+
             right(event);
           }
         }, this.touchTimeout);

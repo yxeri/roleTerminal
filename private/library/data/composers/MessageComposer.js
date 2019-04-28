@@ -3,6 +3,7 @@ const DataComposer = require('./BaseComposer');
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
+const socketManager = require('../../SocketManager');
 
 class MessageComposer extends DataComposer {
   constructor() {
@@ -37,9 +38,39 @@ class MessageComposer extends DataComposer {
     return message;
   }
 
+  fetchMessagesByRoom({
+    roomId,
+    callback,
+  }) {
+    this.handler.fetchObjects({
+      event: socketManager.EmitTypes.GETROOMMSGS,
+      emitParams: { roomId },
+      callback: ({ error: getError }) => {
+        if (getError) {
+          console.log('get messages error', getError);
+        }
+
+        callback({ error: getError });
+      },
+    });
+  }
+
+  getMessagesByRoom({
+    roomId,
+  }) {
+    return this.handler.getObjects({
+      filter: {
+        rules: [
+          { paramName: 'roomId', paramValue: roomId },
+        ],
+      },
+    });
+  }
+
   sendMessage({
     participantIds,
     message,
+    image,
     callback,
   }) {
     const aliasId = storageManager.getAliasId();
@@ -51,8 +82,33 @@ class MessageComposer extends DataComposer {
       callback,
       params: {
         participantIds,
+        image,
+        message: messageToSend,
+      },
+    });
+  }
+
+  updateMessage({
+    message,
+    messageId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        messageId,
         message,
       },
+    });
+  }
+
+  removeMessage({
+    messageId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { messageId },
     });
   }
 }

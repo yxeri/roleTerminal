@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Aleksandar Jankovic
+ Copyright 2015 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -43,16 +43,19 @@ const specials = '!;#&()[]';
 const binary = '01';
 const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
 const internationalRegex = /^[\w\d]+$/;
+const glitchSigns = ['░', '▒', '▓', '█'];
 
 class TextTools {
   /**
    * Beautifies number by adding a 0 before the number if it is lower than 10
    * @static
-   * @param {Number} number - Number to be beautified
-   * @returns {Number|string} - Single number or string with 0 + number
+   * @param {Number} number Number to be beautified
+   * @returns {Number|string} Single number or string with 0 + number
    */
   static beautifyNumber(number) {
-    return number > 9 ? number : `0${number}`;
+    return number > 9
+      ? number
+      : `0${number}`;
   }
 
   static getHoursAndMinutes(time) {
@@ -65,10 +68,10 @@ class TextTools {
   /**
    * Takes date and returns shorter human-readable time.
    * @static
-   * @param {Object} params - Parameters.
-   * @param {Date|number} params.date - Date.
-   * @param {Number} [params.offset] - Should hours be modified from the final time?
-   * @param {boolean} [params.lockDate] - Should the year stay unmodified?
+   * @param {Object} params Parameters.
+   * @param {Date|number} params.date Date.
+   * @param {Number} [params.offset] Should hours be modified from the final time?
+   * @param {boolean} [params.lockDate] Should the year stay unmodified?
    * @returns {Object} Human-readable time and date.
    */
   static generateTimestamp({ date, offset, lockDate }) {
@@ -108,18 +111,18 @@ class TextTools {
   /**
    * Does the string contain only legal (a-zA-z0-9) alphanumerics?
    * @static
-   * @param {string} text - String to be checked
-   * @returns {boolean} - Does string contain only legal (a-zA-z0-9) alphanumerics?
+   * @param {string} text String to be checked
+   * @returns {boolean} Does string contain only legal (a-zA-z0-9) alphanumerics?
    */
   static isTextAllowed(text) { return allowedRegex.test(text); }
 
   /**
    * Replaces part of the sent string and returns it
    * @static
-   * @param {string} text - Original string
-   * @param {string} find - Substring to replace
-   * @param {string} replaceWith - String that will replace the found substring
-   * @returns {string} - Modified string
+   * @param {string} text Original string
+   * @param {string} find Substring to replace
+   * @param {string} replaceWith String that will replace the found substring
+   * @returns {string} Modified string
    */
   static findOneReplace(text, find, replaceWith) {
     return text.replace(new RegExp(find), replaceWith);
@@ -129,16 +132,29 @@ class TextTools {
    * Trims whitespaces from beginning and end of the string
    * Needed for Android 2.1. trim() is not supported
    * @static
-   * @param {string} sentText - String to be trimmed
-   * @returns {string} - String with no whitespaces in the beginning and end
+   * @param {string} sentText String to be trimmed
+   * @returns {string} String with no whitespaces in the beginning and end
    */
   static trimSpace(sentText) { return this.findOneReplace(sentText, /^\s+|\s+$/, ''); }
 
   /**
-   * Creates and returns a randomised string
+   * Creates and returns a randomised glitch string.
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string.
+   * @returns {string} Randomised string.
+   */
+  static createGlitchString(length) {
+    return this.createRandString({
+      length,
+      selection: glitchSigns,
+    });
+  }
+
+  /**
+   * Creates and returns a randomised character string.
+   * @static
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createCharString(length) {
     return this.createRandString({
@@ -150,8 +166,8 @@ class TextTools {
   /**
    * Creates and returns a alphanumerical randomised string
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createAlphaNumbericalString(length) {
     return this.createRandString({
@@ -163,8 +179,8 @@ class TextTools {
   /**
    * Creates and returns a randomised string, only containing 0 and 1
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createBinaryString(length) {
     return this.createRandString({
@@ -176,8 +192,8 @@ class TextTools {
   /**
    * Creates and returns a randomised string, containing alphanumeric and special characters
    * @static
-   * @param {Number} length - Length of randomised string
-   * @returns {string} - Randomised string
+   * @param {Number} length Length of randomised string
+   * @returns {string} Randomised string
    */
   static createMixedString(length) {
     return this.createRandString({
@@ -190,7 +206,9 @@ class TextTools {
     return string.split().map((char) => {
       if (char === charToLower) {
         return char.toLowerCase();
-      } else if (Math.random() > 0.5) {
+      }
+
+      if (Math.random() > 0.5) {
         return char.toUpperCase();
       }
 
@@ -205,7 +223,9 @@ class TextTools {
     for (let i = 0; i < length; i += 1) {
       const randomVal = Math.round(Math.random() * (randomLength - 1));
 
-      result += Math.random() > 0.5 ? selection[randomVal].toUpperCase() : selection[randomVal];
+      result += Math.random() > 0.5
+        ? selection[randomVal].toUpperCase()
+        : selection[randomVal];
     }
 
     return result;
@@ -220,11 +240,13 @@ class TextTools {
   /**
    * Copies string to avoid the original being consumed.
    * @static
-   * @param {string} string - String to copy.
-   * @returns {string} - String copy.
+   * @param {string} string String to copy.
+   * @returns {string} String copy.
    */
   static copyString(string) {
-    return string && string !== null ? JSON.parse(JSON.stringify(string)) : '';
+    return string && string !== null
+      ? JSON.parse(JSON.stringify(string))
+      : '';
   }
 
   static isInternationalAllowed(text) {
@@ -237,13 +259,88 @@ class TextTools {
 
     if (modTen === 1 && modHundred !== 11) {
       return `${number}st`;
-    } else if (modTen === 2 && modHundred !== 12) {
+    }
+
+    if (modTen === 2 && modHundred !== 12) {
       return `${number}nd`;
-    } else if (modTen === 3 && modHundred !== 13) {
+    }
+
+    if (modTen === 3 && modHundred !== 13) {
       return `${number}rd`;
     }
 
     return `${number}th`;
+  }
+
+  static typewriter({
+    paragraphs,
+    target,
+    callback = () => {},
+    amount = 5,
+    paragraphFunc = () => {},
+  }) {
+    const paragraph = paragraphs.shift();
+    let spans;
+
+    const charAnimator = ({
+      span,
+      text,
+    }) => {
+      const characters = text.splice(0, amount);
+
+      if (characters[0]) {
+        span.appendChild(document.createTextNode(characters.join('')));
+
+        setTimeout(() => {
+          charAnimator({
+            span,
+            text,
+          });
+        }, 15);
+      } else {
+        setTimeout(() => {
+          spanAnimator(); // eslint-disable-line
+        }, 15);
+      }
+    };
+    const spanAnimator = () => {
+      const span = spans.shift();
+
+      if (span) {
+        const text = span.textContent.split('');
+
+        span.textContent = '';
+        paragraph.appendChild(span);
+        paragraphFunc();
+
+        charAnimator({
+          span,
+          text,
+        });
+      } else {
+        setTimeout(() => {
+          this.typewriter({
+            amount,
+            paragraphs,
+            target,
+            paragraphFunc,
+            callback,
+          });
+        }, 50);
+      }
+    };
+
+    if (paragraph) {
+      const dumpFragment = document.createDocumentFragment();
+      spans = Array.from(paragraph.getElementsByTagName('span'));
+
+      spans.forEach(child => dumpFragment.appendChild(child));
+      target.appendChild(paragraph);
+
+      spanAnimator();
+    } else {
+      callback();
+    }
   }
 }
 

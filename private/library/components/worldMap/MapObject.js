@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -13,12 +13,16 @@
 
 const Label = require('./MapLabel');
 const BaseDialog = require('../views/dialogs/BaseDialog');
+const VerifyDialog = require('../views/dialogs/VerifyDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
 const elementCreator = require('../../ElementCreator');
 const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
+const eventHandler = require('../../EventCentral');
+const viewSwitcher = require('../../ViewSwitcher');
+const userComposer = require('../../data/composers/UserComposer');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -32,11 +36,11 @@ const cssClasses = {
 
 /**
  * Create functions for hovering and mouse out on MapObjects
- * @param {Object} params - Parameters.
- * @param {HTMLElement} params.element - DOM element.
- * @param {Function} params.hoverFunc - Function to call on hover.
- * @param {Function} [params.outFunc] - Function to call on mouse out.
- * @param {Boolean} [params.shouldOutOnDrag] - Should the mouse out function be called when a user starts dragging?
+ * @param {Object} params Parameters.
+ * @param {HTMLElement} params.element DOM element.
+ * @param {Function} params.hoverFunc Function to call on hover.
+ * @param {Function} [params.outFunc] Function to call on mouse out.
+ * @param {Boolean} [params.shouldOutOnDrag] Should the mouse out function be called when a user starts dragging?
  */
 function addGMapsHoverListeners({
   element,
@@ -85,12 +89,19 @@ class MapObject {
     position,
     labelStyle,
     choosableStyles,
+    triggeredStyles,
+    style,
+    markedStyle,
+    hoverExcludeRule,
+    overlay,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
     shouldCluster = false,
     clickFuncs = {},
   }) {
+    this.overlay = overlay;
+    this.markedStyle = markedStyle;
     this.canBeDragged = canBeDragged;
     this.choosableStyles = choosableStyles;
     this.isDraggable = false;
@@ -99,18 +110,26 @@ class MapObject {
     this.currentCoordinates = this.getLatestCoordinates();
     this.shouldCluster = shouldCluster;
     this.alwaysShowLabel = alwaysShowLabel;
+    this.triggeredStyles = triggeredStyles;
+    this.labelStyle = labelStyle;
     this.label = label || new Label({
       labelStyle,
       coordinates: this.getCenter(),
-      text: this.position.positionName,
+      text: this.position.connectedToUser
+        ? (userComposer.getIdentityName({ objectId: this.position.connectedToUser }) || this.position.positionName)
+        : this.position.positionName,
     });
+    this.style = style;
+    this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
+        const center = this.mapObject.getCenter();
+
         this.setCurrentCoordinates({
           coordinates: {
-            longitude: this.mapObject.position.lng(),
-            latitude: this.mapObject.position.lat(),
+            longitude: center.lng(),
+            latitude: center.lat(),
           },
         });
         this.updatePositionCoordinates();
@@ -126,7 +145,7 @@ class MapObject {
           if (clickFuncs.leftFunc) {
             clickFuncs.leftFunc(event);
           } else if (descriptionOnClick) {
-            MapObject.buildLeftClickBox({ thisMapObject: this });
+            MapObject.buildLeftClickBox({ position: this.position });
           }
 
           return;
@@ -159,6 +178,54 @@ class MapObject {
           this.hideLabel();
         },
       });
+    } else if (labelStyle.minZoomLevel) {
+      eventHandler.addWatcher({
+        event: eventHandler.Events.ZOOM_WORLDMAP,
+        func: ({
+          zoomLevel,
+          map: worldMap,
+        }) => {
+          if (zoomLevel >= labelStyle.minZoomLevel) {
+            this.showLabel(worldMap);
+          } else {
+            this.hideLabel();
+          }
+        },
+      });
+    }
+
+    if (triggeredStyles) {
+      const styleObj = triggeredStyles.find((styleRule) => {
+        const {
+          paramName,
+          type,
+          minLength,
+        } = styleRule;
+        const param = this.position[paramName];
+
+        switch (type) {
+          case 'string': {
+            return param && typeof param === 'string' && param.length >= minLength;
+          }
+          case 'array': {
+            return param && Array.isArray(param) && param.length >= minLength;
+          }
+          default: {
+            return false;
+          }
+        }
+      });
+
+      if (styleObj) {
+        const { style: triggeredStyle } = styleObj;
+        const { styleName } = triggeredStyle;
+
+        this.changeStyle({
+          styleName,
+          style: triggeredStyle,
+          shouldEmit: false,
+        });
+      }
     }
   }
 
@@ -206,17 +273,19 @@ class MapObject {
     this.worldMap = map;
     this.mapObject.setMap(map);
 
-    if (this.alwaysShowLabel) {
+    if (!this.labelStyle.minZoomLevel && this.alwaysShowLabel) {
       this.showLabel();
     }
   }
 
   showLabel() {
-    this.label.showLabel(this.mapObject.getMap());
+    if (this.showLabelOnHover) {
+      this.label.showLabel(this.mapObject.getMap());
+    }
   }
 
   hideLabel() {
-    if (!this.alwaysShowLabel) {
+    if (this.labelStyle.minZoomLevel || !this.alwaysShowLabel) {
       this.label.hideLabel();
     }
   }
@@ -258,29 +327,71 @@ class MapObject {
     return this.position.positionType;
   }
 
-  changeStyle({ styleName, style }) {
-    positionComposer.updatePosition({
-      positionId: this.position.objectId,
-      position: {
-        styleName,
-      },
-      callback: ({ error }) => {
-        if (error) {
-          console.log(error);
+  changeStyle({
+    styleName,
+    style,
+    setCurrentStyle = true,
+    shouldEmit = true,
+  }) {
+    if (shouldEmit) {
+      positionComposer.updatePosition({
+        positionId: this.position.objectId,
+        position: {
+          styleName,
+        },
+        callback: ({ error }) => {
+          if (error) {
+            console.log(error);
 
-          return;
-        }
+            return;
+          }
 
-        this.mapObject.setOptions(style);
-      },
-    });
+          this.mapObject.setOptions(style);
+
+          if (setCurrentStyle) {
+            this.style = style;
+          }
+        },
+      });
+
+      return;
+    }
+
+    this.mapObject.setOptions(style);
+
+    if (setCurrentStyle) {
+      this.style = style;
+    }
   }
 
-  static buildLeftClickBox({ thisMapObject }) {
+  markPosition({ style }) {
+    if (!this.markedStyle) {
+      return;
+    }
+
+    this.changeStyle({
+      style: this.markedStyle,
+      shouldEmit: false,
+      setCurrentStyle: false,
+    });
+
+    setTimeout(() => {
+      this.changeStyle({
+        style: style || this.style,
+        shouldEmit: false,
+      });
+    }, 1500);
+  }
+
+  static buildLeftClickBox({ position }) {
     const {
       positionName,
-      description = [labelHandler.getLabel({ baseObject: 'WorldMapView', label: 'noDescription' })],
-    } = thisMapObject.position;
+      description = [],
+    } = position;
+
+    if (description.length === 0) {
+      return;
+    }
 
     const descriptionContainer = elementCreator.createContainer({
       elements: [elementCreator.createArticle({
@@ -303,7 +414,6 @@ class MapObject {
   }
 
   showPositionRightClickBox({
-    event,
     thisMapObject,
   }) {
     const {
@@ -319,7 +429,7 @@ class MapObject {
 
     const items = [];
 
-    if (this.choosableStyles && storageManager) {
+    if (this.choosableStyles) {
       const radioSet = elementCreator.createRadioSet({
         title: 'Choose color scheme:',
         optionName: ids.CHOOSABLE_STYLE,
@@ -371,7 +481,7 @@ class MapObject {
               ],
             });
 
-            dialog.addToView({ element: this.worldMap.getDiv().parentElement });
+            dialog.addToView({ element: viewSwitcher.getParentElement() });
           },
         },
       });
@@ -390,16 +500,41 @@ class MapObject {
       });
     }
 
-    const mouseEvent = event.Ha || event.Ia;
-    let x;
-    let y;
+    items.push({
+      elements: [elementCreator.createSpan({
+        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'removePosition' }),
+      })],
+      clickFuncs: {
+        leftFunc: () => {
+          const dialog = new VerifyDialog({
+            text: ['Are you sure you want to remove the position?'],
+            callback: ({ confirmed }) => {
+              if (!confirmed) {
+                return;
+              }
 
-    if (mouseEvent) {
-      const { clientX, clientY } = mouseEvent;
+              positionComposer.removePosition({
+                positionId: this.position.objectId,
+                callback: ({ error }) => {
+                  if (error) {
+                    console.log('Failed to remove the position', error);
 
-      x = clientX;
-      y = clientY;
-    }
+                    return;
+                  }
+
+                  dialog.removeFromView();
+                },
+              });
+            },
+          });
+
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
+        },
+      },
+    });
+
+    const coordinates = this.getCenter();
+    const { x, y } = this.overlay.getProjection().fromLatLngToContainerPixel(new google.maps.LatLng(coordinates.latitude, coordinates.longitude));
 
     if (items.length > 0) {
       MapObject.showRightClickBox({
@@ -411,6 +546,11 @@ class MapObject {
   }
 
   static showLeftClickBox({ container }) {
+    eventHandler.emitEvent({
+      event: eventHandler.Events.SHOW_MAP_CLICK_BOX,
+      params: {},
+    });
+
     elementCreator.replaceFirstChild(MapObject.leftClickBox, container);
     MapObject.leftClickBox.classList.remove('hide');
   }
@@ -420,6 +560,11 @@ class MapObject {
     y,
     container,
   }) {
+    eventHandler.emitEvent({
+      event: eventHandler.Events.SHOW_MAP_CLICK_BOX,
+      params: {},
+    });
+
     elementCreator.replaceFirstChild(MapObject.rightClickBox, container);
 
     if (x && y) {
@@ -430,8 +575,12 @@ class MapObject {
       const rightOverflow = bound.right - window.innerWidth;
 
       if (bound.bottom > window.innerHeight || bound.right > window.innerWidth) {
-        const newX = bottomOverflow < 0 ? x - rightOverflow : x;
-        const newY = rightOverflow < 0 ? y - bottomOverflow : y;
+        const newX = bottomOverflow < 0
+          ? x - rightOverflow
+          : x;
+        const newY = rightOverflow < 0
+          ? y - bottomOverflow
+          : y;
 
         MapObject.rightClickBox.setAttribute('style', `left: ${newX}px; top: ${newY}px;`);
       }
@@ -442,10 +591,9 @@ class MapObject {
     }
 
     /**
-     * Fallback if Google Maps mouse event changes var name
+     * Fallback for missing x or y
      */
     MapObject.rightClickBox.classList.add('fallbackMapRightClickBox');
-
     MapObject.rightClickBox.classList.remove('hide');
     MapObject.rightClickBox.removeAttribute('style');
   }

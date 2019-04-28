@@ -1,5 +1,5 @@
 /*
- Copyright 2017 Aleksandar Jankovic
+ Copyright 2017 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,16 +15,22 @@
  */
 
 const mouseHandler = require('./MouseHandler');
+const textTools = require('./TextTools');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
   clickable: 'clickable',
 };
+// const glitchClasses = [
+//   'fastGlitch',
+//   'slowGlitch',
+//   'normalGlitch',
+// ];
 
 /**
  * Set an Id on the element.
- * @param {HTMLElement} element - Element to add an Id to.
- * @param {string} id - Id to add.
+ * @param {HTMLElement} element Element to add an Id to.
+ * @param {string} id Id to add.
  */
 function setElementId(element, id) {
   if (id) {
@@ -34,8 +40,8 @@ function setElementId(element, id) {
 
 /**
  * Set a name on the element.
- * @param {HTMLElement} element - Element to add a name to.
- * @param {string} name - Name to add.
+ * @param {HTMLElement} element Element to add a name to.
+ * @param {string} name Name to add.
  */
 function setName(element, name) {
   if (name) {
@@ -45,8 +51,8 @@ function setName(element, name) {
 
 /**
  * Set classes on the element.
- * @param {HTMLElement} element - Element to add classes to.
- * @param {string[]} classes - Classes to add.
+ * @param {HTMLElement} element Element to add classes to.
+ * @param {string[]} classes Classes to add.
  */
 function setClasses(element, classes = []) {
   classes.forEach(cssClass => element.classList.add(cssClass));
@@ -54,10 +60,10 @@ function setClasses(element, classes = []) {
 
 /**
  * Set click listeners on the element.
- * @param {HTMLElement} element - Element to add click listeners to.
- * @param {Object} clickFuncs - Functions to call on clicks.
- * @param {Function} clickFuncs.leftFunc - Function that is called on left click.
- * @param {Function} clickFuncs.right - Function that is called on right click.
+ * @param {HTMLElement} element Element to add click listeners to.
+ * @param {Object} clickFuncs Functions to call on clicks.
+ * @param {Function} clickFuncs.leftFunc Function that is called on left click.
+ * @param {Function} clickFuncs.right Function that is called on right click.
  */
 function setClickFuncs(element, clickFuncs) {
   if (clickFuncs && (clickFuncs.leftFunc || clickFuncs.right)) {
@@ -72,12 +78,12 @@ function setClickFuncs(element, clickFuncs) {
 
 /**
  * Create an element and set the set parameters.
- * @param {Object} params - Parameters.
- * @param {string} params.elementType - Type of element to create.
- * @param {string} [params.elementId] - Id of the element.
- * @param {string[]} [params.classes] - CSS classes.
- * @param {Function} [params.clickFuncs] - Functions called on clicks.
- * @param {string} [params.name] - Name of the element.
+ * @param {Object} params Parameters.
+ * @param {string} params.elementType Type of element to create.
+ * @param {string} [params.elementId] Id of the element.
+ * @param {string[]} [params.classes] CSS classes.
+ * @param {Function} [params.clickFuncs] Functions called on clicks.
+ * @param {string} [params.name] Name of the element.
  * @return {HTMLElement} The created element.
  */
 function createBaseElement({
@@ -123,6 +129,7 @@ class ElementCreator {
     clickFuncs,
     classes,
     elementId,
+    isUploaded = true,
   }) {
     const pictureElement = createBaseElement({
       elementId,
@@ -130,11 +137,14 @@ class ElementCreator {
       clickFuncs,
       elementType: 'img',
     });
+    const path = isUploaded
+      ? `/images/upload/${picture.fileName}`
+      : `/images/${picture.fileName}`;
 
-    pictureElement.setAttribute('src', picture.url);
+    pictureElement.setAttribute('src', path);
 
-    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width};`); }
-    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height};`); }
+    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
+    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
 
     return pictureElement;
   }
@@ -165,6 +175,7 @@ class ElementCreator {
     elementId,
     classes,
     spanType,
+    effect,
   }) {
     const span = createBaseElement({
       elementId,
@@ -175,6 +186,15 @@ class ElementCreator {
 
     if (text) {
       span.appendChild(document.createTextNode(text));
+    }
+
+    if (effect && Math.random() > 0.90) {
+      const maxLength = text.length > 50
+        ? 50
+        : text.length;
+
+      span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
+      // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
     }
 
     return span;
@@ -227,19 +247,21 @@ class ElementCreator {
   /**
    * Create a paragraph element.
    * Setting elements will attach them to the paragraph. Otherwise, text will be used to attach a text node.
-   * @param {Object} params - Parameters.
-   * @param {Object[]} [params.elements] - Elements to attach.
-   * @param {string} [params.text] - Text to add to the paragraph. It is overriden by elements.
-   * @param {string[]} [params.classes] - Css classes.
+   * @param {Object} params Parameters.
+   * @param {Object[]} [params.elements] Elements to attach.
+   * @param {string} [params.text] Text to add to the paragraph. It is overriden by elements.
+   * @param {string[]} [params.classes] Css classes.
    * @return {HTMLElement} Paragraph element.
    */
   static createParagraph({
     elements,
     text,
+    clickFuncs,
     classes = [],
   }) {
     const paragraph = createBaseElement({
       classes,
+      clickFuncs,
       elementType: 'p',
     });
 
@@ -261,16 +283,32 @@ class ElementCreator {
     elementId,
     classes,
     shouldResize,
+    text,
+    isLocked,
     placeholder = '',
   }) {
     const input = createBaseElement({
       elementId,
       classes,
       name: inputName,
-      elementType: multiLine ? 'textarea' : 'input',
+      elementType: multiLine
+        ? 'textarea'
+        : 'input',
     });
 
-    input.setAttribute('placeholder', placeholder);
+    if (text) {
+      if (multiLine) {
+        input.value = text.join('\n').replace(/''/g, '\n');
+      } else {
+        const [value] = text;
+
+        if (value) {
+          input.value = value;
+        }
+      }
+    } else {
+      input.setAttribute('placeholder', placeholder);
+    }
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
 
@@ -300,15 +338,70 @@ class ElementCreator {
       });
     }
 
+    if (isLocked) {
+      input.setAttribute('readonly', 'true');
+    }
+
     return input;
+  }
+
+  static createImageInput({
+    inputName,
+    elementId,
+    classes,
+    previewId = 'imagePreview',
+    previewContainer = document.createElement('img'),
+    appendPreview = false,
+  }) {
+    const container = this.createContainer({
+      classes,
+      elementId,
+      name: inputName,
+    });
+    const imageInput = document.createElement('input');
+    imageInput.classList.add('hide');
+    imageInput.setAttribute('type', 'file');
+    imageInput.setAttribute('accept', 'image/png, image/jpeg');
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        previewContainer.classList.remove('hide');
+        previewContainer.setAttribute('src', reader.result);
+        previewContainer.setAttribute('name', file.name);
+      });
+
+      reader.readAsDataURL(file);
+    });
+
+    previewContainer.setAttribute('id', previewId);
+
+    container.appendChild(this.createButton({
+      text: 'Image',
+      clickFuncs: {
+        leftFunc: () => {
+          imageInput.click();
+        },
+      },
+    }));
+
+    if (appendPreview) {
+      previewContainer.classList.add('hide');
+      container.appendChild(previewContainer);
+    }
+
+    return container;
   }
 
   static createHeader({
     elements,
     clickFuncs,
+    classes,
   }) {
     const header = createBaseElement({
       clickFuncs,
+      classes,
       elementType: 'header',
     });
 

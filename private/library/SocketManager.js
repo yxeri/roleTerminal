@@ -1,5 +1,5 @@
 /*
- Copyright 2015 Aleksandar Jankovic
+ Copyright 2015 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ const textTools = require('./TextTools');
 
 class SocketManager {
   constructor() {
-    this.socket = io(); // eslint-disable-line no-undef
+    this.socket = io(typeof ioUri !== 'undefined' // eslint-disable-line no-undef
+      ? ioUri // eslint-disable-line no-undef
+      : '/');
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
@@ -64,6 +66,11 @@ class SocketManager {
       CHANGEPASSWORD: 'changePassword',
       UPDATEUSER: 'updateUser',
       UPDATEWALLET: 'updateWallet',
+      UNFOLLOW: 'unfollowRoom',
+      CREATETRANSACTION: 'createTransaction',
+      INVITETEAM: 'inviteToTeam',
+      LEAVETEAM: 'leaveTeam',
+      SIMPLEMSG: 'simpleMsg',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -120,8 +127,6 @@ class SocketManager {
     }, {
       event: this.EmitTypes.RECONNECT,
       func: () => {
-        this.reconnectDone();
-
         this.updateId(() => {
           this.reconnectDone();
           eventCentral.emitEvent({
@@ -202,9 +207,9 @@ class SocketManager {
 
   /**
    * Emit event through socket.io.
-   * @param {string} event - Event to emit.
-   * @param {Object} [params] - Parameters to send in the emit.
-   * @param {Function} [callback] - Callback.
+   * @param {string} event Event to emit.
+   * @param {Object} [params] Parameters to send in the emit.
+   * @param {Function} [callback] Callback.
    */
   emitEvent(event, params = {}, callback) {
     const paramsToSend = params;

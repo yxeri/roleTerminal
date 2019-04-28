@@ -1,24 +1,44 @@
 const BaseView = require('./views/BaseView');
 
 const elementCreator = require('../ElementCreator');
+const eventCentral = require('../EventCentral');
+const viewSwitcher = require('../ViewSwitcher');
 
 class ViewWrapper extends BaseView {
   constructor({
-    statusBar,
-    columns,
+    menuBar,
     title,
+    viewType,
+    useDefaultCss = true,
+    columns = [],
     classes = [],
   }) {
+    const cssClasses = classes;
+
+    if (useDefaultCss) {
+      cssClasses.push('viewWrapper');
+    }
+
     super({
       elementId: `wrap${Date.now()}`,
-      classes: classes.concat(['viewWrapper']),
+      classes: cssClasses,
     });
 
+    this.viewType = viewType;
     this.columnAmount = columns.length;
-    this.statusBar = statusBar;
+    this.menuBar = menuBar;
     this.columns = columns;
     this.columnElements = [];
     this.title = title;
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.TRY_VIEW_SWITCH,
+      func: ({ type }) => {
+        if (type === this.viewType) {
+          viewSwitcher.switchView({ view: this });
+        }
+      },
+    });
   }
 
   attachColumns() {
@@ -38,11 +58,17 @@ class ViewWrapper extends BaseView {
   }
 
   addToView({ element }) {
-    if (this.statusBar) {
-      this.statusBar.addToView({ element: this.element });
+    if (this.menuBar) {
+      if (this.menuBar.appendTop) {
+        this.menuBar.addToView({ element: this.element });
+        this.attachColumns();
+      } else {
+        this.attachColumns();
+        this.menuBar.addToView({ element: this.element });
+      }
+    } else {
+      this.attachColumns();
     }
-
-    this.attachColumns();
 
     super.addToView({ element });
   }
@@ -60,8 +86,8 @@ class ViewWrapper extends BaseView {
       containerClasses.push('one');
     }
 
-    if (this.statusBar) {
-      containerClasses.push('withTopRow');
+    if (this.menuBar) {
+      containerClasses.push('withMenuBar');
     }
 
     const container = elementCreator.createContainer({ classes: containerClasses });
@@ -94,7 +120,7 @@ class ViewWrapper extends BaseView {
       component.removeFromView();
     });
 
-    if (this.statusBar) { index += 1; }
+    if (this.menuBar) { index += 1; }
 
     this.element.replaceChild(this.createColumn({ column }), this.element.childNodes[index]);
   }

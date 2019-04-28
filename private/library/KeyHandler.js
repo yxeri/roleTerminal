@@ -1,5 +1,5 @@
 /*
- Copyright 2016 Aleksandar Jankovic
+ Copyright 2016 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -43,13 +43,19 @@ class KeyHandler {
     this.keyPressed = false;
     this.triggerKeyPressed = false;
     this.paused = false;
-    this.triggerKey = 16; // Alt
+    this.triggerKey = 18; // Alt
     this.ignoredKeys = {};
 
     window.addEventListener('keydown', (event) => {
-      const sentKeyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+      const sentKeyCode = typeof event.which === 'number'
+        ? event.which
+        : event.keyCode;
 
-      if (this.paused || this.ignoredKeys[sentKeyCode]) {
+      if (this.paused) {
+        return;
+      }
+
+      if (this.ignoredKeys[sentKeyCode]) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -75,7 +81,9 @@ class KeyHandler {
         return;
       }
 
-      const keyCode = typeof event.which === 'number' ? event.which : event.keyCode;
+      const keyCode = typeof event.which === 'number'
+        ? event.which
+        : event.keyCode;
 
       if (keyCode === this.triggerKey) {
         this.triggerKeyPressed = false;

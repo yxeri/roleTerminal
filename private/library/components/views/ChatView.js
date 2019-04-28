@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ const ViewWrapper = require('../ViewWrapper');
 const MessageList = require('../lists/MessageList');
 const RoomList = require('../lists/RoomList');
 const InputArea = require('./inputs/InputArea');
-const UserRoomList = require('../lists/UserRoomList');
+const UserList = require('../lists/UserList');
+const WhisperRoomList = require('../lists/WhisperRoomList');
+const RoomFollowingList = require('../lists/RoomFollowingList');
+const RoomInfo = require('./RoomInfo');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -26,29 +29,76 @@ const roomComposer = require('../../data/composers/RoomComposer');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class ChatView extends ViewWrapper {
   constructor({
+    effect,
     shouldResize,
     placeholder,
-    sendOnEnter = true,
+    title,
+    whisperText,
+    showTeam,
+    allowImages,
+    hideDate,
+    fullDate,
+    titles = {
+      rooms: 'Rooms',
+      following: 'Following',
+      whispers: 'Whispers',
+      users: 'Users',
+    },
+    sendOnEnter = false,
     hideRoomList = false,
     classes = [],
     roomListPlacement = 'left',
     inputPlacement = 'bottom',
     elementId = `chView-${Date.now()}`,
   }) {
-    const roomList = new RoomList({});
-    const userRoomList = new UserRoomList({});
+    const roomList = new RoomList({
+      effect,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+      title: titles.rooms,
+    });
+    const roomFollowingList = new RoomFollowingList({
+      effect,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+      title: titles.following,
+    });
+    const whisperRoomList = new WhisperRoomList({
+      effect,
+      whisperText,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+      title: titles.whispers,
+    });
+    const userList = new UserList({
+      effect,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+      title: titles.users,
+      shouldFocusOnClick: false,
+    });
     const messageList = new MessageList({
+      effect,
+      whisperText,
+      showTeam,
+      fullDate,
+      hideDate,
       shouldSwitchRoom: true,
-      roomListId: roomList.elementId,
-      userRoomListId: userRoomList.elementId,
+      roomLists: [
+        roomFollowingList,
+        whisperRoomList,
+        roomList,
+        userList,
+      ],
     });
     const inputArea = new InputArea({
       shouldResize,
       placeholder,
       sendOnEnter,
+      allowImages,
+      minimumAccessLevel: storageManager.getPermissions().SendMessage
+        ? storageManager.getPermissions().SendMessage.accessLevel
+        : accessCentral.AccessLevels.STANDARD,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
         if (textTools.trimSpace(text.join('')).length === 0) {
@@ -57,7 +107,9 @@ class ChatView extends ViewWrapper {
 
         const roomId = messageList.getRoomId();
         const room = roomComposer.getRoom({ roomId });
-        const participantIds = room.isWhisper ? room.participantIds : [];
+        const participantIds = room.isWhisper
+          ? room.participantIds
+          : [];
         const message = {
           text,
           roomId,
@@ -73,8 +125,21 @@ class ChatView extends ViewWrapper {
           message.messageType = messageComposer.MessageTypes.CHAT;
         }
 
+        const imagePreview = document.getElementById('imagePreview-input');
+        let image;
+
+        if (imagePreview.getAttribute('src')) {
+          image = {
+            source: imagePreview.getAttribute('src'),
+            imageName: imagePreview.getAttribute('name'),
+            width: imagePreview.naturalWidth,
+            height: imagePreview.naturalHeight,
+          };
+        }
+
         messageComposer.sendMessage({
           message,
+          image,
           participantIds,
           callback: ({ error, data }) => {
             if (error) {
@@ -82,6 +147,8 @@ class ChatView extends ViewWrapper {
 
               return;
             }
+
+            this.inputArea.clearInput();
 
             const { message: newMessage } = data;
 
@@ -94,8 +161,6 @@ class ChatView extends ViewWrapper {
                 },
               });
             }
-
-            this.inputArea.clearInput();
           },
         });
       },
@@ -103,17 +168,25 @@ class ChatView extends ViewWrapper {
       blurCallback: () => {},
       inputCallback: () => {},
     });
+    const roomInfo = new RoomInfo({
+      whisperText,
+    });
     const columns = [];
     const mainColumn = {
-      components: [],
+      components: [{ component: roomInfo }],
       classes: ['columnChat'],
     };
     const roomListComponent = {
       components: [
+        { component: roomFollowingList },
+        { component: whisperRoomList },
         { component: roomList },
-        { component: userRoomList },
+        { component: userList },
       ],
-      classes: ['columnRoomList'],
+      classes: [
+        'columnList',
+        'columnRoomList',
+      ],
     };
 
     switch (inputPlacement) {
@@ -155,17 +228,23 @@ class ChatView extends ViewWrapper {
     super({
       elementId,
       columns,
+      title,
       classes: classes.concat(['chatView']),
     });
 
-    if (!hideRoomList) { this.roomList = roomList; }
-
     this.inputArea = inputArea;
+    this.whisperRoomList = whisperRoomList;
+    this.userRoomList = userList;
     this.messageList = messageList;
+    this.roomList = roomList;
 
-    accessCentral.addAccessElement({
-      element: this.inputArea.element,
-      minimumAccessLevel: storageManager.getPermissions().SendMessage ? storageManager.getPermissions().SendMessage.accessLevel : 1,
+    eventCentral.addWatcher({
+      event: eventCentral.Events.VIEW_SWITCHED,
+      func: ({ view }) => {
+        if (view.viewType === viewSwitcher.ViewTypes.CHAT) {
+          this.messageList.scrollList();
+        }
+      },
     });
   }
 

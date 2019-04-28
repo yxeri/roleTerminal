@@ -20,13 +20,7 @@ class PositionComposer extends BaseComposer {
      * Eveything outside of the game area is of type WORLD.
      * @type {{string}}
      */
-    this.PositionTypes = {
-      USER: 'user',
-      DEVICE: 'device',
-      WORLD: 'world',
-      LOCAL: 'local',
-      TOOL: 'tool',
-    };
+    this.PositionTypes = {};
     this.PositionStructures = {
       MARKER: 'marker',
       CIRCLE: 'circle',
@@ -73,6 +67,10 @@ class PositionComposer extends BaseComposer {
     });
   }
 
+  getPosition({ positionId }) {
+    return this.handler.getObject({ objectId: positionId });
+  }
+
   createPosition({
     position,
     callback,
@@ -80,6 +78,22 @@ class PositionComposer extends BaseComposer {
     this.handler.createObject({
       callback,
       params: { position },
+    });
+  }
+
+  removePosition({
+    positionId,
+    callback,
+  }) {
+    this.handler.removeObject({
+      callback,
+      params: { positionId },
+    });
+  }
+
+  addPositionTypes(positionTypes = []) {
+    positionTypes.forEach((positionType) => {
+      this.PositionTypes[positionType] = positionType;
     });
   }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ const CurrentUserList = require('../../components/lists/CurrentUserList');
 const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
+// const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
+const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
+// const TeamDialog = require('../../components/views/dialogs/TeamDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -31,20 +34,27 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
+// const teamComposer = require('../../data/composers/TeamComposer');
+const voiceCommander = require('../../VoiceCommander');
 
-class StatusBar extends BaseView {
+class MenuBar extends BaseView {
   constructor({
     title,
+    viewSwitcher,
+    image,
+    appendTop = false,
     showControls = {},
     showClock = true,
     menuItems = [],
     classes = [],
-    elementId = `statusBar-${Date.now()}`,
+    elementId = `menuBar-${Date.now()}`,
   }) {
     super({
       elementId,
-      classes: classes.concat(['statusBar']),
+      classes: classes.concat(['menuBar']),
     });
+
+    const permissions = storageManager.getPermissions();
 
     const controls = showControls;
     controls.user = controls.user || true;
@@ -53,8 +63,21 @@ class StatusBar extends BaseView {
     const items = [];
     const lastItems = [];
 
+    this.viewSwitcher = viewSwitcher;
     this.showClock = showClock;
     this.lists = [];
+    this.appendTop = appendTop;
+    this.image = image;
+
+    viewSwitcher.parentElement.addEventListener('click', () => {
+      this.menuList.classList.add('hide');
+
+      if (this.viewList) {
+        this.viewList.classList.add('hide');
+      }
+
+      this.currentUserList.hideView();
+    });
 
     if (controls.user) {
       const logoutButton = elementCreator.createButton({
@@ -101,15 +124,17 @@ class StatusBar extends BaseView {
       });
 
       accessCentral.addAccessElement({
-        maxAccessLevel: 0,
+        maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
         element: loginButton,
       });
       accessCentral.addAccessElement({
-        minimumAccessLevel: 1,
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
         element: logoutButton,
       });
       accessCentral.addAccessElement({
-        maxAccessLevel: 0,
+        maxAccessLevel: permissions.CreateUser
+          ? permissions.CreateUser.accessLevel
+          : accessCentral.AccessLevels.ANONYMOUS,
         element: registerButton,
       });
 
@@ -119,24 +144,57 @@ class StatusBar extends BaseView {
         elements: [registerButton],
       });
       lastItems.push({ elements: [logoutButton] });
-    }
 
-    /**
-     * elements,
-     clickFuncs,
-     classes,
-     elementId,
-     */
+      voiceCommander.addCommands({
+        activationString: 'menu',
+        commands: [
+          {
+            strings: ['logout'],
+            func: () => {
+              socketManager.logout({
+                callback: ({ error }) => {
+                  if (error) {
+                    console.log('Failed to logout');
+
+                    return;
+                  }
+
+                  console.log('Logged out');
+                },
+              });
+            },
+          }, {
+            strings: ['login'],
+            func: () => {
+              const login = new LoginDialog({});
+
+              login.addToView({
+                element: this.getParentElement(),
+              });
+            },
+          }, {
+            strings: ['register'],
+            func: () => {
+              const register = new RegisterDialog({});
+
+              register.addToView({
+                element: this.getParentElement(),
+              });
+            },
+          },
+        ],
+      });
+    }
 
     if (showControls.docFile) {
       const createDocFileButton = elementCreator.createButton({
-        text: 'Create document',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createDocument' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new DocFileDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -146,19 +204,38 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createDocFileButton,
-        minimumAccessLevel: 1,
+        minimumAccessLevel: permissions.CreateDocFile
+          ? permissions.CreateDocFile.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'file',
+            'document',
+          ],
+          func: () => {
+            const dialog = new DocFileDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 
     if (showControls.room) {
       const createRoomButton = elementCreator.createButton({
-        text: 'Create room',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createRoom' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new RoomDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -168,19 +245,38 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createRoomButton,
-        minimumAccessLevel: 2,
+        minimumAccessLevel: permissions.CreateRoom
+          ? permissions.CreateRoom.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'room',
+            'chat room',
+          ],
+          func: () => {
+            const dialog = new RoomDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 
     if (showControls.alias) {
       const createAliasButton = elementCreator.createButton({
-        text: 'Create alias',
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createAlias' }),
         clickFuncs: {
           leftFunc: () => {
             const dialog = new AliasDialog({});
 
             dialog.addToView({
-              element: this.getParentElement(),
+              element: this.viewSwitcher.getParentElement(),
             });
           },
         },
@@ -190,7 +286,71 @@ class StatusBar extends BaseView {
 
       accessCentral.addAccessElement({
         element: createAliasButton,
-        minimumAccessLevel: 2,
+        minimumAccessLevel: permissions.CreateAlias
+          ? permissions.CreateAlias.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'alias',
+            'alter ego',
+          ],
+          func: () => {
+            const dialog = new AliasDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
+      });
+    }
+
+    if (showControls.team) {
+      const createTeamButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'createTeam' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new TeamCreateDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        },
+      });
+
+      items.push({
+        elements: [
+          createTeamButton,
+        ],
+      });
+
+      accessCentral.addAccessElement({
+        element: createTeamButton,
+        minimumAccessLevel: permissions.CreateTeam
+          ? permissions.CreateTeam.accessLevel
+          : accessCentral.AccessLevels.STANDARD,
+      });
+
+      voiceCommander.addCommands({
+        activationString: 'create',
+        commands: [{
+          strings: [
+            'team',
+            'group',
+          ],
+          func: () => {
+            const dialog = new TeamCreateDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        }],
       });
     }
 
@@ -206,8 +366,12 @@ class StatusBar extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.menuList,
-        leftFunc: () => { this.menuList.classList.toggle('hide'); },
-        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'menu' }),
+        leftFunc: (event) => {
+          this.menuList.classList.toggle('hide');
+
+          event.stopPropagation();
+        },
+        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'menu' }),
       });
 
       this.lists.push(this.menuList);
@@ -222,13 +386,17 @@ class StatusBar extends BaseView {
       });
       const menuButton = this.createMenuButton({
         list: this.currentUserList,
-        leftFunc: () => { this.currentUserList.toggleView(); },
+        leftFunc: (event) => {
+          this.currentUserList.toggleView();
+
+          event.stopPropagation();
+        },
       });
       const container = elementCreator.createContainer({
         elements: [menuButton],
       });
       const watcherFunc = () => {
-        StatusBar.setUsername({ button: menuButton });
+        MenuBar.setUsername({ button: menuButton });
       };
 
       this.lists.push(this.currentUserList);
@@ -251,9 +419,16 @@ class StatusBar extends BaseView {
       });
     }
 
+    if (image) {
+      this.element.appendChild(elementCreator.createPicture({
+        picture: image,
+        isUploaded: false,
+      }));
+    }
+
     if (this.showClock) {
       this.timeSpan = elementCreator.createSpan({
-        text: labelHandler.getLabel({ baseObject: 'StatusBar', label: 'emptyTime' }),
+        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'emptyTime' }),
       });
 
       this.element.appendChild(this.timeSpan);
@@ -282,8 +457,8 @@ class StatusBar extends BaseView {
       text,
       classes: ['topMenuButton'].concat(classes),
       clickFuncs: {
-        leftFunc: () => {
-          leftFunc();
+        leftFunc: (event) => {
+          leftFunc(event);
 
           this.hideLists({ currentList: list });
         },
@@ -322,13 +497,13 @@ class StatusBar extends BaseView {
     }, 100);
   }
 
-  setViews({ views, viewSwitcher }) {
+  setViews({ views }) {
     views.forEach((viewObject) => {
       const viewObjectToAdd = viewObject;
 
       viewObjectToAdd.clickFuncs = {
         leftFunc: () => {
-          viewSwitcher.switchView({ view: viewObjectToAdd.view });
+          this.viewSwitcher.switchView({ view: viewObjectToAdd.view });
         },
       };
     });
@@ -354,8 +529,12 @@ class StatusBar extends BaseView {
 
     const menuButton = this.createMenuButton({
       list: this.viewList,
-      leftFunc: () => { this.viewList.classList.toggle('hide'); },
-      text: labelHandler.getLabel({ baseObject: 'StatusBar', label: '-----' }),
+      leftFunc: (event) => {
+        this.viewList.classList.toggle('hide');
+
+        event.stopPropagation();
+      },
+      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: '-----' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 
@@ -376,4 +555,4 @@ class StatusBar extends BaseView {
   }
 }
 
-module.exports = StatusBar;
+module.exports = MenuBar;

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 const BaseView = require('../BaseView');
 
 const elementCreator = require('../../../ElementCreator');
+const keyHandler = require('../../../KeyHandler');
+const viewSwitcher = require('../../../ViewSwitcher');
+const voiceCommander = require('../../../VoiceCommander');
 
 const ids = {
   UPPERTEXT: 'upperText',
@@ -25,6 +28,7 @@ const ids = {
   LOWERBUTTONS: 'lowerButtons',
   INPUTCONTAINER: 'inContainer',
   COVER: 'dialogCover',
+  IMAGES: 'imagesContainer',
 };
 
 const cssClasses = {
@@ -38,6 +42,7 @@ class BaseDialog extends BaseView {
     lowerText,
     upperButtons,
     lowerButtons,
+    images = [],
     inputs = [],
     classes = [],
     elementId = `elem-${Date.now()}`,
@@ -70,6 +75,12 @@ class BaseDialog extends BaseView {
       classes: [ids.UPPERTEXT],
     }));
 
+    this.element.appendChild(elementCreator.createContainer({
+      elementId: ids.IMAGES,
+      elements: images,
+      classes: [ids.IMAGES],
+    }));
+
     this.element.appendChild(this.createTextContainer({
       text: lowerText,
       elementId: ids.LOWERTEXT,
@@ -86,28 +97,34 @@ class BaseDialog extends BaseView {
   }
 
   addToView({
-    element,
     insertBeforeElement,
     shouldPrepend,
+    element = viewSwitcher.getParentElement(),
   }) {
+    element.appendChild(elementCreator.createContainer({
+      elementId: ids.COVER,
+      classes: [cssClasses.COVER],
+    }));
+
     super.addToView({
       element,
       insertBeforeElement,
       shouldPrepend,
     });
+    keyHandler.pause();
+    voiceCommander.pause();
 
-    element.appendChild(elementCreator.createContainer({
-      elementId: ids.COVER,
-      classes: [cssClasses.COVER],
-    }));
+    if (this.inputs.length > 0) {
+      this.inputs[0].focus();
+    }
   }
 
   removeFromView() {
-    const parentElement = this.getParentElement();
+    this.getParentElement().removeChild(document.getElementById(ids.COVER));
 
     super.removeFromView();
-
-    parentElement.removeChild(document.getElementById(ids.COVER));
+    keyHandler.unpause();
+    voiceCommander.unpause();
   }
 
   createTextContainer({ elementId, text = [] }) {

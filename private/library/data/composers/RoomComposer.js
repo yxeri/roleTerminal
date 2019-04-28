@@ -5,6 +5,7 @@ const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
 const storageManager = require('../../StorageManager');
 const userComposer = require('../../data/composers/UserComposer');
+const messageComposer = require('./MessageComposer');
 
 class RoomComposer extends DataComposer {
   constructor() {
@@ -45,6 +46,8 @@ class RoomComposer extends DataComposer {
 
   follow({ // eslint-disable-line class-methods-use-this
     roomId,
+    password,
+    callback,
   }) {
     const user = userComposer.getCurrentUser();
 
@@ -52,14 +55,48 @@ class RoomComposer extends DataComposer {
       return;
     }
 
-    if (user.followingRooms.includes(roomId)) {
-      const room = this.getRoom({ roomId });
+    const { followingRooms = [] } = user;
 
-      eventCentral.emitEvent({
-        event: eventCentral.Events.FOLLOWED_ROOM,
-        params: { room },
+    if (followingRooms.includes(roomId)) {
+      callback({});
+
+      return;
+    }
+
+    const params = {
+      roomId,
+      password,
+      aliasId: storageManager.getAliasId(),
+    };
+
+    socketManager.emitEvent(socketManager.EmitTypes.FOLLOW, params, ({ error }) => {
+      if (error) {
+        console.log('follow error', error);
+
+        callback({ error });
+
+        return;
+      }
+
+      messageComposer.fetchMessagesByRoom({
+        roomId,
+        callback: ({ error: fetchError }) => {
+          if (fetchError) {
+            console.log('follow get messages', fetchError);
+          }
+
+          callback({ error: fetchError });
+        },
       });
+    });
+  }
 
+  unfollow({ // eslint-disable-line class-methods-use-this
+    roomId,
+  }) {
+    const user = userComposer.getCurrentUser();
+
+    if (!user) {
       return;
     }
 
@@ -68,10 +105,51 @@ class RoomComposer extends DataComposer {
       aliasId: storageManager.getAliasId(),
     };
 
-    socketManager.emitEvent(socketManager.EmitTypes.FOLLOW, params, ({ error }) => {
+    socketManager.emitEvent(socketManager.EmitTypes.UNFOLLOW, params, ({ error }) => {
       if (error) {
-        console.log('follow error', error);
+        console.log('unfollow error', error);
       }
+    });
+  }
+
+  createRoom({
+    room,
+    callback,
+  }) {
+    this.handler.createObject({
+      callback,
+      params: { room },
+    });
+  }
+
+  updateRoom({
+    room,
+    options,
+    roomId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        roomId,
+        room,
+        options,
+      },
+    });
+  }
+
+  resetPassword({
+    roomId,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        roomId,
+        options: {
+          resetPassword: true,
+        },
+      },
     });
   }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,33 +15,70 @@
  */
 
 const List = require('./List');
+const MessageDialog = require('../views/dialogs/MessageDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
 const eventCentral = require('../../EventCentral');
 const textTools = require('../../TextTools');
+const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
+const messageComposer = require('../../data/composers/MessageComposer');
+const teamComposer = require('../../data/composers/TeamComposer');
 
 class MessageList extends List {
   /**
    * MessageList constructor.
-   * @param {Object} params - Parameters.
-   * @param {boolean} [params.multiRoom] - Should messages from all rooms be retrieved and shown in the list?
-   * @param {boolean} [params.shouldSwitchRoom] - Should the messages only be retrieved from the user's current room?
-   * @param {string} [params.roomId] - Id of the room to retrieve messages from.
-   * @param {string[]} [params.classes] - CSS classes.
-   * @param {string} [params.elementId] - Id of the list element.
+   * @param {Object} params Parameters.
+   * @param {boolean} [params.multiRoom] Should messages from all rooms be retrieved and shown in the list?
+   * @param {boolean} [params.shouldSwitchRoom] Should the messages only be retrieved from the user's current room?
+   * @param {string} [params.roomId] Id of the room to retrieve messages from.
+   * @param {string[]} [params.classes] CSS classes.
+   * @param {string} [params.elementId] Id of the list element.
    */
   constructor({
+    roomId,
+    effect,
+    hideDate = false,
+    showTeam = true,
+    fullDate = true,
     multiRoom = false,
     shouldSwitchRoom = false,
-    roomId,
-    roomListId = '',
-    userRoomListId = '',
+    whisperText = ' - ',
+    roomLists = [],
     classes = [],
     elementId = `mList-${Date.now()}`,
   }) {
     const superParams = {
       elementId,
+      effect,
+      sorting: {
+        paramName: 'customTimeCreated',
+        fallbackParamName: 'timeCreated',
+      },
+      listItemClickFuncs: {
+        onlyListItemFields: true,
+        leftFunc: (objectId) => {
+          const message = messageComposer.getMessage({ messageId: objectId });
+          const {
+            hasFullAccess,
+          } = accessCentral.hasAccessTo({
+            objectToAccess: message,
+            toAuth: userComposer.getCurrentUser(),
+          });
+
+          if (hasFullAccess) {
+            const messageDialog = new MessageDialog({
+              messageId: message.objectId,
+              text: message.text,
+            });
+
+            messageDialog.addToView({
+              element: this.getParentElement(),
+            });
+          }
+        },
+      },
       shouldScrollToBottom: true,
       classes: classes.concat(['msgList']),
       dependencies: [
@@ -53,6 +90,7 @@ class MessageList extends List {
       shouldFocusOnClick: false,
       collector: dataHandler.messages,
       fieldToAppend: 'text',
+      shouldAppendImage: true,
       appendClasses: ['msgLine'],
       listItemFieldsClasses: ['msgInfo'],
       listItemFields: [
@@ -60,10 +98,18 @@ class MessageList extends List {
           paramName: 'ownerAliasId',
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
-            const user = dataHandler.users.getObject({ objectId });
+            const identity = userComposer.getIdentity({ objectId });
+            const teamIds = identity.partOfTeams || [];
+            const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
 
-            if (user) {
-              return user.username;
+            if (identity) {
+              let name = identity.username || identity.aliasName;
+
+              if (showTeam) {
+                name += `[${shortNames.join('/')}]`;
+              }
+
+              return name;
             }
 
             return objectId;
@@ -74,7 +120,13 @@ class MessageList extends List {
           convertFunc: (date) => {
             const timestamp = textTools.generateTimestamp({ date });
 
-            return `${timestamp.fullTime} ${timestamp.fullDate}`;
+            if (hideDate) {
+              return timestamp.fullTime;
+            }
+
+            return fullDate
+              ? `${timestamp.fullTime} ${timestamp.fullDate}`
+              : `${timestamp.fullTime} ${timestamp.halfDate}`;
           },
         }, {
           classes: ['msgRoomName'],
@@ -82,7 +134,21 @@ class MessageList extends List {
           convertFunc: (objectId) => {
             const room = dataHandler.rooms.getObject({ objectId });
 
+            if (!multiRoom) {
+              return '';
+            }
+
             if (room) {
+              const { isWhisper, participantIds } = room;
+
+              if (isWhisper) {
+                const identities = userComposer.getWhisperIdentities({ participantIds });
+
+                return identities.length > 0
+                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  : '';
+              }
+
               return room.roomName.slice(0, 24);
             }
 
@@ -102,15 +168,35 @@ class MessageList extends List {
 
     super(superParams);
 
-    this.userRoomListId = userRoomListId;
-    this.roomListId = roomListId;
+    this.onCreateFunc = ({ object }) => {
+      this.roomLists.every((roomList) => {
+        const rooms = roomList.getCollectorObjects();
+        const foundRoom = rooms.find(room => object.roomId === room.objectId);
+
+        if (foundRoom) {
+          roomList.animateElement({ elementId: foundRoom.objectId });
+
+          return false;
+        }
+
+        return true;
+      });
+    };
+    this.roomLists = roomLists;
     this.roomId = roomId || this.getRoomId();
 
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || (this.roomListId === origin || this.userRoomListId === origin)) {
+          if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
+            this.getParentElement().classList.remove('flash');
+            this.getParentElement().classList.add('flash');
+
+            setTimeout(() => {
+              this.getParentElement().classList.remove('flash');
+            }, 400);
+
             this.showMessagesByRoom({ roomId: room.objectId });
           }
         },

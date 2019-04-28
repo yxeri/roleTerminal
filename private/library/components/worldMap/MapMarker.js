@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -22,6 +22,9 @@ class MapMarker extends MapObject {
     position,
     clickFuncs,
     labelStyle,
+    hoverExcludeRule,
+    overlay,
+    descriptionOnClick = true,
     choosableStyles = [],
     zIndex = 4,
     alwaysShowLabel = false,
@@ -44,12 +47,15 @@ class MapMarker extends MapObject {
     }
 
     super({
+      hoverExcludeRule,
       choosableStyles,
       alwaysShowLabel,
       shouldCluster,
       position,
       clickFuncs,
       labelStyle,
+      descriptionOnClick,
+      overlay,
       dragEndFunc: () => {
         this.setCurrentCoordinates({
           coordinates: {
@@ -80,7 +86,11 @@ class MapMarker extends MapObject {
     });
   }
 
-  changeStyle({ styleName, style }) {
+  changeStyle({
+    styleName,
+    style,
+    shouldEmit,
+  }) {
     const {
       icon,
     } = style;
@@ -88,7 +98,11 @@ class MapMarker extends MapObject {
 
     if (icon) { options.icon = icon; }
 
-    super.changeStyle({ styleName, style: options });
+    super.changeStyle({
+      styleName,
+      shouldEmit,
+      style: options,
+    });
   }
 
   setCurrentCoordinates({ coordinates }) {

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,20 +16,24 @@
 
 const ViewWrapper = require('../ViewWrapper');
 const DocFileList = require('../lists/DocFileList');
-const DocFilePage = require('./DocFilePage');
+const DocFilePage = require('./pages/DocFilePage');
 
 class DocFileView extends ViewWrapper {
   constructor({
+    effect,
     classes = [],
     elementId = `dFView-${Date.now()}`,
   }) {
     const docFileList = new DocFileList({});
-    const docFilePage = new DocFilePage({});
+    const docFilePage = new DocFilePage({ effect });
 
     super({
       elementId,
       columns: [
-        { components: [{ component: docFileList }] },
+        {
+          components: [{ component: docFileList }],
+          classes: ['columnList'],
+        },
         { components: [{ component: docFilePage }] },
       ],
       classes: classes.concat(['docFileView']),

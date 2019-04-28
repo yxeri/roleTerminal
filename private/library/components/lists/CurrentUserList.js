@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ const userComposer = require('../../data/composers/UserComposer');
 
 class CurrentUserList extends List {
   constructor({
+    effect,
     classes = [],
     elementId = `cUserList-${Date.now()}`,
   }) {
@@ -35,11 +36,11 @@ class CurrentUserList extends List {
     super({
       elementId,
       classes,
+      effect,
       sorting: {
         paramName: 'aliasName',
         fallbackParamName: 'username',
       },
-      focusedId: storageManager.getAliasId() || storageManager.getUserId(),
       listItemClickFuncs: {
         leftFunc: (objectId) => {
           if (objectId === storageManager.getUserId()) {

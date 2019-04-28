@@ -1,5 +1,5 @@
 /*
- Copyright 2017 Aleksandar Jankovic
+ Copyright 2017 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ const eventCentral = require('./EventCentral');
 
 /**
  * Converts text coordinats to float.
- * @param {Object} coordinates - Coordinates to convert.
+ * @param {Object} coordinates Coordinates to convert.
  * @return {{longitude: Number, latitude: Number}} Coordinates.
  */
 function createCoordinates(coordinates) {
-  return coordinates ? { longitude: parseFloat(coordinates.longitude), latitude: parseFloat(coordinates.latitude) } : {};
+  return coordinates
+    ? { longitude: parseFloat(coordinates.longitude), latitude: parseFloat(coordinates.latitude) }
+    : {};
 }
 
 class StorageManager {
@@ -71,8 +73,8 @@ class StorageManager {
   /**
    * Sets item to localStorage.
    * @static
-   * @param {string} name - Name of the item.
-   * @param {Object} item - Item to be set.
+   * @param {string} name Name of the item.
+   * @param {Object} item Item to be set.
    */
   static setLocalVal(name, item) {
     if (typeof item === 'string') {
@@ -85,8 +87,8 @@ class StorageManager {
   /**
    * Gets item from localStorage.
    * @static
-   * @param {string} name - Name of the item to be retrieved.
-   * @returns {Object|number|boolean|string|[]} - Retrieved item.
+   * @param {string} name Name of the item to be retrieved.
+   * @returns {Object|number|boolean|string|[]} Retrieved item.
    */
   static getLocalVal(name) {
     return localStorage.getItem(name);
@@ -95,7 +97,7 @@ class StorageManager {
   /**
    * Removes item from localStorage.
    * @static
-   * @param {string} name - Name of the item to be removed.
+   * @param {string} name Name of the item to be removed.
    */
   static removeLocalVal(name) {
     localStorage.removeItem(name);
@@ -132,6 +134,8 @@ class StorageManager {
     this.setAccessLevel(0);
     this.removeCurrentForum();
     this.removeUserId();
+    this.removeDefaultViewType();
+    this.removeMarked();
 
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
@@ -160,6 +164,13 @@ class StorageManager {
     return converters.convertToObject(this.getLocalVal('permissions'));
   }
 
+  static addPermission(permission = {}) {
+    const permissions = StorageManager.getPermissions();
+    permissions[permission.name] = permissions;
+
+    StorageManager.setPermissions(permissions);
+  }
+
   /**
    * Get device Id.
    * @static
@@ -172,7 +183,7 @@ class StorageManager {
   /**
    * Set device Id.
    * @static
-   * @param {string} deviceId - Device Id.
+   * @param {string} deviceId Device Id.
    */
   static setDeviceId(deviceId) {
     this.setLocalVal('deviceId', deviceId);
@@ -190,7 +201,7 @@ class StorageManager {
   /**
    * Set user Id.
    * @static
-   * @param {string} userId - User Id.
+   * @param {string} userId User Id.
    */
   static setUserId(userId) {
     this.setLocalVal('userId', userId);
@@ -208,7 +219,7 @@ class StorageManager {
   /**
    * Set alias Id.
    * @static
-   * @param {string} aliasId - Alias Id.
+   * @param {string} aliasId Alias Id.
    */
   static setAliasId(aliasId) {
     this.setLocalVal('aliasId', aliasId);
@@ -225,9 +236,9 @@ class StorageManager {
   /**
    * Set center coordinates for the map.
    * @static
-   * @param {Object} coordinates - Coordinates.
-   * @param {number} coordinates.longitude - Longitude.
-   * @param {number} coordinates.latitude - Latitude.
+   * @param {Object} coordinates Coordinates.
+   * @param {number} coordinates.longitude Longitude.
+   * @param {number} coordinates.latitude Latitude.
    */
   static setCenterCoordinates(coordinates) {
     this.setLocalVal('centerCoordinates', converters.stringifyObject(coordinates));
@@ -240,9 +251,9 @@ class StorageManager {
   /**
    * Set corner one coordinates for the map.
    * @static
-   * @param {Object} coordinates - Parameters.
-   * @param {number} coordinates.longitude - Longitude.
-   * @param {number} coordinates.latitude - Latitude.
+   * @param {Object} coordinates Parameters.
+   * @param {number} coordinates.longitude Longitude.
+   * @param {number} coordinates.latitude Latitude.
    */
   static setCornerOneCoordinates(coordinates) {
     this.setLocalVal('cornerOneCoordinates', converters.stringifyObject(coordinates));
@@ -255,9 +266,9 @@ class StorageManager {
   /**
    * Set corner two coordinates for the map.
    * @static
-   * @param {Object} coordinates - Coordinates.
-   * @param {number} coordinates.longitude - Longitude.
-   * @param {number} coordinates.latitude - Latitude.
+   * @param {Object} coordinates Coordinates.
+   * @param {number} coordinates.longitude Longitude.
+   * @param {number} coordinates.latitude Latitude.
    */
   static setCornerTwoCoordinates(coordinates) {
     this.setLocalVal('cornerTwoCoordinates', converters.stringifyObject(coordinates));
@@ -270,7 +281,7 @@ class StorageManager {
   /**
    * Set default zoom level on the map.
    * @static
-   * @param {number} defaultZoomLevel - Default zoom level on the map.
+   * @param {number} defaultZoomLevel Default zoom level on the map.
    */
   static setDefaultZoomLevel(defaultZoomLevel) {
     this.setLocalVal('defaultZoom', defaultZoomLevel);
@@ -283,7 +294,7 @@ class StorageManager {
   /**
    * Set the amount of years to be used to adjust the current date with.
    * @static
-   * @param {number} yearModification - Amount of years that will be added/removed from the current year.
+   * @param {number} yearModification Amount of years that will be added/removed from the current year.
    */
   static setYearModification(yearModification) {
     this.setLocalVal('yearModification', yearModification);
@@ -304,7 +315,7 @@ class StorageManager {
   /**
    * Set the amount of days to be used to adjust the current date with.
    * @static
-   * @param {number} dayModification - Amount of days that will be added/removed from the current date.
+   * @param {number} dayModification Amount of days that will be added/removed from the current date.
    */
   static setDayModification(dayModification) {
     this.setLocalVal('dayModification', dayModification);
@@ -398,7 +409,7 @@ class StorageManager {
   /**
    * Set user's access level.
    * @static
-   * @param {number} accessLevel - User's access level.
+   * @param {number} accessLevel User's access level.
    */
   static setAccessLevel(accessLevel) {
     this.setLocalVal('accessLevel', accessLevel);
@@ -409,7 +420,58 @@ class StorageManager {
   }
 
   static getLanguage() {
-    this.getLocalVal('language');
+    return this.getLocalVal('language');
+  }
+
+  static setDefaultViewType(type) {
+    this.setLocalVal('defaultViewType', type);
+  }
+
+  static getDefaultViewType() {
+    return this.getLocalVal('defaultViewType');
+  }
+
+  static removeDefaultViewType() {
+    this.removeLocalVal('defaultViewType');
+  }
+
+  static getMarked() {
+    return converters.convertToObject(this.getLocalVal('marked'));
+  }
+
+  static addMarked({ listType, objectId }) {
+    const marked = StorageManager.getMarked();
+    let items = marked[listType];
+
+    if (!items) {
+      items = [];
+    }
+
+    items.push({ objectId });
+    marked[listType] = items;
+
+    StorageManager.setMarked({ marked });
+  }
+
+  static pullMarked({ listType, objectId }) {
+    const marked = StorageManager.getMarked();
+    const items = marked[listType];
+
+    if (items) {
+      items.splice(items.findIndex(item => item.objectId === objectId), 1);
+
+      marked[listType] = items;
+    }
+
+    this.setMarked({ marked });
+  }
+
+  static setMarked({ marked = {} }) {
+    this.setLocalVal('marked', marked);
+  }
+
+  static removeMarked() {
+    this.removeLocalVal('marked');
   }
 }
 

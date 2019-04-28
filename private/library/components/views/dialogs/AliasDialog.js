@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class AliasDialog extends BaseDialog {
                         break;
                       }
                       default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'error' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                         break;
                       }

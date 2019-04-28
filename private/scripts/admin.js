@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -11,7 +11,9 @@
  limitations under the License.
  */
 
-const StatusBar = require('../library/components/views/StatusBar');
+require('../library/polyfills');
+
+const MenuBar = require('../library/components/views/MenuBar');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const AdminUserList = require('../library/components/lists/AdminUserList');
 const BaseView = require('../library/components/views/BaseView');
@@ -22,7 +24,7 @@ const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
 const accessCentral = require('../library/AccessCentral');
 
-const statusBar = new StatusBar({
+const menuBar = new MenuBar({
   viewSwitcher,
   showClock: true,
   showControls: {
@@ -36,7 +38,7 @@ const statusBar = new StatusBar({
 });
 const adminUserList = new AdminUserList({});
 const userWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   columns: [{
     components: [{ component: adminUserList }],
   }],
@@ -49,15 +51,14 @@ const notAllowedView = new BaseView({
 notAllowedView.element.appendChild(elementCreator.createSpan({ text: 'You do not have permission to access the admin controls. Login to an admin account to proceed.' }));
 
 const notAllowedWrapper = new ViewWrapper({
-  statusBar,
+  menuBar,
   columns: [{
     components: [{ component: notAllowedView }],
   }],
 });
 
 mouseHandler.setAllowRightClick(true);
-statusBar.setViews({
-  viewSwitcher,
+menuBar.setViews({
   views: [
     { view: userWrapper },
   ],

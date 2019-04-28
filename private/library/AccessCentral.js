@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -39,12 +39,13 @@ class AccessCentral {
             const {
               minimumAccessLevel,
               maxAccessLevel,
+              element,
             } = accessElement;
 
             if (accessLevel >= minimumAccessLevel && accessLevel <= maxAccessLevel) {
-              accessElement.element.classList.remove('hide');
+              element.classList.remove('hide');
             } else {
-              accessElement.element.classList.add('hide');
+              element.classList.add('hide');
             }
           });
         });
@@ -81,6 +82,49 @@ class AccessCentral {
     levelElements.splice(levelElements.findIndex((accessElement) => {
       return accessElement.element === element;
     }), 1);
+  }
+
+  /**
+   * Checks if user has access, is admin or can see the object.
+   * @param {Object} params Parameter.
+   * @param {Object} params.objectToAccess Object to access.
+   * @param {Object} params.toAuth Object to auth.
+   * @returns {boolean} Does the user have access to the object?
+   */
+  hasAccessTo({
+    objectToAccess,
+    toAuth,
+  }) {
+    const {
+      teamIds = [],
+      userIds = [],
+      userAdminIds = [],
+      teamAdminIds = [],
+      ownerId,
+      isPublic,
+      visibility,
+    } = objectToAccess;
+    const {
+      hasFullAccess,
+      accessLevel = this.AccessLevels.ANONYMOUS,
+      objectId: authUserId,
+      teamIds: authTeamIds = [],
+      aliases = [],
+    } = toAuth;
+
+    const userHasAccess = userIds.concat([ownerId]).includes(authUserId);
+    const teamHasAccess = teamIds.find(teamId => authTeamIds.includes(teamId));
+    const aliasHasAccess = aliases.find(aliasId => userIds.includes(aliasId));
+    const userHasAdminAccess = userAdminIds.includes(authUserId);
+    const aliasHasAdminAccess = aliases.find(aliasId => userAdminIds.includes(aliasId));
+    const teamHasAdminAccess = teamAdminIds.find(adminId => authTeamIds.includes(adminId));
+    const isAdmin = ownerId === authUserId || hasFullAccess || accessLevel >= this.AccessLevels.ADMIN;
+
+    return {
+      canSee: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess || accessLevel >= visibility,
+      hasAccess: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess,
+      hasFullAccess: isAdmin || userHasAdminAccess || teamHasAdminAccess || aliasHasAdminAccess,
+    };
   }
 }
 

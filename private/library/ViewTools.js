@@ -1,5 +1,5 @@
 /*
- Copyright 2017 Aleksandar Jankovic
+ Copyright 2017 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ class ViewTools {
   /**
    * Is the element inside the view or close to the end of the views?
    * @static
-   * @param {HTMLElement} element - The element that will be checked
-   * @param {number} [newElementHeight] - Value will be added to check if an element is close to the edge
-   * @returns {boolean} - Is the element in view or close to the edge?
+   * @param {HTMLElement} element The element that will be checked
+   * @param {number} [newElementHeight] Value will be added to check if an element is close to the edge
+   * @returns {boolean} Is the element in view or close to the edge?
    */
   static isCloseToEnd(element, newElementHeight) {
     const elementBottom = element.getBoundingClientRect().bottom;

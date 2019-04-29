@@ -275,6 +275,7 @@ class TextTools {
   static typewriter({
     paragraphs,
     target,
+    callback = () => {},
     amount = 5,
     paragraphFunc = () => {},
   }) {
@@ -323,6 +324,7 @@ class TextTools {
             paragraphs,
             target,
             paragraphFunc,
+            callback,
           });
         }, 50);
       }
@@ -336,6 +338,8 @@ class TextTools {
       target.appendChild(paragraph);
 
       spanAnimator();
+    } else {
+      callback();
     }
   }
 }

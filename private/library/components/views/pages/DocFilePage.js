@@ -30,12 +30,10 @@ const textTools = require('../../../TextTools');
 /**
  * Create fragment with admin buttons for the document.
  * @param {Object} params Parameters.
- * @param {HTMLElement} params.parentElement Parent element to add the fragment to.
  * @param {Object} params.docFile Doc file.
  * @return {DocumentFragment} Fragment with admin buttons.
  */
 function createControls({
-  // parentElement,
   docFile,
 }) {
   const fragment = document.createDocumentFragment();
@@ -210,10 +208,19 @@ class DocFilePage extends BaseView {
         amount: 15,
         paragraphs: children,
         target: newElement,
+        callback: () => {
+          if (docFile.images && docFile.images.length > 0) {
+            newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
+          }
+        },
       });
     } else {
       newElement.appendChild(createHeader({ docFile }));
       newElement.appendChild(createBody({ docFile }));
+
+      if (docFile.images && docFile.images.length > 0) {
+        newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
+      }
     }
 
     this.replaceOnParent({ element: newElement });

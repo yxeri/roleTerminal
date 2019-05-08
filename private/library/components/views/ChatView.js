@@ -40,6 +40,8 @@ class ChatView extends ViewWrapper {
     whisperText,
     showTeam,
     allowImages,
+    hideDate,
+    fullDate,
     titles = {
       rooms: 'Rooms',
       following: 'Following',
@@ -79,6 +81,8 @@ class ChatView extends ViewWrapper {
       effect,
       whisperText,
       showTeam,
+      fullDate,
+      hideDate,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,

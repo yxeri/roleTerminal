@@ -26,6 +26,8 @@ const ids = {
   POSITIONTYPE: 'createPositionType',
   POSITIONPOINT: 'createPositionPoint',
   POSITIONCIRCLE: 'createPositionCircle',
+  POSITIONLAT: 'positionLatitude',
+  POSITIONLONG: 'positionLongitude',
 };
 
 class MessageDialog extends BaseDialog {
@@ -53,8 +55,8 @@ class MessageDialog extends BaseDialog {
             leftFunc: () => {
               const position = {
                 coordinates: {
-                  longitude,
-                  latitude,
+                  longitude: parseFloat(this.getInputValue(ids.POSITIONLONG)),
+                  latitude: parseFloat(this.getInputValue(ids.POSITIONLAT)),
                 },
                 positionName: this.getInputValue(ids.CREATEPOSITIONNAME),
                 isStationary: true,
@@ -99,6 +101,22 @@ class MessageDialog extends BaseDialog {
           type: 'text',
           multiLine: true,
           placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
+        }),
+        elementCreator.createInput({
+          elementId: ids.POSITIONLAT,
+          inputName: 'latitude',
+          type: 'text',
+          isRequired: true,
+          placeholder: 'latitude',
+          text: [latitude],
+        }),
+        elementCreator.createInput({
+          elementId: ids.POSITIONLONG,
+          inputName: 'longitude',
+          type: 'text',
+          isRequired: true,
+          placeholder: 'longitude',
+          text: [longitude],
         }),
         elementCreator.createRadioSet({
           elementId: ids.POSITIONTYPE,

@@ -60,6 +60,12 @@ class DocFileDialog extends BaseDialog {
         shouldResize: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
+      elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-docFile',
+      }),
       elementCreator.createRadioSet({
         elementId: ids.VISIBILITY,
         title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
@@ -95,7 +101,7 @@ class DocFileDialog extends BaseDialog {
               return;
             }
 
-            docFileComposer.createDocFile({
+            const params = {
               docFile: {
                 ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
@@ -137,7 +143,19 @@ class DocFileDialog extends BaseDialog {
 
                 this.removeFromView();
               },
-            });
+            };
+            const imagePreview = document.getElementById('imagePreview-docFile');
+
+            if (imagePreview.getAttribute('src')) {
+              params.images = [{
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              }];
+            }
+
+            docFileComposer.createDocFile(params);
           },
         },
       }),

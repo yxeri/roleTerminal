@@ -37,11 +37,15 @@ class DocFileComposer extends DataComposer {
 
   createDocFile({
     docFile,
+    images,
     callback,
   }) {
     this.handler.createObject({
       callback,
-      params: { docFile },
+      params: {
+        docFile,
+        images,
+      },
     });
   }
 

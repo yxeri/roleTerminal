@@ -10,7 +10,7 @@ const MenuBar = require('../library/components/views/MenuBar');
 // const TeamView = require('../library/components/views/TeamView');
 // const ForumView = require('../library/components/views/ForumView');
 
-const userComposer = require('../library/data/composers/UserComposer');
+// const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });

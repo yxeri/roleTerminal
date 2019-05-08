@@ -31,7 +31,7 @@ const worldMapParams = {
       height: 24,
       iconAnchor: [12, 12],
       textSize: 12,
-      url: 'images/mapcluster.png',
+      url: '/images/mapcluster.png',
       textColor: '#15ff00',
       fontFamily: 'monospace',
     }],
@@ -62,7 +62,7 @@ const worldMapParams = {
   markerStyle: {
     opacity: 0.9,
     icon: {
-      url: '/images/mapicon-red.png',
+      url: '/images/mapicon.png',
     },
   },
   circleStyle: {
@@ -178,56 +178,57 @@ const worldMapParams = {
     ],
   }],
   lists: [{
-    elementId: 'housingList',
-    title: 'Housing',
-    positionTypes: ['local'],
-    effect: true,
-    zoomLevel: 18,
-  }, {
-    elementId: 'lanternList',
-    title: 'LANTERN',
-    positionTypes: ['lantern'],
-    effect: true,
-    zoomLevel: 16,
-  }, {
-    elementId: 'userList',
-    title: 'Users',
-    positionTypes: ['user'],
-    effect: true,
-    listItemFields: [{
-      paramName: 'objectId',
-      convertFunc: (objectId) => {
-        const user = userComposer.getUser({ userId: objectId });
-
-        if (user) {
-          return user.username;
-        }
-
-        return objectId.slice(0, 10);
-      },
-    }],
-    zoomLevel: 18,
-  }, {
-    elementId: 'roadList',
-    title: 'Roads',
-    positionTypes: [
-      'drivable-roads',
-      'roads',
-    ],
-    effect: true,
-    zoomLevel: 18,
-  }, {
-    elementId: 'deviceList',
-    title: 'Device',
-    positionTypes: ['device'],
-    effect: true,
-    zoomLevel: 18,
-  }, {
+  //   elementId: 'housingList',
+  //   title: 'Housing',
+  //   positionTypes: ['local'],
+  //   effect: true,
+  //   zoomLevel: 18,
+  // }, {
+  //   elementId: 'lanternList',
+  //   title: 'LANTERN',
+  //   positionTypes: ['lantern'],
+  //   effect: true,
+  //   zoomLevel: 16,
+  // }, {
+  //   elementId: 'userList',
+  //   title: 'Users',
+  //   positionTypes: ['user'],
+  //   effect: true,
+  //   listItemFields: [{
+  //     paramName: 'objectId',
+  //     convertFunc: (objectId) => {
+  //       const user = userComposer.getUser({ userId: objectId });
+  //
+  //       if (user) {
+  //         return user.username;
+  //       }
+  //
+  //       return objectId.slice(0, 10);
+  //     },
+  //   }],
+  //   zoomLevel: 18,
+  // }, {
+  //   elementId: 'roadList',
+  //   title: 'Roads',
+  //   positionTypes: [
+  //     'drivable-roads',
+  //     'roads',
+  //   ],
+  //   effect: true,
+  //   zoomLevel: 18,
+  // }, {
+  //   elementId: 'deviceList',
+  //   title: 'Device',
+  //   positionTypes: ['device'],
+  //   effect: true,
+  //   zoomLevel: 18,
+  // },
     elementId: 'worldList',
-    title: 'World',
+    title: 'Sector',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 11,
+    zoomLevel: 16,
+    shouldToggle: false,
   }],
 };
 const chatView = new ChatView({

@@ -97,40 +97,40 @@ const worldMapParams = {
       styleName: 'Marked',
     },
   },
-  choosableStyles: {
-    markers: [{
-      styleName: 'Red',
-      icon: {
-        url: '/images/mapicon-red.png',
-      },
-    }, {
-      styleName: 'Green',
-      icon: {
-        url: '/images/mapicon-green.png',
-      },
-    }],
-    polygons: [{
-      strokeColor: '#ff0001',
-      fillColor: '#ff0001',
-      styleName: 'Red',
-    }, {
-      strokeColor: '#787878',
-      fillColor: '#787878',
-      styleName: 'Grey',
-    }, {
-      strokeColor: '#009100',
-      fillColor: '#009100',
-      styleName: 'Marked',
-    }, {
-      strokeColor: '#ff00d7',
-      fillColor: '#00ffef',
-      styleName: 'Occupied',
-    }, {
-      strokeColor: '#00ffef',
-      fillColor: '#ff00d7',
-      styleName: 'Not Occupied',
-    }],
-  },
+  // choosableStyles: {
+  //   markers: [{
+  //     styleName: 'Red',
+  //     icon: {
+  //       url: '/images/mapicon-red.png',
+  //     },
+  //   }, {
+  //     styleName: 'Green',
+  //     icon: {
+  //       url: '/images/mapicon-green.png',
+  //     },
+  //   }],
+  //   polygons: [{
+  //     strokeColor: '#ff0001',
+  //     fillColor: '#ff0001',
+  //     styleName: 'Red',
+  //   }, {
+  //     strokeColor: '#787878',
+  //     fillColor: '#787878',
+  //     styleName: 'Grey',
+  //   }, {
+  //     strokeColor: '#009100',
+  //     fillColor: '#009100',
+  //     styleName: 'Marked',
+  //   }, {
+  //     strokeColor: '#ff00d7',
+  //     fillColor: '#00ffef',
+  //     styleName: 'Occupied',
+  //   }, {
+  //     strokeColor: '#00ffef',
+  //     fillColor: '#ff00d7',
+  //     styleName: 'Not Occupied',
+  //   }],
+  // },
   lineStyle: {
     strokeColor: '#15ff00',
     strokeWeight: 2,

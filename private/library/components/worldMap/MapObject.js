@@ -14,6 +14,7 @@
 const Label = require('./MapLabel');
 const BaseDialog = require('../views/dialogs/BaseDialog');
 const VerifyDialog = require('../views/dialogs/VerifyDialog');
+const EditPositionDialog = require('../views/dialogs/EditPositionDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
@@ -486,6 +487,21 @@ class MapObject {
         },
       });
     }
+
+    items.push({
+      elements: [elementCreator.createSpan({
+        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'editPosition' }),
+      })],
+      clickFuncs: {
+        leftFunc: () => {
+          const dialog = new EditPositionDialog({
+            positionId: this.position.objectId,
+          });
+
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
+        },
+      },
+    });
 
     if (this.canBeDragged && userAccessLevel >= UpdatePositionCoordinates.accessLevel) {
       items.push({

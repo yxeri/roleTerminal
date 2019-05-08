@@ -404,6 +404,9 @@ const labels = {
     removePosition: (override.MapObject && override.MapObject.removePosition) || {
       en: 'Remove',
     },
+    editPosition: (override.MapObject && override.MapObject.editPosition) || {
+      en: 'Edit',
+    },
   },
   MenuBar: {
     menu: (override.MenuBar && override.MenuBar.menu) || {

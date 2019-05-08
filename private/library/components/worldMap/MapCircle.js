@@ -25,7 +25,7 @@ class MapCircle extends MapObject {
     overlay,
     labelStyle,
     zIndex = 4,
-    radius = 50,
+    radius = 25,
     styles = {},
     alwaysShowLabel = false,
     shouldCluster = false,

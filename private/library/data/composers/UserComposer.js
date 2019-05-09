@@ -205,6 +205,34 @@ class UserComposer extends DataComposer {
       },
     });
   }
+
+  getUsers() {
+    return this.handler.getObjects({});
+  }
+
+  getAllIdentities({ byFullName = false }) {
+    const users = this.getUsers();
+    const aliases = aliasComposer.getAllAliases();
+
+    return aliases.concat(users).sort((a, b) => {
+      const aParam = byFullName
+        ? a.fullName.toLowerCase()
+        : (a.username || a.aliasName).toLowerCase();
+      const bParam = byFullName
+        ? b.fullName.toLowerCase()
+        : (b.username || b.aliasName).toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      }
+
+      if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }
 }
 
 const userComposer = new UserComposer();

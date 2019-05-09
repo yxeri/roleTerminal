@@ -71,6 +71,10 @@ class SocketManager {
       INVITETEAM: 'inviteToTeam',
       LEAVETEAM: 'leaveTeam',
       SIMPLEMSG: 'simpleMsg',
+      INVITEROOM: 'inviteToRoom',
+      DECLINEINVITE: 'decline',
+      ACCEPTTEAM: 'acceptTeamInvitation',
+      ACCEPTROOM: 'acceptRoomInvitation',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

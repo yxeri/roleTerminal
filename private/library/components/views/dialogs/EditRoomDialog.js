@@ -19,11 +19,13 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const roomComposer = require('../../../data/composers/RoomComposer');
+const userComposer = require('../../../data/composers/UserComposer');
 
 const ids = {
   ROOMNAME: 'roomName',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
+  IDENTITIES: 'identities',
 };
 
 class EditRoomDialog extends BaseDialog {
@@ -32,7 +34,8 @@ class EditRoomDialog extends BaseDialog {
     classes = [],
     elementId = `eRDialog-${Date.now()}`,
   }) {
-    const { roomName } = roomComposer.getRoom({ roomId });
+    const room = roomComposer.getRoom({ roomId });
+    const { roomName } = room;
 
     const inputs = [
       elementCreator.createInput({
@@ -63,6 +66,59 @@ class EditRoomDialog extends BaseDialog {
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
         clickFuncs: {
           leftFunc: () => {
+            this.removeFromView();
+          },
+        },
+      }),
+      elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'invite' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const followers = room.followers.concat(room.participantIds);
+            const identities = userComposer.getAllIdentities({}).filter(identity => !followers.includes(identity.objectId));
+            const dialog = new BaseDialog({
+              inputs: [
+                elementCreator.createSelect({
+                  multiple: true,
+                  elementId: ids.IDENTITIES,
+                  options: identities.map((identity) => {
+                    return {
+                      value: identity.objectId,
+                      name: identity.username || identity.aliasName,
+                    };
+                  }),
+                }),
+              ],
+              lowerButtons: [
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      dialog.removeFromView();
+                    },
+                  },
+                }),
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'invite' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      const selected = dialog.getElement(ids.IDENTITIES).selectedOptions;
+                      const selectedIds = Array.from(selected).map(option => option.getAttribute('value'));
+
+                      roomComposer.invite({
+                        roomId,
+                        followerIds: selectedIds,
+                        callback: () => {
+                          dialog.removeFromView();
+                        },
+                      });
+                    },
+                  },
+                }),
+              ],
+            });
+
+            dialog.addToView({ element: this.getParentElement() });
             this.removeFromView();
           },
         },

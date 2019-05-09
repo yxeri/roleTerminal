@@ -272,6 +272,9 @@ const labels = {
       en: 'Remove password',
       se: 'Ta bort lösenordet',
     },
+    invite: (override.RoomDialog && override.RoomDialog.invite) || {
+      en: 'Invite',
+    },
   },
   RoomUpdateDialog: {
     password: (override.RoomUpdateDialog && override.RoomUpdateDialog.newPassword) || {
@@ -542,6 +545,11 @@ const labels = {
   VoiceCommands: {
     viewSwitch: (override.VoiceCommands && override.VoiceCommands.viewSwitch) || {
       en: 'switch',
+    },
+  },
+  InvitationList: {
+    receiver: (override.InvitationList && override.InvitationList.receiver) || {
+      en: 'Receiver',
     },
   },
 };

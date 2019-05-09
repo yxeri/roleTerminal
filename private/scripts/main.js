@@ -39,7 +39,7 @@ const worldMapParams = {
   },
   labelStyle: {
     fontColor: '#15ff00',
-    minZoomLevel: 17,
+    minZoomLevel: 16,
     fontSize: 11,
   },
   backgroundColor: '#000000',
@@ -162,7 +162,7 @@ const worldMapParams = {
     title: 'Sector',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 17,
+    zoomLevel: 16,
     shouldToggle: false,
   }, {
     elementId: 'userList',
@@ -182,7 +182,7 @@ const worldMapParams = {
         return objectId.slice(0, 10);
       },
     }],
-    zoomLevel: 18,
+    zoomLevel: 16,
   }],
 };
 const chatView = new ChatView({

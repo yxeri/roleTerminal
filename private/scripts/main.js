@@ -10,7 +10,7 @@ const MenuBar = require('../library/components/views/MenuBar');
 // const TeamView = require('../library/components/views/TeamView');
 // const ForumView = require('../library/components/views/ForumView');
 
-// const userComposer = require('../library/data/composers/UserComposer');
+const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
@@ -21,6 +21,7 @@ const labelHandler = require('../library/labels/LabelHandler');
 const worldMapParams = {
   alwaysShowLabels: {
     line: true,
+    marker: true,
   },
   maxZoom: 19,
   clusterStyle: {
@@ -97,40 +98,19 @@ const worldMapParams = {
       styleName: 'Marked',
     },
   },
-  // choosableStyles: {
-  //   markers: [{
-  //     styleName: 'Red',
-  //     icon: {
-  //       url: '/images/mapicon-red.png',
-  //     },
-  //   }, {
-  //     styleName: 'Green',
-  //     icon: {
-  //       url: '/images/mapicon-green.png',
-  //     },
-  //   }],
-  //   polygons: [{
-  //     strokeColor: '#ff0001',
-  //     fillColor: '#ff0001',
-  //     styleName: 'Red',
-  //   }, {
-  //     strokeColor: '#787878',
-  //     fillColor: '#787878',
-  //     styleName: 'Grey',
-  //   }, {
-  //     strokeColor: '#009100',
-  //     fillColor: '#009100',
-  //     styleName: 'Marked',
-  //   }, {
-  //     strokeColor: '#ff00d7',
-  //     fillColor: '#00ffef',
-  //     styleName: 'Occupied',
-  //   }, {
-  //     strokeColor: '#00ffef',
-  //     fillColor: '#ff00d7',
-  //     styleName: 'Not Occupied',
-  //   }],
-  // },
+  choosableStyles: {
+    markers: [{
+      styleName: 'Normal',
+      icon: {
+        url: '/images/mapicon.png',
+      },
+    }, {
+      styleName: 'Active',
+      icon: {
+        url: '/images/mapicon-active.png',
+      },
+    }],
+  },
   lineStyle: {
     strokeColor: '#15ff00',
     strokeWeight: 2,
@@ -178,57 +158,31 @@ const worldMapParams = {
     ],
   }],
   lists: [{
-  //   elementId: 'housingList',
-  //   title: 'Housing',
-  //   positionTypes: ['local'],
-  //   effect: true,
-  //   zoomLevel: 18,
-  // }, {
-  //   elementId: 'lanternList',
-  //   title: 'LANTERN',
-  //   positionTypes: ['lantern'],
-  //   effect: true,
-  //   zoomLevel: 16,
-  // }, {
-  //   elementId: 'userList',
-  //   title: 'Users',
-  //   positionTypes: ['user'],
-  //   effect: true,
-  //   listItemFields: [{
-  //     paramName: 'objectId',
-  //     convertFunc: (objectId) => {
-  //       const user = userComposer.getUser({ userId: objectId });
-  //
-  //       if (user) {
-  //         return user.username;
-  //       }
-  //
-  //       return objectId.slice(0, 10);
-  //     },
-  //   }],
-  //   zoomLevel: 18,
-  // }, {
-  //   elementId: 'roadList',
-  //   title: 'Roads',
-  //   positionTypes: [
-  //     'drivable-roads',
-  //     'roads',
-  //   ],
-  //   effect: true,
-  //   zoomLevel: 18,
-  // }, {
-  //   elementId: 'deviceList',
-  //   title: 'Device',
-  //   positionTypes: ['device'],
-  //   effect: true,
-  //   zoomLevel: 18,
-  // },
     elementId: 'worldList',
     title: 'Sector',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 16,
+    zoomLevel: 18,
     shouldToggle: false,
+  }, {
+    elementId: 'userList',
+    title: 'Users',
+    positionTypes: ['user'],
+    effect: true,
+    shouldToggle: false,
+    listItemFields: [{
+      paramName: 'objectId',
+      convertFunc: (objectId) => {
+        const user = userComposer.getUser({ userId: objectId });
+
+        if (user) {
+          return user.username;
+        }
+
+        return objectId.slice(0, 10);
+      },
+    }],
+    zoomLevel: 18,
   }],
 };
 const chatView = new ChatView({

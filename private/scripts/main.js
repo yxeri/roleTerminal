@@ -39,7 +39,7 @@ const worldMapParams = {
   },
   labelStyle: {
     fontColor: '#15ff00',
-    minZoomLevel: 18,
+    minZoomLevel: 17,
     fontSize: 11,
   },
   backgroundColor: '#000000',
@@ -162,7 +162,7 @@ const worldMapParams = {
     title: 'Sector',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 18,
+    zoomLevel: 17,
     shouldToggle: false,
   }, {
     elementId: 'userList',

@@ -24,6 +24,7 @@ class MapMarker extends MapObject {
     labelStyle,
     hoverExcludeRule,
     overlay,
+    showMenuOnClick,
     descriptionOnClick = true,
     choosableStyles = [],
     zIndex = 4,
@@ -56,6 +57,7 @@ class MapMarker extends MapObject {
       labelStyle,
       descriptionOnClick,
       overlay,
+      showMenuOnClick,
       dragEndFunc: () => {
         this.setCurrentCoordinates({
           coordinates: {

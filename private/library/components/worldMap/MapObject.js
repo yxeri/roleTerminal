@@ -24,6 +24,8 @@ const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
+const deviceChecker = require('../../DeviceChecker');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -95,6 +97,7 @@ class MapObject {
     markedStyle,
     hoverExcludeRule,
     overlay,
+    showMenuOnClick = deviceChecker.isTouchDevice,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
@@ -122,6 +125,7 @@ class MapObject {
     });
     this.style = style;
     this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);
+    this.showMenuOnClick = showMenuOnClick;
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
@@ -140,7 +144,14 @@ class MapObject {
     mouseHandler.addGMapsClickListener({
       element: this.mapObject,
       leftFunc: (event) => {
-        MapObject.hideRightClickBox();
+        if (!this.showMenuOnClick) {
+          MapObject.hideRightClickBox();
+        } else {
+          this.showPositionRightClickBox({
+            event,
+            thisMapObject: this,
+          });
+        }
 
         if (!this.isDraggable) {
           if (clickFuncs.leftFunc) {
@@ -425,9 +436,15 @@ class MapObject {
       UpdatePositionCoordinates = { accessLevel: 1 },
     } = storageManager.getPermissions();
     const userAccessLevel = storageManager.getAccessLevel();
+    const { hasAccess } = accessCentral.hasAccessTo({
+      objectToAccess: this.position,
+      toAuth: userComposer.getCurrentUser(),
+    });
 
     if (userAccessLevel < UpdatePosition.accessLevel
-      || (storageManager.getAccessLevel() < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId)) {
+      || (!hasAccess)
+      || (storageManager.getAccessLevel() < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId)
+    ) {
       return;
     }
 

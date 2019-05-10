@@ -39,7 +39,7 @@ const worldMapParams = {
   },
   labelStyle: {
     fontColor: '#15ff00',
-    minZoomLevel: 16,
+    minZoomLevel: 15,
     fontSize: 11,
   },
   backgroundColor: '#000000',

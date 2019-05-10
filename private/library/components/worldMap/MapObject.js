@@ -168,18 +168,21 @@ class MapObject {
       },
     });
 
-    if (!this.alwaysShowLabel) {
-      addGMapsHoverListeners({
-        element: this.mapObject,
-        shouldOutOnDrag: true,
-        hoverFunc: () => {
-          this.showLabel();
-        },
-        outFunc: () => {
+
+    addGMapsHoverListeners({
+      element: this.mapObject,
+      shouldOutOnDrag: true,
+      hoverFunc: () => {
+        this.showLabel();
+      },
+      outFunc: () => {
+        if (labelStyle && labelStyle.minZoomLevel && this.worldMap.getZoom() < labelStyle.minZoomLevel) {
           this.hideLabel();
-        },
-      });
-    } else if (labelStyle.minZoomLevel) {
+        }
+      },
+    });
+
+    if (labelStyle && labelStyle.minZoomLevel) {
       eventHandler.addWatcher({
         event: eventHandler.Events.ZOOM_WORLDMAP,
         func: ({

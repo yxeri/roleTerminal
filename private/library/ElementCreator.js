@@ -526,6 +526,36 @@ class ElementCreator {
     return fieldset;
   }
 
+  static createSelect({
+    name,
+    classes,
+    elementId,
+    multiple,
+    options = [],
+  }) {
+    const select = createBaseElement({
+      elementId,
+      classes,
+      name,
+      elementType: 'select',
+    });
+
+    if (multiple) {
+      select.setAttribute('multiple', 'true');
+    }
+
+    options.forEach((option) => {
+      const optionElement = document.createElement('option');
+
+      optionElement.setAttribute('value', option.value);
+      optionElement.innerText = option.name;
+
+      select.appendChild(optionElement);
+    });
+
+    return select;
+  }
+
   static replaceFirstChild(parentElement, newChild) {
     if (parentElement.firstElementChild) {
       parentElement.replaceChild(newChild, parentElement.firstElementChild);

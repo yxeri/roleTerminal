@@ -71,6 +71,10 @@ class SocketManager {
       INVITETEAM: 'inviteToTeam',
       LEAVETEAM: 'leaveTeam',
       SIMPLEMSG: 'simpleMsg',
+      INVITEROOM: 'inviteToRoom',
+      DECLINEINVITE: 'decline',
+      ACCEPTTEAM: 'acceptTeamInvitation',
+      ACCEPTROOM: 'acceptRoomInvitation',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -88,6 +92,8 @@ class SocketManager {
           cornerOneCoordinates,
           cornerTwoCoordinates,
           defaultZoomLevel,
+          yearModification,
+          dayModification,
           permissions = {},
         } = data;
 
@@ -101,6 +107,8 @@ class SocketManager {
         if (cornerOneCoordinates) { storageManager.setCornerOneCoordinates(cornerOneCoordinates); }
         if (cornerTwoCoordinates) { storageManager.setCornerTwoCoordinates(cornerTwoCoordinates); }
         if (defaultZoomLevel) { storageManager.setDefaultZoomLevel(defaultZoomLevel); }
+        if (yearModification) { storageManager.setYearModification(yearModification); }
+        if (dayModification) { storageManager.setDayModification(dayModification); }
 
         storageManager.setPermissions(permissions);
 

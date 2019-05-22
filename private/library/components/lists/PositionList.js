@@ -23,7 +23,9 @@ const positionComposer = require('../../data/composers/PositionComposer');
 class PositionList extends List {
   constructor(params) {
     const listParams = params;
-    listParams.shouldToggle = true;
+    listParams.shouldToggle = typeof listParams.shouldToggle === 'boolean'
+      ? listParams.shouldToggle
+      : true;
     listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map(positionType => positionComposer.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
     listParams.classes = listParams.classes

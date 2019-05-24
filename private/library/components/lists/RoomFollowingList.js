@@ -37,6 +37,9 @@ class RoomFollowingList extends List {
       elementId,
       classes,
       effect,
+      sorting: {
+        paramName: 'roomName',
+      },
       listType: 'followedRooms',
       filter: {
         rules: [

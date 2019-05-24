@@ -41,6 +41,9 @@ class RoomList extends List {
       elementId,
       classes,
       effect,
+      sorting: {
+        paramName: 'roomName',
+      },
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       listType: 'whisperRooms',
       filter: {

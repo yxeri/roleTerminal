@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Carmilla Mina Jankovic
+ Copyright 2019 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,25 +21,27 @@ const labelHandler = require('../../../labels/LabelHandler');
 const positionComposer = require('../../../data/composers/PositionComposer');
 
 const ids = {
-  CREATEPOSITIONNAME: 'createPositionName',
-  CREATEPOSITIONDESCRIPTION: 'createPositionDescription',
-  POSITIONTYPE: 'createPositionType',
-  POSITIONPOINT: 'createPositionPoint',
-  POSITIONCIRCLE: 'createPositionCircle',
+  EDITPOSITIONNAME: 'editPositionName',
+  EDITPOSITIONDESCRIPTION: 'editPositionDescription',
+  POSITIONTYPE: 'editPositionType',
+  POSITIONPOINT: 'editPositionPoint',
+  POSITIONCIRCLE: 'editPositionCircle',
   POSITIONLAT: 'positionLatitude',
   POSITIONLONG: 'positionLongitude',
 };
 
-class MessageDialog extends BaseDialog {
+class EditPositionDialog extends BaseDialog {
   constructor({
-    latitude,
-    longitude,
+    positionId,
     classes = [],
     elementId = `posDialog-${Date.now()}`,
   }) {
+    const position = positionComposer.getPosition({ positionId });
+    const coordinates = position.coordinatesHistory[0];
+
     super({
       elementId,
-      classes: classes.concat(['PositionDialog']),
+      classes: classes.concat(['EditPositionDialog']),
       lowerButtons: [
         elementCreator.createButton({
           text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -50,32 +52,34 @@ class MessageDialog extends BaseDialog {
           },
         }),
         elementCreator.createButton({
-          text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'create' }),
+          text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
           clickFuncs: {
             leftFunc: () => {
-              const position = {
+              const updatedPosition = {
                 coordinates: {
                   longitude: parseFloat(this.getInputValue(ids.POSITIONLONG)),
                   latitude: parseFloat(this.getInputValue(ids.POSITIONLAT)),
                 },
-                positionName: this.getInputValue(ids.CREATEPOSITIONNAME),
-                isStationary: true,
               };
-              const description = this.getInputValue(ids.CREATEPOSITIONDESCRIPTION);
+              const description = this.getInputValue(ids.EDITPOSITIONDESCRIPTION);
+              const positionName = this.getInputValue(ids.EDITPOSITIONNAME);
+
+              if (positionName !== position.positionName) {
+                updatedPosition.positionName = positionName;
+              }
 
               if (description) {
-                position.description = description.split('\n');
+                updatedPosition.description = description.split('\n');
+              } else {
+                updatedPosition.description = [];
               }
 
-              if (document.getElementById(ids.POSITIONCIRCLE).checked) {
-                position.positionStructure = positionComposer.PositionStructures.CIRCLE;
-              }
-
-              positionComposer.createPosition({
-                position,
+              positionComposer.updatePosition({
+                positionId,
+                position: updatedPosition,
                 callback: ({ error }) => {
                   if (error) {
-                    console.log('Create position', error);
+                    console.log('Edit position', error);
 
                     return;
                   }
@@ -89,18 +93,22 @@ class MessageDialog extends BaseDialog {
       ],
       inputs: [
         elementCreator.createInput({
-          elementId: ids.CREATEPOSITIONNAME,
+          elementId: ids.EDITPOSITIONNAME,
           inputName: 'positionName',
           type: 'text',
           isRequired: true,
           placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionName' }),
+          text: [position.positionName],
         }),
         elementCreator.createInput({
-          elementId: ids.CREATEPOSITIONDESCRIPTION,
+          elementId: ids.EDITPOSITIONDESCRIPTION,
           inputName: 'positionDescription',
           type: 'text',
           multiLine: true,
           placeholder: labelHandler.getLabel({ baseObject: 'MapObject', label: 'createPositionDescription' }),
+          text: position.description
+            ? position.description
+            : undefined,
         }),
         elementCreator.createInput({
           elementId: ids.POSITIONLAT,
@@ -108,7 +116,7 @@ class MessageDialog extends BaseDialog {
           type: 'text',
           isRequired: true,
           placeholder: 'latitude',
-          text: [latitude],
+          text: [coordinates.latitude],
         }),
         elementCreator.createInput({
           elementId: ids.POSITIONLONG,
@@ -116,28 +124,11 @@ class MessageDialog extends BaseDialog {
           type: 'text',
           isRequired: true,
           placeholder: 'longitude',
-          text: [longitude],
-        }),
-        elementCreator.createRadioSet({
-          elementId: ids.POSITIONTYPE,
-          title: 'Type of position',
-          optionName: 'visibility',
-          options: [
-            {
-              optionId: ids.POSITIONPOINT,
-              optionLabel: 'Point',
-              value: 'public',
-              isDefault: true,
-            }, {
-              optionId: ids.POSITIONCIRCLE,
-              optionLabel: 'Circle',
-              value: 'private',
-            },
-          ],
+          text: [coordinates.longitude],
         }),
       ],
     });
   }
 }
 
-module.exports = MessageDialog;
+module.exports = EditPositionDialog;

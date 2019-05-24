@@ -24,8 +24,9 @@ class MapCircle extends MapObject {
     hoverExcludeRule,
     overlay,
     labelStyle,
+    showMenuOnClick,
     zIndex = 4,
-    radius = 50,
+    radius = 25,
     styles = {},
     alwaysShowLabel = false,
     shouldCluster = false,
@@ -41,6 +42,7 @@ class MapCircle extends MapObject {
       clickFuncs,
       overlay,
       labelStyle,
+      showMenuOnClick,
       dragEndFunc: () => {
         this.currentCoordinates({
           coordinates: {

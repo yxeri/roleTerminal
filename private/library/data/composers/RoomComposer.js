@@ -152,6 +152,21 @@ class RoomComposer extends DataComposer {
       },
     });
   }
+
+  invite({
+    roomId,
+    followerIds,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      event: socketManager.EmitTypes.INVITEROOM,
+      params: {
+        roomId,
+        followerIds,
+      },
+    });
+  }
 }
 
 const roomComposer = new RoomComposer();

@@ -59,7 +59,10 @@ class MessageData extends BaseData {
         return;
       }
 
-      const { room } = data;
+      const {
+        room,
+        invited,
+      } = data;
 
       this.fetchObjects({
         event: socketManager.EmitTypes.GETROOMMSGS,
@@ -71,10 +74,15 @@ class MessageData extends BaseData {
             return;
           }
 
-          eventCentral.emitEvent({
-            event: eventCentral.Events.FOLLOWED_ROOM,
-            params: { room },
-          });
+          if (!invited) {
+            eventCentral.emitEvent({
+              event: eventCentral.Events.FOLLOWED_ROOM,
+              params: {
+                room,
+                invited,
+              },
+            });
+          }
         },
       });
     });

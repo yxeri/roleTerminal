@@ -108,7 +108,13 @@ class EditRoomDialog extends BaseDialog {
                       roomComposer.invite({
                         roomId,
                         followerIds: selectedIds,
-                        callback: () => {
+                        callback: ({ error }) => {
+                          if (error) {
+                            console.log(error);
+
+                            return;
+                          }
+
                           dialog.removeFromView();
                         },
                       });

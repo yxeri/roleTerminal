@@ -115,19 +115,23 @@ class RoomFollowingList extends List {
       event: eventCentral.Events.FOLLOWED_ROOM,
       func: ({
         room,
+        invited = false,
       }) => {
         const { objectId } = room;
 
         this.addOneItem({ object: room });
-        this.setFocusedListItem(objectId);
 
-        eventCentral.emitEvent({
-          event: eventCentral.Events.SWITCH_ROOM,
-          params: {
-            room,
-            origin: this.elementId,
-          },
-        });
+        if (!invited) {
+          this.setFocusedListItem(objectId);
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.SWITCH_ROOM,
+            params: {
+              room,
+              origin: this.elementId,
+            },
+          });
+        }
       },
     });
 

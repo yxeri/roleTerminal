@@ -55,7 +55,7 @@ class InvitationComposer extends DataComposer {
     this.handler.createObject({
       callback,
       params,
-      event: socketManager.EmitTypes.INVITEROOM,
+      event: socketManager.EmitTypes.SENDROOMINVITE,
     });
   }
 

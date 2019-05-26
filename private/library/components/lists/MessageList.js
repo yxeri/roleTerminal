@@ -52,6 +52,10 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      collapseEqual: {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+      },
       sorting: {
         paramName: 'customTimeCreated',
         fallbackParamName: 'timeCreated',

@@ -94,6 +94,7 @@ class List extends BaseView {
     userFilter,
     minimumAccessLevel,
     listType,
+    collapseEqual,
     effect = false,
     shouldToggle = false,
     onCreateFunc = () => {},
@@ -140,6 +141,8 @@ class List extends BaseView {
     this.shouldToggle = shouldToggle;
     this.listType = listType;
     this.itemQueue = [];
+    this.collapseEqual = collapseEqual;
+    this.lastObject = null;
 
     if (collector.eventTypes.one) {
       /**
@@ -335,6 +338,8 @@ class List extends BaseView {
         });
 
         fragment.appendChild(listItem);
+
+        this.lastObject = object;
       }
     });
 
@@ -470,7 +475,15 @@ class List extends BaseView {
       /**
        * Add item fields to the list item.
        */
-      if (this.listItemFields) {
+      if (this.listItemFields
+        && (!this.collapseEqual
+          || !this.lastObject
+          || !(
+            (object[this.collapseEqual.paramName] && object[this.collapseEqual.paramName] === this.lastObject[this.collapseEqual.paramName])
+            || (!object[this.collapseEqual.paramName] && !this.lastObject[this.collapseEqual.paramName] && object[this.collapseEqual.fallbackTo] && object[this.collapseEqual.fallbackTo] === this.lastObject[this.collapseEqual.fallbackTo])
+          )
+        )
+      ) {
         const elements = this.listItemFields
           .filter(field => typeof object[field.paramName] !== 'undefined' || typeof object[field.fallbackTo] !== 'undefined')
           .map((field) => {
@@ -596,6 +609,7 @@ class List extends BaseView {
       this.listElement.replaceChild(newItem, this.getElement(objectId));
     } else if (this.sorting && this.sorting.paramName) {
       const firstChild = this.listElement.firstElementChild;
+      this.lastObject = object;
 
       if (!firstChild) {
         this.listElement.appendChild(newItem);
@@ -620,6 +634,7 @@ class List extends BaseView {
       this.listElement.insertBefore(newItem, closestElement);
     } else if (this.sorting && this.sorting.reverse) {
       const firstChild = this.listElement.firstElementChild;
+      this.lastObject = object;
 
       if (!firstChild) {
         this.listElement.appendChild(newItem);
@@ -630,6 +645,8 @@ class List extends BaseView {
       this.listElement.insertBefore(newItem, firstChild);
     } else {
       this.listElement.appendChild(newItem);
+
+      this.lastObject = object;
     }
   }
 

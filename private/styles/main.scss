@@ -400,9 +400,15 @@ button {
 
 .toggle {}
 
-.focusListItem {}
+.focusListItem {
+  border: none !important;
+  color: #505050 !important;
+}
 
-.markListItem {}
+.markListItem {
+  color: white !important;
+  background-color: blue !important;
+}
 
 .newListItem {}
 

@@ -95,6 +95,7 @@ class List extends BaseView {
     minimumAccessLevel,
     listType,
     collapseEqual,
+    imageInfo = {},
     effect = false,
     shouldToggle = false,
     onCreateFunc = () => {},
@@ -143,6 +144,7 @@ class List extends BaseView {
     this.itemQueue = [];
     this.collapseEqual = collapseEqual;
     this.lastObject = null;
+    this.imageInfo = imageInfo;
 
     if (collector.eventTypes.one) {
       /**
@@ -262,6 +264,7 @@ class List extends BaseView {
 
     const elements = [];
     const listClasses = [];
+    this.lastObject = null;
 
     if (this.shouldToggle) {
       listClasses.push('hide');
@@ -523,6 +526,20 @@ class List extends BaseView {
 
         if (this.listItemClickFuncs.onlyListItemFields) {
           paragraphParams.clickFuncs = clickFuncs;
+        }
+
+        if (this.imageInfo && this.imageInfo.show) {
+          const image = this.imageInfo.getImage(object[this.imageInfo.paramName])
+            || !object[this.imageInfo.paramName]
+            ? this.imageInfo.getImage(object[this.imageInfo.fallbackTo])
+            : undefined;
+
+          if (image) {
+            listItemElements.push(elementCreator.createPicture({
+              picture: image,
+              classes: ['listItemImage'],
+            }));
+          }
         }
 
         listItemElements.push(elementCreator.createParagraph(paragraphParams));

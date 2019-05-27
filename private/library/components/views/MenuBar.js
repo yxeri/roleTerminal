@@ -24,6 +24,7 @@ const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 // const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
 const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
 // const TeamDialog = require('../../components/views/dialogs/TeamDialog');
+const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -122,6 +123,18 @@ class MenuBar extends BaseView {
           },
         },
       });
+      const profileButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'myProfile' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const profileDialog = new UserSelfDialog({});
+
+            profileDialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
 
       accessCentral.addAccessElement({
         maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
@@ -143,7 +156,7 @@ class MenuBar extends BaseView {
       }, {
         elements: [registerButton],
       });
-      lastItems.push({ elements: [logoutButton] });
+      lastItems.push({ elements: [profileButton, logoutButton] });
 
       voiceCommander.addCommands({
         activationString: 'menu',

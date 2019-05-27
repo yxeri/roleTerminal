@@ -62,6 +62,9 @@ const labels = {
     edit: (override.Button && override.Button.edit) || {
       en: 'Edit',
     },
+    myProfile: (override.Button && override.Button.myProfile) || {
+      en: 'My profile',
+    },
   },
   Transaction: {
     failed: (override.Transaction && override.Transaction.failed) || {

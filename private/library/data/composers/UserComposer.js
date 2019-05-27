@@ -206,6 +206,22 @@ class UserComposer extends DataComposer {
     });
   }
 
+  updateUser({
+    userId,
+    user,
+    image,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        userId,
+        user,
+        image,
+      },
+    });
+  }
+
   getUsers() {
     return this.handler.getObjects({});
   }

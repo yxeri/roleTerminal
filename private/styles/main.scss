@@ -34,12 +34,15 @@ html, body {
   background-color: lightgrey;
 }
 
+li {
+  list-style: none;
+}
+
 img {
   max-width: 100%;
   object-fit: scale-down;
   background-color: black;
 }
-
 
 .userDialog, .registerDialog, .userSelfDialog {
   img {
@@ -393,6 +396,12 @@ button {
     border-top: 2px solid white;
     border-left: 2px solid white;
     padding: 2px;
+  }
+
+  .listItemImage {
+    float: left;
+    max-width: 40px;
+    max-height: 40px;
   }
 }
 

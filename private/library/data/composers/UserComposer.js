@@ -249,6 +249,16 @@ class UserComposer extends DataComposer {
       return 0;
     });
   }
+
+  getImage(userId) {
+    const user = this.getUser({ userId });
+
+    if (user) {
+      return user.image;
+    }
+
+    return undefined;
+  }
 }
 
 const userComposer = new UserComposer();

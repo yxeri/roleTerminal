@@ -7,8 +7,8 @@ const MenuBar = require('../library/components/views/MenuBar');
 // const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 // const tools = require('../library/Tools');
-const voiceCommander = require('../library/VoiceCommander');
-const labelHandler = require('../library/labels/LabelHandler');
+// const voiceCommander = require('../library/VoiceCommander');
+// const labelHandler = require('../library/labels/LabelHandler');
 
 const chatView = new ChatView({
   hideDate: true,
@@ -65,19 +65,19 @@ viewSwitcher.switchView({
 //   });
 // }
 
-voiceCommander.start();
-voiceCommander.addCommands({
-  activationString: labelHandler.getLabel({ baseObject: 'VoiceCommands', label: 'viewSwitch' }),
-  commands: [
-    {
-      strings: [
-        'chat',
-        'coms',
-      ],
-      func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT }); },
-    },
-  ],
-});
+// voiceCommander.start();
+// voiceCommander.addCommands({
+//   activationString: labelHandler.getLabel({ baseObject: 'VoiceCommands', label: 'viewSwitch' }),
+//   commands: [
+//     {
+//       strings: [
+//         'chat',
+//         'coms',
+//       ],
+//       func: () => { viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT }); },
+//     },
+//   ],
+// });
 
 if (window.cordova) {
   document.addEventListener('deviceready', () => {

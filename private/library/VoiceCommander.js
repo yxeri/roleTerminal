@@ -19,6 +19,8 @@ class VoiceCommander {
     if (typeof annyang !== 'undefined') { // eslint-disable-line
       this.voiceListener = annyang; // eslint-disable-line
     }
+
+    this.hasStarted = false;
     this.commands = {};
   }
 
@@ -34,6 +36,7 @@ class VoiceCommander {
       continuous: false,
     });
     this.voiceListener.addCommands(this.commands);
+    this.hasStarted = true;
   }
 
   addCommands({
@@ -58,13 +61,13 @@ class VoiceCommander {
       });
     });
 
-    if (this.voiceListener) {
+    if (this.voiceListener && this.hasStarted) {
       this.voiceListener.addCommands(commandsObj);
     }
   }
 
   pause() {
-    if (!this.voiceListener) {
+    if (!this.voiceListener || !this.hasStarted) {
       return;
     }
 
@@ -72,7 +75,7 @@ class VoiceCommander {
   }
 
   unpause() {
-    if (!this.voiceListener) {
+    if (!this.voiceListener || !this.hasStarted) {
       return;
     }
 

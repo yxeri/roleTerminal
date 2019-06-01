@@ -176,7 +176,7 @@ class ChatView extends ViewWrapper {
       components: [{ component: roomInfo }],
       classes: ['columnChat'],
     };
-    const roomListComponent = {
+    const roomListColumn = {
       components: [
         { component: roomFollowingList },
         { component: whisperRoomList },
@@ -209,14 +209,14 @@ class ChatView extends ViewWrapper {
 
       switch (roomListPlacement) {
         case 'left': {
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
           columns.push(mainColumn);
 
           break;
         }
         default: {
           columns.push(mainColumn);
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
 
           break;
         }

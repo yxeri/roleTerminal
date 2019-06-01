@@ -24,7 +24,6 @@ $new-color: #009100;
 $darker-new-color: #005f00;
 $header-color: #2e001a;
 $border-color: #ff00d7;
-$dark-border-color: #ff00d7;
 
 $p-margin: .4em;
 $border-width: .1em;
@@ -56,9 +55,10 @@ html, body {
   background-color: $background-color;
   color: $text-color;
   font-family: monospace;
-  font-size: 1em;
+  font-size: 1.1em;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 
@@ -344,11 +344,11 @@ label {
  * Chat View *
  *************/
 
-$msgList-msgInfo-border: .1em solid $dark-border-color;
+$msgList-msgInfo-border: .1em solid $border-color;
 $msgList-li-padding: .5em;
 $msgList-msgLine-side-padding: .2em;
 $msgList-msgInfo-padding: .1em;
-$msgList-textarea-border: .1em solid $dark-border-color;
+$msgList-textarea-border: .1em solid $border-color;
 
 .chatView {
   .msgList {
@@ -391,7 +391,7 @@ $msgList-textarea-border: .1em solid $dark-border-color;
   }
 
   .inputArea {
-    padding-top: .5em;
+    padding-top: .2em;
     margin-top: auto;
 
     textarea {
@@ -676,6 +676,7 @@ $map-padding-fix: 2em;
     bottom: 1.2em;
     box-shadow: 2px 0 5px black;
     -webkit-box-shadow: 2px 0 5px black;
+    scrollbar-width: none;
 
     button {
       width: 100%;
@@ -791,7 +792,7 @@ $map-padding-fix: 2em;
   }
 }
 
-@media (orientation: portrait) {
+@media (orientation: portrait), (orientation: landscape) and (max-width: 768px) {
   #main {
     > .viewWrapper {
       > .oneOfTwo:nth-child(2) {

@@ -44,7 +44,7 @@ class LockedRoomDialog extends BaseDialog {
         inputName: 'password',
         type: 'password',
         isRequired: true,
-        maxLength: 10,
+        maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'LockedRoomDialog', label: 'password' }),
       }),
     ];

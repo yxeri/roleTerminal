@@ -101,10 +101,6 @@ class ChatView extends ViewWrapper {
         : accessCentral.AccessLevels.STANDARD,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
-        if (textTools.trimSpace(text.join('')).length === 0) {
-          return;
-        }
-
         const roomId = messageList.getRoomId();
         const room = roomComposer.getRoom({ roomId });
         const participantIds = room.isWhisper
@@ -135,6 +131,10 @@ class ChatView extends ViewWrapper {
             width: imagePreview.naturalWidth,
             height: imagePreview.naturalHeight,
           };
+        }
+
+        if (!image && textTools.trimSpace(text.join('')).length === 0) {
+          return;
         }
 
         messageComposer.sendMessage({
@@ -176,7 +176,7 @@ class ChatView extends ViewWrapper {
       components: [{ component: roomInfo }],
       classes: ['columnChat'],
     };
-    const roomListComponent = {
+    const roomListColumn = {
       components: [
         { component: roomFollowingList },
         { component: whisperRoomList },
@@ -209,14 +209,14 @@ class ChatView extends ViewWrapper {
 
       switch (roomListPlacement) {
         case 'left': {
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
           columns.push(mainColumn);
 
           break;
         }
         default: {
           columns.push(mainColumn);
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
 
           break;
         }

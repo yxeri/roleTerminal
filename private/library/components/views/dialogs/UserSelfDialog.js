@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Carmilla Mina Jankovic
+ Copyright 2019 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,117 +15,141 @@
  */
 
 const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const userComposer = require('../../../data/composers/UserComposer');
 const positionComposer = require('../../../data/composers/PositionComposer');
-// const invititationComposer = require('../../../data/composers/InvitationComposer');
-// const teamComposer = require('../../../data/composers/TeamComposer');
 const eventCentral = require('../../../EventCentral');
-// const storageManager = require('../../../StorageManager');
-// const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
+
+const ids = {
+  PICTURE: 'picture',
+};
 
 class UserSelfDialog extends BaseDialog {
   constructor({
     classes = [],
-    elementId = `uSDialog-${Date.now()}`,
+    elementId = `uDialog-${Date.now()}`,
   }) {
-    const currentUser = userComposer.getCurrentUser();
+    const user = userComposer.getCurrentUser();
     const {
+      image,
+      partOfTeams,
+      fullName,
       username,
       objectId: userId,
-      partOfTeams = [],
-    } = currentUser;
-    const partOfTeamsText = partOfTeams.length > 0
-      ? partOfTeams
-      : [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'none' })];
-    const userPosition = positionComposer.getPosition({ positionId: userId });
-    const positionLabel = userPosition && userPosition.coordinates
-      ? `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
-      (${userPosition.lastUpdated}): Lat ${userPosition.coordinates.latitude} Long ${userPosition.coordinates.longitude}`
-      : labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
+    } = user;
+    const userPosition = positionComposer.getPosition({ positionId: user.objectId });
 
+    const inputs = [
+      elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-userSelf',
+      }),
+    ];
     const lowerButtons = [
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'done' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
         clickFuncs: {
           leftFunc: () => {
             this.removeFromView();
           },
         },
       }),
+      // elementCreator.createButton({
+      //   text: labelHandler.getLabel({ baseObject: 'UserSelfDialog', label: 'rename' }),
+      //   clickFuncs: {
+      //     leftFunc: () => {
+      //       const renameDialog = new BaseDialog({
+      //         inputs: [
+      //           elementCreator.createInput({
+      //             elementId: 'username',
+      //             inputName: 'username',
+      //             type: 'text',
+      //             isRequired: true,
+      //             maxLength: 10,
+      //             placeholder: labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'username' }),
+      //           }),
+      //         ],
+      //         lowerButtons: [
+      //           elementCreator.createButton({
+      //             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+      //             clickFuncs: {
+      //               leftFunc: () => { renameDialog.removeFromView(); },
+      //             },
+      //           }),
+      //           elementCreator.createButton({
+      //             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+      //             clickFuncs: {
+      //               leftFunc: () => {
+      //                 if (this.hasEmptyRequiredInputs()) {
+      //                   return;
+      //                 }
+      //
+      //                 userComposer.updateUsername({
+      //                   userId,
+      //                   username: renameDialog.getInputValue('username'),
+      //                   callback: ({ error: updateError }) => {
+      //                     if (updateError) {
+      //                       console.log('Failed to update username');
+      //
+      //                       return;
+      //                     }
+      //
+      //                     const parentElement = renameDialog.getParentElement();
+      //
+      //                     renameDialog.removeFromView();
+      //                     this.addToView({ element: parentElement });
+      //                   },
+      //                 });
+      //               },
+      //             },
+      //           }),
+      //         ],
+      //       });
+      //
+      //       renameDialog.addToView({ element: this.getParentElement() });
+      //       this.removeFromView();
+      //     },
+      //   },
+      // }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'UserSelfDialog', label: 'rename' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
         clickFuncs: {
           leftFunc: () => {
-            const renameDialog = new BaseDialog({
-              inputs: [
-                elementCreator.createInput({
-                  elementId: 'username',
-                  inputName: 'username',
-                  type: 'text',
-                  isRequired: true,
-                  maxLength: 10,
-                  placeholder: labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'username' }),
-                }),
-              ],
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => { this.removeFromView(); },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      if (this.hasEmptyRequiredInputs()) {
-                        return;
-                      }
+            if (this.hasEmptyRequiredInputs()) {
+              return;
+            }
 
-                      userComposer.updateUsername({
-                        userId,
-                        username,
-                        callback: ({ error: updateError }) => {
-                          if (updateError) {
-                            console.log('Failed to update username');
+            const params = {
+              userId,
+              callback: ({ error }) => {
+                if (error) {
+                  console.log(error);
 
-                            return;
-                          }
+                  return;
+                }
 
-                          const parentElement = renameDialog.getParentElement();
+                this.removeFromView();
+              },
+            };
+            const imagePreview = document.getElementById('imagePreview-userSelf');
 
-                          renameDialog.removeFromView();
-                          this.addToView({ element: parentElement });
-                        },
-                      });
-                    },
-                  },
-                }),
-              ],
-            });
+            if (imagePreview.getAttribute('src')) {
+              params.image = {
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              };
+            }
 
-            renameDialog.addToView({ element: this.getParentElement() });
-            this.removeFromView();
-          },
-        },
-      }),
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'Button', label: 'leaveTeam' }),
-        clickFuncs: {
-          leftFunc: () => {
-            const verifyDialog = new VerifyDialog({
-              callback: () => {},
-            });
+            console.log('update user ', params);
 
-            verifyDialog.addToView({
-              element: this.getParentElement(),
-            });
-            this.removeFromView();
+            userComposer.updateUser(params);
           },
         },
       }),
@@ -139,8 +163,8 @@ class UserSelfDialog extends BaseDialog {
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
 
             eventCentral.emitEvent({
-              event: eventCentral.Events.FOCUS_USER_MAPPOSITION,
-              params: { userId },
+              event: eventCentral.Events.FOCUS_MAPPOSITION,
+              params: { position: userPosition },
             });
 
             this.removeFromView();
@@ -152,16 +176,38 @@ class UserSelfDialog extends BaseDialog {
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
       '',
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${username}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`,
     ];
 
+    if (fullName) {
+      upperText.push(fullName);
+    }
+
+    upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${username}`);
+
+    if (partOfTeams && partOfTeams.length > 0) {
+      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeams}`);
+    }
+
+    if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
+      const positionLabel = `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
+
+      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+    }
+
+    const images = [];
+
+    if (image) {
+      images.push(elementCreator.createPicture({
+        picture: image,
+      }));
+    }
     super({
       elementId,
       lowerButtons,
       upperText,
-      classes: classes.concat(['UserDialog']),
+      images,
+      inputs,
+      classes: classes.concat(['userSelfDialog']),
     });
   }
 }

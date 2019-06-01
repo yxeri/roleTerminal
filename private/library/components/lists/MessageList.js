@@ -52,6 +52,16 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      imageInfo: {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+        show: true,
+        getImage: (userId) => { return userComposer.getImage(userId); },
+      },
+      collapseEqual: {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+      },
       sorting: {
         paramName: 'customTimeCreated',
         fallbackParamName: 'timeCreated',

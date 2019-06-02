@@ -22,6 +22,7 @@ const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
+const userComposer = require('../../data/composers/UserComposer');
 
 class UserList extends List {
   constructor({
@@ -29,6 +30,7 @@ class UserList extends List {
     shouldFocusOnClick,
     minimumAccessLevel,
     effect,
+    showImage = true,
     classes = [],
     elementId = `userList-${Date.now()}`,
   }) {
@@ -39,7 +41,7 @@ class UserList extends List {
       fallbackTo: 'aliasName',
     }];
 
-    super({
+    const params = {
       elementId,
       classes,
       title,
@@ -87,7 +89,18 @@ class UserList extends List {
       },
       collector: dataHandler.users,
       listItemFields: headerFields,
-    });
+    };
+
+    if (showImage) {
+      params.imageInfo = {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+        show: true,
+        getImage: (userId) => { return userComposer.getImage(userId); },
+      };
+    }
+
+    super(params);
   }
 
   getCollectorObjects() {

@@ -42,6 +42,7 @@ class ChatView extends ViewWrapper {
     allowImages,
     hideDate,
     fullDate,
+    showUserImage = true,
     titles = {
       rooms: 'Rooms',
       following: 'Following',
@@ -73,6 +74,7 @@ class ChatView extends ViewWrapper {
     });
     const userList = new UserList({
       effect,
+      showImage: showUserImage,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: titles.users,
       shouldFocusOnClick: false,

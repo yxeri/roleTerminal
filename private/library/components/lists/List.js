@@ -87,7 +87,6 @@ class List extends BaseView {
     shouldAppendImage,
     filter,
     appendClasses,
-    listItemFieldsClasses,
     sorting,
     title,
     listItemSpecificClasses,
@@ -95,6 +94,7 @@ class List extends BaseView {
     minimumAccessLevel,
     listType,
     collapseEqual,
+    listItemFieldsClasses = [],
     imageInfo = {},
     effect = false,
     shouldToggle = false,
@@ -540,6 +540,7 @@ class List extends BaseView {
               picture: image,
               classes: ['listItemImage'],
             }));
+            paragraphParams.classes.push('listItemWithImage');
           }
         }
 

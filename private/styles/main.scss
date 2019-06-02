@@ -26,7 +26,7 @@ $header-color: #2e001a;
 $border-color: #ff00d7;
 
 $p-margin: .4em;
-$border-width: .1em;
+$border-width: 1px;
 $status-bar-height: 1.3em;
 $map-box-padding: .5em;
 $padding: .3em;
@@ -358,11 +358,11 @@ label {
  * Chat View *
  *************/
 
-$msgList-msgInfo-border: .1em solid $border-color;
+$msgList-msgInfo-border: 1px solid $border-color;
 $msgList-li-padding: .5em;
 $msgList-msgLine-side-padding: .2em;
 $msgList-msgInfo-padding: .1em;
-$msgList-textarea-border: .1em solid $border-color;
+$msgList-textarea-border: 1px solid $border-color;
 
 .chatView {
   .msgList {
@@ -558,7 +558,7 @@ $msgList-textarea-border: .1em solid $border-color;
  * World Map *
  *************/
 
-$map-box-border-weight: .1em;
+$map-box-border-weight: 1px;
 $map-box-border: $map-box-border-weight solid $second-color;
 $map-box-left: .2em;
 $map-padding-fix: 2em;

@@ -258,6 +258,20 @@ label {
   }
 }
 
+.userList {
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  .listItemWithImage {
+    width: calc(100% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: normal;
+  }
+}
+
 /**********
  * Inputs *
  **********/
@@ -359,6 +373,13 @@ $msgList-textarea-border: .1em solid $border-color;
 
     li {
       padding-bottom: $msgList-li-padding;
+
+      .listItemImage {
+        border-right: $msgList-msgInfo-border;
+        border-top: $msgList-msgInfo-border;
+        border-bottom: $msgList-msgInfo-border;
+        margin-bottom: .2em;
+      }
     }
 
     .msgInfo {
@@ -366,6 +387,7 @@ $msgList-textarea-border: .1em solid $border-color;
       //border-bottom: $msgList-msgInfo-border;
       padding: $msgList-msgInfo-padding ($msgList-msgLine-side-padding / 2);
       margin-bottom: $p-margin;
+      margin-top: .2em;
 
       span {
         padding: 0 .2em;
@@ -383,6 +405,7 @@ $msgList-textarea-border: .1em solid $border-color;
     .msgLine {
       padding: 0 $msgList-msgLine-side-padding;
       margin-bottom: $p-margin;
+      clear: both;
     }
 
     .msgLine:last-child {
@@ -715,6 +738,12 @@ $map-padding-fix: 2em;
   li {
     padding: 0;
   }
+}
+
+.listItemImage {
+  max-width: 40px;
+  max-height: 40px;
+  float: left;
 }
 
 #screenFilter {

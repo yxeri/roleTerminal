@@ -20,6 +20,7 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const storageManager = require('../../../StorageManager');
 const userComposer = require('../../../data/composers/UserComposer');
+const socketManager = require('../../../SocketManager');
 
 const ids = {
   FULLNAME: 'fullName',
@@ -155,7 +156,19 @@ class RegisterDialog extends BaseDialog {
                   return;
                 }
 
-                this.removeFromView();
+                socketManager.login({
+                  username: this.getInputValue(ids.USERNAME),
+                  password: this.getInputValue(ids.PASSWORD),
+                  callback: ({ error: loginError }) => {
+                    if (loginError) {
+                      console.log(loginError);
+
+                      return;
+                    }
+
+                    this.removeFromView();
+                  }
+                });
               },
             };
             const imagePreview = document.getElementById('imagePreview-register');

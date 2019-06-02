@@ -257,6 +257,12 @@ class UserComposer extends DataComposer {
       return user.image;
     }
 
+    const alias = aliasComposer.getAlias({ aliasId: userId });
+
+    if (alias) {
+      return alias.image;
+    }
+
     return undefined;
   }
 }

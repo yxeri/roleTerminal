@@ -361,7 +361,7 @@ class ElementCreator {
     const imageInput = document.createElement('input');
     imageInput.classList.add('hide');
     imageInput.setAttribute('type', 'file');
-    imageInput.setAttribute('accept', 'image/png, image/jpeg');
+    imageInput.setAttribute('accept', 'image/png, image/jpeg, image/pjpeg');
     imageInput.addEventListener('change', () => {
       const file = imageInput.files[0];
       const reader = new FileReader();

@@ -434,12 +434,17 @@ $msgList-textarea-border: 1px solid $border-color;
         vertical-align: bottom;
         border: $border;
       }
+
+      button {
+        border-bottom: none;
+        border-left: none;
+      }
     }
 
     .sendButton {
       width: 3em;
       display: inline-block;
-      vertical-align: bottom;
+      vertical-align: top;
     }
   }
 

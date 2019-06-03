@@ -277,7 +277,8 @@ class TextTools {
     target,
     callback = () => {},
     amount = 5,
-    paragraphFunc = () => {},
+    charFunc = () => {
+    },
   }) {
     const paragraph = paragraphs.shift();
     let spans;
@@ -291,6 +292,7 @@ class TextTools {
       if (characters[0]) {
         span.appendChild(document.createTextNode(characters.join('')));
 
+        charFunc();
         setTimeout(() => {
           charAnimator({
             span,
@@ -311,7 +313,7 @@ class TextTools {
 
         span.textContent = '';
         paragraph.appendChild(span);
-        paragraphFunc();
+        charFunc();
 
         charAnimator({
           span,
@@ -323,7 +325,7 @@ class TextTools {
             amount,
             paragraphs,
             target,
-            paragraphFunc,
+            charFunc,
             callback,
           });
         }, 50);

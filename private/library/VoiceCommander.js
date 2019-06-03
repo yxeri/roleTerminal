@@ -31,6 +31,16 @@ class VoiceCommander {
       return;
     }
 
+    this.voiceListener.addCallback('errorPermissionBlocked', () => {
+      this.voiceListener.abort();
+      this.hasStarted = false;
+    });
+
+    this.voiceListener.addCallback('errorPermissionDenied', () => {
+      this.voiceListener.abort();
+      this.hasStarted = false;
+    });
+
     this.voiceListener.start({
       autoRestart: true,
       continuous: false,

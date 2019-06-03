@@ -616,7 +616,7 @@ class List extends BaseView {
       textTools.typewriter({
         paragraphs: children,
         target: newItem,
-        paragraphFunc: () => { this.scrollList(); },
+        charFunc: () => { this.scrollList(); },
       });
     } else if (shouldFlash) {
       newItem.classList.add(cssClasses.newListItem);

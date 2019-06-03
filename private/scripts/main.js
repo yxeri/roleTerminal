@@ -368,7 +368,7 @@ if (!tools.getQueryParameters().noFullscreen) {
   });
 }
 
-voiceCommander.start();
+// voiceCommander.start();
 voiceCommander.addCommands({
   activationString: labelHandler.getLabel({ baseObject: 'VoiceCommands', label: 'viewSwitch' }),
   commands: [

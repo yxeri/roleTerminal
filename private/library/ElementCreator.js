@@ -129,6 +129,7 @@ class ElementCreator {
     clickFuncs,
     classes,
     elementId,
+    isThumb = false,
     isUploaded = true,
   }) {
     const pictureElement = createBaseElement({
@@ -137,9 +138,17 @@ class ElementCreator {
       clickFuncs,
       elementType: 'img',
     });
-    const path = isUploaded
-      ? `/images/upload/${picture.fileName}`
-      : `/images/${picture.fileName}`;
+    let path = '/images/';
+
+    if (isUploaded) {
+      path += 'upload/';
+    }
+
+    if (isThumb) {
+      path += 'imgThumb-';
+    }
+
+    path += picture.fileName;
 
     pictureElement.setAttribute('src', path);
 

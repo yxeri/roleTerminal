@@ -537,6 +537,7 @@ class List extends BaseView {
 
           if (image) {
             listItemElements.push(elementCreator.createPicture({
+              isThumb: true,
               picture: image,
               classes: ['listItemImage'],
             }));

@@ -266,22 +266,24 @@ class List extends BaseView {
     const listClasses = [];
     this.lastObject = null;
 
-    if (this.shouldToggle) {
-      listClasses.push('hide');
-    }
-
     if (this.title) {
-      const clickFuncs = {
-        leftFunc: () => {
-          this.listElement.classList.toggle('hide');
+      const header = elementCreator.createHeader({
+        clickFuncs: {
+          leftFunc: () => {
+            this.listElement.classList.toggle('hide');
+            header.classList.toggle('expanded');
+          },
         },
-      };
-
-      elements.push(elementCreator.createHeader({
-        clickFuncs,
-        classes: ['toggle'],
+        classes: ['toggle', 'expanded'],
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
-      }));
+      });
+
+      if (this.shouldToggle) {
+        listClasses.push('hide');
+        header.classList.toggle('expanded');
+      }
+
+      elements.push(header);
     }
 
     this.listElement = elementCreator.createList({

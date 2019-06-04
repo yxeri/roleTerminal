@@ -58,6 +58,7 @@ class ChatView extends ViewWrapper {
   }) {
     const roomList = new RoomList({
       effect,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: titles.rooms,
     });
@@ -74,6 +75,7 @@ class ChatView extends ViewWrapper {
     });
     const userList = new UserList({
       effect,
+      shouldToggle: true,
       showImage: showUserImage,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: titles.users,

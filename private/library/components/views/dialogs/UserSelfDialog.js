@@ -44,6 +44,7 @@ class UserSelfDialog extends BaseDialog {
 
     const inputs = [
       elementCreator.createImageInput({
+        buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,

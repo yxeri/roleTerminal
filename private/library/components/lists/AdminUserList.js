@@ -101,8 +101,6 @@ class AdminUserList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          console.log('objectid', objectId);
-
           const userId = objectId;
           const { isBanned, isVerified, username } = userComposer.getUser({ userId: objectId });
 

@@ -30,6 +30,7 @@ class RoomList extends List {
     title,
     minimumAccessLevel,
     effect,
+    shouldToggle,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -41,6 +42,7 @@ class RoomList extends List {
       elementId,
       classes,
       effect,
+      shouldToggle,
       sorting: {
         paramName: 'roomName',
       },

@@ -16,6 +16,7 @@
 
 const mouseHandler = require('./MouseHandler');
 const textTools = require('./TextTools');
+const labelHandler = require('./labels/LabelHandler');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
@@ -152,8 +153,17 @@ class ElementCreator {
 
     pictureElement.setAttribute('src', path);
 
-    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
-    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
+    if (picture.width) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`);
+    }
+
+    if (picture.height) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`);
+    }
+
+    pictureElement.addEventListener('load', () => {
+      pictureElement.setAttribute('style', pictureElement.getAttribute('style').replace(`height: ${picture.height}px;`, ''));
+    });
 
     return pictureElement;
   }
@@ -358,6 +368,7 @@ class ElementCreator {
     inputName,
     elementId,
     classes,
+    buttonText = labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'image' }),
     previewId = 'imagePreview',
     previewContainer = document.createElement('img'),
     appendPreview = false,
@@ -387,7 +398,7 @@ class ElementCreator {
     previewContainer.setAttribute('id', previewId);
 
     container.appendChild(this.createButton({
-      text: 'Image',
+      text: buttonText,
       clickFuncs: {
         leftFunc: () => {
           imageInput.click();

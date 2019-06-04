@@ -33,7 +33,6 @@ const menuBar = new MenuBar({
     room: true,
     view: true,
     docFile: true,
-    currentUser: true,
   },
 });
 const adminUserList = new AdminUserList({});

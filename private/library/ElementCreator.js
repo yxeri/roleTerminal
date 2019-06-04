@@ -16,6 +16,7 @@
 
 const mouseHandler = require('./MouseHandler');
 const textTools = require('./TextTools');
+const labelHandler = require('./labels/LabelHandler');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
@@ -358,6 +359,7 @@ class ElementCreator {
     inputName,
     elementId,
     classes,
+    buttonText = labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'image' }),
     previewId = 'imagePreview',
     previewContainer = document.createElement('img'),
     appendPreview = false,
@@ -387,7 +389,7 @@ class ElementCreator {
     previewContainer.setAttribute('id', previewId);
 
     container.appendChild(this.createButton({
-      text: 'Image',
+      text: buttonText,
       clickFuncs: {
         leftFunc: () => {
           imageInput.click();

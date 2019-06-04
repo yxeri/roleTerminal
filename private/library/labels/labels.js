@@ -132,6 +132,9 @@ const labels = {
     send: (override.BaseDialog && override.BaseDialog.send) || {
       en: 'Send',
     },
+    image: (override.BaseDialog && override.BaseDialog.image) || {
+      en: 'Image',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -205,6 +208,12 @@ const labels = {
     },
   },
   RegisterDialog: {
+    info: (override.RegisterDialog && override.RegisterDialog.info) || {
+      en: 'Enter your user information.',
+    },
+    registerUser: (override.RegisterDialog && override.RegisterDialog.registerUser) || {
+      en: 'User registration',
+    },
     username: (override.RegisterDialog && override.RegisterDialog.username) || {
       en: 'Username [a-z 0-9 -_]',
       se: 'Användarnamn [a-z 0-9 -_]',
@@ -233,22 +242,29 @@ const labels = {
       en: 'Intro',
     },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
-      en: 'The user name must be be 2 - 40 characters long.',
-      se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
+      en: 'The user name can be max 40 characters long.',
+      se: 'Användarnamnet får max vara 40 tecken långt.',
     },
     passwordLength: (override.RegisterDialog && override.RegisterDialog.passwordLength) || {
-      en: 'The password must be be 4 - 40 characters long.',
-      se: 'Lösenordet måste vara 4 - 40 tecken långt.',
+      en: 'The password must be at least 3 characters long.',
+      se: 'Lösenordet måste vara minst 3 tecken långt.',
     },
     descriptionLength: (override.RegisterDialog && override.RegisterDialog.descriptionLength) || {
       en: 'The description cannot be more than 500 characters',
     },
     invalidCharacters: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
-      en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',
-      se: 'Otillåtna tecken i användarnamnet/hela namnet. Tillåtna tecken: a-z 0-9 -_',
+      en: 'Invalid characters in the username. Allowed characters: a-ö 0-9 -_',
+      se: 'Otillåtna tecken i användarnamnet. Tillåtna tecken: a-ö 0-9 -_',
     },
     alreadyExists: (override.RegisterDialog && override.RegisterDialog.alreadyExists) || {
-      en: 'User already exists',
+      en: 'User already exists.',
+    },
+    invalidFullName: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
+      en: 'Invalid characters in the full name. Allowed characters: a-ö 0-9 -_',
+      se: 'Otillåtna tecken i hela namnet. Tillåtna tecken: a-ö 0-9 -_',
+    },
+    image: (override.RegisterDialog && override.RegisterDialog.image) || {
+      en: 'Profile picture',
     },
   },
   RoomDialog: {

@@ -33,6 +33,7 @@ $padding: .3em;
 $border: $border-width solid $border-color;
 $menu-min-width: 7em;
 $menu-max-width: 11em;
+$button-margin: .2em;
 
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
@@ -169,6 +170,16 @@ label {
   background-color: $second-color;
 }
 
+.toggle:after {
+  content: '+';
+  float: right;
+}
+
+.expanded:after {
+  content: '-';
+  float: right;
+}
+
 /****************
  * View Wrapper *
  ****************/
@@ -215,13 +226,13 @@ label {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   background-color: $background-color;
-  border: $border-width solid $text-color;
+  border: $border;
   position: absolute;
   top: 2em;
   left: 0;
   right: 0;
   margin: 0 auto;
-  padding: .5em;
+  padding: $padding;
   z-index: 10;
   box-shadow: 2px 0 5px black;
   -webkit-box-shadow: 2px 0 5px black;
@@ -236,16 +247,35 @@ label {
     margin-bottom: 0;
   }
 
-  #lowerButtons {
-    float: right;
-    padding-top: $p-margin;
+  .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {
+    display: none;
+  }
 
-    span {
-      margin-right: $p-margin;
+  .lowerButtons, .lowerText, .inContainer, .imagesContainer {
+    padding-bottom: $padding;
+    padding-top: $padding;
+  }
+
+  .upperText {
+    padding-bottom: $padding / 2;
+    margin-bottom: $padding / 2;
+    border-bottom: $border;
+    text-transform: uppercase;
+  }
+
+  div:last-child {
+    padding-bottom: 0;
+  }
+
+  .lowerButtons {
+    float: right;
+
+    .button {
+      margin-left: $padding;
     }
 
-    span:last-child {
-      margin-right: 0;
+    .button:first-child {
+      margin-left: 0;
     }
   }
 }
@@ -265,7 +295,7 @@ label {
   }
 
   .listItemWithImage {
-    width: calc(100% - 40px);
+    width: calc(100% - 40px - .1em);
     overflow: hidden;
     text-overflow: ellipsis;
     word-wrap: normal;
@@ -487,7 +517,10 @@ $msgList-textarea-border: 1px solid $border-color;
  */
 
 .list {
-  word-wrap: break-word;
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 .columnList {
@@ -746,9 +779,11 @@ $map-padding-fix: 2em;
 }
 
 .listItemImage {
+  border-style: none;
   max-width: 40px;
   max-height: 40px;
   float: left;
+  margin-right: .1em;
 }
 
 #screenFilter {

@@ -153,8 +153,17 @@ class ElementCreator {
 
     pictureElement.setAttribute('src', path);
 
-    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
-    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
+    if (picture.width) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`);
+    }
+
+    if (picture.height) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`);
+    }
+
+    pictureElement.addEventListener('load', () => {
+      pictureElement.setAttribute('style', pictureElement.getAttribute('style').replace(`height: ${picture.height}px;`, ''));
+    });
 
     return pictureElement;
   }

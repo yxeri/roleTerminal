@@ -37,6 +37,8 @@ class RegisterDialog extends BaseDialog {
     classes = [],
     elementId = `rDialog-${Date.now()}`,
   }) {
+    const upperText = [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'registerUser' })];
+    const lowerText = [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'info' })];
     const inputs = [
       elementCreator.createInput({
         elementId: ids.USERNAME,
@@ -50,7 +52,7 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.FULLNAME,
         inputName: 'fullName',
         type: 'text',
-        maxLength: 20,
+        maxLength: 40,
         isRequired: requireFullName,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
       }),
@@ -146,7 +148,18 @@ class RegisterDialog extends BaseDialog {
                       }
                     }
                   } else if (error.type === 'invalid characters') {
-                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
+                    switch (error.extraData.param) {
+                      case 'fullName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidFullName' })] });
+
+                        break;
+                      }
+                      default: {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidCharacters' })] });
+
+                        break;
+                      }
+                    }
                   } else if (error.type === 'already exists') {
                     this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'alreadyExists' })] });
                   } else {
@@ -192,6 +205,8 @@ class RegisterDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      lowerText,
+      upperText,
       classes: classes.concat(['registerDialog']),
     });
   }

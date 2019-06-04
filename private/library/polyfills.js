@@ -176,3 +176,11 @@ if (!Array.prototype.forEach) {
     // 8. return undefined.
   };
 }
+
+// https://stackoverflow.com/questions/42830257/alternative-version-for-object-values
+if (!Object.values) Object.values = o=>Object.keys(o).map(k=>o[k]);
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+Number.isNaN = Number.isNaN || function(value) {
+  return value !== value;
+}

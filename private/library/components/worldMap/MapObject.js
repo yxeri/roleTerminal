@@ -187,7 +187,7 @@ class MapObject {
         this.showLabel();
       },
       outFunc: () => {
-        if (labelStyle && labelStyle.minZoomLevel && this.worldMap.getZoom() < labelStyle.minZoomLevel) {
+        if ((labelStyle && labelStyle.minZoomLevel && this.worldMap.getZoom() < labelStyle.minZoomLevel) || !this.alwaysShowLabel) {
           this.hideLabel();
         }
       },
@@ -200,7 +200,7 @@ class MapObject {
           zoomLevel,
           map: worldMap,
         }) => {
-          if (zoomLevel >= labelStyle.minZoomLevel) {
+          if (this.alwaysShowLabel && zoomLevel >= labelStyle.minZoomLevel) {
             this.showLabel(worldMap);
           } else {
             this.hideLabel();

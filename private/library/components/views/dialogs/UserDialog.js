@@ -150,25 +150,25 @@ class UserDialog extends BaseDialog {
       }));
     }
 
-    const upperText = [
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
-      '',
-    ];
+    const upperText = [`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`];
+    const lowerText = [];
 
     if (chosenIdentity.fullName) {
-      upperText.push(chosenIdentity.fullName);
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'fullName' })}: ${chosenIdentity.fullName}`);
     }
 
-    upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`);
+    lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`);
 
     if (partOfTeams && partOfTeams.length > 0) {
-      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${chosenIdentity.partOfTeams}`);
+      const teamNames = chosenIdentity.partOfTeams.map(teamId => teamComposer.getTeamName({ teamId })).join(', ');
+
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${teamNames}`);
     }
 
     if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
       const positionLabel = `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
 
-      upperText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
     }
 
     const images = [];
@@ -184,8 +184,9 @@ class UserDialog extends BaseDialog {
     super({
       elementId,
       lowerButtons,
-      upperText,
+      lowerText,
       images,
+      upperText,
       classes: classes.concat(['userDialog']),
     });
   }

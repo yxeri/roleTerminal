@@ -122,6 +122,7 @@ class RoomDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      upperText: [labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'createRoom' })],
       classes: classes.concat(['RoomDialog']),
     });
   }

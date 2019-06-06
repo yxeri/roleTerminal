@@ -59,9 +59,8 @@ class TeamDialog extends BaseDialog {
       }),
     ];
 
-    const upperText = [
-      `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamInfo' })}`,
-      '',
+    const upperText = [`${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamInfo' })}`];
+    const lowerText = [
       `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamName' })}: ${teamName} [${shortName}]`,
       `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'members' })}: ${members.map(member => userComposer.getIdentityName({ objectId: member })).join(', ')}`,
       `${labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'location' })}: ${locationName || 'unknown'}`,
@@ -70,8 +69,9 @@ class TeamDialog extends BaseDialog {
     super({
       elementId,
       lowerButtons,
+      lowerText,
       upperText,
-      classes: classes.concat(['TeamDialog']),
+      classes: classes.concat(['teamDialog']),
     });
   }
 }

@@ -165,6 +165,7 @@ class DocFileDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      upperText: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'createDoc' })],
       classes: classes.concat(['DocFileDialog']),
     });
   }

@@ -67,7 +67,7 @@ class MessageList extends List {
         fallbackParamName: 'timeCreated',
       },
       listItemClickFuncs: {
-        onlyListItemFields: true,
+        needsAccess: true,
         leftFunc: (objectId) => {
           const message = messageComposer.getMessage({ messageId: objectId });
           const {

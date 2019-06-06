@@ -396,6 +396,7 @@ class ElementCreator {
     });
 
     previewContainer.setAttribute('id', previewId);
+    previewContainer.classList.add('imagePreview');
 
     container.appendChild(this.createButton({
       text: buttonText,

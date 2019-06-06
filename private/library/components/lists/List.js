@@ -49,6 +49,7 @@ const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
+const accessCentral = require('../../AccessCentral');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -456,6 +457,10 @@ class List extends BaseView {
         socketManager.checkAndReconnect();
       },
     };
+    const { hasAccess } = accessCentral.hasAccessTo({
+      objectToAccess: object,
+      toAuth: userComposer.getCurrentUser(),
+    });
 
     if (this.listItemSpecificClasses) {
       this.listItemSpecificClasses.forEach((item) => {
@@ -470,7 +475,7 @@ class List extends BaseView {
       });
     }
 
-    if (this.listItemClickFuncs.right) {
+    if (this.listItemClickFuncs.right && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
       clickFuncs.right = () => {
         this.listItemClickFuncs.right(objectId);
       };
@@ -524,10 +529,10 @@ class List extends BaseView {
 
         const paragraphParams = {
           elements,
-          classes: this.listItemFieldsClasses,
+          classes: [],
         };
 
-        if (this.listItemClickFuncs.onlyListItemFields) {
+        if (this.listItemClickFuncs.onlyListItemFields && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
           paragraphParams.clickFuncs = clickFuncs;
         }
 
@@ -546,6 +551,8 @@ class List extends BaseView {
             paragraphParams.classes.push('listItemWithImage');
           }
         }
+
+        paragraphParams.classes = paragraphParams.classes.concat(this.listItemFieldsClasses);
 
         listItemElements.push(elementCreator.createParagraph(paragraphParams));
       }
@@ -588,7 +595,7 @@ class List extends BaseView {
       elements: listItemElements,
     };
 
-    if (!this.listItemClickFuncs.onlyListItemFields) {
+    if (!this.listItemClickFuncs.onlyListItemFields && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
       listItemParams.clickFuncs = clickFuncs;
     }
 

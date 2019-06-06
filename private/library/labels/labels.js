@@ -72,7 +72,7 @@ const labels = {
       se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
     },
     wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
-      en: 'Transfer currency',
+      en: 'Payment',
     },
     currency: (override.BaseDialog && override.BaseDialog.currency) || {
       en: 'currency',
@@ -153,6 +153,9 @@ const labels = {
       en: 'Incorrect code. Try again.',
       se: 'Fel kod. Försök igen',
     },
+    protectedDoc: (override.LockedDocFileDialog && override.LockedDocFileDialog.protectedDoc) || {
+      en: 'Protected file',
+    },
   },
   LockedRoomDialog: {
     isLocked: (override.LockedRoomDialog && override.LockedRoomDialog.isLocked) || {
@@ -170,6 +173,9 @@ const labels = {
     },
     accessDenied: (override.LockedRoomDialog && override.LockedRoomDialog.accessDenied) || {
       en: 'Access denied',
+    },
+    protectedRoom: (override.LockedRoomDialog && override.LockedRoomDialog.protectedRoom) || {
+      en: 'Protected room',
     },
   },
   DocFileDialog: {
@@ -193,6 +199,9 @@ const labels = {
     textLength: (override.DocFileDialog && override.DocFileDialog.textLength) || {
       en: 'The text is too long',
     },
+    createDoc: (override.DocFileDialog && override.DocFileDialog.createDoc) || {
+      en: 'Create document',
+    },
   },
   AliasDialog: {
     aliasName: (override.AliasDialog && override.AliasDialog.aliasName) || {
@@ -205,6 +214,9 @@ const labels = {
     fullName: (override.AliasDialog && override.AliasDialog.fullName) || {
       en: 'Full name',
       se: 'Hela namnet',
+    },
+    createAlias: (override.AliasDialog && override.AliasDialog.createAlias) || {
+      en: 'Create alias',
     },
   },
   RegisterDialog: {
@@ -239,7 +251,7 @@ const labels = {
       se: 'Användare existerar redan.',
     },
     description: (override.RegisterDialog && override.RegisterDialog.description) || {
-      en: 'Intro',
+      en: 'Description',
     },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
       en: 'The user name can be max 40 characters long.',
@@ -268,16 +280,16 @@ const labels = {
     },
   },
   RoomDialog: {
-    password: (override.RoomDialog && override.RoomDialog.invalidCharacters) || {
-      en: 'Password to access the room',
-      se: 'Lösenordet för att komma åt rummet',
+    password: (override.RoomDialog && override.RoomDialog.password) || {
+      en: '(Optional) Password to access the room',
+      se: '(Valfritt) Lösenordet för att komma åt rummet',
     },
     repeatPassword: (override.RoomDialog && override.RoomDialog.repeatPassword) || {
       en: 'Repeat password',
       se: 'Skriv in lösenordet igen',
     },
     roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
-      en: 'Name of the room',
+      en: 'Room name',
       se: 'Rummets namn',
     },
     changePassword: (override.RoomDialog && override.RoomDialog.changePassword) || {
@@ -292,7 +304,15 @@ const labels = {
       se: 'Ta bort lösenordet',
     },
     invite: (override.RoomDialog && override.RoomDialog.invite) || {
-      en: 'Invite',
+      en: 'Invite user',
+    },
+    createRoom: (override.RoomDialog && override.RoomDialog.createRoom) || {
+      en: 'Create room',
+    },
+  },
+  EditRoomDialog: {
+    editRoom: (override.EditRoomDialog && override.EditRoomDialog.editRoom) || {
+      en: 'Edit room',
     },
   },
   RoomUpdateDialog: {
@@ -484,13 +504,16 @@ const labels = {
       en: 'You have',
     },
     sendingFrom: (override.WalletDialog && override.WalletDialog.sendingFrom) || {
-      en: 'Using wallet for',
+      en: 'Transferring from',
     },
     sendingTo: (override.WalletDialog && override.WalletDialog.sendingTo) || {
-      en: 'You are transferring to user',
+      en: 'Transferring to user',
     },
     sendingToTeam: (override.WalletDialog && override.WalletDialog.sendingToTeam) || {
-      en: 'You are transferring to team',
+      en: 'Transferring to team',
+    },
+    transfer: (override.WalletDialog && override.WalletDialog.transfer) || {
+      en: 'Transfer',
     },
   },
   UserDialog: {
@@ -498,7 +521,7 @@ const labels = {
       en: 'User information',
     },
     partOfTeam: (override.UserDialog && override.UserDialog.partOfTeam) || {
-      en: 'Part of teams',
+      en: 'Teams',
     },
     position: (override.UserDialog && override.UserDialog.position) || {
       en: 'Tracking coordinates',
@@ -546,6 +569,12 @@ const labels = {
     },
     shortNameLength: (override.TeamDialog && override.TeamDialog.shortNameLength) || {
       en: 'The short name is too long',
+    },
+    teamInfo: (override.TeamDialog && override.TeamDialog.teamInfo) || {
+      en: 'Team information',
+    },
+    createTeam: (override.TeamDialog && override.TeamDialog.createTeam) || {
+      en: 'Create team',
     },
   },
   TransactionList: {

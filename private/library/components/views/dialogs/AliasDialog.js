@@ -30,6 +30,7 @@ class AliasDialog extends BaseDialog {
     classes = [],
     elementId = `aDialog-${Date.now()}`,
   }) {
+    const upperText = [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'createAlias' })];
     const inputs = [
       elementCreator.createInput({
         elementId: ids.ALIASNAME,
@@ -104,6 +105,7 @@ class AliasDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      upperText,
       classes: classes.concat(['AliasDialog']),
     });
   }

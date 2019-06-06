@@ -87,20 +87,22 @@ class WalletDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
       }),
     ];
-    const upperText = [
-      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingFrom', appendSpace: true })}${thisIdentityName}.`,
-      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave', appendSpace: true })}${walletAmount}.`,
+    const upperText = [labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'transfer' })];
+    const lowerText = [
+      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingFrom' })}: ${thisIdentityName}.`,
       isTeam
-        ? `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam', appendSpace: true })}${identityName}.`
-        : `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingTo', appendSpace: true })}${identityName}.`,
+        ? `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam' })}: ${identityName}.`
+        : `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingTo' })}: ${identityName}.`,
+      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave', appendSpace: true })}${walletAmount}.`,
     ];
 
     super({
       elementId,
       lowerButtons,
       inputs,
+      lowerText,
       upperText,
-      classes: classes.concat(['WalletDialog']),
+      classes: classes.concat(['walletDialog']),
     });
   }
 }

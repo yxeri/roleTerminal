@@ -100,12 +100,14 @@ class TeamCreateDialog extends BaseDialog {
         },
       }),
     ];
+    const upperText = [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'createTeam' })];
 
     super({
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['TeamDialog']),
+      upperText,
+      classes: classes.concat(['teamDialog']),
     });
   }
 }

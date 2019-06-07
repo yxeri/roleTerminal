@@ -150,6 +150,10 @@ class MenuBar extends BaseView {
           : accessCentral.AccessLevels.ANONYMOUS,
         element: registerButton,
       });
+      accessCentral.addAccessElement({
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+        element: profileButton,
+      });
 
       items.push({
         elements: [loginButton],

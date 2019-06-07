@@ -191,13 +191,9 @@ const worldMapParams = {
     listItemFields: [{
       paramName: 'objectId',
       convertFunc: (objectId) => {
-        const user = userComposer.getUser({ userId: objectId });
+        const name = userComposer.getIdentityName({ objectId });
 
-        if (user) {
-          return user.username;
-        }
-
-        return objectId.slice(0, 10);
+        return name || objectId;
       },
     }],
     zoomLevel: 18,

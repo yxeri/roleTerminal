@@ -119,8 +119,8 @@ class MapObject {
     this.label = label || new Label({
       labelStyle,
       coordinates: this.getCenter(),
-      text: this.position.connectedToUser
-        ? (userComposer.getIdentityName({ objectId: this.position.connectedToUser }) || this.position.positionName)
+      text: this.position.positionType === 'user'
+        ? (userComposer.getIdentityName({ objectId: this.position.objectId }) || this.position.positionName)
         : this.position.positionName,
     });
     this.style = style;

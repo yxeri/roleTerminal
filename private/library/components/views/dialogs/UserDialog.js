@@ -166,7 +166,7 @@ class UserDialog extends BaseDialog {
     }
 
     if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
-      const positionLabel = `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
+      const positionLabel = `(${userPosition.lastUpdated}) Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
 
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
     }

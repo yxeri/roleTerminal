@@ -524,7 +524,7 @@ const labels = {
       en: 'Teams',
     },
     position: (override.UserDialog && override.UserDialog.position) || {
-      en: 'Tracking coordinates',
+      en: 'Coordinates',
     },
     lastSeenAt: (override.UserDialog && override.UserDialog.lastSeenAt) || {
       en: 'Last seen at',

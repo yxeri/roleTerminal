@@ -36,7 +36,7 @@ class TransactionList extends List {
         convertFunc: (time) => {
           const timestamp = textTools.generateTimestamp({ date: time });
 
-          return `${timestamp.fullDate} - ${timestamp.fullTime}`;
+          return `${timestamp.fullDate} ${timestamp.fullTime}`;
         },
       }, {
         paramName: 'fromWalletId',
@@ -46,23 +46,12 @@ class TransactionList extends List {
       }, {
         paramName: 'toWalletId',
         convertFunc: (toWalletId) => {
-          return `${walletComposer.getWalletOwnerName({ walletId: toWalletId }) || toWalletId}.`;
+          return `${walletComposer.getWalletOwnerName({ walletId: toWalletId }) || toWalletId}`;
         },
       }, {
         paramName: 'amount',
         convertFunc: (amount) => {
-          return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'amount' })}: ${amount}.`;
-        },
-      }, {
-        paramName: 'coordinates',
-        convertFunc: (coordinates) => {
-          if (coordinates) {
-            const { longitude, latitude } = coordinates;
-
-            return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'sentFrom' })}: Latitude ${latitude} Longitude ${longitude}`;
-          }
-
-          return '';
+          return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'amount' })}: ${amount}`;
         },
       },
     ];
@@ -83,11 +72,6 @@ class TransactionList extends List {
         dataHandler.teams,
         dataHandler.wallets,
       ],
-      listItemClickFuncs: {
-        // leftFunc: (objectId) => {
-        //
-        // },
-      },
       collector: dataHandler.transactions,
       listItemFields: headerFields,
     });

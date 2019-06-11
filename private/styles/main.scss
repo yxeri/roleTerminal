@@ -16,6 +16,7 @@ $second-background-color: #23001e;
 $text-color: white;
 $second-text-color: #00ffef;
 $second-color: #ff00d7;
+$light-color: #4b003c;
 $darker-color: #23001e;
 $warning-color: #910001;
 $greyed-out: #6f6f6f;
@@ -30,6 +31,7 @@ $status-bar-height: 1.3em;
 $map-box-padding: .5em;
 $padding: .3em;
 $border: $border-width solid $second-color;
+$border-second: $border-width solid $light-color;
 $menu-min-width: 7em;
 $menu-max-width: 11em;
 $button-margin: .2em;
@@ -240,6 +242,10 @@ select {
     margin-bottom: 0;
   }
 
+  textarea {
+    height: 5em;
+  }
+
   .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {
     display: none;
   }
@@ -361,6 +367,14 @@ select {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   scrollbar-width: none;
+
+  .list {
+    margin-bottom: $padding;
+  }
+
+  li {
+    border-bottom: $border-second;
+  }
 }
 
 /**************
@@ -394,19 +408,19 @@ $msgList-msgLine-side-padding: .2em;
       padding-bottom: .5em;
 
       .listItemImage {
-        border-right: $border;
-        border-top: $border;
-        border-bottom: $border;
+        border-right: $border-second;
+        border-top: $border-second;
+        border-bottom: $border-second;
         margin-bottom: .2em;
       }
     }
 
     .msgInfo {
-      border-top: $border;
-      //border-bottom: $msgList-msgInfo-border;
+      border-top: $border-second;
       padding: .1em ($msgList-msgLine-side-padding / 2);
       margin-bottom: $p-margin;
       margin-top: .2em;
+      background-color: $darker-color;
 
       span {
         padding: 0 .2em;
@@ -474,9 +488,12 @@ $msgList-msgLine-side-padding: .2em;
   }
 
   .roomInfo {
+    border-top: $border;
     border-bottom: $border;
     color: $second-text-color;
     padding-left: $padding;
+    background-color: $darker-color;
+    text-align: center;
   }
 }
 
@@ -486,12 +503,19 @@ $msgList-msgLine-side-padding: .2em;
   }
 }
 
-.list {
-  padding-top: $padding;
-  margin-bottom: $padding;
-
+.transactionList {
   li {
-    padding: .1em .2em;
+    border-bottom: $border-second;
+  }
+}
+
+.list {
+  li {
+    padding: $padding;
+  }
+
+  li:last-child {
+    border-bottom: none;
   }
 
   header {
@@ -748,10 +772,6 @@ $map-padding-fix: 2em;
   }
 }
 
-.hide {
-  display: none;
-}
-
 .hideOverflow {
   overflow: hidden;
 }
@@ -777,6 +797,10 @@ $map-padding-fix: 2em;
   max-height: 40px;
   float: left;
   margin-right: .1em;
+}
+
+.hide {
+  display: none !important;
 }
 
 #screenFilter {

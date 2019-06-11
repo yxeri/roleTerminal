@@ -58,7 +58,7 @@ class RoomInfo extends ViewWrapper {
         return;
       }
 
-      nameSpan.appendChild(document.createTextNode(`${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'room' })}: ${foundRoom.roomName}`));
+      nameSpan.appendChild(document.createTextNode(foundRoom.roomName));
     };
 
     super({

@@ -58,6 +58,7 @@ class DocFileDialog extends BaseDialog {
         maxLength: 3500,
         multiLine: true,
         shouldResize: true,
+        isRequired: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
       elementCreator.createImageInput({
@@ -166,7 +167,7 @@ class DocFileDialog extends BaseDialog {
       inputs,
       lowerButtons,
       upperText: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'createDoc' })],
-      classes: classes.concat(['DocFileDialog']),
+      classes: classes.concat(['docFileDialog']),
     });
   }
 }

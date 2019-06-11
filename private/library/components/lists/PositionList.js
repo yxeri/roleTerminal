@@ -23,6 +23,10 @@ const positionComposer = require('../../data/composers/PositionComposer');
 class PositionList extends List {
   constructor(params) {
     const listParams = params;
+    listParams.sorting = {
+      paramName: 'positionName',
+      fallbackParamName: 'objectId',
+    };
     listParams.shouldToggle = typeof listParams.shouldToggle === 'boolean'
       ? listParams.shouldToggle
       : true;
@@ -83,8 +87,18 @@ class PositionList extends List {
     });
   }
 
+  shouldFilterItem(params) {
+    if (params.object.coordinatesHistory.length === 0) {
+      return false;
+    }
+
+    return super.shouldFilterItem(params);
+  }
+
   getCollectorObjects() {
-    return super.getCollectorObjects().filter(position => !/(^polygon)|(^line)/ig.test(position.positionName));
+    const positions = super.getCollectorObjects().filter(position => !/(^polygon)|(^line)/ig.test(position.positionName));
+
+    return positions.filter(position => position.coordinatesHistory.length !== 0);
   }
 }
 

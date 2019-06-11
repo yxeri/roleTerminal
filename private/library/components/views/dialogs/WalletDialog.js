@@ -82,7 +82,7 @@ class WalletDialog extends BaseDialog {
         elementId: 'walletAmount',
         inputName: 'walletAmount',
         isRequired: true,
-        maxLength: 6,
+        maxLength: 10,
         type: 'number',
         placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
       }),

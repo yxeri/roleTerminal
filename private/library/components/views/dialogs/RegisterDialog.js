@@ -181,7 +181,7 @@ class RegisterDialog extends BaseDialog {
                     }
 
                     this.removeFromView();
-                  }
+                  },
                 });
               },
             };

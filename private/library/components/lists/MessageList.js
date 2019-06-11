@@ -25,6 +25,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
 const messageComposer = require('../../data/composers/MessageComposer');
 const teamComposer = require('../../data/composers/TeamComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class MessageList extends List {
   /**
@@ -84,7 +85,7 @@ class MessageList extends List {
             });
 
             messageDialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           }
         },

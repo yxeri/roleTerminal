@@ -914,4 +914,50 @@ $map-padding-fix: 2em;
     left: 0;
     width: calc(100% - ((#{$map-box-padding} * 2) + (#{$border-width} * 2)));
   }
+
+  .chatView {
+    .columnList {
+      height: calc(1.8em + #{$border-width});
+      width: 100%;
+      display: flex;
+      display: -webkit-flex;
+      overflow: inherit;
+
+      .list {
+        flex-grow: 1;
+        -webkit-flex-grow: 1;
+
+        header {
+          text-align: center;
+        }
+
+        ul {
+          position: absolute;
+          height: calc(100% - 1.8em - #{$border-width} - #{$status-bar-height});
+          width: 100%;
+          left: 0;
+          overflow-y: auto;
+          background-color: $background-color;
+          z-index: 8;
+        }
+
+        .toggle:after {
+          content: '';
+        }
+
+        .expanded:after {
+          content: '';
+        }
+      }
+    }
+
+    .columnChat {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+
+    .oneOfTwo:first-child {
+      max-width: 100%;
+    }
+  }
 }

@@ -27,7 +27,7 @@ $header-color: #2e001a;
 
 $p-margin: .4em;
 $border-width: 1px;
-$status-bar-height: 1.3em;
+$status-bar-height: 1.6em;
 $map-box-padding: .5em;
 $padding: .3em;
 $border: $border-width solid $second-color;
@@ -218,7 +218,7 @@ select {
 
 .dialog {
   max-height: calc(99% - 4em);
-  max-width: 30em;
+  max-width: 40em;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -376,7 +376,7 @@ select {
   scrollbar-width: none;
 
   .list {
-    margin-bottom: $padding;
+    margin-bottom: $padding * 2;
   }
 
   li {
@@ -453,7 +453,6 @@ $msgList-msgLine-side-padding: .2em;
   }
 
   .inputArea {
-    padding-top: .2em;
     margin-top: auto;
 
     textarea {
@@ -482,6 +481,7 @@ $msgList-msgLine-side-padding: .2em;
 
     .sendButton {
       width: 3em;
+      height: 2.4em;
       display: inline-block;
       vertical-align: top;
     }
@@ -499,7 +499,7 @@ $msgList-msgLine-side-padding: .2em;
     border-top: $border;
     border-bottom: $border;
     color: $second-text-color;
-    padding-left: $padding;
+    padding: $padding;
     background-color: $darker-color;
     text-align: center;
   }
@@ -522,12 +522,8 @@ $msgList-msgLine-side-padding: .2em;
     padding: $padding;
   }
 
-  li:last-child {
-    border-bottom: none;
-  }
-
   header {
-    padding: 0 .2em;
+    padding: $padding;
   }
 }
 
@@ -549,12 +545,6 @@ $msgList-msgLine-side-padding: .2em;
     overflow: hidden;
   }
 }
-
-//.positionList {
-//  display: inline-block;
-//  border-bottom: 10px $darker-color solid;
-//  width: 20%;
-//}
 
 /*
  * A list item that has focus in a list.
@@ -719,7 +709,7 @@ $map-padding-fix: 2em;
   z-index: 8;
   color: $text-color;
   font-size: 1.1em;
-  height: 1.2em;
+  height: calc(#{$status-bar-height} - .2em);
 
   > span {
     margin-right: .5em;
@@ -743,6 +733,7 @@ $map-padding-fix: 2em;
     color: $darker-color;
     padding-left: .1em;
     padding-right: .1em;
+    padding-bottom: .2em;
   }
 
   .topMenu {
@@ -754,7 +745,7 @@ $map-padding-fix: 2em;
     max-height: calc(100% - 1.5em);
     overflow-y: scroll;
     border: $border;
-    bottom: 1.2em;
+    bottom: calc(#{$status-bar-height} - .2em);
     box-shadow: 2px 0 5px black;
     -webkit-box-shadow: 2px 0 5px black;
     scrollbar-width: none;
@@ -903,11 +894,11 @@ $map-padding-fix: 2em;
       }
 
       > .oneOfTwo {
-        border-right: 0;
+        border-right: none;
       }
 
       > .oneOfThree {
-        border-right: 0;
+        border-right: none;
       }
     }
   }

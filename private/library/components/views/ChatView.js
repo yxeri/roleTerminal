@@ -274,6 +274,18 @@ class ChatView extends ViewWrapper {
         }
       },
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        eventCentral.emitEvent({
+          event: eventCentral.Events.SWITCH_ROOM,
+          params: {
+            room: { objectId: storageManager.getPublicRoomId() },
+          },
+        });
+      },
+    });
   }
 
   addToView(params) {

@@ -361,7 +361,6 @@ class WorldMapPage extends BaseView {
 
     this.realignMap({
       useDefaultCoordinates: true,
-      markers: Object.keys(this.markers).map(markerId => this.markers[markerId]),
     });
 
     mouseHandler.addGMapsClickListener({

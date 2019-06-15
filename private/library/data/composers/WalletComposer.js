@@ -46,9 +46,14 @@ class WalletComposer extends DataComposer {
     walletId,
   }) {
     const wallet = this.getWallet({ walletId });
-    const walletOwner = teamComposer.getTeam({ teamId: walletId }) || userComposer.getIdentity({ objectId: wallet.ownerAliasId || wallet.ownerId });
 
-    return walletOwner.aliasName || walletOwner.username || walletOwner.teamName;
+    if (wallet) {
+      const walletOwner = teamComposer.getTeam({ teamId: walletId }) || userComposer.getIdentity({ objectId: wallet.ownerAliasId || wallet.ownerId });
+
+      return walletOwner.aliasName || walletOwner.username || walletOwner.teamName;
+    }
+
+    return undefined;
   }
 
   changeWalletAmount({

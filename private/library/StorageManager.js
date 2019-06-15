@@ -458,9 +458,13 @@ class StorageManager {
     const items = marked[listType];
 
     if (items) {
-      items.splice(items.findIndex(item => item.objectId === objectId), 1);
+      const index = items.findIndex(item => item.objectId === objectId);
 
-      marked[listType] = items;
+      if (index !== -1) {
+        items.splice(index, 1);
+
+        marked[listType] = items;
+      }
     }
 
     this.setMarked({ marked });

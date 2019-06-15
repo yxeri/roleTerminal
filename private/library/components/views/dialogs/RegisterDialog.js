@@ -15,12 +15,14 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const TemporaryDialog = require('./TemporaryDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const storageManager = require('../../../StorageManager');
 const userComposer = require('../../../data/composers/UserComposer');
 const socketManager = require('../../../SocketManager');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 const ids = {
   FULLNAME: 'fullName',
@@ -123,7 +125,7 @@ class RegisterDialog extends BaseDialog {
                 password: this.getInputValue(ids.PASSWORD),
                 registerDevice: storageManager.getDeviceId(),
               },
-              callback: ({ error }) => {
+              callback: ({ error, data }) => {
                 if (error) {
                   if (error.type === 'invalid length') {
                     switch (error.extraData.param) {
@@ -166,6 +168,19 @@ class RegisterDialog extends BaseDialog {
                   } else {
                     this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
                   }
+
+                  return;
+                }
+
+                if (!data.user.isVerified) {
+                  const dialog = new TemporaryDialog({
+                    text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'notVerified' })],
+                  });
+
+                  dialog.addToView({
+                    element: viewSwitcher.getParentElement(),
+                  });
+                  this.removeFromView();
 
                   return;
                 }

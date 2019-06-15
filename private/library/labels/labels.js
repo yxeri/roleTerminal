@@ -278,6 +278,9 @@ const labels = {
     image: (override.RegisterDialog && override.RegisterDialog.image) || {
       en: 'Profile picture',
     },
+    notVerified: (override.RegisterDialog && override.RegisterDialog.notVerified) || {
+      en: 'Your user has to be verified. Contact an administrator.',
+    },
   },
   RoomDialog: {
     password: (override.RoomDialog && override.RoomDialog.password) || {

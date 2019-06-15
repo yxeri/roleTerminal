@@ -52,7 +52,7 @@ class RoomInfo extends ViewWrapper {
         const identities = userComposer.getWhisperIdentities({ participantIds });
 
         nameSpan.appendChild(document.createTextNode(identities.length > 0
-          ? `${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'whisper' })}: ${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+          ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
           : ''));
 
         return;

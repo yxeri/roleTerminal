@@ -149,6 +149,11 @@ class SocketManager {
       func: () => {
         this.isOnline = false;
       },
+    }, {
+      event: this.EmitTypes.BAN,
+      func: () => {
+        this.logout({ callback: () => {} });
+      },
     }]);
 
     /**

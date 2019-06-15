@@ -64,12 +64,14 @@ class ChatView extends ViewWrapper {
     });
     const roomFollowingList = new RoomFollowingList({
       effect,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: titles.following,
     });
     const whisperRoomList = new WhisperRoomList({
       effect,
       whisperText,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       title: titles.whispers,
     });
@@ -81,6 +83,28 @@ class ChatView extends ViewWrapper {
       title: titles.users,
       shouldFocusOnClick: false,
     });
+
+    roomList.onToggle = () => {
+      roomFollowingList.hideList();
+      whisperRoomList.hideList();
+      userList.hideList();
+    };
+    roomFollowingList.onToggle = () => {
+      roomList.hideList();
+      whisperRoomList.hideList();
+      userList.hideList();
+    };
+    whisperRoomList.onToggle = () => {
+      roomFollowingList.hideList();
+      roomList.hideList();
+      userList.hideList();
+    };
+    userList.onToggle = () => {
+      roomFollowingList.hideList();
+      whisperRoomList.hideList();
+      roomList.hideList();
+    };
+
     const messageList = new MessageList({
       effect,
       whisperText,
@@ -248,6 +272,18 @@ class ChatView extends ViewWrapper {
         if (view.viewType === viewSwitcher.ViewTypes.CHAT) {
           this.messageList.scrollList();
         }
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        eventCentral.emitEvent({
+          event: eventCentral.Events.SWITCH_ROOM,
+          params: {
+            room: { objectId: storageManager.getPublicRoomId() },
+          },
+        });
       },
     });
   }

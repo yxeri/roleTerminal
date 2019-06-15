@@ -26,6 +26,7 @@ class RoomFollowingList extends List {
   constructor({
     title,
     effect,
+    shouldToggle,
     classes = [],
     elementId = `rFList-${Date.now()}`,
   }) {
@@ -37,6 +38,7 @@ class RoomFollowingList extends List {
       elementId,
       classes,
       effect,
+      shouldToggle,
       sorting: {
         paramName: 'roomName',
       },

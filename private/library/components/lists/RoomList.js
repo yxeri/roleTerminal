@@ -87,7 +87,7 @@ class RoomList extends List {
             roomId,
             callback: ({ error }) => {
               if (error) {
-                if (error.type === 'not allowed' && error.extraData.param === 'password') {
+                if (error.type === 'not allowed' && error.extraData && error.extraData.param === 'password') {
                   const lockedDialog = new LockedRoomDialog({
                     roomId,
                     roomName,
@@ -104,17 +104,6 @@ class RoomList extends List {
 
                 return;
               }
-
-              // eventCentral.emitEvent({
-              //   event: eventCentral.Events.SWITCH_ROOM,
-              //   params: {
-              //     listType: this.ListTypes.ROOMS,
-              //     origin: this.elementId,
-              //     room: {
-              //       objectId: roomId,
-              //     },
-              //   },
-              // });
 
               eventCentral.emitEvent({
                 event: eventCentral.Events.FOLLOWED_ROOM,

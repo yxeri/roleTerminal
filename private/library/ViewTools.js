@@ -59,7 +59,7 @@ class ViewTools {
    * @returns {boolean} Is the view wider than the height?
    */
   static isLandscape() {
-    return window.innerWidth > window.innerHeight;
+    return window.innerWidth > window.innerHeight && window.innerWidth > 768;
   }
 }
 

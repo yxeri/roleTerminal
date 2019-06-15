@@ -29,6 +29,7 @@ class RoomList extends List {
     title,
     minimumAccessLevel,
     effect,
+    shouldToggle,
     whisperText = ' <-> ',
     classes = [],
     elementId = `wRList-${Date.now()}`,
@@ -41,6 +42,7 @@ class RoomList extends List {
       elementId,
       classes,
       effect,
+      shouldToggle,
       sorting: {
         paramName: 'roomName',
       },
@@ -67,11 +69,11 @@ class RoomList extends List {
 
                 const identities = userComposer.getWhisperIdentities({ participantIds });
                 const thisIdentityName = currentUser.aliases && currentUser.aliases.length > 0
-                  ? identities[0].username || identities[0].aliasName
+                  ? `${whisperText}${identities[0].username || identities[0].aliasName}`
                   : '';
 
                 return identities.length > 0
-                  ? `${thisIdentityName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  ? `${thisIdentityName}${identities[1].username || identities[1].aliasName}`
                   : '';
               }
 

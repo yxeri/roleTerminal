@@ -110,10 +110,11 @@ class MessageList extends List {
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
             const identity = userComposer.getIdentity({ objectId });
-            const teamIds = identity.partOfTeams || [];
-            const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
 
             if (identity) {
+              const teamIds = identity.partOfTeams || [];
+              const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
+
               let name = identity.username || identity.aliasName;
 
               if (showTeam) {

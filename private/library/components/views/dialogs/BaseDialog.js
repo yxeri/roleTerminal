@@ -42,6 +42,7 @@ class BaseDialog extends BaseView {
     lowerText,
     upperButtons,
     lowerButtons,
+    timeout,
     images = [],
     inputs = [],
     classes = [],
@@ -52,6 +53,7 @@ class BaseDialog extends BaseView {
       classes: classes.concat(['dialog']),
     });
 
+    this.timeout = timeout;
     this.inputs = inputs;
 
     const inputContainer = elementCreator.createContainer({
@@ -117,14 +119,22 @@ class BaseDialog extends BaseView {
     if (this.inputs.length > 0) {
       this.inputs[0].focus();
     }
+
+    if (this.timeout) {
+      setTimeout(() => { this.removeFromView(); }, this.timeout);
+    }
   }
 
   removeFromView() {
-    this.getParentElement().removeChild(document.getElementById(ids.COVER));
+    const parent = this.getParentElement();
 
-    super.removeFromView();
-    keyHandler.unpause();
-    voiceCommander.unpause();
+    if (parent) {
+      parent.removeChild(document.getElementById(ids.COVER));
+
+      super.removeFromView();
+      keyHandler.unpause();
+      voiceCommander.unpause();
+    }
   }
 
   createTextContainer({ elementId, text = [] }) {

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Aleksandar Jankovic
+ Copyright 2018 Carmilla Mina Jankovic
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -186,9 +186,11 @@ select {
 
 .viewWrapper {
   display: flex;
+  display: -webkit-flex;
   height: 100%;
   width: 100%;
   flex-flow: row wrap;
+  -webkit-flex-flow: row wrap;
 }
 
 .one {
@@ -290,6 +292,7 @@ select {
 .userList {
   li {
     display: flex;
+    display: -webkit-flex;
     align-items: center;
   }
 
@@ -324,12 +327,14 @@ select {
 
   .oneOfTwo:first-child {
     flex-grow: 1;
+    -webkit-flex-grow: 1;
     min-width: $menu-min-width;
     max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
     flex-grow: 5;
+    -webkit-flex-grow: 5;
   }
 }
 
@@ -339,7 +344,9 @@ select {
     padding-bottom: $padding;
     margin-bottom: $padding;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
+    -webkit-flex-direction: column;
 
     span:first-child {
       font-size: 1.5em;
@@ -483,7 +490,9 @@ $msgList-msgLine-side-padding: .2em;
   .columnChat {
     overflow-y: auto;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
+    -webkit-flex-direction: column;
   }
 
   .roomInfo {
@@ -706,6 +715,7 @@ $map-padding-fix: 2em;
   border-top: $border;
   background-color: $header-color;
   display: flex;
+  display: -webkit-flex;
   z-index: 8;
   color: $text-color;
   font-size: 1.1em;

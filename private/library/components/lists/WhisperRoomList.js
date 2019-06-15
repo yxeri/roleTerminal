@@ -29,6 +29,7 @@ class RoomList extends List {
     title,
     minimumAccessLevel,
     effect,
+    shouldToggle,
     whisperText = ' <-> ',
     classes = [],
     elementId = `wRList-${Date.now()}`,
@@ -41,6 +42,7 @@ class RoomList extends List {
       elementId,
       classes,
       effect,
+      shouldToggle,
       sorting: {
         paramName: 'roomName',
       },

@@ -50,6 +50,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 const accessCentral = require('../../AccessCentral');
+const viewTools = require('../../ViewTools');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -95,6 +96,7 @@ class List extends BaseView {
     minimumAccessLevel,
     listType,
     collapseEqual,
+    onToggle,
     listItemFieldsClasses = [],
     imageInfo = {},
     effect = false,
@@ -131,7 +133,6 @@ class List extends BaseView {
     this.fieldToAppend = fieldToAppend;
     this.shouldAppendImage = shouldAppendImage;
     this.focusedId = focusedId;
-    this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
     this.userFilter = userFilter;
@@ -146,6 +147,8 @@ class List extends BaseView {
     this.collapseEqual = collapseEqual;
     this.lastObject = null;
     this.imageInfo = imageInfo;
+    this.header = null;
+    this.onToggle = onToggle;
 
     if (collector.eventTypes.one) {
       /**
@@ -268,11 +271,15 @@ class List extends BaseView {
     this.lastObject = null;
 
     if (this.title) {
-      const header = elementCreator.createHeader({
+      this.header = elementCreator.createHeader({
         clickFuncs: {
           leftFunc: () => {
             this.listElement.classList.toggle('hide');
-            header.classList.toggle('expanded');
+            this.header.classList.toggle('expanded');
+
+            if (this.onToggle) {
+              this.onToggle();
+            }
           },
         },
         classes: ['toggle', 'expanded'],
@@ -281,14 +288,20 @@ class List extends BaseView {
 
       if (this.shouldToggle) {
         listClasses.push('hide');
-        header.classList.toggle('expanded');
+        this.header.classList.toggle('expanded');
       }
 
-      elements.push(header);
+      elements.push(this.header);
     }
 
     this.listElement = elementCreator.createList({
       classes: listClasses,
+    });
+
+    this.listElement.addEventListener('click', () => {
+      if (this.shouldToggle && !viewTools.isLandscape()) {
+        this.listElement.classList.toggle('hide');
+      }
     });
 
     elements.push(this.listElement);
@@ -308,6 +321,14 @@ class List extends BaseView {
 
     this.replaceOnParent({ element: container });
     this.scrollList();
+  }
+
+  hideList() {
+    this.listElement.classList.add('hide');
+
+    if (this.header) {
+      this.header.classList.remove('expanded');
+    }
   }
 
   /**
@@ -348,6 +369,11 @@ class List extends BaseView {
         this.lastObject = object;
       }
     });
+
+    if (this.header && marked[this.listType] && marked[this.listType].length > 0) {
+      console.log(this.listType, marked[this.listType]);
+      this.header.classList.add(cssClasses.markListItem);
+    }
 
     return fragment;
   }
@@ -405,30 +431,6 @@ class List extends BaseView {
     this.focusedId = undefined;
   }
 
-  markListItem(elementId) {
-    const toMark = this.getElement(elementId);
-
-    if (toMark) {
-      toMark.classList.add(cssClasses.markListItem);
-
-      if (!this.markedIds.includes(elementId)) {
-        this.markedIds.push(elementId);
-      }
-    }
-  }
-
-  unmarkListItem(elementId) {
-    const markedIndex = this.markedIds.indexOf(elementId);
-
-    if (markedIndex > -1) {
-      const element = this.getElement(elementId);
-
-      element.classList.remove(cssClasses.markListItem);
-
-      this.markedIds.splice(markedIndex, 1);
-    }
-  }
-
   /**
    * Create a list item.
    * @param {Object} params Parameters.
@@ -448,7 +450,6 @@ class List extends BaseView {
     const clickFuncs = {
       leftFunc: () => {
         this.setFocusedListItem(objectId);
-        this.unmarkListItem(objectId);
 
         if (this.listItemClickFuncs.leftFunc) {
           this.listItemClickFuncs.leftFunc(objectId);
@@ -686,14 +687,20 @@ class List extends BaseView {
   markItem({ objectId }) {
     const element = this.getElement(objectId);
 
-    storageManager.addMarked({
-      objectId,
-      listType: this.listType,
-    });
-
     if (element) {
+      storageManager.addMarked({
+        objectId,
+        listType: this.listType,
+      });
+
       this.animateElement({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
+
+      console.log(this.header);
+
+      if (this.header) {
+        this.header.classList.add(cssClasses.markListItem);
+      }
     }
   }
 
@@ -712,6 +719,14 @@ class List extends BaseView {
       });
 
       element.classList.remove(cssClasses.markListItem);
+
+      if (this.header) {
+        const marked = storageManager.getMarked();
+
+        if (marked[this.listType] && marked[this.listType].length === 0) {
+          this.header.classList.remove(cssClasses.markListItem);
+        }
+      }
     }
   }
 

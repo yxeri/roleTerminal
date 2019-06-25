@@ -552,6 +552,7 @@ class ElementCreator {
     classes,
     elementId,
     multiple,
+    isRequired,
     options = [],
   }) {
     const select = createBaseElement({
@@ -563,6 +564,28 @@ class ElementCreator {
 
     if (multiple) {
       select.setAttribute('multiple', 'true');
+    }
+
+    if (isRequired) {
+      select.addEventListener('blur', () => {
+        if (!select.selectedOptions) {
+          select.classList.add(cssClasses.emptyInput);
+
+          return;
+        }
+
+        const selectedOptions = Array.from(select.selectedOptions);
+
+        if (selectedOptions.filter(selected => selected.getAttribute('value') !== '').length === 0) {
+          select.classList.add(cssClasses.emptyInput);
+        }
+      });
+
+      select.addEventListener('focus', () => {
+        select.classList.remove(cssClasses.emptyInput);
+      });
+
+      select.setAttribute('required', 'true');
     }
 
     options.forEach((option) => {

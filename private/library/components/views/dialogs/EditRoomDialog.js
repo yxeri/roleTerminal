@@ -188,10 +188,13 @@ class EditRoomDialog extends BaseDialog {
       },
     }));
 
-    const lowerText = [
-      `${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' })}: ${roomName}`,
-    ];
+    const lowerText = [`${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' })}: ${roomName}`];
     const upperText = [labelHandler.getLabel({ baseObject: 'EditRoomDialog', label: 'editRoom' })];
+
+    if (room.isWhisper) {
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'users' })}:
+        ${room.participantIds.map(id => userComposer.getIdentityName({ objectId: id })).join(', ')}`);
+    }
 
     super({
       elementId,

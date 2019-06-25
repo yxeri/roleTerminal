@@ -14,6 +14,26 @@ const labels = {
     no: (override.General && override.General.no) || {
       en: 'No',
     },
+    he: (override.General && override.General.he) || {
+      en: 'He',
+    },
+    they: (override.General && override.General.they) || {
+      en: 'They',
+    },
+    she: (override.General && override.General.she) || {
+      en: 'She',
+    },
+    it: (override.General && override.General.it) || {
+      en: 'It',
+    },
+  },
+  UserList: {
+    offName: (override.UserList && override.UserList.offName) || {
+      en: 'OFF name',
+    },
+    pronouns: (override.UserList && override.UserList.pronouns) || {
+      en: 'Pronouns',
+    },
   },
   Button: {
     logout: (override.Button && override.Button.logout) || {
@@ -227,12 +247,12 @@ const labels = {
       en: 'User registration',
     },
     username: (override.RegisterDialog && override.RegisterDialog.username) || {
-      en: 'Username [a-z 0-9 -_]',
-      se: 'Användarnamn [a-z 0-9 -_]',
+      en: 'Name [a-z 0-9 -_]',
+      se: 'Namn [a-z 0-9 -_]',
     },
-    fullName: (override.RegisterDialog && override.RegisterDialog.fullName) || {
-      en: 'Full name [a-z 0-9]',
-      se: 'Hela namnet [a-z 0-9]',
+    offName: (override.RegisterDialog && override.RegisterDialog.offName) || {
+      en: '[OFF] Your name',
+      se: '[OFF] Ditt namn',
     },
     password: (override.RegisterDialog && override.RegisterDialog.password) || {
       en: 'Password',
@@ -271,15 +291,18 @@ const labels = {
     alreadyExists: (override.RegisterDialog && override.RegisterDialog.alreadyExists) || {
       en: 'User already exists.',
     },
-    invalidFullName: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
-      en: 'Invalid characters in the full name. Allowed characters: a-ö 0-9 -_',
-      se: 'Otillåtna tecken i hela namnet. Tillåtna tecken: a-ö 0-9 -_',
+    invalidFullName: (override.RegisterDialog && override.RegisterDialog.invalidFullName) || {
+      en: 'Invalid off name. Length must be 1-40 characters.',
+      se: 'Ej giltigt offnamn. Längden måste vara 1-40 tecken.',
     },
     image: (override.RegisterDialog && override.RegisterDialog.image) || {
       en: 'Profile picture',
     },
     notVerified: (override.RegisterDialog && override.RegisterDialog.notVerified) || {
       en: 'Your user has to be verified. Contact an administrator.',
+    },
+    choosePronouns: (override.RegisterDialog && override.RegisterDialog.choosePronouns) || {
+      en: '--Choose pronouns--',
     },
   },
   RoomDialog: {
@@ -339,12 +362,12 @@ const labels = {
   },
   LoginDialog: {
     username: (override.LoginDialog && override.LoginDialog.username) || {
-      en: 'Your username',
-      se: 'Ditt användarnamn',
+      en: 'Name',
+      se: 'Namn',
     },
     password: (override.LoginDialog && override.LoginDialog.password) || {
-      en: 'Your password',
-      se: 'Ditt lösenord',
+      en: 'Password',
+      se: 'Lösenord',
     },
     login: (override.LoginDialog && override.LoginDialog.login) || {
       en: 'Login',

@@ -32,7 +32,6 @@ const roomComposer = require('../../../data/composers/RoomComposer');
 class UserDialog extends BaseDialog {
   constructor({
     identityId,
-    origin,
     classes = [],
     elementId = `uDialog-${Date.now()}`,
   }) {
@@ -82,12 +81,13 @@ class UserDialog extends BaseDialog {
               ],
             });
 
+            this.removeFromView();
+
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.CHAT });
 
             eventCentral.emitEvent({
               event: eventCentral.Events.SWITCH_ROOM,
               params: {
-                origin,
                 listType: 'rooms',
                 room: whisperRoom
                   ? {
@@ -99,8 +99,6 @@ class UserDialog extends BaseDialog {
                   },
               },
             });
-
-            this.removeFromView();
           },
         },
       }));
@@ -137,14 +135,14 @@ class UserDialog extends BaseDialog {
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
         clickFuncs: {
           leftFunc: () => {
+            this.removeFromView();
+
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
 
             eventCentral.emitEvent({
               event: eventCentral.Events.FOCUS_MAPPOSITION,
               params: { position: userPosition },
             });
-
-            this.removeFromView();
           },
         },
       }));
@@ -178,8 +176,6 @@ class UserDialog extends BaseDialog {
         picture: chosenIdentity.image,
       }));
     }
-
-    console.log('user', identity);
 
     super({
       elementId,

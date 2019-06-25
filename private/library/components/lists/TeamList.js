@@ -26,6 +26,7 @@ class TeamList extends List {
   constructor({
     title,
     effect,
+    shouldToggle,
     classes = [],
     elementId = `teamList-${Date.now()}`,
   }) {
@@ -40,6 +41,7 @@ class TeamList extends List {
       classes,
       title,
       effect,
+      shouldToggle,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.users,

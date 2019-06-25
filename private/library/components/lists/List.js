@@ -97,6 +97,8 @@ class List extends BaseView {
     listType,
     collapseEqual,
     onToggle,
+    hasOffToggle = false,
+    showOff = false,
     listItemFieldsClasses = [],
     imageInfo = {},
     effect = false,
@@ -149,6 +151,9 @@ class List extends BaseView {
     this.imageInfo = imageInfo;
     this.header = null;
     this.onToggle = onToggle;
+    this.showOff = showOff;
+    this.hasOffToggle = hasOffToggle;
+    this.buttons = null;
 
     if (collector.eventTypes.one) {
       /**
@@ -268,18 +273,20 @@ class List extends BaseView {
 
     const elements = [];
     const listClasses = [];
+    this.buttons = elementCreator.createContainer({ classes: ['listButtons'] });
     this.lastObject = null;
 
     if (this.title) {
       this.header = elementCreator.createHeader({
         clickFuncs: {
           leftFunc: () => {
-            this.listElement.classList.toggle('hide');
-            this.header.classList.toggle('expanded');
-
             if (this.onToggle) {
               this.onToggle();
             }
+
+            this.buttons.classList.toggle('hide');
+            this.listElement.classList.toggle('hide');
+            this.header.classList.toggle('expanded');
           },
         },
         classes: ['toggle', 'expanded'],
@@ -287,6 +294,7 @@ class List extends BaseView {
       });
 
       if (this.shouldToggle) {
+        this.buttons.classList.add('hide');
         listClasses.push('hide');
         this.header.classList.toggle('expanded');
       }
@@ -294,12 +302,32 @@ class List extends BaseView {
       elements.push(this.header);
     }
 
+    if (this.hasOffToggle) {
+      const offButton = elementCreator.createButton({
+        text: '[OFF]',
+        clickFuncs: {
+          leftFunc: () => {
+            this.showOff = !this.showOff;
+            this.shouldToggle = false;
+            offButton.classList.toggle('offOn');
+
+            this.appendList();
+          },
+        },
+      });
+
+      this.buttons.appendChild(offButton);
+    }
+
+    elements.push(this.buttons);
+
     this.listElement = elementCreator.createList({
       classes: listClasses,
     });
 
     this.listElement.addEventListener('click', () => {
       if (this.shouldToggle && !viewTools.isLandscape()) {
+        this.buttons.classList.toggle('hide');
         this.listElement.classList.toggle('hide');
       }
     });
@@ -324,6 +352,7 @@ class List extends BaseView {
   }
 
   hideList() {
+    this.buttons.classList.add('hide');
     this.listElement.classList.add('hide');
 
     if (this.header) {
@@ -496,7 +525,10 @@ class List extends BaseView {
         )
       ) {
         const elements = this.listItemFields
-          .filter(field => typeof object[field.paramName] !== 'undefined' || typeof object[field.fallbackTo] !== 'undefined')
+          .filter((field) => {
+            return ((this.showOff && field.isOff) || !field.isOff)
+              && (typeof object[field.paramName] !== 'undefined' || typeof object[field.fallbackTo] !== 'undefined');
+          })
           .map((field) => {
             const {
               paramName,
@@ -513,6 +545,7 @@ class List extends BaseView {
               text,
               classes: fieldClasses,
             };
+            const fragment = document.createDocumentFragment();
 
             if (func) {
               spanParams.clickFuncs = {
@@ -522,9 +555,11 @@ class List extends BaseView {
               };
             }
 
-            return text !== ''
+            fragment.appendChild(text !== ''
               ? elementCreator.createSpan(spanParams)
-              : document.createTextNode('');
+              : document.createTextNode(''));
+
+            return fragment;
           });
 
         const paragraphParams = {

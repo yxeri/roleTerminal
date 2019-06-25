@@ -95,6 +95,7 @@ class SocketManager {
           defaultZoomLevel,
           yearModification,
           dayModification,
+          requireOffName,
           permissions = {},
         } = data;
 
@@ -110,6 +111,7 @@ class SocketManager {
         if (defaultZoomLevel) { storageManager.setDefaultZoomLevel(defaultZoomLevel); }
         if (yearModification) { storageManager.setYearModification(yearModification); }
         if (dayModification) { storageManager.setDayModification(dayModification); }
+        if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
 
         storageManager.setPermissions(permissions);
 

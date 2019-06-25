@@ -25,17 +25,17 @@ const socketManager = require('../../../SocketManager');
 const viewSwitcher = require('../../../ViewSwitcher');
 
 const ids = {
-  FULLNAME: 'fullName',
+  OFFNAME: 'offName',
   USERNAME: 'username',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
   DESCRIPTION: 'description',
   PICTURE: 'picture',
+  PRONOUNS: 'pronouns',
 };
 
 class RegisterDialog extends BaseDialog {
   constructor({
-    requireFullName = false,
     classes = [],
     elementId = `rDialog-${Date.now()}`,
   }) {
@@ -50,47 +50,65 @@ class RegisterDialog extends BaseDialog {
         maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'username' }),
       }),
-      elementCreator.createInput({
-        elementId: ids.FULLNAME,
-        inputName: 'fullName',
-        type: 'text',
-        maxLength: 40,
-        isRequired: requireFullName,
-        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'fullName' }),
-      }),
-      elementCreator.createInput({
-        elementId: ids.PASSWORD,
-        inputName: 'password',
-        type: 'password',
+      elementCreator.createSelect({
         isRequired: true,
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'password' }),
-      }),
-      elementCreator.createInput({
-        elementId: ids.REPEATPASSWORD,
-        inputName: 'repeatPassword',
-        type: 'password',
-        isRequired: true,
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'repeatPassword' }),
-      }),
-      elementCreator.createInput({
-        elementId: ids.DESCRIPTION,
-        inputName: 'description',
-        type: 'text',
-        multiLine: true,
-        maxLength: 500,
-        shouldResize: true,
-        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
-      }),
-      elementCreator.createImageInput({
-        buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
-        elementId: ids.PICTURE,
-        inputName: 'picture',
-        appendPreview: true,
-        previewId: 'imagePreview-register',
+        elementId: ids.PRONOUNS,
+        multiple: true,
+        options: [
+          { value: '', name: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'choosePronouns' }) },
+          { value: 'they', name: labelHandler.getLabel({ baseObject: 'General', label: 'they' }) },
+          { value: 'she', name: labelHandler.getLabel({ baseObject: 'General', label: 'she' }) },
+          { value: 'he', name: labelHandler.getLabel({ baseObject: 'General', label: 'he' }) },
+          { value: 'it', name: labelHandler.getLabel({ baseObject: 'General', label: 'it' }) },
+        ],
       }),
     ];
+
+    if (storageManager.getReqireOffName()) {
+      inputs.push(elementCreator.createInput({
+        elementId: ids.OFFNAME,
+        inputName: 'offName',
+        type: 'text',
+        maxLength: 40,
+        isRequired: true,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'offName' }),
+      }));
+    }
+
+    inputs.push(elementCreator.createInput({
+      elementId: ids.PASSWORD,
+      inputName: 'password',
+      type: 'password',
+      isRequired: true,
+      maxLength: 40,
+      placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'password' }),
+    }),
+    elementCreator.createInput({
+      elementId: ids.REPEATPASSWORD,
+      inputName: 'repeatPassword',
+      type: 'password',
+      isRequired: true,
+      maxLength: 40,
+      placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'repeatPassword' }),
+    }),
+    elementCreator.createInput({
+      elementId: ids.DESCRIPTION,
+      inputName: 'description',
+      type: 'text',
+      multiLine: true,
+      maxLength: 500,
+      shouldResize: true,
+      placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
+    }),
+    elementCreator.createImageInput({
+      buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
+      elementId: ids.PICTURE,
+      inputName: 'picture',
+      appendPreview: true,
+      previewId: 'imagePreview-register',
+    }));
+
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -118,12 +136,15 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
+            const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
+              .filter(selected => selected.getAttribute('value') !== '');
             const params = {
               user: {
                 username: this.getInputValue(ids.USERNAME),
-                fullName: this.getInputValue(ids.FULLNAME),
+                offName: this.getInputValue(ids.OFFNAME),
                 password: this.getInputValue(ids.PASSWORD),
                 registerDevice: storageManager.getDeviceId(),
+                pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
               },
               callback: ({ error, data }) => {
                 if (error) {
@@ -152,8 +173,8 @@ class RegisterDialog extends BaseDialog {
                     }
                   } else if (error.type === 'invalid characters') {
                     switch (error.extraData.param) {
-                      case 'fullName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidFullName' })] });
+                      case 'offName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'invalidOffName' })] });
 
                         break;
                       }

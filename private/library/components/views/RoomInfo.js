@@ -22,7 +22,6 @@ const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
-const labelHandler = require('../../labels/LabelHandler');
 
 class RoomInfo extends ViewWrapper {
   constructor({

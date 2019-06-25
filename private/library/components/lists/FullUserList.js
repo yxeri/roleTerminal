@@ -23,6 +23,7 @@ const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
+const labelHandler = require('../../labels/LabelHandler');
 
 class UserList extends List {
   constructor({
@@ -33,18 +34,26 @@ class UserList extends List {
     shouldToggle,
     showImage = true,
     classes = [],
-    elementId = `userList-${Date.now()}`,
+    elementId = `fUserList-${Date.now()}`,
   }) {
-    classes.push('userList');
+    classes.push('fullUserList', 'userList');
 
     const headerFields = [{
       paramName: 'username',
       fallbackTo: 'aliasName',
       classes: ['username'],
     }, {
+      paramName: 'pronouns',
+      convertFunc: (pronouns) => {
+        return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'pronouns' })}: ${pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ')}`;
+      },
+    }, {
       paramName: 'offName',
       isOff: true,
-      classes: ['offName'],
+      classes: ['offValue'],
+      convertFunc: (offName) => {
+        return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'offName' })}: ${offName}`;
+      },
     }];
 
     const params = {

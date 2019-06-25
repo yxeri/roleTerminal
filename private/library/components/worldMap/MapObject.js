@@ -97,7 +97,7 @@ class MapObject {
     markedStyle,
     hoverExcludeRule,
     overlay,
-    showMenuOnClick = deviceChecker.isTouchDevice,
+    showMenuOnClick,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,

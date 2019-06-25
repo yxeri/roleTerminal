@@ -31,14 +31,6 @@ class TransactionList extends List {
   }) {
     const headerFields = [
       {
-        paramName: 'customTimeCreated',
-        fallbackTo: 'timeCreated',
-        convertFunc: (time) => {
-          const timestamp = textTools.generateTimestamp({ date: time });
-
-          return `${timestamp.fullDate} ${timestamp.fullTime}`;
-        },
-      }, {
         paramName: 'fromWalletId',
         convertFunc: (fromWalletId) => {
           return `${walletComposer.getWalletOwnerName({ walletId: fromWalletId }) || fromWalletId} ${toText}`;
@@ -52,6 +44,14 @@ class TransactionList extends List {
         paramName: 'amount',
         convertFunc: (amount) => {
           return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'amount' })}: ${amount}`;
+        },
+      }, {
+        paramName: 'customTimeCreated',
+        fallbackTo: 'timeCreated',
+        convertFunc: (time) => {
+          const timestamp = textTools.generateTimestamp({ date: time });
+
+          return `${timestamp.fullDate} ${timestamp.fullTime}`;
         },
       },
     ];

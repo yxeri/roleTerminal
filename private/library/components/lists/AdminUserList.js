@@ -37,6 +37,8 @@ class AdminUserList extends List {
       {
         paramName: 'username',
       }, {
+        paramName: 'offName',
+      }, {
         paramName: 'accessLevel',
         classes: ['accessLevel'],
         convertFunc: (accessLevel) => {

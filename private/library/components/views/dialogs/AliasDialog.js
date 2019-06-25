@@ -21,7 +21,7 @@ const labelHandler = require('../../../labels/LabelHandler');
 const aliasComposer = require('../../../data/composers/AliasComposer');
 
 const ids = {
-  FULLNAME: 'fullName',
+  OFFNAME: 'fullName',
   ALIASNAME: 'aliasname',
 };
 

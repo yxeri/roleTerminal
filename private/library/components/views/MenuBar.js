@@ -25,6 +25,7 @@ const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
 // const TeamDialog = require('../../components/views/dialogs/TeamDialog');
 const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
+const WalletInfo = require('../../components/views/WalletInfo');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -43,6 +44,7 @@ class MenuBar extends BaseView {
     title,
     viewSwitcher,
     image,
+    currencySign,
     appendTop = false,
     showControls = {},
     showClock = true,
@@ -434,6 +436,14 @@ class MenuBar extends BaseView {
         event: eventCentral.Events.CHANGED_ALIAS,
         func: watcherFunc,
       });
+    }
+
+    if (showControls.wallet) {
+      const walletInfo = new WalletInfo({
+        sign: currencySign,
+      });
+
+      this.element.appendChild(walletInfo.element);
     }
 
     if (image) {

@@ -477,6 +477,14 @@ class StorageManager {
   static removeMarked() {
     this.removeLocalVal('marked');
   }
+
+  static setRequireOffName(requireOffName) {
+    this.setLocalVal('requireOffName', requireOffName);
+  }
+
+  static getReqireOffName() {
+    return converters.convertToBoolean(this.getLocalVal('requireOffName'));
+  }
 }
 
 StorageManager.addWatchers();

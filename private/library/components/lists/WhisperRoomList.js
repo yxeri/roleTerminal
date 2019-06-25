@@ -69,7 +69,7 @@ class RoomList extends List {
 
                 const identities = userComposer.getWhisperIdentities({ participantIds });
                 const thisIdentityName = currentUser.aliases && currentUser.aliases.length > 0
-                  ? `${whisperText}${identities[0].username || identities[0].aliasName}`
+                  ? `${identities[0].username || identities[0].aliasName}${whisperText}`
                   : '';
 
                 return identities.length > 0

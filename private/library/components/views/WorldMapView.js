@@ -65,9 +65,15 @@ class WorldMapView extends ViewWrapper {
 
     if (lists.length > 0) {
       const components = [];
+      const positionLists = lists.map(list => new PositionList(list));
 
-      lists.forEach((list) => {
-        components.push({ component: new PositionList(list) });
+      positionLists.forEach((positionList) => {
+        const listToPush = positionList;
+        listToPush.onToggle = () => {
+          positionLists.filter(posList => posList !== positionList).forEach(posList => posList.hideList());
+        };
+
+        components.push({ component: listToPush });
       });
 
       columns.push({

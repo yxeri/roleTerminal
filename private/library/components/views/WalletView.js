@@ -18,6 +18,7 @@ const ViewWrapper = require('../ViewWrapper');
 const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
 const TeamList = require('../lists/TeamList');
+const WalletInfo = require('./WalletInfo');
 
 class WalletView extends ViewWrapper {
   constructor({
@@ -28,12 +29,17 @@ class WalletView extends ViewWrapper {
     const transactionList = new TransactionList({ effect });
     const userList = new UserList({
       effect,
+      shouldToggle: true,
       title: 'Users',
     });
     const teamList = new TeamList({
       effect,
+      shouldToggle: true,
       title: 'Teams',
     });
+
+    userList.onToggle = () => { teamList.hideList(); };
+    teamList.onToggle = () => { userList.hideList(); };
 
     super({
       elementId,

@@ -13,12 +13,14 @@
 
 $background-color: rgba(0, 0, 0, 0.98);
 $second-background-color: #23001e;
+$menu-background-color: rgba(35, 0, 30, 0.98);
 $text-color: white;
 $second-text-color: #00ffef;
 $second-color: #ff00d7;
 $light-color: #4b003c;
 $darker-color: #23001e;
 $warning-color: #910001;
+$off-color: #ff6269;
 $greyed-out: #6f6f6f;
 $focus-color: #000691;
 $new-color: #009100;
@@ -140,7 +142,9 @@ label {
 }
 
 select {
-  min-height: 12em;
+  min-height: 7em;
+  font-family: monospace;
+  font-size: 1.1em;
 }
 
 ::-webkit-scrollbar {
@@ -185,12 +189,12 @@ select {
 }
 
 .viewWrapper {
-  display: flex;
   display: -webkit-flex;
+  display: flex;
   height: 100%;
   width: 100%;
-  flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
 }
 
 .one {
@@ -231,8 +235,8 @@ select {
   margin: 0 auto;
   padding: $padding;
   z-index: 10;
-  box-shadow: 2px 0 5px black;
   -webkit-box-shadow: 2px 0 5px black;
+  box-shadow: 2px 0 5px black;
 
   input {
     width: 99%;
@@ -254,7 +258,6 @@ select {
 
   .lowerButtons, .lowerText, .inContainer, .imagesContainer {
     padding-bottom: $padding;
-    padding-top: $padding;
   }
 
   .upperText {
@@ -272,7 +275,11 @@ select {
     float: right;
 
     .button {
-      margin-left: $padding;
+      margin-right: $padding;
+
+      button {
+        margin-top: $padding;
+      }
     }
 
     .button:first-child {
@@ -291,8 +298,9 @@ select {
 
 .userList {
   li {
-    display: flex;
     display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
     align-items: center;
   }
 
@@ -326,15 +334,15 @@ select {
   }
 
   .oneOfTwo:first-child {
-    flex-grow: 1;
     -webkit-flex-grow: 1;
+    flex-grow: 1;
     min-width: $menu-min-width;
     max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
-    flex-grow: 5;
     -webkit-flex-grow: 5;
+    flex-grow: 5;
   }
 }
 
@@ -343,10 +351,10 @@ select {
     border-bottom: $border-width solid $second-color;
     padding-bottom: $padding;
     margin-bottom: $padding;
-    display: flex;
     display: -webkit-flex;
-    flex-direction: column;
+    display: flex;
     -webkit-flex-direction: column;
+    flex-direction: column;
 
     span:first-child {
       font-size: 1.5em;
@@ -362,11 +370,35 @@ select {
   }
 }
 
-.forumView, .docFileView {
+.forumView, .docFileView, .peopleView {
   .column {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+  }
+}
+
+.peopleView {
+  .fullUserList {
+    ul {
+      li {
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+
+        span {
+          display: block;
+        }
+
+        .listItemImage {
+          max-width: 150px;
+          max-height: 150px;
+        }
+      }
+
+      li:nth-child(even) {
+        background-color: $second-background-color;
+      }
+    }
   }
 }
 
@@ -489,10 +521,10 @@ $msgList-msgLine-side-padding: .2em;
 
   .columnChat {
     overflow-y: auto;
-    display: flex;
     display: -webkit-flex;
-    flex-direction: column;
+    display: flex;
     -webkit-flex-direction: column;
+    flex-direction: column;
   }
 
   .roomInfo {
@@ -603,6 +635,14 @@ $msgList-msgLine-side-padding: .2em;
   color: $warning-color;
 }
 
+.offOn {
+  background-color: $warning-color;
+}
+
+.offValue {
+  color: $off-color;
+}
+
 /*************
  * World Map *
  *************/
@@ -704,15 +744,15 @@ $map-padding-fix: 2em;
   box-sizing: border-box;
   border-top: $border;
   background-color: $header-color;
-  display: flex;
   display: -webkit-flex;
+  display: flex;
   z-index: 8;
   color: $text-color;
   font-size: 1.1em;
   height: calc(#{$status-bar-height} - .2em);
 
   > span {
-    margin-right: .5em;
+    margin-right: $padding;
   }
 
   > span:last-child {
@@ -720,7 +760,7 @@ $map-padding-fix: 2em;
   }
 
   > div {
-    margin-right: .5em;
+    margin-right: $padding;
   }
 
   .clickable {
@@ -734,6 +774,11 @@ $map-padding-fix: 2em;
     padding-left: .1em;
     padding-right: .1em;
     padding-bottom: .2em;
+    max-width: 4.5em;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .topMenu {
@@ -746,8 +791,8 @@ $map-padding-fix: 2em;
     overflow-y: scroll;
     border: $border;
     bottom: calc(#{$status-bar-height} - .2em);
-    box-shadow: 2px 0 5px black;
     -webkit-box-shadow: 2px 0 5px black;
+    box-shadow: 2px 0 5px black;
     scrollbar-width: none;
 
     button {
@@ -796,7 +841,7 @@ $map-padding-fix: 2em;
   max-width: 40px;
   max-height: 40px;
   float: left;
-  margin-right: .1em;
+  margin-right: .2em;
 }
 
 .hide {
@@ -911,22 +956,18 @@ $map-padding-fix: 2em;
     width: 100%;
   }
 
-  .mapLeftClickBox {
-    left: 0;
-    width: calc(100% - ((#{$map-box-padding} * 2) + (#{$border-width} * 2)));
-  }
-
-  .chatView {
+  .chatView, .worldMapView, .walletView {
     .columnList {
       height: calc(1.8em + #{$border-width});
       width: 100%;
-      display: flex;
       display: -webkit-flex;
+      display: flex;
       overflow: inherit;
+      z-index: 8;
 
       .list {
-        flex-grow: 1;
         -webkit-flex-grow: 1;
+        flex-grow: 1;
 
         header {
           text-align: center;
@@ -934,12 +975,14 @@ $map-padding-fix: 2em;
 
         ul {
           position: absolute;
-          height: calc(100% - 1.8em - #{$border-width} - #{$status-bar-height});
+          max-height: calc(100% - 1.8em - #{$border-width} - #{$status-bar-height});
           width: 100%;
           left: 0;
           overflow-y: auto;
-          background-color: $background-color;
+          background-color: $menu-background-color;
           z-index: 8;
+          -webkit-box-shadow: 2px 0 5px black;
+          box-shadow: 2px 0 5px black;
         }
 
         .toggle:after {
@@ -952,13 +995,34 @@ $map-padding-fix: 2em;
       }
     }
 
+    .oneOfTwo:first-child {
+      max-width: 100%;
+    }
+  }
+
+  .chatView {
     .columnChat {
       height: calc(100% - 1.8em - #{$border-width});
       width: 100%;
     }
+  }
 
-    .oneOfTwo:first-child {
-      max-width: 100%;
+  .worldMapView {
+    .mapLeftClickBox {
+      left: 0;
+      width: calc(100% - ((#{$map-box-padding} * 2) + (#{$border-width} * 2)));
+    }
+
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+  }
+
+  .walletView {
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
     }
   }
 }

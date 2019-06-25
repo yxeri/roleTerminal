@@ -9,6 +9,7 @@ const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
 const ForumView = require('../library/components/views/ForumView');
+const PeopleView = require('../library/components/views/PeopleView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -198,26 +199,11 @@ const worldMapParams = {
     }],
     zoomLevel: 18,
   }, {
-    elementId: 'roadList',
-    title: 'Roads',
-    positionTypes: [
-      'drivable-roads',
-      'roads',
-    ],
-    effect: true,
-    zoomLevel: 18,
-  }, {
-    elementId: 'deviceList',
-    title: 'Device',
-    positionTypes: ['device'],
-    effect: true,
-    zoomLevel: 18,
-  }, {
     elementId: 'worldList',
     title: 'World',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 11,
+    zoomLevel: 7,
   }],
 };
 const chatView = new ChatView({
@@ -239,11 +225,13 @@ const teamView = new TeamView({
 const forumView = new ForumView({
   effect: true,
 });
+const peopleView = new PeopleView({
+  effect: true,
+});
 
 const menuBar = new MenuBar({
   viewSwitcher,
   appendTop: false,
-  title: 'O3C',
   showClock: true,
   showControls: {
     user: true,
@@ -253,6 +241,7 @@ const menuBar = new MenuBar({
     view: true,
     docFile: true,
     team: true,
+    wallet: true,
   },
 });
 const docWrapper = new ViewWrapper({
@@ -329,6 +318,20 @@ const forumWrapper = new ViewWrapper({
     ],
   }],
 });
+const peopleWrapper = new ViewWrapper({
+  menuBar,
+  viewType: viewSwitcher.ViewTypes.PEOPLE,
+  title: 'Employees',
+  columns: [{
+    components: [
+      { component: peopleView },
+    ],
+  }, {
+    components: [
+      { component: worldMapPage },
+    ],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -339,6 +342,7 @@ menuBar.setViews({
     { view: walletWrapper },
     { view: teamWrapper },
     { view: forumWrapper },
+    { view: peopleWrapper },
   ],
 });
 
@@ -350,6 +354,7 @@ viewSwitcher.addAvailableTypes({
     docWrapper.viewType,
     teamWrapper.viewType,
     forumWrapper.viewType,
+    peopleWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

@@ -25,7 +25,6 @@ const eventHandler = require('../../EventCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
-const deviceChecker = require('../../DeviceChecker');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',

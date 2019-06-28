@@ -18,7 +18,6 @@ const ViewWrapper = require('../ViewWrapper');
 const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
 const TeamList = require('../lists/TeamList');
-const WalletInfo = require('./WalletInfo');
 
 class WalletView extends ViewWrapper {
   constructor({

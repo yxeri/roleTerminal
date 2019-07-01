@@ -29,7 +29,7 @@ $header-color: #2e001a;
 
 $p-margin: .4em;
 $border-width: 1px;
-$status-bar-height: 1.6em;
+$status-bar-height: 1.4em;
 $map-box-padding: .5em;
 $padding: .3em;
 $border: $border-width solid $second-color;
@@ -144,7 +144,7 @@ label {
 select {
   min-height: 7em;
   font-family: monospace;
-  font-size: 1.1em;
+  font-size: 1em;
 }
 
 ::-webkit-scrollbar {
@@ -239,7 +239,7 @@ select {
   box-shadow: 2px 0 5px black;
 
   input {
-    width: 99%;
+    width: calc(100% - .2em);
     padding: .1em;
     margin-bottom: $p-margin;
   }
@@ -250,6 +250,7 @@ select {
 
   textarea {
     height: 5em;
+    width: calc(100% - .2em);
   }
 
   .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {
@@ -390,8 +391,12 @@ select {
         }
 
         .listItemImage {
-          max-width: 150px;
-          max-height: 150px;
+          max-width: 120px;
+          max-height: 120px;
+        }
+
+        .username {
+          color: $second-text-color;
         }
       }
 
@@ -499,8 +504,8 @@ $msgList-msgLine-side-padding: .2em;
       position: relative;
 
       img {
-        max-width: 150px;
-        max-height: 100px;
+        max-width: 120px;
+        max-height: 120px;
         vertical-align: bottom;
         border: $border;
       }
@@ -537,6 +542,35 @@ $msgList-msgLine-side-padding: .2em;
   }
 }
 
+.terminalView {
+  .columnTerminal {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .terminalPage {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .terminalOutput {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: $padding;
+    height: calc(100% - #{$padding});
+  }
+
+  .terminalInput {
+    input {
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
+    }
+  }
+}
+
 .userRoomList {
   li:first-child {
     padding-top: $padding;
@@ -556,6 +590,15 @@ $msgList-msgLine-side-padding: .2em;
 
   header {
     padding: $padding;
+  }
+
+  .listButtonsItem {
+    height: 2em;
+
+    .listButtons {
+      position: fixed;
+      background-color: $background-color;
+    }
   }
 }
 
@@ -636,7 +679,9 @@ $msgList-msgLine-side-padding: .2em;
 }
 
 .offOn {
-  background-color: $warning-color;
+  button {
+    background-color: $warning-color;
+  }
 }
 
 .offValue {
@@ -749,7 +794,8 @@ $map-padding-fix: 2em;
   z-index: 8;
   color: $text-color;
   font-size: 1.1em;
-  height: calc(#{$status-bar-height} - .2em);
+  -webkit-align-items: center;
+  align-items: center;
 
   > span {
     margin-right: $padding;
@@ -771,11 +817,8 @@ $map-padding-fix: 2em;
     font-weight: bold;
     background-color: $text-color;
     color: $darker-color;
-    padding-left: .1em;
-    padding-right: .1em;
-    padding-bottom: .2em;
+    padding: .1em;
     max-width: 4.5em;
-    display: inline-block;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -848,11 +891,26 @@ $map-padding-fix: 2em;
   display: none !important;
 }
 
+.pre {
+  white-space: pre;
+  font-size: .8em;
+}
+
+.fullscreen {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: $background-color;
+  z-index: 10;
+}
+
 #screenFilter {
   height: 100%;
   width: 100%;
   pointer-events: none;
-  position: absolute;
+  position: fixed;
   background-color: rgba(255, 236, 5, 0.08);
   animation: screenFilter 20s linear infinite 5s;
   z-index: 11;

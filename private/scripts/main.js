@@ -10,6 +10,7 @@ const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
 const ForumView = require('../library/components/views/ForumView');
 const PeopleView = require('../library/components/views/PeopleView');
+const TerminalView = require('../library/components/views/TerminalView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -18,6 +19,9 @@ const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ eleme
 const tools = require('../library/Tools');
 const voiceCommander = require('../library/VoiceCommander');
 const labelHandler = require('../library/labels/LabelHandler');
+const elementCreator = require('../library/ElementCreator');
+const socketManager = require('../library/SocketManager');
+const textTools = require('../library/TextTools');
 
 const worldMapParams = {
   alwaysShowLabels: {
@@ -228,6 +232,569 @@ const forumView = new ForumView({
 const peopleView = new PeopleView({
   effect: true,
 });
+const terminalView = new TerminalView({
+  bootSequence: [
+    { element: elementCreator.createSpan({ text: '                          ####', classes: ['pre'] }), fullscreen: true },
+    { element: elementCreator.createSpan({ text: '                ####    #########    ####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '               ###########################', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '              #############################', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '            #######        ##   #  ##########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '      ##########           ##    #  ###  ##########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '     #########             #########   #   #########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '       #####               ##     ########   #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '     #####                 ##     ##     ##########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '     ####                  ##      ##     #   ######', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: ' #######                   ##########     ##    ########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '########                   ##       ########     ########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: ' ######      Organica      ##       #      #############', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '   ####     Oracle         ##       #      ##     ####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '   ####     Operating      ##       #      ##    #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '   ####      System        ##       #      ###########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '########                   ##       #########    ########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '########                   ##########      #    #########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: ' ########                  ##      ##     ## ###########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '     #####                 ##      ##     ### #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '       #####               ##     ########   #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '      #######              ##########   #  ########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '     ###########           ##    ##    # ###########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '      #############        ##    #   #############', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '            ################################', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '              ############################', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '              #######  ##########  #######', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '                ###      ######      ###', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '                          ####', classes: ['pre'] }), afterTimeout: 1000 },
+    { element: elementCreator.createSpan({ text: 'Oracle System Administrator Toolset' }) },
+    { element: elementCreator.createSpan({ text: 'OSAT ACCESS AUTHENTICATION' }) },
+    { element: elementCreator.createSpan({ text: 'PERMITTED ONLY BY AUTHORIZED PERSONNEL' }), afterTimeout: 1000 },
+    { element: elementCreator.createSpan({ text: 'ACCESS DENIED' }) },
+    { element: elementCreator.createSpan({ text: 'ACCESS DENIED' }) },
+    { element: elementCreator.createSpan({ text: 'ACCESS DENIED' }) },
+    { element: elementCreator.createSpan({ text: 'ACCESS DENIED' }) },
+    { element: elementCreator.createSpan({ text: 'ACCESS DENIED' }) },
+    { element: elementCreator.createSpan({ text: 'Loading...' }), afterTimeout: 1000 },
+    { element: elementCreator.createSpan({ text: 'ACCESS GRANTED' }) },
+    { element: elementCreator.createSpan({ text: 'Welcome, administrator Charlotte Jenkins' }), afterTimeout: 1000 },
+    { element: elementCreator.createSpan({ text: 'Your field report is -1 days late' }), afterTimeout: 1000 },
+    { element: elementCreator.createSpan({ text: 'Oracle status: HQ CONNECTION FAILED' }) },
+    { element: elementCreator.createSpan({ text: 'OSAT version: UNDEFINED' }) },
+    { element: elementCreator.createSpan({ text: 'THIS RELEASE OF OSAT WAS BROUGHT TO YOU BY' }) },
+    { element: elementCreator.createSpan({ text: '   ####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '###############', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: ' #####  #########                                           ####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  ####     #######  ########     ###########    ####     ###########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  ####    ######      #######   ####   #####  ########    ####   #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  ####  ###         ####  ####        ####  ###    ###### ####   #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  #########        ####    ####     ####   #####     ##############', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  #### ######     ####     #####  ####     #######   ###  ########', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '  ####   ######  ##### #### #### ############  #######    ####   ###', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: ' ######    #############    ################     ###      ####    #####', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '########     ########        ####                        ######      #####   ##', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '               ###########        ##                                    ###### ', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '                    ###############', classes: ['pre'] }) },
+    { element: elementCreator.createSpan({ text: '#Razor# Demos - Warez - Honey' }) },
+    { element: elementCreator.createSpan({ text: 'ENJOY' }) },
+    { element: elementCreator.createSpan({ text: 'Loading', afterTimeout: 1000 }) },
+    { element: elementCreator.createSpan({ text: '...' }) },
+    { element: elementCreator.createSpan({ text: '...' }) },
+    { element: elementCreator.createSpan({ text: '...' }) },
+    { element: elementCreator.createSpan({ text: '...' }) },
+    { element: elementCreator.createSpan({ text: '...' }), afterTimeout: 1000, fullscreen: false },
+  ],
+});
+
+terminalView.terminalPage.addCommand({
+  commandName: 'lanternMaintenance',
+  startFunc: () => {
+    terminalView.terminalPage.queueMessages({
+      objects: [
+        { element: elementCreator.createSpan({ text: 'Artemisia needs your help to verify LANTERN operational status.' }) },
+        { element: elementCreator.createSpan({ text: 'Downloading list of available LANTERNs ...' }) },
+      ],
+    });
+
+    socketManager.emitEvent('getValidCalibrationStations', { userName: userComposer.getCurrentUser().username }, ({ error: stationError, data: stationData }) => {
+      if (stationError) {
+        if (stationError.type === 'does not exist') {
+          terminalView.terminalPage.queueMessages({
+            objects: [
+              { element: elementCreator.createSpan({ text: '-----' }) },
+              { element: elementCreator.createSpan({ text: 'ERROR' }) },
+              { element: elementCreator.createSpan({ text: '-----' }) },
+              { element: elementCreator.createSpan({ text: 'No LANTERNs are in need of maintenance' }) },
+              { element: elementCreator.createSpan({ text: 'Aborting...' }) },
+            ],
+          });
+
+          terminalView.terminalPage.resetNextFunc();
+
+          return;
+        }
+
+        if (stationError.type === 'too frequent') {
+          const timeText = stationError.extraData && typeof stationError.extraData.timeLeft === 'number'
+            ? `${Math.abs(Math.ceil(stationError.extraData.timeLeft / 60000))}m`
+            : 'UNKNOWN';
+
+          terminalView.terminalPage.queueMessages({
+            objects: [
+              { element: elementCreator.createSpan({ text: '-----' }) },
+              { element: elementCreator.createSpan({ text: 'ERROR' }) },
+              { element: elementCreator.createSpan({ text: '-----' }) },
+              { element: elementCreator.createSpan({ text: 'Data incomplete.' }) },
+              { element: elementCreator.createSpan({ text: 'Data transfer is in progress.' }) },
+              { element: elementCreator.createSpan({ text: `Expected completion in: ${timeText}.` }) },
+              { element: elementCreator.createSpan({ text: 'Aborting...' }) },
+            ],
+          });
+
+          terminalView.terminalPage.resetNextFunc();
+
+          return;
+        }
+
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'ERROR' }) },
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'Something went wrong' }) },
+            { element: elementCreator.createSpan({ text: 'Unable to check LANTERN status.' }) },
+          ],
+        });
+
+        terminalView.terminalPage.resetNextFunc();
+
+        return;
+      }
+
+      if (stationData.mission) {
+        const { mission } = stationData;
+
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: `You have been assigned LANTERN ${mission.stationId}` }) },
+            { element: elementCreator.createSpan({ text: `Your assigned personal verification code is: ${mission.code}` }) },
+            { element: elementCreator.createSpan({ text: `Proceed to LANTERN ${mission.stationId} and use the code` }) },
+            { element: elementCreator.createSpan({ text: 'Artemisia wishes you a nice day!' }) },
+            { element: elementCreator.createSpan({ text: 'END OF MESSAGE' }) },
+          ],
+        });
+
+        terminalView.terminalPage.resetNextFunc();
+
+        return;
+      }
+
+      const { stations } = stationData;
+
+      terminalView.terminalPage.queueMessages({
+        objects: [
+          { element: elementCreator.createSpan({ text: '----------------' }) },
+          { element: elementCreator.createSpan({ text: 'Please select LANTERN to verify' }) },
+          { element: elementCreator.createSpan({ text: '----------------' }) },
+        ],
+      });
+
+      terminalView.terminalPage.queueMessages({
+        objects: stations.map((station) => {
+          const stationSpan = elementCreator.createSpan({
+            classes: ['clickable', 'linkLook', 'moreSpace'],
+            text: `[${station.stationId}] ${station.stationName} - ${station.calibrationReward}vcaps`,
+            clickFuncs: {
+              leftFunc: () => {
+                terminalView.terminalPage.triggerCommand(station.stationId);
+              },
+            },
+          });
+
+          return { element: stationSpan };
+        }),
+      });
+
+      terminalView.terminalPage.setNextFunc((stationId) => {
+        const stationIds = stations.map(station => station.stationId);
+        const chosenStationId = !Number.isNaN(stationId)
+          ? parseInt(stationId, 10)
+          : '';
+
+        if (stationIds.indexOf(chosenStationId) < 0) {
+          terminalView.terminalPage.queueMessages({
+            objects: [{ element: elementCreator.createSpan({ text: 'Incorrect LANTERN ID' }) }],
+          });
+
+          return;
+        }
+
+        socketManager.emitEvent('getCalibrationMission', { userName: userComposer.getCurrentUser().username, stationId: chosenStationId }, ({ error, data }) => {
+          if (error) {
+            if (error.type === 'does not exist') {
+              terminalView.terminalPage.queueMessages({
+                objects: [
+                  { element: elementCreator.createSpan({ text: '-----' }) },
+                  { element: elementCreator.createSpan({ text: 'ERROR' }) },
+                  { element: elementCreator.createSpan({ text: '-----' }) },
+                  { element: elementCreator.createSpan({ text: 'No LANTERN are in need of maintenance.' }) },
+                  { element: elementCreator.createSpan({ text: 'Aborting...' }) },
+                ],
+              });
+              terminalView.terminalPage.resetNextFunc();
+
+              return;
+            }
+
+            if (error.type === 'external') {
+              terminalView.terminalPage.queueMessages({
+                objects: [
+                  { element: elementCreator.createSpan({ text: '-----' }) },
+                  { element: elementCreator.createSpan({ text: 'ERROR' }) },
+                  { element: elementCreator.createSpan({ text: '-----' }) },
+                  { element: elementCreator.createSpan({ text: 'LANTERN activity is blocking status data.' }) },
+                  { element: elementCreator.createSpan({ text: 'Maintenance is blocked.' }) },
+                  { element: elementCreator.createSpan({ text: 'Aborting...' }) },
+                ],
+              });
+              terminalView.terminalPage.resetNextFunc();
+
+              return;
+            }
+
+            terminalView.terminalPage.queueMessages({
+              objects: [
+                { element: elementCreator.createSpan({ text: '-----' }) },
+                { element: elementCreator.createSpan({ text: 'ERROR' }) },
+                { element: elementCreator.createSpan({ text: '-----' }) },
+                { element: elementCreator.createSpan({ text: 'Something went wrong.' }) },
+                { element: elementCreator.createSpan({ text: 'Unable to check for LANTERN status.' }) },
+              ],
+            });
+            terminalView.terminalPage.resetNextFunc();
+
+            return;
+          }
+
+          const { mission, isNew } = data;
+
+          if (isNew) {
+            terminalView.terminalPage.queueMessages({
+              objects: [
+                { element: elementCreator.createSpan({ text: 'LANTERN is need of maintenance!' }) },
+              ],
+            });
+          }
+
+          terminalView.terminalPage.queueMessages({
+            objects: [
+              { element: elementCreator.createSpan({ text: `You have been assigned LANTERN ${mission.stationId}` }) },
+              { element: elementCreator.createSpan({ text: `Your assigned personal verification code is: ${mission.code}` }) },
+              { element: elementCreator.createSpan({ text: `Proceed to LANTERN ${mission.stationId} and use the code` }) },
+              { element: elementCreator.createSpan({ text: 'Artemisia wishes you a nice day!' }) },
+              { element: elementCreator.createSpan({ text: 'END OF MESSAGE' }) },
+            ],
+          });
+
+          terminalView.terminalPage.resetNextFunc();
+        });
+      });
+    });
+  },
+});
+
+terminalView.terminalPage.addCommand({
+  commandName: 'hackLantern',
+  startFunc: () => {
+    terminalView.terminalPage.queueMessages({
+      objects: [
+        { element: elementCreator.createSpan({ text: 'Razor proudly presents:' }) },
+        { element: elementCreator.createSpan({ text: 'LANTERN Amplification Master Manipulator (LAMM)' }) },
+        { element: elementCreator.createSpan({ text: 'Overriding locks ...' }) },
+        { element: elementCreator.createSpan({ text: 'Connecting to database ...' }) },
+      ],
+    });
+
+    socketManager.emitEvent('getLanternInfo', {}, ({
+      error,
+      data,
+    }) => {
+      if (error) {
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'ERROR' }) },
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'Something went wrong' }) },
+            { element: elementCreator.createSpan({ text: 'Unable to access LAMM' }) },
+          ],
+        });
+        terminalView.terminalPage.resetNextFunc();
+
+        return;
+      }
+
+      const {
+        teams,
+        round,
+        activeStations,
+        inactiveStations,
+        timeLeft,
+      } = data;
+
+      if (!round.isActive) {
+        const time = 0;
+        const timeString = time > 0
+          ? `${time} minutes`
+          : 'UNKNOWN';
+
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'ERROR' }) },
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'No signal received.' }) },
+            { element: elementCreator.createSpan({ text: 'Satellites are not in position.' }) },
+            { element: elementCreator.createSpan({ text: 'Unable to target LANTERNs' }) },
+            { element: elementCreator.createSpan({ text: `Next window opens in: ${timeString}` }) },
+            { element: elementCreator.createSpan({ text: 'Aborting LAMM...' }) },
+          ],
+        });
+
+        terminalView.terminalPage.resetNextFunc();
+
+        return;
+      }
+
+      if (activeStations.length === 0) {
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'ERROR' }) },
+            { element: elementCreator.createSpan({ text: '-----' }) },
+            { element: elementCreator.createSpan({ text: 'Unable to connect to LANTERNs.' }) },
+            { element: elementCreator.createSpan({ text: 'No active LANTERN found.' }) },
+            { element: elementCreator.createSpan({ text: 'Unable to proceed.' }) },
+            { element: elementCreator.createSpan({ text: 'Aborting LAMM...' }) },
+          ],
+        });
+
+        terminalView.terminalPage.resetNextFunc();
+
+        return;
+      }
+
+      const time = timeLeft;
+      const timeString = time > 0
+        ? `${time} minutes`
+        : 'UNKNOWN';
+
+      terminalView.terminalPage.queueMessages({
+        objects: [
+          { element: elementCreator.createSpan({ text: '----' }) },
+          { element: elementCreator.createSpan({ text: 'LAMM' }) },
+          { element: elementCreator.createSpan({ text: '----' }) },
+          { element: elementCreator.createSpan({ text: 'You will be shown a user with access to your chosen LANTERN and a text dump.' }) },
+          { element: elementCreator.createSpan({ text: 'Each user will have information about its password attached to it. Use it as a hint and try to find the correct password.' }) },
+          { element: elementCreator.createSpan({ text: 'Each user might have more than one password, so don\'t blindly start clicking around. Check if the information corresponds to the password you are about to choose' }) },
+          { element: elementCreator.createSpan({ text: 'You must find the user\'s password within the dumps to get access to the LANTERN. You will have 3 tries until the automated defense system shuts down the connection.' }) },
+          { element: elementCreator.createSpan({ text: 'We take no responsibility for deaths due to accidental activitation of defense systems.' }) },
+          { element: elementCreator.createSpan({ text: `Window closes in ${timeString}.` }) },
+          { element: elementCreator.createSpan({ text: '-----------------' }) },
+          { element: elementCreator.createSpan({ text: 'Choose a LANTERN:' }) },
+          { element: elementCreator.createSpan({ text: '-----------------' }) },
+        ],
+      });
+
+      terminalView.terminalPage.queueMessages({
+        objects: activeStations.concat(inactiveStations).map((station) => {
+          if (station.isActive) {
+            const paragraph = elementCreator.createParagraph({});
+            const stationSpan = elementCreator.createSpan({
+              classes: ['clickable', 'linkLook', 'moreSpace'],
+              text: `[${station.stationId}] ${station.stationName}`,
+              clickFuncs: {
+                leftFunc: () => {
+                  terminalView.terminalPage.triggerCommand(station.stationId);
+                },
+              },
+            });
+            const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
+            const ownerSpan = elementCreator.createSpan({
+              text: `Owner: ${team
+                ? team.teamName
+                : '---'} ${station.isUnderAttack && team
+                ? ' - UNDER ATTACK'
+                : ''}`,
+            });
+
+            paragraph.appendChild(stationSpan);
+            paragraph.appendChild(ownerSpan);
+
+            return { element: paragraph };
+          }
+
+          return { element: elementCreator.createSpan({ text: `[INACTIVE] ${station.stationName}` }) };
+        }),
+      });
+
+      terminalView.terminalPage.setNextFunc((stationIdValue) => {
+        const activeIds = activeStations.map(station => station.stationId);
+        const stationId = !Number.isNaN(stationIdValue)
+          ? parseInt(stationIdValue, 10)
+          : '';
+
+        if (activeIds.indexOf(stationId) < 0) {
+          terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: 'Incorrect LANTERN number' }) }] });
+
+          return;
+        }
+
+        const actions = [{ id: 1, name: 'Amplify' }, { id: 2, name: 'Dampen' }];
+
+        terminalView.terminalPage.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: '-----------------' }) },
+            { element: elementCreator.createSpan({ text: 'Choose an action:' }) },
+            { element: elementCreator.createSpan({ text: '-----------------' }) },
+          ],
+        });
+
+        terminalView.terminalPage.queueMessages({
+          objects: actions.map((action) => {
+            const actionSpan = elementCreator.createSpan({
+              classes: ['clickable', 'linkLook', 'moreSpace'],
+              text: `[${action.id}] ${action.name}`,
+              clickFuncs: {
+                leftFunc: () => {
+                  terminalView.terminalPage.triggerCommand(action.id);
+                },
+              },
+            });
+
+            return { element: actionSpan };
+          }),
+        });
+
+        terminalView.terminalPage.setNextFunc((actionIdValue) => {
+          const actionIds = actions.map(action => action.id);
+          const actionId = !Number.isNaN(actionIdValue)
+            ? Number.parseInt(actionIdValue, 10)
+            : '';
+
+          if (actionIds.indexOf(actionId) > -1) {
+            terminalView.terminalPage.queueMessages({
+              objects: [
+                { element: elementCreator.createSpan({ text: `Action ${actions.find(action => action.id === actionId).name} chosen.` }) },
+                { element: elementCreator.createSpan({ text: `Accessing LANTERN ${stationId}...` }) },
+              ],
+            });
+
+            socketManager.emitEvent('getLanternHack', { stationId }, ({ error: hackError, data: hackData }) => {
+              if (hackError) {
+                terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: 'Something went wrong. Failed to start hack' }) }] });
+                terminalView.terminalPage.resetNextFunc();
+
+                return;
+              }
+
+              const boostingSignal = actionId === 1;
+              const hintIndex = hackData.passwordHint.index + 1;
+
+              const elements = textTools.createMixedArray({
+                classes: ['moreSpace'],
+                rowAmount: hackData.passwords.length,
+                length: 34,
+                requiredClickableStrings: hackData.passwords,
+                charToLower: hackData.passwordHint.character,
+                requiredFunc: (value) => {
+                  terminalView.terminalPage.triggerCommand(value);
+                },
+              });
+
+              elements.forEach((element) => {
+                let startTouchTime;
+
+                element.addEventListener('touchstart', () => {
+                  startTouchTime = new Date();
+                });
+
+                element.addEventListener('touchend', () => {
+                  const endTouchTime = new Date();
+
+                  if (endTouchTime - startTouchTime >= 300) {
+                    const clickables = Array.from(element.getElementsByClassName('clickable'));
+
+                    elements.forEach(spanElement => Array.from(spanElement.children).forEach(child => child.classList.remove('clickableRevealed')));
+                    clickables.forEach(clickable => clickable.classList.add('clickableRevealed'));
+                  }
+                });
+              });
+
+              terminalView.terminalPage.queueMessages({
+                objects: elements.map((element) => {
+                  return { element };
+                }),
+              });
+
+              terminalView.terminalPage.queueMessages({
+                text: [
+                  { element: elementCreator.createSpan({ text: '------------' }) },
+                  { element: elementCreator.createSpan({ text: `User name: ${hackData.userName}.` }) },
+                  { element: elementCreator.createSpan({ text: `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}.` }) },
+                  { element: elementCreator.createSpan({ text: `${hackData.triesLeft} tries left` }) },
+                  { element: elementCreator.createSpan({ text: '------------' }) },
+                ],
+              });
+
+              terminalView.terminalPage.setNextFunc((password) => {
+                socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
+                  if (manipulateError) {
+                    terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: 'Something went wrong. Failed to manipulate the LANTERN' }) }] });
+                    terminalView.terminalPage.resetNextFunc();
+
+                    return;
+                  }
+
+                  const { success, triesLeft, matches } = manipulateData;
+
+                  if (success) {
+                    terminalView.terminalPage.queueMessages({
+                      objects: [
+                        { element: elementCreator.createSpan({ text: 'Correct password' }) },
+                        {
+                          element: elementCreator.createSpan({
+                            text: `${boostingSignal
+                              ? 'Amplified'
+                              : 'Dampened'} LANTERN ${stationId} signal`,
+                          }),
+                        },
+                        { element: elementCreator.createSpan({ text: 'Thank you for using LAMM.' }) },
+                      ],
+                    });
+                    terminalView.terminalPage.resetNextFunc();
+                  } else if (triesLeft <= 0) {
+                    terminalView.terminalPage.queueMessages({
+                      objects: [
+                        { element: elementCreator.createSpan({ text: 'Incorrect password.' }) },
+                        { element: elementCreator.createSpan({ text: 'Unable to trigger action.' }) },
+                        { element: elementCreator.createSpan({ text: 'Better luck next time!' }) },
+                        { element: elementCreator.createSpan({ text: 'Thank you for using LAMM' }) },
+                      ],
+                    });
+                    terminalView.terminalPage.resetNextFunc();
+                  } else {
+                    terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: `Incorrect. ${matches.amount} matched. ${triesLeft} tries left` }) }] });
+                  }
+                });
+              });
+            });
+
+            return;
+          }
+
+          terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: 'Incorrect action number' }) }] });
+        });
+      });
+    });
+  },
+});
 
 const menuBar = new MenuBar({
   viewSwitcher,
@@ -332,6 +899,16 @@ const peopleWrapper = new ViewWrapper({
     ],
   }],
 });
+const terminalWrapper = new ViewWrapper({
+  menuBar,
+  viewType: viewSwitcher.ViewTypes.TERMINAL,
+  title: 'Terminal',
+  columns: [{
+    components: [{ component: terminalView }],
+  }, {
+    components: [{ component: worldMapPage }],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -343,6 +920,7 @@ menuBar.setViews({
     { view: teamWrapper },
     { view: forumWrapper },
     { view: peopleWrapper },
+    { view: terminalWrapper },
   ],
 });
 
@@ -355,6 +933,7 @@ viewSwitcher.addAvailableTypes({
     teamWrapper.viewType,
     forumWrapper.viewType,
     peopleWrapper.viewType,
+    terminalWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

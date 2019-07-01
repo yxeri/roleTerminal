@@ -45,14 +45,27 @@ class UserList extends List {
     }, {
       paramName: 'pronouns',
       convertFunc: (pronouns) => {
-        return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'pronouns' })}: ${pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ')}`;
+        return pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ');
       },
     }, {
       paramName: 'offName',
       isOff: true,
       classes: ['offValue'],
       convertFunc: (offName) => {
-        return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'offName' })}: ${offName}`;
+        if (typeof offName !== 'boolean') {
+          return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'offName' })}: ${offName}`;
+        }
+
+        return '';
+      },
+    }, {
+      paramName: 'description',
+      convertFunc: (description) => {
+        if (description.length !== 0) {
+          return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'description' })}: ${description.join('\n')}`;
+        }
+
+        return '';
       },
     }];
 

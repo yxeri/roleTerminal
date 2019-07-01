@@ -26,6 +26,7 @@ const teamComposer = require('../../../data/composers/TeamComposer');
 
 const ids = {
   PICTURE: 'picture',
+  DESCRIPTION: 'description',
 };
 
 class UserSelfDialog extends BaseDialog {
@@ -39,11 +40,21 @@ class UserSelfDialog extends BaseDialog {
       partOfTeams,
       fullName,
       username,
+      description,
       objectId: userId,
     } = user;
     const userPosition = positionComposer.getPosition({ positionId: user.objectId });
 
     const inputs = [
+      elementCreator.createInput({
+        inputName: 'description',
+        elementId: ids.DESCRIPTION,
+        multiLine: true,
+        shouldResize: true,
+        text: description,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
+        maxLength: 300,
+      }),
       elementCreator.createImageInput({
         buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
         elementId: ids.PICTURE,
@@ -128,6 +139,7 @@ class UserSelfDialog extends BaseDialog {
 
             const params = {
               userId,
+              user: {},
               callback: ({ error }) => {
                 if (error) {
                   console.log(error);
@@ -139,6 +151,7 @@ class UserSelfDialog extends BaseDialog {
               },
             };
             const imagePreview = document.getElementById('imagePreview-userSelf');
+            const descriptionInput = this.getInputValue(ids.DESCRIPTION);
 
             if (imagePreview.getAttribute('src')) {
               params.image = {
@@ -149,7 +162,9 @@ class UserSelfDialog extends BaseDialog {
               };
             }
 
-            console.log('update user ', params);
+            if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
+              params.user.description = descriptionInput.split('\n');
+            }
 
             userComposer.updateUser(params);
           },

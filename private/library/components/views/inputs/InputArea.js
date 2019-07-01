@@ -11,12 +11,13 @@ class InputArea extends BaseView {
   constructor({
     sendOnEnter,
     minimumAccessLevel,
+    focusless = false,
+    multiLine = true,
     previewId = 'imagePreview-input',
     imageAccessLevel = accessCentral.AccessLevels.STANDARD,
     allowImages = false,
     classes = [],
     placeholder = '',
-    shouldResize = true,
     triggerCallback = () => {},
     focusCallback = () => {},
     blurCallback = () => {},
@@ -31,9 +32,11 @@ class InputArea extends BaseView {
     this.previewId = previewId;
     this.textArea = elementCreator.createInput({
       placeholder,
+      multiLine,
+      shouldResize: true,
       type: 'text',
-      multiLine: true,
     });
+    this.focusless = focusless;
     this.isFocused = false;
     this.focusCallback = focusCallback;
     this.blurCallback = blurCallback;
@@ -69,10 +72,6 @@ class InputArea extends BaseView {
       blurCallback();
     });
     this.textArea.addEventListener('input', () => {
-      if (shouldResize) {
-        this.resizeInput();
-      }
-
       inputCallback(this.getInputValue());
     });
 
@@ -92,11 +91,6 @@ class InputArea extends BaseView {
     this.element.appendChild(this.sendButton);
   }
 
-  resizeInput() {
-    this.textArea.style.height = 'auto';
-    this.textArea.style.height = `${this.textArea.scrollHeight}px`;
-  }
-
   getInputValue() {
     return `${this.textArea.value}`;
   }
@@ -108,17 +102,19 @@ class InputArea extends BaseView {
   clearInput() {
     const image = document.getElementById(this.previewId);
 
-    image.classList.add('hide');
-    image.removeAttribute('src');
+    if (image) {
+      image.classList.add('hide');
+      image.removeAttribute('src');
+    }
 
     this.textArea.value = '';
-
-    this.resizeInput();
+    this.textArea.style.height = 'auto';
+    this.textArea.style.height = `${this.textArea.scrollHeight}px`;
   }
 
   setKeyListener() {
     keyhandler.addKey(13, () => {
-      if (this.isFocused) {
+      if (this.focusless || this.isFocused) {
         this.triggerCallback({ text: this.getSplitInputValue() });
       }
     }, this.sendOnEnter);

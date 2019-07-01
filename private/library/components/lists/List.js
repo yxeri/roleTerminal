@@ -48,7 +48,6 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');
-const textTools = require('../../TextTools');
 const accessCentral = require('../../AccessCentral');
 const viewTools = require('../../ViewTools');
 
@@ -153,7 +152,6 @@ class List extends BaseView {
     this.onToggle = onToggle;
     this.showOff = showOff;
     this.hasOffToggle = hasOffToggle;
-    this.buttons = null;
 
     if (collector.eventTypes.one) {
       /**
@@ -273,7 +271,7 @@ class List extends BaseView {
 
     const elements = [];
     const listClasses = [];
-    this.buttons = elementCreator.createContainer({ classes: ['listButtons'] });
+    const buttons = [];
     this.lastObject = null;
 
     if (this.title) {
@@ -284,7 +282,6 @@ class List extends BaseView {
               this.onToggle();
             }
 
-            this.buttons.classList.toggle('hide');
             this.listElement.classList.toggle('hide');
             this.header.classList.toggle('expanded');
           },
@@ -294,7 +291,6 @@ class List extends BaseView {
       });
 
       if (this.shouldToggle) {
-        this.buttons.classList.add('hide');
         listClasses.push('hide');
         this.header.classList.toggle('expanded');
       }
@@ -309,17 +305,18 @@ class List extends BaseView {
           leftFunc: () => {
             this.showOff = !this.showOff;
             this.shouldToggle = false;
-            offButton.classList.toggle('offOn');
 
             this.appendList();
           },
         },
       });
 
-      this.buttons.appendChild(offButton);
-    }
+      if (this.showOff) {
+        offButton.classList.add('offOn');
+      }
 
-    elements.push(this.buttons);
+      buttons.push(offButton);
+    }
 
     this.listElement = elementCreator.createList({
       classes: listClasses,
@@ -327,10 +324,17 @@ class List extends BaseView {
 
     this.listElement.addEventListener('click', () => {
       if (this.shouldToggle && !viewTools.isLandscape()) {
-        this.buttons.classList.toggle('hide');
         this.listElement.classList.toggle('hide');
       }
     });
+
+
+    if (buttons.length > 0) {
+      this.listElement.appendChild(elementCreator.createListItem({
+        classes: ['listButtonsItem'],
+        elements: [elementCreator.createContainer({ elements: buttons, classes: ['listButtons'] })],
+      }));
+    }
 
     elements.push(this.listElement);
 
@@ -352,7 +356,6 @@ class List extends BaseView {
   }
 
   hideList() {
-    this.buttons.classList.add('hide');
     this.listElement.classList.add('hide');
 
     if (this.header) {
@@ -639,13 +642,11 @@ class List extends BaseView {
    * Add one new list item to the list.
    * @param {Object} params Parameters.
    * @param {Object} params.object Object to create an item from.
-   * @param {boolean} [params.effect] Should the text printed have a typewriter effect?
    * @param {boolean} [params.shouldReplace] Should the list item replace an existing item?
    * @param {boolean} [params.shouldFlash] Should the list item visually flash when added to the DOM?
    */
   addOneItem({
     object,
-    effect,
     shouldReplace = false,
     shouldFlash = false,
   }) {
@@ -653,18 +654,7 @@ class List extends BaseView {
     const newItem = this.createListItem({ object });
     const element = this.getElement(objectId);
 
-    if (effect) {
-      const children = Array.from(newItem.childNodes);
-      const dumpFragment = document.createDocumentFragment();
-
-      children.forEach(child => dumpFragment.appendChild(child));
-
-      textTools.typewriter({
-        paragraphs: children,
-        target: newItem,
-        charFunc: () => { this.scrollList(); },
-      });
-    } else if (shouldFlash) {
+    if (shouldFlash) {
       newItem.classList.add(cssClasses.newListItem);
       setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, this.itemChangeTimeout);
     }

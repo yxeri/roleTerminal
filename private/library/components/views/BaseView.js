@@ -91,8 +91,6 @@ class BaseView {
   }
 
   showView() {
-    console.log('access show', this.minimumAccessLevel, this.element);
-
     if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
       return;
     }

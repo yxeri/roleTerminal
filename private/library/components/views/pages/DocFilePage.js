@@ -25,7 +25,6 @@ const accessCentral = require('../../../AccessCentral');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const viewSwitcher = require('../../../ViewSwitcher');
-const textTools = require('../../../TextTools');
 
 /**
  * Create fragment with admin buttons for the document.
@@ -180,7 +179,6 @@ class DocFilePage extends BaseView {
     elementId,
     classes,
     docFile,
-    effect,
   }) {
     const newElement = elementCreator.createContainer({
       elementId,
@@ -198,29 +196,11 @@ class DocFilePage extends BaseView {
       }));
     }
 
-    if (effect) {
-      const children = ([createHeader({ docFile })]).concat(Array.from(createBody({ docFile }).childNodes));
-      const dumpFragment = document.createDocumentFragment();
+    newElement.appendChild(createHeader({ docFile }));
+    newElement.appendChild(createBody({ docFile }));
 
-      children.forEach(child => dumpFragment.appendChild(child));
-
-      textTools.typewriter({
-        amount: 15,
-        paragraphs: children,
-        target: newElement,
-        callback: () => {
-          if (docFile.images && docFile.images.length > 0) {
-            newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
-          }
-        },
-      });
-    } else {
-      newElement.appendChild(createHeader({ docFile }));
-      newElement.appendChild(createBody({ docFile }));
-
-      if (docFile.images && docFile.images.length > 0) {
-        newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
-      }
+    if (docFile.images && docFile.images.length > 0) {
+      newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
     }
 
     this.replaceOnParent({ element: newElement });

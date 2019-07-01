@@ -15,13 +15,13 @@ const labels = {
       en: 'No',
     },
     he: (override.General && override.General.he) || {
-      en: 'He',
+      en: 'He/Him',
     },
     they: (override.General && override.General.they) || {
-      en: 'They',
+      en: 'They/Them',
     },
     she: (override.General && override.General.she) || {
-      en: 'She',
+      en: 'She/Her',
     },
     it: (override.General && override.General.it) || {
       en: 'It',
@@ -31,8 +31,8 @@ const labels = {
     offName: (override.UserList && override.UserList.offName) || {
       en: 'OFF name',
     },
-    pronouns: (override.UserList && override.UserList.pronouns) || {
-      en: 'Pronouns',
+    description: (override.UserList && override.UserList.description) || {
+      en: 'Intro',
     },
   },
   Button: {
@@ -83,7 +83,7 @@ const labels = {
       en: 'Edit',
     },
     myProfile: (override.Button && override.Button.myProfile) || {
-      en: 'My profile',
+      en: 'Profile',
     },
   },
   Transaction: {
@@ -271,7 +271,7 @@ const labels = {
       se: 'Användare existerar redan.',
     },
     description: (override.RegisterDialog && override.RegisterDialog.description) || {
-      en: 'Description',
+      en: 'Introduction',
     },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
       en: 'The user name can be max 40 characters long.',
@@ -571,7 +571,7 @@ const labels = {
       en: 'You are transferring to team',
     },
     trackPosition: (override.UserDialog && override.UserDialog.trackPosition) || {
-      en: 'Track user',
+      en: 'Position',
     },
     username: (override.UserDialog && override.UserDialog.username) || {
       en: 'Username',
@@ -624,6 +624,35 @@ const labels = {
   InvitationList: {
     receiver: (override.InvitationList && override.InvitationList.receiver) || {
       en: 'Receiver',
+    },
+  },
+  TerminalPage: {
+    multipleMatches: (override.TerminalPage && override.TerminalPage.multipleMatches) || {
+      en: '$ Multiple matched commands',
+    },
+    notFound: (override.TerminalPage && override.TerminalPage.notFound) || {
+      en: 'command not found',
+    },
+    programs: (override.TerminalPage && override.TerminalPage.programs) || {
+      en: 'Programs',
+    },
+    abortCommand: (override.TerminalPage && override.TerminalPage.abort) || {
+      en: 'abort command',
+    },
+    typeAbort: (override.TerminalPage && override.TerminalPage.typeAbort) || {
+      en: 'Type abort or click to',
+    },
+    aborted: (override.TerminalPage && override.TerminalPage.aborted) || {
+      en: 'You have aborted the running program',
+    },
+    running: (override.TerminalPage && override.TerminalPage.running) || {
+      en: 'Running command',
+    },
+    completed: (override.TerminalPage && override.TerminalPage.completed) || {
+      en: 'Process completed',
+    },
+    placeholder: (override.TerminalPage && override.TerminalPage.placeholder) || {
+      en: 'Enter to see programs',
     },
   },
 };

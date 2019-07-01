@@ -96,7 +96,7 @@ class RegisterDialog extends BaseDialog {
       inputName: 'description',
       type: 'text',
       multiLine: true,
-      maxLength: 500,
+      maxLength: 300,
       shouldResize: true,
       placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
     }),
@@ -145,6 +145,7 @@ class RegisterDialog extends BaseDialog {
                 password: this.getInputValue(ids.PASSWORD),
                 registerDevice: storageManager.getDeviceId(),
                 pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
+                description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error, data }) => {
                 if (error) {

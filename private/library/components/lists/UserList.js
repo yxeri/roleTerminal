@@ -44,7 +44,14 @@ class UserList extends List {
     }, {
       paramName: 'offName',
       isOff: true,
-      classes: ['offName'],
+      classes: ['offName', 'offValue'],
+      convertFunc: (offName) => {
+        if (typeof offName !== 'boolean') {
+          return `(${offName})`;
+        }
+
+        return '';
+      },
     }];
 
     const params = {

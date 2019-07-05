@@ -17,6 +17,9 @@
 const mouseHandler = require('./MouseHandler');
 const textTools = require('./TextTools');
 const labelHandler = require('./labels/LabelHandler');
+const eventCentral = require('./EventCentral');
+const userComposer = require('./data/composers/UserComposer');
+const accessCentral = require('./AccessCentral');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
@@ -93,6 +96,8 @@ function createBaseElement({
   elementType,
   clickFuncs,
   name,
+  object,
+  needsFullAccess,
 }) {
   const element = document.createElement(elementType);
 
@@ -100,6 +105,39 @@ function createBaseElement({
   setElementId(element, elementId);
   setClickFuncs(element, clickFuncs);
   setName(element, name);
+
+  if (object) {
+    eventCentral.addWatcher({
+      event: eventCentral.Events.USER_CHANGE,
+      func: () => {
+        const {
+          hasAccess,
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          toAuth: userComposer.getCurrentUser(),
+          objectToAccess: object,
+        });
+
+        if (!hasAccess || (needsFullAccess && !hasFullAccess)) {
+          element.classList.add('hide');
+        } else {
+          element.classList.remove('hide');
+        }
+      },
+    });
+
+    const {
+      hasAccess,
+      hasFullAccess,
+    } = accessCentral.hasAccessTo({
+      toAuth: userComposer.getCurrentUser(),
+      objectToAccess: object,
+    });
+
+    if (!hasAccess || (needsFullAccess && !hasFullAccess)) {
+      element.classList.add('hide');
+    }
+  }
 
   return element;
 }
@@ -223,6 +261,8 @@ class ElementCreator {
     text,
     clickFuncs,
     elementId,
+    needsFullAccess,
+    object,
     classes = [],
   }) {
     const span = this.createSpan({
@@ -232,6 +272,8 @@ class ElementCreator {
       elementId,
       clickFuncs,
       classes,
+      needsFullAccess,
+      object,
       elementType: 'button',
     });
 
@@ -304,11 +346,15 @@ class ElementCreator {
     shouldResize,
     text,
     isLocked,
+    object,
+    needsFullAccess,
     placeholder = '',
   }) {
     const input = createBaseElement({
       elementId,
       classes,
+      needsFullAccess,
+      object,
       name: inputName,
       elementType: multiLine
         ? 'textarea'

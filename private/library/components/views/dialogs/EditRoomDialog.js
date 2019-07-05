@@ -39,6 +39,8 @@ class EditRoomDialog extends BaseDialog {
 
     const inputs = [
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.ROOMNAME,
         inputName: 'roomName',
         type: 'text',
@@ -46,6 +48,8 @@ class EditRoomDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'roomName' }),
       }),
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.PASSWORD,
         inputName: 'password',
         type: 'password',
@@ -53,6 +57,8 @@ class EditRoomDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'password' }),
       }),
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.REPEATPASSWORD,
         inputName: 'repeatPassword',
         type: 'password',
@@ -133,6 +139,8 @@ class EditRoomDialog extends BaseDialog {
 
     if (room.password) {
       lowerButtons.push(elementCreator.createButton({
+        object: room,
+        needsFullAccess: true,
         text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'removePassword' }),
         clickFuncs: {
           leftFunc: () => {
@@ -155,6 +163,8 @@ class EditRoomDialog extends BaseDialog {
     }
 
     lowerButtons.push(elementCreator.createButton({
+      object: room,
+      needsFullAccess: true,
       text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
       clickFuncs: {
         leftFunc: () => {

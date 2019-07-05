@@ -36,7 +36,7 @@ class UserList extends List {
     classes = [],
     elementId = `fUserList-${Date.now()}`,
   }) {
-    classes.push('fullUserList', 'userList');
+    classes.push('fullUserList');
 
     const headerFields = [{
       paramName: 'username',

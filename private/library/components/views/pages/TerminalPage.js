@@ -142,6 +142,7 @@ class TerminalPage extends BaseView {
     this.queueMessages({
       objects: [
         { element: elementCreator.createSpan({ text: `[${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'completed' })}]` }) },
+        { element: elementCreator.createSpan({ text: '' }) },
       ],
     });
     this.printCommands();

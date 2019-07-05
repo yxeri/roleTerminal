@@ -11,7 +11,7 @@
  limitations under the License.
  */
 
-$background-color: rgba(0, 0, 0, 0.98);
+$background-color: black;
 $second-background-color: #23001e;
 $menu-background-color: rgba(35, 0, 30, 0.98);
 $text-color: white;
@@ -29,7 +29,7 @@ $header-color: #2e001a;
 
 $p-margin: .4em;
 $border-width: 1px;
-$status-bar-height: 1.4em;
+$status-bar-height: 1.6em;
 $map-box-padding: .5em;
 $padding: .3em;
 $border: $border-width solid $second-color;
@@ -37,6 +37,7 @@ $border-second: $border-width solid $light-color;
 $menu-min-width: 7em;
 $menu-max-width: 11em;
 $button-margin: .2em;
+$line-height: 1.2em;
 
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
@@ -155,10 +156,6 @@ select {
   color: $second-text-color;
 }
 
-.clickable:hover {
-  background-color: $second-color !important;
-}
-
 .cover {
   background-color: rgba(0, 0, 0, .6);
   z-index: 9;
@@ -212,7 +209,7 @@ select {
 }
 
 .withMenuBar {
-  height: calc(100% - #{$status-bar-height});
+  height: calc(100% - #{$status-bar-height} - .2em);
   order: 1;
 }
 
@@ -303,6 +300,10 @@ select {
     display: flex;
     -webkit-align-items: center;
     align-items: center;
+
+    span {
+      display: block;
+    }
   }
 
   .listItemWithImage {
@@ -383,11 +384,14 @@ select {
   .fullUserList {
     ul {
       li {
-        -webkit-align-items: flex-start;
-        align-items: flex-start;
+        overflow: hidden;
 
         span {
           display: block;
+        }
+
+        p {
+          overflow: initial;
         }
 
         .listItemImage {
@@ -562,6 +566,7 @@ $msgList-msgLine-side-padding: .2em;
     overflow-x: hidden;
     padding: $padding;
     height: calc(100% - #{$padding});
+    line-height: $line-height;
   }
 
   .terminalInput {
@@ -596,7 +601,6 @@ $msgList-msgLine-side-padding: .2em;
     height: 2em;
 
     .listButtons {
-      position: fixed;
       background-color: $background-color;
     }
   }
@@ -796,6 +800,7 @@ $map-padding-fix: 2em;
   font-size: 1.1em;
   -webkit-align-items: center;
   align-items: center;
+  height: $status-bar-height;
 
   > span {
     margin-right: $padding;
@@ -833,7 +838,7 @@ $map-padding-fix: 2em;
     max-height: calc(100% - 1.5em);
     overflow-y: scroll;
     border: $border;
-    bottom: calc(#{$status-bar-height} - .2em);
+    bottom: calc(#{$status-bar-height} - #{$padding});
     -webkit-box-shadow: 2px 0 5px black;
     box-shadow: 2px 0 5px black;
     scrollbar-width: none;
@@ -858,10 +863,6 @@ $map-padding-fix: 2em;
       }
     }
   }
-}
-
-.hideOverflow {
-  overflow: hidden;
 }
 
 .currentUserList {
@@ -893,7 +894,7 @@ $map-padding-fix: 2em;
 
 .pre {
   white-space: pre;
-  font-size: .8em;
+  font-size: .9em;
 }
 
 .fullscreen {
@@ -904,6 +905,20 @@ $map-padding-fix: 2em;
   height: 100%;
   background-color: $background-color;
   z-index: 10;
+}
+
+.textAnimation {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: calc(100% - (#{$padding} * 2));
+  background-color: $background-color;
+  z-index: 10;
+  overflow-y: auto;
+  padding: $padding;
+  scrollbar-width: none;
+  line-height: $line-height;
 }
 
 #screenFilter {
@@ -927,6 +942,10 @@ $map-padding-fix: 2em;
   width: 100%;
   height: 100%;
   font-size: .9em;
+}
+
+.oldIosFix {
+  height: calc(100% - 1.5em) !important;
 }
 
 .fastGlitch, .normalGlitch, .slowGlitch {
@@ -1081,6 +1100,12 @@ $map-padding-fix: 2em;
     .oneOfTwo:last-child {
       height: calc(100% - 1.8em - #{$border-width});
       width: 100%;
+    }
+  }
+
+  .list {
+    .listButtons {
+      position: fixed;
     }
   }
 }

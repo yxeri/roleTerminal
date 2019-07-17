@@ -200,7 +200,11 @@ class ElementCreator {
     }
 
     pictureElement.addEventListener('load', () => {
-      pictureElement.setAttribute('style', pictureElement.getAttribute('style').replace(`height: ${picture.height}px;`, ''));
+      const style = pictureElement.getAttribute('style');
+
+      if (style) {
+        pictureElement.setAttribute('style', style.replace(`height: ${picture.height}px;`, ''));
+      }
     });
 
     return pictureElement;

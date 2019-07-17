@@ -34,8 +34,7 @@ $map-box-padding: .5em;
 $padding: .3em;
 $border: $border-width solid $second-color;
 $border-second: $border-width solid $light-color;
-$menu-min-width: 7em;
-$menu-max-width: 11em;
+$menu-min-width: 10em;
 $button-margin: .2em;
 $line-height: 1.2em;
 
@@ -117,6 +116,10 @@ img {
   max-width: 100%;
   object-fit: scale-down;
   background-color: black;
+}
+
+input {
+  border-radius: 0;
 }
 
 input[type=radio] {
@@ -339,7 +342,6 @@ select {
     -webkit-flex-grow: 1;
     flex-grow: 1;
     min-width: $menu-min-width;
-    max-width: $menu-max-width;
   }
 
   .oneOfTwo:last-child {
@@ -349,17 +351,60 @@ select {
 }
 
 .docFileView {
-  .docFileHeader {
-    border-bottom: $border-width solid $second-color;
-    padding-bottom: $padding;
-    margin-bottom: $padding;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
+  .docFileList {
+    ul {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-flow: row wrap;
+      flex-flow: row wrap;
 
-    span:first-child {
-      font-size: 1.5em;
+      li {
+        text-align: center;
+        width: 9.5em;
+        overflow: hidden;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        border-bottom: none;
+        margin-bottom: 1em;
+
+        p {
+          order: 2;
+        }
+
+        .attachedImage {
+          order: 1;
+          height: 4em;
+        }
+      }
+    }
+  }
+
+  .docFilePage {
+    position: relative;
+
+    .docFileHeader {
+      border-bottom: $border-width solid $second-color;
+      padding-bottom: $padding;
+      margin-bottom: $padding;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+
+      span:first-child {
+        font-size: 1.5em;
+      }
+    }
+
+    .close {
+      position: absolute;
+      right: 0;
+
+      button {
+        padding: 0 .2em;
+      }
     }
   }
 
@@ -573,6 +618,46 @@ $msgList-msgLine-side-padding: .2em;
     input {
       width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
     }
+
+    input {
+      height: 1.8em;
+      border-top: $border;
+      border-bottom: $border;
+    }
+  }
+}
+
+.personPage {
+  div {
+    width: 100%;
+    height: 100%;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    align-items: center;
+
+    img {
+      max-height: 70%;
+    }
+
+    p {
+      background-color: $text-color;
+      color: $background-color;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .close {
+    top: 0;
+    right: 0;
+    position: absolute;
+
+    button {
+      padding: 0 .2em;
+    }
   }
 }
 
@@ -598,10 +683,21 @@ $msgList-msgLine-side-padding: .2em;
   }
 
   .listButtonsItem {
-    height: 2em;
+    height: 1.5em;
 
     .listButtons {
-      background-color: $background-color;
+      background-color: inherit;
+      display: -webkit-flex;
+      display: flex;
+
+      span {
+        display: initial;
+      }
+
+      button {
+        border: none;
+        background-color: inherit;
+      }
     }
   }
 }
@@ -834,11 +930,10 @@ $map-padding-fix: 2em;
     background-color: $second-background-color;
     max-width: 12em;
     z-index: 9;
-    border-bottom: $border;
     max-height: calc(100% - 1.5em);
     overflow-y: scroll;
     border: $border;
-    bottom: calc(#{$status-bar-height} - #{$padding});
+    bottom: calc(#{$status-bar-height} - #{$border-width});
     -webkit-box-shadow: 2px 0 5px black;
     box-shadow: 2px 0 5px black;
     scrollbar-width: none;
@@ -1000,7 +1095,7 @@ $map-padding-fix: 2em;
   }
 }
 
-@media (orientation: portrait), (orientation: landscape) and (max-width: 768px) {
+@media (orientation: portrait), (orientation: landscape) and (max-width: 1023px) {
   #main {
     > .viewWrapper {
       > .oneOfTwo:nth-child(2) {
@@ -1014,7 +1109,9 @@ $map-padding-fix: 2em;
       > .oneOfThree:nth-child(3) {
         display: none;
       }
+    }
 
+    .viewWrapper {
       > .oneOfTwo {
         border-right: none;
       }
@@ -1100,6 +1197,14 @@ $map-padding-fix: 2em;
     .oneOfTwo:last-child {
       height: calc(100% - 1.8em - #{$border-width});
       width: 100%;
+    }
+  }
+
+  .personPage {
+    div {
+      img {
+        width: inherit !important;
+      }
     }
   }
 

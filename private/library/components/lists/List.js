@@ -96,6 +96,9 @@ class List extends BaseView {
     listType,
     collapseEqual,
     onToggle,
+    imageThumb,
+    defaultImage,
+    buttons,
     hasOffToggle = false,
     showOff = false,
     listItemFieldsClasses = [],
@@ -152,6 +155,9 @@ class List extends BaseView {
     this.onToggle = onToggle;
     this.showOff = showOff;
     this.hasOffToggle = hasOffToggle;
+    this.imageThumb = imageThumb;
+    this.defaultImage = defaultImage;
+    this.buttons = buttons;
 
     if (collector.eventTypes.one) {
       /**
@@ -300,7 +306,11 @@ class List extends BaseView {
 
     if (this.hasOffToggle) {
       const offButton = elementCreator.createButton({
-        text: '[OFF]',
+        image: {
+          fileName: 'offgame.png',
+          height: 20,
+          width: 20,
+        },
         clickFuncs: {
           leftFunc: () => {
             this.showOff = !this.showOff;
@@ -311,11 +321,11 @@ class List extends BaseView {
         },
       });
 
-      if (this.showOff) {
-        offButton.classList.add('offOn');
-      }
-
       buttons.push(offButton);
+    }
+
+    if (this.buttons) {
+      buttons.push(...this.buttons);
     }
 
     this.listElement = elementCreator.createList({
@@ -329,11 +339,13 @@ class List extends BaseView {
     });
 
 
-    if (buttons.length > 0) {
-      this.listElement.appendChild(elementCreator.createListItem({
+    if (buttons.length > 0 && storageManager.getAccessLevel() >= accessCentral.AccessLevels.STANDARD) {
+      const item = elementCreator.createListItem({
         classes: ['listButtonsItem'],
         elements: [elementCreator.createContainer({ elements: buttons, classes: ['listButtons'] })],
-      }));
+      });
+
+      this.listElement.appendChild(item);
     }
 
     elements.push(this.listElement);
@@ -595,10 +607,15 @@ class List extends BaseView {
         listItemElements.push(elementCreator.createParagraph(paragraphParams));
       }
 
-      if (this.shouldAppendImage && object.image && object.image.imageName) {
+      if (this.shouldAppendImage
+        && ((object.image && object.image.imageName)
+          || (object.images && object.images[0] && object.images[0].imageName)
+          || (this.defaultImage))) {
         listItemElements.push(elementCreator.createPicture({
-          picture: object.image,
+          picture: object.image || object.images[0] || this.defaultImage,
           classes: ['attachedImage'],
+          isThumb: this.imageThumb,
+          isUploaded: typeof object.image !== 'undefined' || typeof object.images[0] !== 'undefined',
         }));
       }
 

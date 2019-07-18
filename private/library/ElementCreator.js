@@ -267,6 +267,7 @@ class ElementCreator {
     elementId,
     needsFullAccess,
     object,
+    image,
     classes = [],
   }) {
     const span = this.createSpan({
@@ -281,7 +282,12 @@ class ElementCreator {
       elementType: 'button',
     });
 
-    button.appendChild(document.createTextNode(text));
+    if (image) {
+      button.appendChild(ElementCreator.createPicture({ picture: image, isUploaded: false }));
+    } else {
+      button.appendChild(document.createTextNode(text));
+    }
+
     span.appendChild(button);
 
     return span;

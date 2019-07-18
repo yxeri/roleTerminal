@@ -38,6 +38,12 @@ class DocFileList extends List {
       sorting,
       effect,
       listItemFields,
+      defaultImage: {
+        fileName: 'file.jpg',
+      },
+      shouldFocusOnClick: false,
+      shouldAppendImage: true,
+      imageThumb: true,
       classes: classes.concat(['docFileList']),
       dependencies: [
         dataHandler.docFiles,

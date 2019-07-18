@@ -28,6 +28,7 @@ const storageManager = require('../../../StorageManager');
 const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
 const roomComposer = require('../../../data/composers/RoomComposer');
+const textTools = require('../../../TextTools');
 
 class UserDialog extends BaseDialog {
   constructor({
@@ -130,24 +131,6 @@ class UserDialog extends BaseDialog {
       }
     }
 
-    if (userPosition) {
-      lowerButtons.push(elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
-        clickFuncs: {
-          leftFunc: () => {
-            this.removeFromView();
-
-            viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
-
-            eventCentral.emitEvent({
-              event: eventCentral.Events.FOCUS_MAPPOSITION,
-              params: { position: userPosition },
-            });
-          },
-        },
-      }));
-    }
-
     const upperText = [`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`];
     const lowerText = [];
 
@@ -164,9 +147,26 @@ class UserDialog extends BaseDialog {
     }
 
     if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
-      const positionLabel = `(${userPosition.lastUpdated}) Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
+      const positionDate = textTools.generateTimestamp({ date: userPosition.lastUpdated });
+      const positionLabel = `(${positionDate.fullTime} ${positionDate.fullDate}) Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
 
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+
+      lowerButtons.push(elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
+        clickFuncs: {
+          leftFunc: () => {
+            this.removeFromView();
+
+            viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
+
+            eventCentral.emitEvent({
+              event: eventCentral.Events.FOCUS_MAPPOSITION,
+              params: { position: userPosition },
+            });
+          },
+        },
+      }));
     }
 
     const images = [];

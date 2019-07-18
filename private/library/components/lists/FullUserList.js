@@ -16,6 +16,7 @@
 
 const List = require('./List');
 const UserDialog = require('../views/dialogs/UserDialog');
+const PersonPage = require('../views/pages/PersonPage');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
@@ -24,6 +25,7 @@ const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
 const labelHandler = require('../../labels/LabelHandler');
+const elementCreator = require('../../ElementCreator');
 
 class UserList extends List {
   constructor({
@@ -76,6 +78,23 @@ class UserList extends List {
       shouldFocusOnClick,
       effect,
       shouldToggle,
+      buttons: [
+        elementCreator.createButton({
+          image: {
+            fileName: 'smile.png',
+            height: 20,
+            width: 20,
+          },
+          clickFuncs: {
+            leftFunc: () => {
+              const personPage = new PersonPage({});
+
+              personPage.addToView({ element: viewSwitcher.getParentElement() });
+            },
+          },
+        }),
+      ],
+      imageThumb: true,
       hasOffToggle: true,
       sorting: {
         paramName: 'username',

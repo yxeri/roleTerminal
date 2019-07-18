@@ -37,9 +37,6 @@ class TerminalPage extends BaseView {
     this.nextFunc = null;
     this.printing = false;
     this.queue = [];
-    this.outputList = elementCreator.createList({
-      classes: ['terminalOutput'],
-    });
     this.inputArea = new InputArea({
       focusless: true,
       placeholder: labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'placeholder' }),
@@ -52,10 +49,7 @@ class TerminalPage extends BaseView {
       },
     });
 
-    this.element.appendChild(this.outputList);
-    this.inputArea.addToView({
-      element: this.element,
-    });
+    this.clearView();
 
     keyHandler.addKey(9, () => {
       this.autoCompleteCommand();
@@ -74,6 +68,8 @@ class TerminalPage extends BaseView {
     });
 
     this.inputArea.setKeyListener();
+
+    setTimeout(() => { this.scrollView(); });
   }
 
   removeFromView() {
@@ -101,7 +97,7 @@ class TerminalPage extends BaseView {
 
       const callback = () => {
         this.outputList.appendChild(elementCreator.createListItem({ elements: [element] }));
-        this.outputList.lastElementChild.scrollIntoView(true);
+        this.scrollView();
 
         setTimeout(() => { this.consumeQueue(); }, afterTimeout);
       };
@@ -171,6 +167,14 @@ class TerminalPage extends BaseView {
         };
       }),
     });
+  }
+
+  scrollView() {
+    const lastElement = this.outputList.lastElementChild;
+
+    if (lastElement) {
+      lastElement.scrollIntoView(true);
+    }
   }
 
   triggerCommand(value) {
@@ -286,6 +290,18 @@ class TerminalPage extends BaseView {
         }),
       });
     }
+  }
+
+  clearView() {
+    this.outputList = elementCreator.createList({
+      classes: ['terminalOutput'],
+    });
+    this.element.innerHTML = '';
+    this.element.appendChild(this.outputList);
+    this.inputArea.addToView({
+      element: this.element,
+    });
+    this.inputArea.clearInput();
   }
 }
 

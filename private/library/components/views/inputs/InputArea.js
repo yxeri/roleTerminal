@@ -36,6 +36,7 @@ class InputArea extends BaseView {
       shouldResize: true,
       type: 'text',
     });
+    this.multiLine = multiLine;
     this.focusless = focusless;
     this.isFocused = false;
     this.focusCallback = focusCallback;
@@ -108,8 +109,11 @@ class InputArea extends BaseView {
     }
 
     this.textArea.value = '';
-    this.textArea.style.height = 'auto';
-    this.textArea.style.height = `${this.textArea.scrollHeight}px`;
+
+    if (this.multiLine) {
+      this.textArea.style.height = 'auto';
+      this.textArea.style.height = `${this.textArea.scrollHeight}px`;
+    }
   }
 
   setKeyListener() {

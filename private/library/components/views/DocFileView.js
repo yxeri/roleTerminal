@@ -18,6 +18,8 @@ const ViewWrapper = require('../ViewWrapper');
 const DocFileList = require('../lists/DocFileList');
 const DocFilePage = require('./pages/DocFilePage');
 
+const eventCentral = require('../../EventCentral');
+
 class DocFileView extends ViewWrapper {
   constructor({
     effect,
@@ -25,7 +27,13 @@ class DocFileView extends ViewWrapper {
     elementId = `dFView-${Date.now()}`,
   }) {
     const docFileList = new DocFileList({});
-    const docFilePage = new DocFilePage({ effect });
+    const docFilePage = new DocFilePage({
+      effect,
+      closeFunc: () => {
+        this.columnElements[0].classList.remove('hide');
+        this.columnElements[1].classList.add('hide');
+      },
+    });
 
     super({
       elementId,
@@ -33,10 +41,20 @@ class DocFileView extends ViewWrapper {
         {
           components: [{ component: docFileList }],
           classes: ['columnList'],
+        }, {
+          components: [{ component: docFilePage }],
+          classes: ['hide'],
         },
-        { components: [{ component: docFilePage }] },
       ],
       classes: classes.concat(['docFileView']),
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.OPEN_DOCFILE,
+      func: () => {
+        this.columnElements[0].classList.add('hide');
+        this.columnElements[1].classList.remove('hide');
+      },
     });
   }
 }

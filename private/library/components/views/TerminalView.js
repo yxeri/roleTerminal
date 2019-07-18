@@ -48,6 +48,13 @@ class TerminalView extends ViewWrapper {
         this.skipBoot = false;
       },
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        this.terminalPage.clearView();
+      },
+    });
   }
 
   addToView({ element }) {

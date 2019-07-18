@@ -80,7 +80,7 @@ class EditDocFileDialog extends BaseDialog {
             optionId: ids.VISIBILITY_PRIVATE,
             optionLabel: 'Only those with the correct code',
             value: 'private',
-            isDefault: docFile.isPublic,
+            isDefault: !docFile.isPublic,
           },
         ],
       }),

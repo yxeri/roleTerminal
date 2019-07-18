@@ -61,6 +61,7 @@ class UserList extends List {
       shouldFocusOnClick,
       effect,
       shouldToggle,
+      imageThumb: true,
       hasOffToggle: true,
       sorting: {
         paramName: 'username',

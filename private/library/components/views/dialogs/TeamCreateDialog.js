@@ -75,20 +75,22 @@ class TeamCreateDialog extends BaseDialog {
                       case 'teamName': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamNameLength' })] });
 
-                        break;
+                        return;
                       }
                       case 'shortName': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'shortNameLength' })] });
 
-                        break;
+                        return;
                       }
                       default: {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
-                        break;
+                        return;
                       }
                     }
                   }
+
+                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                   return;
                 }

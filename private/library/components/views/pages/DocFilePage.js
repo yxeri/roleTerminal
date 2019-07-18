@@ -102,6 +102,7 @@ function createBody({ docFile }) {
 class DocFilePage extends BaseView {
   constructor({
     effect,
+    closeFunc = () => {},
     classes = [],
     elementId = `dFPage-${Date.now()}`,
   }) {
@@ -117,8 +118,9 @@ class DocFilePage extends BaseView {
       func: ({ docFile }) => {
         this.createDocument({
           elementId,
-          classes,
+          classes: classes.concat(['docFilePage']),
           docFile,
+          closeFunc,
           effect: this.openDocFileId === docFile.objectId
             ? false
             : effect,
@@ -146,8 +148,6 @@ class DocFilePage extends BaseView {
         docFile,
         changeType,
       }) => {
-        console.log('doc file page', changeType, docFile, this.openDocFileId);
-
         switch (changeType) {
           case socketManager.ChangeTypes.REMOVE: {
             if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
@@ -160,8 +160,9 @@ class DocFilePage extends BaseView {
             if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
               this.createDocument({
                 elementId,
-                classes,
                 docFile,
+                closeFunc,
+                classes: classes.concat(['docFilePage']),
               });
             }
 
@@ -179,6 +180,7 @@ class DocFilePage extends BaseView {
     elementId,
     classes,
     docFile,
+    closeFunc,
   }) {
     const newElement = elementCreator.createContainer({
       elementId,
@@ -188,6 +190,16 @@ class DocFilePage extends BaseView {
       objectToAccess: docFile,
       toAuth: userComposer.getCurrentUser(),
     });
+
+    newElement.appendChild(elementCreator.createButton({
+      text: 'X',
+      classes: ['close'],
+      clickFuncs: {
+        leftFunc: () => {
+          closeFunc();
+        },
+      },
+    }));
 
     if (hasFullAccess) {
       newElement.appendChild(createControls({

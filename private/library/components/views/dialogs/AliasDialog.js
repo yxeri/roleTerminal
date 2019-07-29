@@ -23,6 +23,8 @@ const aliasComposer = require('../../../data/composers/AliasComposer');
 const ids = {
   OFFNAME: 'fullName',
   ALIASNAME: 'aliasname',
+  DESCRIPTION: 'description',
+  PRONOUNS: 'pronouns',
 };
 
 class AliasDialog extends BaseDialog {
@@ -40,12 +42,26 @@ class AliasDialog extends BaseDialog {
         maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasName' }),
       }),
+      elementCreator.createSelect({
+        isRequired: true,
+        elementId: ids.PRONOUNS,
+        multiple: true,
+        options: [
+          { value: '', name: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'choosePronouns' }) },
+          { value: 'they', name: labelHandler.getLabel({ baseObject: 'General', label: 'they' }) },
+          { value: 'she', name: labelHandler.getLabel({ baseObject: 'General', label: 'she' }) },
+          { value: 'he', name: labelHandler.getLabel({ baseObject: 'General', label: 'he' }) },
+          { value: 'it', name: labelHandler.getLabel({ baseObject: 'General', label: 'it' }) },
+        ],
+      }),
       elementCreator.createInput({
-        elementId: ids.FULLNAME,
-        inputName: 'fullName',
+        elementId: ids.DESCRIPTION,
+        inputName: 'description',
         type: 'text',
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullName' }),
+        multiLine: true,
+        maxLength: 300,
+        shouldResize: true,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
       }),
     ];
     const lowerButtons = [
@@ -63,10 +79,14 @@ class AliasDialog extends BaseDialog {
               return;
             }
 
+            const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
+              .filter(selected => selected.getAttribute('value') !== '');
+
             aliasComposer.createAlias({
               alias: {
                 aliasName: this.getInputValue(ids.ALIASNAME),
-                fullName: this.getInputValue(ids.FULLNAME),
+                pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
+                description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error }) => {
                 if (error) {

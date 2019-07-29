@@ -46,8 +46,8 @@ class UserList extends List {
       isOff: true,
       classes: ['offName', 'offValue'],
       convertFunc: (offName) => {
-        if (typeof offName !== 'boolean') {
-          return `(${offName})`;
+        if (offName && typeof offName !== 'boolean') {
+          return offName;
         }
 
         return '';

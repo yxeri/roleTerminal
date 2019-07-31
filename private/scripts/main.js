@@ -24,6 +24,8 @@ const elementCreator = require('../library/ElementCreator');
 const socketManager = require('../library/SocketManager');
 const textTools = require('../library/TextTools');
 const deviceChecker = require('../library/DeviceChecker');
+const WreckingStatus = require('./WreckingStatus');
+const eventCentral = require('../library/EventCentral');
 
 const organicaLogo = [
   { element: elementCreator.createSpan({ text: '                          ####', classes: ['pre'] }), fullscreen: true },
@@ -805,6 +807,7 @@ terminalView.terminalPage.addCommand({
   },
 });
 
+const wreckingStatus = new WreckingStatus({ parent: viewSwitcher.getParentElement() });
 const menuBar = new MenuBar({
   viewSwitcher,
   appendTop: false,
@@ -817,8 +820,18 @@ const menuBar = new MenuBar({
     view: true,
     docFile: true,
     team: true,
-    wallet: true,
   },
+  elements: [
+    elementCreator.createSpan({
+      text: 'WRCK',
+      classes: ['topMenuButton'],
+      clickFuncs: {
+        leftFunc: () => {
+          wreckingStatus.element.classList.remove('hide');
+        },
+      },
+    }),
+  ],
 });
 const docWrapper = new ViewWrapper({
   menuBar,
@@ -1048,4 +1061,37 @@ const boot = new TextAnimation({
   ]),
 });
 
-boot.addToView({ element: viewSwitcher.getParentElement() });
+socketManager.addEvents([{
+  event: 'lanternTeams',
+  func: ({ data }) => {
+    const { teams } = data;
+
+    eventCentral.emitEvent({
+      params: { teams },
+      event: 'lanternTeams',
+    });
+  },
+}, {
+  event: 'lanternRound',
+  func: ({ data }) => {
+    const { round } = data;
+
+    eventCentral.emitEvent({
+      params: { round },
+      event: 'lanternRound',
+    });
+  },
+}, {
+  event: 'lanternStations',
+  func: ({ data }) => {
+    const { stations } = data;
+
+    eventCentral.emitEvent({
+      params: { stations },
+      event: 'lanternStations',
+    });
+  },
+}]);
+
+socketManager.emitEvent('getWreckingStatus');
+

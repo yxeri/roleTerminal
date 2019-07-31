@@ -1022,6 +1022,12 @@ $map-padding-fix: 2em;
   line-height: $line-height;
 }
 
+.wreckingStatus {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 #screenFilter {
   height: 100%;
   width: 100%;

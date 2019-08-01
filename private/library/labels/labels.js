@@ -477,10 +477,6 @@ const labels = {
     },
   },
   MenuBar: {
-    menu: (override.MenuBar && override.MenuBar.menu) || {
-      en: 'Menu',
-      se: 'Meny',
-    },
     emptyTime: (override.MenuBar && override.MenuBar.emptyTime) || {
       en: '--:--',
     },

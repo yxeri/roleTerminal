@@ -237,6 +237,7 @@ class ElementCreator {
     classes,
     spanType,
     effect,
+    image,
   }) {
     const span = createBaseElement({
       elementId,
@@ -245,7 +246,9 @@ class ElementCreator {
       elementType: spanType || 'span',
     });
 
-    if (text) {
+    if (image) {
+      span.appendChild(ElementCreator.createPicture({ picture: image, isUploaded: false }));
+    } else if (text) {
       span.appendChild(document.createTextNode(text));
     }
 

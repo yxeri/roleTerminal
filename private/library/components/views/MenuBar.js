@@ -45,6 +45,7 @@ class MenuBar extends BaseView {
     viewSwitcher,
     image,
     currencySign,
+    elements,
     appendTop = false,
     showControls = {},
     showClock = true,
@@ -384,13 +385,18 @@ class MenuBar extends BaseView {
         },
       });
       const menuButton = this.createMenuButton({
+        classes: ['menuButton'],
         list: this.menuList,
         leftFunc: (event) => {
           this.menuList.classList.toggle('hide');
 
           event.stopPropagation();
         },
-        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'menu' }),
+        image: {
+          fileName: 'menuicon.png',
+          height: 20,
+          width: 20,
+        },
       });
 
       this.lists.push(this.menuList);
@@ -446,6 +452,12 @@ class MenuBar extends BaseView {
       this.element.appendChild(walletInfo.element);
     }
 
+    if (elements) {
+      elements.forEach((element) => {
+        this.element.appendChild(elementCreator.createContainer({ elements: [element] }));
+      });
+    }
+
     if (image) {
       this.element.appendChild(elementCreator.createPicture({
         picture: image,
@@ -476,12 +488,14 @@ class MenuBar extends BaseView {
 
   createMenuButton({
     list,
+    image,
     leftFunc = () => {},
     text = '-----',
     classes = [],
   }) {
     return elementCreator.createSpan({
       text,
+      image,
       classes: ['topMenuButton'].concat(classes),
       clickFuncs: {
         leftFunc: (event) => {

@@ -55,6 +55,11 @@ class InputArea extends BaseView {
     });
     this.imageInput = elementCreator.createImageInput({
       previewId,
+      image: {
+        fileName: 'image.png',
+        height: 20,
+        width: 20,
+      },
       elementId: ids.PICTURE,
       inputName: 'picture',
       appendPreview: true,

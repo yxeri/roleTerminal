@@ -115,7 +115,6 @@ span, p {
 img {
   max-width: 100%;
   object-fit: scale-down;
-  background-color: black;
 }
 
 input {
@@ -558,11 +557,21 @@ $msgList-msgLine-side-padding: .2em;
     .buttonContainer {
       position: relative;
 
-      img {
+      .imageInputButton {
+        button {
+          padding: 0;
+        }
+      }
+
+      .imagePreview {
         max-width: 120px;
         max-height: 120px;
         vertical-align: bottom;
         border: $border;
+      }
+
+      img {
+        vertical-align: middle;
       }
 
       button {
@@ -904,6 +913,10 @@ $map-padding-fix: 2em;
   align-items: center;
   height: $status-bar-height;
 
+  img {
+    vertical-align: middle;
+  }
+
   > span {
     margin-right: $padding;
   }
@@ -929,6 +942,11 @@ $map-padding-fix: 2em;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    display: block;
+  }
+
+  .menuButton {
+    display: grid;
   }
 
   .topMenu {

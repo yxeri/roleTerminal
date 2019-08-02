@@ -427,6 +427,7 @@ class ElementCreator {
     inputName,
     elementId,
     classes,
+    image,
     buttonText = labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'image' }),
     previewId = 'imagePreview',
     previewContainer = document.createElement('img'),
@@ -458,6 +459,8 @@ class ElementCreator {
     previewContainer.classList.add('imagePreview');
 
     container.appendChild(this.createButton({
+      image,
+      classes: ['imageInputButton'],
       text: buttonText,
       clickFuncs: {
         leftFunc: () => {

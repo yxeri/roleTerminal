@@ -1093,5 +1093,31 @@ socketManager.addEvents([{
   },
 }]);
 
-socketManager.emitEvent('getWreckingStatus');
+socketManager.emitEvent('getLanternInfo', {}, ({ data }) => {
+  const {
+    teams,
+    timeLeft,
+    round,
+    activeStations = [],
+    inactiveStations = [],
+  } = data;
+  const stations = activeStations.concat(inactiveStations);
 
+  eventCentral.emitEvent({
+    params: { teams },
+    event: 'lanternTeams',
+  });
+
+  eventCentral.emitEvent({
+    params: {
+      round,
+      timeLeft,
+    },
+    event: 'lanternRound',
+  });
+
+  eventCentral.emitEvent({
+    params: { stations },
+    event: 'lanternStations',
+  });
+});

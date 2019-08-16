@@ -827,7 +827,7 @@ const menuBar = new MenuBar({
       classes: ['topMenuButton'],
       clickFuncs: {
         leftFunc: () => {
-          wreckingStatus.element.classList.remove('hide');
+          wreckingStatus.element.classList.toggle('hide');
         },
       },
     }),
@@ -1074,10 +1074,13 @@ socketManager.addEvents([{
 }, {
   event: 'lanternRound',
   func: ({ data }) => {
-    const { round } = data;
+    const { round, timeLeft } = data;
 
     eventCentral.emitEvent({
-      params: { round },
+      params: {
+        round,
+        timeLeft,
+      },
       event: 'lanternRound',
     });
   },

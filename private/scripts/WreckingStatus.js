@@ -30,8 +30,8 @@ class WreckingStatus {
     this.timeLeft = new Date();
 
     this.element.appendChild(this.timeSpan);
-    this.element.appendChild(this.stationStats);
     this.element.appendChild(this.teamStats);
+    this.element.appendChild(this.stationStats);
 
     this.startTime();
 
@@ -67,25 +67,27 @@ class WreckingStatus {
               ? this.teams[foundTeamId].shortName.toUpperCase()
               : '-----';
             const classes = ['stationInfo'];
-            const elements = [];
+            const items = [];
 
             if (station.isUnderAttack && this.isActive) {
               classes.push('warning');
             }
 
-            elements.push(elementCreator.createSpan({ text: `${station.stationName || station.stationId}` }));
+            items.push({ elements: [elementCreator.createSpan({ text: `${station.stationName || station.stationId}` })] });
 
             if (!this.isActive) {
-              elements.push(elementCreator.createSpan({ text: 'REQUIRES' }), elementCreator.createSpan({ text: 'MAINTENANCE' }));
+              items.push({ elements: [elementCreator.createSpan({ text: 'REQUIRES MAINTENANCE' })] });
             } else if (station.isActive) {
-              elements.push(elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }), elementCreator.createSpan({ text: `Owner: ${ownerName}` }));
+              items.push({
+                elements: [elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }), elementCreator.createSpan({ text: `Owner: ${ownerName}` })],
+              });
             } else {
-              elements.push(elementCreator.createSpan({ text: 'NO SIGNAL' }), elementCreator.createSpan({ text: 'INACTIVE' }));
+              items.push({ elements: [elementCreator.createSpan({ text: 'NO SIGNAL' })] });
             }
 
             const list = elementCreator.createList({
               classes,
-              elements,
+              items,
             });
 
             fragment.appendChild(list);
@@ -108,7 +110,7 @@ class WreckingStatus {
 
         const fragment = document.createDocumentFragment();
 
-        fragment.appendChild(elementCreator.createListItem({ element: this.timeSpan }));
+        fragment.appendChild(elementCreator.createListItem({ elements: [this.timeSpan] }));
 
         teams.forEach((team) => {
           this.teams[team.teamId] = team;
@@ -119,7 +121,7 @@ class WreckingStatus {
 
           if (team) {
             fragment.appendChild(elementCreator.createListItem({
-              element: elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` }),
+              elements: [elementCreator.createSpan({ text: `${team.shortName.toUpperCase()}: ${team.points}` })],
             }));
           }
         });

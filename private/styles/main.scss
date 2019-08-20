@@ -12,20 +12,20 @@
  */
 
 $background-color: black;
-$second-background-color: #23001e;
-$menu-background-color: rgba(35, 0, 30, 0.98);
-$text-color: white;
-$second-text-color: #00ffef;
-$second-color: #ff00d7;
-$light-color: #4b003c;
-$darker-color: #23001e;
-$warning-color: #910001;
+$second-background-color: #002301;
+$menu-background-color: rgba(0, 35, 2, 0.98);
+$text-color: #37ff00;
+$second-text-color: #37ff00;
+$second-color: #176a00;
+$light-color: #37ff00;
+$darker-color: #002e03;
+$warning-color: #37ff00;
 $off-color: #ff6269;
-$greyed-out: #6f6f6f;
-$focus-color: #000691;
-$new-color: #009100;
-$darker-new-color: #005f00;
-$header-color: #2e001a;
+$greyed-out: #002301;
+$focus-color: #176a00;
+$new-color: #25c300;
+$darker-new-color: #25c300;
+$header-color: #002e03;
 
 $p-margin: .4em;
 $border-width: 1px;
@@ -86,6 +86,11 @@ ul, li {
 textarea {
   width: 100%;
   border-radius: 0;
+  background-color: $second-background-color;
+  border: $border;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: $text-color;
 }
 
 textarea[readonly], input[readonly] {
@@ -119,6 +124,11 @@ img {
 
 input {
   border-radius: 0;
+  background-color: $second-background-color;
+  border: $border;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: $text-color;
 }
 
 input[type=radio] {
@@ -152,6 +162,10 @@ select {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+::-webkit-input-placeholder {
+  color: $text-color;
 }
 
 .msgInfo {
@@ -547,7 +561,7 @@ $msgList-msgLine-side-padding: .2em;
     margin-top: auto;
 
     textarea {
-      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
+      width: calc(100% - 3em);
       padding: 0 $msgList-msgLine-side-padding;
       border-top: $border;
       border-bottom: $border;

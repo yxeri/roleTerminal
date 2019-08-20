@@ -39,7 +39,7 @@ class DocFileList extends List {
       effect,
       listItemFields,
       defaultImage: {
-        fileName: 'file.jpg',
+        fileName: 'file.png',
       },
       shouldFocusOnClick: false,
       shouldAppendImage: true,

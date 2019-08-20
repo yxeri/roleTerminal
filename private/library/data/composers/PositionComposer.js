@@ -15,12 +15,12 @@ class PositionComposer extends BaseComposer {
       ],
     });
 
-    /**
-     * A LOCAL position is within the game area.
-     * Eveything outside of the game area is of type WORLD.
-     * @type {{string}}
-     */
-    this.PositionTypes = {};
+    this.PositionTypes = {
+      USER: 'user',
+      WORLD: 'world',
+      LOCAL: 'local',
+      DEVICE: 'device',
+    };
     this.PositionStructures = {
       MARKER: 'marker',
       CIRCLE: 'circle',

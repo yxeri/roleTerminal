@@ -13,6 +13,8 @@
 
 const MapCircle = require('./MapCircle');
 const MapObject = require('./MapObject');
+const userComposer = require('../../data/composers/UserComposer');
+const positionComposer = require('../../data/composers/PositionComposer');
 
 /**
  * Requires Google maps library
@@ -47,6 +49,14 @@ class MapMarker extends MapObject {
       chosenStyle = { icon: {} };
     }
 
+    let iconUrl = chosenStyle.icon.url || markerStyles.icon.url || '/images/mapicon.png';
+
+    if (userComposer.getCurrentUser().objectId === position.objectId) {
+      iconUrl = '/images/mapiconyou.png';
+    } else if (position.positionType === positionComposer.PositionTypes.USER) {
+      iconUrl = '/images/mapiconuser.png';
+    }
+
     super({
       hoverExcludeRule,
       choosableStyles,
@@ -74,7 +84,7 @@ class MapMarker extends MapObject {
           lng: latestCoordinates.longitude,
         },
         icon: {
-          url: chosenStyle.icon.url || markerStyles.icon.url || '/images/mapicon.png',
+          url: iconUrl,
           size: chosenStyle.icon.size || markerStyles.icon.size || new google.maps.Size(14, 14),
           origin: chosenStyle.icon.origin || markerStyles.icon.origin || new google.maps.Point(0, 0),
           anchor: chosenStyle.icon.anchor || markerStyles.icon.anchor || new google.maps.Point(7, 7),

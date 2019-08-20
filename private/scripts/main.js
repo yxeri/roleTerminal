@@ -6,6 +6,7 @@ const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const MenuBar = require('../library/components/views/MenuBar');
 const DocFileView = require('../library/components/views/DocFileView');
+const PeopleView = require('../library/components/views/PeopleView');
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
@@ -198,6 +199,9 @@ const docFileView = new DocFileView({
 });
 const worldMapView = new WorldMapView(worldMapParams);
 const worldMapPage = new WorldMapPage(worldMapParams);
+const peopleView = new PeopleView({
+  effect: true,
+});
 
 const menuBar = new MenuBar({
   viewSwitcher,
@@ -250,6 +254,20 @@ const fullMapWrapper = new ViewWrapper({
     components: [{ component: worldMapView }],
   }],
 });
+const peopleWrapper = new ViewWrapper({
+  menuBar,
+  viewType: viewSwitcher.ViewTypes.PEOPLE,
+  title: 'Users',
+  columns: [{
+    components: [
+      { component: peopleView },
+    ],
+  }, {
+    components: [
+      { component: worldMapPage },
+    ],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -257,6 +275,7 @@ menuBar.setViews({
     { view: chatWrapper },
     { view: docWrapper },
     { view: fullMapWrapper },
+    { view: peopleWrapper },
   ],
 });
 
@@ -265,6 +284,7 @@ viewSwitcher.addAvailableTypes({
     chatWrapper.viewType,
     fullMapWrapper.viewType,
     docWrapper.viewType,
+    peopleWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

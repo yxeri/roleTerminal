@@ -117,9 +117,18 @@ span, p {
   min-height: 1em;
 }
 
-img {
-  max-width: 100%;
-  object-fit: scale-down;
+.imgContainer {
+  background-color: $text-color;
+  display: inline-block;
+
+  img {
+    display: block;
+    max-width: 100%;
+    object-fit: scale-down;
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: .65;
+  }
 }
 
 input {
@@ -1015,10 +1024,13 @@ $map-padding-fix: 2em;
 
 .listItemImage {
   border-style: none;
-  max-width: 40px;
-  max-height: 40px;
   float: left;
   margin-right: .2em;
+
+  img {
+    max-width: 40px;
+    max-height: 40px;
+  }
 }
 
 .hide {

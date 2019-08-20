@@ -817,7 +817,7 @@ class List extends BaseView {
           return false;
         }
 
-        if (!this.filter.rules.every(filterFunc)) {
+        if (!this.filter.orCheck && !this.filter.rules.every(filterFunc)) {
           return false;
         }
       }
@@ -827,7 +827,7 @@ class List extends BaseView {
           return false;
         }
 
-        if (!this.userFilter.rules.every(userFilterFunc)) {
+        if (!this.userFilter.orCheck && !this.userFilter.rules.every(userFilterFunc)) {
           return false;
         }
       }

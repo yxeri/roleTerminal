@@ -485,6 +485,15 @@ class StorageManager {
   static getReqireOffName() {
     return converters.convertToBoolean(this.getLocalVal('requireOffName'));
   }
+
+  static setAllowedImages(allowedImages) {
+    this.setLocalVal('allowedImages', allowedImages);
+  }
+
+  static getAllowedImages() {
+    console.log('allowed', converters.convertToObject(this.getLocalVal('allowedImages')));
+    return converters.convertToObject(this.getLocalVal('allowedImages'));
+  }
 }
 
 StorageManager.addWatchers();

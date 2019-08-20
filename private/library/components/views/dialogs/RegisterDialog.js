@@ -99,15 +99,17 @@ class RegisterDialog extends BaseDialog {
       maxLength: 300,
       shouldResize: true,
       placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
-    }),
-    elementCreator.createImageInput({
-      buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
-      elementId: ids.PICTURE,
-      inputName: 'picture',
-      appendPreview: true,
-      previewId: 'imagePreview-register',
     }));
 
+    if (storageManager.getAllowedImages().PROFILE) {
+      inputs.push(elementCreator.createImageInput({
+        buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-register',
+      }));
+    }
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -224,7 +226,7 @@ class RegisterDialog extends BaseDialog {
             };
             const imagePreview = document.getElementById('imagePreview-register');
 
-            if (imagePreview.getAttribute('src')) {
+            if (imagePreview && imagePreview.getAttribute('src')) {
               params.image = {
                 source: imagePreview.getAttribute('src'),
                 imageName: imagePreview.getAttribute('name'),

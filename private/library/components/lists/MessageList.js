@@ -198,6 +198,7 @@ class MessageList extends List {
     };
     this.roomLists = roomLists;
     this.roomId = roomId || this.getRoomId();
+    this.multiRoom = multiRoom;
 
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
@@ -221,6 +222,11 @@ class MessageList extends List {
   showMessagesByRoom({ roomId }) {
     this.roomId = roomId;
     this.filter = { rules: [{ paramName: 'roomId', paramValue: roomId }] };
+
+    if (!this.multiRoom) {
+      this.filter.orCheck = true;
+      this.filter.rules.push({ paramName: 'roomId', paramValue: '111111111111111111111116' });
+    }
 
     this.appendList();
   }

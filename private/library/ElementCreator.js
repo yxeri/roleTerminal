@@ -166,14 +166,16 @@ class ElementCreator {
   static createPicture({
     picture,
     clickFuncs,
-    classes,
     elementId,
+    classes = [],
     isThumb = false,
     isUploaded = true,
   }) {
+    const container = this.createContainer({
+      classes: ['imgContainer'].concat(classes),
+    });
     const pictureElement = createBaseElement({
       elementId,
-      classes,
       clickFuncs,
       elementType: 'img',
     });
@@ -207,7 +209,9 @@ class ElementCreator {
       }
     });
 
-    return pictureElement;
+    container.appendChild(pictureElement);
+
+    return container;
   }
 
   static createListItem({
@@ -433,13 +437,17 @@ class ElementCreator {
     previewContainer = document.createElement('img'),
     appendPreview = false,
   }) {
+    const previewWrapper = this.createContainer({
+      classes: ['imgContainer'],
+      elements: [previewContainer],
+    });
     const container = this.createContainer({
       classes,
       elementId,
       name: inputName,
     });
     const imageInput = document.createElement('input');
-    imageInput.classList.add('hide');
+    previewWrapper.classList.add('hide');
     imageInput.setAttribute('type', 'file');
     imageInput.setAttribute('accept', 'image/png, image/jpeg, image/pjpeg');
     imageInput.addEventListener('change', () => {
@@ -447,7 +455,7 @@ class ElementCreator {
       const reader = new FileReader();
 
       reader.addEventListener('load', () => {
-        previewContainer.classList.remove('hide');
+        previewWrapper.classList.remove('hide');
         previewContainer.setAttribute('src', reader.result);
         previewContainer.setAttribute('name', file.name);
       });
@@ -470,8 +478,9 @@ class ElementCreator {
     }));
 
     if (appendPreview) {
-      previewContainer.classList.add('hide');
-      container.appendChild(previewContainer);
+      previewWrapper.classList.add('hide');
+
+      container.appendChild(previewWrapper);
     }
 
     return container;

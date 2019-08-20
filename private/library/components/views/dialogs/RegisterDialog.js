@@ -224,7 +224,7 @@ class RegisterDialog extends BaseDialog {
             };
             const imagePreview = document.getElementById('imagePreview-register');
 
-            if (imagePreview.getAttribute('src')) {
+            if (imagePreview && imagePreview.getAttribute('src')) {
               params.image = {
                 source: imagePreview.getAttribute('src'),
                 imageName: imagePreview.getAttribute('name'),

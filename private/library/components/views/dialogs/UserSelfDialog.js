@@ -158,7 +158,7 @@ class UserSelfDialog extends BaseDialog {
             const imagePreview = document.getElementById('imagePreview-userSelf');
             const descriptionInput = this.getInputValue(ids.DESCRIPTION);
 
-            if (imagePreview.getAttribute('src')) {
+            if (imagePreview && imagePreview.getAttribute('src')) {
               params.image = {
                 source: imagePreview.getAttribute('src'),
                 imageName: imagePreview.getAttribute('name'),

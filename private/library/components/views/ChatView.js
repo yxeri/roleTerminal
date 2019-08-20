@@ -152,7 +152,7 @@ class ChatView extends ViewWrapper {
         const imagePreview = document.getElementById('imagePreview-input');
         let image;
 
-        if (imagePreview.getAttribute('src')) {
+        if (imagePreview && imagePreview.getAttribute('src')) {
           image = {
             source: imagePreview.getAttribute('src'),
             imageName: imagePreview.getAttribute('name'),

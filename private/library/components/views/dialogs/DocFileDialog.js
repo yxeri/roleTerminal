@@ -152,7 +152,7 @@ class DocFileDialog extends BaseDialog {
             };
             const imagePreview = document.getElementById('imagePreview-docFile');
 
-            if (imagePreview.getAttribute('src')) {
+            if (imagePreview && imagePreview.getAttribute('src')) {
               params.images = [{
                 source: imagePreview.getAttribute('src'),
                 imageName: imagePreview.getAttribute('name'),

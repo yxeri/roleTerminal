@@ -304,7 +304,7 @@ class List extends BaseView {
       elements.push(this.header);
     }
 
-    if (this.hasOffToggle) {
+    if (this.hasOffToggle && storageManager.getAccessLevel() >= storageManager.getPermissions().IncludeOff.accessLevel) {
       const offButton = elementCreator.createButton({
         image: {
           fileName: 'offgame.png',

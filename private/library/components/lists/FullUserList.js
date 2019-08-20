@@ -54,7 +54,7 @@ class UserList extends List {
       isOff: true,
       classes: ['offValue'],
       convertFunc: (offName) => {
-        if (typeof offName !== 'boolean') {
+        if (offName && typeof offName !== 'boolean') {
           return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'offName' })}: ${offName}`;
         }
 

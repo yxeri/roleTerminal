@@ -172,8 +172,10 @@ class MessageList extends List {
 
     if (!multiRoom) {
       superParams.filter = {
+        orCheck: true,
         rules: [
           { paramName: 'roomId', paramValue: roomId || storageManager.getCurrentRoom() },
+          { paramName: 'roomId', paramValue: '111111111111111111111116' },
         ],
       };
     }

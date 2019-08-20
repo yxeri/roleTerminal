@@ -61,30 +61,35 @@ class DocFileDialog extends BaseDialog {
         isRequired: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
+    ];
+
+    if (storageManager.getAllowedImages().DOCFILE) {
       elementCreator.createImageInput({
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
         previewId: 'imagePreview-docFile',
-      }),
-      elementCreator.createRadioSet({
-        elementId: ids.VISIBILITY,
-        title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
-        optionName: 'visibility',
-        options: [
-          {
-            optionId: ids.VISIBILITY_PUBLIC,
-            optionLabel: 'Everyone',
-            value: 'public',
-            isDefault: true,
-          }, {
-            optionId: ids.VISIBILITY_PRIVATE,
-            optionLabel: 'Only those with the correct code',
-            value: 'private',
-          },
-        ],
-      }),
-    ];
+      });
+    }
+
+    inputs.push(elementCreator.createRadioSet({
+      elementId: ids.VISIBILITY,
+      title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
+      optionName: 'visibility',
+      options: [
+        {
+          optionId: ids.VISIBILITY_PUBLIC,
+          optionLabel: 'Everyone',
+          value: 'public',
+          isDefault: true,
+        }, {
+          optionId: ids.VISIBILITY_PRIVATE,
+          optionLabel: 'Only those with the correct code',
+          value: 'private',
+        },
+      ],
+    }));
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),

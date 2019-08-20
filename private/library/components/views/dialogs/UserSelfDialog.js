@@ -23,6 +23,7 @@ const positionComposer = require('../../../data/composers/PositionComposer');
 const eventCentral = require('../../../EventCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
 const teamComposer = require('../../../data/composers/TeamComposer');
+const storageManager = require('../../../StorageManager');
 
 const ids = {
   PICTURE: 'picture',
@@ -55,14 +56,18 @@ class UserSelfDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
         maxLength: 300,
       }),
-      elementCreator.createImageInput({
+    ];
+
+    if (storageManager.getAllowedImages().PROFILE) {
+      inputs.push(elementCreator.createImageInput({
         buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
         previewId: 'imagePreview-userSelf',
-      }),
-    ];
+      }));
+    }
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),

@@ -480,6 +480,9 @@ const labels = {
     emptyTime: (override.MenuBar && override.MenuBar.emptyTime) || {
       en: '--:--',
     },
+    menu: (override.MenuBar && override.MenuBar.menu) || {
+      en: 'Menu',
+    },
   },
   AdminUserDialog: {
     ban: (override.AdminUserDialog && override.AdminUserDialog.ban) || {

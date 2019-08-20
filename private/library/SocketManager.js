@@ -96,6 +96,7 @@ class SocketManager {
           yearModification,
           dayModification,
           requireOffName,
+          allowedImages,
           permissions = {},
         } = data;
 
@@ -113,6 +114,7 @@ class SocketManager {
         if (dayModification) { storageManager.setDayModification(dayModification); }
         if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
 
+        storageManager.setAllowedImages(allowedImages);
         storageManager.setPermissions(permissions);
 
         if (!this.hasConnected) {

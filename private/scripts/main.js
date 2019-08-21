@@ -17,11 +17,13 @@ const deviceChecker = require('../library/DeviceChecker');
 const worldMapParams = {
   alwaysShowLabels: {
     line: true,
+    marker: true,
+    polygon: true,
   },
-  maxZoom: 19,
+  maxZoom: 18,
   clusterStyle: {
     gridSize: 10,
-    maxZoom: 15,
+    maxZoom: 13,
     styles: [{
       width: 24,
       height: 24,
@@ -34,7 +36,7 @@ const worldMapParams = {
   },
   labelStyle: {
     fontColor: '#15ff00',
-    minZoomLevel: 18,
+    minZoomLevel: 16,
     fontSize: 11,
   },
   backgroundColor: '#000000',
@@ -42,10 +44,10 @@ const worldMapParams = {
     'user',
     'device',
     'lantern',
-    'local',
-    'world',
     'roads',
     'drivable-roads',
+    'local',
+    'world',
   ],
   polygonStyle: {
     strokeColor: '#15ff00',
@@ -73,13 +75,6 @@ const worldMapParams = {
       },
     }],
   },
-  showLabelRules: {
-    polygons: [{
-      paramName: 'description',
-      type: 'array',
-      minLength: 1,
-    }],
-  },
   markedStyles: {
     polygons: {
       strokeColor: '#009100',
@@ -98,27 +93,6 @@ const worldMapParams = {
       icon: {
         url: '/images/mapicon-active.png',
       },
-    }],
-    polygons: [{
-      strokeColor: '#ff0001',
-      fillColor: '#ff0001',
-      styleName: 'Red',
-    }, {
-      strokeColor: '#787878',
-      fillColor: '#787878',
-      styleName: 'Grey',
-    }, {
-      strokeColor: '#009100',
-      fillColor: '#009100',
-      styleName: 'Marked',
-    }, {
-      strokeColor: '#ff00d7',
-      fillColor: '#00ffef',
-      styleName: 'Occupied',
-    }, {
-      strokeColor: '#00ffef',
-      fillColor: '#ff00d7',
-      styleName: 'Not Occupied',
     }],
   },
   lineStyle: {
@@ -168,11 +142,17 @@ const worldMapParams = {
     ],
   }],
   lists: [{
+    elementId: 'localList',
+    title: 'Local',
+    positionTypes: ['local'],
+    effect: true,
+    zoomLevel: 16,
+  }, {
     elementId: 'worldList',
     title: 'World',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 7,
+    zoomLevel: 9,
   }, {
     elementId: 'userList',
     title: 'Users',
@@ -186,7 +166,7 @@ const worldMapParams = {
         return name || objectId;
       },
     }],
-    zoomLevel: 18,
+    zoomLevel: 16,
   }],
 };
 const chatView = new ChatView({

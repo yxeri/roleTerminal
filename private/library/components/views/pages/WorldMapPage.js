@@ -442,6 +442,20 @@ class WorldMapPage extends BaseView {
         });
       },
     });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.AGED_POSITIONS,
+      func: ({ positions }) => {
+        positions.forEach((position) => {
+          const marker = this.markers[position.objectId];
+
+          if (marker) {
+            this.clusterer.removeMarker(marker.mapObject);
+            marker.setMap(null);
+          }
+        });
+      },
+    });
   }
 }
 

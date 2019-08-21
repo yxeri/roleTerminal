@@ -21,6 +21,7 @@ class PositionComposer extends BaseComposer {
       LOCAL: 'local',
       DEVICE: 'device',
     };
+    this.maxPositionAge = 1200000;
     this.PositionStructures = {
       MARKER: 'marker',
       CIRCLE: 'circle',
@@ -35,6 +36,8 @@ class PositionComposer extends BaseComposer {
           event: eventHandler.Events.WORLDMAP,
           params: {},
         });
+
+        this.checkPositionAge();
       },
     });
   }
@@ -65,6 +68,18 @@ class PositionComposer extends BaseComposer {
         }),
       },
     });
+  }
+
+  checkPositionAge() {
+    const oldPositions = this.getPositions({ positionTypes: ['user'] })
+      .filter(position => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
+
+    eventHandler.emitEvent({
+      event: eventHandler.Events.AGED_POSITIONS,
+      params: { positions: oldPositions },
+    });
+
+    setTimeout(() => { this.checkPositionAge(); }, 60000);
   }
 
   getPosition({ positionId }) {

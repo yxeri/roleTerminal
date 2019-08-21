@@ -190,7 +190,7 @@ const worldMapParams = {
   }],
 };
 const chatView = new ChatView({
-  allowImages: false,
+  allowImages: true,
   effect: true,
   placeholder: 'Alt+Enter to send message',
 });

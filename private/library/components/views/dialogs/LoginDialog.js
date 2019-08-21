@@ -76,7 +76,7 @@ class LoginDialog extends BaseDialog {
 
                       break;
                     }
-                    case 'not allowed': {
+                    case 'needs verification': {
                       this.updateLowerText({
                         text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'unverified' })],
                       });

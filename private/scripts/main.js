@@ -17,7 +17,6 @@ const deviceChecker = require('../library/DeviceChecker');
 const worldMapParams = {
   alwaysShowLabels: {
     line: true,
-    marker: true,
     polygon: true,
   },
   maxZoom: 18,
@@ -146,7 +145,7 @@ const worldMapParams = {
     title: 'Local',
     positionTypes: ['local'],
     effect: true,
-    zoomLevel: 16,
+    zoomLevel: 17,
   }, {
     elementId: 'worldList',
     title: 'World',
@@ -166,7 +165,7 @@ const worldMapParams = {
         return name || objectId;
       },
     }],
-    zoomLevel: 16,
+    zoomLevel: 17,
   }],
 };
 const chatView = new ChatView({

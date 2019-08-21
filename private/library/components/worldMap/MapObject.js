@@ -126,6 +126,8 @@ class MapObject {
     this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);
     this.showMenuOnClick = showMenuOnClick;
 
+    let clickTimeout = null;
+
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
         const center = this.mapObject.getCenter();
@@ -159,6 +161,16 @@ class MapObject {
             MapObject.buildLeftClickBox({ position: this.position });
           }
 
+          this.showLabel();
+
+          if (clickTimeout) {
+            clearTimeout(clickTimeout);
+          }
+
+          clickTimeout = setTimeout(() => {
+            this.hideLabel();
+          }, 2500);
+
           return;
         }
 
@@ -178,7 +190,6 @@ class MapObject {
       },
     });
 
-
     addGMapsHoverListeners({
       element: this.mapObject,
       shouldOutOnDrag: true,
@@ -186,9 +197,7 @@ class MapObject {
         this.showLabel();
       },
       outFunc: () => {
-        if ((labelStyle && labelStyle.minZoomLevel && this.worldMap.getZoom() < labelStyle.minZoomLevel) || !this.alwaysShowLabel) {
-          this.hideLabel();
-        }
+        this.hideLabel();
       },
     });
 
@@ -293,13 +302,13 @@ class MapObject {
   }
 
   showLabel() {
-    if (this.showLabelOnHover) {
+    if (this.alwaysShowLabel || this.showLabelOnHover) {
       this.label.showLabel(this.mapObject.getMap());
     }
   }
 
   hideLabel() {
-    if (this.labelStyle.minZoomLevel || !this.alwaysShowLabel) {
+    if (!this.worldMap || !this.alwaysShowLabel || (this.labelStyle && this.labelStyle.minZoomLevel && this.worldMap && this.worldMap.getZoom() < this.labelStyle.minZoomLevel)) {
       this.label.hideLabel();
     }
   }

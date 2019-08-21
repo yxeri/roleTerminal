@@ -19,6 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const aliasComposer = require('../../../data/composers/AliasComposer');
+const textTools = require('../../../TextTools');
 
 const ids = {
   OFFNAME: 'fullName',
@@ -84,7 +85,7 @@ class AliasDialog extends BaseDialog {
 
             aliasComposer.createAlias({
               alias: {
-                aliasName: this.getInputValue(ids.ALIASNAME),
+                aliasName: textTools.trimSpace(this.getInputValue(ids.ALIASNAME)),
                 pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
                 description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },

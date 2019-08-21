@@ -19,6 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
+const textTools = require('../../../TextTools');
 
 const ids = {
   USERNAME: 'username',
@@ -64,7 +65,7 @@ class LoginDialog extends BaseDialog {
             }
 
             socketManager.login({
-              username: this.getInputValue(ids.USERNAME),
+              username: textTools.trimSpace(this.getInputValue(ids.USERNAME)),
               password: this.getInputValue(ids.PASSWORD),
               callback: ({ error }) => {
                 if (error) {

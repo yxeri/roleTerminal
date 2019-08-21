@@ -119,7 +119,7 @@ const worldMapParams = {
   markerStyle: {
     opacity: 0.9,
     icon: {
-      url: '/images/mapicon-red.png',
+      url: '/images/mapicon.png',
     },
   },
   triggeredStyles: {

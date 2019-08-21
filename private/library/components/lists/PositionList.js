@@ -85,6 +85,15 @@ class PositionList extends List {
         this.setFocusedListItem(objectId);
       },
     });
+
+    if (this.positionTypes.includes('user')) {
+      eventCentral.addWatcher({
+        event: eventCentral.Events.AGED_POSITIONS,
+        func: ({ positions }) => {
+          positions.forEach(position => this.removeListItem(position));
+        },
+      });
+    }
   }
 
   shouldFilterItem(params) {
@@ -96,9 +105,11 @@ class PositionList extends List {
   }
 
   getCollectorObjects() {
-    const positions = super.getCollectorObjects().filter(position => !/(^polygon)|(^line)/ig.test(position.positionName));
-
-    return positions.filter(position => position.coordinatesHistory.length !== 0);
+    return super.getCollectorObjects().filter((position) => {
+      return !/(^polygon)|(^line)/ig.test(position.positionName)
+        && position.coordinatesHistory.length !== 0
+        && (position.positionType !== 'user' || new Date() - new Date(position.lastUpdated) < positionComposer.maxPositionAge);
+    });
   }
 }
 

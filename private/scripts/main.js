@@ -1096,7 +1096,13 @@ socketManager.addEvents([{
   },
 }]);
 
-socketManager.emitEvent('getLanternInfo', {}, ({ data }) => {
+socketManager.emitEvent('getLanternInfo', {}, ({ error, data }) => {
+  if (error) {
+    console.log('getLanternInfo', error);
+
+    return;
+  }
+
   const {
     teams,
     timeLeft,

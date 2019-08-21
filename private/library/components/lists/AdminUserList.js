@@ -39,7 +39,11 @@ class AdminUserList extends List {
       }, {
         paramName: 'offName',
         convertFunc: (offName) => {
-          return `(${offName})`;
+          if (offName) {
+            return `(${offName})`;
+          }
+
+          return '';
         },
       }, {
         paramName: 'accessLevel',
@@ -87,7 +91,9 @@ class AdminUserList extends List {
       elementId,
       classes,
       effect,
-      shouldToggle: true,
+      sorting: {
+        paramName: 'username',
+      },
       title: 'Users',
       listItemSpecificClasses: [
         {

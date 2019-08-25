@@ -26,6 +26,7 @@ const accessCentral = require('../library/AccessCentral');
 
 const menuBar = new MenuBar({
   viewSwitcher,
+  setMenuImage: false,
   showClock: true,
   showControls: {
     user: true,

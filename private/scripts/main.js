@@ -1061,6 +1061,8 @@ const boot = new TextAnimation({
   ]),
 });
 
+boot.addToView({ element: viewSwitcher.getParentElement() });
+
 socketManager.addEvents([{
   event: 'lanternTeams',
   func: ({ data }) => {

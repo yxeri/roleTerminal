@@ -8,7 +8,6 @@ const MenuBar = require('../library/components/views/MenuBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const TeamView = require('../library/components/views/TeamView');
-const ForumView = require('../library/components/views/ForumView');
 const PeopleView = require('../library/components/views/PeopleView');
 const TerminalView = require('../library/components/views/TerminalView');
 const TextAnimation = require('../library/components/views/TextAnimation');
@@ -276,9 +275,6 @@ const walletView = new WalletView({
 });
 const worldMapPage = new WorldMapPage(worldMapParams);
 const teamView = new TeamView({
-  effect: true,
-});
-const forumView = new ForumView({
   effect: true,
 });
 const peopleView = new PeopleView({
@@ -896,16 +892,6 @@ const teamWrapper = new ViewWrapper({
     ],
   }],
 });
-const forumWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.FORUM,
-  title: 'Forums',
-  columns: [{
-    components: [
-      { component: forumView },
-    ],
-  }],
-});
 const peopleWrapper = new ViewWrapper({
   menuBar,
   viewType: viewSwitcher.ViewTypes.PEOPLE,
@@ -939,7 +925,6 @@ menuBar.setViews({
     { view: fullMapWrapper },
     { view: walletWrapper },
     { view: teamWrapper },
-    { view: forumWrapper },
     { view: peopleWrapper },
     { view: terminalWrapper },
   ],
@@ -952,7 +937,6 @@ viewSwitcher.addAvailableTypes({
     walletWrapper.viewType,
     docWrapper.viewType,
     teamWrapper.viewType,
-    forumWrapper.viewType,
     peopleWrapper.viewType,
     terminalWrapper.viewType,
   ],

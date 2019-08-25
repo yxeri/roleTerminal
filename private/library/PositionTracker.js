@@ -152,7 +152,7 @@ class Tracker {
       return;
     }
 
-    if (this.latestBestPosition.coordinates.accuracy > 150) {
+    if (this.latestBestPosition.coordinates.accuracy > 100) {
       return;
     }
 

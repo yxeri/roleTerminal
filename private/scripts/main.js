@@ -819,7 +819,6 @@ const menuBar = new MenuBar({
     room: true,
     view: true,
     docFile: true,
-    team: true,
   },
   elements: [
     elementCreator.createSpan({

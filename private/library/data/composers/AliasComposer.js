@@ -66,6 +66,22 @@ class AliasComposer extends DataComposer {
   getAllAliases() {
     return this.handler.getObjects({});
   }
+
+  updateAlias({
+    aliasId,
+    alias,
+    image,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        aliasId,
+        alias,
+        image,
+      },
+    });
+  }
 }
 
 const aliasComposer = new AliasComposer();

@@ -24,6 +24,7 @@ const eventCentral = require('../../../EventCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
 const teamComposer = require('../../../data/composers/TeamComposer');
 const storageManager = require('../../../StorageManager');
+const aliasComposer = require('../../../data/composers/AliasComposer');
 
 const ids = {
   PICTURE: 'picture',
@@ -35,16 +36,19 @@ class UserSelfDialog extends BaseDialog {
     classes = [],
     elementId = `uDialog-${Date.now()}`,
   }) {
-    const user = userComposer.getCurrentUser();
+    const identity = userComposer.getCurrentIdentity();
     const {
       image,
       partOfTeams,
       fullName,
       username,
+      aliasName,
       description,
-      objectId: userId,
-    } = user;
-    const userPosition = positionComposer.getPosition({ positionId: user.objectId });
+      objectId: identityId,
+    } = identity;
+    const identityPosition = positionComposer.getPosition({ positionId: identity.objectId });
+    const name = aliasName || username;
+    const isAlias = typeof aliasName !== 'undefined';
 
     const inputs = [
       elementCreator.createInput({
@@ -143,8 +147,6 @@ class UserSelfDialog extends BaseDialog {
             }
 
             const params = {
-              userId,
-              user: {},
               callback: ({ error }) => {
                 if (error) {
                   console.log(error);
@@ -157,6 +159,7 @@ class UserSelfDialog extends BaseDialog {
             };
             const imagePreview = document.getElementById('imagePreview-userSelf');
             const descriptionInput = this.getInputValue(ids.DESCRIPTION);
+            const object = {};
 
             if (imagePreview && imagePreview.getAttribute('src')) {
               params.image = {
@@ -168,16 +171,24 @@ class UserSelfDialog extends BaseDialog {
             }
 
             if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
-              params.user.description = descriptionInput.split('\n');
+              object.description = descriptionInput.split('\n');
             }
 
-            userComposer.updateUser(params);
+            if (isAlias) {
+              params.aliasId = identityId;
+              params.alias = object;
+              aliasComposer.updateAlias(params);
+            } else {
+              params.userId = identityId;
+              params.user = object;
+              userComposer.updateUser(params);
+            }
           },
         },
       }),
     ];
 
-    if (userPosition) {
+    if (identityPosition) {
       lowerButtons.push(elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
         clickFuncs: {
@@ -186,7 +197,7 @@ class UserSelfDialog extends BaseDialog {
 
             eventCentral.emitEvent({
               event: eventCentral.Events.FOCUS_MAPPOSITION,
-              params: { position: userPosition },
+              params: { position: identityPosition },
             });
 
             this.removeFromView();
@@ -204,7 +215,7 @@ class UserSelfDialog extends BaseDialog {
       lowerText.push(fullName);
     }
 
-    lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${username}`);
+    lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`);
 
     if (partOfTeams && partOfTeams.length > 0) {
       const teamNames = partOfTeams.map(teamId => teamComposer.getTeamName({ teamId })).join(', ');
@@ -212,8 +223,8 @@ class UserSelfDialog extends BaseDialog {
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${teamNames}`);
     }
 
-    if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
-      const positionLabel = `(${userPosition.lastUpdated}): Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
+    if (identityPosition && identityPosition.coordinatesHistory && identityPosition.coordinatesHistory[0]) {
+      const positionLabel = `(${identityPosition.lastUpdated}): Lat ${identityPosition.coordinatesHistory[0].latitude} Long ${identityPosition.coordinatesHistory[0].longitude}`;
 
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
     }

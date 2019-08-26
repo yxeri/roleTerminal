@@ -743,7 +743,7 @@ terminalView.terminalPage.addCommand({
               terminalView.terminalPage.queueMessages({
                 text: [
                   { element: elementCreator.createSpan({ text: '------------' }) },
-                  { element: elementCreator.createSpan({ text: `User name: ${hackData.userName}.` }) },
+                  { element: elementCreator.createSpan({ text: `Username: ${hackData.userName}.` }) },
                   { element: elementCreator.createSpan({ text: `Partial crack complete. The ${textTools.appendNumberSuffix(hintIndex)} character ${hackData.passwordHint.character}.` }) },
                   { element: elementCreator.createSpan({ text: `${hackData.triesLeft} tries left` }) },
                   { element: elementCreator.createSpan({ text: '------------' }) },

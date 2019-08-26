@@ -122,6 +122,16 @@ const worldMapParams = {
     },
   },
   triggeredStyles: {
+    markers: [{
+      paramName: 'positionName',
+      type: 'string',
+      value: 'Sticky Spoon Love Bureau',
+      style: {
+        icon: {
+          url: '/images/heart.png',
+        },
+      },
+    }],
     polygons: [{
       paramName: 'description',
       type: 'array',

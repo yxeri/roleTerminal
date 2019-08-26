@@ -223,11 +223,16 @@ class MapObject {
           paramName,
           type,
           minLength,
+          value,
         } = styleRule;
         const param = this.position[paramName];
 
         switch (type) {
           case 'string': {
+            if (value) {
+              return param && typeof param === 'string' && param === value;
+            }
+
             return param && typeof param === 'string' && param.length >= minLength;
           }
           case 'array': {

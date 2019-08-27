@@ -1,11 +1,5 @@
 const override = {};
 
-// try {
-//   override = require('../../override/labels'); // eslint-disable-line import/no-unresolved, global-require
-// } catch (err) {
-//   console.log('Did not find override labels. Using defaults');
-// }
-
 const labels = {
   General: {
     yes: (override.General && override.General.yes) || {

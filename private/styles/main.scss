@@ -249,6 +249,10 @@ select {
     margin-bottom: $p-margin;
   }
 
+  input[type="checkbox"] {
+    width: auto;
+  }
+
   select {
     padding: .1em;
     margin-bottom: $p-margin;
@@ -262,6 +266,12 @@ select {
     height: 5em;
     width: calc(100% - .2em);
     padding: .1em;
+  }
+
+  .inContainer {
+    div {
+      margin-bottom: $p-margin;
+    }
   }
 
   .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {

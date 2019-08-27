@@ -23,6 +23,13 @@ class LabelHandler {
 
     return labelToReturn;
   }
+
+  static setBaseLabel({
+    name,
+    object,
+  }) {
+    labels[name] = object;
+  }
 }
 
 module.exports = LabelHandler;

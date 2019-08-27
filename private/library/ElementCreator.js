@@ -618,6 +618,35 @@ class ElementCreator {
     return fieldset;
   }
 
+  static createCheckBox({
+    classes,
+    elementId,
+    text,
+    clickFuncs,
+    isDefault = false,
+  }) {
+    const label = createBaseElement({
+      classes,
+      clickFuncs,
+      elementType: 'label',
+    });
+    const checkBox = createBaseElement({
+      elementId,
+      elementType: 'input',
+    });
+
+    checkBox.setAttribute('type', 'checkbox');
+
+    if (isDefault) {
+      checkBox.setAttribute('checked', 'true');
+    }
+
+    label.appendChild(checkBox);
+    label.appendChild(document.createTextNode(text || elementId));
+
+    return label;
+  }
+
   static createSelect({
     name,
     classes,

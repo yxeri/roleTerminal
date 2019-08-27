@@ -11,6 +11,7 @@ const TeamView = require('../library/components/views/TeamView');
 const PeopleView = require('../library/components/views/PeopleView');
 const TerminalView = require('../library/components/views/TerminalView');
 const TextAnimation = require('../library/components/views/TextAnimation');
+const SpoonyView = require('./SpoonyView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -25,6 +26,18 @@ const textTools = require('../library/TextTools');
 const deviceChecker = require('../library/DeviceChecker');
 const WreckingStatus = require('./WreckingStatus');
 const eventCentral = require('../library/EventCentral');
+
+labelHandler.setBaseLabel({
+  name: 'spoony',
+  object: {
+    spoony: {
+      en: '"I seek love!" Sticky Spoon Love Bureau will help you find love out in the wastelands.',
+    },
+    'spoony-describe': {
+      en: 'Describe yourself with three words',
+    },
+  },
+});
 
 const organicaLogo = [
   { element: elementCreator.createSpan({ text: '                          ####', classes: ['pre'] }), fullscreen: true },
@@ -268,7 +281,7 @@ const worldMapParams = {
     title: 'World',
     positionTypes: ['world'],
     effect: true,
-    zoomLevel: 7,
+    zoomLevel: 10,
   }],
 };
 const chatView = new ChatView({
@@ -290,6 +303,7 @@ const teamView = new TeamView({
 const peopleView = new PeopleView({
   effect: true,
 });
+const spoonyView = new SpoonyView({});
 const terminalView = new TerminalView({
   bootSequence: organicaLogo
     .concat([
@@ -926,6 +940,16 @@ const terminalWrapper = new ViewWrapper({
     components: [{ component: worldMapPage }],
   }],
 });
+const spoonyWrapper = new ViewWrapper({
+  menuBar,
+  viewType: 'spoony',
+  title: 'Lovers',
+  columns: [{
+    components: [{ component: spoonyView }],
+  }, {
+    components: [{ component: worldMapPage }],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -937,6 +961,7 @@ menuBar.setViews({
     { view: teamWrapper },
     { view: peopleWrapper },
     { view: terminalWrapper },
+    { view: spoonyWrapper },
   ],
 });
 
@@ -949,6 +974,7 @@ viewSwitcher.addAvailableTypes({
     teamWrapper.viewType,
     peopleWrapper.viewType,
     terminalWrapper.viewType,
+    spoonyWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

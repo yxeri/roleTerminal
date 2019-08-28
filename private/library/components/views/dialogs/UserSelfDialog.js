@@ -44,11 +44,13 @@ class UserSelfDialog extends BaseDialog {
       username,
       aliasName,
       description,
+      customFields = [],
       objectId: identityId,
     } = identity;
     const identityPosition = positionComposer.getPosition({ positionId: identity.objectId });
     const name = aliasName || username;
     const isAlias = typeof aliasName !== 'undefined';
+    const customUserFields = storageManager.getCustomUserFields();
 
     const inputs = [
       elementCreator.createInput({
@@ -71,6 +73,68 @@ class UserSelfDialog extends BaseDialog {
         previewId: 'imagePreview-userSelf',
       }));
     }
+
+    customUserFields.forEach((field) => {
+      const {
+        type,
+        parent,
+        hidden,
+        revealOnClick,
+        maxLength,
+        name: fieldName,
+      } = field;
+      const existing = customFields.find(customField => customField.name === fieldName);
+      const hasRevealer = customUserFields.find(customField => customField.parent === parent && customField.revealOnClick);
+      const revealer = hasRevealer
+        ? customFields.find(customField => customField.name === hasRevealer.name)
+        : undefined;
+
+      if (type === 'checkBox') {
+        inputs.push(elementCreator.createCheckBox({
+          parent,
+          isChecked: existing && existing.value,
+          name: fieldName,
+          classes: hidden && (!revealer || !revealer.value)
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          text: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+          clickFuncs: revealOnClick
+            ? {
+              leftFunc: () => {
+                Array.from(this.inputContainer.children).forEach((child) => {
+                  const parentName = child.getAttribute('parent');
+                  const childName = child.getAttribute('name');
+
+                  if (parentName && parentName === parent && childName && childName !== fieldName) {
+                    if (this.getInputValue(fieldName, 'checkBox')) {
+                      child.classList.remove('hide');
+                    } else {
+                      child.classList.add('hide');
+                    }
+                  }
+                });
+              },
+            }
+            : undefined,
+        }));
+      } else if (type === 'input' || type === 'textArea') {
+        inputs.push(elementCreator.createInput({
+          parent,
+          maxLength,
+          multiLine: type === 'textArea',
+          text: existing
+            ? existing.value
+            : undefined,
+          inputName: fieldName,
+          classes: hidden && (!revealer || !revealer.value)
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          placeholder: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+        }));
+      }
+    });
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -159,7 +223,9 @@ class UserSelfDialog extends BaseDialog {
             };
             const imagePreview = document.getElementById('imagePreview-userSelf');
             const descriptionInput = this.getInputValue(ids.DESCRIPTION);
-            const object = {};
+            const object = {
+              customFields: [],
+            };
 
             if (imagePreview && imagePreview.getAttribute('src')) {
               params.image = {
@@ -172,6 +238,34 @@ class UserSelfDialog extends BaseDialog {
 
             if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
               object.description = descriptionInput.split('\n');
+            }
+
+            if (customUserFields.length > 0) {
+              object.customFields = [];
+
+              customUserFields.forEach((field) => {
+                const {
+                  type,
+                  name: fieldName,
+                } = field;
+
+                if (type === 'checkBox') {
+                  object.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName, 'checkBox'),
+                  });
+                } else if (type === 'input') {
+                  object.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName),
+                  });
+                } else if (type === 'textArea') {
+                  object.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName).split('\n'),
+                  });
+                }
+              });
             }
 
             if (isAlias) {

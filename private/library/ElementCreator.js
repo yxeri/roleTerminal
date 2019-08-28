@@ -393,7 +393,7 @@ class ElementCreator {
         : 'input',
     });
 
-    if (text && ((multiLine && text.join('\n') !== '') || text !== '')) {
+    if (text) {
       if (multiLine) {
         input.value = text.join('\n').replace(/''/g, '\n');
       } else {
@@ -403,9 +403,9 @@ class ElementCreator {
           input.value = value;
         }
       }
-    } else {
-      input.setAttribute('placeholder', placeholder);
     }
+
+    input.setAttribute('placeholder', placeholder);
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
 

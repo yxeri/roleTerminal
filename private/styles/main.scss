@@ -639,10 +639,10 @@ $msgList-msgLine-side-padding: .2em;
     display: flex;
     -webkit-flex-direction: column;
     flex-direction: column;
+    overflow-y: auto;
   }
 
   .terminalOutput {
-    overflow-y: auto;
     overflow-x: hidden;
     padding: $padding;
     height: calc(100% - #{$padding});
@@ -650,6 +650,8 @@ $msgList-msgLine-side-padding: .2em;
   }
 
   .terminalInput {
+    height: 2em;
+
     input {
       width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 3em);
     }

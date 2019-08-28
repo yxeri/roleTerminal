@@ -415,7 +415,6 @@ class List extends BaseView {
     });
 
     if (this.header && marked[this.listType] && marked[this.listType].length > 0) {
-      console.log(this.listType, marked[this.listType]);
       this.header.classList.add(cssClasses.markListItem);
     }
 
@@ -737,8 +736,6 @@ class List extends BaseView {
 
       this.animateElement({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
-
-      console.log(this.header);
 
       if (this.header) {
         this.header.classList.add(cssClasses.markListItem);

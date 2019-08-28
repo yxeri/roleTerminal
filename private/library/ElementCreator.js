@@ -635,14 +635,18 @@ class ElementCreator {
 
   static createCheckBox({
     classes,
+    name,
     elementId,
     text,
     clickFuncs,
-    isDefault = false,
+    parent,
+    isChecked = false,
   }) {
     const label = createBaseElement({
       classes,
       clickFuncs,
+      name,
+      parent,
       elementType: 'label',
     });
     const checkBox = createBaseElement({
@@ -652,8 +656,8 @@ class ElementCreator {
 
     checkBox.setAttribute('type', 'checkbox');
 
-    if (isDefault) {
-      checkBox.setAttribute('checked', 'true');
+    if (isChecked) {
+      checkBox.setAttribute('checked', 'on');
     }
 
     label.appendChild(checkBox);

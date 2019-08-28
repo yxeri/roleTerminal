@@ -34,7 +34,22 @@ labelHandler.setBaseLabel({
       en: '"I seek love!" Sticky Spoon Love Bureau will help you find love out in the wastelands.',
     },
     'spoony-describe': {
-      en: 'Describe yourself with three words',
+      en: 'Describe yourself in three words',
+    },
+    'spoony-twoCreatures': {
+      en: 'Wolf or mutant?',
+    },
+    'spoony-twoItems': {
+      en: 'Caps or Stråla?',
+    },
+    'spoony-std': {
+      en: 'STDs?',
+    },
+    'spoony-space': {
+      en: 'Flesh or cyber?',
+    },
+    'spoony-stone': {
+      en: 'You find a clump of strange material. How do you identify it? By... Licking it? Knocking on it? Asking it? Throwing it?',
     },
   },
 });

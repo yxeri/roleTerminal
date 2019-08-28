@@ -170,17 +170,9 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (!this.shouldFilterItem({
-            changeType,
-            object,
-            user,
-          })) {
-            return;
-          }
-
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.addOneItem({
                   object,
                   shouldFlash: true,
@@ -193,7 +185,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.onCreateFunc({ object });
 
                 this.addOneItem({

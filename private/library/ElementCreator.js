@@ -393,7 +393,7 @@ class ElementCreator {
         : 'input',
     });
 
-    if (text) {
+    if (text && ((multiLine && text.join('\n') !== '') || text !== '')) {
       if (multiLine) {
         input.value = text.join('\n').replace(/''/g, '\n');
       } else {

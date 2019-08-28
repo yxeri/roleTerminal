@@ -39,6 +39,7 @@ class RegisterDialog extends BaseDialog {
     classes = [],
     elementId = `rDialog-${Date.now()}`,
   }) {
+    const customUserFields = storageManager.getCustomUserFields();
     const upperText = [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'registerUser' })];
     const lowerText = [labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'info' })];
     const inputs = [
@@ -111,6 +112,56 @@ class RegisterDialog extends BaseDialog {
       }));
     }
 
+    customUserFields.forEach((field) => {
+      const {
+        type,
+        parent,
+        hidden,
+        revealOnClick,
+        name: fieldName,
+      } = field;
+      if (type === 'checkBox') {
+        inputs.push(elementCreator.createCheckBox({
+          parent,
+          name: fieldName,
+          classes: hidden
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          text: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+          clickFuncs: revealOnClick
+            ? {
+              leftFunc: () => {
+                Array.from(this.inputContainer.children).forEach((child) => {
+                  const parentName = child.getAttribute('parent');
+                  const childName = child.getAttribute('name');
+
+                  if (parentName && parentName === parent && childName && childName !== fieldName) {
+                    if (this.getInputValue(fieldName, 'checkBox')) {
+                      child.classList.remove('hide');
+                    } else {
+                      child.classList.add('hide');
+                    }
+                  }
+                });
+              },
+            }
+            : undefined,
+        }));
+      } else if (type === 'input' || type === 'textArea') {
+        inputs.push(elementCreator.createInput({
+          parent,
+          multiLine: type === 'textArea',
+          inputName: fieldName,
+          classes: hidden
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          placeholder: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+        }));
+      }
+    });
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -138,15 +189,13 @@ class RegisterDialog extends BaseDialog {
               return;
             }
 
-            const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
-              .filter(selected => selected.getAttribute('value') !== '');
             const params = {
               user: {
                 username: this.getInputValue(ids.USERNAME),
                 offName: this.getInputValue(ids.OFFNAME),
                 password: this.getInputValue(ids.PASSWORD),
                 registerDevice: storageManager.getDeviceId(),
-                pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
+                pronouns: this.getInputValue(ids.PRONOUNS, 'select'),
                 description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error, data }) => {
@@ -233,6 +282,34 @@ class RegisterDialog extends BaseDialog {
                 width: imagePreview.naturalWidth,
                 height: imagePreview.naturalHeight,
               };
+            }
+
+            if (customUserFields.length > 0) {
+              params.user.customFields = [];
+
+              customUserFields.forEach((field) => {
+                const {
+                  type,
+                  name: fieldName,
+                } = field;
+
+                if (type === 'checkBox') {
+                  params.user.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName, 'checkBox'),
+                  });
+                } else if (type === 'input') {
+                  params.user.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName),
+                  });
+                } else if (type === 'textArea') {
+                  params.user.customFields.push({
+                    name: fieldName,
+                    value: this.getInputValue(fieldName).split('\n'),
+                  });
+                }
+              });
             }
 
             userComposer.createUser(params);

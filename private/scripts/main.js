@@ -49,7 +49,7 @@ labelHandler.setBaseLabel({
       en: 'Flesh or cyber?',
     },
     'spoony-stone': {
-      en: 'You find a clump of strange material. How do you identify it? By... Licking it? Knocking on it? Asking it? Throwing it?',
+      en: 'You find a lump of strange material. How do you identify it? By... Licking it? Knocking on it? Asking it? Throwing it?',
     },
   },
 });

@@ -15,6 +15,7 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const PasswordDialog = require('./PasswordDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -203,80 +204,13 @@ class UserSelfDialog extends BaseDialog {
       //   },
       // }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+        text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'password' }),
         clickFuncs: {
           leftFunc: () => {
-            if (this.hasEmptyRequiredInputs()) {
-              return;
-            }
+            const dialog = new PasswordDialog({});
 
-            const params = {
-              callback: ({ error }) => {
-                if (error) {
-                  console.log(error);
-
-                  return;
-                }
-
-                this.removeFromView();
-              },
-            };
-            const imagePreview = document.getElementById('imagePreview-userSelf');
-            const descriptionInput = this.getInputValue(ids.DESCRIPTION);
-            const object = {
-              customFields: [],
-            };
-
-            if (imagePreview && imagePreview.getAttribute('src')) {
-              params.image = {
-                source: imagePreview.getAttribute('src'),
-                imageName: imagePreview.getAttribute('name'),
-                width: imagePreview.naturalWidth,
-                height: imagePreview.naturalHeight,
-              };
-            }
-
-            if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
-              object.description = descriptionInput.split('\n');
-            }
-
-            if (customUserFields.length > 0) {
-              object.customFields = [];
-
-              customUserFields.forEach((field) => {
-                const {
-                  type,
-                  name: fieldName,
-                } = field;
-
-                if (type === 'checkBox') {
-                  object.customFields.push({
-                    name: fieldName,
-                    value: this.getInputValue(fieldName, 'checkBox'),
-                  });
-                } else if (type === 'input') {
-                  object.customFields.push({
-                    name: fieldName,
-                    value: this.getInputValue(fieldName),
-                  });
-                } else if (type === 'textArea') {
-                  object.customFields.push({
-                    name: fieldName,
-                    value: this.getInputValue(fieldName).split('\n'),
-                  });
-                }
-              });
-            }
-
-            if (isAlias) {
-              params.aliasId = identityId;
-              params.alias = object;
-              aliasComposer.updateAlias(params);
-            } else {
-              params.userId = identityId;
-              params.user = object;
-              userComposer.updateUser(params);
-            }
+            dialog.addToView({ element: this.getParentElement() });
+            this.removeFromView();
           },
         },
       }),
@@ -299,6 +233,85 @@ class UserSelfDialog extends BaseDialog {
         },
       }));
     }
+
+    lowerButtons.push(elementCreator.createButton({
+      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+      clickFuncs: {
+        leftFunc: () => {
+          if (this.hasEmptyRequiredInputs()) {
+            return;
+          }
+
+          const params = {
+            callback: ({ error }) => {
+              if (error) {
+                console.log(error);
+
+                return;
+              }
+
+              this.removeFromView();
+            },
+          };
+          const imagePreview = document.getElementById('imagePreview-userSelf');
+          const descriptionInput = this.getInputValue(ids.DESCRIPTION);
+          const object = {
+            customFields: [],
+          };
+
+          if (imagePreview && imagePreview.getAttribute('src')) {
+            params.image = {
+              source: imagePreview.getAttribute('src'),
+              imageName: imagePreview.getAttribute('name'),
+              width: imagePreview.naturalWidth,
+              height: imagePreview.naturalHeight,
+            };
+          }
+
+          if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
+            object.description = descriptionInput.split('\n');
+          }
+
+          if (customUserFields.length > 0) {
+            object.customFields = [];
+
+            customUserFields.forEach((field) => {
+              const {
+                type,
+                name: fieldName,
+              } = field;
+
+              if (type === 'checkBox') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName, 'checkBox'),
+                });
+              } else if (type === 'input') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName),
+                });
+              } else if (type === 'textArea') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName).split('\n'),
+                });
+              }
+            });
+          }
+
+          if (isAlias) {
+            params.aliasId = identityId;
+            params.alias = object;
+            aliasComposer.updateAlias(params);
+          } else {
+            params.userId = identityId;
+            params.user = object;
+            userComposer.updateUser(params);
+          }
+        },
+      },
+    }));
 
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,

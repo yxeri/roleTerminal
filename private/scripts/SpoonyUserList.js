@@ -137,6 +137,7 @@ class UserList extends List {
 
     return allAliases.concat(allUsers)
       .filter(object => !userAliases.includes(object.objectId))
+      .filter(object => object.customFields && object.customFields.find(field => field.name === 'spoony' && field.value))
       .sort((a, b) => {
         const aParam = (a.username || a.aliasName).toLowerCase();
         const bParam = (b.username || b.aliasName).toLowerCase();

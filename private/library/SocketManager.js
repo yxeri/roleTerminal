@@ -97,6 +97,7 @@ class SocketManager {
           dayModification,
           requireOffName,
           allowedImages,
+          customUserFields,
           permissions = {},
         } = data;
 
@@ -116,6 +117,7 @@ class SocketManager {
 
         storageManager.setAllowedImages(allowedImages);
         storageManager.setPermissions(permissions);
+        storageManager.setCustomUserFields(customUserFields);
 
         if (!this.hasConnected) {
           this.isOnline = true;

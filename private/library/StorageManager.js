@@ -491,8 +491,15 @@ class StorageManager {
   }
 
   static getAllowedImages() {
-    console.log('allowed', converters.convertToObject(this.getLocalVal('allowedImages')));
     return converters.convertToObject(this.getLocalVal('allowedImages'));
+  }
+
+  static setCustomUserFields(fields) {
+    this.setLocalVal('customUserFields', fields);
+  }
+
+  static getCustomUserFields() {
+    return converters.convertToObject(this.getLocalVal('customUserFields'));
   }
 }
 

@@ -16,7 +16,6 @@
 
 const List = require('../library/components/lists/List');
 const UserDialog = require('../library/components/views/dialogs/UserDialog');
-const PersonPage = require('../library/components/views/pages/PersonPage');
 
 const dataHandler = require('../library/data/DataHandler');
 const storageManager = require('../library/StorageManager');
@@ -25,7 +24,6 @@ const accessCentral = require('../library/AccessCentral');
 const viewSwitcher = require('../library/ViewSwitcher');
 const userComposer = require('../library/data/composers/UserComposer');
 const labelHandler = require('../library/labels/LabelHandler');
-const elementCreator = require('../library/ElementCreator');
 
 class UserList extends List {
   constructor({
@@ -77,6 +75,15 @@ class UserList extends List {
         rules: [
           { paramName: 'isBanned', paramValue: false },
           { paramName: 'isVerified', paramValue: true },
+          {
+            valueType: 'object',
+            shouldInclude: true,
+            paramName: 'customFields',
+            paramValue: {
+              name: 'spoony',
+              value: true,
+            },
+          },
         ],
       },
       userFilter: {
@@ -112,7 +119,7 @@ class UserList extends List {
 
     if (showImage) {
       params.imageInfo = {
-        fallbackTo: 'objectId',
+        paramName: 'objectId',
         show: true,
         getImage: (userId) => { return userComposer.getImage(userId); },
       };
@@ -130,12 +137,6 @@ class UserList extends List {
 
     return allAliases.concat(allUsers)
       .filter(object => !userAliases.includes(object.objectId))
-      .filter((object) => {
-        const { customFields = [] } = object;
-        const spoony = customFields.find(field => field.name === 'spoony');
-
-        return spoony && spoony.value === 'on';
-      })
       .sort((a, b) => {
         const aParam = (a.username || a.aliasName).toLowerCase();
         const bParam = (b.username || b.aliasName).toLowerCase();

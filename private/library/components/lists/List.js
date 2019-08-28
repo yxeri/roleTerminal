@@ -578,10 +578,11 @@ class List extends BaseView {
         }
 
         if (this.imageInfo && this.imageInfo.show) {
-          const image = this.imageInfo.getImage(object[this.imageInfo.paramName])
-            || !object[this.imageInfo.paramName]
-            ? this.imageInfo.getImage(object[this.imageInfo.fallbackTo])
-            : undefined;
+          let image = this.imageInfo.getImage(object[this.imageInfo.paramName]);
+
+          if (!image && !object[this.imageInfo.paramName]) {
+            image = this.imageInfo.getImage(object[this.imageInfo.fallbackTo]);
+          }
 
           if (image) {
             listItemElements.push(elementCreator.createPicture({
@@ -668,7 +669,7 @@ class List extends BaseView {
     }
 
     if (shouldReplace && element) {
-      this.listElement.replaceChild(newItem, this.getElement(objectId));
+      this.listElement.replaceChild(newItem, element);
     } else if (this.sorting && this.sorting.paramName) {
       const firstChild = this.listElement.firstElementChild;
       this.lastObject = object;

@@ -56,13 +56,13 @@ class BaseDialog extends BaseView {
     this.timeout = timeout;
     this.inputs = inputs;
 
-    const inputContainer = elementCreator.createContainer({
+    this.inputContainer = elementCreator.createContainer({
       elementId: ids.INPUTCONTAINER,
       classes: [ids.INPUTCONTAINER],
     });
 
     this.inputs.forEach((input) => {
-      this.appendInput({ container: inputContainer, input });
+      this.appendInput({ container: this.inputContainer, input });
     });
 
     this.element.appendChild(elementCreator.createContainer({
@@ -89,7 +89,7 @@ class BaseDialog extends BaseView {
       classes: [ids.LOWERTEXT],
     }));
 
-    this.element.appendChild(inputContainer);
+    this.element.appendChild(this.inputContainer);
 
     this.element.appendChild(elementCreator.createContainer({
       elementId: `${this.elementId}${ids.LOWERBUTTONS}`,
@@ -190,21 +190,38 @@ class BaseDialog extends BaseView {
   appendInput({ container, input }) {
     const inputToAdd = input;
 
-    inputToAdd.setAttribute('id', `${this.elementId}${inputToAdd.getAttribute('id')}`);
+    if (inputToAdd.tagName === 'LABEL') {
+      const inputElement = inputToAdd.firstElementChild;
+
+      inputElement.setAttribute('id', `${this.elementId}${inputElement.getAttribute('id')}`);
+    } else {
+      inputToAdd.setAttribute('id', `${this.elementId}${inputToAdd.getAttribute('id')}`);
+    }
 
     container.appendChild(input);
   }
 
-  getInputValue(elementId) {
+  getInputValue(elementId, type = '') {
     const input = this.getElement(elementId);
 
     if (input) {
-      const {
-        checked,
-        value,
-      } = input;
+      switch (type) {
+        case 'select': {
+          return Array.from(input.selectedOptions)
+            .filter(selected => selected.getAttribute('value') !== '')
+            .map(selected => selected.getAttribute('value'));
+        }
+        case 'checkBox': {
+          const { checked } = input;
 
-      return value || checked || '';
+          return checked;
+        }
+        default: {
+          const { value } = input;
+
+          return value || '';
+        }
+      }
     }
 
     return '';

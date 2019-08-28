@@ -448,25 +448,27 @@ class BaseData {
 
     if (filter) {
       const { orCheck } = filter;
+      const filterFunc = (rule, object) => {
+        if (rule.shouldInclude) {
+          if (rule.valueType && rule.valueType === 'object') {
+            console.log(object.aliasName || object.username, object[rule.paramName], rule.paramValue);
+            return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
+              return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
+            });
+          }
+
+          return object[rule.paramName] && object[rule.paramName].includes(rule.paramValue);
+        }
+
+        return rule.paramValue === object[rule.paramName];
+      };
 
       const filteredObjects = objects.filter((object) => {
         if (orCheck) {
-          return filter.rules.some((rule) => {
-            if (rule.shouldInclude) {
-              return rule.paramValue.every(value => object[rule.paramName].includes(value));
-            }
-
-            return rule.paramValue === object[rule.paramName];
-          });
+          return filter.rules.some(rule => filterFunc(rule, object));
         }
 
-        return filter.rules.every((rule) => {
-          if (rule.shouldInclude) {
-            return rule.paramValue.every(value => object[rule.paramName].includes(value));
-          }
-
-          return rule.paramValue === object[rule.paramName];
-        });
+        return filter.rules.every(rule => filterFunc(rule, object));
       });
 
       return sorting

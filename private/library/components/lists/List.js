@@ -788,6 +788,12 @@ class List extends BaseView {
     if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
       const filterFunc = (rule) => {
         if (rule.shouldInclude) {
+          if (rule.valueType && rule.valueType === 'object') {
+            return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
+              return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
+            });
+          }
+
           return object[rule.paramName].includes(rule.paramValue);
         }
 

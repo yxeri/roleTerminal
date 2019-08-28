@@ -51,6 +51,15 @@ labelHandler.setBaseLabel({
     'spoony-stone': {
       en: 'You find a lump of strange material. How do you identify it? By... Licking it? Knocking on it? Asking it? Throwing it?',
     },
+    'spoony-appearance': {
+      en: 'How does one recognize you in the wastelands?',
+    },
+    'spoony-description': {
+      en: 'What else do you want your future-date to know about you?',
+    },
+    'spoony-turnOn': {
+      en: 'Name the top two things that turn you on',
+    },
   },
 });
 
@@ -958,7 +967,7 @@ const terminalWrapper = new ViewWrapper({
 const spoonyWrapper = new ViewWrapper({
   menuBar,
   viewType: 'spoony',
-  title: 'Lovers',
+  title: 'Love Bureau',
   columns: [{
     components: [{ component: spoonyView }],
   }, {

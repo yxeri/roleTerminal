@@ -56,6 +56,69 @@ class UserList extends List {
 
         return '';
       },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-describe');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-describe' })}: ${field.value.join('\n')}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-twoCreatures');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-twoCreatures' })}: ${field.value}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-twoItems');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-twoItems' })}: ${field.value}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-space');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-space' })}: ${field.value}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-std');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-std' })}: ${field.value.join('\n')}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-stone');
+
+        return `You find a lump of strange material. How do you identify it?: ${field.value.join('\n')}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-appearance');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-appearance' })}: ${field.value.join('\n')}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-turnOn');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-turnOn' })}: ${field.value.join('\n')}`;
+      },
+    }, {
+      paramName: 'customFields',
+      convertFunc: (fields) => {
+        const field = fields.find(customField => customField.name === 'spoony-description');
+
+        return `${labelHandler.getLabel({ baseObject: 'spoony', label: 'spoony-description' })}: ${field.value.join('\n')}`;
+      },
     }];
 
     const params = {

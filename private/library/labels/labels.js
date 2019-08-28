@@ -569,6 +569,9 @@ const labels = {
     username: (override.UserDialog && override.UserDialog.username) || {
       en: 'Username',
     },
+    password: (override.UserDialog && override.UserDialog.password) || {
+      en: 'Password',
+    },
   },
   TeamDialog: {
     tag: (override.TeamDialog && override.TeamDialog.tag) || {
@@ -594,6 +597,14 @@ const labels = {
     },
     createTeam: (override.TeamDialog && override.TeamDialog.createTeam) || {
       en: 'Create team',
+    },
+  },
+  PasswordDialog: {
+    password: (override.PasswordDialog && override.PasswordDialog.password) || {
+      en: 'New password',
+    },
+    repeatPassword: (override.PasswordDialog && override.RegisterDialog.PasswordDialog) || {
+      en: 'Repeat password',
     },
   },
   TransactionList: {

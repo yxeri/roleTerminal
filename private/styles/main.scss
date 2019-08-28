@@ -266,6 +266,7 @@ select {
     height: 5em;
     width: calc(100% - .2em);
     padding: .1em;
+    margin-bottom: $p-margin;
   }
 
   .inContainer {

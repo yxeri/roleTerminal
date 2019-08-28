@@ -112,7 +112,7 @@ class DocFileDialog extends BaseDialog {
                 ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
                 code: this.getInputValue(ids.CODE),
-                isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
+                isPublic: this.getInputValue(ids.VISIBILITY_PUBLIC, 'checkBox'),
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
               callback: ({ error }) => {

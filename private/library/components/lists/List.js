@@ -170,17 +170,9 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (!this.shouldFilterItem({
-            changeType,
-            object,
-            user,
-          })) {
-            return;
-          }
-
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.addOneItem({
                   object,
                   shouldFlash: true,
@@ -193,7 +185,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.onCreateFunc({ object });
 
                 this.addOneItem({
@@ -415,7 +407,6 @@ class List extends BaseView {
     });
 
     if (this.header && marked[this.listType] && marked[this.listType].length > 0) {
-      console.log(this.listType, marked[this.listType]);
       this.header.classList.add(cssClasses.markListItem);
     }
 
@@ -588,10 +579,11 @@ class List extends BaseView {
         }
 
         if (this.imageInfo && this.imageInfo.show) {
-          const image = this.imageInfo.getImage(object[this.imageInfo.paramName])
-            || !object[this.imageInfo.paramName]
-            ? this.imageInfo.getImage(object[this.imageInfo.fallbackTo])
-            : undefined;
+          let image = this.imageInfo.getImage(object[this.imageInfo.paramName]);
+
+          if (!image && !object[this.imageInfo.paramName]) {
+            image = this.imageInfo.getImage(object[this.imageInfo.fallbackTo]);
+          }
 
           if (image) {
             listItemElements.push(elementCreator.createPicture({
@@ -684,7 +676,7 @@ class List extends BaseView {
     }
 
     if (shouldReplace && element) {
-      this.listElement.replaceChild(newItem, this.getElement(objectId));
+      this.listElement.replaceChild(newItem, element);
     } else if (this.sorting && this.sorting.paramName) {
       const firstChild = this.listElement.firstElementChild;
       this.lastObject = object;
@@ -745,8 +737,6 @@ class List extends BaseView {
       this.animateElement({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
 
-      console.log(this.header);
-
       if (this.header) {
         this.header.classList.add(cssClasses.markListItem);
       }
@@ -795,6 +785,12 @@ class List extends BaseView {
     if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
       const filterFunc = (rule) => {
         if (rule.shouldInclude) {
+          if (rule.valueType && rule.valueType === 'object') {
+            return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
+              return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
+            });
+          }
+
           return object[rule.paramName].includes(rule.paramValue);
         }
 

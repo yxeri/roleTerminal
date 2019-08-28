@@ -54,6 +54,17 @@ function setName(element, name) {
 }
 
 /**
+ * Set parent name on the element.
+ * @param {HTMLElement} element Element to add a name to.
+ * @param {string} name Name to add.
+ */
+function setParent(element, name) {
+  if (name) {
+    element.setAttribute('parent', name);
+  }
+}
+
+/**
  * Set classes on the element.
  * @param {HTMLElement} element Element to add classes to.
  * @param {string[]} classes Classes to add.
@@ -98,6 +109,7 @@ function createBaseElement({
   name,
   object,
   needsFullAccess,
+  parent,
 }) {
   const element = document.createElement(elementType);
 
@@ -105,6 +117,7 @@ function createBaseElement({
   setElementId(element, elementId);
   setClickFuncs(element, clickFuncs);
   setName(element, name);
+  setParent(element, parent);
 
   if (object) {
     eventCentral.addWatcher({
@@ -365,6 +378,7 @@ class ElementCreator {
     isLocked,
     object,
     needsFullAccess,
+    parent,
     placeholder = '',
   }) {
     const input = createBaseElement({
@@ -372,13 +386,14 @@ class ElementCreator {
       classes,
       needsFullAccess,
       object,
+      parent,
       name: inputName,
       elementType: multiLine
         ? 'textarea'
         : 'input',
     });
 
-    if (text) {
+    if (text && ((multiLine && text.join('\n') !== '') || text !== '')) {
       if (multiLine) {
         input.value = text.join('\n').replace(/''/g, '\n');
       } else {
@@ -620,14 +635,18 @@ class ElementCreator {
 
   static createCheckBox({
     classes,
+    name,
     elementId,
     text,
     clickFuncs,
-    isDefault = false,
+    parent,
+    isChecked = false,
   }) {
     const label = createBaseElement({
       classes,
       clickFuncs,
+      name,
+      parent,
       elementType: 'label',
     });
     const checkBox = createBaseElement({
@@ -637,8 +656,8 @@ class ElementCreator {
 
     checkBox.setAttribute('type', 'checkbox');
 
-    if (isDefault) {
-      checkBox.setAttribute('checked', 'true');
+    if (isChecked) {
+      checkBox.setAttribute('checked', 'on');
     }
 
     label.appendChild(checkBox);

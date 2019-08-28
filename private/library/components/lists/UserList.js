@@ -106,7 +106,7 @@ class UserList extends List {
 
     if (showImage) {
       params.imageInfo = {
-        fallbackTo: 'objectId',
+        paramName: 'objectId',
         show: true,
         getImage: (userId) => { return userComposer.getImage(userId); },
       };

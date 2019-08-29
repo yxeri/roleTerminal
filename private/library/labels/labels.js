@@ -598,6 +598,9 @@ const labels = {
     createTeam: (override.TeamDialog && override.TeamDialog.createTeam) || {
       en: 'Create team',
     },
+    maxUserTeamLength: (override.TeamDialog && override.TeamDialog.maxUserTeamLength) || {
+      en: 'You are already part of the maximum amount of teams',
+    },
   },
   PasswordDialog: {
     password: (override.PasswordDialog && override.PasswordDialog.password) || {

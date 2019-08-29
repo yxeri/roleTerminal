@@ -18,6 +18,7 @@ const ViewWrapper = require('../ViewWrapper');
 const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
 const TeamList = require('../lists/TeamList');
+const WalletInfo = require('./WalletInfo');
 
 class WalletView extends ViewWrapper {
   constructor({
@@ -25,6 +26,10 @@ class WalletView extends ViewWrapper {
     classes = [],
     elementId = `wView-${Date.now()}`,
   }) {
+    const walletInfo = new WalletInfo({
+      sign: 'vcaps',
+      appendSign: true,
+    });
     const transactionList = new TransactionList({ effect });
     const userList = new UserList({
       effect,
@@ -53,7 +58,14 @@ class WalletView extends ViewWrapper {
             'columnWalletList',
           ],
         },
-        { components: [{ component: transactionList }], classes: ['columnTransactionList'] },
+        {
+          components: [{
+            component: walletInfo,
+          }, {
+            component: transactionList,
+          }],
+          classes: ['columnTransactionList'],
+        },
       ],
       classes: classes.concat(['walletView']),
     });

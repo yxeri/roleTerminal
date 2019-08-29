@@ -82,6 +82,11 @@ class TeamCreateDialog extends BaseDialog {
 
                         return;
                       }
+                      case 'maxUserTeam': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'maxUserTeamLength' })] });
+
+                        return;
+                      }
                       default: {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 

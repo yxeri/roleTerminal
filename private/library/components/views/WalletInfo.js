@@ -14,22 +14,42 @@
  limitations under the License.
  */
 
+const BaseView = require('./BaseView');
+
 const walletComposer = require('../../data/composers/WalletComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 
-class WalletInfo {
+class WalletInfo extends BaseView {
   constructor({
     sign = '$',
+    appendSign = false,
+    showName = false,
   }) {
     const amountSpan = elementCreator.createSpan({ text: '0' });
     const setAmountFunc = ({ walletId, amount }) => {
       const walletAmount = amount || walletComposer.getWalletAmount({ walletId });
+      const identity = userComposer.getCurrentIdentity();
+      const name = identity.aliasName || identity.username;
+      let string = '';
 
       amountSpan.innerHTML = '';
-      amountSpan.appendChild(document.createTextNode(`${sign}${walletAmount.toString()}`));
+
+      if (showName) {
+        string += `${name}: `;
+      }
+
+      if (appendSign) {
+        string += `${walletAmount.toString()}${sign}`;
+      } else {
+        string += `${sign}${walletAmount.toString()}`;
+      }
+
+      amountSpan.appendChild(document.createTextNode(string));
     };
+
+    super({});
 
     this.element = elementCreator.createContainer({
       classes: ['walletInfo'],
@@ -61,6 +81,15 @@ class WalletInfo {
       event: eventCentral.Events.LOGOUT,
       func: () => {
         setAmountFunc({ amount: 0 });
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.TRANSACTION,
+      func: () => {
+        const identity = userComposer.getCurrentIdentity();
+
+        setAmountFunc({ walletId: identity.objectId });
       },
     });
   }

@@ -1007,6 +1007,14 @@ $map-padding-fix: 2em;
   }
 }
 
+.walletView {
+  .walletInfo {
+    text-align: center;
+    border-bottom: $border;
+    padding: $padding;
+  }
+}
+
 .currentUserList {
   margin-bottom: 0;
   padding-top: 0;
@@ -1190,7 +1198,7 @@ $map-padding-fix: 2em;
     width: 100%;
   }
 
-  .chatView, .worldMapView, .walletView {
+  .chatView, .worldMapView, .walletView, .teamView {
     .columnList {
       height: calc(1.8em + #{$border-width});
       width: 100%;

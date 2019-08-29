@@ -33,7 +33,7 @@ class TransactionList extends List {
       {
         paramName: 'fromWalletId',
         convertFunc: (fromWalletId) => {
-          return `${walletComposer.getWalletOwnerName({ walletId: fromWalletId }) || fromWalletId} ${toText}`;
+          return `${walletComposer.getWalletOwnerName({ walletId: fromWalletId }) || fromWalletId} ${toText} `;
         },
       }, {
         paramName: 'toWalletId',

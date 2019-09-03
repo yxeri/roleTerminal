@@ -120,13 +120,17 @@ class UserSelfDialog extends BaseDialog {
             : undefined,
         }));
       } else if (type === 'input' || type === 'textArea') {
+        const existingValue = existing
+          ? existing.value
+          : undefined;
+
         inputs.push(elementCreator.createInput({
           parent,
           maxLength,
           multiLine: type === 'textArea',
-          text: existing
-            ? existing.value
-            : undefined,
+          text: type === 'textArea' && existingValue
+            ? [existingValue]
+            : existingValue,
           inputName: fieldName,
           classes: hidden && (!revealer || !revealer.value)
             ? ['hide']

@@ -143,7 +143,7 @@ class EditDocFileDialog extends BaseDialog {
               docFileId,
               docFile: {
                 title: this.getInputValue(ids.TITLE),
-                isPublic: this.getInputValue(ids.VISIBILITY_PUBLIC, 'checkBox'),
+                isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
               callback: ({ error }) => {

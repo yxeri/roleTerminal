@@ -1010,6 +1010,7 @@ $map-padding-fix: 2em;
 .walletView {
   .walletInfo {
     text-align: center;
+    border-top: $border;
     border-bottom: $border;
     padding: $padding;
   }

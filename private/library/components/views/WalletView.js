@@ -29,10 +29,13 @@ class WalletView extends ViewWrapper {
     const walletInfo = new WalletInfo({
       sign: 'vcaps',
       appendSign: true,
+      showName: true,
+      showTeam: true,
     });
     const transactionList = new TransactionList({ effect });
     const userList = new UserList({
       effect,
+      includeSelf: true,
       shouldToggle: true,
       title: 'Users',
     });

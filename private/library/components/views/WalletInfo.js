@@ -20,18 +20,24 @@ const walletComposer = require('../../data/composers/WalletComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
+const teamComposer = require('../../data/composers/TeamComposer');
 
 class WalletInfo extends BaseView {
   constructor({
     sign = '$',
     appendSign = false,
     showName = false,
+    showTeam = false,
   }) {
     const amountSpan = elementCreator.createSpan({ text: '0' });
     const setAmountFunc = ({ walletId, amount }) => {
       const walletAmount = amount || walletComposer.getWalletAmount({ walletId });
       const identity = userComposer.getCurrentIdentity();
       const name = identity.aliasName || identity.username;
+      const { partOfTeams = [] } = identity;
+      const team = partOfTeams.length > 0
+        ? teamComposer.getTeam({ teamId: partOfTeams[0] })
+        : undefined;
       let string = '';
 
       amountSpan.innerHTML = '';
@@ -44,6 +50,18 @@ class WalletInfo extends BaseView {
         string += `${walletAmount.toString()}${sign}`;
       } else {
         string += `${sign}${walletAmount.toString()}`;
+      }
+
+      if (showTeam && team) {
+        const teamAmount = walletComposer.getWalletAmount({ walletId: team.objectId });
+
+        string += `. ${team.teamName}: `;
+
+        if (appendSign) {
+          string += `${teamAmount.toString()}${sign}`;
+        } else {
+          string += `${sign}${teamAmount.toString()}`;
+        }
       }
 
       amountSpan.appendChild(document.createTextNode(string));

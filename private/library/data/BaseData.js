@@ -451,7 +451,6 @@ class BaseData {
       const filterFunc = (rule, object) => {
         if (rule.shouldInclude) {
           if (rule.valueType && rule.valueType === 'object') {
-            console.log(object.aliasName || object.username, object[rule.paramName], rule.paramValue);
             return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
               return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
             });

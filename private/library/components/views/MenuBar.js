@@ -373,6 +373,30 @@ class MenuBar extends BaseView {
           },
         }],
       });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.COMPLETE_USER,
+        func: () => {
+          const identity = userComposer.getCurrentIdentity();
+
+          if (identity.partOfTeams.length > 0) {
+            createTeamButton.classList.add('hide');
+          }
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_ALIAS,
+        func: ({ userId }) => {
+          const identity = userComposer.getIdentity({ objectId: userId });
+
+          if (identity.partOfTeams.length > 0) {
+            createTeamButton.classList.add('hide');
+          } else {
+            createTeamButton.classList.remove('hide');
+          }
+        },
+      });
     }
 
     if (items.concat(menuItems, lastItems).length > 0) {

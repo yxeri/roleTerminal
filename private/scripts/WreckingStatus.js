@@ -79,7 +79,10 @@ class WreckingStatus {
               items.push({ elements: [elementCreator.createSpan({ text: 'REQUIRES MAINTENANCE' })] });
             } else if (station.isActive) {
               items.push({
-                elements: [elementCreator.createSpan({ text: `Signal: ${station.signalValue}` }), elementCreator.createSpan({ text: `Owner: ${ownerName}` })],
+                elements: [elementCreator.createSpan({ text: `Signal: ${station.signalValue}` })],
+              });
+              items.push({
+                elements: [elementCreator.createSpan({ text: `Owner: ${ownerName}` })],
               });
             } else {
               items.push({ elements: [elementCreator.createSpan({ text: 'NO SIGNAL' })] });

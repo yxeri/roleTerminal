@@ -63,6 +63,12 @@ labelHandler.setBaseLabel({
   },
 });
 
+labelHandler.setLabel({
+  baseObject: 'WalletDialog',
+  labelName: 'currency',
+  label: 'vcaps',
+});
+
 const organicaLogo = [
   { element: elementCreator.createSpan({ text: '                          ####', classes: ['pre'] }), fullscreen: true },
   { element: elementCreator.createSpan({ text: '                ####    #########    ####', classes: ['pre'] }) },

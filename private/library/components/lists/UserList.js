@@ -31,6 +31,7 @@ class UserList extends List {
     minimumAccessLevel,
     effect,
     shouldToggle,
+    includeSelf = false,
     showImage = true,
     classes = [],
     elementId = `userList-${Date.now()}`,
@@ -113,6 +114,8 @@ class UserList extends List {
     }
 
     super(params);
+
+    this.includeSelf = includeSelf;
   }
 
   getCollectorObjects() {
@@ -121,8 +124,11 @@ class UserList extends List {
     const allUsers = this.collector.getObjects({
       filter: this.filter,
     });
+    const allIdentities = this.includeSelf
+      ? allAliases.concat(allUsers)
+      : allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId));
 
-    return allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId)).sort((a, b) => {
+    return allIdentities.sort((a, b) => {
       const aParam = (a.username || a.aliasName).toLowerCase();
       const bParam = (b.username || b.aliasName).toLowerCase();
 

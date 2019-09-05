@@ -28,6 +28,7 @@ class UserComposer extends DataComposer {
     }
 
     return {
+      partOfTeams: [],
       followingRooms: [storageManager.getPublicRoomId()],
       accessLevel: accessCentral.AccessLevels.ANONYMOUS,
       objectId: -1,

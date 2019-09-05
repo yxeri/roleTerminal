@@ -30,6 +30,15 @@ class LabelHandler {
   }) {
     labels[name] = object;
   }
+
+  static setLabel({
+    baseObject,
+    labelName,
+    label,
+    language = 'en',
+  }) {
+    labels[baseObject][labelName][language] = label;
+  }
 }
 
 module.exports = LabelHandler;

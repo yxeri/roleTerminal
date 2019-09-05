@@ -22,8 +22,11 @@ const walletComposer = require('../../../data/composers/WalletComposer');
 const transactionComposer = require('../../../data/composers/TransactionComposer');
 const userComposer = require('../../../data/composers/UserComposer');
 const teamComposer = require('../../../data/composers/TeamComposer');
-const storageManager = require('../../../StorageManager');
 const tracker = require('../../../PositionTracker');
+
+const ids = {
+  FROMTEAM: 'fromTeam',
+};
 
 class WalletDialog extends BaseDialog {
   constructor({
@@ -38,6 +41,13 @@ class WalletDialog extends BaseDialog {
       : userComposer.getIdentityName({ objectId: sendToId });
     const walletAmount = walletComposer.getWalletAmount({ walletId: sendFromId });
     const thisIdentityName = userComposer.getIdentityName({ objectId: sendFromId }) || teamComposer.getTeamName({ teamId: sendFromId });
+    const {
+      objectId: identityId,
+      partOfTeams = [],
+    } = userComposer.getIdentity({ objectId: sendFromId });
+    const team = partOfTeams.length > 0
+      ? teamComposer.getTeam({ teamId: partOfTeams[0] })
+      : undefined;
 
     const lowerButtons = [
       elementCreator.createButton({
@@ -56,10 +66,14 @@ class WalletDialog extends BaseDialog {
               return;
             }
 
+            const fromWalletId = this.getInputValue(ids.FROMTEAM, 'checkBox')
+              ? team.objectId
+              : identityId;
+
             transactionComposer.createTransaction({
               transaction: {
+                fromWalletId,
                 coordinates: tracker.getBestPosition(),
-                fromWalletId: storageManager.getAliasId() || storageManager.getUserId(),
                 toWalletId: sendToId,
                 amount: this.getInputValue('walletAmount'),
               },
@@ -87,14 +101,29 @@ class WalletDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
       }),
     ];
+
+    if (team) {
+      inputs.push(elementCreator.createCheckBox({
+        text: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'transferFromTeam' }),
+        elementId: ids.FROMTEAM,
+      }));
+    }
+
     const upperText = [labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'transfer' })];
     const lowerText = [
       `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingFrom' })}: ${thisIdentityName}.`,
       isTeam
         ? `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingToTeam' })}: ${identityName}.`
         : `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'sendingTo' })}: ${identityName}.`,
-      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave', appendSpace: true })}${walletAmount}.`,
+      `${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'youHave' })} ${walletAmount} ${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' })}.`,
     ];
+
+    if (team) {
+      lowerText.push(`${team.teamName} 
+        ${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'teamHas' })} 
+        ${walletComposer.getWalletAmount({ walletId: team.objectId })} 
+        ${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' })}.`);
+    }
 
     super({
       elementId,

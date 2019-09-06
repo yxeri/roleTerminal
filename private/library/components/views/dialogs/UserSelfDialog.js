@@ -128,7 +128,7 @@ class UserSelfDialog extends BaseDialog {
           parent,
           maxLength,
           multiLine: type === 'textArea',
-          text: type === 'textArea' && existingValue
+          text: existingValue && type !== 'textArea'
             ? [existingValue]
             : existingValue,
           inputName: fieldName,

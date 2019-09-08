@@ -756,10 +756,61 @@ terminalView.terminalPage.addCommand({
                 return;
               }
 
+              const createMixedArray = ({
+                classes,
+                rowAmount,
+                length,
+                charToLower,
+                requiredClickableStrings = [],
+                requiredFunc = () => {},
+              }) => {
+                const selection = 'abcdefghijklmnopqrstuvwxyz0123456789!;#&()[]';
+                const spans = [];
+                let indexes = [];
+
+                for (let i = 0; i < rowAmount; i += 1) {
+                  spans.push(this.createRandString({ selection, length }));
+                  indexes.push(i);
+                }
+
+                indexes = tools.shuffleArray(indexes);
+
+                for (let i = 0; i < requiredClickableStrings.length; i += 1) {
+                  const stringLength = requiredClickableStrings[i].length;
+                  const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
+                  const randomIndex = indexes[i];
+                  const randomString = spans[randomIndex];
+                  const span = elementCreator.createSpan({});
+
+                  /**
+                   * Inserts required string and cuts away enough characters from the left and right of the random string to keep the length intact
+                   */
+                  span.appendChild(elementCreator.createSpan({
+                    text: randomString.slice(0, randomStringIndex),
+                  }));
+                  span.appendChild(elementCreator.createSpan({
+                    text: this.randomiseCase(requiredClickableStrings[i], charToLower),
+                    classes: ['clickable'],
+                    func: () => { requiredFunc(requiredClickableStrings[i]); },
+                  }));
+                  span.appendChild(elementCreator.createSpan({
+                    text: randomString.slice(randomStringIndex + stringLength),
+                  }));
+
+                  if (classes) {
+                    classes.forEach(cssClass => span.classList.add(cssClass));
+                  }
+
+                  spans[randomIndex] = span;
+                }
+
+                return spans;
+              };
+
               const boostingSignal = actionId === 1;
               const hintIndex = hackData.passwordHint.index + 1;
 
-              const elements = textTools.createMixedArray({
+              const elements = createMixedArray({
                 rowAmount: hackData.passwords.length,
                 length: 34,
                 requiredClickableStrings: hackData.passwords,

@@ -15,7 +15,7 @@
  */
 
 const mouseHandler = require('./MouseHandler');
-const textTools = require('./TextTools');
+// const textTools = require('./TextTools');
 const labelHandler = require('./labels/LabelHandler');
 const eventCentral = require('./EventCentral');
 const userComposer = require('./data/composers/UserComposer');
@@ -253,7 +253,7 @@ class ElementCreator {
     elementId,
     classes,
     spanType,
-    effect,
+    // effect,
     image,
   }) {
     const span = createBaseElement({
@@ -269,14 +269,14 @@ class ElementCreator {
       span.appendChild(document.createTextNode(text));
     }
 
-    if (effect && Math.random() > 0.90) {
-      const maxLength = text.length > 50
-        ? 50
-        : text.length;
+    // if (effect && Math.random() > 0.90) {
+    //   const maxLength = text.length > 50
+    //     ? 50
+    //     : text.length;
 
-      span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
-      // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
-    }
+    // span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
+    // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
+    // }
 
     return span;
   }

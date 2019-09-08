@@ -15,8 +15,6 @@
  */
 
 const storageManager = require('./StorageManager');
-const tools = require('./Tools');
-const elementCreator = require('./ElementCreator');
 
 /**
  * Characters used when generating random text
@@ -345,57 +343,6 @@ class TextTools {
     } else {
       callback();
     }
-  }
-
-  static createMixedArray({
-    classes,
-    rowAmount,
-    length,
-    charToLower,
-    requiredClickableStrings = [],
-    requiredFunc = () => {},
-  }) {
-    const selection = chars + numbers + specials;
-    const spans = [];
-    let indexes = [];
-
-    for (let i = 0; i < rowAmount; i += 1) {
-      spans.push(this.createRandString({ selection, length }));
-      indexes.push(i);
-    }
-
-    indexes = tools.shuffleArray(indexes);
-
-    for (let i = 0; i < requiredClickableStrings.length; i += 1) {
-      const stringLength = requiredClickableStrings[i].length;
-      const randomStringIndex = Math.floor(Math.random() * (length - stringLength - 1));
-      const randomIndex = indexes[i];
-      const randomString = spans[randomIndex];
-      const span = elementCreator.createSpan({});
-
-      /**
-       * Inserts required string and cuts away enough characters from the left and right of the random string to keep the length intact
-       */
-      span.appendChild(elementCreator.createSpan({
-        text: randomString.slice(0, randomStringIndex),
-      }));
-      span.appendChild(elementCreator.createSpan({
-        text: this.randomiseCase(requiredClickableStrings[i], charToLower),
-        classes: ['clickable'],
-        func: () => { requiredFunc(requiredClickableStrings[i]); },
-      }));
-      span.appendChild(elementCreator.createSpan({
-        text: randomString.slice(randomStringIndex + stringLength),
-      }));
-
-      if (classes) {
-        classes.forEach(cssClass => span.classList.add(cssClass));
-      }
-
-      spans[randomIndex] = span;
-    }
-
-    return spans;
   }
 }
 

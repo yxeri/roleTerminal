@@ -762,7 +762,6 @@ terminalView.terminalPage.addCommand({
                 length,
                 charToLower,
                 requiredClickableStrings = [],
-                requiredFunc = () => {},
               }) => {
                 const selection = 'abcdefghijklmnopqrstuvwxyz0123456789!;#&()[]';
                 const spans = [];
@@ -791,7 +790,7 @@ terminalView.terminalPage.addCommand({
                   span.appendChild(elementCreator.createSpan({
                     text: textTools.randomiseCase(requiredClickableStrings[i], charToLower),
                     classes: ['clickable', 'noDecoration'],
-                    func: () => { requiredFunc(requiredClickableStrings[i]); },
+                    func: () => { terminalView.terminalPage.triggerCommand(requiredClickableStrings[i]); },
                   }));
                   span.appendChild(elementCreator.createSpan({
                     text: randomString.slice(randomStringIndex + stringLength),
@@ -815,9 +814,6 @@ terminalView.terminalPage.addCommand({
                 length: 34,
                 requiredClickableStrings: hackData.passwords,
                 charToLower: hackData.passwordHint.character,
-                requiredFunc: (value) => {
-                  terminalView.terminalPage.triggerCommand(value);
-                },
               });
 
               elements.forEach((element) => {

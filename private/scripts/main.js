@@ -677,7 +677,7 @@ terminalView.terminalPage.addCommand({
                 },
               },
             });
-            const team = teams.find(foundTeam => foundTeam.teamId === station.owner);
+            const team = teams.find(foundTeam => foundTeam.teamId.toString() === station.owner.toString());
             const ownerSpan = elementCreator.createSpan({
               text: `Owner: ${team
                 ? team.teamName

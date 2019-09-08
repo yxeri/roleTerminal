@@ -532,6 +532,12 @@ $msgList-msgLine-side-padding: .2em;
         border-bottom: $border-second;
         margin-bottom: .2em;
       }
+
+      .attachedImage {
+        img {
+          max-height: 300px;
+        }
+      }
     }
 
     .msgInfo {

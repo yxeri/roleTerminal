@@ -1114,6 +1114,16 @@ const boot = new TextAnimation({
 boot.addToView({ element: viewSwitcher.getParentElement() });
 
 socketManager.addEvents([{
+  event: 'lanternTeam',
+  func: ({ data }) => {
+    const { team } = data;
+
+    eventCentral.emitEvent({
+      params: { teams: [team] },
+      event: 'lanternTeams',
+    });
+  },
+}, {
   event: 'lanternTeams',
   func: ({ data }) => {
     const { teams } = data;
@@ -1134,6 +1144,16 @@ socketManager.addEvents([{
         timeLeft,
       },
       event: 'lanternRound',
+    });
+  },
+}, {
+  event: 'lanternStation',
+  func: ({ data }) => {
+    const { station } = data;
+
+    eventCentral.emitEvent({
+      params: { stations: [station] },
+      event: 'lanternStations',
     });
   },
 }, {

@@ -769,7 +769,7 @@ terminalView.terminalPage.addCommand({
                 let indexes = [];
 
                 for (let i = 0; i < rowAmount; i += 1) {
-                  spans.push(this.createRandString({ selection, length }));
+                  spans.push(textTools.createRandString({ selection, length }));
                   indexes.push(i);
                 }
 
@@ -789,7 +789,7 @@ terminalView.terminalPage.addCommand({
                     text: randomString.slice(0, randomStringIndex),
                   }));
                   span.appendChild(elementCreator.createSpan({
-                    text: this.randomiseCase(requiredClickableStrings[i], charToLower),
+                    text: textTools.randomiseCase(requiredClickableStrings[i], charToLower),
                     classes: ['clickable'],
                     func: () => { requiredFunc(requiredClickableStrings[i]); },
                   }));

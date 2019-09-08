@@ -790,7 +790,7 @@ terminalView.terminalPage.addCommand({
                   }));
                   span.appendChild(elementCreator.createSpan({
                     text: textTools.randomiseCase(requiredClickableStrings[i], charToLower),
-                    classes: ['clickable'],
+                    classes: ['clickable', 'noDecoration'],
                     func: () => { requiredFunc(requiredClickableStrings[i]); },
                   }));
                   span.appendChild(elementCreator.createSpan({

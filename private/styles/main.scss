@@ -1118,6 +1118,10 @@ $map-padding-fix: 2em;
   height: calc(100% - 1.5em) !important;
 }
 
+.noDecoration {
+  text-decoration: none;
+}
+
 .fastGlitch, .normalGlitch, .slowGlitch {
   position: relative;
 }

@@ -24,8 +24,12 @@ class TeamView extends ViewWrapper {
     classes = [],
     elementId = `tView-${Date.now()}`,
   }) {
-    const teamList = new TeamList({ effect });
-    const teamPage = new TeamPage({ effect });
+    const teamList = new TeamList({
+      effect,
+      title: 'Teams',
+      shouldToggle: true,
+    });
+    const teamPage = new TeamPage({});
 
     super({
       elementId,

@@ -1119,7 +1119,7 @@ $map-padding-fix: 2em;
 }
 
 .noDecoration {
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .fastGlitch, .normalGlitch, .slowGlitch {

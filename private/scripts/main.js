@@ -852,7 +852,11 @@ terminalView.terminalPage.addCommand({
               });
 
               terminalView.terminalPage.setNextFunc((password) => {
-                socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal }, ({ error: manipulateError, data: manipulateData }) => {
+                if (!password || password === '') {
+                  return;
+                }
+
+                socketManager.emitEvent('manipulateStation', { password: textTools.trimSpace(password), boostingSignal, stationId }, ({ error: manipulateError, data: manipulateData }) => {
                   if (manipulateError) {
                     terminalView.terminalPage.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: 'Something went wrong. Failed to manipulate the LANTERN' }) }] });
                     terminalView.terminalPage.resetNextFunc();

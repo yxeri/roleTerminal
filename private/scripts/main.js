@@ -790,7 +790,9 @@ terminalView.terminalPage.addCommand({
                   span.appendChild(elementCreator.createSpan({
                     text: textTools.randomiseCase(requiredClickableStrings[i], charToLower),
                     classes: ['clickable', 'noDecoration'],
-                    func: () => { terminalView.terminalPage.triggerCommand(requiredClickableStrings[i]); },
+                    clickFuncs: {
+                      leftFunc: () => { terminalView.terminalPage.triggerCommand(requiredClickableStrings[i]); },
+                    },
                   }));
                   span.appendChild(elementCreator.createSpan({
                     text: randomString.slice(randomStringIndex + stringLength),
@@ -811,7 +813,7 @@ terminalView.terminalPage.addCommand({
 
               const elements = createMixedArray({
                 rowAmount: hackData.passwords.length,
-                length: 34,
+                length: 32,
                 requiredClickableStrings: hackData.passwords,
                 charToLower: hackData.passwordHint.character,
               });

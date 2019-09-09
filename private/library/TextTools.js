@@ -203,17 +203,22 @@ class TextTools {
   }
 
   static randomiseCase(string, charToLower) {
-    return string.split().map((char) => {
+    const charArray = string.split('');
+    let newString = '';
+
+    for (let i = 0; i < charArray.length; i += 1) {
+      const char = charArray[i];
+
       if (char === charToLower) {
-        return char.toLowerCase();
+        newString += char.toLowerCase();
+      } else if (Math.random() > 0.5) {
+        newString += char.toUpperCase();
+      } else {
+        newString += char;
       }
+    }
 
-      if (Math.random() > 0.5) {
-        return char.toUpperCase();
-      }
-
-      return char;
-    }).join('');
+    return newString;
   }
 
   static createRandString({ selection, length }) {

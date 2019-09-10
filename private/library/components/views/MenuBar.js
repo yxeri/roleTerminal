@@ -393,7 +393,7 @@ class MenuBar extends BaseView {
         func: () => {
           const identity = userComposer.getCurrentIdentity();
 
-          if (identity.partOfTeams.length > 0) {
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
             createTeamButton.classList.add('hide');
           }
         },
@@ -404,7 +404,7 @@ class MenuBar extends BaseView {
         func: ({ userId }) => {
           const identity = userComposer.getIdentity({ objectId: userId });
 
-          if (identity.partOfTeams.length > 0) {
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
             createTeamButton.classList.add('hide');
           } else {
             createTeamButton.classList.remove('hide');

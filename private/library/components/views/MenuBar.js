@@ -21,6 +21,7 @@ const CurrentUserList = require('../../components/lists/CurrentUserList');
 const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
+const OpenDocFileDialog = require('../../components/views/dialogs/OpenDocFileDialog');
 // const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
 const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
 // const TeamDialog = require('../../components/views/dialogs/TeamDialog');
@@ -208,6 +209,19 @@ class MenuBar extends BaseView {
     }
 
     if (showControls.docFile) {
+      const openDocButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'openDocument' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new OpenDocFileDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        },
+      });
+
       const createDocFileButton = elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'createDocument' }),
         clickFuncs: {
@@ -221,7 +235,7 @@ class MenuBar extends BaseView {
         },
       });
 
-      items.push({ elements: [createDocFileButton] });
+      items.push({ elements: [openDocButton, createDocFileButton] });
 
       accessCentral.addAccessElement({
         element: createDocFileButton,

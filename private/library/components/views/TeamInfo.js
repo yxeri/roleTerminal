@@ -24,15 +24,15 @@ const teamComposer = require('../../data/composers/TeamComposer');
 class TeamInfo extends BaseView {
   constructor() {
     const teamSpan = elementCreator.createSpan({ text: '---' });
-    const setTeamFunc = ({ user }) => {
+    const setTeamFunc = ({ user, team }) => {
       const identity = user || userComposer.getCurrentIdentity();
 
       teamSpan.innerHTML = '';
 
       if (identity.partOfTeams && identity.partOfTeams.length > 0) {
-        const team = teamComposer.getTeam({ teamId: identity.partOfTeams[0] });
+        const currentTeam = team || teamComposer.getTeam({ teamId: identity.partOfTeams[0] });
 
-        teamSpan.appendChild(document.createTextNode(team.teamName));
+        teamSpan.appendChild(document.createTextNode(currentTeam.teamName));
       } else {
         teamSpan.appendChild(document.createTextNode('---'));
       }
@@ -84,11 +84,11 @@ class TeamInfo extends BaseView {
 
     eventCentral.addWatcher({
       event: eventCentral.Events.TEAM_MEMBER,
-      func: ({ user }) => {
+      func: ({ user, team }) => {
         const identity = userComposer.getCurrentIdentity();
 
         if (identity.objectId === user.objectId) {
-          setTeamFunc({ user });
+          setTeamFunc({ user, team });
         }
       },
     });

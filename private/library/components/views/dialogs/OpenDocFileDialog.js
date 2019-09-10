@@ -20,6 +20,7 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const docFileComposer = require('../../../data/composers/DocFileComposer');
 const viewSwitcher = require('../../../ViewSwitcher');
+const eventCentral = require('../../../EventCentral');
 
 const ids = {
   CODE: 'code',
@@ -58,7 +59,7 @@ class DocFileDialog extends BaseDialog {
 
             docFileComposer.getDocFileByCode({
               code: this.getInputValue(ids.CODE),
-              callback: ({ error }) => {
+              callback: ({ error, data }) => {
                 if (error) {
                   switch (error.errorType) {
                     case 'does not exist': {
@@ -79,7 +80,14 @@ class DocFileDialog extends BaseDialog {
                   }
                 }
 
+                const { docFile } = data;
+
                 viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.DOCS });
+
+                eventCentral.emitEvent({
+                  event: eventCentral.Events.OPEN_DOCFILE,
+                  params: { docFile },
+                });
               },
             });
           },

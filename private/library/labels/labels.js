@@ -79,6 +79,9 @@ const labels = {
     myProfile: (override.Button && override.Button.myProfile) || {
       en: 'Profile',
     },
+    openDocument: (override.Button && override.Button.myProfile) || {
+      en: 'Document ID search',
+    },
   },
   Transaction: {
     failed: (override.Transaction && override.Transaction.failed) || {
@@ -149,6 +152,12 @@ const labels = {
     image: (override.BaseDialog && override.BaseDialog.image) || {
       en: 'Image',
     },
+    accessDenied: (override.BaseDialog && override.BaseDialog.accessDenied) || {
+      en: 'Access denied',
+    },
+    search: (override.BaseDialog && override.BaseDialog.search) || {
+      en: 'Search',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -190,6 +199,17 @@ const labels = {
     },
     protectedRoom: (override.LockedRoomDialog && override.LockedRoomDialog.protectedRoom) || {
       en: 'Protected room',
+    },
+  },
+  OpenDocFileDialog: {
+    code: (override.OpenDocFileDialog && override.OpenDocFileDialog.code) || {
+      en: 'Code/ID',
+    },
+    openDoc: (override.OpenDocFileDialog && override.OpenDocFileDialog.openDoc) || {
+      en: 'Enter the code/ID of the document you want to access',
+    },
+    doesNotExist: (override.OpenDocFileDialog && override.OpenDocFileDialog.doesNotExist) || {
+      en: 'Document does not exist',
     },
   },
   DocFileDialog: {

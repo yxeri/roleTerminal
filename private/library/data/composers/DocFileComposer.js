@@ -49,6 +49,14 @@ class DocFileComposer extends DataComposer {
     });
   }
 
+  getDocFileByCode({ code, callback }) {
+    this.handler.fetchObject({
+      callback,
+      params: { code },
+      noEmit: true,
+    });
+  }
+
   getDocFile({ docFileId }) {
     return this.handler.getObject({ objectId: docFileId });
   }

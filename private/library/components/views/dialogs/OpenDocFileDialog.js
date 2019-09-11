@@ -82,6 +82,8 @@ class DocFileDialog extends BaseDialog {
 
                 const { docFile } = data;
 
+                this.removeFromView();
+
                 viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.DOCS });
 
                 eventCentral.emitEvent({

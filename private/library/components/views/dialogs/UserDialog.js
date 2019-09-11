@@ -16,6 +16,7 @@
 
 const BaseDialog = require('./BaseDialog');
 const WalletDialog = require('./WalletDialog');
+const TemporaryDialog = require('./TemporaryDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -25,7 +26,6 @@ const invititationComposer = require('../../../data/composers/InvitationComposer
 const teamComposer = require('../../../data/composers/TeamComposer');
 const eventCentral = require('../../../EventCentral');
 const storageManager = require('../../../StorageManager');
-const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
 const roomComposer = require('../../../data/composers/RoomComposer');
 const textTools = require('../../../TextTools');
@@ -39,7 +39,7 @@ class UserDialog extends BaseDialog {
     const identity = userComposer.getCurrentIdentity();
     const chosenIdentity = userComposer.getIdentity({ objectId: identityId });
     const identityName = chosenIdentity.aliasName || chosenIdentity.username;
-    const { partOfTeams } = chosenIdentity;
+    const { partOfTeams = [] } = chosenIdentity;
     const userPosition = positionComposer.getPosition({ positionId: identityId });
 
     const lowerButtons = [
@@ -105,30 +105,46 @@ class UserDialog extends BaseDialog {
       }));
     }
 
-    if (userComposer.getUser({ userId: identity }) && userComposer.getCurrentTeams().length > 0) {
-      const team = teamComposer.getTeam({ teamId: partOfTeams[0] });
-      const { hasFullAccess } = accessCentral.hasAccessTo({
-        objectToAccess: team,
-        toAuth: identity,
-      });
+    if (identity.partOfTeams && identity.partOfTeams.length > 0 && !partOfTeams.includes(identity.partOfTeams[0])) {
+      lowerButtons.push(elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'inviteTeam' }),
+        clickFuncs: {
+          leftFunc: () => {
+            invititationComposer.inviteToTeam({
+              memberId: identityId,
+              teamId: identity.partOfTeams[0],
+              callback: ({ error: teamError }) => {
+                const dialog = new TemporaryDialog({});
 
-      if (hasFullAccess) {
-        lowerButtons.push(elementCreator.createButton({
-          text: labelHandler.getLabel({ baseObject: 'Button', label: 'inviteTeam' }),
-          clickFuncs: {
-            leftFunc: () => {
-              invititationComposer.inviteToTeam({
-                memberId: identityId,
-                teamId: partOfTeams[0],
-                callback: () => {
-                },
-              });
+                if (teamError) {
+                  switch (teamError.type) {
+                    case 'already exists': {
+                      dialog.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'UserDialog', label: 'alreadyMember' })],
+                      });
 
-              this.removeFromView();
-            },
+                      return;
+                    }
+                    default: {
+                      dialog.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })],
+                      });
+
+                      return;
+                    }
+                  }
+                }
+
+                dialog.updateLowerText({
+                  text: [labelHandler.getLabel({ baseObject: 'UserDialog', label: 'teamInviteOk' })],
+                });
+              },
+            });
+
+            this.removeFromView();
           },
-        }));
-      }
+        },
+      }));
     }
 
     const upperText = [`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`];

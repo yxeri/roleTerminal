@@ -601,6 +601,15 @@ const labels = {
     password: (override.UserDialog && override.UserDialog.password) || {
       en: 'Password',
     },
+    alreadyMember: (override.UserDialog && override.UserDialog.alreadyMember) || {
+      en: 'User is already a member of a team or already in the maximum amount of teams',
+    },
+    teamInviteOk: (override.UserDialog && override.UserDialog.teamInviteOk) || {
+      en: 'User has been added to the team',
+    },
+    leaveTeam: (override.UserDialog && override.UserDialog.leaveTeam) || {
+      en: 'Leave team',
+    },
   },
   TeamDialog: {
     tag: (override.TeamDialog && override.TeamDialog.tag) || {

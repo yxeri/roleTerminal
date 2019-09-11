@@ -61,7 +61,7 @@ class DocFileDialog extends BaseDialog {
               code: this.getInputValue(ids.CODE),
               callback: ({ error, data }) => {
                 if (error) {
-                  switch (error.errorType) {
+                  switch (error.type) {
                     case 'does not exist': {
                       this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'OpenDocFileDialog', label: 'doesNotExist' })] });
 

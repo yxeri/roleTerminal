@@ -53,6 +53,8 @@ class TransactionList extends List {
 
           return `${timestamp.fullDate} ${timestamp.fullTime}`;
         },
+      }, {
+        paramName: 'note',
       },
     ];
 

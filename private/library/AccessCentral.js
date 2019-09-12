@@ -95,6 +95,14 @@ class AccessCentral {
     objectToAccess,
     toAuth,
   }) {
+    if (!objectToAccess || !toAuth) {
+      return {
+        canSee: false,
+        hasFullAccess: false,
+        hasAccess: false,
+      };
+    }
+
     const {
       teamIds = [],
       userIds = [],

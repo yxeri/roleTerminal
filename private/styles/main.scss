@@ -726,6 +726,16 @@ $msgList-msgLine-side-padding: .2em;
 .transactionList {
   li {
     border-bottom: $border-second;
+
+    p {
+      span {
+        padding-right: .5em;
+      }
+
+      span:first-child {
+        padding-right: 0;
+      }
+    }
   }
 }
 

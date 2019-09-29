@@ -42,7 +42,7 @@ class EditForumThreadDialog extends BaseDialog {
         type: 'text',
         isRequired: true,
         maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'title' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'title' }),
       }),
       elementCreator.createInput({
         text: thread.text,
@@ -52,7 +52,7 @@ class EditForumThreadDialog extends BaseDialog {
         maxLength: 600,
         multiLine: true,
         shouldResize: true,
-        placeholder: labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'text' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'text' }),
       }),
     ];
     const lowerButtons = [
@@ -120,12 +120,12 @@ class EditForumThreadDialog extends BaseDialog {
                   if (error.type === 'invalid length' && error.extraData) {
                     switch (error.extraData.param) {
                       case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'titleLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'titleLength' })] });
 
                         break;
                       }
                       case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumThreadDialog', label: 'textLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'textLength' })] });
 
                         break;
                       }

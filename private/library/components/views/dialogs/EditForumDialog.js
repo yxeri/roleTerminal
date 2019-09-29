@@ -15,27 +15,36 @@
  */
 
 const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const forumComposer = require('../../../data/composers/ForumComposer');
 
 const ids = {
+  TITLE: 'title',
   TEXT: 'text',
 };
 
-class EditForumPostDialog extends BaseDialog {
+class EditForumThreadDialog extends BaseDialog {
   constructor({
-    postId,
+    forumId,
     classes = [],
-    elementId = `postDialog-${Date.now()}`,
+    elementId = `forumDialog-${Date.now()}`,
   }) {
-    const post = forumComposer.getPost({ postId, full: false });
+    const forum = forumComposer.getForum({ forumId, full: false });
 
     const inputs = [
       elementCreator.createInput({
-        text: post.text,
+        text: [forum.title],
+        elementId: ids.TITLE,
+        inputName: 'title',
+        type: 'text',
+        isRequired: true,
+        maxLength: 40,
+        placeholder: labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'title' }),
+      }),
+      elementCreator.createInput({
+        text: forum.text,
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
@@ -55,43 +64,6 @@ class EditForumPostDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'remove' }),
-        clickFuncs: {
-          leftFunc: () => {
-            const parentElement = this.getParentElement();
-
-            const verifyDialog = new VerifyDialog({
-              callback: ({ confirmed }) => {
-                if (!confirmed) {
-                  this.addToView({
-                    element: parentElement,
-                  });
-
-                  return;
-                }
-
-                forumComposer.removePost({
-                  postId,
-                  callback: ({ error: postError }) => {
-                    if (postError) {
-                      console.log('Forum post error', postError);
-                    }
-
-                    verifyDialog.removeFromView();
-                  },
-                });
-              },
-            });
-
-            verifyDialog.addToView({
-              element: this.getParentElement(),
-            });
-
-            this.removeFromView();
-          },
-        },
-      }),
-      elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
         clickFuncs: {
           leftFunc: () => {
@@ -99,9 +71,14 @@ class EditForumPostDialog extends BaseDialog {
               return;
             }
 
-            forumComposer.updatePost({
-              postId,
-              post: {
+            const newTitle = this.getInputValue(ids.TITLE);
+
+            forumComposer.updateForum({
+              forumId,
+              forum: {
+                title: newTitle !== forum.title
+                  ? newTitle
+                  : undefined,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
               callback: ({ error }) => {
@@ -143,9 +120,9 @@ class EditForumPostDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['ForumPostDialog']),
+      classes: classes.concat(['ForumDialog']),
     });
   }
 }
 
-module.exports = EditForumPostDialog;
+module.exports = EditForumThreadDialog;

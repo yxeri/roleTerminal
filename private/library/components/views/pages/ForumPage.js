@@ -19,6 +19,7 @@ const EditForumThreadDialog = require('../dialogs/EditForumThreadDialog');
 const EditForumPostDialog = require('../dialogs/EditForumPostDialog');
 const ForumThreadDialog = require('../dialogs/ForumThreadDialog');
 const ForumPostDialog = require('../dialogs/ForumPostDialog');
+const EditForumDialog = require('../dialogs/EditForumDialog');
 
 const eventCentral = require('../../../EventCentral');
 const elementCreator = require('../../../ElementCreator');
@@ -42,7 +43,7 @@ const cssClasses = {
   postContent: 'postContent',
   forum: 'forum',
   forumContent: 'forumContent',
-  forumInfo: 'forumInfo',
+  info: 'info',
   username: 'username',
   timeCreated: 'timeCreated',
   lastUpdated: 'lastUpdated',
@@ -69,6 +70,7 @@ const ids = {
 const elementChangeTimeout = 800;
 let disableVoting = false;
 let disablePictures = false;
+let cornerContainers = [];
 
 /**
  * Create a picture container.
@@ -90,15 +92,19 @@ function createPictureContainer({ object }) {
  * @return {HTMLElement} Header element.
  */
 function createHeader({ object }) {
-  return elementCreator.createParagraph({
-    classes: [cssClasses.forumInfo],
+  const header = elementCreator.createParagraph({
+    classes: [cssClasses.info],
     elements: [
       elementCreator.createSpan({
         classes: [cssClasses.username],
-        text: object.creatorName || userComposer.getIdentityName({ objectId: object.ownerAliasId || object.ownerId }),
+        text: userComposer.getIdentityName({ objectId: object.ownerAliasId || object.ownerId }),
       }),
     ],
   });
+
+  cornerContainers.forEach(corner => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+
+  return header;
 }
 
 /**
@@ -112,17 +118,17 @@ function createTimestamp({ object }) {
   const lastUpdated = object.customLastUpdated || object.lastUpdated;
   const timeCreatedStamp = textTools.generateTimestamp({ date: timeCreated });
   const lastUpdatedStamp = textTools.generateTimestamp({ date: lastUpdated });
-  const elements = [
-    elementCreator.createSpan({
-      classes: [cssClasses.timeCreated],
-      text: `${labelHandler.getLabel({ baseObject: 'ForumView', label: 'timeCreated', appendSpace: true })}${timeCreatedStamp.fullDate}`,
-    }),
-  ];
+  const elements = [];
 
   if (timeCreated !== lastUpdated) {
     elements.push(elementCreator.createSpan({
       classes: [cssClasses.lastUpdated],
-      text: `${labelHandler.getLabel({ baseObject: 'ForumView', label: 'lastUpdated', appendSpace: true })}${lastUpdatedStamp.fullDate}`,
+      text: lastUpdatedStamp.fullDate,
+    }));
+  } else {
+    elements.push(elementCreator.createSpan({
+      classes: [cssClasses.timeCreated],
+      text: timeCreatedStamp.fullDate,
     }));
   }
 
@@ -169,7 +175,7 @@ function createContentEnd({ object }) {
  * @return {HTMLElement} Header container.
  */
 function createPostHeader({ post }) {
-  return elementCreator.createContainer({
+  const header = elementCreator.createContainer({
     elements: [
       createHeader({ object: post }),
     ],
@@ -194,6 +200,10 @@ function createPostHeader({ post }) {
       },
     },
   });
+
+  cornerContainers.forEach(corner => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+
+  return header;
 }
 
 /**
@@ -213,8 +223,30 @@ function createSubPost({ subPost, elementId }) {
 
   elements.push(createContentEnd({ object: subPost }));
 
+  cornerContainers.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
+
   return elementCreator.createSection({
     elements,
+    clickFuncs: {
+      leftFunc: () => {
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: subPost,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const postDialog = new EditForumPostDialog({
+            postId: subPost.objectId,
+          });
+
+          postDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        }
+      },
+    },
     classes: [cssClasses.subPost],
     elementId: `${elementId}${subPost.objectId}`,
     headerElement: createPostHeader({ post: subPost }),
@@ -239,8 +271,30 @@ function createPostContent({ post, elementId }) {
 
   elements.push(createContentEnd({ object: post }));
 
+  cornerContainers.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
+
   return elementCreator.createContainer({
     elements,
+    clickFuncs: {
+      leftFunc: () => {
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: post,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const postDialog = new EditForumPostDialog({
+            postId: post.objectId,
+          });
+
+          postDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        }
+      },
+    },
     classes: [cssClasses.postContent],
     elementId: `${elementId}${ids.postContent}`,
   });
@@ -272,7 +326,8 @@ function createPost({
   }
 
   if (!post.parentPostId) {
-    elements.push(elementCreator.createButton({
+    const createSubPostButton = elementCreator.createButton({
+      corners: cornerContainers,
       classes: [cssClasses.newSubPostButton],
       text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createSubPost' }),
       clickFuncs: {
@@ -287,7 +342,11 @@ function createPost({
           });
         },
       },
-    }));
+    });
+
+    if (storageManager.getAccessLevel() > 0) {
+      elements.push(createSubPostButton);
+    }
   }
 
   return elementCreator.createSection({
@@ -305,13 +364,48 @@ function createPost({
  * @return {HTMLElement} Header container.
  */
 function createThreadHeader({ thread }) {
-  return elementCreator.createContainer({
+  const header = elementCreator.createContainer({
     elements: [
       elementCreator.createParagraph({
         elements: [elementCreator.createSpan({ spanType: 'h2', text: thread.title })],
       }),
       createHeader({ object: thread }),
     ],
+    clickFuncs: {
+      leftFunc: () => {
+        header.parentElement.parentElement.lastElementChild.classList.toggle('hide');
+      },
+    },
+  });
+
+  cornerContainers.forEach(corner => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+
+  return header;
+}
+
+/**
+ * Create a thread content container.
+ * @param {Object} params Parameters.
+ * @param {Object} params.thread Thread to create a container for.
+ * @param {string} params.elementId Base Id of the element.
+ * @return {HTMLElement} Thread container.
+ */
+function createThreadContent({ thread, elementId }) {
+  const elements = thread.text.map((lines) => {
+    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
+  });
+
+  if (!disablePictures && thread.pictures) {
+    elements.push(createPictureContainer({ object: thread }));
+  }
+
+  elements.push(createContentEnd({ object: thread }));
+  cornerContainers.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
+
+  return elementCreator.createContainer({
+    elements,
+    classes: [cssClasses.threadContent],
+    elementId: `${elementId}${ids.threadContent}`,
     clickFuncs: {
       leftFunc: () => {
         const {
@@ -336,31 +430,6 @@ function createThreadHeader({ thread }) {
 }
 
 /**
- * Create a thread content container.
- * @param {Object} params Parameters.
- * @param {Object} params.thread Thread to create a container for.
- * @param {string} params.elementId Base Id of the element.
- * @return {HTMLElement} Thread container.
- */
-function createThreadContent({ thread, elementId }) {
-  const elements = thread.text.map((lines) => {
-    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
-  });
-
-  if (!disablePictures && thread.pictures) {
-    elements.push(createPictureContainer({ object: thread }));
-  }
-
-  elements.push(createContentEnd({ object: thread }));
-
-  return elementCreator.createContainer({
-    elements,
-    classes: [cssClasses.threadContent],
-    elementId: `${elementId}${ids.threadContent}`,
-  });
-}
-
-/**
  * Create a forum content container.
  * @param {Object} params Parameters.
  * @param {Object} params.forum Forum to create a container for.
@@ -368,12 +437,36 @@ function createThreadContent({ thread, elementId }) {
  * @return {HTMLElement} Thread container.
  */
 function createForumContent({ forum, elementId }) {
+  const elements = forum.text.map((lines) => {
+    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
+  });
+
+  cornerContainers.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
+
   return elementCreator.createContainer({
+    elements,
+    clickFuncs: {
+      leftFunc: () => {
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: forum,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const forumDialog = new EditForumDialog({
+            forumId: forum.objectId,
+          });
+
+          forumDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        }
+      },
+    },
     classes: [cssClasses.forumContent],
     elementId: `${elementId}${ids.forumContent}`,
-    elements: forum.text.map((lines) => {
-      return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
-    }),
   });
 }
 
@@ -399,7 +492,8 @@ function createThread({
     elementId: fullElementId,
   }));
 
-  elements.push(elementCreator.createButton({
+  const createPostButton = elementCreator.createButton({
+    corners: cornerContainers,
     classes: [cssClasses.newPostButton],
     text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createPost' }),
     clickFuncs: {
@@ -413,7 +507,11 @@ function createThread({
         });
       },
     },
-  }));
+  });
+
+  if (storageManager.getAccessLevel() > 0) {
+    elements.push(createPostButton);
+  }
 
   elements.push(elementCreator.createContainer({
     classes: [cssClasses.postContainer],
@@ -424,16 +522,52 @@ function createThread({
   }));
 
   return elementCreator.createArticle({
-    elements,
     headerElement: createThreadHeader({ thread }),
+    elements: [elementCreator.createContainer({
+      elements,
+      classes: ['hide'],
+    })],
     elementId: fullElementId,
     classes: [cssClasses.thread],
+  });
+}
+
+/**
+ * Create forum header.
+ * @param {Object} params Parameters.
+ * @param {Object} forum Forum.
+ * @return {HTMLElement} Header paragraph
+ */
+function createForumHeader({ forum }) {
+  return elementCreator.createParagraph({
+    elements: [elementCreator.createSpan({ spanType: 'h1', text: forum.title })],
+    clickFuncs: {
+      leftFunc: () => {
+        const {
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          objectToAccess: forum,
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (hasFullAccess) {
+          const forumDialog = new EditForumDialog({
+            forumId: forum.objectId,
+          });
+
+          forumDialog.addToView({
+            element: viewSwitcher.getParentElement(),
+          });
+        }
+      },
+    },
   });
 }
 
 class ForumView extends BaseView {
   constructor({
     forumId,
+    corners = [],
     dependencies = [
       dataHandler.users,
       dataHandler.teams,
@@ -450,6 +584,7 @@ class ForumView extends BaseView {
   }) {
     disableVoting = shouldDisableVoting;
     disablePictures = shouldDisablePictures;
+    cornerContainers = corners;
 
     super({
       elementId,
@@ -474,6 +609,20 @@ class ForumView extends BaseView {
             },
           });
         }
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.RECONNECT,
+          func: () => {
+            this.showForum({ forumId: this.getCurrentForumId() });
+          },
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.FORUMS,
+          func: () => {
+            this.showForum({ forumId: this.getCurrentForumId() });
+          },
+        });
 
         eventCentral.addWatcher({
           event: eventCentral.Events.FORUMTHREAD,
@@ -609,6 +758,20 @@ class ForumView extends BaseView {
     return this.currentForum || storageManager.getCurrentForum();
   }
 
+  updateForum({ forum }) {
+    const existingForum = this.getElement(forum.objectId);
+    const forumContent = this.getElement(ids.forumContent);
+
+    existingForum.replaceChild(
+      elementCreator.createHeader({ elements: [createForumHeader({ forum })] }),
+      existingForum.getElementsByTagName('header')[0],
+    );
+    existingForum.replaceChild(
+      createForumContent({ forum, elementId: this.elementId }),
+      forumContent,
+    );
+  }
+
   updateThread({ thread }) {
     const existingThread = this.getElement(thread.objectId);
     const threadContent = this.getElement(`${thread.objectId}${ids.threadContent}`);
@@ -617,7 +780,7 @@ class ForumView extends BaseView {
       elementCreator.createHeader({ elements: [createThreadHeader({ thread })] }),
       existingThread.getElementsByTagName('header')[0],
     );
-    existingThread.replaceChild(
+    existingThread.lastElementChild.replaceChild(
       createThreadContent({ thread, elementId: `${this.elementId}${thread.objectId}` }),
       threadContent,
     );
@@ -652,14 +815,12 @@ class ForumView extends BaseView {
     const { threads = [] } = forum;
 
     if (!forum) {
+      const elements = [elementCreator.createSpan({ text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'removedForum' }) })];
+
       this.replaceOnParent({
         element: elementCreator.createArticle({
           elementId: this.elementId,
-          headerElement: elementCreator.createParagraph({
-            elements: [
-              elementCreator.createSpan({ text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'removedForum' }) }),
-            ],
-          }),
+          headerElement: elementCreator.createParagraph({ elements }),
         }),
       });
 
@@ -672,8 +833,12 @@ class ForumView extends BaseView {
         elementId: this.elementId,
       }),
     ];
+    const header = createForumHeader({ forum });
 
-    forumElements.push(elementCreator.createButton({
+    cornerContainers.forEach(corner => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+
+    const createThreadButton = elementCreator.createButton({
+      corners: cornerContainers,
       classes: [cssClasses.newThreadButton],
       text: labelHandler.getLabel({ baseObject: 'ForumView', label: 'createThread' }),
       clickFuncs: {
@@ -687,7 +852,11 @@ class ForumView extends BaseView {
           });
         },
       },
-    }));
+    });
+
+    if (storageManager.getAccessLevel() > 0) {
+      forumElements.push(createThreadButton);
+    }
 
     forumElements.push(elementCreator.createContainer({
       classes: [cssClasses.threadContainer],
@@ -700,11 +869,9 @@ class ForumView extends BaseView {
     this.replaceOnParent({
       element: elementCreator.createArticle({
         classes: [cssClasses.forum],
-        elementId: this.elementId,
+        elementId: `${this.elementId}${forum.objectId}`,
         elements: forumElements,
-        headerElement: elementCreator.createParagraph({
-          elements: [elementCreator.createSpan({ spanType: 'h1', text: forum.title })],
-        }),
+        headerElement: header,
       }),
     });
   }

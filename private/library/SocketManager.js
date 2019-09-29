@@ -22,7 +22,7 @@ class SocketManager {
   constructor() {
     this.socket = io(typeof ioUri !== 'undefined' // eslint-disable-line no-undef
       ? ioUri // eslint-disable-line no-undef
-      : '/');
+      : '/', { forceNew: true });
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
@@ -236,7 +236,6 @@ class SocketManager {
    */
   reconnect() {
     if (!this.reconnecting) {
-      this.socket.close();
       this.socket.disconnect();
       this.socket.connect();
     }

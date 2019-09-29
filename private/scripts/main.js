@@ -9,7 +9,6 @@ const PeopleView = require('../library/components/views/PeopleView');
 const TextAnimation = require('../library/components/views/TextAnimation');
 const ForumView = require('../library/components/views/ForumView');
 
-const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const tools = require('../library/Tools');
@@ -163,10 +162,7 @@ if (!tools.getQueryParameters().noFullscreen) {
 if (window.cordova) {
   document.addEventListener('deviceready', () => {
     StatusBar.hide(); // eslint-disable-line
-    positionTracker.startTracker({ standalone: true });
   }, false);
-} else {
-  positionTracker.startTracker({});
 }
 
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOSOLD) {

@@ -79,20 +79,29 @@ class WalletInfo extends BaseView {
       event: eventCentral.Events.COMPLETE_WALLET,
       func: () => {
         setAmountFunc({ walletId: userComposer.getCurrentIdentity().objectId });
-      },
-    });
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.CHANGED_ALIAS,
-      func: ({ userId }) => {
-        setAmountFunc({ walletId: userId });
-      },
-    });
+        eventCentral.addWatcher({
+          event: eventCentral.Events.CHANGED_ALIAS,
+          func: ({ userId }) => {
+            setAmountFunc({ walletId: userId });
+          },
+        });
 
-    eventCentral.addWatcher({
-      event: eventCentral.Events.LOGIN,
-      func: ({ user }) => {
-        setAmountFunc({ walletId: user.objectId });
+        eventCentral.addWatcher({
+          event: eventCentral.Events.WALLETS,
+          func: () => {
+            setAmountFunc({ walletId: userComposer.getCurrentIdentity().objectId });
+          },
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.TRANSACTION,
+          func: () => {
+            const identity = userComposer.getCurrentIdentity();
+
+            setAmountFunc({ walletId: identity.objectId });
+          },
+        });
       },
     });
 
@@ -100,15 +109,6 @@ class WalletInfo extends BaseView {
       event: eventCentral.Events.LOGOUT,
       func: () => {
         setAmountFunc({ amount: 0 });
-      },
-    });
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.TRANSACTION,
-      func: () => {
-        const identity = userComposer.getCurrentIdentity();
-
-        setAmountFunc({ walletId: identity.objectId });
       },
     });
   }

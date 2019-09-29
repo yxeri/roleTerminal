@@ -156,6 +156,14 @@ class StorageManager {
     return this.getLocalVal('publicRoom') || '111111111111111111111110';
   }
 
+  static setDefaultForum(forumId) {
+    this.setLocalVal('defaultForum', forumId);
+  }
+
+  static getDefaultForum() {
+    return this.getLocalVal('defaultForum') || '111111111111111111111120';
+  }
+
   static setPermissions(permissions = {}) {
     this.setLocalVal('permissions', permissions);
   }
@@ -394,7 +402,7 @@ class StorageManager {
   }
 
   static getCurrentForum() {
-    return this.getLocalVal('currentForum');
+    return this.getLocalVal('currentForum') || this.getDefaultForum();
   }
 
   /**

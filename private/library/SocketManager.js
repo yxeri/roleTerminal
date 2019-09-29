@@ -98,6 +98,7 @@ class SocketManager {
           requireOffName,
           allowedImages,
           customUserFields,
+          defaultForum,
           permissions = {},
         } = data;
 
@@ -115,6 +116,7 @@ class SocketManager {
         if (dayModification) { storageManager.setDayModification(dayModification); }
         if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
 
+        storageManager.setDefaultForum(defaultForum);
         storageManager.setAllowedImages(allowedImages);
         storageManager.setPermissions(permissions);
         storageManager.setCustomUserFields(customUserFields);

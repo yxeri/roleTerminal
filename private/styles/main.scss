@@ -1,0 +1,1567 @@
+/*
+ Copyright 2018 Carmilla Mina Jankovic
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+$background-color: black;
+$second-background-color: #012924;
+$menu-background-color: rgba(1, 41, 36, 0.98);
+$text-color: #00ffd7;
+$second-text-color: #00ffd7;
+$second-color: #00b99e;
+$light-color: #7cffe4;
+$darker-color: #012924;
+$warning-color: #910001;
+$off-color: #ff6269;
+$greyed-out: #6f6f6f;
+$focus-color: #000691;
+$new-color: #009100;
+$darker-new-color: #005f00;
+$header-color: #012924;
+
+$button-text: #ffc200;
+$button-border-color: #b98b00;
+$button-background: #291f00;
+
+$corner-size: .9em;
+$p-margin: .4em;
+$border-width: 1px;
+$status-bar-height: 1.6em;
+$map-box-padding: .5em;
+$padding: .3em;
+$border: $border-width solid $second-color;
+$border-second: $border-width solid $second-color;
+$button-border: $border-width solid $button-border-color;
+$menu-min-width: 10em;
+$button-margin: .2em;
+$line-height: 1.2em;
+$msgList-msgLine-side-padding: .2em;
+
+@font-face {
+  font-family: deck;
+  src: local("deck"), url("../fonts/deck.ttf") format("truetype");
+}
+
+html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: none;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: deck;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+
+span.clickable {
+  text-decoration: underline;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  font-size: 1em;
+}
+
+ul, li {
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+textarea {
+  width: 100%;
+  border-radius: 0;
+}
+
+textarea[readonly], input[readonly] {
+  background-color: $greyed-out;
+}
+
+button {
+  background-color: $button-background;
+  color: $button-text;
+  box-sizing: border-box;
+  border-top: $button-border;
+  border-bottom: $button-border;
+  padding: $padding $corner-size;
+  position: relative;
+}
+
+.dialog, .sendButton, .docFilePage, .forum {
+  button {
+    .upperRight {
+      border-top: $corner-size solid $background-color;
+      border-left: $corner-size solid $button-background;
+      margin: 0;
+      top: -$border-width;
+      right: 0;
+      position: absolute;
+    }
+
+    .lowerLeft {
+      border-bottom: $corner-size solid $background-color;
+      border-right: $corner-size solid $button-background;
+      margin: 0;
+      bottom: -$border-width;
+      left: 0;
+      position: absolute;
+    }
+  }
+}
+
+header {
+  background-color: $header-color;
+  box-sizing: border-box;
+  border-top: $border;
+  border-bottom: $border;
+  color: $second-text-color;
+}
+
+span, p {
+  min-height: 1em;
+}
+
+.imgContainer {
+  display: inline-block;
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: scale-down;
+  }
+}
+
+input {
+  border-radius: 0;
+}
+
+input[type=radio] {
+  display: none;
+}
+
+input[type="radio"]:checked + span {
+  background-color: $second-color;
+}
+
+label {
+  display: block;
+
+  span {
+    border: $border;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    cursor: pointer;
+    margin-right: .3em;
+    margin-bottom: $border-width;
+  }
+}
+
+select {
+  min-height: 7em;
+  font-family: monospace;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.msgInfo {
+  color: $second-text-color;
+}
+
+.cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toggle:after {
+  content: '+';
+  float: right;
+}
+
+.expanded:after {
+  content: '-';
+  float: right;
+}
+
+/****************
+ * View Wrapper *
+ ****************/
+
+.column {
+  overflow: hidden;
+  height: 100%;
+}
+
+.viewWrapper {
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+.one {
+  width: 100%;
+}
+
+.oneOfTwo {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.oneOfThree {
+  width: 33%;
+  box-sizing: border-box;
+}
+
+.withMenuBar {
+  height: calc(100% - #{$status-bar-height} - .2em);
+  order: 2;
+}
+
+/**********
+ * Dialog *
+ **********/
+
+.dialog {
+  max-height: calc(99% - 4em);
+  max-width: 40em;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background-color: $background-color;
+  border: $border;
+  position: absolute;
+  top: 1em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: $padding;
+  z-index: 10;
+  -webkit-box-shadow: 2px 0 5px black;
+  box-shadow: 2px 0 5px black;
+
+  input {
+    width: calc(100% - .2em);
+    padding: .1em;
+    margin-bottom: $p-margin;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  select {
+    padding: .1em;
+    margin-bottom: $p-margin;
+  }
+
+  input:last-child {
+    margin-bottom: 0;
+  }
+
+  textarea {
+    height: 5em;
+    width: calc(100% - .2em);
+    padding: .1em;
+    margin-bottom: $p-margin;
+  }
+
+  .inContainer {
+    > div {
+      margin-bottom: $p-margin;
+    }
+  }
+
+  .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {
+    display: none;
+  }
+
+  .lowerButtons, .lowerText, .inContainer, .imagesContainer {
+    padding-bottom: $padding;
+  }
+
+  .upperText {
+    padding-bottom: $padding / 2;
+    margin-bottom: $padding / 2;
+    border-bottom: $border;
+    text-transform: uppercase;
+  }
+
+  div:last-child {
+    padding-bottom: 0;
+  }
+
+  .lowerButtons {
+    float: right;
+
+    .button {
+      margin-right: $padding;
+
+      button {
+        margin-top: $padding;
+      }
+    }
+
+    .button:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.userDialog, .registerDialog {
+  img {
+    max-height: 200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.userList {
+  li {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+
+    span {
+      display: block;
+    }
+  }
+
+  .listItemWithImage {
+    width: calc(100% - 40px - .1em);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: normal;
+  }
+}
+
+/**********
+ * Inputs *
+ **********/
+
+/*
+ * A required input field that has been left empty.
+ * The class is most commonly added when the input is blurred.
+ */
+.emptyInput {
+  background-color: $warning-color;
+}
+
+/*********
+ * Views *
+ *********/
+
+.docFileView, .forumView, .walletView, .worldMapView, .teamView, .chatView {
+  .oneOfTwo {
+    width: 0;
+  }
+
+  .oneOfTwo:first-child {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    min-width: $menu-min-width;
+  }
+
+  .oneOfTwo:last-child {
+    -webkit-flex-grow: 5;
+    flex-grow: 5;
+  }
+}
+
+.teamView {
+  .teamInfo {
+    border-top: $border;
+    border-bottom: $border;
+    color: $second-text-color;
+    padding: $padding;
+    background-color: $darker-color;
+    text-align: center;
+    text-decoration: none;
+  }
+}
+
+.docFileView {
+  .docFileList {
+    ul {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-flow: row wrap;
+      flex-flow: row wrap;
+
+      li {
+        text-align: center;
+        width: 9.5em;
+        overflow: hidden;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        border-bottom: none;
+        margin-bottom: 1em;
+
+        p {
+          order: 2;
+          color: $text-color;
+        }
+
+        .attachedImage {
+          order: 1;
+          height: 4em;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      }
+    }
+  }
+
+  .docFilePage {
+    position: relative;
+
+    .docFileHeader {
+      border-bottom: $border-width solid $second-color;
+      padding-bottom: $padding;
+      margin-bottom: $padding;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+
+      span:first-child {
+        font-size: 1.1em;
+      }
+    }
+
+    .close {
+      position: fixed;
+      right: 0;
+
+      button {
+        padding: 0 .2em;
+      }
+    }
+  }
+
+  .oneOfTwo:last-child {
+    word-wrap: break-word;
+
+    p {
+      padding: $padding $padding;
+    }
+  }
+}
+
+.forumView, .docFileView, .peopleView {
+  .column {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+}
+
+.peopleView {
+  .fullUserList {
+    ul {
+      li {
+        overflow: hidden;
+
+        span {
+          display: block;
+        }
+
+        p {
+          overflow: initial;
+        }
+
+        .listItemImage {
+          img {
+            max-width: 120px;
+            max-height: 120px;
+          }
+        }
+
+        .username {
+          color: $second-text-color;
+        }
+      }
+
+      li:nth-child(even) {
+        background-color: $second-background-color;
+      }
+    }
+  }
+}
+
+.columnList {
+  color: $button-text;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  .list {
+    margin-bottom: $padding * 2;
+  }
+
+  li {
+    border-bottom: $button-border;
+  }
+}
+
+/**************
+ * Forum View *
+ **************/
+
+.forum {
+  position: relative;
+  max-width: 80em;
+
+  > header {
+    padding-left: $msgList-msgLine-side-padding;
+    padding-right: $msgList-msgLine-side-padding;
+    border-bottom: none;
+  }
+
+  .forumContent {
+    padding-left: $padding;
+    padding-bottom: $padding;
+    border-bottom: $border;
+    background-color: $second-background-color;
+  }
+
+  .contentEnd {
+    font-size: .8em;
+  }
+
+  .forumContent {
+    position: relative;
+
+    .lowerRight {
+      border-bottom: $corner-size solid $background-color;
+      border-left: $corner-size solid $second-background-color;
+      margin: 0;
+      bottom: -$border-width;
+      right: 0;
+      position: absolute;
+    }
+  }
+
+  .thread {
+    margin-bottom: 1em;
+
+    > header {
+      background-color: $button-background;
+      border-color: $button-border-color;
+      color: $button-text;
+      position: relative;
+      display: inline-block;
+      padding-right: #{$corner-size * 2};
+      min-width: 10em;
+      padding-left: $msgList-msgLine-side-padding;
+      word-break: break-all;
+
+      .username {
+        font-size: .9em;
+      }
+
+      .upperRight {
+        border-top: #{$corner-size * 2} solid $background-color;
+        border-left: #{$corner-size * 2} solid $button-background;
+        margin: 0;
+        top: -$border-width;
+        right: 0;
+        position: absolute;
+      }
+    }
+
+    .threadContent {
+      border-top: $border;
+      border-bottom: $border;
+      background-color: $second-background-color;
+      position: relative;
+      padding-left: $msgList-msgLine-side-padding;
+      padding-right: $msgList-msgLine-side-padding;
+
+      .upperRight {
+        border-top: $corner-size solid $background-color;
+        border-left: $corner-size solid $second-background-color;
+        margin: 0;
+        top: -$border-width;
+        right: 0;
+        position: absolute;
+      }
+    }
+  }
+
+  .post {
+    margin-bottom: .5em;
+
+    .username:after {
+      content: ':';
+    }
+
+    > header {
+      position: relative;
+      border-bottom: none;
+      padding-left: $corner-size;
+
+      .upperRight {
+        border-top: $corner-size solid $background-color;
+        border-left: $corner-size solid $second-background-color;
+        margin: 0;
+        top: -$border-width;
+        right: 0;
+        position: absolute;
+      }
+    }
+
+    .postContent {
+      background-color: $second-background-color;
+      border-bottom: $border;
+      position: relative;
+      padding-left: $corner-size;
+
+      .lowerLeft {
+        border-bottom: $corner-size solid $background-color;
+        border-right: $corner-size solid $second-background-color;
+        margin: 0;
+        bottom: -$border-width;
+        left: 0;
+        position: absolute;
+      }
+    }
+  }
+
+  .threadContainer, .postContainer {
+    margin-top: 1em;
+  }
+
+  .subContainer {
+    .subPost:first-child {
+      header {
+        border-top: none;
+      }
+    }
+
+    .subPost:last-child {
+      .lowerLeft {
+        border-bottom: $corner-size solid $background-color;
+        border-right: $corner-size solid $second-background-color;
+        margin: 0;
+        bottom: -$border-width;
+        left: 0;
+        position: absolute;
+      }
+
+      .lowerRight {
+        border-bottom: $corner-size solid $background-color;
+        border-left: $corner-size solid $second-background-color;
+        margin: 0;
+        bottom: -$border-width;
+        right: 0;
+        position: absolute;
+      }
+    }
+  }
+
+  .subPost {
+    background-color: $second-background-color;
+    position: relative;
+    border-bottom: $border;
+
+    header {
+      border-top: none;
+    }
+
+    > header {
+      border-bottom: none;
+    }
+
+    p {
+      padding-left: $corner-size;
+    }
+  }
+
+  .newSubPostButton {
+    margin-left: $corner-size;
+  }
+
+  .subContainer {
+    padding-left: $corner-size;
+  }
+}
+
+/*************
+ * Chat View *
+ *************/
+
+.chatView {
+  .msgList {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    word-wrap: break-word;
+
+    li {
+      padding-bottom: .5em;
+
+      .listItemImage {
+        border-right: $border-second;
+        border-top: $border-second;
+        border-bottom: $border-second;
+        margin-bottom: .2em;
+        margin-right: 0;
+        position: relative;
+        background-color: $second-background-color;
+        z-index: 2;
+      }
+
+      .attachedImage {
+        img {
+          max-height: 300px;
+        }
+      }
+    }
+
+    .msgInfo {
+      border-top: $border-second;
+      border-bottom: $border-second;
+      padding: .1em ($msgList-msgLine-side-padding / 2);
+      padding-right: $corner-size;
+      margin-top: .2em;
+      margin-bottom: $p-margin;
+      background-color: $second-background-color;
+      position: relative;
+      overflow: visible;
+
+      span {
+        padding: 0 .2em;
+      }
+
+      span:first-child {
+        padding-left: 0;
+      }
+
+      span:last-child {
+        padding-right: 0;
+      }
+
+      .lowerRight {
+        border-bottom: $corner-size solid $background-color;
+        border-left: $corner-size solid $second-background-color;
+        margin: 0;
+        bottom: -$border-width;
+        right: 0;
+        position: absolute;
+      }
+    }
+
+    .msgLine {
+      padding: 0 $msgList-msgLine-side-padding;
+      margin-bottom: $p-margin;
+      clear: both;
+    }
+
+    .msgLine:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .inputArea {
+    margin-top: auto;
+
+    textarea {
+      width: calc(100% - (#{$msgList-msgLine-side-padding} * 2) - 4.2em);
+      padding: 0 $msgList-msgLine-side-padding;
+      border-top: $button-border;
+      border-bottom: $button-border;
+      display: inline-block;
+    }
+
+    .buttonContainer {
+      position: relative;
+
+      .imageInputButton {
+        button {
+          padding: 0;
+          border-left: $button-border;
+          border-right: $button-border;
+        }
+      }
+
+      .imagePreview {
+        max-width: 120px;
+        max-height: 120px;
+        vertical-align: bottom;
+        border: $border;
+      }
+
+      img {
+        vertical-align: middle;
+      }
+
+      button {
+        border-bottom: none;
+        border-left: none;
+      }
+    }
+
+    .sendButton {
+      height: 2.7em;
+      display: inline-block;
+      vertical-align: top;
+    }
+  }
+
+  .columnChat {
+    overflow-y: auto;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .roomInfo {
+    position: relative;
+    border-top: $button-border;
+    border-bottom: $button-border;
+    color: $button-text;
+    padding: $padding;
+    background-color: $button-background;
+    text-align: center;
+
+    .lowerRight {
+      border-bottom: $corner-size solid $background-color;
+      border-left: $corner-size solid $button-background;
+      margin: 0;
+      bottom: -$border-width;
+      right: 0;
+      position: absolute;
+    }
+  }
+}
+
+.personPage {
+  div {
+    width: 100%;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    align-items: center;
+
+    img {
+      max-height: 70%;
+    }
+
+    p {
+      background-color: $text-color;
+      color: $background-color;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .close {
+    top: 0;
+    right: 0;
+    position: absolute;
+
+    button {
+      padding: 0 .2em;
+    }
+  }
+}
+
+.userRoomList {
+  li:first-child {
+    padding-top: $padding;
+  }
+}
+
+.transactionList {
+  li {
+    border-bottom: $border-second;
+
+    p {
+      padding-left: $msgList-msgLine-side-padding;
+      padding-right: $msgList-msgLine-side-padding;
+
+      span {
+        padding-right: .5em;
+      }
+
+      span:first-child {
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+.list {
+  li {
+    padding: $padding;
+  }
+
+  header {
+    padding: $padding;
+    color: $button-text;
+    border-top: $button-border;
+    border-bottom: $button-border;
+    background-color: $button-background;
+  }
+
+  .listButtonsItem {
+    height: 1.5em;
+
+    .listButtons {
+      background-color: inherit;
+      display: -webkit-flex;
+      display: flex;
+
+      span {
+        display: initial;
+        background-color: $background-color;
+      }
+
+      button {
+        border: none;
+        background-color: inherit;
+      }
+    }
+  }
+}
+
+.list:last-child {
+  padding-bottom: 0;
+}
+
+/*********
+ * Lists *
+ *********/
+
+/*
+ * Generic list.
+ */
+
+.list {
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+/*
+ * A list item that has focus in a list.
+ */
+.focusListItem {
+  background-color: $focus-color;
+  text-decoration: underline;
+}
+
+/*
+ * A marked list item in a list.
+ * A list item will be marked when the object that it's connected to is updated.
+ */
+.markListItem {
+  background-color: $darker-new-color;
+}
+
+/**
+ * A new list item in the list.
+ * A list item added to a list will temporarily have the newListItem class.
+ * The class is removed after a set amount of time.
+ */
+.newListItem {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+.flash {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+@keyframes flash {
+  0% {
+    background-color: $new-color;
+    color: $new-color;
+  }
+
+  100% {
+    color: inherit;
+    background-color: inherit;
+    text-shadow: inherit;
+  }
+}
+
+/**
+ * A list item that will be removed from a list.
+ * The class is removed after a set amount of time.
+ */
+.removeListItem {
+  background-color: $warning-color;
+  color: $warning-color;
+}
+
+.offOn {
+  button {
+    background-color: $warning-color;
+  }
+}
+
+.offValue {
+  color: $off-color;
+}
+
+/*************
+ * World Map *
+ *************/
+
+$map-box-left: .2em;
+$map-padding-fix: 2em;
+
+.worldMapPage {
+  padding-top: $map-padding-fix; // Gmaps fix
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  a {
+    display: none !important;
+  }
+}
+
+.mapLeftClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  width: calc(100% - ((#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$border-width} * 2)));
+  max-width: 30em;
+  max-height: calc(100% - (#{$map-padding-fix * 1.5} + (#{$map-box-left} * 2) + (#{$map-box-padding} * 2) + (#{$border-width} * 2)));
+  padding: $map-box-padding;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background-color: $background-color;
+  border: $border;
+
+  header {
+    border: 0;
+    background-color: inherit;
+  }
+
+  p {
+    margin-bottom: $p-margin;
+  }
+}
+
+.mapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  background-color: $background-color;
+  border: $border;
+  padding: .2em;
+  max-width: 15em;
+}
+
+.fallbackMapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  top: $map-box-left;
+  left: $map-box-left;
+  max-width: 15em;
+  padding: .2em;
+  background-color: $background-color;
+  border: $border;
+}
+
+/********
+ * Misc *
+ ********/
+
+#main {
+  height: 100%;
+  width: 100%;
+
+  .viewWrapper {
+    > .oneOfTwo {
+      border-right: $border;
+    }
+
+    > .oneOfTwo:nth-child(2) {
+      border-right: 0;
+    }
+
+    > .oneOfThree {
+      border-right: $border;
+    }
+
+    > .oneOfThree:nth-child(3) {
+      border-right: $border;
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.upperRight {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.menuBar {
+  order: 1;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: $button-border;
+  background-color: $button-background;
+  display: -webkit-flex;
+  display: flex;
+  z-index: 8;
+  color: $button-text;
+  -webkit-align-items: center;
+  align-items: center;
+  height: $status-bar-height;
+  position: relative;
+
+  img {
+    vertical-align: middle;
+  }
+
+  > span {
+    margin-right: $padding;
+  }
+
+  > span:last-child {
+    margin-right: 0;
+  }
+
+  > div {
+    margin-right: $padding;
+  }
+
+  > .upperRight {
+    border-top: $corner-size solid $background-color;
+    border-left: $corner-size solid $button-background;
+    margin: 0;
+    top: -$border-width
+  }
+
+  .clickable {
+    text-decoration: none;
+  }
+
+  .topMenuButton {
+    color: $button-text;
+    padding: .1em;
+    max-width: 4.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    border-left: $button-border;
+    border-right: $button-border;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topMenu {
+    position: absolute;
+    background-color: $button-background;
+    max-width: 12em;
+    z-index: 9;
+    overflow-y: scroll;
+    border: $button-border;
+    -webkit-box-shadow: 2px 0 5px black;
+    box-shadow: 2px 0 5px black;
+    scrollbar-width: none;
+
+    button {
+      width: 100%;
+      border-left: 0;
+      border-right: 0;
+    }
+
+    p {
+      background-color: $button-background;
+      color: $button-text;
+      box-sizing: border-box;
+      border-bottom: $button-border;
+      padding: $padding;
+    }
+
+    li:last-child {
+      p {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+.offline {
+  background-color: $warning-color;
+
+  .upperRight {
+    border-left: $corner-size solid $warning-color;
+  }
+}
+
+.walletView {
+  .walletInfo {
+    text-align: center;
+    border-top: $border;
+    border-bottom: $border;
+    padding: $padding;
+
+    .lowerRight {
+      border-bottom: $corner-size solid $background-color;
+      border-left: $corner-size solid $button-background;
+      margin: 0;
+      bottom: -$border-width;
+      right: 0;
+      position: absolute;
+    }
+  }
+}
+
+.currentUserList {
+  margin-bottom: 0;
+  padding-top: 0;
+
+  li {
+    padding: 0;
+  }
+}
+
+.imagePreview {
+  max-height: 10em;
+  max-width: 10em;
+  display: block;
+}
+
+.listItemImage {
+  border-style: none;
+  float: left;
+  margin-right: .2em;
+
+  img {
+    max-width: 40px;
+    max-height: 40px;
+  }
+}
+
+.hide {
+  display: none !important;
+}
+
+.pre {
+  white-space: pre;
+  font-size: .9em;
+}
+
+.fullscreen {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: $background-color;
+  z-index: 10;
+}
+
+.textAnimation {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: calc(100% - (#{$padding} * 2));
+  background-color: $background-color;
+  z-index: 10;
+  overflow-y: auto;
+  padding: $padding;
+  scrollbar-width: none;
+  line-height: $line-height;
+}
+
+.wreckingStatus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9;
+  background-color: $background-color;
+  border: $border;
+  padding: $map-box-padding;
+}
+
+#screenFilter {
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  position: fixed;
+  background-color: rgba(255, 236, 5, 0.08);
+  //animation: screenFilter 20s linear infinite 5s;
+  z-index: 11;
+  -webkit-box-shadow: inset 0 0 10px rgba(255, 238, 5, 0.18);
+  box-shadow: inset 0 0 10px rgba(255, 238, 5, 0.18);
+}
+
+.baseGlitch {
+  content: attr(subMsg);
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-size: .9em;
+}
+
+.oldIosFix {
+  height: calc(100% - 1.5em) !important;
+}
+
+.noDecoration {
+  text-decoration: none !important;
+}
+
+.fastGlitch, .normalGlitch, .slowGlitch {
+  position: relative;
+}
+
+.fastGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 10s linear infinite 3s;
+}
+
+.normalGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 16s linear infinite 4s;
+}
+
+.slowGlitch:before {
+  @extend .baseGlitch;
+  animation: brightness 21s linear infinite 5s;
+}
+
+@keyframes screenFilter {
+  15% {
+    background-color: rgba(255, 236, 5, 0.10);
+  }
+  40% {
+    background-color: rgba(255, 236, 5, 0.03);
+  }
+  80% {
+    background-color: rgba(255, 236, 5, 0.10);
+  }
+}
+
+@keyframes brightness {
+  from {
+    opacity: 0;
+  }
+  0.5% {
+    opacity: 0.8;
+  }
+  0.8% {
+    opacity: 0.8;
+  }
+  1% {
+    opacity: 0.8;
+  }
+  1.4% {
+    opacity: 0.8;
+  }
+  1.7% {
+    opacity: 0;
+  }
+}
+
+@media (orientation: portrait), (orientation: landscape) and (max-width: 1023px) {
+  #main {
+    > .viewWrapper {
+      > .oneOfTwo:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(3) {
+        display: none;
+      }
+    }
+
+    .viewWrapper {
+      > .oneOfTwo {
+        border-right: none;
+      }
+
+      > .oneOfThree {
+        border-right: none;
+      }
+    }
+  }
+
+  .viewWrapper {
+    width: 100%;
+  }
+
+  .oneOfTwo {
+    width: 100%;
+  }
+
+  .chatView, .worldMapView, .walletView, .teamView {
+    .columnList {
+      height: calc(1.8em + #{$border-width});
+      width: 100%;
+      display: -webkit-flex;
+      display: flex;
+      overflow: inherit;
+      z-index: 8;
+
+      .list {
+        -webkit-flex-grow: 1;
+        flex-grow: 1;
+
+        header {
+          text-align: center;
+        }
+
+        ul {
+          position: absolute;
+          max-height: calc(100% - 1.8em - #{$border-width} - #{$status-bar-height});
+          width: 100%;
+          left: 0;
+          overflow-y: auto;
+          background-color: $button-background;
+          z-index: 8;
+          -webkit-box-shadow: 2px 0 5px black;
+          box-shadow: 2px 0 5px black;
+        }
+
+        .toggle:after {
+          content: '';
+        }
+
+        .expanded:after {
+          content: '';
+        }
+      }
+    }
+
+    .oneOfTwo:first-child {
+      max-width: 100%;
+    }
+  }
+
+  .chatView {
+    .columnChat {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+
+    .roomInfo {
+      .lowerLeft {
+        border-bottom: $corner-size solid $background-color;
+        border-right: $corner-size solid $button-background;
+        margin: 0;
+        bottom: -$border-width;
+        left: 0;
+        position: absolute;
+      }
+    }
+  }
+
+  .worldMapView {
+    .mapLeftClickBox {
+      left: 0;
+      width: calc(100% - ((#{$map-box-padding} * 2) + (#{$border-width} * 2)));
+    }
+
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+  }
+
+  .walletView {
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+  }
+
+  .teamView {
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em - #{$border-width});
+      width: 100%;
+    }
+  }
+
+  .personPage {
+    div {
+      img {
+        width: inherit !important;
+      }
+    }
+  }
+
+  .list {
+    .listButtons {
+      position: fixed;
+    }
+  }
+}

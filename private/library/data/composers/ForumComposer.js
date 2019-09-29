@@ -138,16 +138,26 @@ class ForumComposer extends DataComposer {
   }
 
   createPost({ post, callback }) {
+    const aliasId = storageManager.getAliasId();
+    const postToSend = post;
+
+    postToSend.ownerAliasId = aliasId;
+
     this.forumPostHandler.createObject({
       callback,
-      params: { post },
+      params: { post: postToSend },
     });
   }
 
   createThread({ thread, callback }) {
+    const aliasId = storageManager.getAliasId();
+    const threadToSend = thread;
+
+    threadToSend.ownerAliasId = aliasId;
+
     this.forumThreadHandler.createObject({
       callback,
-      params: { thread },
+      params: { thread: threadToSend },
     });
   }
 

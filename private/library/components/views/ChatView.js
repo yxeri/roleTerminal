@@ -42,6 +42,7 @@ class ChatView extends ViewWrapper {
     allowImages,
     hideDate,
     fullDate,
+    corners,
     showUserImage = true,
     titles = {
       rooms: 'Rooms',
@@ -111,6 +112,7 @@ class ChatView extends ViewWrapper {
       showTeam,
       fullDate,
       hideDate,
+      corners,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,
@@ -124,6 +126,7 @@ class ChatView extends ViewWrapper {
       placeholder,
       sendOnEnter,
       allowImages,
+      corners,
       minimumAccessLevel: storageManager.getPermissions().SendMessage
         ? storageManager.getPermissions().SendMessage.accessLevel
         : accessCentral.AccessLevels.STANDARD,
@@ -198,6 +201,7 @@ class ChatView extends ViewWrapper {
     });
     const roomInfo = new RoomInfo({
       whisperText,
+      corners,
     });
     const columns = [];
     const mainColumn = {

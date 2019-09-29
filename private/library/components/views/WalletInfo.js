@@ -24,6 +24,7 @@ const teamComposer = require('../../data/composers/TeamComposer');
 
 class WalletInfo extends BaseView {
   constructor({
+    corners,
     sign = '$',
     appendSign = false,
     showName = false,
@@ -67,7 +68,7 @@ class WalletInfo extends BaseView {
       amountSpan.appendChild(document.createTextNode(string));
     };
 
-    super({});
+    super({ corners });
 
     this.element = elementCreator.createContainer({
       classes: ['walletInfo'],

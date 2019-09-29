@@ -99,6 +99,7 @@ class List extends BaseView {
     imageThumb,
     defaultImage,
     buttons,
+    corners = [],
     hasOffToggle = false,
     showOff = false,
     listItemFieldsClasses = [],
@@ -127,6 +128,7 @@ class List extends BaseView {
       FOLLOWEDROOMS: 'followedRooms',
       WHISPERROOMS: 'whisperRooms',
     };
+    this.corners = corners;
     this.effect = effect;
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
@@ -567,6 +569,8 @@ class List extends BaseView {
 
             return fragment;
           });
+
+        this.corners.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
 
         const paragraphParams = {
           elements,

@@ -40,6 +40,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    corners,
     hideDate = false,
     showTeam = true,
     fullDate = true,
@@ -53,6 +54,7 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      corners,
       imageInfo: {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',

@@ -23,11 +23,13 @@ const WalletInfo = require('./WalletInfo');
 class WalletView extends ViewWrapper {
   constructor({
     effect,
+    corners,
     classes = [],
     elementId = `wView-${Date.now()}`,
   }) {
     const walletInfo = new WalletInfo({
       sign: 'vcaps',
+      corners,
       appendSign: true,
       showName: true,
       showTeam: true,

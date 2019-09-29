@@ -47,6 +47,7 @@ class MenuBar extends BaseView {
     image,
     currencySign,
     elements,
+    corners = [],
     setMenuImage = true,
     appendTop = false,
     showControls = {},
@@ -57,6 +58,7 @@ class MenuBar extends BaseView {
   }) {
     super({
       elementId,
+      corners,
       classes: classes.concat(['menuBar']),
     });
 
@@ -496,7 +498,7 @@ class MenuBar extends BaseView {
         sign: currencySign,
       });
 
-      this.element.appendChild(walletInfo.element);
+      walletInfo.addToView({ element: this.element });
     }
 
     if (elements) {

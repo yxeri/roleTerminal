@@ -20,11 +20,13 @@ const FullUserList = require('../lists/FullUserList');
 class PeopleView extends ViewWrapper {
   constructor({
     effect,
+    showButtons,
     classes = [],
     elementId = `pView-${Date.now()}`,
   }) {
     const userList = new FullUserList({
       effect,
+      showButtons,
       shouldFocusOnClick: false,
     });
 

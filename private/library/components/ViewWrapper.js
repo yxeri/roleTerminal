@@ -9,6 +9,7 @@ class ViewWrapper extends BaseView {
     menuBar,
     title,
     viewType,
+    corners,
     useDefaultCss = true,
     columns = [],
     classes = [],
@@ -20,6 +21,7 @@ class ViewWrapper extends BaseView {
     }
 
     super({
+      corners,
       elementId: `wrap${Date.now()}`,
       classes: cssClasses,
     });

@@ -47,6 +47,7 @@ class MenuBar extends BaseView {
     image,
     currencySign,
     elements,
+    corners = [],
     setMenuImage = true,
     appendTop = false,
     showControls = {},
@@ -57,6 +58,7 @@ class MenuBar extends BaseView {
   }) {
     super({
       elementId,
+      corners,
       classes: classes.concat(['menuBar']),
     });
 
@@ -83,6 +85,26 @@ class MenuBar extends BaseView {
       }
 
       this.currentUserList.hideView();
+    });
+
+    this.element.addEventListener('click', () => {
+      if (!socketManager.isOnline) {
+        socketManager.reconnect();
+      }
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.OFFLINE,
+      func: () => {
+        this.element.classList.add('offline');
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ONLINE,
+      func: () => {
+        this.element.classList.remove('offline');
+      },
     });
 
     if (controls.user) {
@@ -140,6 +162,14 @@ class MenuBar extends BaseView {
           },
         },
       });
+      const rebootButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'reboot' }),
+        clickFuncs: {
+          leftFunc: () => {
+            window.location.reload(true);
+          },
+        },
+      });
 
       accessCentral.addAccessElement({
         maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
@@ -165,7 +195,13 @@ class MenuBar extends BaseView {
       }, {
         elements: [registerButton],
       });
-      lastItems.push({ elements: [profileButton, logoutButton] });
+      lastItems.push({
+        elements: [
+          profileButton,
+          logoutButton,
+          rebootButton,
+        ],
+      });
 
       voiceCommander.addCommands({
         activationString: 'menu',
@@ -494,9 +530,10 @@ class MenuBar extends BaseView {
     if (showControls.wallet) {
       const walletInfo = new WalletInfo({
         sign: currencySign,
+        appendSign: true,
       });
 
-      this.element.appendChild(walletInfo.element);
+      walletInfo.addToView({ element: this.element });
     }
 
     if (elements) {

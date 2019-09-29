@@ -7,6 +7,15 @@ const socketManager = require('../../SocketManager');
 const aliasComposer = require('./AliasComposer');
 const accessCentral = require('../../AccessCentral');
 
+const anonymous = {
+  partOfTeams: [],
+  followingRooms: [storageManager.getPublicRoomId()],
+  accessLevel: accessCentral.AccessLevels.ANONYMOUS,
+  objectId: -1,
+  aliases: [],
+  username: '---',
+};
+
 class UserComposer extends DataComposer {
   constructor() {
     super({
@@ -27,13 +36,7 @@ class UserComposer extends DataComposer {
       return this.handler.getObject({ objectId: userId });
     }
 
-    return {
-      partOfTeams: [],
-      followingRooms: [storageManager.getPublicRoomId()],
-      accessLevel: accessCentral.AccessLevels.ANONYMOUS,
-      objectId: -1,
-      aliases: [],
-    };
+    return anonymous;
   }
 
   getCurrentIdentity() {
@@ -48,7 +51,7 @@ class UserComposer extends DataComposer {
       return this.handler.getObject({ objectId: userId });
     }
 
-    return {};
+    return anonymous;
   }
 
   getCurrentTeams() {

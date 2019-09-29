@@ -19,15 +19,18 @@ const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
 const TeamList = require('../lists/TeamList');
 const WalletInfo = require('./WalletInfo');
+const labelHandler = require('../../labels/LabelHandler');
 
 class WalletView extends ViewWrapper {
   constructor({
     effect,
+    corners,
     classes = [],
     elementId = `wView-${Date.now()}`,
   }) {
     const walletInfo = new WalletInfo({
-      sign: 'vcaps',
+      corners,
+      sign: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' }),
       appendSign: true,
       showName: true,
       showTeam: true,

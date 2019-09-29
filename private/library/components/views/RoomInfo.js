@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
+const BaseView = require('./BaseView');
 const EditRoomDialog = require('./dialogs/EditRoomDialog');
 
 const roomComposer = require('../../data/composers/RoomComposer');
@@ -23,8 +23,9 @@ const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
 
-class RoomInfo extends ViewWrapper {
+class RoomInfo extends BaseView {
   constructor({
+    corners = [],
     userText = 'User: ',
     whisperText = ' <-> ',
     classes = [],
@@ -61,6 +62,7 @@ class RoomInfo extends ViewWrapper {
     };
 
     super({
+      corners,
       elementId,
       useDefaultCss: false,
       classes: classes.concat([

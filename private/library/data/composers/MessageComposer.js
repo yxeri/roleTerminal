@@ -29,13 +29,7 @@ class MessageComposer extends DataComposer {
   getMessage({
     messageId,
   }) {
-    const message = this.handler.getObject({ objectId: messageId });
-
-    if (message) {
-      message.creatorName = this.createCreatorName({ object: message });
-    }
-
-    return message;
+    return this.handler.getObject({ objectId: messageId });
   }
 
   fetchMessagesByRoom({

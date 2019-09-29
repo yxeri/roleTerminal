@@ -109,7 +109,6 @@ class DocFileDialog extends BaseDialog {
 
             const params = {
               docFile: {
-                ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
                 code: this.getInputValue(ids.CODE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,

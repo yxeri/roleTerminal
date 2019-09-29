@@ -9,6 +9,7 @@ const ids = {
 
 class InputArea extends BaseView {
   constructor({
+    corners,
     sendOnEnter,
     minimumAccessLevel,
     focusless = false,
@@ -45,6 +46,7 @@ class InputArea extends BaseView {
     this.triggerCallback = triggerCallback;
     this.sendOnEnter = sendOnEnter;
     this.sendButton = elementCreator.createButton({
+      corners,
       text: 'Send',
       classes: ['sendButton'],
       clickFuncs: {

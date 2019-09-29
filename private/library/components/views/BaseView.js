@@ -29,6 +29,7 @@ class BaseView {
   constructor({
     classes,
     minimumAccessLevel,
+    corners = [],
     elementId = `elem-${Date.now()}`,
   }) {
     this.itemChangeTimeout = 800;
@@ -39,6 +40,8 @@ class BaseView {
       classes,
       elementId,
     });
+
+    corners.forEach(corner => this.element.appendChild(elementCreator.createContainer({ classes: [corner] })));
 
     if (minimumAccessLevel) {
       accessCentral.addAccessElement({

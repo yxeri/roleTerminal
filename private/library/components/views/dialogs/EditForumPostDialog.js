@@ -39,10 +39,10 @@ class EditForumPostDialog extends BaseDialog {
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
-        maxLength: 3500,
+        maxLength: 600,
         multiLine: true,
         shouldResize: true,
-        placeholder: labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'text' }),
+        placeholder: labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'text' }),
       }),
     ];
     const lowerButtons = [
@@ -109,12 +109,12 @@ class EditForumPostDialog extends BaseDialog {
                   if (error.type === 'invalid length' && error.extraData) {
                     switch (error.extraData.param) {
                       case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'titleLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'titleLength' })] });
 
                         break;
                       }
                       case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'textLength' })] });
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ForumDialog', label: 'textLength' })] });
 
                         break;
                       }

@@ -40,11 +40,15 @@ class DocFileComposer extends DataComposer {
     images,
     callback,
   }) {
+    const aliasId = storageManager.getAliasId();
+    const fileToSend = docFile;
+    fileToSend.ownerAliasId = aliasId;
+
     this.handler.createObject({
       callback,
       params: {
-        docFile,
         images,
+        docFile: fileToSend,
       },
     });
   }

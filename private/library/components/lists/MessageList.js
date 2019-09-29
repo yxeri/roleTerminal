@@ -40,6 +40,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    corners,
     hideDate = false,
     showTeam = true,
     fullDate = true,
@@ -53,6 +54,7 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      corners,
       imageInfo: {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',
@@ -117,7 +119,7 @@ class MessageList extends List {
 
               let name = identity.username || identity.aliasName;
 
-              if (showTeam) {
+              if (showTeam && shortNames.length > 0) {
                 name += `[${shortNames.join('/')}]`;
               }
 
@@ -205,12 +207,16 @@ class MessageList extends List {
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
           if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
-            this.getParentElement().classList.remove('flash');
-            this.getParentElement().classList.add('flash');
+            const parent = this.getParentElement();
 
-            setTimeout(() => {
+            if (parent) {
               this.getParentElement().classList.remove('flash');
-            }, 400);
+              this.getParentElement().classList.add('flash');
+
+              setTimeout(() => {
+                this.getParentElement().classList.remove('flash');
+              }, 400);
+            }
 
             this.showMessagesByRoom({ roomId: room.objectId });
           }

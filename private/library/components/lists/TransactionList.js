@@ -43,7 +43,7 @@ class TransactionList extends List {
       }, {
         paramName: 'amount',
         convertFunc: (amount) => {
-          return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'amount' })}: ${amount}`;
+          return `${amount}${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' })}`;
         },
       }, {
         paramName: 'customTimeCreated',

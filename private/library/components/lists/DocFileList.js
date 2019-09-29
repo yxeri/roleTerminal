@@ -41,6 +41,12 @@ class DocFileList extends List {
       defaultImage: {
         fileName: 'file.png',
       },
+      conditionalImages: [{
+        fileName: 'lock.png',
+        func: (docFile) => {
+          return docFile.isLocked && !docFile.code;
+        },
+      }],
       shouldFocusOnClick: false,
       shouldAppendImage: true,
       imageThumb: true,

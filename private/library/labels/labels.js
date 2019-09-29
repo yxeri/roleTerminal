@@ -82,6 +82,9 @@ const labels = {
     openDocument: (override.Button && override.Button.myProfile) || {
       en: 'Document ID search',
     },
+    reboot: (override.Button && override.Button.reboot) || {
+      en: 'Reboot',
+    },
   },
   Transaction: {
     failed: (override.Transaction && override.Transaction.failed) || {
@@ -453,6 +456,20 @@ const labels = {
       en: '+Sub-post',
     },
   },
+  ForumDialog: {
+    titleLength: (override.ForumDialog && override.ForumDialog.titleLength) || {
+      en: 'Title is too long',
+    },
+    textLength: (override.ForumDialog && override.ForumDialog.textLength) || {
+      en: 'Text is too long',
+    },
+    title: (override.ForumDialog && override.ForumDialog.title) || {
+      en: 'Title',
+    },
+    text: (override.ForumDialog && override.ForumDialog.text) || {
+      en: 'Text',
+    },
+  },
   WorldMapView: {
     noName: (override.WorldMapView && override.WorldMapView.noName) || {
       en: 'Unknown position.',
@@ -558,7 +575,7 @@ const labels = {
       en: 'has',
     },
     currency: (override.WalletDialog && override.WalletDialog.currency) || {
-      en: 'currency',
+      en: '',
     },
     transferFromTeam: (override.WalletDialog && override.WalletDialog.transferFromTeam) || {
       en: 'Use your team\'s wallet. The team will be the sender',

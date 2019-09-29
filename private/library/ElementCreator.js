@@ -288,6 +288,7 @@ class ElementCreator {
     needsFullAccess,
     object,
     image,
+    corners = ['upperLeft', 'upperRight', 'lowerLeft', 'lowerRight'],
     classes = [],
   }) {
     const span = this.createSpan({
@@ -307,6 +308,8 @@ class ElementCreator {
     } else {
       button.appendChild(document.createTextNode(text));
     }
+
+    corners.forEach(corner => button.appendChild(this.createContainer({ classes: [corner] })));
 
     span.appendChild(button);
 
@@ -559,10 +562,12 @@ class ElementCreator {
     footerElement,
     headerElement,
     elementId,
+    clickFuncs,
   }) {
     const section = createBaseElement({
       elementId,
       classes,
+      clickFuncs,
       elementType: 'section',
     });
 

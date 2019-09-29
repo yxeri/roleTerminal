@@ -99,6 +99,7 @@ class List extends BaseView {
     imageThumb,
     defaultImage,
     buttons,
+    conditionalImages = [],
     corners = [],
     hasOffToggle = false,
     showOff = false,
@@ -128,6 +129,7 @@ class List extends BaseView {
       FOLLOWEDROOMS: 'followedRooms',
       WHISPERROOMS: 'whisperRooms',
     };
+    this.conditionalImages = conditionalImages;
     this.corners = corners;
     this.effect = effect;
     this.dependencies = dependencies;
@@ -603,16 +605,26 @@ class List extends BaseView {
         listItemElements.push(elementCreator.createParagraph(paragraphParams));
       }
 
-      if (this.shouldAppendImage
-        && ((object.image && object.image.imageName)
-          || (object.images && object.images[0] && object.images[0].imageName)
-          || (this.defaultImage))) {
-        listItemElements.push(elementCreator.createPicture({
-          picture: object.image || object.images[0] || this.defaultImage,
-          classes: ['attachedImage'],
-          isThumb: this.imageThumb,
-          isUploaded: typeof object.image !== 'undefined' || typeof object.images[0] !== 'undefined',
-        }));
+      if (this.shouldAppendImage) {
+        if ((object.image && object.image.imageName) || (object.images && object.images[0] && object.images[0].imageName)) {
+          listItemElements.push(elementCreator.createPicture({
+            picture: object.image || object.images[0],
+            classes: ['attachedImage'],
+            isThumb: this.imageThumb,
+            isUploaded: typeof object.image !== 'undefined' || typeof object.images[0] !== 'undefined',
+          }));
+        } else {
+          const image = this.conditionalImages.find(img => img.func(object)) || this.defaultImage;
+
+          if (image) {
+            listItemElements.push(elementCreator.createPicture({
+              picture: image,
+              classes: ['attachedImage'],
+              isThumb: this.imageThumb,
+              isUploaded: false,
+            }));
+          }
+        }
       }
 
       /**

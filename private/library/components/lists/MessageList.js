@@ -119,7 +119,7 @@ class MessageList extends List {
 
               let name = identity.username || identity.aliasName;
 
-              if (showTeam) {
+              if (showTeam && shortNames.length > 0) {
                 name += `[${shortNames.join('/')}]`;
               }
 

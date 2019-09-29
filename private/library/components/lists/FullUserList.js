@@ -34,6 +34,7 @@ class UserList extends List {
     minimumAccessLevel,
     effect,
     shouldToggle,
+    showButtons = true,
     showImage = true,
     classes = [],
     elementId = `fUserList-${Date.now()}`,
@@ -78,22 +79,6 @@ class UserList extends List {
       shouldFocusOnClick,
       effect,
       shouldToggle,
-      buttons: [
-        elementCreator.createButton({
-          image: {
-            fileName: 'smile.png',
-            height: 20,
-            width: 20,
-          },
-          clickFuncs: {
-            leftFunc: () => {
-              const personPage = new PersonPage({});
-
-              personPage.addToView({ element: viewSwitcher.getParentElement() });
-            },
-          },
-        }),
-      ],
       imageThumb: true,
       hasOffToggle: true,
       sorting: {
@@ -136,6 +121,25 @@ class UserList extends List {
       collector: dataHandler.users,
       listItemFields: headerFields,
     };
+
+    if (showButtons) {
+      params.buttons = [
+        elementCreator.createButton({
+          image: {
+            fileName: 'smile.png',
+            height: 20,
+            width: 20,
+          },
+          clickFuncs: {
+            leftFunc: () => {
+              const personPage = new PersonPage({});
+
+              personPage.addToView({ element: viewSwitcher.getParentElement() });
+            },
+          },
+        }),
+      ];
+    }
 
     if (showImage) {
       params.imageInfo = {

@@ -89,6 +89,8 @@ class EventCentral {
       SHOW_MAP_CLICK_BOX: 'Map box is shown',
       AGED_POSITIONS: 'Positions are old',
       TEAM_MEMBER: 'Team member change',
+      ONLINE: 'Online',
+      OFFLINE: 'Offline',
     };
     this.eventWatchers = {};
   }

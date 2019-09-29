@@ -87,6 +87,26 @@ class MenuBar extends BaseView {
       this.currentUserList.hideView();
     });
 
+    this.element.addEventListener('click', () => {
+      if (!socketManager.isOnline) {
+        socketManager.reconnect();
+      }
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.OFFLINE,
+      func: () => {
+        this.element.classList.add('offline');
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ONLINE,
+      func: () => {
+        this.element.classList.remove('offline');
+      },
+    });
+
     if (controls.user) {
       const logoutButton = elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'logout' }),

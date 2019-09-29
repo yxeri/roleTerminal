@@ -136,6 +136,10 @@ class SocketManager {
               event: eventCentral.Events.USER_CHANGE,
               params: {},
             });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.ONLINE,
+              params: {},
+            });
           });
         }
       },
@@ -144,8 +148,14 @@ class SocketManager {
       func: () => {
         this.updateId(() => {
           this.reconnectDone();
+
           eventCentral.emitEvent({
             event: eventCentral.Events.RECONNECT,
+            params: {},
+          });
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.ONLINE,
             params: {},
           });
         });
@@ -154,6 +164,11 @@ class SocketManager {
       event: this.EmitTypes.DISCONNECT,
       func: () => {
         this.isOnline = false;
+
+        eventCentral.emitEvent({
+          event: eventCentral.Events.OFFLINE,
+          params: {},
+        });
       },
     }, {
       event: this.EmitTypes.BAN,

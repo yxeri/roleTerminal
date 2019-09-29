@@ -2,6 +2,7 @@ const DataComposer = require('./BaseComposer');
 
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class ForumComposer extends DataComposer {
   constructor() {
@@ -19,6 +20,7 @@ class ForumComposer extends DataComposer {
 
     this.forumPostHandler = dataHandler.forumPosts;
     this.forumThreadHandler = dataHandler.forumThreads;
+    this.forumHandler = dataHandler.forums;
   }
 
   getSubPosts({ parentPostId }) {
@@ -205,6 +207,20 @@ class ForumComposer extends DataComposer {
       params: {
         threadId,
         thread,
+      },
+    });
+  }
+
+  updateForum({
+    forum,
+    forumId,
+    callback,
+  }) {
+    this.forumHandler.updateObject({
+      callback,
+      params: {
+        forumId,
+        forum,
       },
     });
   }

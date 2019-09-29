@@ -34,20 +34,6 @@ class BaseComposer {
       });
     }
   }
-
-  createCreatorName({ object, full = true }) {
-    const user = this.userHandler.getObject({ objectId: object.ownerAliasId || object.ownerId });
-
-    if (!user) {
-      return object.ownerAliasId || object.ownerId;
-    }
-
-    if (full) {
-      return user.fullName || user.username;
-    }
-
-    return user.username;
-  }
 }
 
 module.exports = BaseComposer;

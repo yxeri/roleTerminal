@@ -530,6 +530,7 @@ class MenuBar extends BaseView {
     if (showControls.wallet) {
       const walletInfo = new WalletInfo({
         sign: currencySign,
+        appendSign: true,
       });
 
       walletInfo.addToView({ element: this.element });

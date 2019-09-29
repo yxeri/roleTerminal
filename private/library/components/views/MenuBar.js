@@ -162,6 +162,14 @@ class MenuBar extends BaseView {
           },
         },
       });
+      const rebootButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'reboot' }),
+        clickFuncs: {
+          leftFunc: () => {
+            window.location.reload(true);
+          },
+        },
+      });
 
       accessCentral.addAccessElement({
         maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
@@ -187,7 +195,13 @@ class MenuBar extends BaseView {
       }, {
         elements: [registerButton],
       });
-      lastItems.push({ elements: [profileButton, logoutButton] });
+      lastItems.push({
+        elements: [
+          profileButton,
+          logoutButton,
+          rebootButton,
+        ],
+      });
 
       voiceCommander.addCommands({
         activationString: 'menu',

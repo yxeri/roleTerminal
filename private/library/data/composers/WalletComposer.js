@@ -86,7 +86,7 @@ class WalletComposer extends DataComposer {
       return wallet.amount;
     }
 
-    return -1;
+    return 0;
   }
 }
 

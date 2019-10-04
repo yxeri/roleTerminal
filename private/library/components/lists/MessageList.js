@@ -40,6 +40,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    corners,
     hideDate = false,
     showTeam = true,
     fullDate = true,
@@ -53,6 +54,7 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      corners,
       imageInfo: {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',
@@ -113,11 +115,11 @@ class MessageList extends List {
 
             if (identity) {
               const teamIds = identity.partOfTeams || [];
-              const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
+              const shortNames = teamIds.map((teamId) => teamComposer.getTeam({ teamId }).shortName);
 
               let name = identity.username || identity.aliasName;
 
-              if (showTeam) {
+              if (showTeam && shortNames.length > 0) {
                 name += `[${shortNames.join('/')}]`;
               }
 
@@ -185,7 +187,7 @@ class MessageList extends List {
     this.onCreateFunc = ({ object }) => {
       this.roomLists.every((roomList) => {
         const rooms = roomList.getCollectorObjects();
-        const foundRoom = rooms.find(room => object.roomId === room.objectId);
+        const foundRoom = rooms.find((room) => object.roomId === room.objectId);
 
         if (foundRoom) {
           roomList.animateElement({ elementId: foundRoom.objectId });
@@ -204,13 +206,17 @@ class MessageList extends List {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
-            this.getParentElement().classList.remove('flash');
-            this.getParentElement().classList.add('flash');
+          if (!origin || this.roomLists.map((roomList) => roomList.elementId).some((roomListId) => roomListId === origin)) {
+            const parent = this.getParentElement();
 
-            setTimeout(() => {
+            if (parent) {
               this.getParentElement().classList.remove('flash');
-            }, 400);
+              this.getParentElement().classList.add('flash');
+
+              setTimeout(() => {
+                this.getParentElement().classList.remove('flash');
+              }, 400);
+            }
 
             this.showMessagesByRoom({ roomId: room.objectId });
           }

@@ -43,7 +43,7 @@ class MapMarker extends MapObject {
     let chosenStyle = {};
 
     if (position.styleName) {
-      chosenStyle = choosableStyles.find(style => style.styleName === position.styleName) || {};
+      chosenStyle = choosableStyles.find((style) => style.styleName === position.styleName) || {};
 
       chosenStyle.icon = chosenStyle.icon || {};
     } else {

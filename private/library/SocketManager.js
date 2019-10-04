@@ -22,7 +22,7 @@ class SocketManager {
   constructor() {
     this.socket = io(typeof ioUri !== 'undefined' // eslint-disable-line no-undef
       ? ioUri // eslint-disable-line no-undef
-      : '/');
+      : '/', { forceNew: true });
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
@@ -98,6 +98,7 @@ class SocketManager {
           requireOffName,
           allowedImages,
           customUserFields,
+          defaultForum,
           permissions = {},
         } = data;
 
@@ -115,6 +116,7 @@ class SocketManager {
         if (dayModification) { storageManager.setDayModification(dayModification); }
         if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
 
+        storageManager.setDefaultForum(defaultForum);
         storageManager.setAllowedImages(allowedImages);
         storageManager.setPermissions(permissions);
         storageManager.setCustomUserFields(customUserFields);
@@ -136,6 +138,10 @@ class SocketManager {
               event: eventCentral.Events.USER_CHANGE,
               params: {},
             });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.ONLINE,
+              params: {},
+            });
           });
         }
       },
@@ -144,8 +150,14 @@ class SocketManager {
       func: () => {
         this.updateId(() => {
           this.reconnectDone();
+
           eventCentral.emitEvent({
             event: eventCentral.Events.RECONNECT,
+            params: {},
+          });
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.ONLINE,
             params: {},
           });
         });
@@ -154,6 +166,11 @@ class SocketManager {
       event: this.EmitTypes.DISCONNECT,
       func: () => {
         this.isOnline = false;
+
+        eventCentral.emitEvent({
+          event: eventCentral.Events.OFFLINE,
+          params: {},
+        });
       },
     }, {
       event: this.EmitTypes.BAN,
@@ -189,7 +206,7 @@ class SocketManager {
   }
 
   addEvents(events) {
-    events.forEach(event => this.addEvent(event.event, event.func));
+    events.forEach((event) => this.addEvent(event.event, event.func));
   }
 
   updateId(callback) {
@@ -219,7 +236,6 @@ class SocketManager {
    */
   reconnect() {
     if (!this.reconnecting) {
-      this.socket.close();
       this.socket.disconnect();
       this.socket.connect();
     }

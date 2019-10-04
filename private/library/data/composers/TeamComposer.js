@@ -3,6 +3,7 @@ const DataComposer = require('./BaseComposer');
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
 const socketManager = require('../../SocketManager');
+const storageManager = require('../../StorageManager');
 
 class TeamComposer extends DataComposer {
   constructor() {
@@ -35,9 +36,12 @@ class TeamComposer extends DataComposer {
     team,
     callback,
   }) {
+    const teamToCreate = team;
+    teamToCreate.ownerAliasId = storageManager.getAliasId();
+
     this.handler.createObject({
       callback,
-      params: { team },
+      params: { team: teamToCreate },
     });
   }
 

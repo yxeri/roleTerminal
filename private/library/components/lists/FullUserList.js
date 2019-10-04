@@ -34,6 +34,7 @@ class UserList extends List {
     minimumAccessLevel,
     effect,
     shouldToggle,
+    showButtons = true,
     showImage = true,
     classes = [],
     elementId = `fUserList-${Date.now()}`,
@@ -47,7 +48,7 @@ class UserList extends List {
     }, {
       paramName: 'pronouns',
       convertFunc: (pronouns) => {
-        return pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ');
+        return pronouns.map((pronoun) => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ');
       },
     }, {
       paramName: 'offName',
@@ -78,22 +79,6 @@ class UserList extends List {
       shouldFocusOnClick,
       effect,
       shouldToggle,
-      buttons: [
-        elementCreator.createButton({
-          image: {
-            fileName: 'smile.png',
-            height: 20,
-            width: 20,
-          },
-          clickFuncs: {
-            leftFunc: () => {
-              const personPage = new PersonPage({});
-
-              personPage.addToView({ element: viewSwitcher.getParentElement() });
-            },
-          },
-        }),
-      ],
       imageThumb: true,
       hasOffToggle: true,
       sorting: {
@@ -137,6 +122,25 @@ class UserList extends List {
       listItemFields: headerFields,
     };
 
+    if (showButtons) {
+      params.buttons = [
+        elementCreator.createButton({
+          image: {
+            fileName: 'smile.png',
+            height: 20,
+            width: 20,
+          },
+          clickFuncs: {
+            leftFunc: () => {
+              const personPage = new PersonPage({});
+
+              personPage.addToView({ element: viewSwitcher.getParentElement() });
+            },
+          },
+        }),
+      ];
+    }
+
     if (showImage) {
       params.imageInfo = {
         paramName: 'objectId',
@@ -149,13 +153,13 @@ class UserList extends List {
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,
     });
 
-    return allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId)).sort((a, b) => {
+    return allAliases.concat(allUsers).filter((object) => !userAliases.includes(object.objectId)).sort((a, b) => {
       const aParam = (a.username || a.aliasName).toLowerCase();
       const bParam = (b.username || b.aliasName).toLowerCase();
 

@@ -152,7 +152,7 @@ class RoomList extends List {
 
     return {
       canSee:
-        (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
+        (user.aliases && object.participantIds.some((participant) => user.aliases.includes(participant)))
         || (user.objectId && object.participantIds.includes(user.objectId))
         || access.canSee,
     };
@@ -160,7 +160,7 @@ class RoomList extends List {
 
   getCollectorObjects() {
     const currentUser = userComposer.getCurrentUser();
-    const userAliases = [currentUser.objectId].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [currentUser.objectId].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allRooms = this.collector.getObjects({
       filter: this.filter,
     });
@@ -170,7 +170,7 @@ class RoomList extends List {
     }
 
     return allRooms.filter((room) => {
-      return userAliases.find(objectId => room.participantIds.includes(objectId));
+      return userAliases.find((objectId) => room.participantIds.includes(objectId));
     }).sort((a, b) => {
       const aParam = a.roomName.toLowerCase();
       const bParam = b.roomName.toLowerCase();

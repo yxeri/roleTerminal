@@ -29,13 +29,7 @@ class MessageComposer extends DataComposer {
   getMessage({
     messageId,
   }) {
-    const message = this.handler.getObject({ objectId: messageId });
-
-    if (message) {
-      message.creatorName = this.createCreatorName({ object: message });
-    }
-
-    return message;
+    return this.handler.getObject({ objectId: messageId });
   }
 
   fetchMessagesByRoom({
@@ -73,10 +67,9 @@ class MessageComposer extends DataComposer {
     image,
     callback,
   }) {
-    const aliasId = storageManager.getAliasId();
     const messageToSend = message;
-
-    if (aliasId) { messageToSend.ownerAliasId = aliasId; }
+    messageToSend.ownerAliasId = storageManager.getAliasId();
+    messageToSend.teamId = storageManager.getTeamId();
 
     this.handler.createObject({
       callback,

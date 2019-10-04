@@ -55,10 +55,11 @@ class MapPolygon extends MapObject {
       fillColor: chosenStyle.fillColor || styles.fillColor || '#000000',
       fillOpacity: chosenStyle.fillOpacity || styles.fillOpacity || 0.35,
     };
-    const options = Object.assign({
+    const options = {
       zIndex,
       paths: new google.maps.MVCArray(allPoints),
-    }, style);
+      ...style,
+    };
 
     super({
       hoverExcludeRule,

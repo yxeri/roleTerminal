@@ -70,7 +70,7 @@ function setParent(element, name) {
  * @param {string[]} classes Classes to add.
  */
 function setClasses(element, classes = []) {
-  classes.forEach(cssClass => element.classList.add(cssClass));
+  classes.forEach((cssClass) => element.classList.add(cssClass));
 }
 
 /**
@@ -241,7 +241,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => listItem.appendChild(element));
+      elements.forEach((element) => listItem.appendChild(element));
     }
 
     return listItem;
@@ -309,7 +309,7 @@ class ElementCreator {
       button.appendChild(document.createTextNode(text));
     }
 
-    corners.forEach(corner => button.appendChild(this.createContainer({ classes: [corner] })));
+    corners.forEach((corner) => button.appendChild(this.createContainer({ classes: [corner] })));
 
     span.appendChild(button);
 
@@ -332,7 +332,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => container.appendChild(element));
+      elements.forEach((element) => container.appendChild(element));
     }
 
     return container;
@@ -360,7 +360,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => paragraph.appendChild(element));
+      elements.forEach((element) => paragraph.appendChild(element));
     } else {
       paragraph.appendChild(document.createTextNode(text));
     }
@@ -516,7 +516,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => header.appendChild(element));
+      elements.forEach((element) => header.appendChild(element));
     }
 
     return header;
@@ -543,7 +543,7 @@ class ElementCreator {
     }
 
     if (elements) {
-      elements.forEach(element => article.appendChild(element));
+      elements.forEach((element) => article.appendChild(element));
     }
 
     if (footerElement) {
@@ -579,7 +579,7 @@ class ElementCreator {
     }
 
     if (elements) {
-      elements.forEach(element => section.appendChild(element));
+      elements.forEach((element) => section.appendChild(element));
     }
 
     if (footerElement) {
@@ -700,7 +700,7 @@ class ElementCreator {
 
         const selectedOptions = Array.from(select.selectedOptions);
 
-        if (selectedOptions.filter(selected => selected.getAttribute('value') !== '').length === 0) {
+        if (selectedOptions.filter((selected) => selected.getAttribute('value') !== '').length === 0) {
           select.classList.add(cssClasses.emptyInput);
         }
       });

@@ -2,6 +2,7 @@ const BaseComposer = require('./BaseComposer');
 
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../DataHandler');
+const storageManager = require('../../StorageManager');
 
 class PositionComposer extends BaseComposer {
   constructor() {
@@ -90,9 +91,13 @@ class PositionComposer extends BaseComposer {
     position,
     callback,
   }) {
+    const positionToCreate = position;
+    positionToCreate.ownerAliasId = storageManager.getAliasId();
+    positionToCreate.teamId = storageManager.getTeamId();
+
     this.handler.createObject({
       callback,
-      params: { position },
+      params: { position: positionToCreate },
     });
   }
 

@@ -30,7 +30,7 @@ class PositionList extends List {
     listParams.shouldToggle = typeof listParams.shouldToggle === 'boolean'
       ? listParams.shouldToggle
       : true;
-    listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map(positionType => positionComposer.PositionTypes[positionType]);
+    listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map((positionType) => positionComposer.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
     listParams.classes = listParams.classes
       ? listParams.classes.concat(['positionList'])
@@ -90,7 +90,7 @@ class PositionList extends List {
       eventCentral.addWatcher({
         event: eventCentral.Events.AGED_POSITIONS,
         func: ({ positions }) => {
-          positions.forEach(position => this.removeListItem(position));
+          positions.forEach((position) => this.removeListItem(position));
         },
       });
     }

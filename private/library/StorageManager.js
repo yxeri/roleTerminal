@@ -489,7 +489,7 @@ class StorageManager {
     const items = marked[listType];
 
     if (items) {
-      const index = items.findIndex(item => item.objectId === objectId);
+      const index = items.findIndex((item) => item.objectId === objectId);
 
       if (index !== -1) {
         items.splice(index, 1);

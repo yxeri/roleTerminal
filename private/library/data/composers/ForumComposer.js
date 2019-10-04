@@ -76,7 +76,7 @@ class ForumComposer extends DataComposer {
 
       return basePosts.map((post) => {
         const modifiedPost = post;
-        modifiedPost.subPosts = subPosts.filter(subPost => subPost.parentPostId === modifiedPost.objectId);
+        modifiedPost.subPosts = subPosts.filter((subPost) => subPost.parentPostId === modifiedPost.objectId);
 
         return modifiedPost;
       });

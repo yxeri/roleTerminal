@@ -260,8 +260,8 @@ class WorldMapPage extends BaseView {
 
     this.clusterer.clearMarkers();
     this.clusterer.addMarkers(Object.keys(this.markers)
-      .filter(markerId => this.markers[markerId].shouldCluster)
-      .map(markerId => this.markers[markerId].mapObject));
+      .filter((markerId) => this.markers[markerId].shouldCluster)
+      .map((markerId) => this.markers[markerId].mapObject));
   }
 
   /**

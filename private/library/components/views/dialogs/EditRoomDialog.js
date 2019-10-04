@@ -81,7 +81,7 @@ class EditRoomDialog extends BaseDialog {
         clickFuncs: {
           leftFunc: () => {
             const followers = room.followers.concat(room.participantIds);
-            const identities = userComposer.getAllIdentities({}).filter(identity => !followers.includes(identity.objectId));
+            const identities = userComposer.getAllIdentities({}).filter((identity) => !followers.includes(identity.objectId));
             const dialog = new BaseDialog({
               inputs: [
                 elementCreator.createSelect({
@@ -109,7 +109,7 @@ class EditRoomDialog extends BaseDialog {
                   clickFuncs: {
                     leftFunc: () => {
                       const selected = dialog.getElement(ids.IDENTITIES).selectedOptions;
-                      const selectedIds = Array.from(selected).map(option => option.getAttribute('value'));
+                      const selectedIds = Array.from(selected).map((option) => option.getAttribute('value'));
 
                       roomComposer.invite({
                         roomId,
@@ -203,7 +203,7 @@ class EditRoomDialog extends BaseDialog {
 
     if (room.isWhisper) {
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'users' })}:
-        ${room.participantIds.map(id => userComposer.getIdentityName({ objectId: id })).join(', ')}`);
+        ${room.participantIds.map((id) => userComposer.getIdentityName({ objectId: id })).join(', ')}`);
     }
 
     super({

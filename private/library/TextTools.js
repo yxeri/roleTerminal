@@ -341,7 +341,7 @@ class TextTools {
       const dumpFragment = document.createDocumentFragment();
       spans = Array.from(paragraph.getElementsByTagName('span'));
 
-      spans.forEach(child => dumpFragment.appendChild(child));
+      spans.forEach((child) => dumpFragment.appendChild(child));
       target.appendChild(paragraph);
 
       spanAnimator();

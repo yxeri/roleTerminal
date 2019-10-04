@@ -48,7 +48,7 @@ class UserList extends List {
     }, {
       paramName: 'pronouns',
       convertFunc: (pronouns) => {
-        return pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ');
+        return pronouns.map((pronoun) => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', ');
       },
     }, {
       paramName: 'offName',
@@ -153,13 +153,13 @@ class UserList extends List {
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,
     });
 
-    return allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId)).sort((a, b) => {
+    return allAliases.concat(allUsers).filter((object) => !userAliases.includes(object.objectId)).sort((a, b) => {
       const aParam = (a.username || a.aliasName).toLowerCase();
       const bParam = (b.username || b.aliasName).toLowerCase();
 

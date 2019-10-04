@@ -46,7 +46,7 @@ class ViewWrapper extends BaseView {
   attachColumns() {
     const fragment = document.createDocumentFragment();
 
-    this.columnElements.forEach(columnElement => columnElement.remove());
+    this.columnElements.forEach((columnElement) => columnElement.remove());
     this.columnElements = [];
 
     this.columns.forEach((column) => {

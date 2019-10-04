@@ -43,9 +43,9 @@ class MapPolygon extends MapObject {
     const { coordinatesHistory } = position;
     const latestCoordinates = coordinatesHistory[coordinatesHistory.length - 1];
     const allPoints = [new google.maps.LatLng(latestCoordinates.latitude, latestCoordinates.longitude)]
-      .concat((latestCoordinates.extraCoordinates || []).map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
+      .concat((latestCoordinates.extraCoordinates || []).map((coords) => new google.maps.LatLng(coords.latitude, coords.longitude)));
     const chosenStyle = choosableStyles && position.styleName
-      ? choosableStyles.find(style => style.styleName === position.styleName)
+      ? choosableStyles.find((style) => style.styleName === position.styleName)
       : {};
     const style = {
       opacity: chosenStyle.opacity || styles.opacity || 1,
@@ -129,7 +129,7 @@ class MapPolygon extends MapObject {
   // TODO Combine with MapLine
   setCurrentCoordinates({ coordinates }) {
     const allPoints = [new google.maps.LatLng(coordinates.latitude, coordinates.longitude)]
-      .concat(coordinates.extraCoordinates.map(coords => new google.maps.LatLng(coords.latitude, coords.longitude)));
+      .concat(coordinates.extraCoordinates.map((coords) => new google.maps.LatLng(coords.latitude, coords.longitude)));
 
     super.setCurrentCoordinates({ coordinates });
 

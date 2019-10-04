@@ -81,12 +81,12 @@ class AliasDialog extends BaseDialog {
             }
 
             const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
-              .filter(selected => selected.getAttribute('value') !== '');
+              .filter((selected) => selected.getAttribute('value') !== '');
 
             aliasComposer.createAlias({
               alias: {
                 aliasName: textTools.trimSpace(this.getInputValue(ids.ALIASNAME)),
-                pronouns: selectedPronouns.map(selected => selected.getAttribute('value')),
+                pronouns: selectedPronouns.map((selected) => selected.getAttribute('value')),
                 description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error }) => {

@@ -72,7 +72,7 @@ class PositionComposer extends BaseComposer {
 
   checkPositionAge() {
     const oldPositions = this.getPositions({ positionTypes: ['user'] })
-      .filter(position => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
+      .filter((position) => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
 
     eventHandler.emitEvent({
       event: eventHandler.Events.AGED_POSITIONS,

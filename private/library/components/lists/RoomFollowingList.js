@@ -168,7 +168,7 @@ class RoomFollowingList extends List {
     });
     const { followingRooms = [] } = currentUser;
 
-    return allRooms.filter(object => followingRooms.includes(object.objectId)).sort((a, b) => {
+    return allRooms.filter((object) => followingRooms.includes(object.objectId)).sort((a, b) => {
       const aParam = a.roomName.toLowerCase();
       const bParam = b.roomName.toLowerCase();
 

@@ -119,14 +119,14 @@ class UserList extends List {
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,
     });
     const allIdentities = this.includeSelf
       ? allAliases.concat(allUsers)
-      : allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId));
+      : allAliases.concat(allUsers).filter((object) => !userAliases.includes(object.objectId));
 
     return allIdentities.sort((a, b) => {
       const aParam = (a.username || a.aliasName).toLowerCase();

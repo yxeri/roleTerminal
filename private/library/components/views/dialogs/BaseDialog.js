@@ -153,11 +153,11 @@ class BaseDialog extends BaseView {
 
   hasEmptyRequiredInputs() {
     const emptyInputs = this.inputs
-      .filter(input => input.getAttribute('required') === 'true')
+      .filter((input) => input.getAttribute('required') === 'true')
       .filter((input) => {
         return (input.value === '')
           || (input.tagName.toLowerCase() === 'select'
-            && (!input.selectedOptions || Array.from(input.selectedOptions).every(selected => selected.getAttribute('value') === '')));
+            && (!input.selectedOptions || Array.from(input.selectedOptions).every((selected) => selected.getAttribute('value') === '')));
       });
 
     emptyInputs.forEach((input) => {
@@ -208,8 +208,8 @@ class BaseDialog extends BaseView {
       switch (type) {
         case 'select': {
           return Array.from(input.selectedOptions)
-            .filter(selected => selected.getAttribute('value') !== '')
-            .map(selected => selected.getAttribute('value'));
+            .filter((selected) => selected.getAttribute('value') !== '')
+            .map((selected) => selected.getAttribute('value'));
         }
         case 'checkBox': {
           const { checked } = input;

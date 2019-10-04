@@ -84,10 +84,10 @@ class UserSelfDialog extends BaseDialog {
         maxLength,
         name: fieldName,
       } = field;
-      const existing = customFields.find(customField => customField.name === fieldName);
-      const hasRevealer = customUserFields.find(customField => customField.parent === parent && customField.revealOnClick);
+      const existing = customFields.find((customField) => customField.name === fieldName);
+      const hasRevealer = customUserFields.find((customField) => customField.parent === parent && customField.revealOnClick);
       const revealer = hasRevealer
-        ? customFields.find(customField => customField.name === hasRevealer.name)
+        ? customFields.find((customField) => customField.name === hasRevealer.name)
         : undefined;
 
       if (type === 'checkBox') {
@@ -329,7 +329,7 @@ class UserSelfDialog extends BaseDialog {
     lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`);
 
     if (partOfTeams && partOfTeams.length > 0) {
-      const teamNames = partOfTeams.map(teamId => teamComposer.getTeamName({ teamId })).join(', ');
+      const teamNames = partOfTeams.map((teamId) => teamComposer.getTeamName({ teamId })).join(', ');
 
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${teamNames}`);
     }

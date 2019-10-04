@@ -388,13 +388,13 @@ class BaseData {
     // TODO Duplicate code. Similar to getObjects()
     if (filter) {
       const { orCheck } = filter;
-      const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
+      const objects = Object.keys(this.objects).map((objectKey) => this.objects[objectKey]);
 
       return objects.find((object) => {
         if (orCheck) {
           return filter.rules.some((rule) => {
             if (rule.shouldInclude) {
-              return rule.paramValue.every(value => object[rule.paramName].includes(value));
+              return rule.paramValue.every((value) => object[rule.paramName].includes(value));
             }
 
             return rule.paramValue === object[rule.paramName];
@@ -403,7 +403,7 @@ class BaseData {
 
         return filter.rules.every((rule) => {
           if (rule.shouldInclude) {
-            return rule.paramValue.every(value => object[rule.paramName].includes(value));
+            return rule.paramValue.every((value) => object[rule.paramName].includes(value));
           }
 
           return rule.paramValue === object[rule.paramName];
@@ -444,7 +444,7 @@ class BaseData {
 
       return 0;
     };
-    const objects = Object.keys(this.objects).map(objectKey => this.objects[objectKey]);
+    const objects = Object.keys(this.objects).map((objectKey) => this.objects[objectKey]);
 
     if (filter) {
       const { orCheck } = filter;
@@ -452,7 +452,7 @@ class BaseData {
         if (rule.shouldInclude) {
           if (rule.valueType && rule.valueType === 'object') {
             return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
-              return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
+              return Object.keys(rule.paramValue).every((key) => storedObject[key] === rule.paramValue[key]);
             });
           }
 
@@ -464,10 +464,10 @@ class BaseData {
 
       const filteredObjects = objects.filter((object) => {
         if (orCheck) {
-          return filter.rules.some(rule => filterFunc(rule, object));
+          return filter.rules.some((rule) => filterFunc(rule, object));
         }
 
-        return filter.rules.every(rule => filterFunc(rule, object));
+        return filter.rules.every((rule) => filterFunc(rule, object));
       });
 
       return sorting

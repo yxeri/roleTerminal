@@ -41,7 +41,7 @@ class BaseView {
       elementId,
     });
 
-    corners.forEach(corner => this.element.appendChild(elementCreator.createContainer({ classes: [corner] })));
+    corners.forEach((corner) => this.element.appendChild(elementCreator.createContainer({ classes: [corner] })));
 
     if (minimumAccessLevel) {
       accessCentral.addAccessElement({

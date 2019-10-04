@@ -507,7 +507,7 @@ class MapObject {
                       dialog.removeFromView();
                       this.changeStyle({
                         styleName,
-                        style: this.choosableStyles.find(item => item.styleName === styleName),
+                        style: this.choosableStyles.find((item) => item.styleName === styleName),
                       });
                     },
                   },

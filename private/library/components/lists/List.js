@@ -263,7 +263,7 @@ class List extends BaseView {
    * Build and attach the DOM for the list.
    */
   appendList() {
-    if (!this.dependencies.every(dependency => dependency.hasFetched)) {
+    if (!this.dependencies.every((dependency) => dependency.hasFetched)) {
       setTimeout(() => {
         this.appendList();
       }, 200);
@@ -400,7 +400,7 @@ class List extends BaseView {
         const listItem = this.createListItem({
           object,
           isMarked: marked[this.listType]
-            ? marked[this.listType].map(mark => mark.objectId).includes(object.objectId)
+            ? marked[this.listType].map((mark) => mark.objectId).includes(object.objectId)
             : false,
         });
 
@@ -572,7 +572,7 @@ class List extends BaseView {
             return fragment;
           });
 
-        this.corners.forEach(corner => elements.push(elementCreator.createContainer({ classes: [corner] })));
+        this.corners.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
 
         const paragraphParams = {
           elements,
@@ -614,7 +614,7 @@ class List extends BaseView {
             isUploaded: typeof object.image !== 'undefined' || typeof object.images[0] !== 'undefined',
           }));
         } else {
-          const image = this.conditionalImages.find(img => img.func(object)) || this.defaultImage;
+          const image = this.conditionalImages.find((img) => img.func(object)) || this.defaultImage;
 
           if (image) {
             listItemElements.push(elementCreator.createPicture({
@@ -796,7 +796,7 @@ class List extends BaseView {
         if (rule.shouldInclude) {
           if (rule.valueType && rule.valueType === 'object') {
             return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
-              return Object.keys(rule.paramValue).every(key => storedObject[key] === rule.paramValue[key]);
+              return Object.keys(rule.paramValue).every((key) => storedObject[key] === rule.paramValue[key]);
             });
           }
 

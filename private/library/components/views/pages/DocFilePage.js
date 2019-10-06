@@ -34,6 +34,7 @@ const viewSwitcher = require('../../../ViewSwitcher');
  */
 function createControls({
   docFile,
+  closeFunc,
 }) {
   const fragment = document.createDocumentFragment();
 
@@ -42,6 +43,7 @@ function createControls({
     clickFuncs: {
       leftFunc: () => {
         const dialog = new EditDocFileDialog({
+          closeFunc,
           docFileId: docFile.objectId,
         });
 
@@ -204,6 +206,7 @@ class DocFilePage extends BaseView {
     if (hasFullAccess) {
       newElement.appendChild(createControls({
         docFile,
+        closeFunc,
         parentElement: this.getParentElement(),
       }));
     }

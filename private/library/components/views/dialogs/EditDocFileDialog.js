@@ -33,6 +33,7 @@ const ids = {
 class EditDocFileDialog extends BaseDialog {
   constructor({
     docFileId,
+    closeFunc = () => {},
     classes = [],
     elementId = `docDialog-${Date.now()}`,
   }) {
@@ -115,9 +116,12 @@ class EditDocFileDialog extends BaseDialog {
                   callback: ({ error: docFileError }) => {
                     if (docFileError) {
                       console.log('doc file error', docFileError);
+
+                      return;
                     }
 
                     verifyDialog.removeFromView();
+                    closeFunc();
                   },
                 });
               },

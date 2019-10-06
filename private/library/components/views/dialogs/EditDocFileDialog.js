@@ -140,6 +140,7 @@ class EditDocFileDialog extends BaseDialog {
             }
 
             docFileComposer.updateDocFile({
+              docFileId,
               docFile: {
                 title: this.getInputValue(ids.TITLE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,

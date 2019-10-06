@@ -93,7 +93,7 @@ class PersonPage extends BaseView {
       text: username,
     }));
     altContainer.appendChild(elementCreator.createParagraph({
-      text: pronouns.map(pronoun => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', '),
+      text: pronouns.map((pronoun) => labelHandler.getLabel({ baseObject: 'General', label: pronoun })).join(', '),
     }));
 
     fragment.appendChild(container);

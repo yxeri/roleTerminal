@@ -2,6 +2,7 @@ const BaseComposer = require('./BaseComposer');
 
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../DataHandler');
+const storageManager = require('../../StorageManager');
 
 class PositionComposer extends BaseComposer {
   constructor() {
@@ -72,7 +73,7 @@ class PositionComposer extends BaseComposer {
 
   checkPositionAge() {
     const oldPositions = this.getPositions({ positionTypes: ['user'] })
-      .filter(position => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
+      .filter((position) => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
 
     eventHandler.emitEvent({
       event: eventHandler.Events.AGED_POSITIONS,
@@ -90,9 +91,13 @@ class PositionComposer extends BaseComposer {
     position,
     callback,
   }) {
+    const positionToCreate = position;
+    positionToCreate.ownerAliasId = storageManager.getAliasId();
+    positionToCreate.teamId = storageManager.getTeamId();
+
     this.handler.createObject({
       callback,
-      params: { position },
+      params: { position: positionToCreate },
     });
   }
 

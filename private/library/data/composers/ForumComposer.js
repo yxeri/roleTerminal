@@ -76,7 +76,7 @@ class ForumComposer extends DataComposer {
 
       return basePosts.map((post) => {
         const modifiedPost = post;
-        modifiedPost.subPosts = subPosts.filter(subPost => subPost.parentPostId === modifiedPost.objectId);
+        modifiedPost.subPosts = subPosts.filter((subPost) => subPost.parentPostId === modifiedPost.objectId);
 
         return modifiedPost;
       });
@@ -140,10 +140,9 @@ class ForumComposer extends DataComposer {
   }
 
   createPost({ post, callback }) {
-    const aliasId = storageManager.getAliasId();
     const postToSend = post;
-
-    postToSend.ownerAliasId = aliasId;
+    postToSend.ownerAliasId = storageManager.getAliasId();
+    postToSend.teamId = storageManager.getTeamId();
 
     this.forumPostHandler.createObject({
       callback,
@@ -152,10 +151,9 @@ class ForumComposer extends DataComposer {
   }
 
   createThread({ thread, callback }) {
-    const aliasId = storageManager.getAliasId();
     const threadToSend = thread;
-
-    threadToSend.ownerAliasId = aliasId;
+    threadToSend.ownerAliasId = storageManager.getAliasId();
+    threadToSend.teamId = storageManager.getTeamId();
 
     this.forumThreadHandler.createObject({
       callback,

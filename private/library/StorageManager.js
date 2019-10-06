@@ -136,6 +136,7 @@ class StorageManager {
     this.removeUserId();
     this.removeDefaultViewType();
     this.removeMarked();
+    this.removeTeamId();
 
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
@@ -235,6 +236,28 @@ class StorageManager {
 
   static removeAliasId() {
     this.removeLocalVal('aliasId');
+  }
+
+  /**
+   * Get team Id.
+   * @static
+   * @returns {string} Alias Id.
+   */
+  static getTeamId() {
+    return this.getLocalVal('teamId');
+  }
+
+  /**
+   * Set team Id.
+   * @static
+   * @param {string} teamId Team Id.
+   */
+  static setTeamId(teamId) {
+    this.setLocalVal('teamId', teamId);
+  }
+
+  static removeTeamId() {
+    this.removeLocalVal('teamId');
   }
 
   static removeUserId() {
@@ -466,7 +489,7 @@ class StorageManager {
     const items = marked[listType];
 
     if (items) {
-      const index = items.findIndex(item => item.objectId === objectId);
+      const index = items.findIndex((item) => item.objectId === objectId);
 
       if (index !== -1) {
         items.splice(index, 1);

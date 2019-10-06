@@ -122,7 +122,7 @@ class EventCentral {
     console.log(event, params);
 
     if (this.eventWatchers[event]) {
-      this.eventWatchers[event].forEach(watcher => watcher.func(params));
+      this.eventWatchers[event].forEach((watcher) => watcher.func(params));
     }
   }
 }

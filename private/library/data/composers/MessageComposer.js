@@ -67,10 +67,9 @@ class MessageComposer extends DataComposer {
     image,
     callback,
   }) {
-    const aliasId = storageManager.getAliasId();
     const messageToSend = message;
-
-    if (aliasId) { messageToSend.ownerAliasId = aliasId; }
+    messageToSend.ownerAliasId = storageManager.getAliasId();
+    messageToSend.teamId = storageManager.getTeamId();
 
     this.handler.createObject({
       callback,

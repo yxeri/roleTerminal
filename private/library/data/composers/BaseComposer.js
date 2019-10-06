@@ -17,7 +17,7 @@ class BaseComposer {
   }
 
   checkIsComplete() {
-    if (!this.dependencies.every(dependency => dependency.hasFetched)) {
+    if (!this.dependencies.every((dependency) => dependency.hasFetched)) {
       setTimeout(() => {
         this.checkIsComplete();
       }, 200);

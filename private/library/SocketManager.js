@@ -206,7 +206,7 @@ class SocketManager {
   }
 
   addEvents(events) {
-    events.forEach(event => this.addEvent(event.event, event.func));
+    events.forEach((event) => this.addEvent(event.event, event.func));
   }
 
   updateId(callback) {

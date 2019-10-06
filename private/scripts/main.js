@@ -73,6 +73,7 @@ const menuBar = new MenuBar({
     view: true,
     docFile: true,
     wallet: true,
+    team: true,
   },
   corners: ['upperRight'],
 });

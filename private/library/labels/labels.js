@@ -416,6 +416,21 @@ const labels = {
       en: 'The item has been removed.',
       se: 'Raden har raderats.',
     },
+    users: {
+      en: 'Users',
+    },
+    teams: {
+      en: 'Teams',
+    },
+    rooms: {
+      en: 'Rooms',
+    },
+    following: {
+      en: 'Following',
+    },
+    whispers: {
+      en: 'Whispers',
+    },
   },
   ForumView: {
     removedForum: (override.ForumView && override.ForumView.removedForum) || {

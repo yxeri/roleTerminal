@@ -76,6 +76,9 @@ class EditRoomDialog extends BaseDialog {
           },
         },
       }),
+    ];
+
+    if (!room.isWhisper) {
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'invite' }),
         clickFuncs: {
@@ -134,8 +137,8 @@ class EditRoomDialog extends BaseDialog {
             this.removeFromView();
           },
         },
-      }),
-    ];
+      });
+    }
 
     if (room.password) {
       lowerButtons.push(elementCreator.createButton({

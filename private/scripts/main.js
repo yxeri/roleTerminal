@@ -6,14 +6,12 @@ const MenuBar = require('../library/components/views/MenuBar');
 const DocFileView = require('../library/components/views/DocFileView');
 const WalletView = require('../library/components/views/WalletView');
 const PeopleView = require('../library/components/views/PeopleView');
-const TextAnimation = require('../library/components/views/TextAnimation');
 const ForumView = require('../library/components/views/ForumView');
 
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const tools = require('../library/Tools');
 const labelHandler = require('../library/labels/LabelHandler');
-const elementCreator = require('../library/ElementCreator');
 const deviceChecker = require('../library/DeviceChecker');
 const mouseHandler = require('../library/MouseHandler');
 
@@ -22,16 +20,21 @@ labelHandler.setLabel({ baseObject: 'ForumView', labelName: 'createThread', labe
 labelHandler.setLabel({ baseObject: 'ForumView', labelName: 'createPost', label: 'reply' });
 labelHandler.setLabel({ baseObject: 'ForumView', labelName: 'createSubPost', label: 'sub_reply' });
 labelHandler.setLabel({ baseObject: 'MenuBar', labelName: 'menu', label: 'menu' });
-
-const systemLogo = [];
+labelHandler.setLabel({ baseObject: 'List', labelName: 'users', label: 'usrs' });
+labelHandler.setLabel({ baseObject: 'List', labelName: 'teams', label: 'crews' });
+labelHandler.setLabel({ baseObject: 'List', labelName: 'whispers', label: 'pm' });
+labelHandler.setLabel({ baseObject: 'List', labelName: 'rooms', label: 'rooms' });
+labelHandler.setLabel({ baseObject: 'List', labelName: 'following', label: 'following' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'createAlias', label: 'create handle' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'createDocument', label: 'create document' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'createRoom', label: 'create room' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'openDocument', label: 'document id search' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'login', label: 'login' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'logout', label: 'logout' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'reboot', label: 'reboot' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'myProfile', label: 'profile' });
 
 const chatView = new ChatView({
-  titles: {
-    rooms: 'room',
-    following: 'following',
-    whispers: 'pm',
-    users: 'usr',
-  },
   corners: [
     'lowerRight',
     'lowerLeft',

@@ -33,6 +33,8 @@ labelHandler.setLabel({ baseObject: 'Button', labelName: 'login', label: 'login'
 labelHandler.setLabel({ baseObject: 'Button', labelName: 'logout', label: 'logout' });
 labelHandler.setLabel({ baseObject: 'Button', labelName: 'reboot', label: 'reboot' });
 labelHandler.setLabel({ baseObject: 'Button', labelName: 'myProfile', label: 'profile' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'createTeam', label: 'create crew' });
+labelHandler.setLabel({ baseObject: 'Button', labelName: 'register', label: 'register user' });
 
 const chatView = new ChatView({
   corners: [

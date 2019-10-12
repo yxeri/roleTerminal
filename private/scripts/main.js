@@ -168,6 +168,10 @@ if (!tools.getQueryParameters().noFullscreen) {
 if (window.cordova) {
   document.addEventListener('deviceready', () => {
     StatusBar.hide(); // eslint-disable-line
+
+    if (window.FirebasePlugin) {
+      window.FirebasePlugin.grantPermission();
+    }
   }, false);
 }
 

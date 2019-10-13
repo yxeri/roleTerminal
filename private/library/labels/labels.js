@@ -561,6 +561,11 @@ const labels = {
       en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet and won\'t show up in the user\'s transaction list.',
     },
   },
+  AdminTeamDialog: {
+    updateTeam: {
+      en: 'Choose an action:',
+    },
+  },
   WalletDialog: {
     walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
       en: 'Enter the amount that you want to transfer.',

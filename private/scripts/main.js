@@ -174,6 +174,15 @@ const worldMapParams = {
           url: '/images/heart.png',
         },
       },
+    }, {
+      paramName: 'positionType',
+      type: 'string',
+      value: 'lantern',
+      style: {
+        icon: {
+          url: '/images/mapicon-red.png',
+        },
+      },
     }],
     polygons: [{
       paramName: 'description',

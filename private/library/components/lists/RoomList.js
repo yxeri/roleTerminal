@@ -24,10 +24,10 @@ const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const viewSwitcher = require('../../ViewSwitcher');
 const accessCentral = require('../../AccessCentral');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomList extends List {
   constructor({
-    title,
     minimumAccessLevel,
     effect,
     shouldToggle,
@@ -38,7 +38,7 @@ class RoomList extends List {
     classes.push('chatRoomList');
 
     super({
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'rooms' }),
       elementId,
       classes,
       effect,

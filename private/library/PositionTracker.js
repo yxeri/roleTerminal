@@ -64,6 +64,8 @@ class Tracker {
         setTimeout(() => {
           this.startTracker({ standalone: true });
         }, 1000);
+
+        return;
       }
 
       backgroundGeo.onLocation((position) => {

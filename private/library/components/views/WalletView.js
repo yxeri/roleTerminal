@@ -40,12 +40,12 @@ class WalletView extends ViewWrapper {
       effect,
       includeSelf: true,
       shouldToggle: true,
-      title: 'Users',
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'users' }),
     });
     const teamList = new TeamList({
       effect,
       shouldToggle: true,
-      title: 'Teams',
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'teams' }),
     });
 
     userList.onToggle = () => { teamList.hideList(); };

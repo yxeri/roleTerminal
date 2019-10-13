@@ -23,10 +23,10 @@ const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
+const labelHandler = require('../../labels/LabelHandler');
 
 class UserList extends List {
   constructor({
-    title,
     shouldFocusOnClick,
     minimumAccessLevel,
     effect,
@@ -58,7 +58,7 @@ class UserList extends List {
     const params = {
       elementId,
       classes,
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'users' }),
       shouldFocusOnClick,
       effect,
       shouldToggle,

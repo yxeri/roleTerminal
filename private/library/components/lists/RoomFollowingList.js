@@ -21,10 +21,10 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomFollowingList extends List {
   constructor({
-    title,
     effect,
     shouldToggle,
     classes = [],
@@ -34,7 +34,7 @@ class RoomFollowingList extends List {
     classes.push('chatRoomFollowingList');
 
     super({
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'following' }),
       elementId,
       classes,
       effect,

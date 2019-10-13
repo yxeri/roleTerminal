@@ -44,12 +44,6 @@ class ChatView extends ViewWrapper {
     fullDate,
     corners,
     showUserImage = true,
-    titles = {
-      rooms: 'Rooms',
-      following: 'Following',
-      whispers: 'Whispers',
-      users: 'Users',
-    },
     sendOnEnter = false,
     hideRoomList = false,
     classes = [],
@@ -61,27 +55,23 @@ class ChatView extends ViewWrapper {
       effect,
       shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.rooms,
     });
     const roomFollowingList = new RoomFollowingList({
       effect,
       shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.following,
     });
     const whisperRoomList = new WhisperRoomList({
       effect,
       whisperText,
       shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.whispers,
     });
     const userList = new UserList({
       effect,
       shouldToggle: true,
       showImage: showUserImage,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.users,
       shouldFocusOnClick: false,
     });
 

@@ -70,6 +70,7 @@ class MessageList extends List {
         fallbackParamName: 'timeCreated',
       },
       listItemClickFuncs: {
+        onlyAppend: true,
         needsAccess: true,
         leftFunc: (objectId) => {
           const message = messageComposer.getMessage({ messageId: objectId });
@@ -127,6 +128,14 @@ class MessageList extends List {
             }
 
             return objectId;
+          },
+          clickFuncs: {
+            leftFunc: (message, event) => {
+              const dialog = new UserDialog({ identityId: message.ownerAliasId || message.ownerId });
+
+              dialog.addToView({ element: viewSwitcher.getParentElement() });
+              event.stopPropagation();
+            },
           },
         }, {
           paramName: 'customTimeCreated',

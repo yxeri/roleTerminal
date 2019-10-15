@@ -22,11 +22,10 @@ const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
 const OpenDocFileDialog = require('../../components/views/dialogs/OpenDocFileDialog');
-// const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
 const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
-// const TeamDialog = require('../../components/views/dialogs/TeamDialog');
 const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
 const WalletInfo = require('../../components/views/WalletInfo');
+const TeamProfileDialog = require('../../components/views/dialogs/TeamProfileDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -162,6 +161,18 @@ class MenuBar extends BaseView {
           },
         },
       });
+      const teamProfileButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'teamProfile' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const teamProfileDialog = new TeamProfileDialog({});
+
+            teamProfileDialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
       const rebootButton = elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'reboot' }),
         clickFuncs: {
@@ -189,15 +200,45 @@ class MenuBar extends BaseView {
         minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
         element: profileButton,
       });
+      accessCentral.addAccessElement({
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+        element: teamProfileButton,
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.COMPLETE_USER,
+        func: () => {
+          const identity = userComposer.getCurrentIdentity();
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            teamProfileButton.classList.remove('hide');
+          }
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_ALIAS,
+        func: ({ userId }) => {
+          const identity = userComposer.getIdentity({ objectId: userId });
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            teamProfileButton.classList.remove('hide');
+          } else {
+            teamProfileButton.classList.add('hide');
+          }
+        },
+      });
 
       items.push({
         elements: [loginButton],
       }, {
         elements: [registerButton],
       });
+
       lastItems.push({
         elements: [
           profileButton,
+          teamProfileButton,
           logoutButton,
           rebootButton,
         ],

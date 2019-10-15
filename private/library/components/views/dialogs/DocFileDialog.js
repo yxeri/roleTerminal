@@ -64,12 +64,12 @@ class DocFileDialog extends BaseDialog {
     ];
 
     if (storageManager.getAllowedImages().DOCFILE) {
-      elementCreator.createImageInput({
+      inputs.push(elementCreator.createImageInput({
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
         previewId: 'imagePreview-docFile',
-      });
+      }));
     }
 
     inputs.push(elementCreator.createRadioSet({

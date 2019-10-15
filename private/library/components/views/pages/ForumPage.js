@@ -20,6 +20,7 @@ const EditForumPostDialog = require('../dialogs/EditForumPostDialog');
 const ForumThreadDialog = require('../dialogs/ForumThreadDialog');
 const ForumPostDialog = require('../dialogs/ForumPostDialog');
 const EditForumDialog = require('../dialogs/EditForumDialog');
+const UserDialog = require('../dialogs/UserDialog');
 
 const eventCentral = require('../../../EventCentral');
 const elementCreator = require('../../../ElementCreator');
@@ -98,6 +99,15 @@ function createHeader({ object }) {
       elementCreator.createSpan({
         classes: [cssClasses.username],
         text: userComposer.getIdentityName({ objectId: object.ownerAliasId || object.ownerId }),
+        clickFuncs: {
+          leftFunc: (event) => {
+            const dialog = new UserDialog({ identityId: object.ownerAliasId || object.ownerId });
+
+            dialog.addToView({ element: viewSwitcher.getParentElement() });
+
+            event.stopPropagation();
+          },
+        },
       }),
     ],
   });

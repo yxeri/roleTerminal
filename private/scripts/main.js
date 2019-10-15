@@ -12,6 +12,7 @@ const PeopleView = require('../library/components/views/PeopleView');
 const TerminalView = require('../library/components/views/TerminalView');
 const TextAnimation = require('../library/components/views/TextAnimation');
 const SpoonyView = require('./SpoonyView');
+const ForumView = require('../library/components/views/ForumView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -26,6 +27,7 @@ const textTools = require('../library/TextTools');
 const deviceChecker = require('../library/DeviceChecker');
 const WreckingStatus = require('./WreckingStatus');
 const eventCentral = require('../library/EventCentral');
+const mouseHandler = require('../library/MouseHandler');
 
 labelHandler.setBaseLabel({
   name: 'spoony',
@@ -195,13 +197,6 @@ const worldMapParams = {
       },
     }],
   },
-  showLabelRules: {
-    polygons: [{
-      paramName: 'description',
-      type: 'array',
-      minLength: 1,
-    }],
-  },
   markedStyles: {
     polygons: {
       strokeColor: '#009100',
@@ -341,6 +336,10 @@ const teamView = new TeamView({
 });
 const peopleView = new PeopleView({
   effect: true,
+});
+const forumView = new ForumView({
+  showForumList: false,
+  showUserList: false,
 });
 const spoonyView = new SpoonyView({});
 const terminalView = new TerminalView({
@@ -1043,6 +1042,16 @@ const spoonyWrapper = new ViewWrapper({
     components: [{ component: worldMapPage }],
   }],
 });
+const forumWrapper = new ViewWrapper({
+  menuBar,
+  viewType: viewSwitcher.ViewTypes.FORUM,
+  title: 'Forum',
+  columns: [{
+    components: [{ component: forumView }],
+  }, {
+    components: [{ component: worldMapPage }],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -1055,6 +1064,7 @@ menuBar.setViews({
     { view: peopleWrapper },
     { view: terminalWrapper },
     { view: spoonyWrapper },
+    { view: forumWrapper },
   ],
 });
 
@@ -1068,6 +1078,7 @@ viewSwitcher.addAvailableTypes({
     peopleWrapper.viewType,
     terminalWrapper.viewType,
     spoonyWrapper.viewType,
+    forumWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });
@@ -1264,3 +1275,5 @@ socketManager.emitEvent('getLanternInfo', {}, ({ error, data }) => {
     event: 'lanternStations',
   });
 });
+
+mouseHandler.setAllowRightClick(true);

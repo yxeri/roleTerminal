@@ -160,6 +160,10 @@ select {
   display: none;
 }
 
+.upperLeft, .upperRight, .lowerLeft, .lowerRight {
+  display: none;
+}
+
 .msgInfo {
   color: $second-text-color;
 }

@@ -34,6 +34,7 @@ class TeamComposer extends DataComposer {
 
   createTeam({
     team,
+    image,
     callback,
   }) {
     const teamToCreate = team;
@@ -41,7 +42,10 @@ class TeamComposer extends DataComposer {
 
     this.handler.createObject({
       callback,
-      params: { team: teamToCreate },
+      params: {
+        image,
+        team: teamToCreate,
+      },
     });
   }
 
@@ -53,6 +57,22 @@ class TeamComposer extends DataComposer {
       callback,
       event: socketManager.EmitTypes.LEAVETEAM,
       params: { teamId },
+    });
+  }
+
+  updateTeam({
+    teamId,
+    team,
+    image,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        teamId,
+        team,
+        image,
+      },
     });
   }
 }

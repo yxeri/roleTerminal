@@ -40,15 +40,10 @@ class UserComposer extends DataComposer {
   }
 
   getCurrentIdentity() {
-    const userId = storageManager.getUserId();
-    const aliasId = storageManager.getAliasId();
+    const id = storageManager.getAliasId() || storageManager.getUserId();
 
-    if (aliasId) {
-      return aliasComposer.getAlias({ aliasId });
-    }
-
-    if (userId) {
-      return this.handler.getObject({ objectId: userId });
+    if (id) {
+      return this.getIdentity({ objectId: id });
     }
 
     return anonymous;
@@ -128,25 +123,28 @@ class UserComposer extends DataComposer {
   }
 
   getWhisperIdentities({ participantIds = [0, 1] }) {
-    const { objectId, aliases } = this.getCurrentUser();
+    const {
+      objectId,
+      aliases,
+    } = this.getCurrentUser();
 
     if (objectId) {
-      const users = [
-        this.getUser({ userId: participantIds[0] }) || aliasComposer.getAlias({ aliasId: participantIds[0] }),
-        this.getUser({ userId: participantIds[1] }) || aliasComposer.getAlias({ aliasId: participantIds[1] }),
+      const identities = [
+        this.getIdentity({ objectId: participantIds[0] }),
+        this.getIdentity({ objectId: participantIds[1] }),
       ];
-      const userOrder = [];
-      const { objectId: oneId } = users[0];
+      const identityOrder = [];
+      const { objectId: oneId } = identities[0];
 
       if (oneId === objectId || aliases.includes(oneId)) {
-        userOrder.push(users[0]);
-        userOrder.push(users[1]);
+        identityOrder.push(identities[0]);
+        identityOrder.push(identities[1]);
       } else {
-        userOrder.push(users[1]);
-        userOrder.push(users[0]);
+        identityOrder.push(identities[1]);
+        identityOrder.push(identities[0]);
       }
 
-      return userOrder;
+      return identityOrder;
     }
 
     return [];
@@ -157,7 +155,7 @@ class UserComposer extends DataComposer {
   }
 
   getIdentityName({ objectId }) {
-    const identity = this.getUser({ userId: objectId }) || aliasComposer.getAlias({ aliasId: objectId });
+    const identity = this.getIdentity({ objectId });
 
     if (identity) {
       return identity.aliasName || identity.username;
@@ -254,17 +252,11 @@ class UserComposer extends DataComposer {
     });
   }
 
-  getImage(userId) {
-    const alias = aliasComposer.getAlias({ aliasId: userId });
+  getImage(identityId) {
+    const identity = this.getIdentity({ objectId: identityId });
 
-    if (alias) {
-      return alias.image;
-    }
-
-    const user = this.getUser({ userId });
-
-    if (user) {
-      return user.image;
+    if (identity) {
+      return identity.image;
     }
 
     return undefined;

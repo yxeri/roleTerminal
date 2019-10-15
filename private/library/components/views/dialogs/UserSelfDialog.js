@@ -150,63 +150,6 @@ class UserSelfDialog extends BaseDialog {
           },
         },
       }),
-      // elementCreator.createButton({
-      //   text: labelHandler.getLabel({ baseObject: 'UserSelfDialog', label: 'rename' }),
-      //   clickFuncs: {
-      //     leftFunc: () => {
-      //       const renameDialog = new BaseDialog({
-      //         inputs: [
-      //           elementCreator.createInput({
-      //             elementId: 'username',
-      //             inputName: 'username',
-      //             type: 'text',
-      //             isRequired: true,
-      //             maxLength: 10,
-      //             placeholder: labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'username' }),
-      //           }),
-      //         ],
-      //         lowerButtons: [
-      //           elementCreator.createButton({
-      //             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-      //             clickFuncs: {
-      //               leftFunc: () => { renameDialog.removeFromView(); },
-      //             },
-      //           }),
-      //           elementCreator.createButton({
-      //             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
-      //             clickFuncs: {
-      //               leftFunc: () => {
-      //                 if (this.hasEmptyRequiredInputs()) {
-      //                   return;
-      //                 }
-      //
-      //                 userComposer.updateUsername({
-      //                   userId,
-      //                   username: renameDialog.getInputValue('username'),
-      //                   callback: ({ error: updateError }) => {
-      //                     if (updateError) {
-      //                       console.log('Failed to update username');
-      //
-      //                       return;
-      //                     }
-      //
-      //                     const parentElement = renameDialog.getParentElement();
-      //
-      //                     renameDialog.removeFromView();
-      //                     this.addToView({ element: parentElement });
-      //                   },
-      //                 });
-      //               },
-      //             },
-      //           }),
-      //         ],
-      //       });
-      //
-      //       renameDialog.addToView({ element: this.getParentElement() });
-      //       this.removeFromView();
-      //     },
-      //   },
-      // }),
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'password' }),
         clickFuncs: {

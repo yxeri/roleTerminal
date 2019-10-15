@@ -61,6 +61,7 @@ class TransactionList extends List {
     super({
       elementId,
       effect,
+      shouldFocusOnClick: false,
       sorting: {
         paramName: 'cutomTimeCreated',
         fallbackParamName: 'timeCreated',

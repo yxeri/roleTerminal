@@ -71,6 +71,17 @@ class PositionComposer extends BaseComposer {
     });
   }
 
+  getPositionByName({ positionName }) {
+    return this.handler.getObject({
+      filter: {
+        rules: [{
+          paramName: positionName,
+          paramValue: positionName,
+        }],
+      },
+    });
+  }
+
   checkPositionAge() {
     const oldPositions = this.getPositions({ positionTypes: ['user'] })
       .filter((position) => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);

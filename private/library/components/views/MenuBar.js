@@ -634,13 +634,10 @@ class MenuBar extends BaseView {
 
   static setUsername({ button }) {
     const buttonToChange = button;
-    const userId = storageManager.getUserId();
-    const aliasId = storageManager.getAliasId();
+    const id = storageManager.getAliasId() || storageManager.getUserId();
 
-    if (aliasId) {
-      buttonToChange.textContent = aliasComposer.getAliasName({ aliasId });
-    } else if (userId) {
-      buttonToChange.textContent = userComposer.getUsername({ userId });
+    if (id) {
+      buttonToChange.textContent = userComposer.getIdentityName({ objectId: id });
     } else {
       buttonToChange.textContent = '-----';
     }

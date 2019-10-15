@@ -85,6 +85,9 @@ const labels = {
     reboot: (override.Button && override.Button.reboot) || {
       en: 'Reboot',
     },
+    teamProfile: {
+      en: 'Team profile',
+    },
   },
   Transaction: {
     failed: (override.Transaction && override.Transaction.failed) || {

@@ -16,6 +16,7 @@
 
 const List = require('./List');
 const MessageDialog = require('../views/dialogs/MessageDialog');
+const UserDialog = require('../views/dialogs/UserDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
@@ -59,7 +60,7 @@ class MessageList extends List {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',
         show: true,
-        getImage: (userId) => { return userComposer.getImage(userId); },
+        getImage: (identityId) => { return userComposer.getImage(identityId); },
       },
       collapseEqual: {
         paramName: 'ownerAliasId',
@@ -166,9 +167,11 @@ class MessageList extends List {
 
               if (isWhisper) {
                 const identities = userComposer.getWhisperIdentities({ participantIds });
+                const firstName = identities[0].username || identities[0].aliasName;
+                const secondName = identities[1].username || identities[1].aliasName;
 
                 return identities.length > 0
-                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  ? `${firstName}${whisperText}${secondName}`
                   : '';
               }
 

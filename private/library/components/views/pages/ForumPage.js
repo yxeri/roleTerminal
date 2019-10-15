@@ -81,7 +81,7 @@ let cornerContainers = [];
 function createPictureContainer({ object }) {
   return elementCreator.createContainer({
     classes: [cssClasses.pictureContainer],
-    elements: object.pictures.map((picture) => elementCreator.createPicture({ picture })),
+    elements: object.pictures.map((picture) => { return elementCreator.createPicture({ picture }); }),
   });
 }
 
@@ -102,7 +102,7 @@ function createHeader({ object }) {
     ],
   });
 
-  cornerContainers.forEach((corner) => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { header.appendChild(elementCreator.createContainer({ classes: [corner] })); });
 
   return header;
 }
@@ -201,7 +201,7 @@ function createPostHeader({ post }) {
     },
   });
 
-  cornerContainers.forEach((corner) => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { header.appendChild(elementCreator.createContainer({ classes: [corner] })); });
 
   return header;
 }
@@ -213,9 +213,9 @@ function createPostHeader({ post }) {
  * @return {HTMLElement} Sub post element.
  */
 function createSubPost({ subPost, elementId }) {
-  const elements = subPost.text.map((lines) => elementCreator.createParagraph({
-    elements: [elementCreator.createSpan({ text: lines })],
-  }));
+  const elements = subPost.text.map((lines) => {
+    return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
+  });
 
   if (!disablePictures && subPost.pictures) {
     elements.push(createPictureContainer({ object: subPost }));
@@ -223,7 +223,7 @@ function createSubPost({ subPost, elementId }) {
 
   elements.push(createContentEnd({ object: subPost }));
 
-  cornerContainers.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { elements.push(elementCreator.createContainer({ classes: [corner] })); });
 
   return elementCreator.createSection({
     elements,
@@ -271,7 +271,7 @@ function createPostContent({ post, elementId }) {
 
   elements.push(createContentEnd({ object: post }));
 
-  cornerContainers.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { elements.push(elementCreator.createContainer({ classes: [corner] })); });
 
   return elementCreator.createContainer({
     elements,
@@ -378,7 +378,7 @@ function createThreadHeader({ thread }) {
     },
   });
 
-  cornerContainers.forEach((corner) => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { header.appendChild(elementCreator.createContainer({ classes: [corner] })); });
 
   return header;
 }
@@ -400,7 +400,7 @@ function createThreadContent({ thread, elementId }) {
   }
 
   elements.push(createContentEnd({ object: thread }));
-  cornerContainers.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { elements.push(elementCreator.createContainer({ classes: [corner] })); });
 
   return elementCreator.createContainer({
     elements,
@@ -441,7 +441,7 @@ function createForumContent({ forum, elementId }) {
     return elementCreator.createParagraph({ elements: [elementCreator.createSpan({ text: lines })] });
   });
 
-  cornerContainers.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
+  cornerContainers.forEach((corner) => { elements.push(elementCreator.createContainer({ classes: [corner] })); });
 
   return elementCreator.createContainer({
     elements,
@@ -835,7 +835,7 @@ class ForumView extends BaseView {
     ];
     const header = createForumHeader({ forum });
 
-    cornerContainers.forEach((corner) => header.appendChild(elementCreator.createContainer({ classes: [corner] })));
+    cornerContainers.forEach((corner) => { header.appendChild(elementCreator.createContainer({ classes: [corner] })); });
 
     const createThreadButton = elementCreator.createButton({
       corners: cornerContainers,

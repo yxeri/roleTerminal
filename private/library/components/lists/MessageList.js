@@ -115,7 +115,7 @@ class MessageList extends List {
 
             if (identity) {
               const teamIds = identity.partOfTeams || [];
-              const shortNames = teamIds.map((teamId) => teamComposer.getTeam({ teamId }).shortName);
+              const shortNames = teamIds.map((teamId) => { return teamComposer.getTeam({ teamId }).shortName; });
 
               let name = identity.username || identity.aliasName;
 
@@ -187,7 +187,7 @@ class MessageList extends List {
     this.onCreateFunc = ({ object }) => {
       this.roomLists.every((roomList) => {
         const rooms = roomList.getCollectorObjects();
-        const foundRoom = rooms.find((room) => object.roomId === room.objectId);
+        const foundRoom = rooms.find((room) => { return object.roomId === room.objectId; });
 
         if (foundRoom) {
           roomList.animateElement({ elementId: foundRoom.objectId });
@@ -206,7 +206,10 @@ class MessageList extends List {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || this.roomLists.map((roomList) => roomList.elementId).some((roomListId) => roomListId === origin)) {
+          if (!origin || this.roomLists
+            .map((roomList) => { return roomList.elementId; })
+            .some((roomListId) => { return roomListId === origin; })
+          ) {
             const parent = this.getParentElement();
 
             if (parent) {

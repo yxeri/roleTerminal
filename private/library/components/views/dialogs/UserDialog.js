@@ -157,7 +157,7 @@ class UserDialog extends BaseDialog {
     lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${identityName}`);
 
     if (partOfTeams && partOfTeams.length > 0) {
-      const teamNames = chosenIdentity.partOfTeams.map((teamId) => teamComposer.getTeamName({ teamId })).join(', ');
+      const teamNames = chosenIdentity.partOfTeams.map((teamId) => { return teamComposer.getTeamName({ teamId }); }).join(', ');
 
       lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${teamNames}`);
     }

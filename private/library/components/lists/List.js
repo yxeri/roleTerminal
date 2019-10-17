@@ -544,7 +544,7 @@ class List extends BaseView {
               paramName,
               fallbackTo,
               convertFunc,
-              func,
+              clickFuncs: fieldClickFuncs,
               classes: fieldClasses,
             } = field;
             const value = object[paramName] || object[fallbackTo];
@@ -558,12 +558,20 @@ class List extends BaseView {
             };
             const fragment = document.createDocumentFragment();
 
-            if (func) {
-              spanParams.clickFuncs = {
-                leftFunc: () => {
-                  func(objectId);
-                },
-              };
+            if (fieldClickFuncs) {
+              spanParams.clickFuncs = {};
+
+              if (fieldClickFuncs.leftFunc) {
+                spanParams.clickFuncs.leftFunc = (event) => {
+                  fieldClickFuncs.leftFunc(object, event);
+                };
+              }
+
+              if (fieldClickFuncs.right) {
+                spanParams.clickFuncs.right = (event) => {
+                  fieldClickFuncs.right(object, event);
+                };
+              }
             }
 
             fragment.appendChild(text !== ''

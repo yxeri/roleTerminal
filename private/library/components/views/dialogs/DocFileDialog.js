@@ -64,12 +64,12 @@ class DocFileDialog extends BaseDialog {
     ];
 
     if (storageManager.getAllowedImages().DOCFILE) {
-      elementCreator.createImageInput({
+      inputs.push(elementCreator.createImageInput({
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
         previewId: 'imagePreview-docFile',
-      });
+      }));
     }
 
     inputs.push(elementCreator.createRadioSet({
@@ -114,6 +114,20 @@ class DocFileDialog extends BaseDialog {
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
+            };
+            const imagePreview = document.getElementById('imagePreview-docFile');
+
+            if (imagePreview && imagePreview.getAttribute('src')) {
+              params.images = [{
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              }];
+            }
+
+            docFileComposer.createDocFile({
+              ...params,
               callback: ({ error }) => {
                 if (error) {
                   if (error.type === 'invalid length' && error.extraData) {
@@ -148,19 +162,7 @@ class DocFileDialog extends BaseDialog {
 
                 this.removeFromView();
               },
-            };
-            const imagePreview = document.getElementById('imagePreview-docFile');
-
-            if (imagePreview && imagePreview.getAttribute('src')) {
-              params.images = [{
-                source: imagePreview.getAttribute('src'),
-                imageName: imagePreview.getAttribute('name'),
-                width: imagePreview.naturalWidth,
-                height: imagePreview.naturalHeight,
-              }];
-            }
-
-            docFileComposer.createDocFile(params);
+            });
           },
         },
       }),

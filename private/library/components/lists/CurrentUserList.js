@@ -43,13 +43,8 @@ class CurrentUserList extends List {
       },
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const currentUser = userComposer.getCurrentUser();
-
           if (objectId === storageManager.getUserId()) {
             storageManager.removeAliasId();
-            storageManager.removeTeamId();
-          } else if (currentUser.partOfTeams.includes(objectId)) {
-            storageManager.setTeamId(objectId);
           } else {
             storageManager.setAliasId(objectId);
           }
@@ -65,7 +60,6 @@ class CurrentUserList extends List {
       dependencies: [
         dataHandler.aliases,
         dataHandler.users,
-        dataHandler.teams,
       ],
       collector: dataHandler.aliases,
       listItemFields: headerFields,

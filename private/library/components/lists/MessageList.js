@@ -16,6 +16,7 @@
 
 const List = require('./List');
 const MessageDialog = require('../views/dialogs/MessageDialog');
+const UserDialog = require('../views/dialogs/UserDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
@@ -59,7 +60,7 @@ class MessageList extends List {
         paramName: 'ownerAliasId',
         fallbackTo: 'ownerId',
         show: true,
-        getImage: (userId) => { return userComposer.getImage(userId); },
+        getImage: (identityId) => { return userComposer.getImage(identityId); },
       },
       collapseEqual: {
         paramName: 'ownerAliasId',
@@ -70,6 +71,7 @@ class MessageList extends List {
         fallbackParamName: 'timeCreated',
       },
       listItemClickFuncs: {
+        onlyAppend: true,
         needsAccess: true,
         leftFunc: (objectId) => {
           const message = messageComposer.getMessage({ messageId: objectId });
@@ -115,7 +117,7 @@ class MessageList extends List {
 
             if (identity) {
               const teamIds = identity.partOfTeams || [];
-              const shortNames = teamIds.map((teamId) => teamComposer.getTeam({ teamId }).shortName);
+              const shortNames = teamIds.map((teamId) => { return teamComposer.getTeam({ teamId }).shortName; });
 
               let name = identity.username || identity.aliasName;
 
@@ -127,6 +129,14 @@ class MessageList extends List {
             }
 
             return objectId;
+          },
+          clickFuncs: {
+            leftFunc: (message, event) => {
+              const dialog = new UserDialog({ identityId: message.ownerAliasId || message.ownerId });
+
+              dialog.addToView({ element: viewSwitcher.getParentElement() });
+              event.stopPropagation();
+            },
           },
         }, {
           paramName: 'customTimeCreated',
@@ -157,9 +167,11 @@ class MessageList extends List {
 
               if (isWhisper) {
                 const identities = userComposer.getWhisperIdentities({ participantIds });
+                const firstName = identities[0].username || identities[0].aliasName;
+                const secondName = identities[1].username || identities[1].aliasName;
 
                 return identities.length > 0
-                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  ? `${firstName}${whisperText}${secondName}`
                   : '';
               }
 
@@ -187,7 +199,7 @@ class MessageList extends List {
     this.onCreateFunc = ({ object }) => {
       this.roomLists.every((roomList) => {
         const rooms = roomList.getCollectorObjects();
-        const foundRoom = rooms.find((room) => object.roomId === room.objectId);
+        const foundRoom = rooms.find((room) => { return object.roomId === room.objectId; });
 
         if (foundRoom) {
           roomList.animateElement({ elementId: foundRoom.objectId });
@@ -206,7 +218,10 @@ class MessageList extends List {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || this.roomLists.map((roomList) => roomList.elementId).some((roomListId) => roomListId === origin)) {
+          if (!origin || this.roomLists
+            .map((roomList) => { return roomList.elementId; })
+            .some((roomListId) => { return roomListId === origin; })
+          ) {
             const parent = this.getParentElement();
 
             if (parent) {

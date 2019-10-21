@@ -189,9 +189,49 @@ class EditRoomDialog extends BaseDialog {
             },
             callback: ({ error }) => {
               if (error) {
-                console.log(error);
+                switch (error.type) {
+                  case 'invalid length': {
+                    switch (error.extraData.param) {
+                      case 'roomName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'name' })] });
 
-                return;
+                        return;
+                      }
+                      case 'password': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'optionalPassword' })] });
+
+                        return;
+                      }
+                      default: {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
+
+                        return;
+                      }
+                    }
+                  }
+                  case 'invalid characters': {
+                    switch (error.extraData.param) {
+                      case 'roomName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'name' })] });
+
+                        return;
+                      }
+                      case 'protected': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'protected' })] });
+
+                        return;
+                      }
+                      default: {
+                        return;
+                      }
+                    }
+                  }
+                  default: {
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                    return;
+                  }
+                }
               }
 
               this.removeFromView();

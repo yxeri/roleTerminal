@@ -22,7 +22,6 @@ const aliasComposer = require('../../../data/composers/AliasComposer');
 const textTools = require('../../../TextTools');
 
 const ids = {
-  OFFNAME: 'fullName',
   ALIASNAME: 'aliasname',
   DESCRIPTION: 'description',
   PRONOUNS: 'pronouns',
@@ -81,37 +80,61 @@ class AliasDialog extends BaseDialog {
             }
 
             const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
-              .filter((selected) => selected.getAttribute('value') !== '');
+              .filter((selected) => { return selected.getAttribute('value') !== ''; });
 
             aliasComposer.createAlias({
               alias: {
                 aliasName: textTools.trimSpace(this.getInputValue(ids.ALIASNAME)),
-                pronouns: selectedPronouns.map((selected) => selected.getAttribute('value')),
+                pronouns: selectedPronouns.map((selected) => { return selected.getAttribute('value'); }),
                 description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error }) => {
                 if (error) {
-                  if (error.type === 'invalid length') {
-                    switch (error.extraData.param) {
-                      case 'aliasName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasNameLength' })] });
+                  switch (error.type) {
+                    case 'invalid length': {
+                      switch (error.extraData.param) {
+                        case 'aliasName': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'aliasName' })] });
 
-                        break;
-                      }
-                      case 'fullName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullNameLength' })] });
+                          return;
+                        }
+                        case 'description': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'description' })] });
 
-                        break;
-                      }
-                      default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
 
-                        break;
+                          return;
+                        }
                       }
                     }
-                  }
+                    case 'invalid characters': {
+                      switch (error.extraData.param) {
+                        case 'aliasName': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'name' })] });
 
-                  return;
+                          return;
+                        }
+                        case 'protected': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'protected' })] });
+
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'general' })] });
+
+                          return;
+                        }
+                      }
+                    }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      return;
+                    }
+                  }
                 }
 
                 this.removeFromView();

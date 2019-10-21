@@ -192,7 +192,7 @@ class ElementCreator {
       clickFuncs,
       elementType: 'img',
     });
-    let path = '/images/';
+    let path = 'images/';
 
     if (isUploaded) {
       path += 'upload/';

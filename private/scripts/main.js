@@ -28,6 +28,7 @@ const deviceChecker = require('../library/DeviceChecker');
 const WreckingStatus = require('./WreckingStatus');
 const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
+const notificationManager = require('../library/NotificationManager');
 
 labelHandler.setBaseLabel({
   name: 'spoony',
@@ -1137,15 +1138,6 @@ voiceCommander.addCommands({
   ],
 });
 
-if (window.cordova) {
-  document.addEventListener('deviceready', () => {
-    StatusBar.hide(); // eslint-disable-line
-    positionTracker.startTracker({ standalone: true });
-  }, false);
-} else {
-  positionTracker.startTracker({});
-}
-
 if (deviceChecker.deviceType === deviceChecker.DeviceEnum.IOSOLD) {
   document.body.classList.add('oldIosFix');
 }
@@ -1277,3 +1269,14 @@ socketManager.emitEvent('getLanternInfo', {}, ({ error, data }) => {
 });
 
 mouseHandler.setAllowRightClick(true);
+
+if (window.cordova) {
+  document.addEventListener('deviceready', () => {
+    window.StatusBar.hide();
+    positionTracker.startTracker({ standalone: true });
+  });
+} else {
+  positionTracker.startTracker({});
+}
+
+notificationManager.start();

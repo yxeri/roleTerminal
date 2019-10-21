@@ -76,6 +76,7 @@ class WalletDialog extends BaseDialog {
                 coordinates: tracker.getBestPosition(),
                 toWalletId: sendToId,
                 amount: this.getInputValue('walletAmount'),
+                note: this.getInputValue('walletNote'),
               },
               callback: ({ error }) => {
                 if (error) {
@@ -99,6 +100,12 @@ class WalletDialog extends BaseDialog {
         maxLength: 10,
         type: 'number',
         placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'amountPlaceholder' }),
+      }),
+      elementCreator.createInput({
+        elementId: 'walletNote',
+        inputName: 'walletNote',
+        maxLength: 50,
+        placeholder: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'note' }),
       }),
     ];
 

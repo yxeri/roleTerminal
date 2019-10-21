@@ -178,29 +178,32 @@ class EditDocFileDialog extends BaseDialog {
               ...params,
               callback: ({ error }) => {
                 if (error) {
-                  if (error.type === 'invalid length' && error.extraData) {
-                    switch (error.extraData.param) {
-                      case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'titleLength' })] });
+                  switch (error.type) {
+                    case 'invalid length': {
+                      switch (error.extraData.param) {
+                        case 'title': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'title' })] });
 
-                        break;
-                      }
-                      case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'textLength' })] });
+                          return;
+                        }
+                        case 'text': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'text' })] });
 
-                        break;
-                      }
-                      default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
 
-                        break;
+                          return;
+                        }
                       }
                     }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      return;
+                    }
                   }
-
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
-
-                  return;
                 }
 
                 this.removeFromView();

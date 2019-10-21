@@ -79,9 +79,32 @@ class EditPositionDialog extends BaseDialog {
                 position: updatedPosition,
                 callback: ({ error }) => {
                   if (error) {
-                    console.log('Edit position', error);
+                    switch (error.type) {
+                      case 'invalid length': {
+                        switch (error.extraData.param) {
+                          case 'name': {
+                            this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'name' })] });
 
-                    return;
+                            return;
+                          }
+                          case 'description': {
+                            this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'description' })] });
+
+                            return;
+                          }
+                          default: {
+                            this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
+
+                            return;
+                          }
+                        }
+                      }
+                      default: {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                        return;
+                      }
+                    }
                   }
 
                   this.removeFromView();

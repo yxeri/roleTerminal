@@ -21,6 +21,62 @@ const labels = {
       en: 'It',
     },
   },
+  Error: {
+    general: {
+      en: 'Something went wrong',
+      se: 'Något gick fel',
+    },
+  },
+  InvalidDataError: {
+    general: {
+      en: '',
+    },
+  },
+  NotAllowedError: {
+    general: {
+      en: 'Access denied. You are not allowed to access this function',
+    },
+  },
+  InvalidLengthError: {
+    general: {
+      en: 'One of the fields are too short/long',
+    },
+    aliasName: {
+      en: 'The name is too short/long',
+    },
+    description: {
+      en: 'The description is too long',
+    },
+    title: {
+      en: 'The title is too long',
+    },
+    code: {
+      en: 'The code is too long',
+    },
+    text: {
+      en: 'The text is too long',
+    },
+    name: {
+      en: 'The name is too long',
+    },
+    optionalPassword: {
+      en: 'The password is too long',
+    },
+  },
+  InvalidCharactersError: {
+    general: {
+      en: 'One of the fields contain invalid characters',
+    },
+    name: {
+      en: 'The name contains invalid characters',
+    },
+    code: {
+      en: 'The code contains invalid characters',
+    },
+    protected: {
+      en: 'The name is protected. Please try again',
+    },
+  },
   UserList: {
     offName: (override.UserList && override.UserList.offName) || {
       en: 'OFF name',
@@ -229,15 +285,6 @@ const labels = {
     },
     text: (override.DocFileDialog && override.DocFileDialog.text) || {
       en: 'Text',
-    },
-    titleLength: (override.DocFileDialog && override.DocFileDialog.titleLength) || {
-      en: 'The title is too long',
-    },
-    codeLength: (override.DocFileDialog && override.DocFileDialog.codeLength) || {
-      en: 'The code is too long',
-    },
-    textLength: (override.DocFileDialog && override.DocFileDialog.textLength) || {
-      en: 'The text is too long',
     },
     createDoc: (override.DocFileDialog && override.DocFileDialog.createDoc) || {
       en: 'Create document',

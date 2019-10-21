@@ -23,6 +23,7 @@ const storageManager = require('../../../StorageManager');
 const userComposer = require('../../../data/composers/UserComposer');
 const socketManager = require('../../../SocketManager');
 const viewSwitcher = require('../../../ViewSwitcher');
+const notificationManager = require('../../../NotificationManager');
 
 const ids = {
   OFFNAME: 'offName',
@@ -197,6 +198,7 @@ class RegisterDialog extends BaseDialog {
                 registerDevice: storageManager.getDeviceId(),
                 pronouns: this.getInputValue(ids.PRONOUNS, 'select'),
                 description: this.getInputValue(ids.DESCRIPTION).split('\n'),
+                pushToken: notificationManager.token,
               },
               callback: ({ error, data }) => {
                 if (error) {

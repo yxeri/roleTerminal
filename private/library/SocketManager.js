@@ -17,6 +17,7 @@
 const storageManager = require('./StorageManager');
 const eventCentral = require('./EventCentral');
 const textTools = require('./TextTools');
+const notificationManager = require('./NotificationManager');
 
 class SocketManager {
   constructor() {
@@ -294,6 +295,7 @@ class SocketManager {
       user: {
         username,
         password,
+        pushToken: notificationManager.token,
       },
       device: { objectId: storageManager.getDeviceId() },
     }, ({ error, data }) => {

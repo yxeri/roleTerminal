@@ -34,9 +34,7 @@ const accessCentral = require('../../AccessCentral');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
-// const teamComposer = require('../../data/composers/TeamComposer');
 const voiceCommander = require('../../VoiceCommander');
 
 class MenuBar extends BaseView {

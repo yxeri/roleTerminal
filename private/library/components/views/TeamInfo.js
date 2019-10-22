@@ -44,11 +44,6 @@ class TeamInfo extends BaseView {
       classes: ['teamInfo'],
       clickFuncs: {
         leftFunc: () => {
-          const identity = userComposer.getCurrentIdentity();
-
-          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
-            const team = teamComposer.getTeam({ teamId: identity.partOfTeams[0] });
-          }
         },
       },
     });

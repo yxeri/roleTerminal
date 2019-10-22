@@ -33,13 +33,13 @@ class NotificationManager {
         window.FirebasePlugin.onTokenRefresh(() => {
           this.sendPushToken();
         }, (error) => {
-          alert(error);
+          console.log(error);
         });
 
         window.FirebasePlugin.onNotificationOpen((notification) => {
           document.getElementById('main').appendChild(document.createTextNode(JSON.parse(notification)));
         }, (error) => {
-          alert(error);
+          console.log(error);
         });
       });
 

@@ -15,6 +15,7 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const TemporaryDialog = require('./TemporaryDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -23,6 +24,7 @@ const transactionComposer = require('../../../data/composers/TransactionComposer
 const userComposer = require('../../../data/composers/UserComposer');
 const teamComposer = require('../../../data/composers/TeamComposer');
 const tracker = require('../../../PositionTracker');
+const viewSwitcher = require('../../../ViewSwitcher');
 
 const ids = {
   FROMTEAM: 'fromTeam',
@@ -69,13 +71,14 @@ class WalletDialog extends BaseDialog {
             const fromWalletId = this.getInputValue(ids.FROMTEAM, 'checkBox')
               ? team.objectId
               : identityId;
+            const amount = this.getInputValue('walletAmount');
 
             transactionComposer.createTransaction({
               transaction: {
                 fromWalletId,
+                amount,
                 coordinates: tracker.getBestPosition(),
                 toWalletId: sendToId,
-                amount: this.getInputValue('walletAmount'),
                 note: this.getInputValue('walletNote'),
               },
               callback: ({ error }) => {
@@ -85,6 +88,17 @@ class WalletDialog extends BaseDialog {
                   return;
                 }
 
+                const tempDialog = new TemporaryDialog({
+                  timeout: 30000,
+                  text: [
+                    labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'transferComplete' }),
+                    `From: ${thisIdentityName}`,
+                    `To: ${identityName}.`,
+                    `Amount: ${amount}`,
+                  ],
+                });
+
+                tempDialog.addToView({ element: viewSwitcher.getParentElement() });
                 this.removeFromView();
               },
             });

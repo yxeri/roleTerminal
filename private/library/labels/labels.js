@@ -650,6 +650,9 @@ const labels = {
     transferFromTeam: (override.WalletDialog && override.WalletDialog.transferFromTeam) || {
       en: 'Use your team\'s wallet. The team will be the sender',
     },
+    transferComplete: {
+      en: 'Transfer complete!',
+    },
   },
   UserDialog: {
     userInfo: (override.UserDialog && override.UserDialog.userInfo) || {

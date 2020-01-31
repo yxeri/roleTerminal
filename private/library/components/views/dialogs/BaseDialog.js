@@ -55,6 +55,7 @@ class BaseDialog extends BaseView {
 
     this.timeout = timeout;
     this.inputs = inputs;
+    this.timeoutId = null;
 
     this.inputContainer = elementCreator.createContainer({
       elementId: ids.INPUTCONTAINER,
@@ -121,7 +122,7 @@ class BaseDialog extends BaseView {
     }
 
     if (this.timeout) {
-      setTimeout(() => { this.removeFromView(); }, this.timeout);
+      this.timeoutId = setTimeout(() => { this.removeFromView(); }, this.timeout);
     }
   }
 
@@ -134,6 +135,10 @@ class BaseDialog extends BaseView {
       super.removeFromView();
       keyHandler.unpause();
       voiceCommander.unpause();
+
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+      }
     }
   }
 

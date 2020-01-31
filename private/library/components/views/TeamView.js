@@ -15,8 +15,7 @@
  */
 
 const ViewWrapper = require('../ViewWrapper');
-const TeamList = require('../lists/TeamList');
-const TeamPage = require('./pages/TeamPage');
+const FullTeamList = require('../lists/FullTeamList');
 
 class TeamView extends ViewWrapper {
   constructor({
@@ -24,12 +23,7 @@ class TeamView extends ViewWrapper {
     classes = [],
     elementId = `tView-${Date.now()}`,
   }) {
-    const teamList = new TeamList({
-      effect,
-      title: 'Teams',
-      shouldToggle: true,
-    });
-    const teamPage = new TeamPage({});
+    const teamList = new FullTeamList({ effect });
 
     super({
       elementId,
@@ -38,7 +32,6 @@ class TeamView extends ViewWrapper {
           components: [{ component: teamList }],
           classes: ['columnList'],
         },
-        { components: [{ component: teamPage }] },
       ],
       classes: classes.concat(['teamView']),
     });

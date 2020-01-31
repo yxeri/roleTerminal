@@ -75,6 +75,16 @@ class TeamComposer extends DataComposer {
       },
     });
   }
+
+  getImage(teamId) {
+    const team = this.getTeam({ teamId });
+
+    if (team) {
+      return team.image;
+    }
+
+    return undefined;
+  }
 }
 
 const teamComposer = new TeamComposer();

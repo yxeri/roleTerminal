@@ -30,6 +30,7 @@ class ViewSwitcher {
       FORUM: 'forum',
       PEOPLE: 'people',
       TERMINAL: 'terminal',
+      ADMIN: 'admin',
     };
     this.parentElement = undefined;
     this.availableTypes = [];

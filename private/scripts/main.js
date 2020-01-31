@@ -13,6 +13,7 @@ const TerminalView = require('../library/components/views/TerminalView');
 const TextAnimation = require('../library/components/views/TextAnimation');
 const SpoonyView = require('./SpoonyView');
 const ForumView = require('../library/components/views/ForumView');
+const AdminView = require('../library/components/views/AdminView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -342,6 +343,7 @@ const forumView = new ForumView({
   showForumList: false,
   showUserList: false,
 });
+const adminView = new AdminView({});
 const spoonyView = new SpoonyView({});
 const terminalView = new TerminalView({
   bootSequence: organicaLogo
@@ -1053,6 +1055,14 @@ const forumWrapper = new ViewWrapper({
     components: [{ component: worldMapPage }],
   }],
 });
+const adminWrapper = new ViewWrapper({
+  menuBar,
+  viewType: viewSwitcher.ViewTypes.ADMIN,
+  title: 'Admin',
+  columns: [{
+    components: [{ component: adminView }],
+  }],
+});
 
 menuBar.setViews({
   viewSwitcher,
@@ -1066,6 +1076,7 @@ menuBar.setViews({
     { view: terminalWrapper },
     { view: spoonyWrapper },
     { view: forumWrapper },
+    { view: adminWrapper },
   ],
 });
 
@@ -1080,6 +1091,7 @@ viewSwitcher.addAvailableTypes({
     terminalWrapper.viewType,
     spoonyWrapper.viewType,
     forumWrapper.viewType,
+    adminWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

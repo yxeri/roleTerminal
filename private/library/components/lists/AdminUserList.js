@@ -132,11 +132,17 @@ class AdminUserList extends List {
             isVerified,
             username,
             aliasName,
+            offName = '',
           } = userComposer.getIdentity({ objectId });
           const name = username || aliasName;
+          const wallet = walletComposer.getWallet({ walletId: userId });
 
           const dialog = new BaseDialog({
-            upperText: [`Updating user: ${name}.`, labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'updateUser' })],
+            upperText: [
+              `${name}.`, labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'updateUser' }),
+              `Off name: ${offName}`,
+              `Wallet amount: ${wallet.amount}`,
+            ],
           });
           const lowerButtons = [elementCreator.createButton({
             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),

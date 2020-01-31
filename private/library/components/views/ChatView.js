@@ -43,6 +43,7 @@ class ChatView extends ViewWrapper {
     hideDate,
     fullDate,
     corners,
+    hideUserList = false,
     showUserImage = true,
     sendOnEnter = false,
     hideRoomList = false,
@@ -203,13 +204,16 @@ class ChatView extends ViewWrapper {
         { component: roomFollowingList },
         { component: whisperRoomList },
         { component: roomList },
-        { component: userList },
       ],
       classes: [
         'columnList',
         'columnRoomList',
       ],
     };
+
+    if (!hideUserList) {
+      roomListColumn.components.push({ component: userList });
+    }
 
     switch (inputPlacement) {
       case 'top': {

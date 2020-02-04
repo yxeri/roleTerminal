@@ -1,0 +1,923 @@
+/*
+ Copyright 2020 Carmilla Mina Jankovic
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: none;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: monospace;
+  font-size: 1.1em;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+
+span.clickable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+}
+
+ul, li {
+}
+
+textarea {
+}
+
+textarea[readonly], input[readonly] {
+}
+
+button {
+}
+
+header {
+}
+
+span, p {
+}
+
+input {
+}
+
+input[type=radio] {
+}
+
+input[type="radio"]:checked + span {
+}
+
+label {
+  display: block;
+
+  span {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+}
+
+select {
+  font-family: monospace;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * A required input field that has been left empty.
+ * The class is most commonly added when the input is blurred.
+ */
+.emptyInput {
+}
+
+/*
+
+ */
+.imgContainer {
+  display: inline-block;
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: scale-down;
+  }
+}
+
+/*
+  Divs that are used in some containers to create corner effects (e.g.
+ */
+.upperLeft, .upperRight, .lowerLeft, .lowerRight {
+}
+
+/*
+  Added to container together with a pop-up. It's meant to cover the rest of the page while the pop-up is in focus.
+ */
+.cover {
+  background-color: rgba(0, 0, 0, .6);
+  z-index: 9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+  Expandable lists have this class
+ */
+.toggle:after {
+  content: '+';
+  float: right;
+}
+
+/*
+  An expanded list has this class
+ */
+.expanded:after {
+  content: '-';
+  float: right;
+}
+
+/****************
+ * View Wrapper *
+ ****************/
+
+/*
+  A view wrapper wraps a specific view (e.g. chat, world map, forum).
+  A view wrapper can contain other view wrappers (e.g. one view is split into part chat and part world map).
+ */
+.viewWrapper {
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+/*
+  Each view contains one or more columns. Each column can contain other views with columns.
+ */
+.column {
+  overflow: hidden;
+  height: 100%;
+}
+
+/*
+  Added to the single column in a view.
+ */
+.one {
+  width: 100%;
+}
+
+/*
+  Added to the two columns in a view.
+ */
+.oneOfTwo {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+/*
+  Added to the three columns in a view.
+ */
+.oneOfThree {
+  width: 33%;
+  box-sizing: border-box;
+}
+
+/*
+  Added to the columns highest up in the hierarchy.
+ */
+.withMenuBar {
+  // height: calc(100% - #{$status-bar-height});
+  order: 1;
+}
+
+/**********
+ * Dialog *
+ **********/
+
+/*
+  Pop-up
+ */
+.dialog {
+  max-height: calc(99% - 4em);
+  max-width: 40em;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: absolute;
+  top: 1em;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: 10;
+
+  input {
+  }
+
+  input[type="checkbox"] {
+  }
+
+  select {
+  }
+
+  input:last-child {
+  }
+
+  textarea {
+  }
+
+  /*
+    Input container. It contains all text areas, inputs, selects and such items.
+   */
+  .inContainer {
+  }
+
+  /*
+    Buttons container on the bottom of the dialog
+   */
+  .lowerButtons {
+    float: right;
+  }
+
+  /*
+    Buttons container on the top of the dialog
+   */
+  .upperButtons {
+
+  }
+
+  /*
+    Text in the upper part of the dialog (e.g. title).
+   */
+  .upperText {
+
+  }
+
+  /*
+    Text in the lower part of the dialog.
+   */
+  .lowerText {
+
+  }
+
+  /*
+    It contains any attached images.
+   */
+  .imagesContainer {
+
+  }
+
+  /*
+    All these containers exist in the dialog, even if empty.
+   */
+  .upperButtons:empty, .lowerButtons:empty, .upperText:empty, .lowerText:empty, .inContainer:empty, .imagesContainer:empty {
+    display: none;
+  }
+}
+
+/*
+  User dialog. Displays information about a user (self or other)
+ */
+.userDialog {
+}
+
+/*
+  Register a user dialog.
+ */
+.registerDialog {
+}
+
+/*********
+ * Views *
+ *********/
+
+/*
+  View containing documents and lists.
+ */
+.docFileView {
+  /*
+    List of available documents
+   */
+  .docFileList {
+  }
+
+  /*
+    The open document.
+   */
+  .docFilePage {
+    /*
+      Top of the document containing items such as title, creator name and date.
+     */
+    .docFileHeader {
+    }
+
+    /*
+      Close button.
+     */
+    .close {
+    }
+  }
+}
+
+/*
+  View containing the forum and lists.
+ */
+.forumView {
+  .forum {
+    /*
+      Forum title.
+     */
+    header {
+
+    }
+
+    /*
+      Forum description.
+     */
+    .forumContent {
+    }
+
+    .newThreadButton {
+
+    }
+
+    /*
+      Contains all threads of the forum.
+     */
+    .threadContainer {
+      .thread {
+        /*
+          Thread title.
+         */
+        header {
+
+        }
+
+        /*
+          Thread text content.
+         */
+        .threadContent {
+
+        }
+
+        .newPostButton {
+
+        }
+
+        /*
+          Contains all posts from a thread.
+        */
+        .postContainer {
+          .post {
+            header {
+
+            }
+
+            .postContent {
+
+            }
+
+            /*
+              Contains all sub-posts in a post.
+            */
+            .subContainer {
+              .subPost {
+                header {
+
+                }
+
+                .contentEnd {
+
+                }
+              }
+            }
+          }
+        }
+
+        .newSubPostButton {
+
+        }
+      }
+    }
+  }
+}
+
+/*
+  View containing transaction information and other lists.
+ */
+.walletView{
+  /*
+    Wallet name and amount.
+   */
+  .walletInfo {
+  }
+
+  /*
+    List of transactions.
+   */
+  .transactionList {
+  }
+}
+
+/*
+  View containing the world map, including lists.
+ */
+.worldMapView{
+}
+
+/*
+  View containg information about teams.
+ */
+.teamView {
+  .teamInfo {
+  }
+}
+
+/*
+  View containing the chat, including lists.
+ */
+.chatView {
+  /*
+    User list
+   */
+  .userRoomList {
+  }
+
+  /*
+    Paragraph containing sender name and timestamp
+   */
+  .msgInfo {
+  }
+
+  /*
+    List of messages
+   */
+  .msgList {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    word-wrap: break-word;
+
+    li {
+      /*
+        User profile image.
+       */
+      .listItemImage {
+      }
+
+      /*
+        Image attached to the message
+       */
+      .attachedImage {
+      }
+    }
+
+    /*
+      Message content.
+     */
+    .msgLine {
+      clear: both;
+    }
+  }
+
+  .inputArea {
+    textarea {
+    }
+
+    /*
+      Container with buttons above the text area.
+     */
+    .buttonContainer {
+      .imageInputButton {
+      }
+
+      /*
+        Preview of the attached image.
+       */
+      .imagePreview {
+        max-width: 120px;
+        max-height: 120px;
+        vertical-align: bottom;
+      }
+    }
+
+    .sendButton {
+    }
+  }
+
+  .columnChat {
+    overflow-y: auto;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .roomInfo {
+    border-top: $border;
+    border-bottom: $border;
+    color: $second-text-color;
+    padding: $padding;
+    background-color: $darker-color;
+    text-align: center;
+  }
+}
+
+/*
+  View containing information about users.
+ */
+.peopleView {
+  /*
+    The list with users.
+   */
+  .fullUserList {
+    .username {
+    }
+  }
+}
+
+/*
+  View containing the admin interface.
+ */
+.adminView {
+}
+
+/*
+  View containing fake terminal input and output
+ */
+.terminalView {
+  .columnTerminal {
+  }
+
+  .terminalPage {
+  }
+
+  .terminalOutput {
+  }
+
+  .terminalInput {
+  }
+}
+
+/*********
+ * Lists *
+ *********/
+
+/*
+  Every list gets this class.
+ */
+.list {
+  li {
+  }
+
+  /*
+    List item that has an image attached to it.
+   */
+  .listItemWithImage {
+  }
+
+  /*
+    List item added to the top of the list with buttons.
+   */
+  .listButtonsItem {
+    .listButtons {
+    }
+  }
+}
+
+/*
+  A list of users. It can be shown in the wallet/forum/chat views.
+ */
+.userList {
+}
+
+/*
+  Added to a column that is primarily a list.
+ */
+.columnList {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/*
+ * A list item that has focus in a list.
+ */
+.focusListItem {
+  background-color: $focus-color;
+  text-decoration: underline;
+}
+
+/*
+ * A marked list item in a list.
+ * A list item will be marked when the object that it's connected to is updated.
+ */
+.markListItem {
+  background-color: $darker-new-color;
+}
+
+/**
+ * A new list item in the list.
+ * A list item added to a list will temporarily have the newListItem class.
+ * The class is removed after a set amount of time.
+ */
+.newListItem {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+/*
+  Temporary class for animation.
+ */
+.flash {
+  animation: flash;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-duration: .4s;
+}
+
+@keyframes flash {
+  0% {
+  }
+
+  100% {
+    color: inherit;
+    background-color: inherit;
+    text-shadow: inherit;
+  }
+}
+
+/**
+ * A list item that will be removed from a list.
+ * The class is removed after a set amount of time.
+ */
+.removeListItem {
+}
+
+/*************
+ * World Map *
+ *************/
+
+.worldMapPage {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  a {
+    display: none !important;
+  }
+}
+
+/*
+  Shows information about the clicked POI
+ */
+.mapLeftClickBox {
+  position: absolute;
+  z-index: 3;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+/*
+  Shows actions available when the map is right clicked.
+ */
+.mapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  max-width: 15em;
+}
+
+/*
+  Used if the primary right click box fails to be inserted.
+ */
+.fallbackMapRightClickBox {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  max-width: 15em;
+}
+
+/********
+ * Misc *
+ ********/
+
+.clickable {
+  cursor: pointer;
+}
+
+.menuBar {
+  order: 2;
+  width: 100%;
+  box-sizing: border-box;
+  display: -webkit-flex;
+  display: flex;
+  z-index: 8;
+  font-size: 1.1em;
+  -webkit-align-items: center;
+  align-items: center;
+
+  .topMenuButton {
+    font-weight: bold;
+    display: block;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topMenu {
+    position: absolute;
+    max-width: 12em;
+    z-index: 9;
+    max-height: calc(100% - 1.5em);
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+}
+
+.currentUserList {
+  margin-bottom: 0;
+  padding-top: 0;
+
+  li {
+    padding: 0;
+  }
+}
+
+.listItemImage {
+  border-style: none;
+  float: left;
+  margin-right: .2em;
+
+  img {
+    max-width: 40px;
+    max-height: 40px;
+  }
+}
+
+.hide {
+  display: none !important;
+}
+
+.pre {
+  white-space: pre;
+}
+
+.fullscreen {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10;
+}
+
+#screenFilter {
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  position: fixed;
+  z-index: 11;
+}
+
+.oldIosFix {
+  height: calc(100% - 1.5em) !important;
+}
+
+.noDecoration {
+  text-decoration: none !important;
+}
+
+@media (orientation: portrait), (orientation: landscape) and (max-width: 1023px) {
+  #main {
+    > .viewWrapper {
+      > .oneOfTwo:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(2) {
+        display: none;
+      }
+
+      > .oneOfThree:nth-child(3) {
+        display: none;
+      }
+    }
+
+    .viewWrapper {
+      > .oneOfTwo {
+        border-right: none;
+      }
+
+      > .oneOfThree {
+        border-right: none;
+      }
+    }
+  }
+
+  .viewWrapper {
+    width: 100%;
+  }
+
+  .oneOfTwo {
+    width: 100%;
+  }
+
+  .chatView, .worldMapView, .walletView, .teamView {
+    .columnList {
+      height: calc(1.8em);
+      width: 100%;
+      display: -webkit-flex;
+      display: flex;
+      overflow: inherit;
+      z-index: 8;
+
+      .list {
+        -webkit-flex-grow: 1;
+        flex-grow: 1;
+
+        header {
+          text-align: center;
+        }
+
+        ul {
+          position: absolute;
+          max-height: calc(100% - 1.8em);
+          width: 100%;
+          left: 0;
+          overflow-y: auto;
+          z-index: 8;
+        }
+
+        .toggle:after {
+          content: '';
+        }
+
+        .expanded:after {
+          content: '';
+        }
+      }
+    }
+
+    .oneOfTwo:first-child {
+      max-width: 100%;
+    }
+  }
+
+  .chatView {
+    .columnChat {
+      height: calc(100% - 1.8em);
+      width: 100%;
+    }
+  }
+
+  .worldMapView {
+    .mapLeftClickBox {
+      left: 0;
+      width: 100%;
+    }
+
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em);
+      width: 100%;
+    }
+  }
+
+  .walletView {
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em);
+      width: 100%;
+    }
+  }
+
+  .teamView {
+    .oneOfTwo:last-child {
+      height: calc(100% - 1.8em);
+      width: 100%;
+    }
+  }
+
+  .list {
+    .listButtons {
+      position: fixed;
+    }
+  }
+}

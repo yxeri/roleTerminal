@@ -5,7 +5,7 @@
   "author": "Carmilla Mina Jankovic <carmillam@icloud.com>",
   "private": true,
   "scripts": {
-    "dev": "./node_modules/roleHaven/start.sh && node app",
+    "dev": "./node_modules/roleHaven/start.sh && MODE=dev node app",
     "test": "DEBUG=eslint:cli-engine eslint ./",
     "start": "node app",
     "nsp": "nsp check"

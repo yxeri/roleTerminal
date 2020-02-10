@@ -2,6 +2,7 @@ const DataComposer = require('./BaseComposer');
 
 const dataHandler = require('../DataHandler');
 const eventCentral = require('../../EventCentral');
+const storageManager = require('../../StorageManager');
 
 class ForumComposer extends DataComposer {
   constructor() {
@@ -19,6 +20,7 @@ class ForumComposer extends DataComposer {
 
     this.forumPostHandler = dataHandler.forumPosts;
     this.forumThreadHandler = dataHandler.forumThreads;
+    this.forumHandler = dataHandler.forums;
   }
 
   getSubPosts({ parentPostId }) {
@@ -28,11 +30,6 @@ class ForumComposer extends DataComposer {
           { paramName: 'parentPostId', paramValue: parentPostId },
         ],
       },
-    }).map((subPost) => {
-      const modifiedSubPost = subPost;
-      modifiedSubPost.creatorName = this.createCreatorName({ object: subPost });
-
-      return modifiedSubPost;
     });
   }
 
@@ -40,8 +37,6 @@ class ForumComposer extends DataComposer {
     const post = this.forumPostHandler.getObject({ objectId: postId });
 
     if (post) {
-      post.creatorName = this.createCreatorName({ object: post });
-
       if (post.parentPostId && full) {
         post.subPosts = this.getSubPosts({ parentPostId: postId });
       }
@@ -65,11 +60,6 @@ class ForumComposer extends DataComposer {
           { paramName: 'threadId', paramValue: threadId },
         ],
       },
-    }).map((post) => {
-      const modifiedPost = post;
-      modifiedPost.creatorName = this.createCreatorName({ object: modifiedPost });
-
-      return modifiedPost;
     });
 
     if (full) {
@@ -86,7 +76,7 @@ class ForumComposer extends DataComposer {
 
       return basePosts.map((post) => {
         const modifiedPost = post;
-        modifiedPost.subPosts = subPosts.filter(subPost => subPost.parentPostId === modifiedPost.objectId);
+        modifiedPost.subPosts = subPosts.filter((subPost) => subPost.parentPostId === modifiedPost.objectId);
 
         return modifiedPost;
       });
@@ -98,12 +88,8 @@ class ForumComposer extends DataComposer {
   getThread({ threadId, full = true }) {
     const thread = this.forumThreadHandler.getObject({ objectId: threadId });
 
-    if (thread) {
-      thread.creatorName = this.createCreatorName({ object: thread });
-
-      if (full) {
-        thread.posts = this.getPostsByThread({});
-      }
+    if (thread && full) {
+      thread.posts = this.getPostsByThread({});
     }
 
     return thread;
@@ -125,18 +111,12 @@ class ForumComposer extends DataComposer {
           { paramName: 'forumId', paramValue: forumId },
         ],
       },
-    }).map((thread) => {
-      const modifiedThread = thread;
-      modifiedThread.creatorName = this.createCreatorName({ object: thread });
-
-      return modifiedThread;
     });
 
     if (full) {
       return threads.map((thread) => {
         const fullThread = thread;
 
-        fullThread.creatorName = this.createCreatorName({ object: thread });
         fullThread.posts = this.getPostsByThread({ threadId: thread.objectId });
 
         return fullThread;
@@ -152,28 +132,32 @@ class ForumComposer extends DataComposer {
   }) {
     const forum = this.handler.getObject({ objectId: forumId });
 
-    if (forum) {
-      forum.creatorName = this.createCreatorName({ object: forum });
-
-      if (full) {
-        forum.threads = this.getThreadsByForum({ forumId });
-      }
+    if (forum && full) {
+      forum.threads = this.getThreadsByForum({ forumId });
     }
 
     return forum;
   }
 
   createPost({ post, callback }) {
+    const postToSend = post;
+    postToSend.ownerAliasId = storageManager.getAliasId();
+    postToSend.teamId = storageManager.getTeamId();
+
     this.forumPostHandler.createObject({
       callback,
-      params: { post },
+      params: { post: postToSend },
     });
   }
 
   createThread({ thread, callback }) {
+    const threadToSend = thread;
+    threadToSend.ownerAliasId = storageManager.getAliasId();
+    threadToSend.teamId = storageManager.getTeamId();
+
     this.forumThreadHandler.createObject({
       callback,
-      params: { thread },
+      params: { thread: threadToSend },
     });
   }
 
@@ -221,6 +205,20 @@ class ForumComposer extends DataComposer {
       params: {
         threadId,
         thread,
+      },
+    });
+  }
+
+  updateForum({
+    forum,
+    forumId,
+    callback,
+  }) {
+    this.forumHandler.updateObject({
+      callback,
+      params: {
+        forumId,
+        forum,
       },
     });
   }

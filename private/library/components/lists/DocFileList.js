@@ -38,6 +38,18 @@ class DocFileList extends List {
       sorting,
       effect,
       listItemFields,
+      defaultImage: {
+        fileName: 'file.png',
+      },
+      conditionalImages: [{
+        fileName: 'lock.png',
+        func: (docFile) => {
+          return docFile.isLocked && !docFile.code;
+        },
+      }],
+      shouldFocusOnClick: false,
+      shouldAppendImage: true,
+      imageThumb: true,
       classes: classes.concat(['docFileList']),
       dependencies: [
         dataHandler.docFiles,

@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Carmilla Mina Jankovic
+ Copyright 2019 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,20 +17,54 @@
 const ViewWrapper = require('../ViewWrapper');
 const TerminalPage = require('./pages/TerminalPage');
 
+const eventCentral = require('../../EventCentral');
+
 class TerminalView extends ViewWrapper {
   constructor({
+    bootSequence,
     classes = [],
-    elementId = `teView-${Date.now()}`,
+    elementId = `termView-${Date.now()}`,
   }) {
-    const linePrinterPage = new TerminalPage({});
+    const terminalPage = new TerminalPage({});
 
     super({
       elementId,
       columns: [
-        { components: [{ component: linePrinterPage }] },
+        {
+          classes: ['columnTerminal'],
+          components: [{ component: terminalPage }],
+        },
       ],
-      classes: classes.concat(['linePrinterView']),
+      classes: classes.concat(['terminalView']),
     });
+
+    this.terminalPage = terminalPage;
+    this.bootSequence = bootSequence;
+    this.skipBoot = false;
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGIN,
+      func: () => {
+        this.skipBoot = false;
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        this.terminalPage.clearView();
+      },
+    });
+  }
+
+  addToView({ element }) {
+    super.addToView({ element });
+
+    if (!this.skipBoot && this.bootSequence && this.bootSequence.length > 0) {
+      this.skipBoot = true;
+
+      this.terminalPage.queueMessages({ objects: this.bootSequence });
+    }
   }
 }
 

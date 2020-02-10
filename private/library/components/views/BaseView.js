@@ -29,6 +29,7 @@ class BaseView {
   constructor({
     classes,
     minimumAccessLevel,
+    corners = [],
     elementId = `elem-${Date.now()}`,
   }) {
     this.itemChangeTimeout = 800;
@@ -39,6 +40,8 @@ class BaseView {
       classes,
       elementId,
     });
+
+    corners.forEach((corner) => this.element.appendChild(elementCreator.createContainer({ classes: [corner] })));
 
     if (minimumAccessLevel) {
       accessCentral.addAccessElement({
@@ -91,8 +94,6 @@ class BaseView {
   }
 
   showView() {
-    console.log('access show', this.minimumAccessLevel, this.element);
-
     if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
       return;
     }
@@ -174,21 +175,23 @@ class BaseView {
     const { objectId } = object;
     const toRemove = this.getElement(objectId);
 
-    if (shouldAnimate) {
-      toRemove.classList.add(cssClasses.removeElement);
+    if (toRemove) {
+      if (shouldAnimate) {
+        toRemove.classList.add(cssClasses.removeElement);
 
-      setTimeout(() => {
-        const element = this.getElement(objectId);
+        setTimeout(() => {
+          const element = this.getElement(objectId);
 
-        if (element) {
-          toRemove.parentElement.removeChild(element);
-        }
-      }, this.itemChangeTimeout / 4);
+          if (element) {
+            toRemove.parentElement.removeChild(element);
+          }
+        }, this.itemChangeTimeout / 4);
 
-      return;
+        return;
+      }
+
+      toRemove.parentElement.removeChild(toRemove);
     }
-
-    toRemove.parentElement.removeChild(toRemove);
   }
 
   animateElement({

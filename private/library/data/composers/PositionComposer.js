@@ -2,6 +2,7 @@ const BaseComposer = require('./BaseComposer');
 
 const eventHandler = require('../../EventCentral');
 const dataHandler = require('../DataHandler');
+const storageManager = require('../../StorageManager');
 
 class PositionComposer extends BaseComposer {
   constructor() {
@@ -15,12 +16,13 @@ class PositionComposer extends BaseComposer {
       ],
     });
 
-    /**
-     * A LOCAL position is within the game area.
-     * Eveything outside of the game area is of type WORLD.
-     * @type {{string}}
-     */
-    this.PositionTypes = {};
+    this.PositionTypes = {
+      USER: 'user',
+      WORLD: 'world',
+      LOCAL: 'local',
+      DEVICE: 'device',
+    };
+    this.maxPositionAge = 1200000;
     this.PositionStructures = {
       MARKER: 'marker',
       CIRCLE: 'circle',
@@ -35,6 +37,8 @@ class PositionComposer extends BaseComposer {
           event: eventHandler.Events.WORLDMAP,
           params: {},
         });
+
+        this.checkPositionAge();
       },
     });
   }
@@ -67,6 +71,29 @@ class PositionComposer extends BaseComposer {
     });
   }
 
+  getPositionByName({ positionName }) {
+    return this.handler.getObject({
+      filter: {
+        rules: [{
+          paramName: positionName,
+          paramValue: positionName,
+        }],
+      },
+    });
+  }
+
+  checkPositionAge() {
+    const oldPositions = this.getPositions({ positionTypes: ['user'] })
+      .filter((position) => position.coordinatesHistory.length !== 0 && new Date() - new Date(position.lastUpdated) > this.maxPositionAge);
+
+    eventHandler.emitEvent({
+      event: eventHandler.Events.AGED_POSITIONS,
+      params: { positions: oldPositions },
+    });
+
+    setTimeout(() => { this.checkPositionAge(); }, 60000);
+  }
+
   getPosition({ positionId }) {
     return this.handler.getObject({ objectId: positionId });
   }
@@ -75,9 +102,13 @@ class PositionComposer extends BaseComposer {
     position,
     callback,
   }) {
+    const positionToCreate = position;
+    positionToCreate.ownerAliasId = storageManager.getAliasId();
+    positionToCreate.teamId = storageManager.getTeamId();
+
     this.handler.createObject({
       callback,
-      params: { position },
+      params: { position: positionToCreate },
     });
   }
 

@@ -21,11 +21,12 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomFollowingList extends List {
   constructor({
-    title,
     effect,
+    shouldToggle,
     classes = [],
     elementId = `rFList-${Date.now()}`,
   }) {
@@ -33,10 +34,14 @@ class RoomFollowingList extends List {
     classes.push('chatRoomFollowingList');
 
     super({
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'following' }),
       elementId,
       classes,
       effect,
+      shouldToggle,
+      sorting: {
+        paramName: 'roomName',
+      },
       listType: 'followedRooms',
       filter: {
         rules: [
@@ -115,19 +120,23 @@ class RoomFollowingList extends List {
       event: eventCentral.Events.FOLLOWED_ROOM,
       func: ({
         room,
+        invited = false,
       }) => {
         const { objectId } = room;
 
         this.addOneItem({ object: room });
-        this.setFocusedListItem(objectId);
 
-        eventCentral.emitEvent({
-          event: eventCentral.Events.SWITCH_ROOM,
-          params: {
-            room,
-            origin: this.elementId,
-          },
-        });
+        if (!invited) {
+          this.setFocusedListItem(objectId);
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.SWITCH_ROOM,
+            params: {
+              room,
+              origin: this.elementId,
+            },
+          });
+        }
       },
     });
 
@@ -159,7 +168,7 @@ class RoomFollowingList extends List {
     });
     const { followingRooms = [] } = currentUser;
 
-    return allRooms.filter(object => followingRooms.includes(object.objectId)).sort((a, b) => {
+    return allRooms.filter((object) => followingRooms.includes(object.objectId)).sort((a, b) => {
       const aParam = a.roomName.toLowerCase();
       const bParam = b.roomName.toLowerCase();
 

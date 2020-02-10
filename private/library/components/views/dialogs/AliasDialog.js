@@ -19,10 +19,12 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const aliasComposer = require('../../../data/composers/AliasComposer');
+const textTools = require('../../../TextTools');
 
 const ids = {
-  FULLNAME: 'fullName',
   ALIASNAME: 'aliasname',
+  DESCRIPTION: 'description',
+  PRONOUNS: 'pronouns',
 };
 
 class AliasDialog extends BaseDialog {
@@ -30,6 +32,7 @@ class AliasDialog extends BaseDialog {
     classes = [],
     elementId = `aDialog-${Date.now()}`,
   }) {
+    const upperText = [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'createAlias' })];
     const inputs = [
       elementCreator.createInput({
         elementId: ids.ALIASNAME,
@@ -39,12 +42,26 @@ class AliasDialog extends BaseDialog {
         maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasName' }),
       }),
+      elementCreator.createSelect({
+        isRequired: true,
+        elementId: ids.PRONOUNS,
+        multiple: true,
+        options: [
+          { value: '', name: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'choosePronouns' }) },
+          { value: 'they', name: labelHandler.getLabel({ baseObject: 'General', label: 'they' }) },
+          { value: 'she', name: labelHandler.getLabel({ baseObject: 'General', label: 'she' }) },
+          { value: 'he', name: labelHandler.getLabel({ baseObject: 'General', label: 'he' }) },
+          { value: 'it', name: labelHandler.getLabel({ baseObject: 'General', label: 'it' }) },
+        ],
+      }),
       elementCreator.createInput({
-        elementId: ids.FULLNAME,
-        inputName: 'fullName',
+        elementId: ids.DESCRIPTION,
+        inputName: 'description',
         type: 'text',
-        maxLength: 40,
-        placeholder: labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullName' }),
+        multiLine: true,
+        maxLength: 300,
+        shouldResize: true,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
       }),
     ];
     const lowerButtons = [
@@ -62,34 +79,62 @@ class AliasDialog extends BaseDialog {
               return;
             }
 
+            const selectedPronouns = Array.from(this.getElement(ids.PRONOUNS).selectedOptions)
+              .filter((selected) => { return selected.getAttribute('value') !== ''; });
+
             aliasComposer.createAlias({
               alias: {
-                aliasName: this.getInputValue(ids.ALIASNAME),
-                fullName: this.getInputValue(ids.FULLNAME),
+                aliasName: textTools.trimSpace(this.getInputValue(ids.ALIASNAME)),
+                pronouns: selectedPronouns.map((selected) => { return selected.getAttribute('value'); }),
+                description: this.getInputValue(ids.DESCRIPTION).split('\n'),
               },
               callback: ({ error }) => {
                 if (error) {
-                  if (error.type === 'invalid length') {
-                    switch (error.extraData.param) {
-                      case 'aliasName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'aliasNameLength' })] });
+                  switch (error.type) {
+                    case 'invalid length': {
+                      switch (error.extraData.param) {
+                        case 'aliasName': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'aliasName' })] });
 
-                        break;
-                      }
-                      case 'fullName': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'AliasDialog', label: 'fullNameLength' })] });
+                          return;
+                        }
+                        case 'description': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'description' })] });
 
-                        break;
-                      }
-                      default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
 
-                        break;
+                          return;
+                        }
                       }
                     }
-                  }
+                    case 'invalid characters': {
+                      switch (error.extraData.param) {
+                        case 'aliasName': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'name' })] });
 
-                  return;
+                          return;
+                        }
+                        case 'protected': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'protected' })] });
+
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'general' })] });
+
+                          return;
+                        }
+                      }
+                    }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      return;
+                    }
+                  }
                 }
 
                 this.removeFromView();
@@ -104,6 +149,7 @@ class AliasDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      upperText,
       classes: classes.concat(['AliasDialog']),
     });
   }

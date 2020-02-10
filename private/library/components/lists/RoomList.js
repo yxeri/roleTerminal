@@ -24,12 +24,13 @@ const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const viewSwitcher = require('../../ViewSwitcher');
 const accessCentral = require('../../AccessCentral');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomList extends List {
   constructor({
-    title,
     minimumAccessLevel,
     effect,
+    shouldToggle,
     classes = [],
     elementId = `rList-${Date.now()}`,
   }) {
@@ -37,10 +38,11 @@ class RoomList extends List {
     classes.push('chatRoomList');
 
     super({
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'rooms' }),
       elementId,
       classes,
       effect,
+      shouldToggle,
       sorting: {
         paramName: 'roomName',
       },
@@ -85,7 +87,7 @@ class RoomList extends List {
             roomId,
             callback: ({ error }) => {
               if (error) {
-                if (error.type === 'not allowed' && error.extraData.param === 'password') {
+                if (error.type === 'not allowed' && error.extraData && error.extraData.param === 'password') {
                   const lockedDialog = new LockedRoomDialog({
                     roomId,
                     roomName,
@@ -102,17 +104,6 @@ class RoomList extends List {
 
                 return;
               }
-
-              // eventCentral.emitEvent({
-              //   event: eventCentral.Events.SWITCH_ROOM,
-              //   params: {
-              //     listType: this.ListTypes.ROOMS,
-              //     origin: this.elementId,
-              //     room: {
-              //       objectId: roomId,
-              //     },
-              //   },
-              // });
 
               eventCentral.emitEvent({
                 event: eventCentral.Events.FOLLOWED_ROOM,
@@ -155,7 +146,7 @@ class RoomList extends List {
     });
     const { followingRooms = [] } = currentUser;
 
-    return allRooms.filter(object => !followingRooms.includes(object.objectId)).sort((a, b) => {
+    return allRooms.filter((object) => !followingRooms.includes(object.objectId)).sort((a, b) => {
       const aParam = a.roomName.toLowerCase();
       const bParam = b.roomName.toLowerCase();
 

@@ -17,6 +17,7 @@ const MenuBar = require('../library/components/views/MenuBar');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const AdminUserList = require('../library/components/lists/AdminUserList');
 const BaseView = require('../library/components/views/BaseView');
+const AdminTeamList = require('../library/components/lists/AdminTeamList');
 
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const elementCreator = require('../library/ElementCreator');
@@ -26,6 +27,7 @@ const accessCentral = require('../library/AccessCentral');
 
 const menuBar = new MenuBar({
   viewSwitcher,
+  setMenuImage: false,
   showClock: true,
   showControls: {
     user: true,
@@ -36,11 +38,19 @@ const menuBar = new MenuBar({
     currentUser: true,
   },
 });
-const adminUserList = new AdminUserList({});
+const adminUserList = new AdminUserList({
+  shouldToggle: true,
+});
+const adminTeamList = new AdminTeamList({
+  shouldToggle: true,
+});
 const userWrapper = new ViewWrapper({
   menuBar,
   columns: [{
-    components: [{ component: adminUserList }],
+    components: [
+      { component: adminUserList },
+      { component: adminTeamList },
+    ],
   }],
 });
 

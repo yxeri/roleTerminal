@@ -15,11 +15,10 @@
  */
 
 const BaseView = require('../BaseView');
-const TeamList = require('../../lists/TeamList');
+const TeamInfo = require('../TeamInfo');
 
 class TeamPage extends BaseView {
   constructor({
-    effect,
     classes = [],
     elementId = `tPage-${Date.now()}`,
   }) {
@@ -28,13 +27,9 @@ class TeamPage extends BaseView {
       classes: classes.concat(['teamPage']),
     });
 
-    const teamList = new TeamList({
-      effect,
-    });
+    const teamInfo = new TeamInfo({});
 
-    teamList.addToView({
-      element: this.element,
-    });
+    teamInfo.addToView({ element: this.element });
   }
 }
 

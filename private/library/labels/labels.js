@@ -1,11 +1,5 @@
 const override = {};
 
-// try {
-//   override = require('../../override/labels'); // eslint-disable-line import/no-unresolved, global-require
-// } catch (err) {
-//   console.log('Did not find override labels. Using defaults');
-// }
-
 const labels = {
   General: {
     yes: (override.General && override.General.yes) || {
@@ -13,6 +7,82 @@ const labels = {
     },
     no: (override.General && override.General.no) || {
       en: 'No',
+    },
+    he: (override.General && override.General.he) || {
+      en: 'He/Him',
+    },
+    they: (override.General && override.General.they) || {
+      en: 'They/Them',
+    },
+    she: (override.General && override.General.she) || {
+      en: 'She/Her',
+    },
+    it: (override.General && override.General.it) || {
+      en: 'It',
+    },
+  },
+  Error: {
+    general: {
+      en: 'Something went wrong',
+      se: 'Något gick fel',
+    },
+  },
+  InvalidDataError: {
+    general: {
+      en: '',
+    },
+  },
+  NotAllowedError: {
+    general: {
+      en: 'Access denied.',
+    },
+  },
+  InvalidLengthError: {
+    general: {
+      en: 'One of the fields are too short/long',
+    },
+    aliasName: {
+      en: 'The name is too short/long',
+    },
+    description: {
+      en: 'The description is too long',
+    },
+    title: {
+      en: 'The title is too long',
+    },
+    code: {
+      en: 'The code is too long',
+    },
+    text: {
+      en: 'The text is too long',
+    },
+    name: {
+      en: 'The name is too long',
+    },
+    optionalPassword: {
+      en: 'The password is too long',
+    },
+  },
+  InvalidCharactersError: {
+    general: {
+      en: 'One of the fields contain invalid characters',
+    },
+    name: {
+      en: 'The name contains invalid characters',
+    },
+    code: {
+      en: 'The code contains invalid characters',
+    },
+    protected: {
+      en: 'The name is protected. Please try again',
+    },
+  },
+  UserList: {
+    offName: (override.UserList && override.UserList.offName) || {
+      en: 'OFF name',
+    },
+    description: (override.UserList && override.UserList.description) || {
+      en: 'Intro',
     },
   },
   Button: {
@@ -62,6 +132,18 @@ const labels = {
     edit: (override.Button && override.Button.edit) || {
       en: 'Edit',
     },
+    myProfile: (override.Button && override.Button.myProfile) || {
+      en: 'Profile',
+    },
+    openDocument: (override.Button && override.Button.myProfile) || {
+      en: 'Document ID search',
+    },
+    reboot: (override.Button && override.Button.reboot) || {
+      en: 'Reboot',
+    },
+    teamProfile: {
+      en: 'Team profile',
+    },
   },
   Transaction: {
     failed: (override.Transaction && override.Transaction.failed) || {
@@ -69,7 +151,7 @@ const labels = {
       se: 'Lyckades inte utföra kommandot! Försök igen eller kontakta en administratör.',
     },
     wallet: (override.BaseDialog && override.BaseDialog.wallet) || {
-      en: 'Transfer currency',
+      en: 'Payment',
     },
     currency: (override.BaseDialog && override.BaseDialog.currency) || {
       en: 'currency',
@@ -129,6 +211,15 @@ const labels = {
     send: (override.BaseDialog && override.BaseDialog.send) || {
       en: 'Send',
     },
+    image: (override.BaseDialog && override.BaseDialog.image) || {
+      en: 'Image',
+    },
+    accessDenied: (override.BaseDialog && override.BaseDialog.accessDenied) || {
+      en: 'Access denied',
+    },
+    search: (override.BaseDialog && override.BaseDialog.search) || {
+      en: 'Search',
+    },
   },
   LockedDocFileDialog: {
     unlock: (override.LockedDocFileDialog && override.LockedDocFileDialog.unlock) || {
@@ -146,6 +237,9 @@ const labels = {
     incorrectCode: (override.LockedDocFileDialog && override.LockedDocFileDialog.enterCode) || {
       en: 'Incorrect code. Try again.',
       se: 'Fel kod. Försök igen',
+    },
+    protectedDoc: (override.LockedDocFileDialog && override.LockedDocFileDialog.protectedDoc) || {
+      en: 'Protected file',
     },
   },
   LockedRoomDialog: {
@@ -165,6 +259,20 @@ const labels = {
     accessDenied: (override.LockedRoomDialog && override.LockedRoomDialog.accessDenied) || {
       en: 'Access denied',
     },
+    protectedRoom: (override.LockedRoomDialog && override.LockedRoomDialog.protectedRoom) || {
+      en: 'Protected room',
+    },
+  },
+  OpenDocFileDialog: {
+    code: (override.OpenDocFileDialog && override.OpenDocFileDialog.code) || {
+      en: 'Code/ID',
+    },
+    openDoc: (override.OpenDocFileDialog && override.OpenDocFileDialog.openDoc) || {
+      en: 'Enter the code/ID of the document you want to access',
+    },
+    doesNotExist: (override.OpenDocFileDialog && override.OpenDocFileDialog.doesNotExist) || {
+      en: 'Document does not exist',
+    },
   },
   DocFileDialog: {
     title: (override.DocFileDialog && override.DocFileDialog.title) || {
@@ -178,14 +286,8 @@ const labels = {
     text: (override.DocFileDialog && override.DocFileDialog.text) || {
       en: 'Text',
     },
-    titleLength: (override.DocFileDialog && override.DocFileDialog.titleLength) || {
-      en: 'The title is too long',
-    },
-    codeLength: (override.DocFileDialog && override.DocFileDialog.codeLength) || {
-      en: 'The code is too long',
-    },
-    textLength: (override.DocFileDialog && override.DocFileDialog.textLength) || {
-      en: 'The text is too long',
+    createDoc: (override.DocFileDialog && override.DocFileDialog.createDoc) || {
+      en: 'Create document',
     },
   },
   AliasDialog: {
@@ -200,15 +302,24 @@ const labels = {
       en: 'Full name',
       se: 'Hela namnet',
     },
+    createAlias: (override.AliasDialog && override.AliasDialog.createAlias) || {
+      en: 'Create alias',
+    },
   },
   RegisterDialog: {
-    username: (override.RegisterDialog && override.RegisterDialog.username) || {
-      en: 'Username [a-z 0-9 -_]',
-      se: 'Användarnamn [a-z 0-9 -_]',
+    info: (override.RegisterDialog && override.RegisterDialog.info) || {
+      en: 'Enter your user information.',
     },
-    fullName: (override.RegisterDialog && override.RegisterDialog.fullName) || {
-      en: 'Full name [a-z 0-9]',
-      se: 'Hela namnet [a-z 0-9]',
+    registerUser: (override.RegisterDialog && override.RegisterDialog.registerUser) || {
+      en: 'User registration',
+    },
+    username: (override.RegisterDialog && override.RegisterDialog.username) || {
+      en: 'Name [a-z 0-9 -_]',
+      se: 'Namn [a-z 0-9 -_]',
+    },
+    offName: (override.RegisterDialog && override.RegisterDialog.offName) || {
+      en: '[OFF] Your name',
+      se: '[OFF] Ditt namn',
     },
     password: (override.RegisterDialog && override.RegisterDialog.password) || {
       en: 'Password',
@@ -227,38 +338,51 @@ const labels = {
       se: 'Användare existerar redan.',
     },
     description: (override.RegisterDialog && override.RegisterDialog.description) || {
-      en: 'Intro',
+      en: 'Introduction',
     },
     usernameLength: (override.RegisterDialog && override.RegisterDialog.usernameLength) || {
-      en: 'The user name must be be 2 - 40 characters long.',
-      se: 'Användarnamnet måste vara 2 - 40 tecken långt.',
+      en: 'The user name can be max 40 characters long.',
+      se: 'Användarnamnet får max vara 40 tecken långt.',
     },
     passwordLength: (override.RegisterDialog && override.RegisterDialog.passwordLength) || {
-      en: 'The password must be be 4 - 40 characters long.',
-      se: 'Lösenordet måste vara 4 - 40 tecken långt.',
+      en: 'The password must be at least 3 characters long.',
+      se: 'Lösenordet måste vara minst 3 tecken långt.',
     },
     descriptionLength: (override.RegisterDialog && override.RegisterDialog.descriptionLength) || {
       en: 'The description cannot be more than 500 characters',
     },
     invalidCharacters: (override.RegisterDialog && override.RegisterDialog.invalidCharacters) || {
-      en: 'Invalid characters in the username/full name Allowed characters: a-z 0-9 -_',
-      se: 'Otillåtna tecken i användarnamnet/hela namnet. Tillåtna tecken: a-z 0-9 -_',
+      en: 'Invalid characters in the username. Allowed characters: a-ö 0-9 -_',
+      se: 'Otillåtna tecken i användarnamnet. Tillåtna tecken: a-ö 0-9 -_',
     },
     alreadyExists: (override.RegisterDialog && override.RegisterDialog.alreadyExists) || {
-      en: 'User already exists',
+      en: 'User already exists.',
+    },
+    invalidFullName: (override.RegisterDialog && override.RegisterDialog.invalidFullName) || {
+      en: 'Invalid off name. Length must be 1-40 characters.',
+      se: 'Ej giltigt offnamn. Längden måste vara 1-40 tecken.',
+    },
+    image: (override.RegisterDialog && override.RegisterDialog.image) || {
+      en: 'Profile picture',
+    },
+    notVerified: (override.RegisterDialog && override.RegisterDialog.notVerified) || {
+      en: 'Your user has to be verified. Contact an administrator.',
+    },
+    choosePronouns: (override.RegisterDialog && override.RegisterDialog.choosePronouns) || {
+      en: '--Choose pronouns--',
     },
   },
   RoomDialog: {
-    password: (override.RoomDialog && override.RoomDialog.invalidCharacters) || {
-      en: 'Password to access the room',
-      se: 'Lösenordet för att komma åt rummet',
+    password: (override.RoomDialog && override.RoomDialog.password) || {
+      en: '(Optional) Password to access the room',
+      se: '(Valfritt) Lösenordet för att komma åt rummet',
     },
     repeatPassword: (override.RoomDialog && override.RoomDialog.repeatPassword) || {
       en: 'Repeat password',
       se: 'Skriv in lösenordet igen',
     },
     roomName: (override.RoomDialog && override.RoomDialog.roomName) || {
-      en: 'Name of the room',
+      en: 'Room name',
       se: 'Rummets namn',
     },
     changePassword: (override.RoomDialog && override.RoomDialog.changePassword) || {
@@ -271,6 +395,29 @@ const labels = {
     removePassword: (override.RoomDialog && override.RoomDialog.removePassword) || {
       en: 'Remove password',
       se: 'Ta bort lösenordet',
+    },
+    invite: (override.RoomDialog && override.RoomDialog.invite) || {
+      en: 'Invite user',
+    },
+    createRoom: (override.RoomDialog && override.RoomDialog.createRoom) || {
+      en: 'Create room',
+    },
+    passwordLength: (override.RoomDialog && override.RoomDialog.passwordLength) || {
+      en: 'The password is too long.',
+    },
+    roomNameLength: (override.RoomDialog && override.RoomDialog.roomNameLength) || {
+      en: 'The name of the room is too long. Max 20 characters.',
+    },
+    topicLength: (override.RoomDialog && override.RoomDialog.topicLength) || {
+      en: 'The topic of the room is too long. Max 300 characters.',
+    },
+    topic: {
+      en: 'Topic. Will be shown when entering the room',
+    },
+  },
+  EditRoomDialog: {
+    editRoom: (override.EditRoomDialog && override.EditRoomDialog.editRoom) || {
+      en: 'Edit room',
     },
   },
   RoomUpdateDialog: {
@@ -294,12 +441,12 @@ const labels = {
   },
   LoginDialog: {
     username: (override.LoginDialog && override.LoginDialog.username) || {
-      en: 'Your username',
-      se: 'Ditt användarnamn',
+      en: 'Name',
+      se: 'Namn',
     },
     password: (override.LoginDialog && override.LoginDialog.password) || {
-      en: 'Your password',
-      se: 'Ditt lösenord',
+      en: 'Password',
+      se: 'Lösenord',
     },
     login: (override.LoginDialog && override.LoginDialog.login) || {
       en: 'Login',
@@ -330,6 +477,21 @@ const labels = {
     removedItem: (override.List && override.List.invalidCharacters) || {
       en: 'The item has been removed.',
       se: 'Raden har raderats.',
+    },
+    users: {
+      en: 'Users',
+    },
+    teams: {
+      en: 'Teams',
+    },
+    rooms: {
+      en: 'Rooms',
+    },
+    following: {
+      en: 'Following',
+    },
+    whispers: {
+      en: 'Whispers',
     },
   },
   ForumView: {
@@ -371,6 +533,20 @@ const labels = {
       en: '+Sub-post',
     },
   },
+  ForumDialog: {
+    titleLength: (override.ForumDialog && override.ForumDialog.titleLength) || {
+      en: 'Title is too long',
+    },
+    textLength: (override.ForumDialog && override.ForumDialog.textLength) || {
+      en: 'Text is too long',
+    },
+    title: (override.ForumDialog && override.ForumDialog.title) || {
+      en: 'Title',
+    },
+    text: (override.ForumDialog && override.ForumDialog.text) || {
+      en: 'Text',
+    },
+  },
   WorldMapView: {
     noName: (override.WorldMapView && override.WorldMapView.noName) || {
       en: 'Unknown position.',
@@ -404,14 +580,16 @@ const labels = {
     removePosition: (override.MapObject && override.MapObject.removePosition) || {
       en: 'Remove',
     },
+    editPosition: (override.MapObject && override.MapObject.editPosition) || {
+      en: 'Edit',
+    },
   },
   MenuBar: {
-    menu: (override.MenuBar && override.MenuBar.menu) || {
-      en: 'Menu',
-      se: 'Meny',
-    },
     emptyTime: (override.MenuBar && override.MenuBar.emptyTime) || {
       en: '--:--',
+    },
+    menu: (override.MenuBar && override.MenuBar.menu) || {
+      en: 'Menu',
     },
   },
   AdminUserDialog: {
@@ -445,6 +623,11 @@ const labels = {
       en: 'Enter the amount that you want to transfer to the wallet. It will be magically created and will not be deducted from your wallet and won\'t show up in the user\'s transaction list.',
     },
   },
+  AdminTeamDialog: {
+    updateTeam: {
+      en: 'Choose an action:',
+    },
+  },
   WalletDialog: {
     walletAmount: (override.WalletDialog && override.WalletDialog.walletAmount) || {
       en: 'Enter the amount that you want to transfer.',
@@ -459,13 +642,31 @@ const labels = {
       en: 'You have',
     },
     sendingFrom: (override.WalletDialog && override.WalletDialog.sendingFrom) || {
-      en: 'Using wallet for',
+      en: 'Transferring from',
     },
     sendingTo: (override.WalletDialog && override.WalletDialog.sendingTo) || {
-      en: 'You are transferring to user',
+      en: 'Transferring to user',
     },
     sendingToTeam: (override.WalletDialog && override.WalletDialog.sendingToTeam) || {
-      en: 'You are transferring to team',
+      en: 'Transferring to team',
+    },
+    transfer: (override.WalletDialog && override.WalletDialog.transfer) || {
+      en: 'Transfer',
+    },
+    teamHas: (override.WalletDialog && override.WalletDialog.teamHas) || {
+      en: 'has',
+    },
+    currency: (override.WalletDialog && override.WalletDialog.currency) || {
+      en: '',
+    },
+    transferFromTeam: (override.WalletDialog && override.WalletDialog.transferFromTeam) || {
+      en: 'Use your team\'s wallet. The team will be the sender',
+    },
+    transferComplete: {
+      en: 'Transfer complete!',
+    },
+    note: {
+      en: 'Short note',
     },
   },
   UserDialog: {
@@ -473,10 +674,10 @@ const labels = {
       en: 'User information',
     },
     partOfTeam: (override.UserDialog && override.UserDialog.partOfTeam) || {
-      en: 'Part of teams',
+      en: 'Teams',
     },
     position: (override.UserDialog && override.UserDialog.position) || {
-      en: 'Tracking coordinates',
+      en: 'Coordinates',
     },
     lastSeenAt: (override.UserDialog && override.UserDialog.lastSeenAt) || {
       en: 'Last seen at',
@@ -497,10 +698,25 @@ const labels = {
       en: 'You are transferring to team',
     },
     trackPosition: (override.UserDialog && override.UserDialog.trackPosition) || {
-      en: 'Track user',
+      en: 'Position',
     },
     username: (override.UserDialog && override.UserDialog.username) || {
       en: 'Username',
+    },
+    password: (override.UserDialog && override.UserDialog.password) || {
+      en: 'Password',
+    },
+    alreadyMember: (override.UserDialog && override.UserDialog.alreadyMember) || {
+      en: 'User is already a member of a team or already in the maximum amount of teams',
+    },
+    teamInviteOk: (override.UserDialog && override.UserDialog.teamInviteOk) || {
+      en: 'User has been added to the team',
+    },
+    leaveTeam: (override.UserDialog && override.UserDialog.leaveTeam) || {
+      en: 'Leave team',
+    },
+    code: {
+      en: 'ID',
     },
   },
   TeamDialog: {
@@ -522,6 +738,23 @@ const labels = {
     shortNameLength: (override.TeamDialog && override.TeamDialog.shortNameLength) || {
       en: 'The short name is too long',
     },
+    teamInfo: (override.TeamDialog && override.TeamDialog.teamInfo) || {
+      en: 'Team information',
+    },
+    createTeam: (override.TeamDialog && override.TeamDialog.createTeam) || {
+      en: 'Create team',
+    },
+    maxUserTeamLength: (override.TeamDialog && override.TeamDialog.maxUserTeamLength) || {
+      en: 'You are already part of the maximum amount of teams',
+    },
+  },
+  PasswordDialog: {
+    password: (override.PasswordDialog && override.PasswordDialog.password) || {
+      en: 'New password',
+    },
+    repeatPassword: (override.PasswordDialog && override.RegisterDialog.PasswordDialog) || {
+      en: 'Repeat password',
+    },
   },
   TransactionList: {
     amount: (override.TransactionList && override.TransactionList.amount) || {
@@ -539,6 +772,51 @@ const labels = {
   VoiceCommands: {
     viewSwitch: (override.VoiceCommands && override.VoiceCommands.viewSwitch) || {
       en: 'switch',
+    },
+  },
+  InvitationList: {
+    receiver: (override.InvitationList && override.InvitationList.receiver) || {
+      en: 'Receiver',
+    },
+  },
+  TerminalPage: {
+    multipleMatches: (override.TerminalPage && override.TerminalPage.multipleMatches) || {
+      en: '$ Multiple matched commands',
+    },
+    notFound: (override.TerminalPage && override.TerminalPage.notFound) || {
+      en: 'command not found',
+    },
+    programs: (override.TerminalPage && override.TerminalPage.programs) || {
+      en: 'Programs',
+    },
+    abortCommand: (override.TerminalPage && override.TerminalPage.abort) || {
+      en: 'abort command',
+    },
+    typeAbort: (override.TerminalPage && override.TerminalPage.typeAbort) || {
+      en: 'Type abort or click to',
+    },
+    aborted: (override.TerminalPage && override.TerminalPage.aborted) || {
+      en: 'You have aborted the running program',
+    },
+    running: (override.TerminalPage && override.TerminalPage.running) || {
+      en: 'Running command',
+    },
+    completed: (override.TerminalPage && override.TerminalPage.completed) || {
+      en: 'Process completed',
+    },
+    placeholder: (override.TerminalPage && override.TerminalPage.placeholder) || {
+      en: 'Enter to see programs',
+    },
+  },
+  FindUserByIdDialog: {
+    findUser: {
+      en: 'Find a user',
+    },
+    id: {
+      en: 'User ID',
+    },
+    notFound: {
+      en: 'No user was found with that ID.',
     },
   },
 };

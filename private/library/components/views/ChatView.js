@@ -22,6 +22,7 @@ const UserList = require('../lists/UserList');
 const WhisperRoomList = require('../lists/WhisperRoomList');
 const RoomFollowingList = require('../lists/RoomFollowingList');
 const RoomInfo = require('./RoomInfo');
+const FindUserByIdDialog = require('./dialogs/FindUserByIdDialog');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -30,6 +31,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 const viewSwitcher = require('../../ViewSwitcher');
+const elementCreator = require('../../ElementCreator');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -42,12 +44,9 @@ class ChatView extends ViewWrapper {
     allowImages,
     hideDate,
     fullDate,
-    titles = {
-      rooms: 'Rooms',
-      following: 'Following',
-      whispers: 'Whispers',
-      users: 'Users',
-    },
+    corners,
+    hideUserList = false,
+    showUserImage = true,
     sendOnEnter = false,
     hideRoomList = false,
     classes = [],
@@ -57,32 +56,56 @@ class ChatView extends ViewWrapper {
   }) {
     const roomList = new RoomList({
       effect,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.rooms,
     });
     const roomFollowingList = new RoomFollowingList({
       effect,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.following,
     });
     const whisperRoomList = new WhisperRoomList({
       effect,
       whisperText,
+      shouldToggle: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.whispers,
     });
     const userList = new UserList({
       effect,
+      shouldToggle: true,
+      showImage: showUserImage,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-      title: titles.users,
       shouldFocusOnClick: false,
     });
+
+    roomList.onToggle = () => {
+      roomFollowingList.hideList();
+      whisperRoomList.hideList();
+      userList.hideList();
+    };
+    roomFollowingList.onToggle = () => {
+      roomList.hideList();
+      whisperRoomList.hideList();
+      userList.hideList();
+    };
+    whisperRoomList.onToggle = () => {
+      roomFollowingList.hideList();
+      roomList.hideList();
+      userList.hideList();
+    };
+    userList.onToggle = () => {
+      roomFollowingList.hideList();
+      whisperRoomList.hideList();
+      roomList.hideList();
+    };
+
     const messageList = new MessageList({
       effect,
       whisperText,
       showTeam,
       fullDate,
       hideDate,
+      corners,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,
@@ -96,15 +119,12 @@ class ChatView extends ViewWrapper {
       placeholder,
       sendOnEnter,
       allowImages,
+      corners,
       minimumAccessLevel: storageManager.getPermissions().SendMessage
         ? storageManager.getPermissions().SendMessage.accessLevel
         : accessCentral.AccessLevels.STANDARD,
       classes: [inputPlacement],
       triggerCallback: ({ text }) => {
-        if (textTools.trimSpace(text.join('')).length === 0) {
-          return;
-        }
-
         const roomId = messageList.getRoomId();
         const room = roomComposer.getRoom({ roomId });
         const participantIds = room.isWhisper
@@ -128,13 +148,17 @@ class ChatView extends ViewWrapper {
         const imagePreview = document.getElementById('imagePreview-input');
         let image;
 
-        if (imagePreview.getAttribute('src')) {
+        if (imagePreview && imagePreview.getAttribute('src')) {
           image = {
             source: imagePreview.getAttribute('src'),
             imageName: imagePreview.getAttribute('name'),
             width: imagePreview.naturalWidth,
             height: imagePreview.naturalHeight,
           };
+        }
+
+        if (!image && textTools.trimSpace(text.join('')).length === 0) {
+          return;
         }
 
         messageComposer.sendMessage({
@@ -170,24 +194,40 @@ class ChatView extends ViewWrapper {
     });
     const roomInfo = new RoomInfo({
       whisperText,
+      corners,
     });
     const columns = [];
     const mainColumn = {
       components: [{ component: roomInfo }],
       classes: ['columnChat'],
     };
-    const roomListComponent = {
+    const roomListColumn = {
       components: [
+        {
+          component: elementCreator.createButton({
+            text: 'Find user by ID',
+            clickFuncs: {
+              leftFunc: () => {
+                const dialog = new FindUserByIdDialog({});
+
+                dialog.addToView({ element: viewSwitcher.getParentElement() });
+              },
+            },
+          }),
+        },
         { component: roomFollowingList },
         { component: whisperRoomList },
         { component: roomList },
-        { component: userList },
       ],
       classes: [
         'columnList',
         'columnRoomList',
       ],
     };
+
+    if (!hideUserList) {
+      roomListColumn.components.push({ component: userList });
+    }
 
     switch (inputPlacement) {
       case 'top': {
@@ -209,14 +249,14 @@ class ChatView extends ViewWrapper {
 
       switch (roomListPlacement) {
         case 'left': {
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
           columns.push(mainColumn);
 
           break;
         }
         default: {
           columns.push(mainColumn);
-          columns.push(roomListComponent);
+          columns.push(roomListColumn);
 
           break;
         }
@@ -244,6 +284,18 @@ class ChatView extends ViewWrapper {
         if (view.viewType === viewSwitcher.ViewTypes.CHAT) {
           this.messageList.scrollList();
         }
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.LOGOUT,
+      func: () => {
+        eventCentral.emitEvent({
+          event: eventCentral.Events.SWITCH_ROOM,
+          params: {
+            room: { objectId: storageManager.getPublicRoomId() },
+          },
+        });
       },
     });
   }

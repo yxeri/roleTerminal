@@ -23,12 +23,13 @@ const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
+const labelHandler = require('../../labels/LabelHandler');
 
 class RoomList extends List {
   constructor({
-    title,
     minimumAccessLevel,
     effect,
+    shouldToggle,
     whisperText = ' <-> ',
     classes = [],
     elementId = `wRList-${Date.now()}`,
@@ -37,10 +38,14 @@ class RoomList extends List {
     classes.push('whisperRoomList');
 
     super({
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'whispers' }),
       elementId,
       classes,
       effect,
+      shouldToggle,
+      sorting: {
+        paramName: 'roomName',
+      },
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       listType: 'whisperRooms',
       filter: {
@@ -64,11 +69,11 @@ class RoomList extends List {
 
                 const identities = userComposer.getWhisperIdentities({ participantIds });
                 const thisIdentityName = currentUser.aliases && currentUser.aliases.length > 0
-                  ? identities[0].username || identities[0].aliasName
+                  ? `${identities[0].username || identities[0].aliasName}${whisperText}`
                   : '';
 
                 return identities.length > 0
-                  ? `${thisIdentityName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  ? `${thisIdentityName}${identities[1].username || identities[1].aliasName}`
                   : '';
               }
 
@@ -147,7 +152,7 @@ class RoomList extends List {
 
     return {
       canSee:
-        (user.aliases && object.participantIds.some(participant => user.aliases.includes(participant)))
+        (user.aliases && object.participantIds.some((participant) => user.aliases.includes(participant)))
         || (user.objectId && object.participantIds.includes(user.objectId))
         || access.canSee,
     };
@@ -155,7 +160,7 @@ class RoomList extends List {
 
   getCollectorObjects() {
     const currentUser = userComposer.getCurrentUser();
-    const userAliases = [currentUser.objectId].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [currentUser.objectId].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allRooms = this.collector.getObjects({
       filter: this.filter,
     });
@@ -165,7 +170,7 @@ class RoomList extends List {
     }
 
     return allRooms.filter((room) => {
-      return userAliases.find(objectId => room.participantIds.includes(objectId));
+      return userAliases.find((objectId) => room.participantIds.includes(objectId));
     }).sort((a, b) => {
       const aParam = a.roomName.toLowerCase();
       const bParam = b.roomName.toLowerCase();

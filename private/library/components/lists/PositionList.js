@@ -23,8 +23,14 @@ const positionComposer = require('../../data/composers/PositionComposer');
 class PositionList extends List {
   constructor(params) {
     const listParams = params;
-    listParams.shouldToggle = true;
-    listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map(positionType => positionComposer.PositionTypes[positionType]);
+    listParams.sorting = {
+      paramName: 'positionName',
+      fallbackParamName: 'objectId',
+    };
+    listParams.shouldToggle = typeof listParams.shouldToggle === 'boolean'
+      ? listParams.shouldToggle
+      : true;
+    listParams.positionTypes = listParams.positionTypes || Object.keys(positionComposer.PositionTypes).map((positionType) => positionComposer.PositionTypes[positionType]);
     listParams.elementId = listParams.elementId || `pList-${Date.now()}`;
     listParams.classes = listParams.classes
       ? listParams.classes.concat(['positionList'])
@@ -79,10 +85,31 @@ class PositionList extends List {
         this.setFocusedListItem(objectId);
       },
     });
+
+    if (this.positionTypes.includes('user')) {
+      eventCentral.addWatcher({
+        event: eventCentral.Events.AGED_POSITIONS,
+        func: ({ positions }) => {
+          positions.forEach((position) => this.removeListItem(position));
+        },
+      });
+    }
+  }
+
+  shouldFilterItem(params) {
+    if (params.object.coordinatesHistory.length === 0) {
+      return false;
+    }
+
+    return super.shouldFilterItem(params);
   }
 
   getCollectorObjects() {
-    return super.getCollectorObjects().filter(position => !/(^polygon)|(^line)/ig.test(position.positionName));
+    return super.getCollectorObjects().filter((position) => {
+      return !/(^polygon)|(^line)/ig.test(position.positionName)
+        && position.coordinatesHistory.length !== 0
+        && (position.positionType !== 'user' || new Date() - new Date(position.lastUpdated) < positionComposer.maxPositionAge);
+    });
   }
 }
 

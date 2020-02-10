@@ -32,7 +32,8 @@ class LockedDocFileDialog extends BaseDialog {
     classes = [],
     elementId = `lDialog-${Date.now()}`,
   }) {
-    const upperText = [
+    const upperText = [labelHandler.getLabel({ baseObject: 'LockedDocFileDialog', label: 'protectedDoc' })];
+    const lowerText = [
       `${title} ${labelHandler.getLabel({ baseObject: 'LockedDocFileDialog', label: 'isLocked', prependSpace: true })}`,
       `${labelHandler.getLabel({ baseObject: 'LockedDocFileDialog', label: 'enterCode' })}`,
     ];
@@ -100,6 +101,7 @@ class LockedDocFileDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      lowerText,
       upperText,
       classes: classes.concat(['lockedDocFileDialog']),
     });

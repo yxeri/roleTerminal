@@ -7,6 +7,15 @@ const socketManager = require('../../SocketManager');
 const aliasComposer = require('./AliasComposer');
 const accessCentral = require('../../AccessCentral');
 
+const anonymous = {
+  partOfTeams: [],
+  followingRooms: [storageManager.getPublicRoomId()],
+  accessLevel: accessCentral.AccessLevels.ANONYMOUS,
+  objectId: -1,
+  aliases: [],
+  username: '---',
+};
+
 class UserComposer extends DataComposer {
   constructor() {
     super({
@@ -27,27 +36,17 @@ class UserComposer extends DataComposer {
       return this.handler.getObject({ objectId: userId });
     }
 
-    return {
-      followingRooms: [storageManager.getPublicRoomId()],
-      accessLevel: accessCentral.AccessLevels.ANONYMOUS,
-      objectId: -1,
-      aliases: [],
-    };
+    return anonymous;
   }
 
   getCurrentIdentity() {
-    const userId = storageManager.getUserId();
-    const aliasId = storageManager.getAliasId();
+    const id = storageManager.getAliasId() || storageManager.getUserId();
 
-    if (aliasId) {
-      return aliasComposer.getAlias({ aliasId });
+    if (id) {
+      return this.getIdentity({ objectId: id });
     }
 
-    if (userId) {
-      return this.handler.getObject({ objectId: userId });
-    }
-
-    return {};
+    return anonymous;
   }
 
   getCurrentTeams() {
@@ -124,25 +123,28 @@ class UserComposer extends DataComposer {
   }
 
   getWhisperIdentities({ participantIds = [0, 1] }) {
-    const { objectId, aliases } = this.getCurrentUser();
+    const {
+      objectId,
+      aliases,
+    } = this.getCurrentUser();
 
     if (objectId) {
-      const users = [
-        this.getUser({ userId: participantIds[0] }) || aliasComposer.getAlias({ aliasId: participantIds[0] }),
-        this.getUser({ userId: participantIds[1] }) || aliasComposer.getAlias({ aliasId: participantIds[1] }),
+      const identities = [
+        this.getIdentity({ objectId: participantIds[0] }),
+        this.getIdentity({ objectId: participantIds[1] }),
       ];
-      const userOrder = [];
-      const { objectId: oneId } = users[0];
+      const identityOrder = [];
+      const { objectId: oneId } = identities[0];
 
       if (oneId === objectId || aliases.includes(oneId)) {
-        userOrder.push(users[0]);
-        userOrder.push(users[1]);
+        identityOrder.push(identities[0]);
+        identityOrder.push(identities[1]);
       } else {
-        userOrder.push(users[1]);
-        userOrder.push(users[0]);
+        identityOrder.push(identities[1]);
+        identityOrder.push(identities[0]);
       }
 
-      return userOrder;
+      return identityOrder;
     }
 
     return [];
@@ -153,7 +155,7 @@ class UserComposer extends DataComposer {
   }
 
   getIdentityName({ objectId }) {
-    const identity = this.getUser({ userId: objectId }) || aliasComposer.getAlias({ aliasId: objectId });
+    const identity = this.getIdentity({ objectId });
 
     if (identity) {
       return identity.aliasName || identity.username;
@@ -204,6 +206,67 @@ class UserComposer extends DataComposer {
         user: { username },
       },
     });
+  }
+
+  updateUser({
+    userId,
+    user,
+    image,
+    callback,
+  }) {
+    this.handler.updateObject({
+      callback,
+      params: {
+        userId,
+        user,
+        image,
+      },
+    });
+  }
+
+  getUsers() {
+    return this.handler.getObjects({});
+  }
+
+  getAllIdentities({ byFullName = false }) {
+    const users = this.getUsers();
+    const aliases = aliasComposer.getAllAliases();
+
+    return aliases.concat(users).sort((a, b) => {
+      const aParam = byFullName
+        ? a.fullName.toLowerCase()
+        : (a.username || a.aliasName).toLowerCase();
+      const bParam = byFullName
+        ? b.fullName.toLowerCase()
+        : (b.username || b.aliasName).toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      }
+
+      if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }
+
+  getImage(identityId) {
+    const identity = this.getIdentity({ objectId: identityId });
+
+    if (identity) {
+      return identity.image;
+    }
+
+    return undefined;
+  }
+
+  getUserByCode({
+    code,
+    callback,
+  }) {
+    socketManager.emitEvent(socketManager.EmitTypes.GETUSERBYCODE, { code }, callback);
   }
 }
 

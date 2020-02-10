@@ -42,6 +42,7 @@ class BaseDialog extends BaseView {
     lowerText,
     upperButtons,
     lowerButtons,
+    timeout,
     images = [],
     inputs = [],
     classes = [],
@@ -52,15 +53,17 @@ class BaseDialog extends BaseView {
       classes: classes.concat(['dialog']),
     });
 
+    this.timeout = timeout;
     this.inputs = inputs;
+    this.timeoutId = null;
 
-    const inputContainer = elementCreator.createContainer({
+    this.inputContainer = elementCreator.createContainer({
       elementId: ids.INPUTCONTAINER,
       classes: [ids.INPUTCONTAINER],
     });
 
     this.inputs.forEach((input) => {
-      this.appendInput({ container: inputContainer, input });
+      this.appendInput({ container: this.inputContainer, input });
     });
 
     this.element.appendChild(elementCreator.createContainer({
@@ -87,7 +90,7 @@ class BaseDialog extends BaseView {
       classes: [ids.LOWERTEXT],
     }));
 
-    this.element.appendChild(inputContainer);
+    this.element.appendChild(this.inputContainer);
 
     this.element.appendChild(elementCreator.createContainer({
       elementId: `${this.elementId}${ids.LOWERBUTTONS}`,
@@ -117,14 +120,26 @@ class BaseDialog extends BaseView {
     if (this.inputs.length > 0) {
       this.inputs[0].focus();
     }
+
+    if (this.timeout) {
+      this.timeoutId = setTimeout(() => { this.removeFromView(); }, this.timeout);
+    }
   }
 
   removeFromView() {
-    this.getParentElement().removeChild(document.getElementById(ids.COVER));
+    const parent = this.getParentElement();
 
-    super.removeFromView();
-    keyHandler.unpause();
-    voiceCommander.unpause();
+    if (parent) {
+      parent.removeChild(document.getElementById(ids.COVER));
+
+      super.removeFromView();
+      keyHandler.unpause();
+      voiceCommander.unpause();
+
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+      }
+    }
   }
 
   createTextContainer({ elementId, text = [] }) {
@@ -143,8 +158,12 @@ class BaseDialog extends BaseView {
 
   hasEmptyRequiredInputs() {
     const emptyInputs = this.inputs
-      .filter(input => input.getAttribute('required') === 'true')
-      .filter(input => input.value === '');
+      .filter((input) => input.getAttribute('required') === 'true')
+      .filter((input) => {
+        return (input.value === '')
+          || (input.tagName.toLowerCase() === 'select'
+            && (!input.selectedOptions || Array.from(input.selectedOptions).every((selected) => selected.getAttribute('value') === '')));
+      });
 
     emptyInputs.forEach((input) => {
       BaseDialog.markInput({ input });
@@ -176,21 +195,38 @@ class BaseDialog extends BaseView {
   appendInput({ container, input }) {
     const inputToAdd = input;
 
-    inputToAdd.setAttribute('id', `${this.elementId}${inputToAdd.getAttribute('id')}`);
+    if (inputToAdd.tagName === 'LABEL') {
+      const inputElement = inputToAdd.firstElementChild;
+
+      inputElement.setAttribute('id', `${this.elementId}${inputElement.getAttribute('id')}`);
+    } else {
+      inputToAdd.setAttribute('id', `${this.elementId}${inputToAdd.getAttribute('id')}`);
+    }
 
     container.appendChild(input);
   }
 
-  getInputValue(elementId) {
+  getInputValue(elementId, type = '') {
     const input = this.getElement(elementId);
 
     if (input) {
-      const {
-        checked,
-        value,
-      } = input;
+      switch (type) {
+        case 'select': {
+          return Array.from(input.selectedOptions)
+            .filter((selected) => selected.getAttribute('value') !== '')
+            .map((selected) => selected.getAttribute('value'));
+        }
+        case 'checkBox': {
+          const { checked } = input;
 
-      return value || checked || '';
+          return checked;
+        }
+        default: {
+          const { value } = input;
+
+          return value || '';
+        }
+      }
     }
 
     return '';

@@ -20,6 +20,9 @@ $unverified: #b0b000;
 $verified: green;
 $banned: #c50000;
 
+$status-bar-height: 1.5em;
+$border: 1px solid;
+
 html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fieldset {
   margin: 0;
   padding: 0;
@@ -71,13 +74,17 @@ button {
   display: none;
 }
 
-.statusBar {
-  order: 1;
+.menuBar {
+  order: 2;
   width: 100%;
   box-sizing: border-box;
-  border-bottom: $border-width solid $text-color;
+  border-top: $border;
+  background-color: $button-background;
   display: flex;
   z-index: 8;
+  color: $text-color;
+  font-size: 1.1em;
+  height: 1.2em;
 
   > span {
     margin-right: .5em;
@@ -95,38 +102,45 @@ button {
     text-decoration: none;
   }
 
-  .topMenuButton:before {
-    content: '| ';
-  }
-
-  .topMenuButton:after {
-    content: ' |';
-  }
-
   .topMenuButton {
-    background-color: $button-background;
     font-weight: bold;
+    background-color: $text-color;
+    color: $button-background;
+    padding-left: .1em;
+    padding-right: .1em;
   }
 
   .topMenu {
     position: absolute;
+    background-color: $background-color;
     max-width: 12em;
     z-index: 9;
+    border-bottom: $border;
+    max-height: calc(100% - 1.5em);
+    overflow-y: scroll;
+    border: $border;
+    bottom: 1.2em;
+    box-shadow: 2px 0 5px black;
+    -webkit-box-shadow: 2px 0 5px black;
+    scrollbar-width: none;
 
     button {
       width: 100%;
+      border-left: 0;
+      border-right: 0;
     }
 
     p {
+      background-color: $button-background;
       color: $text-color;
       box-sizing: border-box;
-      border: $border-width solid $text-color;
-      width: 100%;
-      padding: .3em 0;
-      text-align: center;
+      border-bottom: $border;
+      padding: .2em;
+    }
 
-      span {
-        padding: 0 .3em;
+    li:last-child {
+      p {
+        border-bottom: 0;
       }
     }
   }
@@ -149,7 +163,7 @@ button {
   -webkit-overflow-scrolling: touch;
   background-color: $background-color;
   border: $border-width solid $text-color;
-  position: absolute;
+  position: fixed;
   top: 2em;
   left: 0;
   right: 0;
@@ -221,6 +235,10 @@ button {
 
 .column {
   margin-top: .2em;
+  overflow-y:auto;
+  height: 100%;
+  width: 100%;
+
 }
 
 .topMenuButton {
@@ -235,4 +253,22 @@ button {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.withMenuBar {
+  height: calc(100% - #{$status-bar-height});
+  order: 1;
+}
+
+.viewWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: row wrap;
+}
+
+#main {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }

@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
+const BaseView = require('./BaseView');
 const EditRoomDialog = require('./dialogs/EditRoomDialog');
 
 const roomComposer = require('../../data/composers/RoomComposer');
@@ -22,10 +22,10 @@ const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
-const labelHandler = require('../../labels/LabelHandler');
 
-class RoomInfo extends ViewWrapper {
+class RoomInfo extends BaseView {
   constructor({
+    corners = [],
     userText = 'User: ',
     whisperText = ' <-> ',
     classes = [],
@@ -52,16 +52,17 @@ class RoomInfo extends ViewWrapper {
         const identities = userComposer.getWhisperIdentities({ participantIds });
 
         nameSpan.appendChild(document.createTextNode(identities.length > 0
-          ? `${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'whisper' })}: ${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+          ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
           : ''));
 
         return;
       }
 
-      nameSpan.appendChild(document.createTextNode(`${labelHandler.getLabel({ baseObject: 'RoomInfo', label: 'room' })}: ${foundRoom.roomName}`));
+      nameSpan.appendChild(document.createTextNode(foundRoom.roomName));
     };
 
     super({
+      corners,
       elementId,
       useDefaultCss: false,
       classes: classes.concat([

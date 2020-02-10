@@ -64,6 +64,8 @@ class Tracker {
         setTimeout(() => {
           this.startTracker({ standalone: true });
         }, 1000);
+
+        return;
       }
 
       backgroundGeo.onLocation((position) => {
@@ -152,7 +154,7 @@ class Tracker {
       return;
     }
 
-    if (this.latestBestPosition.coordinates.accuracy > 150) {
+    if (this.latestBestPosition.coordinates.accuracy > 100) {
       return;
     }
 

@@ -31,45 +31,37 @@ class TransactionList extends List {
   }) {
     const headerFields = [
       {
+        paramName: 'fromWalletId',
+        convertFunc: (fromWalletId) => {
+          return `${walletComposer.getWalletOwnerName({ walletId: fromWalletId }) || fromWalletId} ${toText} `;
+        },
+      }, {
+        paramName: 'toWalletId',
+        convertFunc: (toWalletId) => {
+          return `${walletComposer.getWalletOwnerName({ walletId: toWalletId }) || toWalletId}`;
+        },
+      }, {
+        paramName: 'amount',
+        convertFunc: (amount) => {
+          return `${amount}${labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' })}`;
+        },
+      }, {
         paramName: 'customTimeCreated',
         fallbackTo: 'timeCreated',
         convertFunc: (time) => {
           const timestamp = textTools.generateTimestamp({ date: time });
 
-          return `${timestamp.fullDate} - ${timestamp.fullTime}`;
+          return `${timestamp.fullDate} ${timestamp.fullTime}`;
         },
       }, {
-        paramName: 'fromWalletId',
-        convertFunc: (fromWalletId) => {
-          return `${walletComposer.getWalletOwnerName({ walletId: fromWalletId }) || fromWalletId} ${toText}`;
-        },
-      }, {
-        paramName: 'toWalletId',
-        convertFunc: (toWalletId) => {
-          return `${walletComposer.getWalletOwnerName({ walletId: toWalletId }) || toWalletId}.`;
-        },
-      }, {
-        paramName: 'amount',
-        convertFunc: (amount) => {
-          return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'amount' })}: ${amount}.`;
-        },
-      }, {
-        paramName: 'coordinates',
-        convertFunc: (coordinates) => {
-          if (coordinates) {
-            const { longitude, latitude } = coordinates;
-
-            return `${labelHandler.getLabel({ baseObject: 'TransactionList', label: 'sentFrom' })}: Latitude ${latitude} Longitude ${longitude}`;
-          }
-
-          return '';
-        },
+        paramName: 'note',
       },
     ];
 
     super({
       elementId,
       effect,
+      shouldFocusOnClick: false,
       sorting: {
         paramName: 'cutomTimeCreated',
         fallbackParamName: 'timeCreated',
@@ -83,11 +75,6 @@ class TransactionList extends List {
         dataHandler.teams,
         dataHandler.wallets,
       ],
-      listItemClickFuncs: {
-        // leftFunc: (objectId) => {
-        //
-        // },
-      },
       collector: dataHandler.transactions,
       listItemFields: headerFields,
     });

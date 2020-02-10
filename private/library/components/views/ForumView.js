@@ -22,27 +22,46 @@ const UserList = require('../lists/UserList');
 class ForumView extends ViewWrapper {
   constructor({
     effect,
+    corners,
+    shouldDisableVoting,
+    showUserList = true,
+    showForumList = true,
     classes = [],
     elementId = `fView-${Date.now()}`,
   }) {
     const forumList = new ForumList({ effect });
-    const forumPage = new ForumPage({ effect });
+    const forumPage = new ForumPage({
+      effect,
+      shouldDisableVoting,
+      corners,
+    });
     const userList = new UserList({
       title: 'Users',
     });
+    const columns = [];
+
+    if (showUserList || showForumList) {
+      const components = [];
+
+      if (showForumList) {
+        components.push({ component: forumList });
+      }
+
+      if (showUserList) {
+        components.push({ component: userList });
+      }
+
+      columns.push({
+        components,
+        classes: ['columnList'],
+      });
+    }
+
+    columns.push({ components: [{ component: forumPage }] });
 
     super({
       elementId,
-      columns: [
-        {
-          components: [
-            { component: forumList },
-            { component: userList },
-          ],
-          classes: ['columnList'],
-        },
-        { components: [{ component: forumPage }] },
-      ],
+      columns,
       classes: classes.concat(['forumView']),
     });
   }

@@ -1,10 +1,11 @@
 {
   "name": "roleterminal",
-  "version": "1.2.2",
+  "version": "1.5.0",
   "description": "In-game tool/game for use at Blodsband Reloaded event. Dependency: roleHaven",
   "author": "Carmilla Mina Jankovic <carmillam@icloud.com>",
   "private": true,
   "scripts": {
+    "dev": "./node_modules/roleHaven/start.sh && MODE=dev MAINJSNAME=main MAINCSSNAME=main INDEXNAME=main node app",
     "test": "DEBUG=eslint:cli-engine eslint ./",
     "start": "node app",
     "nsp": "nsp check"
@@ -18,13 +19,13 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "eslint": "5.8.0",
-    "eslint-config-airbnb": "17.1.0",
-    "eslint-config-airbnb-base": "13.1.0",
-    "eslint-plugin-import": "2.14.0",
-    "eslint-plugin-jsx-a11y": "6.1.2",
-    "eslint-plugin-mocha": "5.2.0",
-    "eslint-plugin-react": "7.11.1"
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "18.0.1",
+    "eslint-config-airbnb-base": "14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-mocha": "^6.2.2",
+    "eslint-plugin-react": "^7.18.0"
   },
   "dependencies": {
     "rolehaven": "git://github.com/yxeri/roleHaven.git"

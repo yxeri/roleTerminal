@@ -95,29 +95,43 @@ class AccessCentral {
     objectToAccess,
     toAuth,
   }) {
+    if (!objectToAccess || !toAuth) {
+      return {
+        canSee: false,
+        hasFullAccess: false,
+        hasAccess: false,
+      };
+    }
+
     const {
+      ownerId,
+      ownerAliasId,
+      teamId,
+      isPublic,
+      visibility,
       teamIds = [],
       userIds = [],
       userAdminIds = [],
       teamAdminIds = [],
-      ownerId,
-      isPublic,
-      visibility,
     } = objectToAccess;
     const {
       hasFullAccess,
+      partOfTeams = [],
       accessLevel = this.AccessLevels.ANONYMOUS,
       objectId: authUserId,
       teamIds: authTeamIds = [],
       aliases = [],
     } = toAuth;
 
+    const foundOwnerAlias = ownerAliasId && aliases.includes(ownerAliasId);
+    const partOfTeam = teamId && partOfTeams.includes(teamId);
+
     const userHasAccess = userIds.concat([ownerId]).includes(authUserId);
-    const teamHasAccess = teamIds.find(teamId => authTeamIds.includes(teamId));
-    const aliasHasAccess = aliases.find(aliasId => userIds.includes(aliasId));
+    const teamHasAccess = partOfTeam || teamIds.find((id) => authTeamIds.includes(id));
+    const aliasHasAccess = foundOwnerAlias || aliases.find((aliasId) => userIds.includes(aliasId));
     const userHasAdminAccess = userAdminIds.includes(authUserId);
-    const aliasHasAdminAccess = aliases.find(aliasId => userAdminIds.includes(aliasId));
-    const teamHasAdminAccess = teamAdminIds.find(adminId => authTeamIds.includes(adminId));
+    const aliasHasAdminAccess = foundOwnerAlias || aliases.find((aliasId) => userAdminIds.includes(aliasId));
+    const teamHasAdminAccess = partOfTeam || teamAdminIds.find((adminId) => authTeamIds.includes(adminId));
     const isAdmin = ownerId === authUserId || hasFullAccess || accessLevel >= this.AccessLevels.ADMIN;
 
     return {

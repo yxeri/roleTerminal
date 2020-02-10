@@ -203,17 +203,22 @@ class TextTools {
   }
 
   static randomiseCase(string, charToLower) {
-    return string.split().map((char) => {
+    const charArray = string.split('');
+    let newString = '';
+
+    for (let i = 0; i < charArray.length; i += 1) {
+      const char = charArray[i];
+
       if (char === charToLower) {
-        return char.toLowerCase();
+        newString += char.toLowerCase();
+      } else if (Math.random() > 0.5) {
+        newString += char.toUpperCase();
+      } else {
+        newString += char;
       }
+    }
 
-      if (Math.random() > 0.5) {
-        return char.toUpperCase();
-      }
-
-      return char;
-    }).join('');
+    return newString;
   }
 
   static createRandString({ selection, length }) {
@@ -277,7 +282,8 @@ class TextTools {
     target,
     callback = () => {},
     amount = 5,
-    paragraphFunc = () => {},
+    charFunc = () => {
+    },
   }) {
     const paragraph = paragraphs.shift();
     let spans;
@@ -291,6 +297,7 @@ class TextTools {
       if (characters[0]) {
         span.appendChild(document.createTextNode(characters.join('')));
 
+        charFunc();
         setTimeout(() => {
           charAnimator({
             span,
@@ -311,7 +318,7 @@ class TextTools {
 
         span.textContent = '';
         paragraph.appendChild(span);
-        paragraphFunc();
+        charFunc();
 
         charAnimator({
           span,
@@ -323,7 +330,7 @@ class TextTools {
             amount,
             paragraphs,
             target,
-            paragraphFunc,
+            charFunc,
             callback,
           });
         }, 50);
@@ -334,7 +341,7 @@ class TextTools {
       const dumpFragment = document.createDocumentFragment();
       spans = Array.from(paragraph.getElementsByTagName('span'));
 
-      spans.forEach(child => dumpFragment.appendChild(child));
+      spans.forEach((child) => dumpFragment.appendChild(child));
       target.appendChild(paragraph);
 
       spanAnimator();

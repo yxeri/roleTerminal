@@ -19,6 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const teamComposer = require('../../../data/composers/TeamComposer');
+const storageManager = require('../../../StorageManager');
 
 const ids = {
   TEAMNAME: 'teamName',
@@ -48,6 +49,17 @@ class TeamCreateDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'tag' }),
       }),
     ];
+
+    if (storageManager.getAllowedImages().PROFILE) {
+      inputs.push(elementCreator.createImageInput({
+        buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-team',
+      }));
+    }
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -63,11 +75,25 @@ class TeamCreateDialog extends BaseDialog {
               return;
             }
 
-            teamComposer.createTeam({
+            const params = {
               team: {
                 teamName: this.getInputValue(ids.TEAMNAME),
                 shortName: this.getInputValue(ids.TAG),
               },
+            };
+            const imagePreview = document.getElementById('imagePreview-team');
+
+            if (imagePreview && imagePreview.getAttribute('src')) {
+              params.image = {
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              };
+            }
+
+            teamComposer.createTeam({
+              ...params,
               callback: ({ error }) => {
                 if (error) {
                   if (error.type === 'invalid length') {
@@ -75,20 +101,27 @@ class TeamCreateDialog extends BaseDialog {
                       case 'teamName': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'teamNameLength' })] });
 
-                        break;
+                        return;
                       }
                       case 'shortName': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'shortNameLength' })] });
 
-                        break;
+                        return;
+                      }
+                      case 'maxUserTeam': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'maxUserTeamLength' })] });
+
+                        return;
                       }
                       default: {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
-                        break;
+                        return;
                       }
                     }
                   }
+
+                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
 
                   return;
                 }
@@ -100,12 +133,14 @@ class TeamCreateDialog extends BaseDialog {
         },
       }),
     ];
+    const upperText = [labelHandler.getLabel({ baseObject: 'TeamDialog', label: 'createTeam' })];
 
     super({
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['TeamDialog']),
+      upperText,
+      classes: classes.concat(['teamDialog']),
     });
   }
 }

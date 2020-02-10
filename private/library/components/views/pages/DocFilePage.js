@@ -25,7 +25,6 @@ const accessCentral = require('../../../AccessCentral');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const viewSwitcher = require('../../../ViewSwitcher');
-const textTools = require('../../../TextTools');
 
 /**
  * Create fragment with admin buttons for the document.
@@ -35,6 +34,7 @@ const textTools = require('../../../TextTools');
  */
 function createControls({
   docFile,
+  closeFunc,
 }) {
   const fragment = document.createDocumentFragment();
 
@@ -43,6 +43,7 @@ function createControls({
     clickFuncs: {
       leftFunc: () => {
         const dialog = new EditDocFileDialog({
+          closeFunc,
           docFileId: docFile.objectId,
         });
 
@@ -103,6 +104,7 @@ function createBody({ docFile }) {
 class DocFilePage extends BaseView {
   constructor({
     effect,
+    closeFunc = () => {},
     classes = [],
     elementId = `dFPage-${Date.now()}`,
   }) {
@@ -118,8 +120,9 @@ class DocFilePage extends BaseView {
       func: ({ docFile }) => {
         this.createDocument({
           elementId,
-          classes,
+          classes: classes.concat(['docFilePage']),
           docFile,
+          closeFunc,
           effect: this.openDocFileId === docFile.objectId
             ? false
             : effect,
@@ -147,8 +150,6 @@ class DocFilePage extends BaseView {
         docFile,
         changeType,
       }) => {
-        console.log('doc file page', changeType, docFile, this.openDocFileId);
-
         switch (changeType) {
           case socketManager.ChangeTypes.REMOVE: {
             if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
@@ -161,8 +162,9 @@ class DocFilePage extends BaseView {
             if (this.openDocFileId && this.openDocFileId === docFile.objectId) {
               this.createDocument({
                 elementId,
-                classes,
                 docFile,
+                closeFunc,
+                classes: classes.concat(['docFilePage']),
               });
             }
 
@@ -180,7 +182,7 @@ class DocFilePage extends BaseView {
     elementId,
     classes,
     docFile,
-    effect,
+    closeFunc,
   }) {
     const newElement = elementCreator.createContainer({
       elementId,
@@ -191,36 +193,29 @@ class DocFilePage extends BaseView {
       toAuth: userComposer.getCurrentUser(),
     });
 
+    newElement.appendChild(elementCreator.createButton({
+      text: 'X',
+      classes: ['close'],
+      clickFuncs: {
+        leftFunc: () => {
+          closeFunc();
+        },
+      },
+    }));
+
     if (hasFullAccess) {
       newElement.appendChild(createControls({
         docFile,
+        closeFunc,
         parentElement: this.getParentElement(),
       }));
     }
 
-    if (effect) {
-      const children = ([createHeader({ docFile })]).concat(Array.from(createBody({ docFile }).childNodes));
-      const dumpFragment = document.createDocumentFragment();
+    newElement.appendChild(createHeader({ docFile }));
+    newElement.appendChild(createBody({ docFile }));
 
-      children.forEach(child => dumpFragment.appendChild(child));
-
-      textTools.typewriter({
-        amount: 15,
-        paragraphs: children,
-        target: newElement,
-        callback: () => {
-          if (docFile.images && docFile.images.length > 0) {
-            newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
-          }
-        },
-      });
-    } else {
-      newElement.appendChild(createHeader({ docFile }));
-      newElement.appendChild(createBody({ docFile }));
-
-      if (docFile.images && docFile.images.length > 0) {
-        newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
-      }
+    if (docFile.images && docFile.images.length > 0) {
+      newElement.appendChild(elementCreator.createPicture({ picture: docFile.images[0] }));
     }
 
     this.replaceOnParent({ element: newElement });

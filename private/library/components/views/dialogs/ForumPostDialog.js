@@ -49,7 +49,7 @@ class ForumPostDialog extends BaseDialog {
         elementId: ids.TEXT,
         inputName: 'text',
         type: 'text',
-        maxLength: 3500,
+        maxLength: 600,
         multiLine: true,
         shouldResize: true,
         placeholder: labelHandler.getLabel({ baseObject: 'ForumPostDialog', label: 'text' }),

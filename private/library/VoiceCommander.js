@@ -19,6 +19,8 @@ class VoiceCommander {
     if (typeof annyang !== 'undefined') { // eslint-disable-line
       this.voiceListener = annyang; // eslint-disable-line
     }
+
+    this.hasStarted = false;
     this.commands = {};
   }
 
@@ -29,11 +31,22 @@ class VoiceCommander {
       return;
     }
 
+    this.voiceListener.addCallback('errorPermissionBlocked', () => {
+      this.voiceListener.abort();
+      this.hasStarted = false;
+    });
+
+    this.voiceListener.addCallback('errorPermissionDenied', () => {
+      this.voiceListener.abort();
+      this.hasStarted = false;
+    });
+
     this.voiceListener.start({
       autoRestart: true,
       continuous: false,
     });
     this.voiceListener.addCommands(this.commands);
+    this.hasStarted = true;
   }
 
   addCommands({
@@ -58,13 +71,13 @@ class VoiceCommander {
       });
     });
 
-    if (this.voiceListener) {
+    if (this.voiceListener && this.hasStarted) {
       this.voiceListener.addCommands(commandsObj);
     }
   }
 
   pause() {
-    if (!this.voiceListener) {
+    if (!this.voiceListener || !this.hasStarted) {
       return;
     }
 
@@ -72,7 +85,7 @@ class VoiceCommander {
   }
 
   unpause() {
-    if (!this.voiceListener) {
+    if (!this.voiceListener || !this.hasStarted) {
       return;
     }
 

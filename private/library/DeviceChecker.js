@@ -22,6 +22,7 @@ class DeviceChecker {
       IOS: 'ios',
       ANDROID: 'android',
       OTHER: 'other',
+      IOSOLD: 'iosOld',
     };
     this.BrowserEnum = {
       SAFARIDESKTOP: 'safari desktop',
@@ -29,6 +30,10 @@ class DeviceChecker {
     };
     this.deviceType = (() => {
       if (userAgent.match(/iP(hone|ad|od)/i) !== null) {
+        if (userAgent.match(/OS (7_|8_|9_)/i) !== null) {
+          return this.DeviceEnum.IOSOLD;
+        }
+
         return this.DeviceEnum.IOS;
       }
 

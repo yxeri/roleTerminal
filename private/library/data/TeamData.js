@@ -17,7 +17,7 @@
 const BaseData = require('./BaseData');
 
 const eventCentral = require('../EventCentral');
-const { EmitTypes } = require('../SocketManager');
+const socketManager = require('../SocketManager');
 
 class TeamData extends BaseData {
   constructor() {
@@ -43,7 +43,22 @@ class TeamData extends BaseData {
       removeEvents: {
         one: 'removeTeam',
       },
-      emitTypes: [EmitTypes.TEAM],
+      emitTypes: [socketManager.EmitTypes.TEAM],
+    });
+
+    socketManager.addEvent(socketManager.EmitTypes.TEAMMEMBER, ({ data }) => {
+      const {
+        team,
+        user,
+      } = data;
+
+      eventCentral.emitEvent({
+        event: eventCentral.Events.TEAM_MEMBER,
+        params: {
+          team,
+          user,
+        },
+      });
     });
   }
 }

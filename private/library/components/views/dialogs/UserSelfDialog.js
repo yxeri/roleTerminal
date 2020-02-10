@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Carmilla Mina Jankovic
+ Copyright 2019 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,42 +15,136 @@
  */
 
 const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
+const PasswordDialog = require('./PasswordDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const userComposer = require('../../../data/composers/UserComposer');
 const positionComposer = require('../../../data/composers/PositionComposer');
-// const invititationComposer = require('../../../data/composers/InvitationComposer');
-// const teamComposer = require('../../../data/composers/TeamComposer');
 const eventCentral = require('../../../EventCentral');
-// const storageManager = require('../../../StorageManager');
-// const accessCentral = require('../../../AccessCentral');
 const viewSwitcher = require('../../../ViewSwitcher');
+const teamComposer = require('../../../data/composers/TeamComposer');
+const storageManager = require('../../../StorageManager');
+const aliasComposer = require('../../../data/composers/AliasComposer');
+
+const ids = {
+  PICTURE: 'picture',
+  DESCRIPTION: 'description',
+};
 
 class UserSelfDialog extends BaseDialog {
   constructor({
     classes = [],
-    elementId = `uSDialog-${Date.now()}`,
+    elementId = `uDialog-${Date.now()}`,
   }) {
-    const currentUser = userComposer.getCurrentUser();
+    const identity = userComposer.getCurrentIdentity();
     const {
+      image,
+      partOfTeams,
+      fullName,
       username,
-      objectId: userId,
-      partOfTeams = [],
-    } = currentUser;
-    const partOfTeamsText = partOfTeams.length > 0
-      ? partOfTeams
-      : [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'none' })];
-    const userPosition = positionComposer.getPosition({ positionId: userId });
-    const positionLabel = userPosition && userPosition.coordinates
-      ? `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'lastSeenAt', appendSpace: true })}
-      (${userPosition.lastUpdated}): Lat ${userPosition.coordinates.latitude} Long ${userPosition.coordinates.longitude}`
-      : labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'unknown' });
+      aliasName,
+      description,
+      code,
+      customFields = [],
+      objectId: identityId,
+    } = identity;
+    const identityPosition = positionComposer.getPosition({ positionId: identity.objectId });
+    const name = aliasName || username;
+    const isAlias = typeof aliasName !== 'undefined';
+    const customUserFields = storageManager.getCustomUserFields();
+
+    const inputs = [
+      elementCreator.createInput({
+        inputName: 'description',
+        elementId: ids.DESCRIPTION,
+        multiLine: true,
+        shouldResize: true,
+        text: description,
+        placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'description' }),
+        maxLength: 300,
+      }),
+    ];
+
+    if (storageManager.getAllowedImages().PROFILE) {
+      inputs.push(elementCreator.createImageInput({
+        buttonText: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'image' }),
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-userSelf',
+      }));
+    }
+
+    customUserFields.forEach((field) => {
+      const {
+        type,
+        parent,
+        hidden,
+        revealOnClick,
+        maxLength,
+        name: fieldName,
+      } = field;
+      const existing = customFields.find((customField) => customField.name === fieldName);
+      const hasRevealer = customUserFields.find((customField) => customField.parent === parent && customField.revealOnClick);
+      const revealer = hasRevealer
+        ? customFields.find((customField) => customField.name === hasRevealer.name)
+        : undefined;
+
+      if (type === 'checkBox') {
+        inputs.push(elementCreator.createCheckBox({
+          parent,
+          isChecked: existing && existing.value,
+          name: fieldName,
+          classes: hidden && (!revealer || !revealer.value)
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          text: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+          clickFuncs: revealOnClick
+            ? {
+              leftFunc: () => {
+                Array.from(this.inputContainer.children).forEach((child) => {
+                  const parentName = child.getAttribute('parent');
+                  const childName = child.getAttribute('name');
+
+                  if (parentName && parentName === parent && childName && childName !== fieldName) {
+                    if (this.getInputValue(fieldName, 'checkBox')) {
+                      child.classList.remove('hide');
+                    } else {
+                      child.classList.add('hide');
+                    }
+                  }
+                });
+              },
+            }
+            : undefined,
+        }));
+      } else if (type === 'input' || type === 'textArea') {
+        const existingValue = existing
+          ? existing.value
+          : undefined;
+
+        inputs.push(elementCreator.createInput({
+          parent,
+          maxLength,
+          multiLine: type === 'textArea',
+          text: existingValue && type !== 'textArea'
+            ? [existingValue]
+            : existingValue,
+          inputName: fieldName,
+          classes: hidden && (!revealer || !revealer.value)
+            ? ['hide']
+            : undefined,
+          elementId: fieldName,
+          placeholder: labelHandler.getLabel({ baseObject: parent, label: fieldName }),
+        }));
+      }
+    });
 
     const lowerButtons = [
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'done' }),
+        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
         clickFuncs: {
           leftFunc: () => {
             this.removeFromView();
@@ -58,80 +152,19 @@ class UserSelfDialog extends BaseDialog {
         },
       }),
       elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'UserSelfDialog', label: 'rename' }),
+        text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'password' }),
         clickFuncs: {
           leftFunc: () => {
-            const renameDialog = new BaseDialog({
-              inputs: [
-                elementCreator.createInput({
-                  elementId: 'username',
-                  inputName: 'username',
-                  type: 'text',
-                  isRequired: true,
-                  maxLength: 10,
-                  placeholder: labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'username' }),
-                }),
-              ],
-              lowerButtons: [
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
-                  clickFuncs: {
-                    leftFunc: () => { this.removeFromView(); },
-                  },
-                }),
-                elementCreator.createButton({
-                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
-                  clickFuncs: {
-                    leftFunc: () => {
-                      if (this.hasEmptyRequiredInputs()) {
-                        return;
-                      }
+            const dialog = new PasswordDialog({});
 
-                      userComposer.updateUsername({
-                        userId,
-                        username,
-                        callback: ({ error: updateError }) => {
-                          if (updateError) {
-                            console.log('Failed to update username');
-
-                            return;
-                          }
-
-                          const parentElement = renameDialog.getParentElement();
-
-                          renameDialog.removeFromView();
-                          this.addToView({ element: parentElement });
-                        },
-                      });
-                    },
-                  },
-                }),
-              ],
-            });
-
-            renameDialog.addToView({ element: this.getParentElement() });
-            this.removeFromView();
-          },
-        },
-      }),
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'Button', label: 'leaveTeam' }),
-        clickFuncs: {
-          leftFunc: () => {
-            const verifyDialog = new VerifyDialog({
-              callback: () => {},
-            });
-
-            verifyDialog.addToView({
-              element: this.getParentElement(),
-            });
+            dialog.addToView({ element: this.getParentElement() });
             this.removeFromView();
           },
         },
       }),
     ];
 
-    if (userPosition) {
+    if (identityPosition) {
       lowerButtons.push(elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
         clickFuncs: {
@@ -139,8 +172,8 @@ class UserSelfDialog extends BaseDialog {
             viewSwitcher.switchViewByType({ type: viewSwitcher.ViewTypes.WORLDMAP });
 
             eventCentral.emitEvent({
-              event: eventCentral.Events.FOCUS_USER_MAPPOSITION,
-              params: { userId },
+              event: eventCentral.Events.FOCUS_MAPPOSITION,
+              params: { position: identityPosition },
             });
 
             this.removeFromView();
@@ -149,19 +182,126 @@ class UserSelfDialog extends BaseDialog {
       }));
     }
 
+    lowerButtons.push(elementCreator.createButton({
+      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+      clickFuncs: {
+        leftFunc: () => {
+          if (this.hasEmptyRequiredInputs()) {
+            return;
+          }
+
+          const params = {
+            callback: ({ error }) => {
+              if (error) {
+                console.log(error);
+
+                return;
+              }
+
+              this.removeFromView();
+            },
+          };
+          const imagePreview = document.getElementById('imagePreview-userSelf');
+          const descriptionInput = this.getInputValue(ids.DESCRIPTION);
+          const object = {
+            customFields: [],
+          };
+
+          if (imagePreview && imagePreview.getAttribute('src')) {
+            params.image = {
+              source: imagePreview.getAttribute('src'),
+              imageName: imagePreview.getAttribute('name'),
+              width: imagePreview.naturalWidth,
+              height: imagePreview.naturalHeight,
+            };
+          }
+
+          if ((description.length === 0 && descriptionInput) || descriptionInput !== description.join('\n')) {
+            object.description = descriptionInput.split('\n');
+          }
+
+          if (customUserFields.length > 0) {
+            object.customFields = [];
+
+            customUserFields.forEach((field) => {
+              const {
+                type,
+                name: fieldName,
+              } = field;
+
+              if (type === 'checkBox') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName, 'checkBox'),
+                });
+              } else if (type === 'input') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName),
+                });
+              } else if (type === 'textArea') {
+                object.customFields.push({
+                  name: fieldName,
+                  value: this.getInputValue(fieldName).split('\n'),
+                });
+              }
+            });
+          }
+
+          if (isAlias) {
+            params.aliasId = identityId;
+            params.alias = object;
+            aliasComposer.updateAlias(params);
+          } else {
+            params.userId = identityId;
+            params.user = object;
+            userComposer.updateUser(params);
+          }
+        },
+      },
+    }));
+
     const upperText = [
       `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'userInfo' })}`,
-      '',
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${username}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${partOfTeamsText}`,
-      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`,
     ];
+    const lowerText = [];
 
+    if (fullName) {
+      lowerText.push(fullName);
+    }
+
+    lowerText.push(
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`,
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'code' })}: ${code}`,
+    );
+
+    if (partOfTeams && partOfTeams.length > 0) {
+      const teamNames = partOfTeams.map((teamId) => teamComposer.getTeamName({ teamId })).join(', ');
+
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'partOfTeam' })}: ${teamNames}`);
+    }
+
+    if (identityPosition && identityPosition.coordinatesHistory && identityPosition.coordinatesHistory[0]) {
+      const positionLabel = `(${identityPosition.lastUpdated}): Lat ${identityPosition.coordinatesHistory[0].latitude} Long ${identityPosition.coordinatesHistory[0].longitude}`;
+
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
+    }
+
+    const images = [];
+
+    if (image) {
+      images.push(elementCreator.createPicture({
+        picture: image,
+      }));
+    }
     super({
       elementId,
       lowerButtons,
       upperText,
-      classes: classes.concat(['UserDialog']),
+      lowerText,
+      images,
+      inputs,
+      classes: classes.concat(['userSelfDialog']),
     });
   }
 }

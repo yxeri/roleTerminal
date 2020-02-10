@@ -17,12 +17,13 @@
 const storageManager = require('./StorageManager');
 const eventCentral = require('./EventCentral');
 const textTools = require('./TextTools');
+const notificationManager = require('./NotificationManager');
 
 class SocketManager {
   constructor() {
     this.socket = io(typeof ioUri !== 'undefined' // eslint-disable-line no-undef
       ? ioUri // eslint-disable-line no-undef
-      : '/');
+      : '/', { forceNew: true });
     this.lastAlive = (new Date()).getTime();
     this.reconnecting = false;
     this.hasConnected = false;
@@ -71,6 +72,12 @@ class SocketManager {
       INVITETEAM: 'inviteToTeam',
       LEAVETEAM: 'leaveTeam',
       SIMPLEMSG: 'simpleMsg',
+      INVITEROOM: 'inviteToRoom',
+      DECLINEINVITE: 'decline',
+      ACCEPTTEAM: 'acceptTeamInvitation',
+      ACCEPTROOM: 'acceptRoomInvitation',
+      SENDROOMINVITE: 'sendInvitationToRoom',
+      GETUSERBYCODE: 'getUserByCode',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -88,6 +95,12 @@ class SocketManager {
           cornerOneCoordinates,
           cornerTwoCoordinates,
           defaultZoomLevel,
+          yearModification,
+          dayModification,
+          requireOffName,
+          allowedImages,
+          customUserFields,
+          defaultForum,
           permissions = {},
         } = data;
 
@@ -101,8 +114,14 @@ class SocketManager {
         if (cornerOneCoordinates) { storageManager.setCornerOneCoordinates(cornerOneCoordinates); }
         if (cornerTwoCoordinates) { storageManager.setCornerTwoCoordinates(cornerTwoCoordinates); }
         if (defaultZoomLevel) { storageManager.setDefaultZoomLevel(defaultZoomLevel); }
+        if (yearModification) { storageManager.setYearModification(yearModification); }
+        if (dayModification) { storageManager.setDayModification(dayModification); }
+        if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
 
+        storageManager.setDefaultForum(defaultForum);
+        storageManager.setAllowedImages(allowedImages);
         storageManager.setPermissions(permissions);
+        storageManager.setCustomUserFields(customUserFields);
 
         if (!this.hasConnected) {
           this.isOnline = true;
@@ -121,6 +140,10 @@ class SocketManager {
               event: eventCentral.Events.USER_CHANGE,
               params: {},
             });
+            eventCentral.emitEvent({
+              event: eventCentral.Events.ONLINE,
+              params: {},
+            });
           });
         }
       },
@@ -129,8 +152,14 @@ class SocketManager {
       func: () => {
         this.updateId(() => {
           this.reconnectDone();
+
           eventCentral.emitEvent({
             event: eventCentral.Events.RECONNECT,
+            params: {},
+          });
+
+          eventCentral.emitEvent({
+            event: eventCentral.Events.ONLINE,
             params: {},
           });
         });
@@ -139,6 +168,16 @@ class SocketManager {
       event: this.EmitTypes.DISCONNECT,
       func: () => {
         this.isOnline = false;
+
+        eventCentral.emitEvent({
+          event: eventCentral.Events.OFFLINE,
+          params: {},
+        });
+      },
+    }, {
+      event: this.EmitTypes.BAN,
+      func: () => {
+        this.logout({ callback: () => {} });
       },
     }]);
 
@@ -169,7 +208,7 @@ class SocketManager {
   }
 
   addEvents(events) {
-    events.forEach(event => this.addEvent(event.event, event.func));
+    events.forEach((event) => this.addEvent(event.event, event.func));
   }
 
   updateId(callback) {
@@ -199,7 +238,6 @@ class SocketManager {
    */
   reconnect() {
     if (!this.reconnecting) {
-      this.socket.close();
       this.socket.disconnect();
       this.socket.connect();
     }
@@ -258,6 +296,7 @@ class SocketManager {
       user: {
         username,
         password,
+        pushToken: notificationManager.token,
       },
       device: { objectId: storageManager.getDeviceId() },
     }, ({ error, data }) => {

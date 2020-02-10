@@ -19,11 +19,13 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const roomComposer = require('../../../data/composers/RoomComposer');
+const userComposer = require('../../../data/composers/UserComposer');
 
 const ids = {
   ROOMNAME: 'roomName',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
+  IDENTITIES: 'identities',
 };
 
 class EditRoomDialog extends BaseDialog {
@@ -32,10 +34,13 @@ class EditRoomDialog extends BaseDialog {
     classes = [],
     elementId = `eRDialog-${Date.now()}`,
   }) {
-    const { roomName } = roomComposer.getRoom({ roomId });
+    const room = roomComposer.getRoom({ roomId });
+    const { roomName } = room;
 
     const inputs = [
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.ROOMNAME,
         inputName: 'roomName',
         type: 'text',
@@ -43,6 +48,8 @@ class EditRoomDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'roomName' }),
       }),
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.PASSWORD,
         inputName: 'password',
         type: 'password',
@@ -50,6 +57,8 @@ class EditRoomDialog extends BaseDialog {
         placeholder: labelHandler.getLabel({ baseObject: 'RoomUpdateDialog', label: 'password' }),
       }),
       elementCreator.createInput({
+        object: room,
+        needsFullAccess: true,
         elementId: ids.REPEATPASSWORD,
         inputName: 'repeatPassword',
         type: 'password',
@@ -67,7 +76,74 @@ class EditRoomDialog extends BaseDialog {
           },
         },
       }),
+    ];
+
+    if (!room.isWhisper) {
       elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'invite' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const followers = room.followers.concat(room.participantIds);
+            const identities = userComposer.getAllIdentities({}).filter((identity) => !followers.includes(identity.objectId));
+            const dialog = new BaseDialog({
+              inputs: [
+                elementCreator.createSelect({
+                  multiple: true,
+                  elementId: ids.IDENTITIES,
+                  options: identities.map((identity) => {
+                    return {
+                      value: identity.objectId,
+                      name: identity.username || identity.aliasName,
+                    };
+                  }),
+                }),
+              ],
+              lowerButtons: [
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      dialog.removeFromView();
+                    },
+                  },
+                }),
+                elementCreator.createButton({
+                  text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'invite' }),
+                  clickFuncs: {
+                    leftFunc: () => {
+                      const selected = dialog.getElement(ids.IDENTITIES).selectedOptions;
+                      const selectedIds = Array.from(selected).map((option) => option.getAttribute('value'));
+
+                      roomComposer.invite({
+                        roomId,
+                        followerIds: selectedIds,
+                        callback: ({ error }) => {
+                          if (error) {
+                            console.log(error);
+
+                            return;
+                          }
+
+                          dialog.removeFromView();
+                        },
+                      });
+                    },
+                  },
+                }),
+              ],
+            });
+
+            dialog.addToView({ element: this.getParentElement() });
+            this.removeFromView();
+          },
+        },
+      });
+    }
+
+    if (room.password) {
+      lowerButtons.push(elementCreator.createButton({
+        object: room,
+        needsFullAccess: true,
         text: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'removePassword' }),
         clickFuncs: {
           leftFunc: () => {
@@ -86,51 +162,99 @@ class EditRoomDialog extends BaseDialog {
             });
           },
         },
-      }),
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
-        clickFuncs: {
-          leftFunc: () => {
-            if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
-              BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
-              BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
+      }));
+    }
 
-              this.setInputValue({ elementId: ids.PASSWORD, value: '' });
-              this.setInputValue({ elementId: ids.REPEATPASSWORD, value: '' });
+    lowerButtons.push(elementCreator.createButton({
+      object: room,
+      needsFullAccess: true,
+      text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'update' }),
+      clickFuncs: {
+        leftFunc: () => {
+          if (this.getInputValue(ids.PASSWORD) !== '' && this.getInputValue(ids.PASSWORD) !== this.getInputValue(ids.REPEATPASSWORD)) {
+            BaseDialog.markInput({ input: this.getElement(ids.PASSWORD) });
+            BaseDialog.markInput({ input: this.getElement(ids.REPEATPASSWORD) });
 
-              return;
-            }
+            this.setInputValue({ elementId: ids.PASSWORD, value: '' });
+            this.setInputValue({ elementId: ids.REPEATPASSWORD, value: '' });
 
-            roomComposer.updateRoom({
-              roomId,
-              room: {
-                roomName: this.getInputValue(ids.ROOMNAME),
-                password: this.getInputValue(ids.PASSWORD),
-              },
-              callback: ({ error }) => {
-                if (error) {
-                  console.log(error);
+            return;
+          }
 
-                  return;
+          roomComposer.updateRoom({
+            roomId,
+            room: {
+              roomName: this.getInputValue(ids.ROOMNAME),
+              password: this.getInputValue(ids.PASSWORD),
+            },
+            callback: ({ error }) => {
+              if (error) {
+                switch (error.type) {
+                  case 'invalid length': {
+                    switch (error.extraData.param) {
+                      case 'roomName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'name' })] });
+
+                        return;
+                      }
+                      case 'password': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'optionalPassword' })] });
+
+                        return;
+                      }
+                      default: {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
+
+                        return;
+                      }
+                    }
+                  }
+                  case 'invalid characters': {
+                    switch (error.extraData.param) {
+                      case 'roomName': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'name' })] });
+
+                        return;
+                      }
+                      case 'protected': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'protected' })] });
+
+                        return;
+                      }
+                      default: {
+                        return;
+                      }
+                    }
+                  }
+                  default: {
+                    this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                    return;
+                  }
                 }
+              }
 
-                this.removeFromView();
-              },
-            });
-          },
+              this.removeFromView();
+            },
+          });
         },
-      }),
-    ];
+      },
+    }));
 
-    const upperText = [
-      `${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' })}: ${roomName}`,
-    ];
+    const lowerText = [`${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' })}: ${roomName}`];
+    const upperText = [labelHandler.getLabel({ baseObject: 'EditRoomDialog', label: 'editRoom' })];
+
+    if (room.isWhisper) {
+      lowerText.push(`${labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'users' })}:
+        ${room.participantIds.map((id) => userComposer.getIdentityName({ objectId: id })).join(', ')}`);
+    }
 
     super({
       elementId,
       lowerButtons,
-      upperText,
+      lowerText,
       inputs,
+      upperText,
       classes: classes.concat(['editRoomDialog']),
     });
   }

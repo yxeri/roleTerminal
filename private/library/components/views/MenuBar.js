@@ -21,9 +21,11 @@ const CurrentUserList = require('../../components/lists/CurrentUserList');
 const AliasDialog = require('../../components/views/dialogs/AliasDialog');
 const RoomDialog = require('../../components/views/dialogs/RoomDialog');
 const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
-// const VerifyDialog = require('../../components/views/dialogs/VerifyDialog');
+const OpenDocFileDialog = require('../../components/views/dialogs/OpenDocFileDialog');
 const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
-// const TeamDialog = require('../../components/views/dialogs/TeamDialog');
+const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
+const WalletInfo = require('../../components/views/WalletInfo');
+const TeamProfileDialog = require('../../components/views/dialogs/TeamProfileDialog');
 
 const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
@@ -32,9 +34,7 @@ const accessCentral = require('../../AccessCentral');
 const socketManager = require('../../SocketManager');
 const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/composers/AliasComposer');
 const userComposer = require('../../data/composers/UserComposer');
-// const teamComposer = require('../../data/composers/TeamComposer');
 const voiceCommander = require('../../VoiceCommander');
 
 class MenuBar extends BaseView {
@@ -42,6 +42,10 @@ class MenuBar extends BaseView {
     title,
     viewSwitcher,
     image,
+    currencySign,
+    elements,
+    corners = [],
+    setMenuImage = true,
     appendTop = false,
     showControls = {},
     showClock = true,
@@ -51,6 +55,7 @@ class MenuBar extends BaseView {
   }) {
     super({
       elementId,
+      corners,
       classes: classes.concat(['menuBar']),
     });
 
@@ -77,6 +82,26 @@ class MenuBar extends BaseView {
       }
 
       this.currentUserList.hideView();
+    });
+
+    this.element.addEventListener('click', () => {
+      if (!socketManager.isOnline) {
+        socketManager.reconnect();
+      }
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.OFFLINE,
+      func: () => {
+        this.element.classList.add('offline');
+      },
+    });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.ONLINE,
+      func: () => {
+        this.element.classList.remove('offline');
+      },
     });
 
     if (controls.user) {
@@ -122,6 +147,38 @@ class MenuBar extends BaseView {
           },
         },
       });
+      const profileButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'myProfile' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const profileDialog = new UserSelfDialog({});
+
+            profileDialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
+      const teamProfileButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'teamProfile' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const teamProfileDialog = new TeamProfileDialog({});
+
+            teamProfileDialog.addToView({
+              element: this.getParentElement(),
+            });
+          },
+        },
+      });
+      const rebootButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'reboot' }),
+        clickFuncs: {
+          leftFunc: () => {
+            window.location.reload(true);
+          },
+        },
+      });
 
       accessCentral.addAccessElement({
         maxAccessLevel: accessCentral.AccessLevels.ANONYMOUS,
@@ -137,13 +194,53 @@ class MenuBar extends BaseView {
           : accessCentral.AccessLevels.ANONYMOUS,
         element: registerButton,
       });
+      accessCentral.addAccessElement({
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+        element: profileButton,
+      });
+      accessCentral.addAccessElement({
+        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+        element: teamProfileButton,
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.COMPLETE_USER,
+        func: () => {
+          const identity = userComposer.getCurrentIdentity();
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            teamProfileButton.classList.remove('hide');
+          }
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_ALIAS,
+        func: ({ userId }) => {
+          const identity = userComposer.getIdentity({ objectId: userId });
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            teamProfileButton.classList.remove('hide');
+          } else {
+            teamProfileButton.classList.add('hide');
+          }
+        },
+      });
 
       items.push({
         elements: [loginButton],
       }, {
         elements: [registerButton],
       });
-      lastItems.push({ elements: [logoutButton] });
+
+      lastItems.push({
+        elements: [
+          profileButton,
+          teamProfileButton,
+          logoutButton,
+          rebootButton,
+        ],
+      });
 
       voiceCommander.addCommands({
         activationString: 'menu',
@@ -187,6 +284,19 @@ class MenuBar extends BaseView {
     }
 
     if (showControls.docFile) {
+      const openDocButton = elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'Button', label: 'openDocument' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new OpenDocFileDialog({});
+
+            dialog.addToView({
+              element: this.viewSwitcher.getParentElement(),
+            });
+          },
+        },
+      });
+
       const createDocFileButton = elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'Button', label: 'createDocument' }),
         clickFuncs: {
@@ -200,7 +310,7 @@ class MenuBar extends BaseView {
         },
       });
 
-      items.push({ elements: [createDocFileButton] });
+      items.push({ elements: [openDocButton, createDocFileButton] });
 
       accessCentral.addAccessElement({
         element: createDocFileButton,
@@ -352,6 +462,30 @@ class MenuBar extends BaseView {
           },
         }],
       });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.COMPLETE_USER,
+        func: () => {
+          const identity = userComposer.getCurrentIdentity();
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            createTeamButton.classList.add('hide');
+          }
+        },
+      });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_ALIAS,
+        func: ({ userId }) => {
+          const identity = userComposer.getIdentity({ objectId: userId });
+
+          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+            createTeamButton.classList.add('hide');
+          } else {
+            createTeamButton.classList.remove('hide');
+          }
+        },
+      });
     }
 
     if (items.concat(menuItems, lastItems).length > 0) {
@@ -364,15 +498,28 @@ class MenuBar extends BaseView {
           },
         },
       });
-      const menuButton = this.createMenuButton({
+
+      const menuButtonParams = {
+        classes: ['menuButton'],
         list: this.menuList,
         leftFunc: (event) => {
           this.menuList.classList.toggle('hide');
 
           event.stopPropagation();
         },
-        text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'menu' }),
-      });
+      };
+
+      if (setMenuImage) {
+        menuButtonParams.image = {
+          fileName: 'menuicon.png',
+          height: 20,
+          width: 20,
+        };
+      } else {
+        menuButtonParams.text = labelHandler.getLabel({ baseObject: 'MenuBar', label: 'menu' });
+      }
+
+      const menuButton = this.createMenuButton(menuButtonParams);
 
       this.lists.push(this.menuList);
       this.element.appendChild(elementCreator.createContainer({
@@ -419,6 +566,21 @@ class MenuBar extends BaseView {
       });
     }
 
+    if (showControls.wallet) {
+      const walletInfo = new WalletInfo({
+        sign: currencySign,
+        appendSign: true,
+      });
+
+      walletInfo.addToView({ element: this.element });
+    }
+
+    if (elements) {
+      elements.forEach((element) => {
+        this.element.appendChild(elementCreator.createContainer({ elements: [element] }));
+      });
+    }
+
     if (image) {
       this.element.appendChild(elementCreator.createPicture({
         picture: image,
@@ -449,12 +611,14 @@ class MenuBar extends BaseView {
 
   createMenuButton({
     list,
+    image,
     leftFunc = () => {},
     text = '-----',
     classes = [],
   }) {
     return elementCreator.createSpan({
       text,
+      image,
       classes: ['topMenuButton'].concat(classes),
       clickFuncs: {
         leftFunc: (event) => {
@@ -468,13 +632,10 @@ class MenuBar extends BaseView {
 
   static setUsername({ button }) {
     const buttonToChange = button;
-    const userId = storageManager.getUserId();
-    const aliasId = storageManager.getAliasId();
+    const id = storageManager.getAliasId() || storageManager.getUserId();
 
-    if (aliasId) {
-      buttonToChange.textContent = aliasComposer.getAliasName({ aliasId });
-    } else if (userId) {
-      buttonToChange.textContent = userComposer.getUsername({ userId });
+    if (id) {
+      buttonToChange.textContent = userComposer.getIdentityName({ objectId: id });
     } else {
       buttonToChange.textContent = '-----';
     }

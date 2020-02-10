@@ -34,7 +34,8 @@ class LockedRoomDialog extends BaseDialog {
     classes = [],
     elementId = `lRDialog-${Date.now()}`,
   }) {
-    const upperText = [
+    const upperText = [labelHandler.getLabel({ baseObject: 'LockedRoomDialog', label: 'protectedRoom' })];
+    const lowerText = [
       `${roomName} ${labelHandler.getLabel({ baseObject: 'LockedRoomDialog', label: 'isLocked', prependSpace: true })}`,
       `${labelHandler.getLabel({ baseObject: 'LockedRoomDialog', label: 'enterPassword' })}`,
     ];
@@ -44,7 +45,7 @@ class LockedRoomDialog extends BaseDialog {
         inputName: 'password',
         type: 'password',
         isRequired: true,
-        maxLength: 10,
+        maxLength: 40,
         placeholder: labelHandler.getLabel({ baseObject: 'LockedRoomDialog', label: 'password' }),
       }),
     ];
@@ -104,6 +105,7 @@ class LockedRoomDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
+      lowerText,
       upperText,
       classes: classes.concat(['lockedRoomDialog']),
     });

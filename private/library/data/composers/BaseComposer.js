@@ -17,7 +17,7 @@ class BaseComposer {
   }
 
   checkIsComplete() {
-    if (!this.dependencies.every(dependency => dependency.hasFetched)) {
+    if (!this.dependencies.every((dependency) => dependency.hasFetched)) {
       setTimeout(() => {
         this.checkIsComplete();
       }, 200);
@@ -33,20 +33,6 @@ class BaseComposer {
         params: {},
       });
     }
-  }
-
-  createCreatorName({ object, full = true }) {
-    const user = this.userHandler.getObject({ objectId: object.ownerAliasId || object.ownerId });
-
-    if (!user) {
-      return object.ownerAliasId || object.ownerId;
-    }
-
-    if (full) {
-      return user.fullName || user.username;
-    }
-
-    return user.username;
   }
 }
 

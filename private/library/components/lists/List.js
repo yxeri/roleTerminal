@@ -48,7 +48,8 @@ const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');
-const textTools = require('../../TextTools');
+const accessCentral = require('../../AccessCentral');
+const viewTools = require('../../ViewTools');
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -87,13 +88,23 @@ class List extends BaseView {
     shouldAppendImage,
     filter,
     appendClasses,
-    listItemFieldsClasses,
     sorting,
     title,
     listItemSpecificClasses,
     userFilter,
     minimumAccessLevel,
     listType,
+    collapseEqual,
+    onToggle,
+    imageThumb,
+    defaultImage,
+    buttons,
+    conditionalImages = [],
+    corners = [],
+    hasOffToggle = false,
+    showOff = false,
+    listItemFieldsClasses = [],
+    imageInfo = {},
     effect = false,
     shouldToggle = false,
     onCreateFunc = () => {},
@@ -118,6 +129,8 @@ class List extends BaseView {
       FOLLOWEDROOMS: 'followedRooms',
       WHISPERROOMS: 'whisperRooms',
     };
+    this.conditionalImages = conditionalImages;
+    this.corners = corners;
     this.effect = effect;
     this.dependencies = dependencies;
     this.listItemClickFuncs = listItemClickFuncs;
@@ -128,7 +141,6 @@ class List extends BaseView {
     this.fieldToAppend = fieldToAppend;
     this.shouldAppendImage = shouldAppendImage;
     this.focusedId = focusedId;
-    this.markedIds = [];
     this.shouldFocusOnClick = shouldFocusOnClick;
     this.filter = filter;
     this.userFilter = userFilter;
@@ -140,6 +152,16 @@ class List extends BaseView {
     this.shouldToggle = shouldToggle;
     this.listType = listType;
     this.itemQueue = [];
+    this.collapseEqual = collapseEqual;
+    this.lastObject = null;
+    this.imageInfo = imageInfo;
+    this.header = null;
+    this.onToggle = onToggle;
+    this.showOff = showOff;
+    this.hasOffToggle = hasOffToggle;
+    this.imageThumb = imageThumb;
+    this.defaultImage = defaultImage;
+    this.buttons = buttons;
 
     if (collector.eventTypes.one) {
       /**
@@ -152,17 +174,9 @@ class List extends BaseView {
           const { changeType } = data;
           const user = userComposer.getCurrentUser();
 
-          if (!this.shouldFilterItem({
-            changeType,
-            object,
-            user,
-          })) {
-            return;
-          }
-
           switch (changeType) {
             case socketManager.ChangeTypes.UPDATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.addOneItem({
                   object,
                   shouldFlash: true,
@@ -175,7 +189,7 @@ class List extends BaseView {
               break;
             }
             case socketManager.ChangeTypes.CREATE: {
-              if (this.hasAccess({ object, user }).canSee) {
+              if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.onCreateFunc({ object });
 
                 this.addOneItem({
@@ -249,7 +263,7 @@ class List extends BaseView {
    * Build and attach the DOM for the list.
    */
   appendList() {
-    if (!this.dependencies.every(dependency => dependency.hasFetched)) {
+    if (!this.dependencies.every((dependency) => dependency.hasFetched)) {
       setTimeout(() => {
         this.appendList();
       }, 200);
@@ -259,28 +273,76 @@ class List extends BaseView {
 
     const elements = [];
     const listClasses = [];
-
-    if (this.shouldToggle) {
-      listClasses.push('hide');
-    }
+    const buttons = [];
+    this.lastObject = null;
 
     if (this.title) {
-      const clickFuncs = {
-        leftFunc: () => {
-          this.listElement.classList.toggle('hide');
-        },
-      };
+      this.header = elementCreator.createHeader({
+        clickFuncs: {
+          leftFunc: () => {
+            if (this.onToggle) {
+              this.onToggle();
+            }
 
-      elements.push(elementCreator.createHeader({
-        clickFuncs,
-        classes: ['toggle'],
+            this.listElement.classList.toggle('hide');
+            this.header.classList.toggle('expanded');
+          },
+        },
+        classes: ['toggle', 'expanded'],
         elements: [elementCreator.createSpan({ text: this.title, classes: ['listTitle'] })],
-      }));
+      });
+
+      if (this.shouldToggle) {
+        listClasses.push('hide');
+        this.header.classList.toggle('expanded');
+      }
+
+      elements.push(this.header);
+    }
+
+    if (this.hasOffToggle && storageManager.getAccessLevel() >= storageManager.getPermissions().IncludeOff.accessLevel) {
+      const offButton = elementCreator.createButton({
+        image: {
+          fileName: 'offgame.png',
+          height: 20,
+          width: 20,
+        },
+        clickFuncs: {
+          leftFunc: () => {
+            this.showOff = !this.showOff;
+            this.shouldToggle = false;
+
+            this.appendList();
+          },
+        },
+      });
+
+      buttons.push(offButton);
+    }
+
+    if (this.buttons) {
+      buttons.push(...this.buttons);
     }
 
     this.listElement = elementCreator.createList({
       classes: listClasses,
     });
+
+    this.listElement.addEventListener('click', () => {
+      if (this.shouldToggle && !viewTools.isLandscape()) {
+        this.listElement.classList.toggle('hide');
+      }
+    });
+
+
+    if (buttons.length > 0 && storageManager.getAccessLevel() >= accessCentral.AccessLevels.STANDARD) {
+      const item = elementCreator.createListItem({
+        classes: ['listButtonsItem'],
+        elements: [elementCreator.createContainer({ elements: buttons, classes: ['listButtons'] })],
+      });
+
+      this.listElement.appendChild(item);
+    }
 
     elements.push(this.listElement);
 
@@ -299,6 +361,14 @@ class List extends BaseView {
 
     this.replaceOnParent({ element: container });
     this.scrollList();
+  }
+
+  hideList() {
+    this.listElement.classList.add('hide');
+
+    if (this.header) {
+      this.header.classList.remove('expanded');
+    }
   }
 
   /**
@@ -330,13 +400,19 @@ class List extends BaseView {
         const listItem = this.createListItem({
           object,
           isMarked: marked[this.listType]
-            ? marked[this.listType].map(mark => mark.objectId).includes(object.objectId)
+            ? marked[this.listType].map((mark) => mark.objectId).includes(object.objectId)
             : false,
         });
 
         fragment.appendChild(listItem);
+
+        this.lastObject = object;
       }
     });
+
+    if (this.header && marked[this.listType] && marked[this.listType].length > 0) {
+      this.header.classList.add(cssClasses.markListItem);
+    }
 
     return fragment;
   }
@@ -394,30 +470,6 @@ class List extends BaseView {
     this.focusedId = undefined;
   }
 
-  markListItem(elementId) {
-    const toMark = this.getElement(elementId);
-
-    if (toMark) {
-      toMark.classList.add(cssClasses.markListItem);
-
-      if (!this.markedIds.includes(elementId)) {
-        this.markedIds.push(elementId);
-      }
-    }
-  }
-
-  unmarkListItem(elementId) {
-    const markedIndex = this.markedIds.indexOf(elementId);
-
-    if (markedIndex > -1) {
-      const element = this.getElement(elementId);
-
-      element.classList.remove(cssClasses.markListItem);
-
-      this.markedIds.splice(markedIndex, 1);
-    }
-  }
-
   /**
    * Create a list item.
    * @param {Object} params Parameters.
@@ -437,7 +489,6 @@ class List extends BaseView {
     const clickFuncs = {
       leftFunc: () => {
         this.setFocusedListItem(objectId);
-        this.unmarkListItem(objectId);
 
         if (this.listItemClickFuncs.leftFunc) {
           this.listItemClickFuncs.leftFunc(objectId);
@@ -446,6 +497,10 @@ class List extends BaseView {
         socketManager.checkAndReconnect();
       },
     };
+    const { hasAccess } = accessCentral.hasAccessTo({
+      objectToAccess: object,
+      toAuth: userComposer.getCurrentUser(),
+    });
 
     if (this.listItemSpecificClasses) {
       this.listItemSpecificClasses.forEach((item) => {
@@ -460,7 +515,7 @@ class List extends BaseView {
       });
     }
 
-    if (this.listItemClickFuncs.right) {
+    if (this.listItemClickFuncs.right && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
       clickFuncs.right = () => {
         this.listItemClickFuncs.right(objectId);
       };
@@ -470,15 +525,26 @@ class List extends BaseView {
       /**
        * Add item fields to the list item.
        */
-      if (this.listItemFields) {
+      if (this.listItemFields
+        && (!this.collapseEqual
+          || !this.lastObject
+          || !(
+            (object[this.collapseEqual.paramName] && object[this.collapseEqual.paramName] === this.lastObject[this.collapseEqual.paramName])
+            || (!object[this.collapseEqual.paramName] && !this.lastObject[this.collapseEqual.paramName] && object[this.collapseEqual.fallbackTo] && object[this.collapseEqual.fallbackTo] === this.lastObject[this.collapseEqual.fallbackTo])
+          )
+        )
+      ) {
         const elements = this.listItemFields
-          .filter(field => typeof object[field.paramName] !== 'undefined' || typeof object[field.fallbackTo] !== 'undefined')
+          .filter((field) => {
+            return ((this.showOff && field.isOff) || !field.isOff)
+              && (typeof object[field.paramName] !== 'undefined' || typeof object[field.fallbackTo] !== 'undefined');
+          })
           .map((field) => {
             const {
               paramName,
               fallbackTo,
               convertFunc,
-              func,
+              clickFuncs: fieldClickFuncs,
               classes: fieldClasses,
             } = field;
             const value = object[paramName] || object[fallbackTo];
@@ -489,37 +555,84 @@ class List extends BaseView {
               text,
               classes: fieldClasses,
             };
+            const fragment = document.createDocumentFragment();
 
-            if (func) {
-              spanParams.clickFuncs = {
-                leftFunc: () => {
-                  func(objectId);
-                },
-              };
+            if (fieldClickFuncs) {
+              spanParams.clickFuncs = {};
+
+              if (fieldClickFuncs.leftFunc) {
+                spanParams.clickFuncs.leftFunc = (event) => {
+                  fieldClickFuncs.leftFunc(object, event);
+                };
+              }
+
+              if (fieldClickFuncs.right) {
+                spanParams.clickFuncs.right = (event) => {
+                  fieldClickFuncs.right(object, event);
+                };
+              }
             }
 
-            return text !== ''
+            fragment.appendChild(text !== ''
               ? elementCreator.createSpan(spanParams)
-              : document.createTextNode('');
+              : document.createTextNode(''));
+
+            return fragment;
           });
+
+        this.corners.forEach((corner) => elements.push(elementCreator.createContainer({ classes: [corner] })));
 
         const paragraphParams = {
           elements,
-          classes: this.listItemFieldsClasses,
+          classes: [],
         };
 
-        if (this.listItemClickFuncs.onlyListItemFields) {
+        if (this.listItemClickFuncs.onlyListItemFields && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
           paragraphParams.clickFuncs = clickFuncs;
         }
+
+        if (this.imageInfo && this.imageInfo.show) {
+          let image = this.imageInfo.getImage(object[this.imageInfo.paramName]);
+
+          if (!image && !object[this.imageInfo.paramName]) {
+            image = this.imageInfo.getImage(object[this.imageInfo.fallbackTo]);
+          }
+
+          if (image) {
+            listItemElements.push(elementCreator.createPicture({
+              isThumb: true,
+              picture: image,
+              classes: ['listItemImage'],
+            }));
+            paragraphParams.classes.push('listItemWithImage');
+          }
+        }
+
+        paragraphParams.classes = paragraphParams.classes.concat(this.listItemFieldsClasses);
 
         listItemElements.push(elementCreator.createParagraph(paragraphParams));
       }
 
-      if (this.shouldAppendImage && object.image && object.image.imageName) {
-        listItemElements.push(elementCreator.createPicture({
-          picture: object.image,
-          classes: ['attachedImage'],
-        }));
+      if (this.shouldAppendImage) {
+        if ((object.image && object.image.imageName) || (object.images && object.images[0] && object.images[0].imageName)) {
+          listItemElements.push(elementCreator.createPicture({
+            picture: object.image || object.images[0],
+            classes: ['attachedImage'],
+            isThumb: this.imageThumb,
+            isUploaded: typeof object.image !== 'undefined' || typeof object.images[0] !== 'undefined',
+          }));
+        } else {
+          const image = this.conditionalImages.find((img) => img.func(object)) || this.defaultImage;
+
+          if (image) {
+            listItemElements.push(elementCreator.createPicture({
+              picture: image,
+              classes: ['attachedImage'],
+              isThumb: this.imageThumb,
+              isUploaded: false,
+            }));
+          }
+        }
       }
 
       /**
@@ -547,7 +660,7 @@ class List extends BaseView {
       elements: listItemElements,
     };
 
-    if (!this.listItemClickFuncs.onlyListItemFields) {
+    if (!this.listItemClickFuncs.onlyListItemFields && (!this.listItemClickFuncs.needsAccess || hasAccess)) {
       listItemParams.clickFuncs = clickFuncs;
     }
 
@@ -562,13 +675,11 @@ class List extends BaseView {
    * Add one new list item to the list.
    * @param {Object} params Parameters.
    * @param {Object} params.object Object to create an item from.
-   * @param {boolean} [params.effect] Should the text printed have a typewriter effect?
    * @param {boolean} [params.shouldReplace] Should the list item replace an existing item?
    * @param {boolean} [params.shouldFlash] Should the list item visually flash when added to the DOM?
    */
   addOneItem({
     object,
-    effect,
     shouldReplace = false,
     shouldFlash = false,
   }) {
@@ -576,26 +687,16 @@ class List extends BaseView {
     const newItem = this.createListItem({ object });
     const element = this.getElement(objectId);
 
-    if (effect) {
-      const children = Array.from(newItem.childNodes);
-      const dumpFragment = document.createDocumentFragment();
-
-      children.forEach(child => dumpFragment.appendChild(child));
-
-      textTools.typewriter({
-        paragraphs: children,
-        target: newItem,
-        paragraphFunc: () => { this.scrollList(); },
-      });
-    } else if (shouldFlash) {
+    if (shouldFlash) {
       newItem.classList.add(cssClasses.newListItem);
       setTimeout(() => { newItem.classList.remove(cssClasses.newListItem); }, this.itemChangeTimeout);
     }
 
     if (shouldReplace && element) {
-      this.listElement.replaceChild(newItem, this.getElement(objectId));
+      this.listElement.replaceChild(newItem, element);
     } else if (this.sorting && this.sorting.paramName) {
       const firstChild = this.listElement.firstElementChild;
+      this.lastObject = object;
 
       if (!firstChild) {
         this.listElement.appendChild(newItem);
@@ -620,6 +721,7 @@ class List extends BaseView {
       this.listElement.insertBefore(newItem, closestElement);
     } else if (this.sorting && this.sorting.reverse) {
       const firstChild = this.listElement.firstElementChild;
+      this.lastObject = object;
 
       if (!firstChild) {
         this.listElement.appendChild(newItem);
@@ -630,6 +732,8 @@ class List extends BaseView {
       this.listElement.insertBefore(newItem, firstChild);
     } else {
       this.listElement.appendChild(newItem);
+
+      this.lastObject = object;
     }
   }
 
@@ -641,14 +745,18 @@ class List extends BaseView {
   markItem({ objectId }) {
     const element = this.getElement(objectId);
 
-    storageManager.addMarked({
-      objectId,
-      listType: this.listType,
-    });
-
     if (element) {
+      storageManager.addMarked({
+        objectId,
+        listType: this.listType,
+      });
+
       this.animateElement({ elementId: objectId });
       element.classList.add(cssClasses.markListItem);
+
+      if (this.header) {
+        this.header.classList.add(cssClasses.markListItem);
+      }
     }
   }
 
@@ -667,6 +775,14 @@ class List extends BaseView {
       });
 
       element.classList.remove(cssClasses.markListItem);
+
+      if (this.header) {
+        const marked = storageManager.getMarked();
+
+        if (marked[this.listType] && marked[this.listType].length === 0) {
+          this.header.classList.remove(cssClasses.markListItem);
+        }
+      }
     }
   }
 
@@ -686,6 +802,12 @@ class List extends BaseView {
     if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
       const filterFunc = (rule) => {
         if (rule.shouldInclude) {
+          if (rule.valueType && rule.valueType === 'object') {
+            return object[rule.paramName] && object[rule.paramName].find((storedObject) => {
+              return Object.keys(rule.paramValue).every((key) => storedObject[key] === rule.paramValue[key]);
+            });
+          }
+
           return object[rule.paramName].includes(rule.paramValue);
         }
 
@@ -715,7 +837,7 @@ class List extends BaseView {
           return false;
         }
 
-        if (!this.filter.rules.every(filterFunc)) {
+        if (!this.filter.orCheck && !this.filter.rules.every(filterFunc)) {
           return false;
         }
       }
@@ -725,7 +847,7 @@ class List extends BaseView {
           return false;
         }
 
-        if (!this.userFilter.rules.every(userFilterFunc)) {
+        if (!this.userFilter.orCheck && !this.userFilter.rules.every(userFilterFunc)) {
           return false;
         }
       }

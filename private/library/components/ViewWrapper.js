@@ -9,6 +9,7 @@ class ViewWrapper extends BaseView {
     menuBar,
     title,
     viewType,
+    corners,
     useDefaultCss = true,
     columns = [],
     classes = [],
@@ -20,6 +21,7 @@ class ViewWrapper extends BaseView {
     }
 
     super({
+      corners,
       elementId: `wrap${Date.now()}`,
       classes: cssClasses,
     });
@@ -44,7 +46,7 @@ class ViewWrapper extends BaseView {
   attachColumns() {
     const fragment = document.createDocumentFragment();
 
-    this.columnElements.forEach(columnElement => columnElement.remove());
+    this.columnElements.forEach((columnElement) => columnElement.remove());
     this.columnElements = [];
 
     this.columns.forEach((column) => {
@@ -105,7 +107,11 @@ class ViewWrapper extends BaseView {
         }));
       }
 
-      component.addToView({ element: container });
+      if (component.addToView) {
+        component.addToView({ element: container });
+      } else {
+        container.appendChild(component);
+      }
     });
 
     return container;

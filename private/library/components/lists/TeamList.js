@@ -21,18 +21,29 @@ const dataHandler = require('../../data/DataHandler');
 const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const storageManager = require('../../StorageManager');
+const labelHandler = require('../../labels/LabelHandler');
 
 class TeamList extends List {
   constructor({
     title,
     effect,
+    shouldToggle,
     classes = [],
-    elementId = `teamList-${Date.now()}`,
+    elementId = `fullTeamList-${Date.now()}`,
   }) {
-    classes.push('teamList');
+    classes.push('fullTeamList');
 
     const headerFields = [{
       paramName: 'teamName',
+    }, {
+      paramName: 'description',
+      convertFunc: (description) => {
+        if (description.length !== 0) {
+          return `${labelHandler.getLabel({ baseObject: 'UserList', label: 'description' })}: ${description.join('\n')}`;
+        }
+
+        return '';
+      },
     }];
 
     super({
@@ -40,6 +51,8 @@ class TeamList extends List {
       classes,
       title,
       effect,
+      shouldToggle,
+      imageThumb: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
         dataHandler.users,

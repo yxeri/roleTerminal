@@ -15,7 +15,11 @@
  */
 
 const mouseHandler = require('./MouseHandler');
-const textTools = require('./TextTools');
+// const textTools = require('./TextTools');
+const labelHandler = require('./labels/LabelHandler');
+const eventCentral = require('./EventCentral');
+const userComposer = require('./data/composers/UserComposer');
+const accessCentral = require('./AccessCentral');
 
 const cssClasses = {
   emptyInput: 'emptyInput',
@@ -50,12 +54,23 @@ function setName(element, name) {
 }
 
 /**
+ * Set parent name on the element.
+ * @param {HTMLElement} element Element to add a name to.
+ * @param {string} name Name to add.
+ */
+function setParent(element, name) {
+  if (name) {
+    element.setAttribute('parent', name);
+  }
+}
+
+/**
  * Set classes on the element.
  * @param {HTMLElement} element Element to add classes to.
  * @param {string[]} classes Classes to add.
  */
 function setClasses(element, classes = []) {
-  classes.forEach(cssClass => element.classList.add(cssClass));
+  classes.forEach((cssClass) => element.classList.add(cssClass));
 }
 
 /**
@@ -92,6 +107,9 @@ function createBaseElement({
   elementType,
   clickFuncs,
   name,
+  object,
+  needsFullAccess,
+  parent,
 }) {
   const element = document.createElement(elementType);
 
@@ -99,6 +117,40 @@ function createBaseElement({
   setElementId(element, elementId);
   setClickFuncs(element, clickFuncs);
   setName(element, name);
+  setParent(element, parent);
+
+  if (object) {
+    eventCentral.addWatcher({
+      event: eventCentral.Events.USER_CHANGE,
+      func: () => {
+        const {
+          hasAccess,
+          hasFullAccess,
+        } = accessCentral.hasAccessTo({
+          toAuth: userComposer.getCurrentUser(),
+          objectToAccess: object,
+        });
+
+        if (!hasAccess || (needsFullAccess && !hasFullAccess)) {
+          element.classList.add('hide');
+        } else {
+          element.classList.remove('hide');
+        }
+      },
+    });
+
+    const {
+      hasAccess,
+      hasFullAccess,
+    } = accessCentral.hasAccessTo({
+      toAuth: userComposer.getCurrentUser(),
+      objectToAccess: object,
+    });
+
+    if (!hasAccess || (needsFullAccess && !hasFullAccess)) {
+      element.classList.add('hide');
+    }
+  }
 
   return element;
 }
@@ -127,26 +179,52 @@ class ElementCreator {
   static createPicture({
     picture,
     clickFuncs,
-    classes,
     elementId,
+    classes = [],
+    isThumb = false,
     isUploaded = true,
   }) {
+    const container = this.createContainer({
+      classes: ['imgContainer'].concat(classes),
+    });
     const pictureElement = createBaseElement({
       elementId,
-      classes,
       clickFuncs,
       elementType: 'img',
     });
-    const path = isUploaded
-      ? `/images/upload/${picture.fileName}`
-      : `/images/${picture.fileName}`;
+    let path = 'images/';
+
+    if (isUploaded) {
+      path += 'upload/';
+    }
+
+    if (isThumb) {
+      path += 'imgThumb-';
+    }
+
+    path += picture.fileName;
 
     pictureElement.setAttribute('src', path);
 
-    if (picture.width) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`); }
-    if (picture.height) { pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`); }
+    if (picture.width) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} width: ${picture.width}px;`);
+    }
 
-    return pictureElement;
+    if (picture.height) {
+      pictureElement.setAttribute('style', `${pictureElement.getAttribute('style') || ''} height: ${picture.height}px;`);
+    }
+
+    pictureElement.addEventListener('load', () => {
+      const style = pictureElement.getAttribute('style');
+
+      if (style) {
+        pictureElement.setAttribute('style', style.replace(`height: ${picture.height}px;`, ''));
+      }
+    });
+
+    container.appendChild(pictureElement);
+
+    return container;
   }
 
   static createListItem({
@@ -163,7 +241,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => listItem.appendChild(element));
+      elements.forEach((element) => listItem.appendChild(element));
     }
 
     return listItem;
@@ -175,7 +253,8 @@ class ElementCreator {
     elementId,
     classes,
     spanType,
-    effect,
+    // effect,
+    image,
   }) {
     const span = createBaseElement({
       elementId,
@@ -184,18 +263,20 @@ class ElementCreator {
       elementType: spanType || 'span',
     });
 
-    if (text) {
+    if (image) {
+      span.appendChild(ElementCreator.createPicture({ picture: image, isUploaded: false }));
+    } else if (text) {
       span.appendChild(document.createTextNode(text));
     }
 
-    if (effect && Math.random() > 0.90) {
-      const maxLength = text.length > 50
-        ? 50
-        : text.length;
+    // if (effect && Math.random() > 0.90) {
+    //   const maxLength = text.length > 50
+    //     ? 50
+    //     : text.length;
 
-      span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
-      // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
-    }
+    // span.setAttribute('subMsg', textTools.createGlitchString(maxLength));
+    // span.classList.add(glitchClasses[Math.floor(Math.random() * glitchClasses.length)]);
+    // }
 
     return span;
   }
@@ -204,6 +285,10 @@ class ElementCreator {
     text,
     clickFuncs,
     elementId,
+    needsFullAccess,
+    object,
+    image,
+    corners = ['upperLeft', 'upperRight', 'lowerLeft', 'lowerRight'],
     classes = [],
   }) {
     const span = this.createSpan({
@@ -213,10 +298,19 @@ class ElementCreator {
       elementId,
       clickFuncs,
       classes,
+      needsFullAccess,
+      object,
       elementType: 'button',
     });
 
-    button.appendChild(document.createTextNode(text));
+    if (image) {
+      button.appendChild(ElementCreator.createPicture({ picture: image, isUploaded: false }));
+    } else {
+      button.appendChild(document.createTextNode(text));
+    }
+
+    corners.forEach((corner) => button.appendChild(this.createContainer({ classes: [corner] })));
+
     span.appendChild(button);
 
     return span;
@@ -238,7 +332,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => container.appendChild(element));
+      elements.forEach((element) => container.appendChild(element));
     }
 
     return container;
@@ -266,7 +360,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => paragraph.appendChild(element));
+      elements.forEach((element) => paragraph.appendChild(element));
     } else {
       paragraph.appendChild(document.createTextNode(text));
     }
@@ -285,11 +379,17 @@ class ElementCreator {
     shouldResize,
     text,
     isLocked,
+    object,
+    needsFullAccess,
+    parent,
     placeholder = '',
   }) {
     const input = createBaseElement({
       elementId,
       classes,
+      needsFullAccess,
+      object,
+      parent,
       name: inputName,
       elementType: multiLine
         ? 'textarea'
@@ -306,9 +406,9 @@ class ElementCreator {
           input.value = value;
         }
       }
-    } else {
-      input.setAttribute('placeholder', placeholder);
     }
+
+    input.setAttribute('placeholder', placeholder);
 
     if (maxLength) { input.setAttribute('maxlength', maxLength); }
 
@@ -349,25 +449,31 @@ class ElementCreator {
     inputName,
     elementId,
     classes,
+    image,
+    buttonText = labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'image' }),
     previewId = 'imagePreview',
     previewContainer = document.createElement('img'),
     appendPreview = false,
   }) {
+    const previewWrapper = this.createContainer({
+      classes: ['imgContainer'],
+      elements: [previewContainer],
+    });
     const container = this.createContainer({
       classes,
       elementId,
       name: inputName,
     });
     const imageInput = document.createElement('input');
-    imageInput.classList.add('hide');
+    previewWrapper.classList.add('hide');
     imageInput.setAttribute('type', 'file');
-    imageInput.setAttribute('accept', 'image/png, image/jpeg');
+    imageInput.setAttribute('accept', 'image/png, image/jpeg, image/pjpeg');
     imageInput.addEventListener('change', () => {
       const file = imageInput.files[0];
       const reader = new FileReader();
 
       reader.addEventListener('load', () => {
-        previewContainer.classList.remove('hide');
+        previewWrapper.classList.remove('hide');
         previewContainer.setAttribute('src', reader.result);
         previewContainer.setAttribute('name', file.name);
       });
@@ -376,9 +482,12 @@ class ElementCreator {
     });
 
     previewContainer.setAttribute('id', previewId);
+    previewContainer.classList.add('imagePreview');
 
     container.appendChild(this.createButton({
-      text: 'Image',
+      image,
+      classes: ['imageInputButton'],
+      text: buttonText,
       clickFuncs: {
         leftFunc: () => {
           imageInput.click();
@@ -387,8 +496,9 @@ class ElementCreator {
     }));
 
     if (appendPreview) {
-      previewContainer.classList.add('hide');
-      container.appendChild(previewContainer);
+      previewWrapper.classList.add('hide');
+
+      container.appendChild(previewWrapper);
     }
 
     return container;
@@ -406,7 +516,7 @@ class ElementCreator {
     });
 
     if (elements) {
-      elements.forEach(element => header.appendChild(element));
+      elements.forEach((element) => header.appendChild(element));
     }
 
     return header;
@@ -433,7 +543,7 @@ class ElementCreator {
     }
 
     if (elements) {
-      elements.forEach(element => article.appendChild(element));
+      elements.forEach((element) => article.appendChild(element));
     }
 
     if (footerElement) {
@@ -452,10 +562,12 @@ class ElementCreator {
     footerElement,
     headerElement,
     elementId,
+    clickFuncs,
   }) {
     const section = createBaseElement({
       elementId,
       classes,
+      clickFuncs,
       elementType: 'section',
     });
 
@@ -467,7 +579,7 @@ class ElementCreator {
     }
 
     if (elements) {
-      elements.forEach(element => section.appendChild(element));
+      elements.forEach((element) => section.appendChild(element));
     }
 
     if (footerElement) {
@@ -524,6 +636,92 @@ class ElementCreator {
     });
 
     return fieldset;
+  }
+
+  static createCheckBox({
+    classes,
+    name,
+    elementId,
+    text,
+    clickFuncs,
+    parent,
+    isChecked = false,
+  }) {
+    const label = createBaseElement({
+      classes,
+      clickFuncs,
+      name,
+      parent,
+      elementType: 'label',
+    });
+    const checkBox = createBaseElement({
+      elementId,
+      elementType: 'input',
+    });
+
+    checkBox.setAttribute('type', 'checkbox');
+
+    if (isChecked) {
+      checkBox.setAttribute('checked', 'on');
+    }
+
+    label.appendChild(checkBox);
+    label.appendChild(document.createTextNode(text || elementId));
+
+    return label;
+  }
+
+  static createSelect({
+    name,
+    classes,
+    elementId,
+    multiple,
+    isRequired,
+    options = [],
+  }) {
+    const select = createBaseElement({
+      elementId,
+      classes,
+      name,
+      elementType: 'select',
+    });
+
+    if (multiple) {
+      select.setAttribute('multiple', 'true');
+    }
+
+    if (isRequired) {
+      select.addEventListener('blur', () => {
+        if (!select.selectedOptions) {
+          select.classList.add(cssClasses.emptyInput);
+
+          return;
+        }
+
+        const selectedOptions = Array.from(select.selectedOptions);
+
+        if (selectedOptions.filter((selected) => selected.getAttribute('value') !== '').length === 0) {
+          select.classList.add(cssClasses.emptyInput);
+        }
+      });
+
+      select.addEventListener('focus', () => {
+        select.classList.remove(cssClasses.emptyInput);
+      });
+
+      select.setAttribute('required', 'true');
+    }
+
+    options.forEach((option) => {
+      const optionElement = document.createElement('option');
+
+      optionElement.setAttribute('value', option.value);
+      optionElement.innerText = option.name;
+
+      select.appendChild(optionElement);
+    });
+
+    return select;
   }
 
   static replaceFirstChild(parentElement, newChild) {

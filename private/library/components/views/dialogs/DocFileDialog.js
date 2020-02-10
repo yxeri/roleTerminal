@@ -58,32 +58,38 @@ class DocFileDialog extends BaseDialog {
         maxLength: 3500,
         multiLine: true,
         shouldResize: true,
+        isRequired: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
-      elementCreator.createImageInput({
+    ];
+
+    if (storageManager.getAllowedImages().DOCFILE) {
+      inputs.push(elementCreator.createImageInput({
         elementId: ids.PICTURE,
         inputName: 'picture',
         appendPreview: true,
         previewId: 'imagePreview-docFile',
-      }),
-      elementCreator.createRadioSet({
-        elementId: ids.VISIBILITY,
-        title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
-        optionName: 'visibility',
-        options: [
-          {
-            optionId: ids.VISIBILITY_PUBLIC,
-            optionLabel: 'Everyone',
-            value: 'public',
-            isDefault: true,
-          }, {
-            optionId: ids.VISIBILITY_PRIVATE,
-            optionLabel: 'Only those with the correct code',
-            value: 'private',
-          },
-        ],
-      }),
-    ];
+      }));
+    }
+
+    inputs.push(elementCreator.createRadioSet({
+      elementId: ids.VISIBILITY,
+      title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
+      optionName: 'visibility',
+      options: [
+        {
+          optionId: ids.VISIBILITY_PUBLIC,
+          optionLabel: 'Everyone',
+          value: 'public',
+          isDefault: true,
+        }, {
+          optionId: ids.VISIBILITY_PRIVATE,
+          optionLabel: 'Only those with the correct code',
+          value: 'private',
+        },
+      ],
+    }));
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -103,50 +109,15 @@ class DocFileDialog extends BaseDialog {
 
             const params = {
               docFile: {
-                ownerAliasId: storageManager.getAliasId(),
                 title: this.getInputValue(ids.TITLE),
                 code: this.getInputValue(ids.CODE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
-              callback: ({ error }) => {
-                if (error) {
-                  if (error.type === 'invalid length' && error.extraData) {
-                    switch (error.extraData.param) {
-                      case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'titleLength' })] });
-
-                        break;
-                      }
-                      case 'code': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'codeLength' })] });
-
-                        break;
-                      }
-                      case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'textLength' })] });
-
-                        break;
-                      }
-                      default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
-
-                        break;
-                      }
-                    }
-                  }
-
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
-
-                  return;
-                }
-
-                this.removeFromView();
-              },
             };
             const imagePreview = document.getElementById('imagePreview-docFile');
 
-            if (imagePreview.getAttribute('src')) {
+            if (imagePreview && imagePreview.getAttribute('src')) {
               params.images = [{
                 source: imagePreview.getAttribute('src'),
                 imageName: imagePreview.getAttribute('name'),
@@ -155,7 +126,58 @@ class DocFileDialog extends BaseDialog {
               }];
             }
 
-            docFileComposer.createDocFile(params);
+            docFileComposer.createDocFile({
+              ...params,
+              callback: ({ error }) => {
+                if (error) {
+                  switch (error.type) {
+                    case 'invalid length': {
+                      switch (error.extraData.param) {
+                        case 'title': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'title' })] });
+
+                          return;
+                        }
+                        case 'code': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'code' })] });
+
+                          return;
+                        }
+                        case 'text': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'text' })] });
+
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
+
+                          return;
+                        }
+                      }
+                    }
+                    case 'invalid characters': {
+                      switch (error.extraData.param) {
+                        case 'code': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidCharactersError', label: 'code' })] });
+
+                          return;
+                        }
+                        default: {
+                          return;
+                        }
+                      }
+                    }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      return;
+                    }
+                  }
+                }
+
+                this.removeFromView();
+              },
+            });
           },
         },
       }),
@@ -165,7 +187,8 @@ class DocFileDialog extends BaseDialog {
       elementId,
       inputs,
       lowerButtons,
-      classes: classes.concat(['DocFileDialog']),
+      upperText: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'createDoc' })],
+      classes: classes.concat(['docFileDialog']),
     });
   }
 }

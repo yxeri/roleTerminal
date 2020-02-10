@@ -16,6 +16,7 @@
 
 const List = require('./List');
 const MessageDialog = require('../views/dialogs/MessageDialog');
+const UserDialog = require('../views/dialogs/UserDialog');
 
 const dataHandler = require('../../data/DataHandler');
 const storageManager = require('../../StorageManager');
@@ -25,6 +26,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const accessCentral = require('../../AccessCentral');
 const messageComposer = require('../../data/composers/MessageComposer');
 const teamComposer = require('../../data/composers/TeamComposer');
+const viewSwitcher = require('../../ViewSwitcher');
 
 class MessageList extends List {
   /**
@@ -39,6 +41,7 @@ class MessageList extends List {
   constructor({
     roomId,
     effect,
+    corners,
     hideDate = false,
     showTeam = true,
     fullDate = true,
@@ -52,12 +55,24 @@ class MessageList extends List {
     const superParams = {
       elementId,
       effect,
+      corners,
+      imageInfo: {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+        show: true,
+        getImage: (identityId) => { return userComposer.getImage(identityId); },
+      },
+      collapseEqual: {
+        paramName: 'ownerAliasId',
+        fallbackTo: 'ownerId',
+      },
       sorting: {
         paramName: 'customTimeCreated',
         fallbackParamName: 'timeCreated',
       },
       listItemClickFuncs: {
-        onlyListItemFields: true,
+        onlyAppend: true,
+        needsAccess: true,
         leftFunc: (objectId) => {
           const message = messageComposer.getMessage({ messageId: objectId });
           const {
@@ -74,7 +89,7 @@ class MessageList extends List {
             });
 
             messageDialog.addToView({
-              element: this.getParentElement(),
+              element: viewSwitcher.getParentElement(),
             });
           }
         },
@@ -99,13 +114,14 @@ class MessageList extends List {
           fallbackTo: 'ownerId',
           convertFunc: (objectId) => {
             const identity = userComposer.getIdentity({ objectId });
-            const teamIds = identity.partOfTeams || [];
-            const shortNames = teamIds.map(teamId => teamComposer.getTeam({ teamId }).shortName);
 
             if (identity) {
+              const teamIds = identity.partOfTeams || [];
+              const shortNames = teamIds.map((teamId) => { return teamComposer.getTeam({ teamId }).shortName; });
+
               let name = identity.username || identity.aliasName;
 
-              if (showTeam) {
+              if (showTeam && shortNames.length > 0) {
                 name += `[${shortNames.join('/')}]`;
               }
 
@@ -113,6 +129,14 @@ class MessageList extends List {
             }
 
             return objectId;
+          },
+          clickFuncs: {
+            leftFunc: (message, event) => {
+              const dialog = new UserDialog({ identityId: message.ownerAliasId || message.ownerId });
+
+              dialog.addToView({ element: viewSwitcher.getParentElement() });
+              event.stopPropagation();
+            },
           },
         }, {
           paramName: 'customTimeCreated',
@@ -143,9 +167,11 @@ class MessageList extends List {
 
               if (isWhisper) {
                 const identities = userComposer.getWhisperIdentities({ participantIds });
+                const firstName = identities[0].username || identities[0].aliasName;
+                const secondName = identities[1].username || identities[1].aliasName;
 
                 return identities.length > 0
-                  ? `${identities[0].username || identities[0].aliasName}${whisperText}${identities[1].username || identities[1].aliasName}`
+                  ? `${firstName}${whisperText}${secondName}`
                   : '';
               }
 
@@ -160,8 +186,10 @@ class MessageList extends List {
 
     if (!multiRoom) {
       superParams.filter = {
+        orCheck: true,
         rules: [
           { paramName: 'roomId', paramValue: roomId || storageManager.getCurrentRoom() },
+          { paramName: 'roomId', paramValue: '111111111111111111111116' },
         ],
       };
     }
@@ -171,7 +199,7 @@ class MessageList extends List {
     this.onCreateFunc = ({ object }) => {
       this.roomLists.every((roomList) => {
         const rooms = roomList.getCollectorObjects();
-        const foundRoom = rooms.find(room => object.roomId === room.objectId);
+        const foundRoom = rooms.find((room) => { return object.roomId === room.objectId; });
 
         if (foundRoom) {
           roomList.animateElement({ elementId: foundRoom.objectId });
@@ -184,18 +212,26 @@ class MessageList extends List {
     };
     this.roomLists = roomLists;
     this.roomId = roomId || this.getRoomId();
+    this.multiRoom = multiRoom;
 
     if (shouldSwitchRoom) {
       eventCentral.addWatcher({
         event: eventCentral.Events.SWITCH_ROOM,
         func: ({ origin, room }) => {
-          if (!origin || this.roomLists.map(roomList => roomList.elementId).some(roomListId => roomListId === origin)) {
-            this.getParentElement().classList.remove('flash');
-            this.getParentElement().classList.add('flash');
+          if (!origin || this.roomLists
+            .map((roomList) => { return roomList.elementId; })
+            .some((roomListId) => { return roomListId === origin; })
+          ) {
+            const parent = this.getParentElement();
 
-            setTimeout(() => {
+            if (parent) {
               this.getParentElement().classList.remove('flash');
-            }, 400);
+              this.getParentElement().classList.add('flash');
+
+              setTimeout(() => {
+                this.getParentElement().classList.remove('flash');
+              }, 400);
+            }
 
             this.showMessagesByRoom({ roomId: room.objectId });
           }
@@ -207,6 +243,11 @@ class MessageList extends List {
   showMessagesByRoom({ roomId }) {
     this.roomId = roomId;
     this.filter = { rules: [{ paramName: 'roomId', paramValue: roomId }] };
+
+    if (!this.multiRoom) {
+      this.filter.orCheck = true;
+      this.filter.rules.push({ paramName: 'roomId', paramValue: '111111111111111111111116' });
+    }
 
     this.appendList();
   }

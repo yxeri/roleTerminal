@@ -24,10 +24,12 @@ const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');
 const walletComposer = require('../../data/composers/WalletComposer');
 const viewSwitcher = require('../../ViewSwitcher');
+const aliasComposer = require('../../data/composers/AliasComposer');
 
 class AdminUserList extends List {
   constructor({
     effect,
+    shouldToggle,
     classes = [],
     elementId = `aUserList-${Date.now()}`,
   }) {
@@ -36,6 +38,25 @@ class AdminUserList extends List {
     const headerFields = [
       {
         paramName: 'username',
+        fallbackTo: 'aliasName',
+      }, {
+        paramName: 'aliasName',
+        convertFunc: (aliasName) => {
+          if (aliasName) {
+            return '[ALIAS]';
+          }
+
+          return '';
+        },
+      }, {
+        paramName: 'offName',
+        convertFunc: (offName) => {
+          if (offName) {
+            return `(${offName})`;
+          }
+
+          return '';
+        },
       }, {
         paramName: 'accessLevel',
         classes: ['accessLevel'],
@@ -82,7 +103,11 @@ class AdminUserList extends List {
       elementId,
       classes,
       effect,
-      shouldToggle: true,
+      shouldToggle,
+      sorting: {
+        paramName: 'username',
+        fallbackParamName: 'aliasName',
+      },
       title: 'Users',
       listItemSpecificClasses: [
         {
@@ -101,13 +126,23 @@ class AdminUserList extends List {
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          console.log('objectid', objectId);
-
           const userId = objectId;
-          const { isBanned, isVerified, username } = userComposer.getUser({ userId: objectId });
+          const {
+            isBanned,
+            isVerified,
+            username,
+            aliasName,
+            offName = '',
+          } = userComposer.getIdentity({ objectId });
+          const name = username || aliasName;
+          const wallet = walletComposer.getWallet({ walletId: userId });
 
           const dialog = new BaseDialog({
-            upperText: [`Updating user: ${username}.`, labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'updateUser' })],
+            upperText: [
+              `${name}.`, labelHandler.getLabel({ baseObject: 'AdminUserDialog', label: 'updateUser' }),
+              `Off name: ${offName}`,
+              `Wallet amount: ${wallet.amount}`,
+            ],
           });
           const lowerButtons = [elementCreator.createButton({
             text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -329,17 +364,21 @@ class AdminUserList extends List {
             },
           });
 
-          if (isBanned) {
-            lowerButtons.push(unbanButton);
-          } else {
-            lowerButtons.push(banButton);
-          }
-
           if (!isVerified) {
             lowerButtons.push(verifyButton);
           }
 
-          lowerButtons.push(resetPasswordButton, changeAccessButton, walletButton);
+          if (!aliasName) {
+            if (isBanned) {
+              lowerButtons.push(unbanButton);
+            } else {
+              lowerButtons.push(banButton);
+            }
+
+            lowerButtons.push(resetPasswordButton, changeAccessButton);
+          }
+
+          lowerButtons.push(walletButton);
 
           dialog.addToView({ element: viewSwitcher.getParentElement() });
           dialog.addBottomButtons({ buttons: lowerButtons });
@@ -351,6 +390,28 @@ class AdminUserList extends List {
       ],
       collector: dataHandler.users,
       listItemFields: headerFields,
+    });
+  }
+
+  getCollectorObjects() {
+    const allAliases = aliasComposer.getAllAliases();
+    const allUsers = this.collector.getObjects({
+      filter: this.filter,
+    });
+
+    return allAliases.concat(allUsers).sort((a, b) => {
+      const aParam = (a.username || a.aliasName).toLowerCase();
+      const bParam = (b.username || b.aliasName).toLowerCase();
+
+      if (aParam < bParam) {
+        return -1;
+      }
+
+      if (aParam > bParam) {
+        return 1;
+      }
+
+      return 0;
     });
   }
 }

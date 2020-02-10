@@ -136,6 +136,7 @@ class StorageManager {
     this.removeUserId();
     this.removeDefaultViewType();
     this.removeMarked();
+    this.removeTeamId();
 
     eventCentral.emitEvent({
       event: eventCentral.Events.ACCESS_CHANGE,
@@ -154,6 +155,14 @@ class StorageManager {
 
   static getPublicRoomId() {
     return this.getLocalVal('publicRoom') || '111111111111111111111110';
+  }
+
+  static setDefaultForum(forumId) {
+    this.setLocalVal('defaultForum', forumId);
+  }
+
+  static getDefaultForum() {
+    return this.getLocalVal('defaultForum') || '111111111111111111111120';
   }
 
   static setPermissions(permissions = {}) {
@@ -227,6 +236,28 @@ class StorageManager {
 
   static removeAliasId() {
     this.removeLocalVal('aliasId');
+  }
+
+  /**
+   * Get team Id.
+   * @static
+   * @returns {string} Alias Id.
+   */
+  static getTeamId() {
+    return this.getLocalVal('teamId');
+  }
+
+  /**
+   * Set team Id.
+   * @static
+   * @param {string} teamId Team Id.
+   */
+  static setTeamId(teamId) {
+    this.setLocalVal('teamId', teamId);
+  }
+
+  static removeTeamId() {
+    this.removeLocalVal('teamId');
   }
 
   static removeUserId() {
@@ -394,7 +425,7 @@ class StorageManager {
   }
 
   static getCurrentForum() {
-    return this.getLocalVal('currentForum');
+    return this.getLocalVal('currentForum') || this.getDefaultForum();
   }
 
   /**
@@ -458,9 +489,13 @@ class StorageManager {
     const items = marked[listType];
 
     if (items) {
-      items.splice(items.findIndex(item => item.objectId === objectId), 1);
+      const index = items.findIndex((item) => item.objectId === objectId);
 
-      marked[listType] = items;
+      if (index !== -1) {
+        items.splice(index, 1);
+
+        marked[listType] = items;
+      }
     }
 
     this.setMarked({ marked });
@@ -472,6 +507,30 @@ class StorageManager {
 
   static removeMarked() {
     this.removeLocalVal('marked');
+  }
+
+  static setRequireOffName(requireOffName) {
+    this.setLocalVal('requireOffName', requireOffName);
+  }
+
+  static getReqireOffName() {
+    return converters.convertToBoolean(this.getLocalVal('requireOffName'));
+  }
+
+  static setAllowedImages(allowedImages) {
+    this.setLocalVal('allowedImages', allowedImages);
+  }
+
+  static getAllowedImages() {
+    return converters.convertToObject(this.getLocalVal('allowedImages'));
+  }
+
+  static setCustomUserFields(fields) {
+    this.setLocalVal('customUserFields', fields);
+  }
+
+  static getCustomUserFields() {
+    return converters.convertToObject(this.getLocalVal('customUserFields'));
   }
 }
 

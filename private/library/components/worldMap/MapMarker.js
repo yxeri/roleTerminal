@@ -13,6 +13,8 @@
 
 const MapCircle = require('./MapCircle');
 const MapObject = require('./MapObject');
+const userComposer = require('../../data/composers/UserComposer');
+const positionComposer = require('../../data/composers/PositionComposer');
 
 /**
  * Requires Google maps library
@@ -24,6 +26,8 @@ class MapMarker extends MapObject {
     labelStyle,
     hoverExcludeRule,
     overlay,
+    showMenuOnClick,
+    triggeredStyles,
     descriptionOnClick = true,
     choosableStyles = [],
     zIndex = 4,
@@ -39,11 +43,19 @@ class MapMarker extends MapObject {
     let chosenStyle = {};
 
     if (position.styleName) {
-      chosenStyle = choosableStyles.find(style => style.styleName === position.styleName);
+      chosenStyle = choosableStyles.find((style) => style.styleName === position.styleName) || {};
 
       chosenStyle.icon = chosenStyle.icon || {};
     } else {
       chosenStyle = { icon: {} };
+    }
+
+    let iconUrl = chosenStyle.icon.url || markerStyles.icon.url || '/images/mapicon.png';
+
+    if (userComposer.getCurrentUser().objectId === position.objectId) {
+      iconUrl = '/images/mapiconyou.png';
+    } else if (position.positionType === positionComposer.PositionTypes.USER) {
+      iconUrl = '/images/mapiconuser.png';
     }
 
     super({
@@ -56,6 +68,8 @@ class MapMarker extends MapObject {
       labelStyle,
       descriptionOnClick,
       overlay,
+      showMenuOnClick,
+      triggeredStyles,
       dragEndFunc: () => {
         this.setCurrentCoordinates({
           coordinates: {
@@ -72,7 +86,7 @@ class MapMarker extends MapObject {
           lng: latestCoordinates.longitude,
         },
         icon: {
-          url: chosenStyle.icon.url || markerStyles.icon.url || '/images/mapicon.png',
+          url: iconUrl,
           size: chosenStyle.icon.size || markerStyles.icon.size || new google.maps.Size(14, 14),
           origin: chosenStyle.icon.origin || markerStyles.icon.origin || new google.maps.Point(0, 0),
           anchor: chosenStyle.icon.anchor || markerStyles.icon.anchor || new google.maps.Point(7, 7),

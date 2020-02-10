@@ -20,6 +20,7 @@ const VerifyDialog = require('./VerifyDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const docFileComposer = require('../../../data/composers/DocFileComposer');
+const storageManager = require('../../../StorageManager');
 
 const ids = {
   TITLE: 'title',
@@ -33,6 +34,7 @@ const ids = {
 class EditDocFileDialog extends BaseDialog {
   constructor({
     docFileId,
+    closeFunc = () => {},
     classes = [],
     elementId = `docDialog-${Date.now()}`,
   }) {
@@ -66,25 +68,36 @@ class EditDocFileDialog extends BaseDialog {
         shouldResize: true,
         placeholder: labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'text' }),
       }),
-      elementCreator.createRadioSet({
-        elementId: ids.VISIBILITY,
-        title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
-        optionName: 'visibility',
-        options: [
-          {
-            optionId: ids.VISIBILITY_PUBLIC,
-            optionLabel: 'Everyone',
-            value: 'public',
-            isDefault: docFile.isPublic,
-          }, {
-            optionId: ids.VISIBILITY_PRIVATE,
-            optionLabel: 'Only those with the correct code',
-            value: 'private',
-            isDefault: docFile.isPublic,
-          },
-        ],
-      }),
     ];
+
+    if (storageManager.getAllowedImages().DOCFILE) {
+      inputs.push(elementCreator.createImageInput({
+        elementId: ids.PICTURE,
+        inputName: 'picture',
+        appendPreview: true,
+        previewId: 'imagePreview-docFile',
+      }));
+    }
+
+    inputs.push(elementCreator.createRadioSet({
+      elementId: ids.VISIBILITY,
+      title: 'Who should be able to view the document? Those with the correct code will always be able to view the document.',
+      optionName: 'visibility',
+      options: [
+        {
+          optionId: ids.VISIBILITY_PUBLIC,
+          optionLabel: 'Everyone',
+          value: 'public',
+          isDefault: docFile.isPublic,
+        }, {
+          optionId: ids.VISIBILITY_PRIVATE,
+          optionLabel: 'Only those with the correct code',
+          value: 'private',
+          isDefault: !docFile.isPublic,
+        },
+      ],
+    }));
+
     const lowerButtons = [
       elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'cancel' }),
@@ -115,9 +128,12 @@ class EditDocFileDialog extends BaseDialog {
                   callback: ({ error: docFileError }) => {
                     if (docFileError) {
                       console.log('doc file error', docFileError);
+
+                      return;
                     }
 
                     verifyDialog.removeFromView();
+                    closeFunc();
                   },
                 });
               },
@@ -139,37 +155,55 @@ class EditDocFileDialog extends BaseDialog {
               return;
             }
 
-            docFileComposer.updateDocFile({
+            const params = {
+              docFileId,
               docFile: {
                 title: this.getInputValue(ids.TITLE),
                 isPublic: document.getElementById(ids.VISIBILITY_PUBLIC).checked,
                 text: this.getInputValue(ids.TEXT).split('\n'),
               },
+            };
+            const imagePreview = document.getElementById('imagePreview-docFile');
+
+            if (imagePreview && imagePreview.getAttribute('src')) {
+              params.images = [{
+                source: imagePreview.getAttribute('src'),
+                imageName: imagePreview.getAttribute('name'),
+                width: imagePreview.naturalWidth,
+                height: imagePreview.naturalHeight,
+              }];
+            }
+
+            docFileComposer.updateDocFile({
+              ...params,
               callback: ({ error }) => {
                 if (error) {
-                  if (error.type === 'invalid length' && error.extraData) {
-                    switch (error.extraData.param) {
-                      case 'title': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'titleLength' })] });
+                  switch (error.type) {
+                    case 'invalid length': {
+                      switch (error.extraData.param) {
+                        case 'title': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'title' })] });
 
-                        break;
-                      }
-                      case 'text': {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'DocFileDialog', label: 'textLength' })] });
+                          return;
+                        }
+                        case 'text': {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'text' })] });
 
-                        break;
-                      }
-                      default: {
-                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
+                          return;
+                        }
+                        default: {
+                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'InvalidLengthError', label: 'general' })] });
 
-                        break;
+                          return;
+                        }
                       }
                     }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      return;
+                    }
                   }
-
-                  this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'error' })] });
-
-                  return;
                 }
 
                 this.removeFromView();

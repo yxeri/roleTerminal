@@ -14,6 +14,7 @@
 const Label = require('./MapLabel');
 const BaseDialog = require('../views/dialogs/BaseDialog');
 const VerifyDialog = require('../views/dialogs/VerifyDialog');
+const EditPositionDialog = require('../views/dialogs/EditPositionDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
@@ -23,6 +24,7 @@ const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
+const accessCentral = require('../../AccessCentral');
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -94,6 +96,7 @@ class MapObject {
     markedStyle,
     hoverExcludeRule,
     overlay,
+    showMenuOnClick,
     descriptionOnClick = true,
     canBeDragged = true,
     alwaysShowLabel = false,
@@ -115,12 +118,15 @@ class MapObject {
     this.label = label || new Label({
       labelStyle,
       coordinates: this.getCenter(),
-      text: this.position.connectedToUser
-        ? (userComposer.getIdentityName({ objectId: this.position.connectedToUser }) || this.position.positionName)
+      text: this.position.positionType === 'user'
+        ? (userComposer.getIdentityName({ objectId: this.position.objectId }) || this.position.positionName)
         : this.position.positionName,
     });
     this.style = style;
     this.showLabelOnHover = !hoverExcludeRule || !hoverExcludeRule.paramRegExp.test(this.position[hoverExcludeRule.paramName]);
+    this.showMenuOnClick = showMenuOnClick;
+
+    let clickTimeout = null;
 
     if (this.canBeDragged) {
       this.mapObject.addListener('dragend', () => {
@@ -139,7 +145,14 @@ class MapObject {
     mouseHandler.addGMapsClickListener({
       element: this.mapObject,
       leftFunc: (event) => {
-        MapObject.hideRightClickBox();
+        if (!this.showMenuOnClick) {
+          MapObject.hideRightClickBox();
+        } else {
+          this.showPositionRightClickBox({
+            event,
+            thisMapObject: this,
+          });
+        }
 
         if (!this.isDraggable) {
           if (clickFuncs.leftFunc) {
@@ -147,6 +160,16 @@ class MapObject {
           } else if (descriptionOnClick) {
             MapObject.buildLeftClickBox({ position: this.position });
           }
+
+          this.showLabel();
+
+          if (clickTimeout) {
+            clearTimeout(clickTimeout);
+          }
+
+          clickTimeout = setTimeout(() => {
+            this.hideLabel();
+          }, 2500);
 
           return;
         }
@@ -167,25 +190,25 @@ class MapObject {
       },
     });
 
-    if (!this.alwaysShowLabel) {
-      addGMapsHoverListeners({
-        element: this.mapObject,
-        shouldOutOnDrag: true,
-        hoverFunc: () => {
-          this.showLabel();
-        },
-        outFunc: () => {
-          this.hideLabel();
-        },
-      });
-    } else if (labelStyle.minZoomLevel) {
+    addGMapsHoverListeners({
+      element: this.mapObject,
+      shouldOutOnDrag: true,
+      hoverFunc: () => {
+        this.showLabel();
+      },
+      outFunc: () => {
+        this.hideLabel();
+      },
+    });
+
+    if (labelStyle && labelStyle.minZoomLevel) {
       eventHandler.addWatcher({
         event: eventHandler.Events.ZOOM_WORLDMAP,
         func: ({
           zoomLevel,
           map: worldMap,
         }) => {
-          if (zoomLevel >= labelStyle.minZoomLevel) {
+          if (this.alwaysShowLabel && zoomLevel >= labelStyle.minZoomLevel) {
             this.showLabel(worldMap);
           } else {
             this.hideLabel();
@@ -200,11 +223,16 @@ class MapObject {
           paramName,
           type,
           minLength,
+          value,
         } = styleRule;
         const param = this.position[paramName];
 
         switch (type) {
           case 'string': {
+            if (value) {
+              return param && typeof param === 'string' && param === value;
+            }
+
             return param && typeof param === 'string' && param.length >= minLength;
           }
           case 'array': {
@@ -279,13 +307,13 @@ class MapObject {
   }
 
   showLabel() {
-    if (this.showLabelOnHover) {
+    if (this.alwaysShowLabel || this.showLabelOnHover) {
       this.label.showLabel(this.mapObject.getMap());
     }
   }
 
   hideLabel() {
-    if (this.labelStyle.minZoomLevel || !this.alwaysShowLabel) {
+    if (!this.worldMap || !this.alwaysShowLabel || (this.labelStyle && this.labelStyle.minZoomLevel && this.worldMap && this.worldMap.getZoom() < this.labelStyle.minZoomLevel)) {
       this.label.hideLabel();
     }
   }
@@ -421,9 +449,15 @@ class MapObject {
       UpdatePositionCoordinates = { accessLevel: 1 },
     } = storageManager.getPermissions();
     const userAccessLevel = storageManager.getAccessLevel();
+    const { hasAccess } = accessCentral.hasAccessTo({
+      objectToAccess: this.position,
+      toAuth: userComposer.getCurrentUser(),
+    });
 
     if (userAccessLevel < UpdatePosition.accessLevel
-      || (storageManager.getAccessLevel() < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId)) {
+      || (!hasAccess)
+      || (storageManager.getAccessLevel() < this.position.accessLevel && storageManager.getUserId() !== this.position.ownerId)
+    ) {
       return;
     }
 
@@ -473,7 +507,7 @@ class MapObject {
                       dialog.removeFromView();
                       this.changeStyle({
                         styleName,
-                        style: this.choosableStyles.find(item => item.styleName === styleName),
+                        style: this.choosableStyles.find((item) => item.styleName === styleName),
                       });
                     },
                   },
@@ -486,6 +520,21 @@ class MapObject {
         },
       });
     }
+
+    items.push({
+      elements: [elementCreator.createSpan({
+        text: labelHandler.getLabel({ baseObject: 'MapObject', label: 'editPosition' }),
+      })],
+      clickFuncs: {
+        leftFunc: () => {
+          const dialog = new EditPositionDialog({
+            positionId: this.position.objectId,
+          });
+
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
+        },
+      },
+    });
 
     if (this.canBeDragged && userAccessLevel >= UpdatePositionCoordinates.accessLevel) {
       items.push({

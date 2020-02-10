@@ -18,22 +18,38 @@ const ViewWrapper = require('../ViewWrapper');
 const TransactionList = require('../lists/TransactionList');
 const UserList = require('../lists/UserList');
 const TeamList = require('../lists/TeamList');
+const WalletInfo = require('./WalletInfo');
+const labelHandler = require('../../labels/LabelHandler');
 
 class WalletView extends ViewWrapper {
   constructor({
     effect,
+    corners,
     classes = [],
     elementId = `wView-${Date.now()}`,
   }) {
+    const walletInfo = new WalletInfo({
+      corners,
+      sign: labelHandler.getLabel({ baseObject: 'WalletDialog', label: 'currency' }),
+      appendSign: true,
+      showName: true,
+      showTeam: true,
+    });
     const transactionList = new TransactionList({ effect });
     const userList = new UserList({
       effect,
-      title: 'Users',
+      includeSelf: true,
+      shouldToggle: true,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'users' }),
     });
     const teamList = new TeamList({
       effect,
-      title: 'Teams',
+      shouldToggle: true,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'teams' }),
     });
+
+    userList.onToggle = () => { teamList.hideList(); };
+    teamList.onToggle = () => { userList.hideList(); };
 
     super({
       elementId,
@@ -48,7 +64,14 @@ class WalletView extends ViewWrapper {
             'columnWalletList',
           ],
         },
-        { components: [{ component: transactionList }], classes: ['columnTransactionList'] },
+        {
+          components: [{
+            component: walletInfo,
+          }, {
+            component: transactionList,
+          }],
+          classes: ['columnTransactionList'],
+        },
       ],
       classes: classes.concat(['walletView']),
     });

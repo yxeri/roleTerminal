@@ -260,8 +260,8 @@ class WorldMapPage extends BaseView {
 
     this.clusterer.clearMarkers();
     this.clusterer.addMarkers(Object.keys(this.markers)
-      .filter(markerId => this.markers[markerId].shouldCluster)
-      .map(markerId => this.markers[markerId].mapObject));
+      .filter((markerId) => this.markers[markerId].shouldCluster)
+      .map((markerId) => this.markers[markerId].mapObject));
   }
 
   /**
@@ -361,7 +361,6 @@ class WorldMapPage extends BaseView {
 
     this.realignMap({
       useDefaultCoordinates: true,
-      markers: Object.keys(this.markers).map(markerId => this.markers[markerId]),
     });
 
     mouseHandler.addGMapsClickListener({
@@ -440,6 +439,20 @@ class WorldMapPage extends BaseView {
         this.insertPosition({
           position,
           changeType,
+        });
+      },
+    });
+
+    eventHandler.addWatcher({
+      event: eventHandler.Events.AGED_POSITIONS,
+      func: ({ positions }) => {
+        positions.forEach((position) => {
+          const marker = this.markers[position.objectId];
+
+          if (marker) {
+            this.clusterer.removeMarker(marker.mapObject);
+            marker.setMap(null);
+          }
         });
       },
     });

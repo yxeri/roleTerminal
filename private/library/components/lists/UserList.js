@@ -22,13 +22,17 @@ const storageManager = require('../../StorageManager');
 const aliasComposer = require('../../data/composers/AliasComposer');
 const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
+const userComposer = require('../../data/composers/UserComposer');
+const labelHandler = require('../../labels/LabelHandler');
 
 class UserList extends List {
   constructor({
-    title,
     shouldFocusOnClick,
     minimumAccessLevel,
     effect,
+    shouldToggle,
+    includeSelf = false,
+    showImage = true,
     classes = [],
     elementId = `userList-${Date.now()}`,
   }) {
@@ -37,14 +41,29 @@ class UserList extends List {
     const headerFields = [{
       paramName: 'username',
       fallbackTo: 'aliasName',
+      classes: ['username'],
+    }, {
+      paramName: 'offName',
+      isOff: true,
+      classes: ['offName', 'offValue'],
+      convertFunc: (offName) => {
+        if (offName && typeof offName !== 'boolean') {
+          return offName;
+        }
+
+        return '';
+      },
     }];
 
-    super({
+    const params = {
       elementId,
       classes,
-      title,
+      title: labelHandler.getLabel({ baseObject: 'List', label: 'users' }),
       shouldFocusOnClick,
       effect,
+      shouldToggle,
+      imageThumb: true,
+      hasOffToggle: true,
       sorting: {
         paramName: 'username',
         fallbackParamName: 'aliasName',
@@ -77,27 +96,39 @@ class UserList extends List {
             return;
           }
 
-          const userDialog = new UserDialog({
-            identityId: objectId,
-            origin: this.elementId,
-          });
+          const userDialog = new UserDialog({ identityId: objectId });
 
           userDialog.addToView({ element: viewSwitcher.getParentElement() });
         },
       },
       collector: dataHandler.users,
       listItemFields: headerFields,
-    });
+    };
+
+    if (showImage) {
+      params.imageInfo = {
+        paramName: 'objectId',
+        show: true,
+        getImage: (userId) => { return userComposer.getImage(userId); },
+      };
+    }
+
+    super(params);
+
+    this.includeSelf = includeSelf;
   }
 
   getCollectorObjects() {
-    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map(alias => alias.objectId));
+    const userAliases = [storageManager.getUserId()].concat(aliasComposer.getCurrentUserAliases().map((alias) => alias.objectId));
     const allAliases = aliasComposer.getAllAliases();
     const allUsers = this.collector.getObjects({
       filter: this.filter,
     });
+    const allIdentities = this.includeSelf
+      ? allAliases.concat(allUsers)
+      : allAliases.concat(allUsers).filter((object) => !userAliases.includes(object.objectId));
 
-    return allAliases.concat(allUsers).filter(object => !userAliases.includes(object.objectId)).sort((a, b) => {
+    return allIdentities.sort((a, b) => {
       const aParam = (a.username || a.aliasName).toLowerCase();
       const bParam = (b.username || b.aliasName).toLowerCase();
 

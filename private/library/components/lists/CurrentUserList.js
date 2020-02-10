@@ -75,7 +75,6 @@ class CurrentUserList extends List {
     });
     const currentUser = userComposer.getCurrentUser();
 
-
     if (currentUser) {
       return [currentUser].concat(allObjects);
     }

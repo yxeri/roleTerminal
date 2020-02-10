@@ -1,5 +1,5 @@
 /*
- Copyright 2018 Carmilla Mina Jankovic
+ Copyright 2019 Carmilla Mina Jankovic
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,89 +15,253 @@
  */
 
 const BaseView = require('../BaseView');
-const List = require('../../lists/List');
 const InputArea = require('../inputs/InputArea');
 
-// const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../../ElementCreator');
-// const userComposer = require('../../data/composers/UserComposer');
-// const accessCentral = require('../../AccessCentral');
-// const labelHandler = require('../../labels/LabelHandler');
-const socketManager = require('../../../SocketManager');
+const accessCentral = require('../../../AccessCentral');
 const textTools = require('../../../TextTools');
+const labelHandler = require('../../../labels/LabelHandler');
+const keyHandler = require('../../../KeyHandler');
 
 class TerminalPage extends BaseView {
   constructor({
     classes = [],
-    elementId = `tePage-${Date.now()}`,
+    elementId = `termPage-${Date.now()}`,
   }) {
     super({
       elementId,
-      classes: classes.concat(['linePrinterPage']),
-    });
-
-    const lineList = new List({
-
-    });
-    const inputArea = new InputArea({
-      sendOnEnter: true,
+      classes: classes.concat(['terminalPage']),
     });
 
     this.commands = [];
-    this.timeout = 50;
-    this.lineList = lineList;
-    this.inputArea = inputArea;
-
-    socketManager.addEvent(socketManager.EmitTypes.SIMPLEMSG, ({ error, data }) => {
-      const { simpleMsg } = data;
-
-      if (simpleMsg.type !== 'terminal') {
-        return;
-      }
-
-      if (error) {
-        console.log('simple msg', error);
-
-        return;
-      }
-
-      this.lineList.addOneItem({
-
-      });
+    this.nextFunc = null;
+    this.printing = false;
+    this.queue = [];
+    this.inputArea = new InputArea({
+      focusless: true,
+      placeholder: labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'placeholder' }),
+      classes: ['terminalInput'],
+      multiLine: false,
+      sendOnEnter: true,
+      minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+      triggerCallback: ({ text }) => {
+        this.triggerCommand(text);
+      },
     });
 
-    // eventCentral.addWatcher({
-    //   event: eventCentral.Events.SIMPLEMSG,
-    //   func: ({ docFile }) => {
-    //     const { title, objectId } = docFile;
-    //     const dialog = new LockedDocFileDialog({
-    //       title,
-    //       docFileId: objectId,
-    //     });
-    //
-    //     dialog.addToView({ element: this.getParentElement() });
-    //   },
-    // });
+    this.clearView();
+
+    keyHandler.addKey(9, () => {
+      this.autoCompleteCommand();
+    }, true);
   }
 
-  getCommandNames() {
-    return this.commands.map(({ commandName }) => commandName);
+  addToView({
+    element,
+    insertBeforeElement,
+    shouldPrepend,
+  }) {
+    super.addToView({
+      element,
+      insertBeforeElement,
+      shouldPrepend,
+    });
+
+    this.inputArea.setKeyListener();
+
+    setTimeout(() => { this.scrollView(); });
   }
 
-  getInput() {
-    return textTools.trimSpace(this.inputArea.getInputValue());
+  removeFromView() {
+    super.removeFromView();
+
+    keyHandler.removeKey(9);
+  }
+
+  consumeQueue() {
+    const object = this.queue.shift();
+
+    if (object) {
+      const {
+        element,
+        beforeTimeout,
+        fullscreen,
+        afterTimeout = 50,
+      } = object;
+
+      if (fullscreen) {
+        this.outputList.classList.add('fullscreen');
+      } else if (typeof fullscreen === 'boolean' && !fullscreen) {
+        this.outputList.classList.remove('fullscreen');
+      }
+
+      const callback = () => {
+        this.outputList.appendChild(elementCreator.createListItem({ elements: [element] }));
+        this.scrollView();
+
+        setTimeout(() => { this.consumeQueue(); }, afterTimeout);
+      };
+
+      if (beforeTimeout) {
+        setTimeout(callback, beforeTimeout);
+
+        return;
+      }
+
+      callback();
+    } else {
+      this.outputList.classList.remove('fullscreen');
+      this.printing = false;
+    }
+  }
+
+  queueMessages({
+    objects,
+  }) {
+    this.queue.push(...objects);
+
+    if (!this.printing) {
+      this.printing = true;
+
+      this.consumeQueue({ queue: this.queue });
+    }
+  }
+
+  setNextFunc(func) {
+    this.nextFunc = func;
+  }
+
+  resetNextFunc() {
+    this.nextFunc = null;
+
+    this.inputArea.clearInput();
+    this.queueMessages({
+      objects: [
+        { element: elementCreator.createSpan({ text: `[${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'completed' })}]` }) },
+        { element: elementCreator.createSpan({ text: '' }) },
+      ],
+    });
+    this.printCommands();
+  }
+
+  addCommand(command) {
+    this.commands.push(command);
+  }
+
+  printCommands() {
+    this.queueMessages({
+      objects: [{ element: elementCreator.createSpan({ text: `${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'programs' })}:` }) }],
+    });
+    this.queueMessages({
+      objects: this.commands.map(({ commandName }) => {
+        return {
+          element: elementCreator.createSpan({
+            text: commandName,
+            classes: ['clickable', 'linkLook'],
+            clickFuncs: {
+              leftFunc: () => {
+                this.triggerCommand(commandName);
+              },
+            },
+          }),
+        };
+      }),
+    });
+  }
+
+  scrollView() {
+    const lastElement = this.outputList.lastElementChild;
+
+    if (lastElement) {
+      lastElement.scrollIntoView(true);
+    }
+  }
+
+  triggerCommand(value) {
+    const inputValue = (value || this.inputArea.getInputValue()).toString();
+
+    if (this.nextFunc) {
+      if (textTools.trimSpace(inputValue.toLowerCase()) === 'abort') {
+        this.inputArea.clearInput();
+        this.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'aborted' }) }) }] });
+        this.resetNextFunc();
+      } else {
+        this.queueMessages({ objects: [{ element: elementCreator.createSpan({ text: `$ ${inputValue}` }) }] });
+        this.nextFunc(inputValue);
+        this.inputArea.clearInput();
+      }
+
+      return;
+    }
+
+    if (inputValue === '') {
+      this.queueMessages({
+        objects: [{ element: elementCreator.createSpan({ text: '$' }) }],
+      });
+      this.printCommands();
+    } else {
+      const sentCommandName = textTools.trimSpace(inputValue.toLowerCase());
+      const command = this.commands.find(({ commandName }) => sentCommandName === commandName.toLowerCase());
+
+      if (command) {
+        this.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: `$ ${inputValue}` }) },
+            { element: elementCreator.createSpan({ text: `${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'running' })} ${command.commandName}:` }) },
+            { element: elementCreator.createSpan({ text: `${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'typeAbort' })} ` }) },
+            {
+              element: elementCreator.createSpan({
+                classes: ['clickable', 'linkLook'],
+                text: labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'abortCommand' }),
+                clickFuncs: {
+                  leftFunc: () => {
+                    this.triggerCommand('abort');
+                  },
+                },
+              }),
+            },
+          ],
+        });
+
+        command.startFunc();
+      } else {
+        this.queueMessages({
+          objects: [
+            { element: elementCreator.createSpan({ text: `$ ${inputValue}: ${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'notFound' })}` }) },
+          ],
+        });
+        this.printCommands();
+      }
+    }
+
+    this.inputArea.clearInput();
   }
 
   autoCompleteCommand() {
-    const commands = this.getCommandNames();
+    const commands = this.commands.map(({ commandName }) => commandName);
     const matched = [];
-    const inputValue = this.getInput().toLowerCase();
+    const inputValue = this.inputArea.getInputValue().toLowerCase();
+    let matches;
+
+    if (inputValue === '') {
+      this.triggerCommand('');
+
+      return;
+    }
 
     commands.forEach((commandName) => {
       const lowerCommand = commandName.toLowerCase();
-      const matches = inputValue.split().every((char, index) => {
-        return char === lowerCommand.charAt(index);
-      });
+      matches = false;
+
+      for (let j = 0; j < inputValue.length; j += 1) {
+        if (inputValue.charAt(j) === lowerCommand.charAt(j)) {
+          matches = true;
+        } else {
+          matches = false;
+
+          break;
+        }
+      }
 
       if (matches) {
         matched.push(commandName);
@@ -107,21 +271,37 @@ class TerminalPage extends BaseView {
     if (matched.length === 1) {
       this.inputArea.setInputValue({ value: matched[0] });
     } else if (matched.length > 0) {
-      this.queueMessage({
-        message: {
-          text: ['$ Multiple matched commands:'],
-          elements: matched.map((commandName) => {
-            return elementCreator.createSpan({
+      this.queueMessages({
+        objects: [{ element: elementCreator.createSpan({ text: `${labelHandler.getLabel({ baseObject: 'TerminalPage', label: 'multipleMatches' })}:` }) }],
+      });
+      this.queueMessages({
+        objects: matched.map((commandName) => {
+          return {
+            element: elementCreator.createSpan({
               text: commandName,
               classes: ['clickable'],
-              func: () => {
-                this.triggerCommand(commandName);
+              clickFuncs: {
+                leftFunc: () => {
+                  this.triggerCommand(commandName);
+                },
               },
-            });
-          }),
-        },
+            }),
+          };
+        }),
       });
     }
+  }
+
+  clearView() {
+    this.outputList = elementCreator.createList({
+      classes: ['terminalOutput'],
+    });
+    this.element.innerHTML = '';
+    this.element.appendChild(this.outputList);
+    this.inputArea.addToView({
+      element: this.element,
+    });
+    this.inputArea.clearInput();
   }
 }
 

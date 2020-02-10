@@ -402,6 +402,18 @@ const labels = {
     createRoom: (override.RoomDialog && override.RoomDialog.createRoom) || {
       en: 'Create room',
     },
+    passwordLength: (override.RoomDialog && override.RoomDialog.passwordLength) || {
+      en: 'The password is too long.',
+    },
+    roomNameLength: (override.RoomDialog && override.RoomDialog.roomNameLength) || {
+      en: 'The name of the room is too long. Max 20 characters.',
+    },
+    topicLength: (override.RoomDialog && override.RoomDialog.topicLength) || {
+      en: 'The topic of the room is too long. Max 300 characters.',
+    },
+    topic: {
+      en: 'Topic. Will be shown when entering the room',
+    },
   },
   EditRoomDialog: {
     editRoom: (override.EditRoomDialog && override.EditRoomDialog.editRoom) || {
@@ -652,6 +664,9 @@ const labels = {
     },
     transferComplete: {
       en: 'Transfer complete!',
+    },
+    note: {
+      en: 'Short note',
     },
   },
   UserDialog: {

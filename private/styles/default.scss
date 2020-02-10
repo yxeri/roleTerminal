@@ -528,12 +528,6 @@ select {
   }
 
   .roomInfo {
-    border-top: $border;
-    border-bottom: $border;
-    color: $second-text-color;
-    padding: $padding;
-    background-color: $darker-color;
-    text-align: center;
   }
 }
 
@@ -618,7 +612,6 @@ select {
  * A list item that has focus in a list.
  */
 .focusListItem {
-  background-color: $focus-color;
   text-decoration: underline;
 }
 
@@ -627,7 +620,6 @@ select {
  * A list item will be marked when the object that it's connected to is updated.
  */
 .markListItem {
-  background-color: $darker-new-color;
 }
 
 /**

@@ -34,7 +34,7 @@ const labels = {
   },
   NotAllowedError: {
     general: {
-      en: 'Access denied. You are not allowed to access this function',
+      en: 'Access denied.',
     },
   },
   InvalidLengthError: {
@@ -700,6 +700,9 @@ const labels = {
     leaveTeam: (override.UserDialog && override.UserDialog.leaveTeam) || {
       en: 'Leave team',
     },
+    code: {
+      en: 'ID',
+    },
   },
   TeamDialog: {
     tag: (override.TeamDialog && override.TeamDialog.tag) || {
@@ -788,6 +791,17 @@ const labels = {
     },
     placeholder: (override.TerminalPage && override.TerminalPage.placeholder) || {
       en: 'Enter to see programs',
+    },
+  },
+  FindUserByIdDialog: {
+    findUser: {
+      en: 'Find a user',
+    },
+    id: {
+      en: 'User ID',
+    },
+    notFound: {
+      en: 'No user was found with that ID.',
     },
   },
 };

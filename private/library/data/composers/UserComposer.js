@@ -261,6 +261,13 @@ class UserComposer extends DataComposer {
 
     return undefined;
   }
+
+  getUserByCode({
+    code,
+    callback,
+  }) {
+    socketManager.emitEvent(socketManager.EmitTypes.GETUSERBYCODE, { code }, callback);
+  }
 }
 
 const userComposer = new UserComposer();

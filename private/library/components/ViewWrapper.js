@@ -107,7 +107,11 @@ class ViewWrapper extends BaseView {
         }));
       }
 
-      component.addToView({ element: container });
+      if (component.addToView) {
+        component.addToView({ element: container });
+      } else {
+        container.appendChild(component);
+      }
     });
 
     return container;

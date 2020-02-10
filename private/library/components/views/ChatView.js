@@ -22,6 +22,7 @@ const UserList = require('../lists/UserList');
 const WhisperRoomList = require('../lists/WhisperRoomList');
 const RoomFollowingList = require('../lists/RoomFollowingList');
 const RoomInfo = require('./RoomInfo');
+const FindUserByIdDialog = require('./dialogs/FindUserByIdDialog');
 
 const messageComposer = require('../../data/composers/MessageComposer');
 const accessCentral = require('../../AccessCentral');
@@ -30,6 +31,7 @@ const eventCentral = require('../../EventCentral');
 const storageManager = require('../../StorageManager');
 const textTools = require('../../TextTools');
 const viewSwitcher = require('../../ViewSwitcher');
+const elementCreator = require('../../ElementCreator');
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -201,6 +203,18 @@ class ChatView extends ViewWrapper {
     };
     const roomListColumn = {
       components: [
+        {
+          component: elementCreator.createButton({
+            text: 'Find user by ID',
+            clickFuncs: {
+              leftFunc: () => {
+                const dialog = new FindUserByIdDialog({});
+
+                dialog.addToView({ element: viewSwitcher.getParentElement() });
+              },
+            },
+          }),
+        },
         { component: roomFollowingList },
         { component: whisperRoomList },
         { component: roomList },

@@ -28,6 +28,6 @@
     "eslint-plugin-react": "^7.18.0"
   },
   "dependencies": {
-    "rolehaven": "git://github.com/yxeri/roleHaven.git"
+    "rolehaven": "git://github.com/yxeri/roleHaven.git#greylight"
   }
 }

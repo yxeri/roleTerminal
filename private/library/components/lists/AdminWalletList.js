@@ -17,7 +17,6 @@
 const List = require('./List');
 
 const dataHandler = require('../../data/DataHandler');
-const walletComposer = require('../../data/composers/WalletComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const teamComposer = require('../../data/composers/TeamComposer');
 

@@ -45,6 +45,7 @@ class UserSelfDialog extends BaseDialog {
       username,
       aliasName,
       description,
+      code,
       customFields = [],
       objectId: identityId,
     } = identity;
@@ -269,7 +270,10 @@ class UserSelfDialog extends BaseDialog {
       lowerText.push(fullName);
     }
 
-    lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`);
+    lowerText.push(
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`,
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'code' })}: ${code}`,
+    );
 
     if (partOfTeams && partOfTeams.length > 0) {
       const teamNames = partOfTeams.map((teamId) => teamComposer.getTeamName({ teamId })).join(', ');

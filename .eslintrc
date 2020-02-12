@@ -16,7 +16,8 @@
     "no-underscore-dangle": 0,
     "arrow-body-style": 0,
     "brace-style": "error",
-    "multiline-ternary": ["error", "always"]
+    "multiline-ternary": ["error", "always"],
+    "class-methods-use-this": 0
   },
   "globals": {
     "google": false,

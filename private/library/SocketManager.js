@@ -55,6 +55,7 @@ class SocketManager {
       TRANSACTION: 'transaction',
       DISCONNECT: 'disconnect',
       RECONNECT: 'reconnect',
+      TERMINATE: 'terminate',
       STARTUP: 'startup',
       SENDMSG: 'sendMessage',
       UPDATEPOSITION: 'updatePosition',
@@ -78,6 +79,7 @@ class SocketManager {
       ACCEPTROOM: 'acceptRoomInvitation',
       SENDROOMINVITE: 'sendInvitationToRoom',
       GETUSERBYCODE: 'getUserByCode',
+      USEGAMECODE: 'useGameCode',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -101,6 +103,7 @@ class SocketManager {
           allowedImages,
           customUserFields,
           defaultForum,
+          activeTermination,
           permissions = {},
         } = data;
 
@@ -117,6 +120,7 @@ class SocketManager {
         if (yearModification) { storageManager.setYearModification(yearModification); }
         if (dayModification) { storageManager.setDayModification(dayModification); }
         if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
+        if (activeTermination) { storageManager.setActiveTermination(activeTermination); }
 
         storageManager.setDefaultForum(defaultForum);
         storageManager.setAllowedImages(allowedImages);

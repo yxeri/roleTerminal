@@ -48,7 +48,6 @@ class RegisterDialog extends BaseDialog {
         elementId: ids.USERNAME,
         inputName: 'username',
         type: 'text',
-        isRequired: true,
         maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'RegisterDialog', label: 'username' }),
       }),

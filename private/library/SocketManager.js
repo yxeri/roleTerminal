@@ -310,7 +310,12 @@ class SocketManager {
 
       storageManager.setToken(token);
 
-      callback({ data: { success: true } });
+      callback({
+        data: {
+          user,
+          success: true,
+        },
+      });
 
       eventCentral.emitEvent({
         event: eventCentral.Events.LOGIN,

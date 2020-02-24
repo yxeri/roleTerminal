@@ -15,6 +15,7 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const NameDialog = require('./NameDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -67,7 +68,7 @@ class LoginDialog extends BaseDialog {
             socketManager.login({
               username: textTools.trimSpace(this.getInputValue(ids.USERNAME)),
               password: this.getInputValue(ids.PASSWORD),
-              callback: ({ error }) => {
+              callback: ({ error, data }) => {
                 if (error) {
                   switch (error.type) {
                     case 'banned': {
@@ -80,6 +81,13 @@ class LoginDialog extends BaseDialog {
                     case 'needs verification': {
                       this.updateLowerText({
                         text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'unverified' })],
+                      });
+
+                      break;
+                    }
+                    case 'insufficient': {
+                      this.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'noLives' })],
                       });
 
                       break;
@@ -99,6 +107,14 @@ class LoginDialog extends BaseDialog {
                   });
 
                   return;
+                }
+
+                const { user } = data;
+
+                if (!user.hasSetName) {
+                  const dialog = new NameDialog({ user });
+
+                  dialog.addToView({ element: this.getParentElement() });
                 }
 
                 this.setInputValue({

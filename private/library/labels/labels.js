@@ -27,6 +27,14 @@ const labels = {
       se: 'Något gick fel',
     },
   },
+  UserUpdate: {
+    banned: {
+      en: 'You have been banned.',
+    },
+    terminated: {
+      en: 'You have been terminated.',
+    },
+  },
   InvalidDataError: {
     general: {
       en: '',
@@ -441,8 +449,8 @@ const labels = {
   },
   LoginDialog: {
     username: (override.LoginDialog && override.LoginDialog.username) || {
-      en: 'Name',
-      se: 'Namn',
+      en: 'Name/ID',
+      se: 'Namn/ID',
     },
     password: (override.LoginDialog && override.LoginDialog.password) || {
       en: 'Password',
@@ -465,6 +473,9 @@ const labels = {
     },
     unverified: (override.LoginDialog && override.LoginDialog.unverified) || {
       en: 'The user has not been verified. Contact an administrator.',
+    },
+    noLives: {
+      en: 'That user has been terminated.',
     },
   },
   FeedView: {
@@ -718,6 +729,9 @@ const labels = {
     code: {
       en: 'ID',
     },
+    name: {
+      en: 'Name',
+    },
   },
   TeamDialog: {
     tag: (override.TeamDialog && override.TeamDialog.tag) || {
@@ -817,6 +831,34 @@ const labels = {
     },
     notFound: {
       en: 'No user was found with that ID.',
+    },
+  },
+  TargetDialog: {
+    id: {
+      en: 'Enter the ID',
+    },
+    title: {
+      en: 'Tracer',
+    },
+    invalid: {
+      en: 'Invalid ID',
+    },
+    success: {
+      en: 'Trace was successful.',
+    },
+    target: {
+      en: 'Target',
+    },
+    faction: {
+      en: 'Faction',
+    },
+  },
+  NameDialog: {
+    name: {
+      en: 'New username',
+    },
+    setName: {
+      en: 'Choose a username! This is the name that will shown to all other users. You can also use this name instead of your ID to login in the future.',
     },
   },
 };

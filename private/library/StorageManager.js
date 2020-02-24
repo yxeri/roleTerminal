@@ -532,6 +532,14 @@ class StorageManager {
   static getCustomUserFields() {
     return converters.convertToObject(this.getLocalVal('customUserFields'));
   }
+
+  static setActiveTermination(activeTermination) {
+    this.setLocalVal('activeTermination', activeTermination);
+  }
+
+  static getActiveTermination() {
+    return converters.convertToBoolean(this.getLocalVal('activeTermination'));
+  }
 }
 
 StorageManager.addWatchers();

@@ -84,6 +84,7 @@ class EventCentral {
       COMPLETE_TRANSACTION: 'Transaction dependencies fetched',
       COMPLETE_TEAM: 'Team dependencies fetched',
       COMPLETE_INVITATION: 'Invitation dependencies fetched',
+      COMPLETE_GAMECODE: 'Game code dependencies fetched',
       LEFT_TEAM: 'Left team',
       MY_POSITION: 'User position',
       SHOW_MAP_CLICK_BOX: 'Map box is shown',

@@ -92,6 +92,7 @@ class EventCentral {
       TEAM_MEMBER: 'Team member change',
       ONLINE: 'Online',
       OFFLINE: 'Offline',
+      CHANGED_NAME: 'Changed name',
     };
     this.eventWatchers = {};
   }

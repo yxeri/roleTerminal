@@ -16,6 +16,7 @@
 
 const BaseDialog = require('./BaseDialog');
 const NameDialog = require('./NameDialog');
+const TemporaryDialog = require('./TemporaryDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -121,6 +122,13 @@ class LoginDialog extends BaseDialog {
                   elementId: ids.PASSWORD,
                   value: '',
                 });
+
+                const loggedInDialog = new TemporaryDialog({
+                  text: [`You have logged in as user ${user.username}`],
+                  timeout: 3000,
+                });
+
+                loggedInDialog.addToView({});
 
                 this.removeFromView();
               },

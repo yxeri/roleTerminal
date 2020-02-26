@@ -42,6 +42,7 @@ class MessageList extends List {
     roomId,
     effect,
     corners,
+    linkUser = true,
     hideDate = false,
     showTeam = true,
     fullDate = true,
@@ -52,6 +53,44 @@ class MessageList extends List {
     classes = [],
     elementId = `mList-${Date.now()}`,
   }) {
+    const userItemField = {
+      paramName: 'ownerAliasId',
+      fallbackTo: 'ownerId',
+      convertFunc: (objectId) => {
+        const identity = userComposer.getIdentity({ objectId });
+
+        if (identity) {
+          const teamIds = identity.partOfTeams || [];
+          const shortNames = teamIds.map((teamId) => { return teamComposer.getTeam({ teamId }).shortName; });
+
+          let name = identity.username || identity.aliasName;
+
+          if (showTeam && shortNames.length > 0) {
+            name += `[${shortNames.join('/')}]`;
+          }
+
+          return name;
+        }
+
+        return objectId;
+      },
+    };
+
+    if (linkUser) {
+      userItemField.clickFuncs = {
+        leftFunc: (message, event) => {
+          if (!linkUser) {
+            return;
+          }
+
+          const dialog = new UserDialog({ identityId: message.ownerAliasId || message.ownerId });
+
+          dialog.addToView({ element: viewSwitcher.getParentElement() });
+          event.stopPropagation();
+        },
+      };
+    }
+
     const superParams = {
       elementId,
       effect,
@@ -109,36 +148,8 @@ class MessageList extends List {
       appendClasses: ['msgLine'],
       listItemFieldsClasses: ['msgInfo'],
       listItemFields: [
+        userItemField,
         {
-          paramName: 'ownerAliasId',
-          fallbackTo: 'ownerId',
-          convertFunc: (objectId) => {
-            const identity = userComposer.getIdentity({ objectId });
-
-            if (identity) {
-              const teamIds = identity.partOfTeams || [];
-              const shortNames = teamIds.map((teamId) => { return teamComposer.getTeam({ teamId }).shortName; });
-
-              let name = identity.username || identity.aliasName;
-
-              if (showTeam && shortNames.length > 0) {
-                name += `[${shortNames.join('/')}]`;
-              }
-
-              return name;
-            }
-
-            return objectId;
-          },
-          clickFuncs: {
-            leftFunc: (message, event) => {
-              const dialog = new UserDialog({ identityId: message.ownerAliasId || message.ownerId });
-
-              dialog.addToView({ element: viewSwitcher.getParentElement() });
-              event.stopPropagation();
-            },
-          },
-        }, {
           paramName: 'customTimeCreated',
           fallbackTo: 'timeCreated',
           convertFunc: (date) => {

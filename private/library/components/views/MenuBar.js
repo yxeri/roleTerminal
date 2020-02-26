@@ -63,7 +63,6 @@ class MenuBar extends BaseView {
 
     const controls = showControls;
     controls.user = controls.user || true;
-    controls.alias = controls.alias || true;
 
     const items = [];
     const lastItems = [];
@@ -564,6 +563,11 @@ class MenuBar extends BaseView {
         event: eventCentral.Events.CHANGED_ALIAS,
         func: watcherFunc,
       });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_NAME,
+        func: watcherFunc,
+      });
     }
 
     if (showControls.wallet) {
@@ -695,7 +699,7 @@ class MenuBar extends BaseView {
 
         event.stopPropagation();
       },
-      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: '-----' }),
+      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'changeView' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 
@@ -706,13 +710,6 @@ class MenuBar extends BaseView {
     }
 
     this.lists.push(this.viewList);
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.VIEW_SWITCHED,
-      func: ({ view }) => {
-        menuButton.textContent = view.getTitle();
-      },
-    });
   }
 }
 

@@ -22,6 +22,7 @@ const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
 const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
+const accessCentral = require('../../AccessCentral');
 
 class RoomInfo extends BaseView {
   constructor({
@@ -76,6 +77,15 @@ class RoomInfo extends BaseView {
     this.element.appendChild(nameSpan);
     this.element.addEventListener('click', () => {
       if (this.roomId) {
+        const { hasFullAccess } = accessCentral.hasAccessTo({
+          objectToAccess: roomComposer.getRoom({ roomId: this.roomId }),
+          toAuth: userComposer.getCurrentUser(),
+        });
+
+        if (!hasFullAccess) {
+          return;
+        }
+
         const dialog = new EditRoomDialog({
           roomId: this.roomId,
         });

@@ -45,6 +45,7 @@ class ChatView extends ViewWrapper {
     hideDate,
     fullDate,
     corners,
+    linkUser,
     hideUserList = false,
     showUserImage = true,
     sendOnEnter = false,
@@ -106,6 +107,7 @@ class ChatView extends ViewWrapper {
       fullDate,
       hideDate,
       corners,
+      linkUser,
       shouldSwitchRoom: true,
       roomLists: [
         roomFollowingList,
@@ -250,6 +252,11 @@ class ChatView extends ViewWrapper {
       switch (roomListPlacement) {
         case 'left': {
           columns.push(roomListColumn);
+          columns.push(mainColumn);
+
+          break;
+        }
+        case 'hide': {
           columns.push(mainColumn);
 
           break;

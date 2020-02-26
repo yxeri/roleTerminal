@@ -12,6 +12,7 @@ const TextAnimation = require('../library/components/views/TextAnimation');
 const AdminView = require('../library/components/views/AdminView');
 const TargetDialog = require('../library/components/views/dialogs/TargetDialog');
 const TemporaryDialog = require('../library/components/views/dialogs/TemporaryDialog');
+const ConnectDialog = require('../library/components/views/dialogs/ConnectDialog');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -280,6 +281,9 @@ const chatView = new ChatView({
   allowImages: true,
   effect: true,
   placeholder: 'Alt+Enter to send message',
+  roomListPlacement: 'hide',
+  showTeam: false,
+  linkUser: false,
 });
 const docFileView = new DocFileView({
   effect: true,
@@ -304,20 +308,28 @@ const targetButton = elementCreator.createSpan({
     },
   },
 });
+const connectButton = elementCreator.createSpan({
+  text: 'CONNECT',
+  classes: ['topMenuButton'],
+  clickFuncs: {
+    leftFunc: () => {
+      const dialog = new ConnectDialog({});
+
+      dialog.addToView({});
+    },
+  },
+});
 const menuBar = new MenuBar({
   viewSwitcher,
   appendTop: false,
-  showClock: true,
+  showClock: false,
   showControls: {
     user: true,
-    alias: true,
-    currentUser: true,
-    room: true,
+    currentUser: false,
     view: true,
-    docFile: true,
-    team: true,
   },
   elements: [
+    connectButton,
     targetButton,
   ],
 });

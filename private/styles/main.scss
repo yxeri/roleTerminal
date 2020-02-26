@@ -12,20 +12,20 @@
  */
 
 $background-color: black;
-$second-background-color: #23001e;
-$menu-background-color: rgba(35, 0, 30, 0.98);
-$text-color: white;
-$second-text-color: #00ffef;
-$second-color: #ff00d7;
-$light-color: #4b003c;
-$darker-color: #23001e;
+$second-background-color: #232223;
+$menu-background-color: rgba(35, 35, 35, 0.98);
+$text-color: #00f3ff;
+$second-text-color: #00f3ff;
+$second-color: #00f3ff;
+$light-color: #00f3ff;
+$darker-color: black;
 $warning-color: #910001;
 $off-color: #ff6269;
 $greyed-out: #6f6f6f;
 $focus-color: #000691;
-$new-color: #009100;
-$darker-new-color: #005f00;
-$header-color: #2e001a;
+$new-color: #00f3ff;
+$darker-new-color: #00f3ff;
+$header-color: black;
 
 $p-margin: .4em;
 $border-width: 1px;
@@ -990,9 +990,8 @@ $map-padding-fix: 2em;
   }
 
   .topMenuButton {
-    font-weight: bold;
-    background-color: $text-color;
-    color: $darker-color;
+    border-left: $border;
+    border-right: $border;
     padding: .1em;
     max-width: 4.5em;
     text-overflow: ellipsis;

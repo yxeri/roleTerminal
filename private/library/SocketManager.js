@@ -80,6 +80,7 @@ class SocketManager {
       SENDROOMINVITE: 'sendInvitationToRoom',
       GETUSERBYCODE: 'getUserByCode',
       USEGAMECODE: 'useGameCode',
+      CONNECTUSER: 'connectUser',
     };
     this.ChangeTypes = {
       UPDATE: 'update',

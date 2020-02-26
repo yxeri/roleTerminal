@@ -866,17 +866,26 @@ const labels = {
     instructions: {
       en: 'Enter the username of the person you want to connect with.',
     },
-    areYouSure: {
-      en: 'Are you sure?',
-    },
     warning: {
-      en: 'WARNING! Connecting to a member of a rival faction may expose your identity. Are you sure the person is who they say they are?',
+      en: 'Connecting to a member of a rival faction may expose your identity. Are you sure the person is who they say they are?',
     },
     username: {
       en: 'Enter the username',
     },
     connect: {
       en: 'Connect',
+    },
+    notFound: {
+      en: 'Could not find user with that name',
+    },
+    fail: {
+      en: 'WARNING! You have tried connecting with a rival faction. You may be compromised.',
+    },
+    success: {
+      en: 'Connection established. You have connected with one of your members.',
+    },
+    alreadyConnected: {
+      en: 'You are already connected to this user.',
     },
   },
   NameDialog: {

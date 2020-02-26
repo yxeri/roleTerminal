@@ -16,13 +16,10 @@
 
 const BaseDialog = require('./BaseDialog');
 const TemporaryDialog = require('./TemporaryDialog');
-const VerifyDialog = require('./VerifyDialog');
 
 const labelHandler = require('../../../labels/LabelHandler');
 const elementCreator = require('../../../ElementCreator');
-const gameCodeComposer = require('../../../data/composers/GameCodeComposer');
 const userComposer = require('../../../data/composers/UserComposer');
-const teamComposer = require('../../../data/composers/TeamComposer');
 
 const ids = {
   USERNAME: 'username',
@@ -34,7 +31,10 @@ class ConnectDialog extends BaseDialog {
     elementId = `cDialog-${Date.now()}`,
   }) {
     const upperText = [labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'title' })];
-    const lowerText = [labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'instructions' })];
+    const lowerText = [
+      labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'instructions' }),
+      labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'warning' }),
+    ];
     const inputs = [
       elementCreator.createInput({
         type: 'text',
@@ -60,61 +60,51 @@ class ConnectDialog extends BaseDialog {
               return;
             }
 
-            const verifyDialog = new VerifyDialog({
-              text: [
-                labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'areYouSure' }),
-                labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'warning' }),
-              ],
-              callback: ({ confirmed }) => {
-                if (!confirmed) {
-                  this.removeFromView();
+            userComposer.connectUser({
+              username: this.getInputValue(ids.USERNAME),
+              callback: ({ error, data }) => {
+                if (error) {
+                  switch (error.type) {
+                    case 'does not exist': {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'notFound' })] });
+
+                      break;
+                    }
+                    case 'already exists': {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'alreadyConnected' })] });
+
+                      break;
+                    }
+                    default: {
+                      this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+
+                      break;
+                    }
+                  }
 
                   return;
                 }
 
-                gameCodeComposer.useGameCode({
-                  code: this.getInputValue(ids.TARGET),
-                  callback: ({ error, data }) => {
-                    if (error) {
-                      switch (error.type) {
-                        case 'does not exist': {
-                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'invalid' })] });
+                const { success } = data;
+                const dialogText = [];
 
-                          break;
-                        }
-                        default: {
-                          this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'Error', label: 'general' })] });
+                console.log(data);
 
-                          break;
-                        }
-                      }
+                if (success) {
+                  dialogText.push(labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'success' }));
+                } else {
+                  dialogText.push(labelHandler.getLabel({ baseObject: 'ConnectDialog', label: 'fail' }));
+                }
 
-                      return;
-                    }
-
-                    const { gameCode } = data;
-                    const target = userComposer.getIdentity({ objectId: gameCode.ownerAliasId || gameCode.ownerId });
-                    const teamName = target.partOfTeams > 0
-                      ? teamComposer.getTeamName({ teamId: teamComposer.getTeamName({ teamId: target.partOfTeams[0] }) })
-                      : '-';
-                    const dialog = new TemporaryDialog({
-                      text: [
-                        labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'success' }),
-                        `${labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'target' })}: ${target.aliasName || target.username}`,
-                        `${labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'faction' })}: ${teamName}`,
-                      ],
-                      timeout: 10000,
-                    });
-
-                    dialog.addToView({ element: this.getParentElement() });
-                    this.removeFromView();
-                  },
+                const dialog = new TemporaryDialog({
+                  text: dialogText,
+                  timeout: 10000,
                 });
+
+                dialog.addToView({ element: this.getParentElement() });
+                this.removeFromView();
               },
             });
-
-            verifyDialog.addToView({});
-            this.removeFromView();
           },
         },
       }),

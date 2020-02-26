@@ -80,7 +80,9 @@ class MenuBar extends BaseView {
         this.viewList.classList.add('hide');
       }
 
-      this.currentUserList.hideView();
+      if (this.currentUserList) {
+        this.currentUserList.hideView();
+      }
     });
 
     this.element.addEventListener('click', () => {

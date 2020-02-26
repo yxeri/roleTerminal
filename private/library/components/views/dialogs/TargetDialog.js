@@ -33,6 +33,7 @@ class TargetDialog extends BaseDialog {
     elementId = `tDialog-${Date.now()}`,
   }) {
     const upperText = [labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'title' })];
+    const lowerText = [labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'instructions' })];
     const inputs = [
       elementCreator.createInput({
         type: 'text',
@@ -105,6 +106,7 @@ class TargetDialog extends BaseDialog {
     super({
       elementId,
       upperText,
+      lowerText,
       inputs,
       lowerButtons,
       classes: classes.concat(['TargetDialog']),

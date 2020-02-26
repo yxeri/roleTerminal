@@ -602,6 +602,9 @@ const labels = {
     menu: (override.MenuBar && override.MenuBar.menu) || {
       en: 'Menu',
     },
+    changeView: {
+      en: 'Apps',
+    },
   },
   AdminUserDialog: {
     ban: (override.AdminUserDialog && override.AdminUserDialog.ban) || {
@@ -838,19 +841,42 @@ const labels = {
       en: 'Enter the ID',
     },
     title: {
-      en: 'Tracer',
+      en: 'Lethal Tracer',
     },
     invalid: {
       en: 'Invalid ID',
     },
     success: {
-      en: 'Trace was successful.',
+      en: 'Trace was successful. Target was terminated.',
     },
     target: {
       en: 'Target',
     },
     faction: {
       en: 'Faction',
+    },
+    instructions: {
+      en: 'Enter the ID of the target of termination.',
+    },
+  },
+  ConnectDialog: {
+    title: {
+      en: 'Connect',
+    },
+    instructions: {
+      en: 'Enter the username of the person you want to connect with.',
+    },
+    areYouSure: {
+      en: 'Are you sure?',
+    },
+    warning: {
+      en: 'WARNING! Connecting to a member of a rival faction may expose your identity. Are you sure the person is who they say they are?',
+    },
+    username: {
+      en: 'Enter the username',
+    },
+    connect: {
+      en: 'Connect',
     },
   },
   NameDialog: {

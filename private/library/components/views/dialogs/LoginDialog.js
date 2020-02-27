@@ -22,6 +22,7 @@ const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const textTools = require('../../../TextTools');
+const teampComposer = require('../../../data/composers/TeamComposer');
 
 const ids = {
   USERNAME: 'username',
@@ -113,9 +114,22 @@ class LoginDialog extends BaseDialog {
                 const { user } = data;
 
                 if (!user.hasSetName) {
-                  const dialog = new NameDialog({ user });
+                  if (user.partOfTeams[0]) {
+                    const teamDialog = new TemporaryDialog({
+                      text: [`You are part of the ${teampComposer.getTeamName({ teamId: user.partOfTeams[0] })}`],
+                      callback: () => {
+                        const dialog = new NameDialog({ user });
 
-                  dialog.addToView({});
+                        dialog.addToView({});
+                      },
+                    });
+
+                    teamDialog.addToView({});
+                  } else {
+                    const dialog = new NameDialog({ user });
+
+                    dialog.addToView({});
+                  }
                 } else {
                   const loggedInDialog = new TemporaryDialog({
                     text: [`You have logged in as user ${user.username}`],

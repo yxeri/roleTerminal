@@ -22,6 +22,7 @@ class TemporaryDialog extends BaseDialog {
   constructor({
     text,
     timeout,
+    callback = () => {},
     classes = [],
     elementId = `tempDialog-${Date.now()}`,
   }) {
@@ -30,6 +31,7 @@ class TemporaryDialog extends BaseDialog {
         text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'ok' }),
         clickFuncs: {
           leftFunc: () => {
+            callback();
             this.removeFromView();
           },
         },

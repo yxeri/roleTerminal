@@ -31,6 +31,7 @@ class ViewSwitcher {
       PEOPLE: 'people',
       TERMINAL: 'terminal',
       ADMIN: 'admin',
+      TEAMSCORE: 'teamScore',
     };
     this.parentElement = undefined;
     this.availableTypes = [];

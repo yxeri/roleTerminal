@@ -53,6 +53,7 @@ class SocketManager {
       BAN: 'ban',
       WALLET: 'wallet',
       TRANSACTION: 'transaction',
+      TEAMSCORING: 'teamScoring',
       DISCONNECT: 'disconnect',
       RECONNECT: 'reconnect',
       TERMINATE: 'terminate',

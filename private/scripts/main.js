@@ -1,20 +1,15 @@
 require('../library/polyfills');
 
-const WorldMapView = require('../library/components/views/WorldMapView');
-const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
 const ViewWrapper = require('../library/components/ViewWrapper');
 const ChatView = require('../library/components/views/ChatView');
 const MenuBar = require('../library/components/views/MenuBar');
-const DocFileView = require('../library/components/views/DocFileView');
-const TeamView = require('../library/components/views/TeamView');
-const PeopleView = require('../library/components/views/PeopleView');
 const TextAnimation = require('../library/components/views/TextAnimation');
-const AdminView = require('../library/components/views/AdminView');
 const TargetDialog = require('../library/components/views/dialogs/TargetDialog');
 const TemporaryDialog = require('../library/components/views/dialogs/TemporaryDialog');
 const ConnectDialog = require('../library/components/views/dialogs/ConnectDialog');
+const TeamScoreView = require('../library/components/views/TeamScoreView');
+const TeamScorePage = require('../library/components/views/pages/TeamScorePage');
 
-const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
@@ -78,205 +73,6 @@ const razorLogo = [
   { element: elementCreator.createSpan({ text: '#RAZOR# Demos - Warez - Honey' }), afterTimeout: 2000 },
 ];
 
-const worldMapParams = {
-  alwaysShowLabels: {
-    line: true,
-  },
-  maxZoom: 19,
-  clusterStyle: {
-    gridSize: 10,
-    maxZoom: 15,
-    styles: [{
-      width: 24,
-      height: 24,
-      iconAnchor: [12, 12],
-      textSize: 12,
-      url: 'images/mapcluster.png',
-      textColor: '#ff00d7',
-      fontFamily: 'monospace',
-    }],
-  },
-  labelStyle: {
-    fontColor: '#00ffef',
-    minZoomLevel: 18,
-    fontSize: 11,
-  },
-  backgroundColor: '#23001e',
-  positionTypes: [
-    'user',
-    'device',
-    'lantern',
-    'local',
-    'world',
-    'roads',
-    'drivable-roads',
-  ],
-  polygonStyle: {
-    strokeColor: '#00ffef',
-    fillColor: '#ff00d7',
-    opacity: 1,
-    strokeOpacity: 1,
-    fillOpacity: 1,
-    strokeWeight: 1.5,
-  },
-  markerStyle: {
-    opacity: 0.9,
-    icon: {
-      url: '/images/mapicon.png',
-    },
-  },
-  triggeredStyles: {
-    markers: [{
-      paramName: 'positionName',
-      type: 'string',
-      value: 'Sticky Spoon Love Bureau',
-      style: {
-        icon: {
-          url: '/images/heart.png',
-        },
-      },
-    }, {
-      paramName: 'positionType',
-      type: 'string',
-      value: 'lantern',
-      style: {
-        icon: {
-          url: '/images/mapicon-red.png',
-        },
-      },
-    }],
-    polygons: [{
-      paramName: 'description',
-      type: 'array',
-      minLength: 1,
-      style: {
-        strokeColor: '#ff00d7',
-        fillColor: '#00ffef',
-        styleName: 'Occupied',
-      },
-    }],
-  },
-  markedStyles: {
-    polygons: {
-      strokeColor: '#009100',
-      fillColor: '#009100',
-      styleName: 'Marked',
-    },
-  },
-  choosableStyles: {
-    markers: [{
-      styleName: 'Red',
-      icon: {
-        url: '/images/mapicon-red.png',
-      },
-    }, {
-      styleName: 'Green',
-      icon: {
-        url: '/images/mapicon-green.png',
-      },
-    }],
-    polygons: [{
-      strokeColor: '#ff0001',
-      fillColor: '#ff0001',
-      styleName: 'Red',
-    }, {
-      strokeColor: '#787878',
-      fillColor: '#787878',
-      styleName: 'Grey',
-    }, {
-      strokeColor: '#009100',
-      fillColor: '#009100',
-      styleName: 'Marked',
-    }, {
-      strokeColor: '#ff00d7',
-      fillColor: '#00ffef',
-      styleName: 'Occupied',
-    }, {
-      strokeColor: '#00ffef',
-      fillColor: '#ff00d7',
-      styleName: 'Not Occupied',
-    }],
-  },
-  lineStyle: {
-    strokeColor: '#ffffff',
-    strokeWeight: 2,
-  },
-  mapStyles: [{
-    elementType: 'geometry',
-    stylers: [
-      { color: '#23001e' },
-    ],
-  }, {
-    elementType: 'labels',
-    stylers: [
-      { visibility: 'off' },
-    ],
-  }, {
-    featureType: 'poi',
-    stylers: [
-      { visibility: 'off' },
-    ],
-  }, {
-    featureType: 'administrative',
-    stylers: [
-      { color: '#57004a' },
-    ],
-  }, {
-    featureType: 'landscape.natural.terrain',
-    stylers: [
-      { color: '#44003a' },
-    ],
-  }, {
-    featureType: 'road',
-    stylers: [
-      { color: '#414141' },
-      { weight: 0.5 },
-    ],
-  }, {
-    featureType: 'transit',
-    stylers: [
-      { visibility: 'off' },
-    ],
-  }, {
-    featureType: 'water',
-    stylers: [
-      { color: '#7d006c' },
-    ],
-  }],
-  lists: [{
-    elementId: 'housingList',
-    title: 'Housing',
-    positionTypes: ['local'],
-    effect: true,
-    zoomLevel: 18,
-  }, {
-    elementId: 'lanternList',
-    title: 'LANTERN',
-    positionTypes: ['lantern'],
-    effect: true,
-    zoomLevel: 16,
-  }, {
-    elementId: 'userList',
-    title: 'Users',
-    positionTypes: ['user'],
-    effect: true,
-    listItemFields: [{
-      paramName: 'objectId',
-      convertFunc: (objectId) => {
-        const name = userComposer.getIdentityName({ objectId });
-
-        return name || objectId;
-      },
-    }],
-    zoomLevel: 18,
-  }, {
-    elementId: 'worldList',
-    title: 'World',
-    positionTypes: ['world'],
-    effect: true,
-    zoomLevel: 10,
-  }],
-};
 const chatView = new ChatView({
   allowImages: true,
   effect: true,
@@ -284,19 +80,10 @@ const chatView = new ChatView({
   roomListPlacement: 'hide',
   showTeam: false,
   linkUser: false,
+  showInfo: false,
 });
-const docFileView = new DocFileView({
-  effect: true,
-});
-const worldMapView = new WorldMapView(worldMapParams);
-const worldMapPage = new WorldMapPage(worldMapParams);
-const teamView = new TeamView({
-  effect: true,
-});
-const peopleView = new PeopleView({
-  effect: true,
-});
-const adminView = new AdminView({});
+const teamScoreView = new TeamScoreView({});
+const teamScorePage = new TeamScorePage({});
 const targetButton = elementCreator.createSpan({
   text: 'TARGET',
   classes: ['topMenuButton'],
@@ -337,76 +124,26 @@ accessCentral.addAccessElement({
   element: targetButton,
   minimumAccessLevel: 1,
 });
-const docWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.DOCS,
-  title: 'Docs',
-  columns: [{
-    components: [
-      { component: docFileView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
+accessCentral.addAccessElement({
+  element: connectButton,
+  minimumAccessLevel: 1,
 });
 const chatWrapper = new ViewWrapper({
   menuBar,
   viewType: viewSwitcher.ViewTypes.CHAT,
-  title: 'Coms',
+  title: 'Chat',
   columns: [{
-    components: [
-      { component: chatView },
-    ],
+    components: [{ component: chatView }],
   }, {
-    components: [
-      { component: worldMapPage },
-    ],
+    components: [{ component: teamScorePage }],
   }],
 });
-const fullMapWrapper = new ViewWrapper({
+const teamScoreWrapper = new ViewWrapper({
   menuBar,
-  viewType: viewSwitcher.ViewTypes.WORLDMAP,
-  title: 'Maps',
+  viewType: viewSwitcher.ViewTypes.TEAMSCORE,
+  title: 'Score',
   columns: [{
-    components: [{ component: worldMapView }],
-  }],
-});
-const teamWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.TEAM,
-  title: 'Teams',
-  columns: [{
-    components: [
-      { component: teamView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
-});
-const peopleWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.PEOPLE,
-  title: 'Employees',
-  columns: [{
-    components: [
-      { component: peopleView },
-    ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
-  }],
-});
-const adminWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.ADMIN,
-  title: 'Admin',
-  columns: [{
-    components: [{ component: adminView }],
+    components: [{ component: teamScoreView }],
   }],
 });
 
@@ -414,22 +151,14 @@ menuBar.setViews({
   viewSwitcher,
   views: [
     { view: chatWrapper },
-    { view: docWrapper },
-    { view: fullMapWrapper },
-    { view: teamWrapper },
-    { view: peopleWrapper },
-    { view: adminWrapper },
+    { view: teamScoreWrapper },
   ],
 });
 
 viewSwitcher.addAvailableTypes({
   types: [
     chatWrapper.viewType,
-    fullMapWrapper.viewType,
-    docWrapper.viewType,
-    teamWrapper.viewType,
-    peopleWrapper.viewType,
-    adminWrapper.viewType,
+    teamScoreWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

@@ -743,6 +743,27 @@ $msgList-msgLine-side-padding: .2em;
   }
 }
 
+.teamScoreView {
+  font-size: 1.5em;
+}
+
+.teamScorePage {
+  .teamScore {
+    li {
+      border-top: $border;
+      border-bottom: $border;
+      color: $second-text-color;
+      padding: $padding;
+      background-color: $darker-color;
+      text-align: center;
+    }
+
+    li:last-child {
+      border-top: none;
+    }
+  }
+}
+
 .list {
   li {
     padding: $padding;

@@ -80,17 +80,20 @@ class TargetDialog extends BaseDialog {
                   return;
                 }
 
-                const { gameCode } = data;
+                const { gameCode, success } = data;
                 const target = userComposer.getIdentity({ objectId: gameCode.ownerAliasId || gameCode.ownerId });
-                const teamName = target.partOfTeams > 0
-                  ? teamComposer.getTeamName({ teamId: teamComposer.getTeamName({ teamId: target.partOfTeams[0] }) })
+                const teamName = target.partOfTeams[0]
+                  ? teamComposer.getTeamName({ teamId: target.partOfTeams[0] })
                   : '-';
-                const dialog = new TemporaryDialog({
-                  text: [
+                const text = success
+                  ? [
                     labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'success' }),
                     `${labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'target' })}: ${target.aliasName || target.username}`,
                     `${labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'faction' })}: ${teamName}`,
-                  ],
+                  ]
+                  : [labelHandler.getLabel({ baseObject: 'TargetDialog', label: 'fail' })];
+                const dialog = new TemporaryDialog({
+                  text,
                   timeout: 10000,
                 });
 

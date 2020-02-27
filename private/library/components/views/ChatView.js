@@ -46,6 +46,7 @@ class ChatView extends ViewWrapper {
     fullDate,
     corners,
     linkUser,
+    showInfo = true,
     hideUserList = false,
     showUserImage = true,
     sendOnEnter = false,
@@ -197,10 +198,11 @@ class ChatView extends ViewWrapper {
     const roomInfo = new RoomInfo({
       whisperText,
       corners,
+      classes: [],
     });
     const columns = [];
     const mainColumn = {
-      components: [{ component: roomInfo }],
+      components: [],
       classes: ['columnChat'],
     };
     const roomListColumn = {
@@ -226,6 +228,10 @@ class ChatView extends ViewWrapper {
         'columnRoomList',
       ],
     };
+
+    if (showInfo) {
+      mainColumn.components.push({ component: roomInfo });
+    }
 
     if (!hideUserList) {
       roomListColumn.components.push({ component: userList });

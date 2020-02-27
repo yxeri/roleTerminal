@@ -50,6 +50,7 @@ class EventCentral {
       INVITATIONS: 'Invitations',
       MESSAGE: 'Message',
       MESSAGES: 'Messages',
+      TEAMSCORING: 'Team scoring',
       STARTUP: 'Startup',
       RECONNECT: 'Reconnect',
       CHATMSG: 'Chat message',

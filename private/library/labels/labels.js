@@ -856,8 +856,11 @@ const labels = {
       en: 'Faction',
     },
     instructions: {
-      en: 'Enter the ID of the target of termination.',
+      en: 'Enter the ID of the target for termination.',
     },
+    fail: {
+      en: 'Trace was successful, but the target has already been terminated.'
+    }
   },
   ConnectDialog: {
     title: {
@@ -894,6 +897,17 @@ const labels = {
     },
     setName: {
       en: 'Choose a username! This is the name that will shown to all other users. You can also use this name instead of your ID to login in the future.',
+    },
+  },
+  TeamScoring: {
+    doneBy: {
+      en: 'Done by',
+    },
+    target: {
+      en: 'Target',
+    },
+    elimination: {
+      en: 'Target has been eliminated',
     },
   },
 };

@@ -115,20 +115,20 @@ class LoginDialog extends BaseDialog {
                 if (!user.hasSetName) {
                   const dialog = new NameDialog({ user });
 
-                  dialog.addToView({ element: this.getParentElement() });
+                  dialog.addToView({});
+                } else {
+                  const loggedInDialog = new TemporaryDialog({
+                    text: [`You have logged in as user ${user.username}`],
+                    timeout: 2000,
+                  });
+
+                  loggedInDialog.addToView({});
                 }
 
                 this.setInputValue({
                   elementId: ids.PASSWORD,
                   value: '',
                 });
-
-                const loggedInDialog = new TemporaryDialog({
-                  text: [`You have logged in as user ${user.username}`],
-                  timeout: 3000,
-                });
-
-                loggedInDialog.addToView({});
 
                 this.removeFromView();
               },

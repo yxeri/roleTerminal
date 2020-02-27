@@ -10,7 +10,6 @@ const ConnectDialog = require('../library/components/views/dialogs/ConnectDialog
 const TeamScoreView = require('../library/components/views/TeamScoreView');
 const TeamScorePage = require('../library/components/views/pages/TeamScorePage');
 
-const positionTracker = require('../library/PositionTracker');
 const viewTools = require('../library/ViewTools');
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
 const tools = require('../library/Tools');
@@ -20,7 +19,6 @@ const elementCreator = require('../library/ElementCreator');
 const socketManager = require('../library/SocketManager');
 const deviceChecker = require('../library/DeviceChecker');
 const mouseHandler = require('../library/MouseHandler');
-const notificationManager = require('../library/NotificationManager');
 const accessCentral = require('../library/AccessCentral');
 const storageManager = require('../library/StorageManager');
 const eventCentral = require('../library/EventCentral');
@@ -114,6 +112,8 @@ const menuBar = new MenuBar({
     user: true,
     currentUser: false,
     view: true,
+    register: false,
+    teamProfile: false,
   },
   elements: [
     connectButton,
@@ -273,14 +273,3 @@ socketManager.addEvent(socketManager.EmitTypes.TERMINATE, () => {
 });
 
 mouseHandler.setAllowRightClick(true);
-
-if (window.cordova) {
-  document.addEventListener('deviceready', () => {
-    window.StatusBar.hide();
-    positionTracker.startTracker({ standalone: true });
-  });
-} else {
-  positionTracker.startTracker({});
-}
-
-notificationManager.start();

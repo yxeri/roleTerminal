@@ -37,7 +37,7 @@ class RoomInfo extends BaseView {
       isUser,
       roomId,
     }) => {
-      const foundRoom = roomComposer.getRoom({ roomId });
+      const foundRoom = roomComposer.getRoom({ roomId }) || {};
       this.roomId = roomId;
 
       nameSpan.innerHTML = '';
@@ -59,7 +59,9 @@ class RoomInfo extends BaseView {
         return;
       }
 
-      nameSpan.appendChild(document.createTextNode(foundRoom.roomName));
+      if (foundRoom.roomName) {
+        nameSpan.appendChild(document.createTextNode(foundRoom.roomName));
+      }
     };
 
     super({

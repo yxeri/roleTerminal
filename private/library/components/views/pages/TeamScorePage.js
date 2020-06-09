@@ -14,38 +14,26 @@
  limitations under the License.
  */
 
-const BaseDialog = require('./BaseDialog');
+const BaseView = require('../BaseView');
+const TeamScoreInfo = require('../TeamScoreInfo');
+
+const socketManager = require('../../../SocketManager');
 const elementCreator = require('../../../ElementCreator');
-const labelHandler = require('../../../labels/LabelHandler');
 
-class TemporaryDialog extends BaseDialog {
+class TeamScorePage extends BaseView {
   constructor({
-    text,
-    timeout,
-    callback = () => {},
     classes = [],
-    elementId = `tempDialog-${Date.now()}`,
+    elementId = `tSPage-${Date.now()}`,
   }) {
-    const lowerButtons = [
-      elementCreator.createButton({
-        text: labelHandler.getLabel({ baseObject: 'BaseDialog', label: 'ok' }),
-        clickFuncs: {
-          leftFunc: () => {
-            callback();
-            this.removeFromView();
-          },
-        },
-      }),
-    ];
-
     super({
       elementId,
-      lowerButtons,
-      lowerText: text,
-      timeout: timeout || 10000,
-      classes: classes.concat(['tempDialog']),
+      classes: classes.concat(['teamScorePage']),
     });
+
+    const teamScoreInfo = new TeamScoreInfo({});
+
+    teamScoreInfo.addToView({ element: this.element });
   }
 }
 
-module.exports = TemporaryDialog;
+module.exports = TeamScorePage;

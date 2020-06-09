@@ -85,6 +85,10 @@ class TeamComposer extends DataComposer {
 
     return undefined;
   }
+
+  getTeams() {
+    return this.handler.getObjects({});
+  }
 }
 
 const teamComposer = new TeamComposer();

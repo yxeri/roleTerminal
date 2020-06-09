@@ -64,6 +64,26 @@ class CurrentUserList extends List {
       collector: dataHandler.aliases,
       listItemFields: headerFields,
     });
+
+    eventCentral.addWatcher({
+      event: eventCentral.Events.USER,
+      func: ({ user }) => {
+        const currentUser = userComposer.getCurrentUser();
+
+        if (user.objectId === currentUser.objectId && user.username) {
+          eventCentral.emitEvent({
+            event: eventCentral.Events.CHANGED_NAME,
+            params: {},
+          });
+
+          this.addOneItem({
+            object: user,
+            shouldFlash: true,
+            shouldReplace: true,
+          });
+        }
+      },
+    });
   }
 
   getCollectorObjects() {

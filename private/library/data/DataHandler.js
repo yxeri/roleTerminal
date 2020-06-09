@@ -14,3 +14,4 @@ exports.teams = require('./TeamData');
 exports.transactions = require('./TransactionData');
 exports.users = require('./UserData');
 exports.wallets = require('./WalletData');
+exports.teamScoring = require('./TeamScoringData');

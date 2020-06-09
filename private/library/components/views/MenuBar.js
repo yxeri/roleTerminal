@@ -60,10 +60,7 @@ class MenuBar extends BaseView {
     });
 
     const permissions = storageManager.getPermissions();
-
     const controls = showControls;
-    controls.user = controls.user || true;
-    controls.alias = controls.alias || true;
 
     const items = [];
     const lastItems = [];
@@ -81,7 +78,9 @@ class MenuBar extends BaseView {
         this.viewList.classList.add('hide');
       }
 
-      this.currentUserList.hideView();
+      if (this.currentUserList) {
+        this.currentUserList.hideView();
+      }
     });
 
     this.element.addEventListener('click', () => {
@@ -189,54 +188,65 @@ class MenuBar extends BaseView {
         element: logoutButton,
       });
       accessCentral.addAccessElement({
-        maxAccessLevel: permissions.CreateUser
-          ? permissions.CreateUser.accessLevel
-          : accessCentral.AccessLevels.ANONYMOUS,
-        element: registerButton,
-      });
-      accessCentral.addAccessElement({
         minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
         element: profileButton,
-      });
-      accessCentral.addAccessElement({
-        minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
-        element: teamProfileButton,
-      });
-
-      eventCentral.addWatcher({
-        event: eventCentral.Events.COMPLETE_USER,
-        func: () => {
-          const identity = userComposer.getCurrentIdentity();
-
-          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
-            teamProfileButton.classList.remove('hide');
-          }
-        },
-      });
-
-      eventCentral.addWatcher({
-        event: eventCentral.Events.CHANGED_ALIAS,
-        func: ({ userId }) => {
-          const identity = userComposer.getIdentity({ objectId: userId });
-
-          if (identity.partOfTeams && identity.partOfTeams.length > 0) {
-            teamProfileButton.classList.remove('hide');
-          } else {
-            teamProfileButton.classList.add('hide');
-          }
-        },
       });
 
       items.push({
         elements: [loginButton],
-      }, {
-        elements: [registerButton],
       });
+
+      if (controls.register) {
+        accessCentral.addAccessElement({
+          maxAccessLevel: permissions.CreateUser
+            ? permissions.CreateUser.accessLevel
+            : accessCentral.AccessLevels.ANONYMOUS,
+          element: registerButton,
+        });
+
+        items.push({
+          elements: [registerButton],
+        });
+      }
+
+      if (controls.teamProfile) {
+        accessCentral.addAccessElement({
+          minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
+          element: teamProfileButton,
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.COMPLETE_USER,
+          func: () => {
+            const identity = userComposer.getCurrentIdentity();
+
+            if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+              teamProfileButton.classList.remove('hide');
+            }
+          },
+        });
+
+        eventCentral.addWatcher({
+          event: eventCentral.Events.CHANGED_ALIAS,
+          func: ({ userId }) => {
+            const identity = userComposer.getIdentity({ objectId: userId });
+
+            if (identity.partOfTeams && identity.partOfTeams.length > 0) {
+              teamProfileButton.classList.remove('hide');
+            } else {
+              teamProfileButton.classList.add('hide');
+            }
+          },
+        });
+
+        items.push({
+          elements: [teamProfileButton],
+        });
+      }
 
       lastItems.push({
         elements: [
           profileButton,
-          teamProfileButton,
           logoutButton,
           rebootButton,
         ],
@@ -564,6 +574,11 @@ class MenuBar extends BaseView {
         event: eventCentral.Events.CHANGED_ALIAS,
         func: watcherFunc,
       });
+
+      eventCentral.addWatcher({
+        event: eventCentral.Events.CHANGED_NAME,
+        func: watcherFunc,
+      });
     }
 
     if (showControls.wallet) {
@@ -695,7 +710,7 @@ class MenuBar extends BaseView {
 
         event.stopPropagation();
       },
-      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: '-----' }),
+      text: labelHandler.getLabel({ baseObject: 'MenuBar', label: 'changeView' }),
     });
     const container = elementCreator.createContainer({ elements: [menuButton, this.viewList] });
 
@@ -706,13 +721,6 @@ class MenuBar extends BaseView {
     }
 
     this.lists.push(this.viewList);
-
-    eventCentral.addWatcher({
-      event: eventCentral.Events.VIEW_SWITCHED,
-      func: ({ view }) => {
-        menuButton.textContent = view.getTitle();
-      },
-    });
   }
 }
 

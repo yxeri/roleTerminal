@@ -53,8 +53,10 @@ class SocketManager {
       BAN: 'ban',
       WALLET: 'wallet',
       TRANSACTION: 'transaction',
+      TEAMSCORING: 'teamScoring',
       DISCONNECT: 'disconnect',
       RECONNECT: 'reconnect',
+      TERMINATE: 'terminate',
       STARTUP: 'startup',
       SENDMSG: 'sendMessage',
       UPDATEPOSITION: 'updatePosition',
@@ -77,6 +79,9 @@ class SocketManager {
       ACCEPTTEAM: 'acceptTeamInvitation',
       ACCEPTROOM: 'acceptRoomInvitation',
       SENDROOMINVITE: 'sendInvitationToRoom',
+      GETUSERBYCODE: 'getUserByCode',
+      USEGAMECODE: 'useGameCode',
+      CONNECTUSER: 'connectUser',
     };
     this.ChangeTypes = {
       UPDATE: 'update',
@@ -100,6 +105,7 @@ class SocketManager {
           allowedImages,
           customUserFields,
           defaultForum,
+          activeTermination,
           permissions = {},
         } = data;
 
@@ -116,6 +122,7 @@ class SocketManager {
         if (yearModification) { storageManager.setYearModification(yearModification); }
         if (dayModification) { storageManager.setDayModification(dayModification); }
         if (requireOffName) { storageManager.setRequireOffName(requireOffName); }
+        if (activeTermination) { storageManager.setActiveTermination(activeTermination); }
 
         storageManager.setDefaultForum(defaultForum);
         storageManager.setAllowedImages(allowedImages);
@@ -309,7 +316,12 @@ class SocketManager {
 
       storageManager.setToken(token);
 
-      callback({ data: { success: true } });
+      callback({
+        data: {
+          user,
+          success: true,
+        },
+      });
 
       eventCentral.emitEvent({
         event: eventCentral.Events.LOGIN,

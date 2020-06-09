@@ -50,6 +50,7 @@ class EventCentral {
       INVITATIONS: 'Invitations',
       MESSAGE: 'Message',
       MESSAGES: 'Messages',
+      TEAMSCORING: 'Team scoring',
       STARTUP: 'Startup',
       RECONNECT: 'Reconnect',
       CHATMSG: 'Chat message',
@@ -84,6 +85,7 @@ class EventCentral {
       COMPLETE_TRANSACTION: 'Transaction dependencies fetched',
       COMPLETE_TEAM: 'Team dependencies fetched',
       COMPLETE_INVITATION: 'Invitation dependencies fetched',
+      COMPLETE_GAMECODE: 'Game code dependencies fetched',
       LEFT_TEAM: 'Left team',
       MY_POSITION: 'User position',
       SHOW_MAP_CLICK_BOX: 'Map box is shown',
@@ -91,6 +93,7 @@ class EventCentral {
       TEAM_MEMBER: 'Team member change',
       ONLINE: 'Online',
       OFFLINE: 'Offline',
+      CHANGED_NAME: 'Changed name',
     };
     this.eventWatchers = {};
   }

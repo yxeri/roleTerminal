@@ -24,6 +24,7 @@ const ids = {
   ROOMNAME: 'roomName',
   PASSWORD: 'password',
   REPEATPASSWORD: 'repeatPassword',
+  TOPIC: 'topic',
 };
 
 class RoomDialog extends BaseDialog {
@@ -39,6 +40,14 @@ class RoomDialog extends BaseDialog {
         isRequired: true,
         maxLength: 20,
         placeholder: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'roomName' }),
+      }),
+      elementCreator.createInput({
+        elementId: ids.TOPIC,
+        inputName: 'topic',
+        type: 'text',
+        multiLine: true,
+        maxLength: 300,
+        placeholder: labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'topic' }),
       }),
       elementCreator.createInput({
         elementId: ids.PASSWORD,
@@ -84,6 +93,7 @@ class RoomDialog extends BaseDialog {
               room: {
                 roomName: this.getInputValue(ids.ROOMNAME),
                 password: this.getInputValue(ids.PASSWORD),
+                topic: this.getInputValue(ids.TOPIC),
               },
               callback: ({ error }) => {
                 if (error) {
@@ -96,6 +106,11 @@ class RoomDialog extends BaseDialog {
                       }
                       case 'password': {
                         this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'passwordLength' })] });
+
+                        break;
+                      }
+                      case 'topic': {
+                        this.updateLowerText({ text: [labelHandler.getLabel({ baseObject: 'RoomDialog', label: 'topicLength' })] });
 
                         break;
                       }

@@ -15,11 +15,14 @@
  */
 
 const BaseDialog = require('./BaseDialog');
+const NameDialog = require('./NameDialog');
+const TemporaryDialog = require('./TemporaryDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const textTools = require('../../../TextTools');
+const teampComposer = require('../../../data/composers/TeamComposer');
 
 const ids = {
   USERNAME: 'username',
@@ -67,7 +70,7 @@ class LoginDialog extends BaseDialog {
             socketManager.login({
               username: textTools.trimSpace(this.getInputValue(ids.USERNAME)),
               password: this.getInputValue(ids.PASSWORD),
-              callback: ({ error }) => {
+              callback: ({ error, data }) => {
                 if (error) {
                   switch (error.type) {
                     case 'banned': {
@@ -80,6 +83,13 @@ class LoginDialog extends BaseDialog {
                     case 'needs verification': {
                       this.updateLowerText({
                         text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'unverified' })],
+                      });
+
+                      break;
+                    }
+                    case 'insufficient': {
+                      this.updateLowerText({
+                        text: [labelHandler.getLabel({ baseObject: 'LoginDialog', label: 'noLives' })],
                       });
 
                       break;
@@ -99,6 +109,34 @@ class LoginDialog extends BaseDialog {
                   });
 
                   return;
+                }
+
+                const { user } = data;
+
+                if (!user.hasSetName) {
+                  if (user.partOfTeams[0]) {
+                    const teamDialog = new TemporaryDialog({
+                      text: [`You are part of the ${teampComposer.getTeamName({ teamId: user.partOfTeams[0] })}`],
+                      callback: () => {
+                        const dialog = new NameDialog({ user });
+
+                        dialog.addToView({});
+                      },
+                    });
+
+                    teamDialog.addToView({});
+                  } else {
+                    const dialog = new NameDialog({ user });
+
+                    dialog.addToView({});
+                  }
+                } else {
+                  const loggedInDialog = new TemporaryDialog({
+                    text: [`You have logged in as user ${user.username}`],
+                    timeout: 2000,
+                  });
+
+                  loggedInDialog.addToView({});
                 }
 
                 this.setInputValue({

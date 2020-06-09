@@ -261,6 +261,20 @@ class UserComposer extends DataComposer {
 
     return undefined;
   }
+
+  getUserByCode({
+    code,
+    callback,
+  }) {
+    socketManager.emitEvent(socketManager.EmitTypes.GETUSERBYCODE, { code }, callback);
+  }
+
+  connectUser({
+    username,
+    callback,
+  }) {
+    socketManager.emitEvent(socketManager.EmitTypes.CONNECTUSER, { username }, callback);
+  }
 }
 
 const userComposer = new UserComposer();

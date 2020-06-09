@@ -16,6 +16,7 @@
 
 const BaseDialog = require('./BaseDialog');
 const PasswordDialog = require('./PasswordDialog');
+const NameDialog = require('./NameDialog');
 
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
@@ -45,6 +46,7 @@ class UserSelfDialog extends BaseDialog {
       username,
       aliasName,
       description,
+      code,
       customFields = [],
       objectId: identityId,
     } = identity;
@@ -161,6 +163,17 @@ class UserSelfDialog extends BaseDialog {
           },
         },
       }),
+      elementCreator.createButton({
+        text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'name' }),
+        clickFuncs: {
+          leftFunc: () => {
+            const dialog = new NameDialog({});
+
+            dialog.addToView({ element: this.getParentElement() });
+            this.removeFromView();
+          },
+        },
+      }),
     ];
 
     if (identityPosition) {
@@ -269,7 +282,15 @@ class UserSelfDialog extends BaseDialog {
       lowerText.push(fullName);
     }
 
-    lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`);
+    lowerText.push(
+      `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'username' })}: ${name}`,
+    );
+
+    if (code) {
+      lowerText.push(
+        `${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'code' })}: ${code}`,
+      );
+    }
 
     if (partOfTeams && partOfTeams.length > 0) {
       const teamNames = partOfTeams.map((teamId) => teamComposer.getTeamName({ teamId })).join(', ');

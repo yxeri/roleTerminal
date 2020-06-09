@@ -27,6 +27,14 @@ const labels = {
       se: 'Något gick fel',
     },
   },
+  UserUpdate: {
+    banned: {
+      en: 'You have been banned.',
+    },
+    terminated: {
+      en: 'You have been terminated.',
+    },
+  },
   InvalidDataError: {
     general: {
       en: '',
@@ -34,7 +42,7 @@ const labels = {
   },
   NotAllowedError: {
     general: {
-      en: 'Access denied. You are not allowed to access this function',
+      en: 'Access denied.',
     },
   },
   InvalidLengthError: {
@@ -402,6 +410,18 @@ const labels = {
     createRoom: (override.RoomDialog && override.RoomDialog.createRoom) || {
       en: 'Create room',
     },
+    passwordLength: (override.RoomDialog && override.RoomDialog.passwordLength) || {
+      en: 'The password is too long.',
+    },
+    roomNameLength: (override.RoomDialog && override.RoomDialog.roomNameLength) || {
+      en: 'The name of the room is too long. Max 20 characters.',
+    },
+    topicLength: (override.RoomDialog && override.RoomDialog.topicLength) || {
+      en: 'The topic of the room is too long. Max 300 characters.',
+    },
+    topic: {
+      en: 'Topic. Will be shown when entering the room',
+    },
   },
   EditRoomDialog: {
     editRoom: (override.EditRoomDialog && override.EditRoomDialog.editRoom) || {
@@ -429,8 +449,8 @@ const labels = {
   },
   LoginDialog: {
     username: (override.LoginDialog && override.LoginDialog.username) || {
-      en: 'Name',
-      se: 'Namn',
+      en: 'Name/ID',
+      se: 'Namn/ID',
     },
     password: (override.LoginDialog && override.LoginDialog.password) || {
       en: 'Password',
@@ -453,6 +473,9 @@ const labels = {
     },
     unverified: (override.LoginDialog && override.LoginDialog.unverified) || {
       en: 'The user has not been verified. Contact an administrator.',
+    },
+    noLives: {
+      en: 'That user has been terminated.',
     },
   },
   FeedView: {
@@ -579,6 +602,9 @@ const labels = {
     menu: (override.MenuBar && override.MenuBar.menu) || {
       en: 'Menu',
     },
+    changeView: {
+      en: 'Apps',
+    },
   },
   AdminUserDialog: {
     ban: (override.AdminUserDialog && override.AdminUserDialog.ban) || {
@@ -653,6 +679,9 @@ const labels = {
     transferComplete: {
       en: 'Transfer complete!',
     },
+    note: {
+      en: 'Short note',
+    },
   },
   UserDialog: {
     userInfo: (override.UserDialog && override.UserDialog.userInfo) || {
@@ -699,6 +728,12 @@ const labels = {
     },
     leaveTeam: (override.UserDialog && override.UserDialog.leaveTeam) || {
       en: 'Leave team',
+    },
+    code: {
+      en: 'ID',
+    },
+    name: {
+      en: 'Name',
     },
   },
   TeamDialog: {
@@ -788,6 +823,91 @@ const labels = {
     },
     placeholder: (override.TerminalPage && override.TerminalPage.placeholder) || {
       en: 'Enter to see programs',
+    },
+  },
+  FindUserByIdDialog: {
+    findUser: {
+      en: 'Find a user',
+    },
+    id: {
+      en: 'User ID',
+    },
+    notFound: {
+      en: 'No user was found with that ID.',
+    },
+  },
+  TargetDialog: {
+    id: {
+      en: 'Enter the ID',
+    },
+    title: {
+      en: 'Lethal Tracer',
+    },
+    invalid: {
+      en: 'Invalid ID',
+    },
+    success: {
+      en: 'Trace was successful. Target was terminated.',
+    },
+    target: {
+      en: 'Target',
+    },
+    faction: {
+      en: 'Faction',
+    },
+    instructions: {
+      en: 'Enter the ID of the target for termination.',
+    },
+    fail: {
+      en: 'Trace was successful, but the target has already been terminated.'
+    }
+  },
+  ConnectDialog: {
+    title: {
+      en: 'Connect',
+    },
+    instructions: {
+      en: 'Enter the username of the person you want to connect with.',
+    },
+    warning: {
+      en: 'Connecting to a member of a rival faction may expose your identity. Are you sure the person is who they say they are?',
+    },
+    username: {
+      en: 'Enter the username',
+    },
+    connect: {
+      en: 'Connect',
+    },
+    notFound: {
+      en: 'Could not find user with that name',
+    },
+    fail: {
+      en: 'WARNING! You have tried connecting with a rival faction. You may be compromised.',
+    },
+    success: {
+      en: 'Connection established. You have connected with one of your members.',
+    },
+    alreadyConnected: {
+      en: 'You are already connected to this user.',
+    },
+  },
+  NameDialog: {
+    name: {
+      en: 'New username',
+    },
+    setName: {
+      en: 'Choose a username! This is the name that will shown to all other users. You can also use this name instead of your ID to login in the future.',
+    },
+  },
+  TeamScoring: {
+    doneBy: {
+      en: 'Done by',
+    },
+    target: {
+      en: 'Target',
+    },
+    elimination: {
+      en: 'Target has been eliminated',
     },
   },
 };

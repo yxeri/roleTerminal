@@ -19,6 +19,7 @@ const BaseDialog = require('./BaseDialog');
 const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const roomComposer = require('../../../data/composers/RoomComposer');
+const eventCentral = require('../../../EventCentral');
 
 const ids = {
   ROOMNAME: 'roomName',
@@ -95,7 +96,7 @@ class RoomDialog extends BaseDialog {
                 password: this.getInputValue(ids.PASSWORD),
                 topic: this.getInputValue(ids.TOPIC),
               },
-              callback: ({ error }) => {
+              callback: ({ data, error }) => {
                 if (error) {
                   if (error.type === 'invalid length') {
                     switch (error.extraData.param) {
@@ -124,6 +125,15 @@ class RoomDialog extends BaseDialog {
 
                   return;
                 }
+
+                const { room: createdRoom } = data;
+
+                eventCentral.emitEvent({
+                  event: eventCentral.Events.FOLLOWED_ROOM,
+                  params: {
+                    room: { objectId: createdRoom.objectId },
+                  },
+                });
 
                 this.removeFromView();
               },

@@ -163,11 +163,6 @@ class UserDialog extends BaseDialog {
     }
 
     if (userPosition && userPosition.coordinatesHistory && userPosition.coordinatesHistory[0]) {
-      const positionDate = textTools.generateTimestamp({ date: userPosition.lastUpdated });
-      const positionLabel = `(${positionDate.fullTime} ${positionDate.fullDate}) Lat ${userPosition.coordinatesHistory[0].latitude} Long ${userPosition.coordinatesHistory[0].longitude}`;
-
-      lowerText.push(`${labelHandler.getLabel({ baseObject: 'UserDialog', label: 'position' })}: ${positionLabel}`);
-
       lowerButtons.push(elementCreator.createButton({
         text: labelHandler.getLabel({ baseObject: 'UserDialog', label: 'trackPosition' }),
         clickFuncs: {

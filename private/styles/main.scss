@@ -746,6 +746,7 @@ $msgList-msgLine-side-padding: .2em;
 .list {
   li {
     padding: $padding;
+    white-space: pre;
   }
 
   header {

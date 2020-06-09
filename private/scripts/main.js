@@ -934,6 +934,7 @@ const menuBar = new MenuBar({
     view: true,
     docFile: true,
     team: true,
+    register: true,
   },
   elements: [
     elementCreator.createSpan({
@@ -1188,7 +1189,9 @@ const boot = new TextAnimation({
   ]),
 });
 
-boot.addToView({ element: viewSwitcher.getParentElement() });
+if (!tools.getQueryParameters().noBoot) {
+  boot.addToView({ element: viewSwitcher.getParentElement() });
+}
 
 socketManager.addEvents([{
   event: 'lanternTeam',

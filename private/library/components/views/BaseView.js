@@ -94,7 +94,7 @@ class BaseView {
   }
 
   showView() {
-    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
+    if (this.minimumAccessLevel) {
       return;
     }
 
@@ -102,11 +102,15 @@ class BaseView {
   }
 
   hideView() {
+    if (this.minimumAccessLevel) {
+      return;
+    }
+
     this.element.classList.add('hide');
   }
 
   toggleView() {
-    if (this.minimumAccessLevel && this.minimumAccessLevel > storageManager.getAccessLevel()) {
+    if (this.minimumAccessLevel) {
       return;
     }
 

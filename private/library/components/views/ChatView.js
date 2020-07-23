@@ -314,15 +314,11 @@ class ChatView extends ViewWrapper {
   }
 
   addToView(params) {
-    this.inputArea.showView();
-
     super.addToView(params);
   }
 
   removeFromView() {
     super.removeFromView();
-
-    this.inputArea.hideView();
   }
 }
 

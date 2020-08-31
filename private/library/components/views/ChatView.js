@@ -207,18 +207,6 @@ class ChatView extends ViewWrapper {
     };
     const roomListColumn = {
       components: [
-        {
-          component: elementCreator.createButton({
-            text: 'Find user by ID',
-            clickFuncs: {
-              leftFunc: () => {
-                const dialog = new FindUserByIdDialog({});
-
-                dialog.addToView({ element: viewSwitcher.getParentElement() });
-              },
-            },
-          }),
-        },
         { component: roomFollowingList },
         { component: whisperRoomList },
         { component: roomList },
@@ -314,15 +302,11 @@ class ChatView extends ViewWrapper {
   }
 
   addToView(params) {
-    this.inputArea.showView();
-
     super.addToView(params);
   }
 
   removeFromView() {
     super.removeFromView();
-
-    this.inputArea.hideView();
   }
 }
 

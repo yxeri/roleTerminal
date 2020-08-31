@@ -11,9 +11,6 @@ const TeamView = require('../library/components/views/TeamView');
 const PeopleView = require('../library/components/views/PeopleView');
 const TerminalView = require('../library/components/views/TerminalView');
 const TextAnimation = require('../library/components/views/TextAnimation');
-const SpoonyView = require('./SpoonyView');
-const ForumView = require('../library/components/views/ForumView');
-const AdminView = require('../library/components/views/AdminView');
 
 const userComposer = require('../library/data/composers/UserComposer');
 const positionTracker = require('../library/PositionTracker');
@@ -30,42 +27,6 @@ const WreckingStatus = require('./WreckingStatus');
 const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
 const notificationManager = require('../library/NotificationManager');
-
-labelHandler.setBaseLabel({
-  name: 'spoony',
-  object: {
-    spoony: {
-      en: '"I seek love!" Sticky Spoon Love Bureau will help you find love out in the wastelands.',
-    },
-    'spoony-describe': {
-      en: 'Describe yourself in three words',
-    },
-    'spoony-twoCreatures': {
-      en: 'Wolf or mutant?',
-    },
-    'spoony-twoItems': {
-      en: 'Caps or Stråla?',
-    },
-    'spoony-std': {
-      en: 'STDs?',
-    },
-    'spoony-space': {
-      en: 'Flesh or cyber?',
-    },
-    'spoony-stone': {
-      en: 'You find a lump of strange material. How do you identify it? By... Licking it? Knocking on it? Asking it? Throwing it?',
-    },
-    'spoony-appearance': {
-      en: 'How does one recognize you in the wastelands?',
-    },
-    'spoony-description': {
-      en: 'What else do you want your future-date to know about you?',
-    },
-    'spoony-turnOn': {
-      en: 'Name the top two things that turn you on',
-    },
-  },
-});
 
 labelHandler.setLabel({
   baseObject: 'WalletDialog',
@@ -339,12 +300,6 @@ const teamView = new TeamView({
 const peopleView = new PeopleView({
   effect: true,
 });
-const forumView = new ForumView({
-  showForumList: false,
-  showUserList: false,
-});
-const adminView = new AdminView({});
-const spoonyView = new SpoonyView({});
 const terminalView = new TerminalView({
   bootSequence: organicaLogo
     .concat([
@@ -970,10 +925,6 @@ const chatWrapper = new ViewWrapper({
     components: [
       { component: chatView },
     ],
-  }, {
-    components: [
-      { component: worldMapPage },
-    ],
   }],
 });
 const fullMapWrapper = new ViewWrapper({
@@ -1036,34 +987,6 @@ const terminalWrapper = new ViewWrapper({
     components: [{ component: worldMapPage }],
   }],
 });
-const spoonyWrapper = new ViewWrapper({
-  menuBar,
-  viewType: 'spoony',
-  title: 'Love Bureau',
-  columns: [{
-    components: [{ component: spoonyView }],
-  }, {
-    components: [{ component: worldMapPage }],
-  }],
-});
-const forumWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.FORUM,
-  title: 'Forum',
-  columns: [{
-    components: [{ component: forumView }],
-  }, {
-    components: [{ component: worldMapPage }],
-  }],
-});
-const adminWrapper = new ViewWrapper({
-  menuBar,
-  viewType: viewSwitcher.ViewTypes.ADMIN,
-  title: 'Admin',
-  columns: [{
-    components: [{ component: adminView }],
-  }],
-});
 
 menuBar.setViews({
   viewSwitcher,
@@ -1075,9 +998,6 @@ menuBar.setViews({
     { view: teamWrapper },
     { view: peopleWrapper },
     { view: terminalWrapper },
-    { view: spoonyWrapper },
-    { view: forumWrapper },
-    { view: adminWrapper },
   ],
 });
 
@@ -1090,9 +1010,6 @@ viewSwitcher.addAvailableTypes({
     teamWrapper.viewType,
     peopleWrapper.viewType,
     terminalWrapper.viewType,
-    spoonyWrapper.viewType,
-    forumWrapper.viewType,
-    adminWrapper.viewType,
   ],
 });
 viewSwitcher.setDefaultView({ view: chatWrapper });

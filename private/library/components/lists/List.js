@@ -41,10 +41,11 @@
  * @property {boolean} [rules.shouldBeTrue] Should the test be true?
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('../views/BaseView');
 
 const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
 const socketManager = require('../../SocketManager');
 const userComposer = require('../../data/composers/UserComposer');
 const storageManager = require('../../StorageManager');

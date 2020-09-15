@@ -14,11 +14,12 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 const NameDialog = require('./NameDialog');
 const TemporaryDialog = require('./TemporaryDialog');
 
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const socketManager = require('../../../SocketManager');
 const textTools = require('../../../TextTools');

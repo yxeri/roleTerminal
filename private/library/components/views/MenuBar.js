@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('./BaseView');
 const LoginDialog = require('../../components/views/dialogs/LoginDialog');
 const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
@@ -27,7 +29,6 @@ const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
 const WalletInfo = require('../../components/views/WalletInfo');
 const TeamProfileDialog = require('../../components/views/dialogs/TeamProfileDialog');
 
-const elementCreator = require('../../ElementCreator');
 const textTools = require('../../TextTools');
 const labelHandler = require('../../labels/LabelHandler');
 const accessCentral = require('../../AccessCentral');

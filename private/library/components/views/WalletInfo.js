@@ -14,12 +14,13 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('./BaseView');
 
 const walletComposer = require('../../data/composers/WalletComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
 const teamComposer = require('../../data/composers/TeamComposer');
 
 class WalletInfo extends BaseView {

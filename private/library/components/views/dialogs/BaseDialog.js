@@ -14,9 +14,10 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 
-const elementCreator = require('../../../ElementCreator');
 const keyHandler = require('../../../KeyHandler');
 const viewSwitcher = require('../../../ViewSwitcher');
 const voiceCommander = require('../../../VoiceCommander');

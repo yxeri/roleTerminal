@@ -14,9 +14,9 @@
  limitations under the License.
  */
 
-const elementCreator = require('../../ElementCreator');
+import elementCreator from '../../ElementCreator';
+
 const accessCentral = require('../../AccessCentral');
-const storageManager = require('../../StorageManager');
 
 const cssClasses = {
   focusElement: 'focusElement',

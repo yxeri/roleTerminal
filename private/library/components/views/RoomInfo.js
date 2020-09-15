@@ -14,13 +14,14 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('./BaseView');
 const EditRoomDialog = require('./dialogs/EditRoomDialog');
 
 const roomComposer = require('../../data/composers/RoomComposer');
 const userComposer = require('../../data/composers/UserComposer');
 const eventCentral = require('../../EventCentral');
-const elementCreator = require('../../ElementCreator');
 const storageManager = require('../../StorageManager');
 const accessCentral = require('../../AccessCentral');
 

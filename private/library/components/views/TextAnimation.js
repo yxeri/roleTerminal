@@ -14,8 +14,9 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('./BaseView');
-const elementCreator = require('../../ElementCreator');
 
 class TextAnimation extends BaseView {
   constructor({

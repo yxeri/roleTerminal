@@ -1,5 +1,6 @@
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
-const elementCreator = require('../../../ElementCreator');
 const keyhandler = require('../../../KeyHandler');
 const accessCentral = require('../../../AccessCentral');
 

@@ -1,6 +1,7 @@
+import elementCreator from '../ElementCreator';
+
 const BaseView = require('./views/BaseView');
 
-const elementCreator = require('../ElementCreator');
 const eventCentral = require('../EventCentral');
 const viewSwitcher = require('../ViewSwitcher');
 

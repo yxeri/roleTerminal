@@ -14,10 +14,11 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 const WalletDialog = require('./WalletDialog');
 
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const teamComposer = require('../../../data/composers/TeamComposer');
 const userComposer = require('../../../data/composers/UserComposer');

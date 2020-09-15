@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+import React from 'react';
+
 const mouseHandler = require('./MouseHandler');
 // const textTools = require('./TextTools');
 const labelHandler = require('./labels/LabelHandler');
@@ -155,7 +157,7 @@ function createBaseElement({
   return element;
 }
 
-class ElementCreator {
+export default class ElementCreator {
   static createList({
     elementId,
     clickFuncs,
@@ -732,5 +734,3 @@ class ElementCreator {
     }
   }
 }
-
-module.exports = ElementCreator;

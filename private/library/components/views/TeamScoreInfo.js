@@ -14,9 +14,10 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const BaseView = require('./BaseView');
 
-const elementCreator = require('../../ElementCreator');
 const teamComposer = require('../../data/composers/TeamComposer');
 const eventCentral = require('../../EventCentral');
 

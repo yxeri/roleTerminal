@@ -11,29 +11,31 @@
  limitations under the License.
  */
 
+import WorldMapView from '../library/components/views/WorldMapView';
+import WorldMapPage from '../library/components/views/pages/WorldMapPage';
+import ChatView from '../library/components/views/ChatView';
+import MenuBar from '../library/components/views/MenuBar';
+import DocFileView from '../library/components/views/DocFileView';
+import WalletView from '../library/components/views/WalletView';
+import TeamView from '../library/components/views/TeamView';
+import PeopleView from '../library/components/views/PeopleView';
+import TerminalView from '../library/components/views/TerminalView';
+import ForumView from '../library/components/views/ForumView';
+import AdminView from '../library/components/views/AdminView';
+import ViewWrapper from '../library/components/ViewWrapper';
+
+import viewSwitcher from '../library/ViewSwitcher';
+import userComposer from '../library/data/composers/UserComposer';
+import mouseHandler from '../library/MouseHandler';
+import positionTracker from '../library/PositionTracker';
+import notificationManager from '../library/NotificationManager';
+import tools from '../library/Tools';
+import viewTools from '../library/ViewTools';
+import deviceChecker from '../library/DeviceChecker';
+
 require('../library/polyfills');
 
-const WorldMapView = require('../library/components/views/WorldMapView');
-const WorldMapPage = require('../library/components/views/pages/WorldMapPage');
-const ChatView = require('../library/components/views/ChatView');
-const MenuBar = require('../library/components/views/MenuBar');
-const DocFileView = require('../library/components/views/DocFileView');
-const WalletView = require('../library/components/views/WalletView');
-const TeamView = require('../library/components/views/TeamView');
-const PeopleView = require('../library/components/views/PeopleView');
-const TerminalView = require('../library/components/views/TerminalView');
-const ForumView = require('../library/components/views/ForumView');
-const AdminView = require('../library/components/views/AdminView');
-const ViewWrapper = require('../library/components/ViewWrapper');
-
-const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
-const userComposer = require('../library/data/composers/UserComposer');
-const mouseHandler = require('../library/MouseHandler');
-const positionTracker = require('../library/PositionTracker');
-const notificationManager = require('../library/NotificationManager');
-const tools = require('../library/Tools');
-const viewTools = require('../library/ViewTools');
-const deviceChecker = require('../library/DeviceChecker');
+viewSwitcher.setParentElement({ element: document.getElementById('main') });
 
 const worldMapParams = {
   alwaysShowLabels: {

@@ -11,6 +11,8 @@
  limitations under the License.
  */
 
+import elementCreator from '../library/ElementCreator';
+
 require('../library/polyfills');
 
 const MenuBar = require('../library/components/views/MenuBar');
@@ -20,7 +22,6 @@ const BaseView = require('../library/components/views/BaseView');
 const AdminTeamList = require('../library/components/lists/AdminTeamList');
 
 const viewSwitcher = require('../library/ViewSwitcher').setParentElement({ element: document.getElementById('main') });
-const elementCreator = require('../library/ElementCreator');
 const eventCentral = require('../library/EventCentral');
 const mouseHandler = require('../library/MouseHandler');
 const accessCentral = require('../library/AccessCentral');

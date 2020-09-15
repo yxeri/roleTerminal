@@ -14,9 +14,10 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const roomComposer = require('../../../data/composers/RoomComposer');
 const eventCentral = require('../../../EventCentral');

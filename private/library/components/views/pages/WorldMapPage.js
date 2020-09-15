@@ -1,3 +1,5 @@
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 const MapMarker = require('../../worldMap/MapMarker');
 const MapLine = require('../../worldMap/MapLine');
@@ -11,7 +13,6 @@ const storageManager = require('../../../StorageManager');
 const eventHandler = require('../../../EventCentral');
 const socketManager = require('../../../SocketManager');
 const mouseHandler = require('../../../MouseHandler');
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const viewSwitcher = require('../../../ViewSwitcher');
 

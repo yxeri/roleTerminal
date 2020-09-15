@@ -14,11 +14,12 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 
 const userComposer = require('../../../data/composers/UserComposer');
 const tools = require('../../../Tools');
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 
 class PersonPage extends BaseView {

@@ -859,8 +859,8 @@ const labels = {
       en: 'Enter the ID of the target for termination.',
     },
     fail: {
-      en: 'Trace was successful, but the target has already been terminated.'
-    }
+      en: 'Trace was successful, but the target has already been terminated.',
+    },
   },
   ConnectDialog: {
     title: {

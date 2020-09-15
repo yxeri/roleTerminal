@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const List = require('./List');
 const UserDialog = require('../views/dialogs/UserDialog');
 const PersonPage = require('../views/pages/PersonPage');
@@ -25,7 +27,6 @@ const accessCentral = require('../../AccessCentral');
 const viewSwitcher = require('../../ViewSwitcher');
 const userComposer = require('../../data/composers/UserComposer');
 const labelHandler = require('../../labels/LabelHandler');
-const elementCreator = require('../../ElementCreator');
 
 class UserList extends List {
   constructor({

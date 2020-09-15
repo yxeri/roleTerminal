@@ -14,9 +14,10 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const aliasComposer = require('../../../data/composers/AliasComposer');
 const textTools = require('../../../TextTools');

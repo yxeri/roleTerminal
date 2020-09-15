@@ -14,12 +14,13 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 const LockedDocFileDialog = require('../dialogs/LockedDocFileDialog');
 const EditDocFileDialog = require('../dialogs/EditDocFileDialog');
 
 const eventCentral = require('../../../EventCentral');
-const elementCreator = require('../../../ElementCreator');
 const userComposer = require('../../../data/composers/UserComposer');
 const accessCentral = require('../../../AccessCentral');
 const labelHandler = require('../../../labels/LabelHandler');

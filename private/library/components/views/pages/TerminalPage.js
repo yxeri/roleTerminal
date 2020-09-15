@@ -14,10 +14,11 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 const InputArea = require('../inputs/InputArea');
 
-const elementCreator = require('../../../ElementCreator');
 const accessCentral = require('../../../AccessCentral');
 const textTools = require('../../../TextTools');
 const labelHandler = require('../../../labels/LabelHandler');

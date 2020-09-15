@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseView = require('../BaseView');
 const EditForumThreadDialog = require('../dialogs/EditForumThreadDialog');
 const EditForumPostDialog = require('../dialogs/EditForumPostDialog');
@@ -23,7 +25,6 @@ const EditForumDialog = require('../dialogs/EditForumDialog');
 const UserDialog = require('../dialogs/UserDialog');
 
 const eventCentral = require('../../../EventCentral');
-const elementCreator = require('../../../ElementCreator');
 const socketManager = require('../../../SocketManager');
 const labelHandler = require('../../../labels/LabelHandler');
 const storageManager = require('../../../StorageManager');

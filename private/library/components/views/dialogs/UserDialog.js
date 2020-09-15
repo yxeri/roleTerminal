@@ -14,11 +14,12 @@
  limitations under the License.
  */
 
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 const WalletDialog = require('./WalletDialog');
 const TemporaryDialog = require('./TemporaryDialog');
 
-const elementCreator = require('../../../ElementCreator');
 const labelHandler = require('../../../labels/LabelHandler');
 const userComposer = require('../../../data/composers/UserComposer');
 const positionComposer = require('../../../data/composers/PositionComposer');
@@ -28,7 +29,6 @@ const eventCentral = require('../../../EventCentral');
 const storageManager = require('../../../StorageManager');
 const viewSwitcher = require('../../../ViewSwitcher');
 const roomComposer = require('../../../data/composers/RoomComposer');
-const textTools = require('../../../TextTools');
 
 class UserDialog extends BaseDialog {
   constructor({

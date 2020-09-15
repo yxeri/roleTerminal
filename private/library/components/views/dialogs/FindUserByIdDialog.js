@@ -1,6 +1,7 @@
+import elementCreator from '../../../ElementCreator';
+
 const BaseDialog = require('./BaseDialog');
 const UserDialog = require('./UserDialog');
-const elementCreator = require('../../../ElementCreator');
 const userComposer = require('../../../data/composers/UserComposer');
 const labelHandler = require('../../../labels/LabelHandler');
 

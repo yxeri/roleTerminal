@@ -11,6 +11,8 @@
  limitations under the License.
  */
 
+import elementCreator from '../../ElementCreator';
+
 const Label = require('./MapLabel');
 const BaseDialog = require('../views/dialogs/BaseDialog');
 const VerifyDialog = require('../views/dialogs/VerifyDialog');
@@ -18,7 +20,6 @@ const EditPositionDialog = require('../views/dialogs/EditPositionDialog');
 
 const mouseHandler = require('../../MouseHandler');
 const labelHandler = require('../../labels/LabelHandler');
-const elementCreator = require('../../ElementCreator');
 const positionComposer = require('../../data/composers/PositionComposer');
 const storageManager = require('../../StorageManager');
 const eventHandler = require('../../EventCentral');

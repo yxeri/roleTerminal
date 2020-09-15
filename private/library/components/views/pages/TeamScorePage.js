@@ -17,9 +17,6 @@
 const BaseView = require('../BaseView');
 const TeamScoreInfo = require('../TeamScoreInfo');
 
-const socketManager = require('../../../SocketManager');
-const elementCreator = require('../../../ElementCreator');
-
 class TeamScorePage extends BaseView {
   constructor({
     classes = [],

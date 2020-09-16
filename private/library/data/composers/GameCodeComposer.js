@@ -1,16 +1,18 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  gameCodes,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import socketManager, { EmitTypes } from '../../SocketManager';
 
 class GameCodeComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.gameCodes,
+      handler: gameCodes,
       completionEvent: eventCentral.Events.COMPLETE_GAMECODE,
       dependencies: [
-        dataHandler.gameCodes,
+        gameCodes,
       ],
     });
   }
@@ -19,7 +21,7 @@ class GameCodeComposer extends DataComposer {
     code,
     callback,
   }) {
-    socketManager.emitEvent(socketManager.EmitTypes.USEGAMECODE, { code }, callback);
+    socketManager.emitEvent(EmitTypes.USEGAMECODE, { code }, callback);
   }
 }
 

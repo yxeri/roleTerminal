@@ -45,7 +45,7 @@ import BaseView from '../views/BaseView';
 
 import elementCreator from '../../ElementCreator';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import socketManager, { ChangeTypes } from '../../SocketManager';
 import userComposer from '../../data/composers/UserComposer';
 import storageManager from '../../StorageManager';
 import accessCentral from '../../AccessCentral';
@@ -175,7 +175,7 @@ export default class List extends BaseView {
           const user = userComposer.getCurrentUser();
 
           switch (changeType) {
-            case socketManager.ChangeTypes.UPDATE: {
+            case ChangeTypes.UPDATE: {
               if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.addOneItem({
                   object,
@@ -188,7 +188,7 @@ export default class List extends BaseView {
 
               break;
             }
-            case socketManager.ChangeTypes.CREATE: {
+            case ChangeTypes.CREATE: {
               if (this.hasAccess({ object, user }).canSee && this.shouldFilterItem({ changeType, object, user })) {
                 this.onCreateFunc({ object });
 
@@ -202,7 +202,7 @@ export default class List extends BaseView {
 
               break;
             }
-            case socketManager.ChangeTypes.REMOVE: {
+            case ChangeTypes.REMOVE: {
               console.log('going to remove object', object, collector.objectTypes.one);
 
               this.removeElement({ object });
@@ -799,7 +799,7 @@ export default class List extends BaseView {
     object,
     user,
   }) {
-    if (changeType !== socketManager.ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
+    if (changeType !== ChangeTypes.REMOVE && (this.filter || this.userFilter)) {
       const filterFunc = (rule) => {
         if (rule.shouldInclude) {
           if (rule.valueType && rule.valueType === 'object') {

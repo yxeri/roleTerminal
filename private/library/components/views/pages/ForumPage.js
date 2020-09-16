@@ -24,12 +24,19 @@ import UserDialog from '../dialogs/UserDialog';
 
 import elementCreator from '../../../ElementCreator';
 import eventCentral from '../../../EventCentral';
-import socketManager from '../../../SocketManager';
+import { ChangeTypes } from '../../../SocketManager';
 import labelHandler from '../../../labels/LabelHandler';
 import storageManager from '../../../StorageManager';
 import textTools from '../../../TextTools';
 import forumComposer from '../../../data/composers/ForumComposer';
-import dataHandler from '../../../data/DataHandler';
+import {
+  users,
+  teams,
+  aliases,
+  forumPosts,
+  forums,
+  forumThreads,
+} from '../../../data/DataHandler';
 import accessCentral from '../../../AccessCentral';
 import userComposer from '../../../data/composers/UserComposer';
 import viewSwitcher from '../../../ViewSwitcher';
@@ -579,12 +586,12 @@ class ForumView extends BaseView {
     forumId,
     corners = [],
     dependencies = [
-      dataHandler.users,
-      dataHandler.teams,
-      dataHandler.aliases,
-      dataHandler.forumPosts,
-      dataHandler.forums,
-      dataHandler.forumThreads,
+      users,
+      teams,
+      aliases,
+      forumPosts,
+      forums,
+      forumThreads,
     ],
     shouldDisableVoting = false,
     lockedToForum = false,
@@ -637,19 +644,19 @@ class ForumView extends BaseView {
         eventCentral.addWatcher({
           event: eventCentral.Events.FORUMTHREAD,
           func: ({ thread, changeType }) => {
-            if (changeType !== socketManager.ChangeTypes.REMOVE && this.getCurrentForumId() !== thread.forumId) {
+            if (changeType !== ChangeTypes.REMOVE && this.getCurrentForumId() !== thread.forumId) {
               return;
             }
 
             const { objectId } = thread;
 
             switch (changeType) {
-              case socketManager.ChangeTypes.UPDATE: {
+              case ChangeTypes.UPDATE: {
                 this.updateThread({ thread });
 
                 break;
               }
-              case socketManager.ChangeTypes.CREATE: {
+              case ChangeTypes.CREATE: {
                 const threadContainer = this.getElement(ids.threadContainer);
                 const newThread = createThread({ thread, elementId: this.elementId });
 
@@ -657,7 +664,7 @@ class ForumView extends BaseView {
 
                 break;
               }
-              case socketManager.ChangeTypes.REMOVE: {
+              case ChangeTypes.REMOVE: {
                 const toRemove = this.getElement(thread.objectId);
 
                 if (!toRemove) {
@@ -684,20 +691,20 @@ class ForumView extends BaseView {
           func: ({ post, changeType }) => {
             const parentThread = forumComposer.getThread({ threadId: post.threadId, full: false });
 
-            if (changeType !== socketManager.ChangeTypes.REMOVE && (!parentThread || this.getCurrentForumId() !== parentThread.forumId)) {
+            if (changeType !== ChangeTypes.REMOVE && (!parentThread || this.getCurrentForumId() !== parentThread.forumId)) {
               return;
             }
 
             const { parentPostId, objectId } = post;
 
             switch (changeType) {
-              case socketManager.ChangeTypes.UPDATE: {
+              case ChangeTypes.UPDATE: {
                 this.updatePost({ post });
                 this.updateThread({ thread: forumComposer.getThread({ threadId: post.threadId, full: false }) });
 
                 break;
               }
-              case socketManager.ChangeTypes.CREATE: {
+              case ChangeTypes.CREATE: {
                 if (parentPostId) {
                   const newPost = createSubPost({ subPost: post, elementId: this.elementId });
                   const parentPostContainer = this.getElement(`${parentPostId}${ids.subpostContainer}`);
@@ -714,7 +721,7 @@ class ForumView extends BaseView {
 
                 break;
               }
-              case socketManager.ChangeTypes.REMOVE: {
+              case ChangeTypes.REMOVE: {
                 const toRemove = this.getElement(objectId);
 
                 if (!toRemove) {
@@ -744,12 +751,12 @@ class ForumView extends BaseView {
             }
 
             switch (changeType) {
-              case socketManager.ChangeTypes.UPDATE: {
+              case ChangeTypes.UPDATE: {
                 this.updateForum({ forum });
 
                 break;
               }
-              case socketManager.ChangeTypes.REMOVE: {
+              case ChangeTypes.REMOVE: {
                 this.showForum({ forumId: '' });
 
                 break;

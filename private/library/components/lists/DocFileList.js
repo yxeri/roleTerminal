@@ -16,7 +16,13 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  docFiles,
+  aliases,
+  users,
+  teams,
+  transactions,
+} from '../../data/DataHandler';
 import eventCentral from '../../EventCentral';
 
 export default class DocFileList extends List {
@@ -52,15 +58,15 @@ export default class DocFileList extends List {
       imageThumb: true,
       classes: classes.concat(['docFileList']),
       dependencies: [
-        dataHandler.docFiles,
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.transactions,
+        docFiles,
+        aliases,
+        users,
+        teams,
+        transactions,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
-          const docFile = dataHandler.docFiles.getObject({ objectId });
+          const docFile = docFiles.getObject({ objectId });
 
           if (!docFile.isLocked || docFile.code) {
             eventCentral.emitEvent({
@@ -75,7 +81,7 @@ export default class DocFileList extends List {
           }
         },
       },
-      collector: dataHandler.docFiles,
+      collector: docFiles,
     });
   }
 }

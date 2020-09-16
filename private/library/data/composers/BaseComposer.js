@@ -1,4 +1,4 @@
-import dataHandler from '../DataHandler';
+import { users } from '../DataHandler';
 import eventCentral from '../../EventCentral';
 
 class BaseComposer {
@@ -11,7 +11,7 @@ class BaseComposer {
     this.dependencies = dependencies;
     this.completionEvent = completionEvent;
     this.handler = handler;
-    this.userHandler = dataHandler.users;
+    this.userHandler = users;
 
     this.checkIsComplete();
   }

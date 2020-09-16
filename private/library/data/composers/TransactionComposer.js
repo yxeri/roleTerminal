@@ -1,20 +1,26 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  users,
+  teams,
+  aliases,
+  wallets,
+  transactions,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 
 class TransactionComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.transactions,
+      handler: transactions,
       completionEvent: eventCentral.Events.COMPLETE_TRANSACTION,
       dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
-        dataHandler.wallets,
-        dataHandler.transactions,
+        users,
+        teams,
+        aliases,
+        wallets,
+        transactions,
       ],
     });
   }
@@ -25,7 +31,7 @@ class TransactionComposer extends DataComposer {
   }) {
     this.handler.createObject({
       callback,
-      event: socketManager.EmitTypes.CREATETRANSACTION,
+      event: EmitTypes.CREATETRANSACTION,
       params: {
         transaction,
       },

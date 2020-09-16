@@ -1,20 +1,25 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  invitations,
+  users,
+  teams,
+  aliases,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 import storageManager from '../../StorageManager';
 
 class InvitationComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.teams,
+      handler: teams,
       completionEvent: eventCentral.Events.COMPLETE_INVITATION,
       dependencies: [
-        dataHandler.invitations,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
+        invitations,
+        users,
+        teams,
+        aliases,
       ],
     });
 
@@ -36,7 +41,7 @@ class InvitationComposer extends DataComposer {
 
     this.handler.createObject({
       callback,
-      event: socketManager.EmitTypes.INVITETEAM,
+      event: EmitTypes.INVITETEAM,
       params: { invitation },
     });
   }
@@ -55,7 +60,7 @@ class InvitationComposer extends DataComposer {
     this.handler.createObject({
       callback,
       params,
-      event: socketManager.EmitTypes.SENDROOMINVITE,
+      event: EmitTypes.SENDROOMINVITE,
     });
   }
 
@@ -66,7 +71,7 @@ class InvitationComposer extends DataComposer {
     this.handler.removeObject({
       callback,
       params: { itemId: teamId },
-      event: socketManager.EmitTypes.ACCEPTTEAM,
+      event: EmitTypes.ACCEPTTEAM,
     });
   }
 
@@ -77,7 +82,7 @@ class InvitationComposer extends DataComposer {
     this.handler.removeObject({
       callback,
       params: { itemId: roomId },
-      event: socketManager.EmitTypes.ACCEPTROOM,
+      event: EmitTypes.ACCEPTROOM,
     });
   }
 
@@ -87,7 +92,7 @@ class InvitationComposer extends DataComposer {
   }) {
     this.handler.removeObject({
       callback,
-      event: socketManager.EmitTypes.DECLINEINVITE,
+      event: EmitTypes.DECLINEINVITE,
       paprams: { itemId },
     });
   }

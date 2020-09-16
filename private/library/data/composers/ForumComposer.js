@@ -1,26 +1,32 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  forums,
+  forumPosts,
+  forumThreads,
+  users,
+  teams,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
 
 class ForumComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.forums,
+      handler: forums,
       completionEvent: eventCentral.Events.COMPLETE_FORUM,
       dependencies: [
-        dataHandler.forums,
-        dataHandler.forumPosts,
-        dataHandler.forumThreads,
-        dataHandler.users,
-        dataHandler.teams,
+        forums,
+        forumPosts,
+        forumThreads,
+        users,
+        teams,
       ],
     });
 
-    this.forumPostHandler = dataHandler.forumPosts;
-    this.forumThreadHandler = dataHandler.forumThreads;
-    this.forumHandler = dataHandler.forums;
+    this.forumPostHandler = forumPosts;
+    this.forumThreadHandler = forumThreads;
+    this.forumHandler = forums;
   }
 
   getSubPosts({ parentPostId }) {

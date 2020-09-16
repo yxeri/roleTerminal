@@ -1,11 +1,15 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  users,
+  teams,
+  aliases,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
-import socketManager from '../../SocketManager';
 import aliasComposer from './AliasComposer';
 import accessCentral from '../../AccessCentral';
+import socketManager, { EmitTypes } from '../../SocketManager';
 
 const anonymous = {
   partOfTeams: [],
@@ -19,12 +23,12 @@ const anonymous = {
 class UserComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.users,
+      handler: users,
       completionEvent: eventCentral.Events.COMPLETE_USER,
       dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
+        users,
+        teams,
+        aliases,
       ],
     });
   }
@@ -75,7 +79,7 @@ class UserComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.BANUSER,
+      event: EmitTypes.BANUSER,
       params: {
         banUserId: userId,
       },
@@ -88,7 +92,7 @@ class UserComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.UNBANUSER,
+      event: EmitTypes.UNBANUSER,
       params: {
         bannedUserId: userId,
       },
@@ -101,7 +105,7 @@ class UserComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.VERIFYUSER,
+      event: EmitTypes.VERIFYUSER,
       params: {
         userIdToVerify: userId,
       },
@@ -125,7 +129,7 @@ class UserComposer extends DataComposer {
   getWhisperIdentities({ participantIds = [0, 1] }) {
     const {
       objectId,
-      aliases,
+      aliases: userAliases,
     } = this.getCurrentUser();
 
     if (objectId) {
@@ -136,7 +140,7 @@ class UserComposer extends DataComposer {
       const identityOrder = [];
       const { objectId: oneId } = identities[0];
 
-      if (oneId === objectId || aliases.includes(oneId)) {
+      if (oneId === objectId || userAliases.includes(oneId)) {
         identityOrder.push(identities[0]);
         identityOrder.push(identities[1]);
       } else {
@@ -171,7 +175,7 @@ class UserComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.CHANGEPASSWORD,
+      event: EmitTypes.CHANGEPASSWORD,
       params: {
         password,
         userId,
@@ -186,7 +190,7 @@ class UserComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.UPDATEUSER,
+      event: EmitTypes.UPDATEUSER,
       params: {
         userId,
         user: { accessLevel },
@@ -229,10 +233,10 @@ class UserComposer extends DataComposer {
   }
 
   getAllIdentities({ byFullName = false }) {
-    const users = this.getUsers();
-    const aliases = aliasComposer.getAllAliases();
+    const allUsers = this.getUsers();
+    const allAliases = aliasComposer.getAllAliases();
 
-    return aliases.concat(users).sort((a, b) => {
+    return allAliases.concat(allUsers).sort((a, b) => {
       const aParam = byFullName
         ? a.fullName.toLowerCase()
         : (a.username || a.aliasName).toLowerCase();
@@ -266,14 +270,14 @@ class UserComposer extends DataComposer {
     code,
     callback,
   }) {
-    socketManager.emitEvent(socketManager.EmitTypes.GETUSERBYCODE, { code }, callback);
+    socketManager.emitEvent(EmitTypes.GETUSERBYCODE, { code }, callback);
   }
 
   connectUser({
     username,
     callback,
   }) {
-    socketManager.emitEvent(socketManager.EmitTypes.CONNECTUSER, { username }, callback);
+    socketManager.emitEvent(EmitTypes.CONNECTUSER, { username }, callback);
   }
 }
 

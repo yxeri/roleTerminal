@@ -1,22 +1,28 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  wallets,
+  users,
+  teams,
+  aliases,
+  transactions,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 import userComposer from './UserComposer';
 import teamComposer from './TeamComposer';
 
 class WalletComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.wallets,
+      handler: wallets,
       completionEvent: eventCentral.Events.COMPLETE_WALLET,
       dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
-        dataHandler.wallets,
-        dataHandler.transactions,
+        users,
+        teams,
+        aliases,
+        wallets,
+        transactions,
       ],
     });
   }
@@ -29,7 +35,7 @@ class WalletComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.UPDATEWALLET,
+      event: EmitTypes.UPDATEWALLET,
       params: {
         wallet,
         walletId,
@@ -65,7 +71,7 @@ class WalletComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.UPDATEWALLET,
+      event: EmitTypes.UPDATEWALLET,
       params: {
         walletId,
         wallet: {

@@ -16,7 +16,13 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  forums,
+  forumPosts,
+  forumThreads,
+  users,
+  teams,
+} from '../../data/DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
 
@@ -36,10 +42,10 @@ export default class ForumList extends List {
       shouldFocusOnClick: true,
       focusedId: storageManager.getCurrentForum(),
       dependencies: [
-        dataHandler.forumPosts,
-        dataHandler.forumThreads,
-        dataHandler.users,
-        dataHandler.teams,
+        forumPosts,
+        forumThreads,
+        users,
+        teams,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
@@ -49,7 +55,7 @@ export default class ForumList extends List {
           });
         },
       },
-      collector: dataHandler.forums,
+      collector: forums,
     });
   }
 }

@@ -17,7 +17,7 @@
 import BaseData from './BaseData';
 
 import eventCentral from '../EventCentral';
-import socketManager from '../SocketManager';
+import socketManager, { EmitTypes } from '../SocketManager';
 
 class TeamData extends BaseData {
   constructor() {
@@ -43,10 +43,10 @@ class TeamData extends BaseData {
       removeEvents: {
         one: 'removeTeam',
       },
-      emitTypes: [socketManager.EmitTypes.TEAM],
+      emitTypes: [EmitTypes.TEAM],
     });
 
-    socketManager.addEvent(socketManager.EmitTypes.TEAMMEMBER, ({ data }) => {
+    socketManager.addEvent(EmitTypes.TEAMMEMBER, ({ data }) => {
       const {
         team,
         user,

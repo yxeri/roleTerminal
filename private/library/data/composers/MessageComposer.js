@@ -1,20 +1,25 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  messages,
+  rooms,
+  users,
+  teams,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 
 class MessageComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.messages,
+      handler: messages,
       completionEvent: eventCentral.Events.COMPLETE_MESSAGE,
       dependencies: [
-        dataHandler.messages,
-        dataHandler.rooms,
-        dataHandler.users,
-        dataHandler.teams,
+        messages,
+        rooms,
+        users,
+        teams,
       ],
     });
 
@@ -37,7 +42,7 @@ class MessageComposer extends DataComposer {
     callback,
   }) {
     this.handler.fetchObjects({
-      event: socketManager.EmitTypes.GETROOMMSGS,
+      event: EmitTypes.GETROOMMSGS,
       emitParams: { roomId },
       callback: ({ error: getError }) => {
         if (getError) {

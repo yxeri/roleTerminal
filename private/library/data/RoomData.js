@@ -17,7 +17,7 @@
 import BaseData from './BaseData';
 
 import eventCentral from '../EventCentral';
-import socketManager from '../SocketManager';
+import socketManager, { EmitTypes } from '../SocketManager';
 
 class RoomData extends BaseData {
   constructor() {
@@ -43,7 +43,7 @@ class RoomData extends BaseData {
       removeEvents: {
         one: 'removeRoom',
       },
-      emitTypes: [socketManager.EmitTypes.ROOM],
+      emitTypes: [EmitTypes.ROOM],
     });
   }
 }

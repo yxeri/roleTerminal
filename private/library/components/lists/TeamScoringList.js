@@ -16,7 +16,12 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  teamScoring,
+  aliases,
+  users,
+  teams,
+} from '../../data/DataHandler';
 import userComposer from '../../data/composers/UserComposer';
 import teamComposer from '../../data/composers/TeamComposer';
 import labelHandler from '../../labels/LabelHandler';
@@ -79,12 +84,12 @@ export default class TeamScoringList extends List {
       },
       classes: classes.concat(['teamScoringList']),
       dependencies: [
-        dataHandler.teamScoring,
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
+        teamScoring,
+        aliases,
+        users,
+        teams,
       ],
-      collector: dataHandler.teamScoring,
+      collector: teamScoring,
       listItemFields: headerFields,
     });
   }

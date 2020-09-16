@@ -16,7 +16,12 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  rooms,
+  users,
+  aliases,
+  teams,
+} from '../../data/DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
 import roomComposer from '../../data/composers/RoomComposer';
@@ -92,12 +97,12 @@ export default class RoomFollowingList extends List {
         },
       },
       dependencies: [
-        dataHandler.rooms,
-        dataHandler.users,
-        dataHandler.aliases,
-        dataHandler.teams,
+        rooms,
+        users,
+        aliases,
+        teams,
       ],
-      collector: dataHandler.rooms,
+      collector: rooms,
     });
 
     eventCentral.addWatcher({

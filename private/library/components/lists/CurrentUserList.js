@@ -16,7 +16,10 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  users,
+  aliases,
+} from '../../data/DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
 import userComposer from '../../data/composers/UserComposer';
@@ -58,10 +61,10 @@ export default class CurrentUserList extends List {
         },
       },
       dependencies: [
-        dataHandler.aliases,
-        dataHandler.users,
+        aliases,
+        users,
       ],
-      collector: dataHandler.aliases,
+      collector: aliases,
       listItemFields: headerFields,
     });
 

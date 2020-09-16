@@ -1,23 +1,27 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  rooms,
+  users,
+  aliases,
+  teams,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 import storageManager from '../../StorageManager';
-import userComposer from '../../data/composers/UserComposer';
+import userComposer from './UserComposer';
 import messageComposer from './MessageComposer';
 
 class RoomComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.rooms,
+      handler: rooms,
       completionEvent: eventCentral.Events.COMPLETE_ROOM,
       dependencies: [
-        dataHandler.users,
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.rooms,
+        users,
+        aliases,
+        teams,
+        rooms,
       ],
     });
   }
@@ -160,7 +164,7 @@ class RoomComposer extends DataComposer {
   }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.INVITEROOM,
+      event: EmitTypes.INVITEROOM,
       params: {
         roomId,
         followerIds,

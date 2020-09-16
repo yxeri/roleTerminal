@@ -17,7 +17,11 @@
 import List from './List';
 import TeamDialog from '../views/dialogs/TeamDialog';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  users,
+  teams,
+  aliases,
+} from '../../data/DataHandler';
 import accessCentral from '../../AccessCentral';
 import viewSwitcher from '../../ViewSwitcher';
 import storageManager from '../../StorageManager';
@@ -55,11 +59,11 @@ export default class TeamList extends List {
       imageThumb: true,
       minimumAccessLevel: accessCentral.AccessLevels.STANDARD,
       dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
+        users,
+        teams,
+        aliases,
       ],
-      collector: dataHandler.teams,
+      collector: teams,
       listItemFields: headerFields,
       sorting: {
         paramName: 'teamName',

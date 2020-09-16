@@ -18,7 +18,13 @@ import List from './List';
 import MessageDialog from '../views/dialogs/MessageDialog';
 import UserDialog from '../views/dialogs/UserDialog';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  users,
+  rooms,
+  aliases,
+  teams,
+  messages,
+} from '../../data/DataHandler';
 import storageManager from '../../StorageManager';
 import eventCentral from '../../EventCentral';
 import textTools from '../../TextTools';
@@ -136,13 +142,13 @@ export default class MessageList extends List {
       shouldScrollToBottom: true,
       classes: classes.concat(['msgList']),
       dependencies: [
-        dataHandler.users,
-        dataHandler.rooms,
-        dataHandler.aliases,
-        dataHandler.teams,
+        users,
+        rooms,
+        aliases,
+        teams,
       ],
       shouldFocusOnClick: false,
-      collector: dataHandler.messages,
+      collector: messages,
       fieldToAppend: 'text',
       shouldAppendImage: true,
       appendClasses: ['msgLine'],
@@ -167,7 +173,7 @@ export default class MessageList extends List {
           classes: ['msgRoomName'],
           paramName: 'roomId',
           convertFunc: (objectId) => {
-            const room = dataHandler.rooms.getObject({ objectId });
+            const room = rooms.getObject({ objectId });
 
             if (!multiRoom) {
               return '';
@@ -209,8 +215,8 @@ export default class MessageList extends List {
 
     this.onCreateFunc = ({ object }) => {
       this.roomLists.every((roomList) => {
-        const rooms = roomList.getCollectorObjects();
-        const foundRoom = rooms.find((room) => { return object.roomId === room.objectId; });
+        const retrievedRooms = roomList.getCollectorObjects();
+        const foundRoom = retrievedRooms.find((room) => { return object.roomId === room.objectId; });
 
         if (foundRoom) {
           roomList.animateElement({ elementId: foundRoom.objectId });

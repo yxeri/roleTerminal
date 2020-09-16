@@ -17,12 +17,10 @@
 import BaseData from './BaseData';
 
 import eventCentral from '../EventCentral';
-import socketManager from '../SocketManager';
+import socketManager, { EmitTypes } from '../SocketManager';
 
 class MessageData extends BaseData {
   constructor() {
-    const { EmitTypes } = socketManager;
-
     super({
       createEvents: {
         one: 'sendMessage',
@@ -52,7 +50,7 @@ class MessageData extends BaseData {
       ],
     });
 
-    socketManager.addEvent(socketManager.EmitTypes.FOLLOW, ({ error, data }) => {
+    socketManager.addEvent(EmitTypes.FOLLOW, ({ error, data }) => {
       if (error) {
         console.log('follow error', error);
 
@@ -65,7 +63,7 @@ class MessageData extends BaseData {
       } = data;
 
       this.fetchObjects({
-        event: socketManager.EmitTypes.GETROOMMSGS,
+        event: EmitTypes.GETROOMMSGS,
         emitParams: { roomId: room.objectId },
         callback: ({ error: fetchError }) => {
           if (fetchError) {

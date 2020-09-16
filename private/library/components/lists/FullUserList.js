@@ -19,7 +19,12 @@ import UserDialog from '../views/dialogs/UserDialog';
 import PersonPage from '../views/pages/PersonPage';
 
 import elementCreator from '../../ElementCreator';
-import dataHandler from '../../data/DataHandler';
+import {
+  rooms,
+  users,
+  teams,
+  aliases,
+} from '../../data/DataHandler';
 import storageManager from '../../StorageManager';
 import aliasComposer from '../../data/composers/AliasComposer';
 import accessCentral from '../../AccessCentral';
@@ -102,10 +107,10 @@ export default class UserList extends List {
       },
       minimumAccessLevel: minimumAccessLevel || accessCentral.AccessLevels.STANDARD,
       dependencies: [
-        dataHandler.rooms,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
+        rooms,
+        users,
+        teams,
+        aliases,
       ],
       listItemClickFuncs: {
         leftFunc: (objectId) => {
@@ -118,7 +123,7 @@ export default class UserList extends List {
           userDialog.addToView({ element: viewSwitcher.getParentElement() });
         },
       },
-      collector: dataHandler.users,
+      collector: users,
       listItemFields: headerFields,
     };
 

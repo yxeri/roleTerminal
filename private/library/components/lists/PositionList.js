@@ -16,7 +16,11 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  users,
+  teams,
+  positions,
+} from '../../data/DataHandler';
 import eventCentral from '../../EventCentral';
 import positionComposer from '../../data/composers/PositionComposer';
 
@@ -42,9 +46,9 @@ export default class PositionList extends List {
       }),
     };
     listParams.dependencies = [
-      dataHandler.users,
-      dataHandler.teams,
-      dataHandler.positions,
+      users,
+      teams,
+      positions,
     ];
     listParams.listItemClickFuncs = {
       leftFunc: (objectId) => {
@@ -59,7 +63,7 @@ export default class PositionList extends List {
         });
       },
     };
-    listParams.collector = dataHandler.positions;
+    listParams.collector = positions;
     listParams.listItemFields = listParams.listItemFields || [
       { paramName: 'positionName' },
     ];
@@ -89,8 +93,8 @@ export default class PositionList extends List {
     if (this.positionTypes.includes('user')) {
       eventCentral.addWatcher({
         event: eventCentral.Events.AGED_POSITIONS,
-        func: ({ positions }) => {
-          positions.forEach((position) => this.removeListItem(position));
+        func: ({ positions: sentPositions }) => {
+          sentPositions.forEach((position) => this.removeListItem(position));
         },
       });
     }

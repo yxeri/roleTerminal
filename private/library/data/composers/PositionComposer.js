@@ -1,18 +1,24 @@
 import BaseComposer from './BaseComposer';
 
 import eventHandler from '../../EventCentral';
-import dataHandler from '../DataHandler';
+import {
+  positions,
+  users,
+  teams,
+  aliases,
+} from '../DataHandler';
 import storageManager from '../../StorageManager';
 
 class PositionComposer extends BaseComposer {
   constructor() {
     super({
       completionEvent: eventHandler.Events.COMPLETE_POSITION,
-      handler: dataHandler.positions,
+      handler: positions,
       dependencies: [
-        dataHandler.positions,
-        dataHandler.users,
-        dataHandler.teams,
+        positions,
+        users,
+        teams,
+        aliases,
       ],
     });
 

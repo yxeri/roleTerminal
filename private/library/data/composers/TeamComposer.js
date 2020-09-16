@@ -1,6 +1,10 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  users,
+  teams,
+  aliases,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
 import socketManager from '../../SocketManager';
 import storageManager from '../../StorageManager';
@@ -8,12 +12,12 @@ import storageManager from '../../StorageManager';
 class TeamComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.teams,
+      handler: teams,
       completionEvent: eventCentral.Events.COMPLETE_TEAM,
       dependencies: [
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.aliases,
+        users,
+        teams,
+        aliases,
       ],
     });
   }

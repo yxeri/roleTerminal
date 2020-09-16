@@ -16,7 +16,12 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  aliases,
+  users,
+  teams,
+  wallets,
+} from '../../data/DataHandler';
 import userComposer from '../../data/composers/UserComposer';
 import teamComposer from '../../data/composers/TeamComposer';
 
@@ -52,12 +57,12 @@ export default class AdminWalletList extends List {
       shouldFocusOnClick: false,
       classes: classes.concat(['walletList']),
       dependencies: [
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.wallets,
+        aliases,
+        users,
+        teams,
+        wallets,
       ],
-      collector: dataHandler.wallets,
+      collector: wallets,
       listItemFields: headerFields,
     });
   }

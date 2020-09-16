@@ -1,20 +1,25 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  docFiles,
+  aliases,
+  users,
+  teams,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
-import socketManager from '../../SocketManager';
+import { EmitTypes } from '../../SocketManager';
 import storageManager from '../../StorageManager';
 
 class DocFileComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.docFiles,
+      handler: docFiles,
       completionEvent: eventCentral.Events.COMPLETE_DOCFILE,
       dependencies: [
-        dataHandler.docFiles,
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
+        docFiles,
+        aliases,
+        users,
+        teams,
       ],
     });
   }
@@ -22,7 +27,7 @@ class DocFileComposer extends DataComposer {
   unlockDocFile({ docFileId, code, callback }) {
     this.handler.updateObject({
       callback,
-      event: socketManager.EmitTypes.UNLOCKDOCFILE,
+      event: EmitTypes.UNLOCKDOCFILE,
       params: {
         docFileId,
         code,

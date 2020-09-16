@@ -16,7 +16,13 @@
 
 import List from './List';
 
-import dataHandler from '../../data/DataHandler';
+import {
+  transactions,
+  aliases,
+  users,
+  teams,
+  wallets,
+} from '../../data/DataHandler';
 import walletComposer from '../../data/composers/WalletComposer';
 import labelHandler from '../../labels/LabelHandler';
 import textTools from '../../TextTools';
@@ -69,13 +75,13 @@ export default class TransactionList extends List {
       },
       classes: classes.concat(['transactionList']),
       dependencies: [
-        dataHandler.transactions,
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
-        dataHandler.wallets,
+        transactions,
+        aliases,
+        users,
+        teams,
+        wallets,
       ],
-      collector: dataHandler.transactions,
+      collector: transactions,
       listItemFields: headerFields,
     });
   }

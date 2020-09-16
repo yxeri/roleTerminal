@@ -1,18 +1,22 @@
 import DataComposer from './BaseComposer';
 
-import dataHandler from '../DataHandler';
+import {
+  aliases,
+  users,
+  teams,
+} from '../DataHandler';
 import eventCentral from '../../EventCentral';
 import storageManager from '../../StorageManager';
 
 class AliasComposer extends DataComposer {
   constructor() {
     super({
-      handler: dataHandler.aliases,
+      handler: aliases,
       completionEvent: eventCentral.Events.COMPLETE_ALIAS,
       dependencies: [
-        dataHandler.aliases,
-        dataHandler.users,
-        dataHandler.teams,
+        aliases,
+        users,
+        teams,
       ],
     });
   }

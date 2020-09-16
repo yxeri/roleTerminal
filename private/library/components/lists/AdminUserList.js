@@ -18,7 +18,10 @@ import List from './List';
 import BaseDialog from '../views/dialogs/BaseDialog';
 
 import elementCreator from '../../ElementCreator';
-import dataHandler from '../../data/DataHandler';
+import {
+  users,
+  aliases,
+} from '../../data/DataHandler';
 import userComposer from '../../data/composers/UserComposer';
 import labelHandler from '../../labels/LabelHandler';
 import accessCentral from '../../AccessCentral';
@@ -385,10 +388,10 @@ export default class AdminUserList extends List {
         },
       },
       dependencies: [
-        dataHandler.aliases,
-        dataHandler.users,
+        aliases,
+        users,
       ],
-      collector: dataHandler.users,
+      collector: users,
       listItemFields: headerFields,
     });
   }

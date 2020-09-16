@@ -1,8 +1,8 @@
-import elementCreator from '../../../ElementCreator';
+import BaseView from '../BaseView';
 
-const BaseView = require('../BaseView');
-const keyhandler = require('../../../KeyHandler');
-const accessCentral = require('../../../AccessCentral');
+import elementCreator from '../../../ElementCreator';
+import keyhandler from '../../../KeyHandler';
+import accessCentral from '../../../AccessCentral';
 
 const ids = {
   PICTURE: 'picture',
@@ -149,4 +149,4 @@ class InputArea extends BaseView {
   }
 }
 
-module.exports = InputArea;
+export default InputArea;

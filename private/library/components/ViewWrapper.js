@@ -1,9 +1,8 @@
+import BaseView from './views/BaseView';
+
 import elementCreator from '../ElementCreator';
-
-const BaseView = require('./views/BaseView');
-
-const eventCentral = require('../EventCentral');
-const viewSwitcher = require('../ViewSwitcher');
+import eventCentral from '../EventCentral';
+import viewSwitcher from '../ViewSwitcher';
 
 class ViewWrapper extends BaseView {
   constructor({
@@ -137,4 +136,4 @@ class ViewWrapper extends BaseView {
   }
 }
 
-module.exports = ViewWrapper;
+export default ViewWrapper;

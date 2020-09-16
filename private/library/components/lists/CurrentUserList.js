@@ -14,14 +14,14 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const userComposer = require('../../data/composers/UserComposer');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import userComposer from '../../data/composers/UserComposer';
 
-class CurrentUserList extends List {
+export default class CurrentUserList extends List {
   constructor({
     effect,
     classes = [],
@@ -102,5 +102,3 @@ class CurrentUserList extends List {
     return allObjects;
   }
 }
-
-module.exports = CurrentUserList;

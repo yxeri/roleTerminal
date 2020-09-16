@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import VerifyDialog from './VerifyDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const forumComposer = require('../../../data/composers/ForumComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import forumComposer from '../../../data/composers/ForumComposer';
 
 const ids = {
   TEXT: 'text',
@@ -147,4 +146,4 @@ class EditForumPostDialog extends BaseDialog {
   }
 }
 
-module.exports = EditForumPostDialog;
+export default EditForumPostDialog;

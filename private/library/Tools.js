@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-class Tools {
+export default class Tools {
   static shuffleArray(array) {
     const shuffledArray = array;
     let currentIndex = array.length;
@@ -50,5 +50,3 @@ class Tools {
     return {};
   }
 }
-
-module.exports = Tools;

@@ -11,8 +11,8 @@
  limitations under the License.
  */
 
-const storageManager = require('./StorageManager');
-const positionComposer = require('./data/composers/PositionComposer');
+import storageManager from './StorageManager';
+import positionComposer from './data/composers/PositionComposer';
 
 /**
  * Convert from geolocation position
@@ -181,4 +181,4 @@ class Tracker {
 
 const tracker = new Tracker();
 
-module.exports = tracker;
+export default tracker;

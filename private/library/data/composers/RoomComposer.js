@@ -1,11 +1,11 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const storageManager = require('../../StorageManager');
-const userComposer = require('../../data/composers/UserComposer');
-const messageComposer = require('./MessageComposer');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
+import storageManager from '../../StorageManager';
+import userComposer from '../../data/composers/UserComposer';
+import messageComposer from './MessageComposer';
 
 class RoomComposer extends DataComposer {
   constructor() {
@@ -171,4 +171,4 @@ class RoomComposer extends DataComposer {
 
 const roomComposer = new RoomComposer();
 
-module.exports = roomComposer;
+export default roomComposer;

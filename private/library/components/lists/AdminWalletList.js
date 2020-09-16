@@ -14,13 +14,13 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const userComposer = require('../../data/composers/UserComposer');
-const teamComposer = require('../../data/composers/TeamComposer');
+import dataHandler from '../../data/DataHandler';
+import userComposer from '../../data/composers/UserComposer';
+import teamComposer from '../../data/composers/TeamComposer';
 
-class AdminWalletList extends List {
+export default class AdminWalletList extends List {
   constructor({
     effect,
     shouldToggle,
@@ -62,5 +62,3 @@ class AdminWalletList extends List {
     });
   }
 }
-
-module.exports = AdminWalletList;

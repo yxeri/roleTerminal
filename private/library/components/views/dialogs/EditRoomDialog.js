@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const roomComposer = require('../../../data/composers/RoomComposer');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import roomComposer from '../../../data/composers/RoomComposer';
+import userComposer from '../../../data/composers/UserComposer';
 
 const ids = {
   ROOMNAME: 'roomName',
@@ -261,4 +260,4 @@ class EditRoomDialog extends BaseDialog {
   }
 }
 
-module.exports = EditRoomDialog;
+export default EditRoomDialog;

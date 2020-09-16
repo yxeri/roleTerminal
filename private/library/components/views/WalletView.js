@@ -14,12 +14,12 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const TransactionList = require('../lists/TransactionList');
-const UserList = require('../lists/UserList');
-const TeamList = require('../lists/TeamList');
-const WalletInfo = require('./WalletInfo');
-const labelHandler = require('../../labels/LabelHandler');
+import ViewWrapper from '../ViewWrapper';
+import TransactionList from '../lists/TransactionList';
+import UserList from '../lists/UserList';
+import TeamList from '../lists/TeamList';
+import WalletInfo from './WalletInfo';
+import labelHandler from '../../labels/LabelHandler';
 
 class WalletView extends ViewWrapper {
   constructor({
@@ -78,4 +78,4 @@ class WalletView extends ViewWrapper {
   }
 }
 
-module.exports = WalletView;
+export default WalletView;

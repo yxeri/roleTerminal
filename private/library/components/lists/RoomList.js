@@ -14,19 +14,19 @@
  limitations under the License.
  */
 
-const List = require('./List');
-const LockedRoomDialog = require('../views/dialogs/LockedRoomDialog');
+import List from './List';
+import LockedRoomDialog from '../views/dialogs/LockedRoomDialog';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const roomComposer = require('../../data/composers/RoomComposer');
-const userComposer = require('../../data/composers/UserComposer');
-const viewSwitcher = require('../../ViewSwitcher');
-const accessCentral = require('../../AccessCentral');
-const labelHandler = require('../../labels/LabelHandler');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import roomComposer from '../../data/composers/RoomComposer';
+import userComposer from '../../data/composers/UserComposer';
+import viewSwitcher from '../../ViewSwitcher';
+import accessCentral from '../../AccessCentral';
+import labelHandler from '../../labels/LabelHandler';
 
-class RoomList extends List {
+export default class RoomList extends List {
   constructor({
     minimumAccessLevel,
     effect,
@@ -162,5 +162,3 @@ class RoomList extends List {
     });
   }
 }
-
-module.exports = RoomList;

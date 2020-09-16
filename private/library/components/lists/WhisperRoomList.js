@@ -14,16 +14,16 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const roomComposer = require('../../data/composers/RoomComposer');
-const userComposer = require('../../data/composers/UserComposer');
-const aliasComposer = require('../../data/composers/AliasComposer');
-const accessCentral = require('../../AccessCentral');
-const labelHandler = require('../../labels/LabelHandler');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import roomComposer from '../../data/composers/RoomComposer';
+import userComposer from '../../data/composers/UserComposer';
+import aliasComposer from '../../data/composers/AliasComposer';
+import accessCentral from '../../AccessCentral';
+import labelHandler from '../../labels/LabelHandler';
 
 class RoomList extends List {
   constructor({
@@ -188,4 +188,4 @@ class RoomList extends List {
   }
 }
 
-module.exports = RoomList;
+export default RoomList;

@@ -132,4 +132,4 @@ class EventCentral {
 
 const eventCentral = new EventCentral();
 
-module.exports = eventCentral;
+export default eventCentral;

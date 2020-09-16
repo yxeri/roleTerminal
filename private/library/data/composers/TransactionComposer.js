@@ -1,8 +1,8 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
 
 class TransactionComposer extends DataComposer {
   constructor() {
@@ -35,4 +35,4 @@ class TransactionComposer extends DataComposer {
 
 const transactionComposer = new TransactionComposer();
 
-module.exports = transactionComposer;
+export default transactionComposer;

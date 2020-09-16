@@ -14,14 +14,13 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import VerifyDialog from './VerifyDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const docFileComposer = require('../../../data/composers/DocFileComposer');
-const storageManager = require('../../../StorageManager');
+import labelHandler from '../../../labels/LabelHandler';
+import docFileComposer from '../../../data/composers/DocFileComposer';
+import storageManager from '../../../StorageManager';
 
 const ids = {
   TITLE: 'title',
@@ -224,4 +223,4 @@ class EditDocFileDialog extends BaseDialog {
   }
 }
 
-module.exports = EditDocFileDialog;
+export default EditDocFileDialog;

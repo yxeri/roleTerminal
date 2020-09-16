@@ -1,7 +1,7 @@
-const { version } = require('../../package');
+const { version } from '../../package');
 
 const config = {
   version,
 };
 
-module.exports = config;
+export default config;

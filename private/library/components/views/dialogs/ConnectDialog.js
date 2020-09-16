@@ -14,13 +14,13 @@
  limitations under the License.
  */
 
+
+import BaseDialog from './BaseDialog';
+import TemporaryDialog from './TemporaryDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const TemporaryDialog = require('./TemporaryDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import userComposer from '../../../data/composers/UserComposer';
 
 const ids = {
   USERNAME: 'username',
@@ -122,4 +122,4 @@ class ConnectDialog extends BaseDialog {
   }
 }
 
-module.exports = ConnectDialog;
+export default ConnectDialog;

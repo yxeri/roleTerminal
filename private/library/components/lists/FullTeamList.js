@@ -14,16 +14,16 @@
  limitations under the License.
  */
 
-const List = require('./List');
-const TeamDialog = require('../views/dialogs/TeamDialog');
+import List from './List';
+import TeamDialog from '../views/dialogs/TeamDialog';
 
-const dataHandler = require('../../data/DataHandler');
-const accessCentral = require('../../AccessCentral');
-const viewSwitcher = require('../../ViewSwitcher');
-const storageManager = require('../../StorageManager');
-const teamComposer = require('../../data/composers/TeamComposer');
+import dataHandler from '../../data/DataHandler';
+import accessCentral from '../../AccessCentral';
+import viewSwitcher from '../../ViewSwitcher';
+import storageManager from '../../StorageManager';
+import teamComposer from '../../data/composers/TeamComposer';
 
-class FullTeamList extends List {
+export default class FullTeamList extends List {
   constructor({
     title,
     effect,
@@ -87,5 +87,3 @@ class FullTeamList extends List {
     super(params);
   }
 }
-
-module.exports = FullTeamList;

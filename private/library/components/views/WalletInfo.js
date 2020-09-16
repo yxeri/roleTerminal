@@ -14,14 +14,13 @@
  limitations under the License.
  */
 
+import BaseView from './BaseView';
+
 import elementCreator from '../../ElementCreator';
-
-const BaseView = require('./BaseView');
-
-const walletComposer = require('../../data/composers/WalletComposer');
-const userComposer = require('../../data/composers/UserComposer');
-const eventCentral = require('../../EventCentral');
-const teamComposer = require('../../data/composers/TeamComposer');
+import walletComposer from '../../data/composers/WalletComposer';
+import userComposer from '../../data/composers/UserComposer';
+import eventCentral from '../../EventCentral';
+import teamComposer from '../../data/composers/TeamComposer';
 
 class WalletInfo extends BaseView {
   constructor({
@@ -115,4 +114,4 @@ class WalletInfo extends BaseView {
   }
 }
 
-module.exports = WalletInfo;
+export default WalletInfo;

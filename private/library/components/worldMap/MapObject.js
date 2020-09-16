@@ -11,21 +11,20 @@
  limitations under the License.
  */
 
+import Label from './MapLabel';
+import BaseDialog from '../views/dialogs/BaseDialog';
+import VerifyDialog from '../views/dialogs/VerifyDialog';
+import EditPositionDialog from '../views/dialogs/EditPositionDialog';
+
 import elementCreator from '../../ElementCreator';
-
-const Label = require('./MapLabel');
-const BaseDialog = require('../views/dialogs/BaseDialog');
-const VerifyDialog = require('../views/dialogs/VerifyDialog');
-const EditPositionDialog = require('../views/dialogs/EditPositionDialog');
-
-const mouseHandler = require('../../MouseHandler');
-const labelHandler = require('../../labels/LabelHandler');
-const positionComposer = require('../../data/composers/PositionComposer');
-const storageManager = require('../../StorageManager');
-const eventHandler = require('../../EventCentral');
-const viewSwitcher = require('../../ViewSwitcher');
-const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
+import mouseHandler from '../../MouseHandler';
+import labelHandler from '../../labels/LabelHandler';
+import positionComposer from '../../data/composers/PositionComposer';
+import storageManager from '../../StorageManager';
+import eventHandler from '../../EventCentral';
+import viewSwitcher from '../../ViewSwitcher';
+import userComposer from '../../data/composers/UserComposer';
+import accessCentral from '../../AccessCentral';
 
 const ids = {
   RIGHTCLICKBOX: 'rMapBox',
@@ -674,4 +673,4 @@ MapObject.rightClickBox = elementCreator.createContainer({
   },
 });
 
-module.exports = MapObject;
+export default MapObject;

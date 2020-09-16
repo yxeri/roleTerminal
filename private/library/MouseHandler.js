@@ -126,4 +126,4 @@ class MouseHandler {
 
 const mouseHandler = new MouseHandler();
 
-module.exports = mouseHandler;
+export default mouseHandler;

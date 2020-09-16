@@ -14,19 +14,19 @@
  limitations under the License.
  */
 
+
+import List from './List';
+import BaseDialog from '../views/dialogs/BaseDialog';
+
 import elementCreator from '../../ElementCreator';
+import dataHandler from '../../data/DataHandler';
+import accessCentral from '../../AccessCentral';
+import viewSwitcher from '../../ViewSwitcher';
+import labelHandler from '../../labels/LabelHandler';
+import walletComposer from '../../data/composers/WalletComposer';
+import teamComposer from '../../data/composers/TeamComposer';
 
-const List = require('./List');
-const BaseDialog = require('../views/dialogs/BaseDialog');
-
-const dataHandler = require('../../data/DataHandler');
-const accessCentral = require('../../AccessCentral');
-const viewSwitcher = require('../../ViewSwitcher');
-const labelHandler = require('../../labels/LabelHandler');
-const walletComposer = require('../../data/composers/WalletComposer');
-const teamComposer = require('../../data/composers/TeamComposer');
-
-class TeamList extends List {
+export default class TeamList extends List {
   constructor({
     effect,
     shouldToggle,
@@ -148,5 +148,3 @@ class TeamList extends List {
     });
   }
 }
-
-module.exports = TeamList;

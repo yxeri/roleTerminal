@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-const eventCentral = require('./EventCentral');
+import eventCentral from './EventCentral';
 
 class AccessCentral {
   constructor() {
@@ -144,4 +144,4 @@ class AccessCentral {
 
 const accessCentral = new AccessCentral();
 
-module.exports = accessCentral;
+export default accessCentral;

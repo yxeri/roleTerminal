@@ -1,9 +1,9 @@
-import elementCreator from '../../../ElementCreator';
+import BaseDialog from './BaseDialog';
+import UserDialog from './UserDialog';
 
-const BaseDialog = require('./BaseDialog');
-const UserDialog = require('./UserDialog');
-const userComposer = require('../../../data/composers/UserComposer');
-const labelHandler = require('../../../labels/LabelHandler');
+import elementCreator from '../../../ElementCreator';
+import userComposer from '../../../data/composers/UserComposer';
+import labelHandler from '../../../labels/LabelHandler';
 
 const ids = {
   CODE: 'code',
@@ -93,4 +93,4 @@ class FindUserByIdDialog extends BaseDialog {
   }
 }
 
-module.exports = FindUserByIdDialog;
+export default FindUserByIdDialog;

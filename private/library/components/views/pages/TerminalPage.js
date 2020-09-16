@@ -14,15 +14,14 @@
  limitations under the License.
  */
 
+import BaseView from '../BaseView';
+import InputArea from '../inputs/InputArea';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-const InputArea = require('../inputs/InputArea');
-
-const accessCentral = require('../../../AccessCentral');
-const textTools = require('../../../TextTools');
-const labelHandler = require('../../../labels/LabelHandler');
-const keyHandler = require('../../../KeyHandler');
+import accessCentral from '../../../AccessCentral';
+import textTools from '../../../TextTools';
+import labelHandler from '../../../labels/LabelHandler';
+import keyHandler from '../../../KeyHandler';
 
 class TerminalPage extends BaseView {
   constructor({
@@ -306,4 +305,4 @@ class TerminalPage extends BaseView {
   }
 }
 
-module.exports = TerminalPage;
+export default TerminalPage;

@@ -14,17 +14,16 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const positionComposer = require('../../../data/composers/PositionComposer');
-const eventCentral = require('../../../EventCentral');
-const viewSwitcher = require('../../../ViewSwitcher');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const storageManager = require('../../../StorageManager');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import positionComposer from '../../../data/composers/PositionComposer';
+import eventCentral from '../../../EventCentral';
+import viewSwitcher from '../../../ViewSwitcher';
+import teamComposer from '../../../data/composers/TeamComposer';
+import storageManager from '../../../StorageManager';
+import userComposer from '../../../data/composers/UserComposer';
 
 const ids = {
   PICTURE: 'picture',
@@ -180,4 +179,4 @@ class TeamProfileDialog extends BaseDialog {
   }
 }
 
-module.exports = TeamProfileDialog;
+export default TeamProfileDialog;

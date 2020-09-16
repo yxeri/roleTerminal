@@ -14,11 +14,11 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const DocFileList = require('../lists/DocFileList');
-const DocFilePage = require('./pages/DocFilePage');
+import ViewWrapper from '../ViewWrapper';
+import DocFileList from '../lists/DocFileList';
+import DocFilePage from './pages/DocFilePage';
 
-const eventCentral = require('../../EventCentral');
+import eventCentral from '../../EventCentral';
 
 class DocFileView extends ViewWrapper {
   constructor({
@@ -59,4 +59,4 @@ class DocFileView extends ViewWrapper {
   }
 }
 
-module.exports = DocFileView;
+export default DocFileView;

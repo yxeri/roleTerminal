@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const roomComposer = require('../../../data/composers/RoomComposer');
-const eventCentral = require('../../../EventCentral');
+import labelHandler from '../../../labels/LabelHandler';
+import roomComposer from '../../../data/composers/RoomComposer';
+import eventCentral from '../../../EventCentral';
 
 const ids = {
   PASSWORD: 'password',
@@ -113,4 +112,4 @@ class LockedRoomDialog extends BaseDialog {
   }
 }
 
-module.exports = LockedRoomDialog;
+export default LockedRoomDialog;

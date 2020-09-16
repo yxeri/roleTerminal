@@ -14,14 +14,13 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const docFileComposer = require('../../../data/composers/DocFileComposer');
-const viewSwitcher = require('../../../ViewSwitcher');
-const eventCentral = require('../../../EventCentral');
+import labelHandler from '../../../labels/LabelHandler';
+import docFileComposer from '../../../data/composers/DocFileComposer';
+import viewSwitcher from '../../../ViewSwitcher';
+import eventCentral from '../../../EventCentral';
 
 const ids = {
   CODE: 'code',
@@ -108,4 +107,4 @@ class DocFileDialog extends BaseDialog {
   }
 }
 
-module.exports = DocFileDialog;
+export default DocFileDialog;

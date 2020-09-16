@@ -14,12 +14,11 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const positionComposer = require('../../../data/composers/PositionComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import positionComposer from '../../../data/composers/PositionComposer';
 
 const ids = {
   EDITPOSITIONNAME: 'editPositionName',
@@ -155,4 +154,4 @@ class EditPositionDialog extends BaseDialog {
   }
 }
 
-module.exports = EditPositionDialog;
+export default EditPositionDialog;

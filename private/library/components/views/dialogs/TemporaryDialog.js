@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-import elementCreator from '../../../ElementCreator';
+import BaseDialog from './BaseDialog';
 
-const BaseDialog = require('./BaseDialog');
-const labelHandler = require('../../../labels/LabelHandler');
+import elementCreator from '../../../ElementCreator';
+import labelHandler from '../../../labels/LabelHandler';
 
 class TemporaryDialog extends BaseDialog {
   constructor({
@@ -49,4 +49,4 @@ class TemporaryDialog extends BaseDialog {
   }
 }
 
-module.exports = TemporaryDialog;
+export default TemporaryDialog;

@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const aliasComposer = require('../../../data/composers/AliasComposer');
-const textTools = require('../../../TextTools');
+import labelHandler from '../../../labels/LabelHandler';
+import aliasComposer from '../../../data/composers/AliasComposer';
+import textTools from '../../../TextTools';
 
 const ids = {
   ALIASNAME: 'aliasname',
@@ -28,7 +27,7 @@ const ids = {
   PRONOUNS: 'pronouns',
 };
 
-class AliasDialog extends BaseDialog {
+export default class AliasDialog extends BaseDialog {
   constructor({
     classes = [],
     elementId = `aDialog-${Date.now()}`,
@@ -155,5 +154,3 @@ class AliasDialog extends BaseDialog {
     });
   }
 }
-
-module.exports = AliasDialog;

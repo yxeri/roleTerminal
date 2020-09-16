@@ -41,16 +41,15 @@
  * @property {boolean} [rules.shouldBeTrue] Should the test be true?
  */
 
+import BaseView from '../views/BaseView';
+
 import elementCreator from '../../ElementCreator';
-
-const BaseView = require('../views/BaseView');
-
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const userComposer = require('../../data/composers/UserComposer');
-const storageManager = require('../../StorageManager');
-const accessCentral = require('../../AccessCentral');
-const viewTools = require('../../ViewTools');
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
+import userComposer from '../../data/composers/UserComposer';
+import storageManager from '../../StorageManager';
+import accessCentral from '../../AccessCentral';
+import viewTools from '../../ViewTools';
 
 const cssClasses = {
   focusListItem: 'focusListItem',
@@ -59,7 +58,7 @@ const cssClasses = {
   removeListItem: 'removeListItem',
 };
 
-class List extends BaseView {
+export default class List extends BaseView {
   /**
    * List constructor.
    * @param {Object} params Parameters.
@@ -857,5 +856,3 @@ class List extends BaseView {
     return true;
   }
 }
-
-module.exports = List;

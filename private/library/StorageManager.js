@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const converters = require('./Converters');
-const eventCentral = require('./EventCentral');
+import converters from './Converters';
+import eventCentral from './EventCentral';
 
 /**
  * Converts text coordinats to float.
@@ -544,4 +544,4 @@ class StorageManager {
 
 StorageManager.addWatchers();
 
-module.exports = StorageManager;
+export default StorageManager;

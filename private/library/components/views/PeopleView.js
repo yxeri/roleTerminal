@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const FullUserList = require('../lists/FullUserList');
+import ViewWrapper from '../ViewWrapper';
+import FullUserList from '../lists/FullUserList';
 
 class PeopleView extends ViewWrapper {
   constructor({
@@ -40,4 +40,4 @@ class PeopleView extends ViewWrapper {
   }
 }
 
-module.exports = PeopleView;
+export default PeopleView;

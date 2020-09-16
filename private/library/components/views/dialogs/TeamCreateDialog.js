@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const storageManager = require('../../../StorageManager');
+import labelHandler from '../../../labels/LabelHandler';
+import teamComposer from '../../../data/composers/TeamComposer';
+import storageManager from '../../../StorageManager';
 
 const ids = {
   TEAMNAME: 'teamName',
@@ -146,4 +145,4 @@ class TeamCreateDialog extends BaseDialog {
   }
 }
 
-module.exports = TeamCreateDialog;
+export default TeamCreateDialog;

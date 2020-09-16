@@ -14,15 +14,15 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const userComposer = require('../../data/composers/UserComposer');
-const teamComposer = require('../../data/composers/TeamComposer');
-const labelHandler = require('../../labels/LabelHandler');
-const textTools = require('../../TextTools');
+import dataHandler from '../../data/DataHandler';
+import userComposer from '../../data/composers/UserComposer';
+import teamComposer from '../../data/composers/TeamComposer';
+import labelHandler from '../../labels/LabelHandler';
+import textTools from '../../TextTools';
 
-class TeamScoringList extends List {
+export default class TeamScoringList extends List {
   constructor({
     effect,
     reverseSorting = true,
@@ -89,5 +89,3 @@ class TeamScoringList extends List {
     });
   }
 }
-
-module.exports = TeamScoringList;

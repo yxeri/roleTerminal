@@ -95,4 +95,4 @@ class VoiceCommander {
 
 const voiceCommander = new VoiceCommander();
 
-module.exports = voiceCommander;
+export default voiceCommander;

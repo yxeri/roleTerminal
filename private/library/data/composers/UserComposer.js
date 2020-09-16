@@ -1,11 +1,11 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const socketManager = require('../../SocketManager');
-const aliasComposer = require('./AliasComposer');
-const accessCentral = require('../../AccessCentral');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import socketManager from '../../SocketManager';
+import aliasComposer from './AliasComposer';
+import accessCentral from '../../AccessCentral';
 
 const anonymous = {
   partOfTeams: [],
@@ -279,4 +279,4 @@ class UserComposer extends DataComposer {
 
 const userComposer = new UserComposer();
 
-module.exports = userComposer;
+export default userComposer;

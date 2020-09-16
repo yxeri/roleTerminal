@@ -14,20 +14,19 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import PasswordDialog from './PasswordDialog';
+import NameDialog from './NameDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const PasswordDialog = require('./PasswordDialog');
-const NameDialog = require('./NameDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const userComposer = require('../../../data/composers/UserComposer');
-const positionComposer = require('../../../data/composers/PositionComposer');
-const eventCentral = require('../../../EventCentral');
-const viewSwitcher = require('../../../ViewSwitcher');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const storageManager = require('../../../StorageManager');
-const aliasComposer = require('../../../data/composers/AliasComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import userComposer from '../../../data/composers/UserComposer';
+import positionComposer from '../../../data/composers/PositionComposer';
+import eventCentral from '../../../EventCentral';
+import viewSwitcher from '../../../ViewSwitcher';
+import teamComposer from '../../../data/composers/TeamComposer';
+import storageManager from '../../../StorageManager';
+import aliasComposer from '../../../data/composers/AliasComposer';
 
 const ids = {
   PICTURE: 'picture',
@@ -324,4 +323,4 @@ class UserSelfDialog extends BaseDialog {
   }
 }
 
-module.exports = UserSelfDialog;
+export default UserSelfDialog;

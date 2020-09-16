@@ -1,20 +1,19 @@
+import BaseView from '../BaseView';
+import MapMarker from '../../worldMap/MapMarker';
+import MapLine from '../../worldMap/MapLine';
+import MapPolygon from '../../worldMap/MapPolygon';
+import MapObject from '../../worldMap/MapObject';
+import PositionDialog from '../dialogs/PositionDialog';
+import MapCircle from '../../worldMap/MapCircle';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-const MapMarker = require('../../worldMap/MapMarker');
-const MapLine = require('../../worldMap/MapLine');
-const MapPolygon = require('../../worldMap/MapPolygon');
-const MapObject = require('../../worldMap/MapObject');
-const PositionDialog = require('../dialogs/PositionDialog');
-const MapCircle = require('../../worldMap/MapCircle');
-
-const positionComposer = require('../../../data/composers/PositionComposer');
-const storageManager = require('../../../StorageManager');
-const eventHandler = require('../../../EventCentral');
-const socketManager = require('../../../SocketManager');
-const mouseHandler = require('../../../MouseHandler');
-const labelHandler = require('../../../labels/LabelHandler');
-const viewSwitcher = require('../../../ViewSwitcher');
+import positionComposer from '../../../data/composers/PositionComposer';
+import storageManager from '../../../StorageManager';
+import eventHandler from '../../../EventCentral';
+import socketManager from '../../../SocketManager';
+import mouseHandler from '../../../MouseHandler';
+import labelHandler from '../../../labels/LabelHandler';
+import viewSwitcher from '../../../ViewSwitcher';
 
 class WorldMapPage extends BaseView {
   constructor({
@@ -460,4 +459,4 @@ class WorldMapPage extends BaseView {
   }
 }
 
-module.exports = WorldMapPage;
+export default WorldMapPage;

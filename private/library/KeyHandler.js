@@ -131,4 +131,4 @@ class KeyHandler {
 
 const keyHandler = new KeyHandler();
 
-module.exports = keyHandler;
+export default keyHandler;

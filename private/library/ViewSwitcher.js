@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const eventCentral = require('./EventCentral');
-const storageManager = require('./StorageManager');
+import eventCentral from './EventCentral';
+import storageManager from './StorageManager';
 
 let currentView;
 
@@ -104,4 +104,4 @@ class ViewSwitcher {
 
 const viewSwitcher = new ViewSwitcher();
 
-module.exports = viewSwitcher;
+export default viewSwitcher;

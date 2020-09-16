@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const ForumList = require('../lists/ForumList');
-const ForumPage = require('./pages/ForumPage');
-const UserList = require('../lists/UserList');
+import ViewWrapper from '../ViewWrapper';
+import ForumList from '../lists/ForumList';
+import ForumPage from './pages/ForumPage';
+import UserList from '../lists/UserList';
 
 class ForumView extends ViewWrapper {
   constructor({
@@ -67,4 +67,4 @@ class ForumView extends ViewWrapper {
   }
 }
 
-module.exports = ForumView;
+export default ForumView;

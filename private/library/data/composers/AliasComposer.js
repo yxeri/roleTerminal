@@ -1,8 +1,8 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
 
 class AliasComposer extends DataComposer {
   constructor() {
@@ -86,4 +86,4 @@ class AliasComposer extends DataComposer {
 
 const aliasComposer = new AliasComposer();
 
-module.exports = aliasComposer;
+export default aliasComposer;

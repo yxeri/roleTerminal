@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const BaseView = require('../BaseView');
-const TeamScoreInfo = require('../TeamScoreInfo');
+import BaseView from '../BaseView';
+import TeamScoreInfo from '../TeamScoreInfo';
 
 class TeamScorePage extends BaseView {
   constructor({
@@ -33,4 +33,4 @@ class TeamScorePage extends BaseView {
   }
 }
 
-module.exports = TeamScorePage;
+export default TeamScorePage;

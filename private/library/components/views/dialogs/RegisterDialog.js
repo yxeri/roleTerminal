@@ -14,17 +14,16 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import TemporaryDialog from './TemporaryDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const TemporaryDialog = require('./TemporaryDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const storageManager = require('../../../StorageManager');
-const userComposer = require('../../../data/composers/UserComposer');
-const socketManager = require('../../../SocketManager');
-const viewSwitcher = require('../../../ViewSwitcher');
-const notificationManager = require('../../../NotificationManager');
+import labelHandler from '../../../labels/LabelHandler';
+import storageManager from '../../../StorageManager';
+import userComposer from '../../../data/composers/UserComposer';
+import socketManager from '../../../SocketManager';
+import viewSwitcher from '../../../ViewSwitcher';
+import notificationManager from '../../../NotificationManager';
 
 const ids = {
   OFFNAME: 'offName',
@@ -331,4 +330,4 @@ class RegisterDialog extends BaseDialog {
   }
 }
 
-module.exports = RegisterDialog;
+export default RegisterDialog;

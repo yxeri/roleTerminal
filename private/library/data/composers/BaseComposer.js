@@ -1,5 +1,5 @@
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
 
 class BaseComposer {
   constructor({
@@ -36,4 +36,4 @@ class BaseComposer {
   }
 }
 
-module.exports = BaseComposer;
+export default BaseComposer;

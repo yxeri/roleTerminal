@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const TeamScorePage = require('./pages/TeamScorePage');
+import ViewWrapper from '../ViewWrapper';
+import TeamScorePage from './pages/TeamScorePage';
 
 class TeamScoreViewView extends ViewWrapper {
   constructor({
@@ -36,4 +36,4 @@ class TeamScoreViewView extends ViewWrapper {
   }
 }
 
-module.exports = TeamScoreViewView;
+export default TeamScoreViewView;

@@ -1,8 +1,8 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
 
 class GameCodeComposer extends DataComposer {
   constructor() {
@@ -25,4 +25,4 @@ class GameCodeComposer extends DataComposer {
 
 const gameCodeComposer = new GameCodeComposer();
 
-module.exports = gameCodeComposer;
+export default gameCodeComposer;

@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const FullTeamList = require('../lists/FullTeamList');
+import ViewWrapper from '../ViewWrapper';
+import FullTeamList from '../lists/FullTeamList';
 
 class TeamView extends ViewWrapper {
   constructor({
@@ -38,4 +38,4 @@ class TeamView extends ViewWrapper {
   }
 }
 
-module.exports = TeamView;
+export default TeamView;

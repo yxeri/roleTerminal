@@ -14,12 +14,12 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
 
-class DocFileList extends List {
+export default class DocFileList extends List {
   constructor({
     title,
     effect,
@@ -79,5 +79,3 @@ class DocFileList extends List {
     });
   }
 }
-
-module.exports = DocFileList;

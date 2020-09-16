@@ -14,12 +14,11 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import userComposer from '../../../data/composers/UserComposer';
 
 const ids = {
   PASSWORD: 'password',
@@ -121,4 +120,4 @@ class UserSelfDialog extends BaseDialog {
   }
 }
 
-module.exports = UserSelfDialog;
+export default UserSelfDialog;

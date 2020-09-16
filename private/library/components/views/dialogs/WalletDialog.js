@@ -14,18 +14,17 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import TemporaryDialog from './TemporaryDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const TemporaryDialog = require('./TemporaryDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const walletComposer = require('../../../data/composers/WalletComposer');
-const transactionComposer = require('../../../data/composers/TransactionComposer');
-const userComposer = require('../../../data/composers/UserComposer');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const tracker = require('../../../PositionTracker');
-const viewSwitcher = require('../../../ViewSwitcher');
+import labelHandler from '../../../labels/LabelHandler';
+import walletComposer from '../../../data/composers/WalletComposer';
+import transactionComposer from '../../../data/composers/TransactionComposer';
+import userComposer from '../../../data/composers/UserComposer';
+import teamComposer from '../../../data/composers/TeamComposer';
+import tracker from '../../../PositionTracker';
+import viewSwitcher from '../../../ViewSwitcher';
 
 const ids = {
   FROMTEAM: 'fromTeam',
@@ -158,4 +157,4 @@ class WalletDialog extends BaseDialog {
   }
 }
 
-module.exports = WalletDialog;
+export default WalletDialog;

@@ -14,14 +14,13 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import WalletDialog from './WalletDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const WalletDialog = require('./WalletDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import teamComposer from '../../../data/composers/TeamComposer';
+import userComposer from '../../../data/composers/UserComposer';
 
 class TeamDialog extends BaseDialog {
   constructor({
@@ -77,4 +76,4 @@ class TeamDialog extends BaseDialog {
   }
 }
 
-module.exports = TeamDialog;
+export default TeamDialog;

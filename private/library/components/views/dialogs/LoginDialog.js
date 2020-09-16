@@ -16,14 +16,14 @@
 
 import elementCreator from '../../../ElementCreator';
 
-const BaseDialog = require('./BaseDialog');
-const NameDialog = require('./NameDialog');
-const TemporaryDialog = require('./TemporaryDialog');
+import BaseDialog from './BaseDialog';
+import NameDialog from './NameDialog';
+import TemporaryDialog from './TemporaryDialog';
 
-const labelHandler = require('../../../labels/LabelHandler');
-const socketManager = require('../../../SocketManager');
-const textTools = require('../../../TextTools');
-const teampComposer = require('../../../data/composers/TeamComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import socketManager from '../../../SocketManager';
+import textTools from '../../../TextTools';
+import teampComposer from '../../../data/composers/TeamComposer';
 
 const ids = {
   USERNAME: 'username',
@@ -162,4 +162,4 @@ class LoginDialog extends BaseDialog {
   }
 }
 
-module.exports = LoginDialog;
+export default LoginDialog;

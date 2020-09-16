@@ -14,21 +14,21 @@
  limitations under the License.
  */
 
-const List = require('./List');
-const MessageDialog = require('../views/dialogs/MessageDialog');
-const UserDialog = require('../views/dialogs/UserDialog');
+import List from './List';
+import MessageDialog from '../views/dialogs/MessageDialog';
+import UserDialog from '../views/dialogs/UserDialog';
 
-const dataHandler = require('../../data/DataHandler');
-const storageManager = require('../../StorageManager');
-const eventCentral = require('../../EventCentral');
-const textTools = require('../../TextTools');
-const userComposer = require('../../data/composers/UserComposer');
-const accessCentral = require('../../AccessCentral');
-const messageComposer = require('../../data/composers/MessageComposer');
-const teamComposer = require('../../data/composers/TeamComposer');
-const viewSwitcher = require('../../ViewSwitcher');
+import dataHandler from '../../data/DataHandler';
+import storageManager from '../../StorageManager';
+import eventCentral from '../../EventCentral';
+import textTools from '../../TextTools';
+import userComposer from '../../data/composers/UserComposer';
+import accessCentral from '../../AccessCentral';
+import messageComposer from '../../data/composers/MessageComposer';
+import teamComposer from '../../data/composers/TeamComposer';
+import viewSwitcher from '../../ViewSwitcher';
 
-class MessageList extends List {
+export default class MessageList extends List {
   /**
    * MessageList constructor.
    * @param {Object} params Parameters.
@@ -275,5 +275,3 @@ class MessageList extends List {
     return this.roomId || storageManager.getCurrentRoom();
   }
 }
-
-module.exports = MessageList;

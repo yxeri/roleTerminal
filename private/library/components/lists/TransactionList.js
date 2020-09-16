@@ -14,14 +14,14 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const walletComposer = require('../../data/composers/WalletComposer');
-const labelHandler = require('../../labels/LabelHandler');
-const textTools = require('../../TextTools');
+import dataHandler from '../../data/DataHandler';
+import walletComposer from '../../data/composers/WalletComposer';
+import labelHandler from '../../labels/LabelHandler';
+import textTools from '../../TextTools';
 
-class TransactionList extends List {
+export default class TransactionList extends List {
   constructor({
     effect,
     reverseSorting = true,
@@ -80,5 +80,3 @@ class TransactionList extends List {
     });
   }
 }
-
-module.exports = TransactionList;

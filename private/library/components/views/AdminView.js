@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const AdminUserList = require('../lists/AdminUserList');
-const AdminTeamList = require('../lists/AdminTeamList');
-const AdminWalletList = require('../lists/AdminWalletList');
+import ViewWrapper from '../ViewWrapper';
+import AdminUserList from '../lists/AdminUserList';
+import AdminTeamList from '../lists/AdminTeamList';
+import AdminWalletList from '../lists/AdminWalletList';
 
 class AdminView extends ViewWrapper {
   constructor({
@@ -50,4 +50,4 @@ class AdminView extends ViewWrapper {
   }
 }
 
-module.exports = AdminView;
+export default AdminView;

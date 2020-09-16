@@ -14,18 +14,18 @@
  limitations under the License.
  */
 
-const List = require('./List');
-const UserDialog = require('../views/dialogs/UserDialog');
+import List from './List';
+import UserDialog from '../views/dialogs/UserDialog';
 
-const dataHandler = require('../../data/DataHandler');
-const storageManager = require('../../StorageManager');
-const aliasComposer = require('../../data/composers/AliasComposer');
-const accessCentral = require('../../AccessCentral');
-const viewSwitcher = require('../../ViewSwitcher');
-const userComposer = require('../../data/composers/UserComposer');
-const labelHandler = require('../../labels/LabelHandler');
+import dataHandler from '../../data/DataHandler';
+import storageManager from '../../StorageManager';
+import aliasComposer from '../../data/composers/AliasComposer';
+import accessCentral from '../../AccessCentral';
+import viewSwitcher from '../../ViewSwitcher';
+import userComposer from '../../data/composers/UserComposer';
+import labelHandler from '../../labels/LabelHandler';
 
-class UserList extends List {
+export default class UserList extends List {
   constructor({
     shouldFocusOnClick,
     minimumAccessLevel,
@@ -144,5 +144,3 @@ class UserList extends List {
     });
   }
 }
-
-module.exports = UserList;

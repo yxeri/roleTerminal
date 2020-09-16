@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-const BaseData = require('./BaseData');
+import BaseData from './BaseData';
 
-const eventCentral = require('../EventCentral');
-const socketManager = require('../SocketManager');
+import eventCentral from '../EventCentral';
+import socketManager from '../SocketManager';
 
 class MessageData extends BaseData {
   constructor() {
@@ -91,4 +91,4 @@ class MessageData extends BaseData {
 
 const messageData = new MessageData();
 
-module.exports = messageData;
+export default messageData;

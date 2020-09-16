@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-const BaseData = require('./BaseData');
+import BaseData from './BaseData';
 
-const eventCentral = require('../EventCentral');
-const { EmitTypes } = require('../SocketManager');
+import eventCentral from '../EventCentral';
+import { EmitTypes } from '../SocketManager';
 
 class WalletData extends BaseData {
   constructor() {
@@ -44,4 +44,4 @@ class WalletData extends BaseData {
 
 const walletData = new WalletData();
 
-module.exports = walletData;
+export default walletData;

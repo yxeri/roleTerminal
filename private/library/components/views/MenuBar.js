@@ -14,29 +14,28 @@
  limitations under the License.
  */
 
+import BaseView from './BaseView';
+import LoginDialog from '../../components/views/dialogs/LoginDialog';
+import RegisterDialog from '../../components/views/dialogs/RegisterDialog';
+import CurrentUserList from '../../components/lists/CurrentUserList';
+import AliasDialog from '../../components/views/dialogs/AliasDialog';
+import RoomDialog from '../../components/views/dialogs/RoomDialog';
+import DocFileDialog from '../../components/views/dialogs/DocFileDialog';
+import OpenDocFileDialog from '../../components/views/dialogs/OpenDocFileDialog';
+import TeamCreateDialog from '../../components/views/dialogs/TeamCreateDialog';
+import UserSelfDialog from '../../components/views/dialogs/UserSelfDialog';
+import WalletInfo from '../../components/views/WalletInfo';
+import TeamProfileDialog from '../../components/views/dialogs/TeamProfileDialog';
+
 import elementCreator from '../../ElementCreator';
-
-const BaseView = require('./BaseView');
-const LoginDialog = require('../../components/views/dialogs/LoginDialog');
-const RegisterDialog = require('../../components/views/dialogs/RegisterDialog');
-const CurrentUserList = require('../../components/lists/CurrentUserList');
-const AliasDialog = require('../../components/views/dialogs/AliasDialog');
-const RoomDialog = require('../../components/views/dialogs/RoomDialog');
-const DocFileDialog = require('../../components/views/dialogs/DocFileDialog');
-const OpenDocFileDialog = require('../../components/views/dialogs/OpenDocFileDialog');
-const TeamCreateDialog = require('../../components/views/dialogs/TeamCreateDialog');
-const UserSelfDialog = require('../../components/views/dialogs/UserSelfDialog');
-const WalletInfo = require('../../components/views/WalletInfo');
-const TeamProfileDialog = require('../../components/views/dialogs/TeamProfileDialog');
-
-const textTools = require('../../TextTools');
-const labelHandler = require('../../labels/LabelHandler');
-const accessCentral = require('../../AccessCentral');
-const socketManager = require('../../SocketManager');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const userComposer = require('../../data/composers/UserComposer');
-const voiceCommander = require('../../VoiceCommander');
+import textTools from '../../TextTools';
+import labelHandler from '../../labels/LabelHandler';
+import accessCentral from '../../AccessCentral';
+import socketManager from '../../SocketManager';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import userComposer from '../../data/composers/UserComposer';
+import voiceCommander from '../../VoiceCommander';
 
 class MenuBar extends BaseView {
   constructor({
@@ -725,4 +724,4 @@ class MenuBar extends BaseView {
   }
 }
 
-module.exports = MenuBar;
+export default MenuBar;

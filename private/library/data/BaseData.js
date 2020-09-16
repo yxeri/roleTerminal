@@ -32,8 +32,8 @@
  * @property {boolean} [reverse] Should the sorting be reversed?
  */
 
-const socketManager = require('../SocketManager');
-const eventCentral = require('../EventCentral');
+import socketManager from '../SocketManager';
+import eventCentral from '../EventCentral';
 
 const noFunctionError = {
   type: 'no function',
@@ -481,4 +481,4 @@ class BaseData {
   }
 }
 
-module.exports = BaseData;
+export default BaseData;

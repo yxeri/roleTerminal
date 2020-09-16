@@ -14,21 +14,20 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import WalletDialog from './WalletDialog';
+import TemporaryDialog from './TemporaryDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const WalletDialog = require('./WalletDialog');
-const TemporaryDialog = require('./TemporaryDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const userComposer = require('../../../data/composers/UserComposer');
-const positionComposer = require('../../../data/composers/PositionComposer');
-const invititationComposer = require('../../../data/composers/InvitationComposer');
-const teamComposer = require('../../../data/composers/TeamComposer');
-const eventCentral = require('../../../EventCentral');
-const storageManager = require('../../../StorageManager');
-const viewSwitcher = require('../../../ViewSwitcher');
-const roomComposer = require('../../../data/composers/RoomComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import userComposer from '../../../data/composers/UserComposer';
+import positionComposer from '../../../data/composers/PositionComposer';
+import invititationComposer from '../../../data/composers/InvitationComposer';
+import teamComposer from '../../../data/composers/TeamComposer';
+import eventCentral from '../../../EventCentral';
+import storageManager from '../../../StorageManager';
+import viewSwitcher from '../../../ViewSwitcher';
+import roomComposer from '../../../data/composers/RoomComposer';
 
 class UserDialog extends BaseDialog {
   constructor({
@@ -199,4 +198,4 @@ class UserDialog extends BaseDialog {
   }
 }
 
-module.exports = UserDialog;
+export default UserDialog;

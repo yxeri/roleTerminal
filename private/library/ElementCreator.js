@@ -14,14 +14,13 @@
  limitations under the License.
  */
 
-import React from 'react';
+import mouseHandler from './MouseHandler';
+import labelHandler from './labels/LabelHandler';
+import eventCentral from './EventCentral';
+import userComposer from './data/composers/UserComposer';
+import accessCentral from './AccessCentral';
 
-const mouseHandler = require('./MouseHandler');
-// const textTools = require('./TextTools');
-const labelHandler = require('./labels/LabelHandler');
-const eventCentral = require('./EventCentral');
-const userComposer = require('./data/composers/UserComposer');
-const accessCentral = require('./AccessCentral');
+// const textTools from './TextTools');
 
 const cssClasses = {
   emptyInput: 'emptyInput',

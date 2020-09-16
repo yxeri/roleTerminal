@@ -14,12 +14,11 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const userComposer = require('../../../data/composers/UserComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import userComposer from '../../../data/composers/UserComposer';
 
 const ids = {
   USERNAME: 'username',
@@ -121,4 +120,4 @@ class NameDialog extends BaseDialog {
   }
 }
 
-module.exports = NameDialog;
+export default NameDialog;

@@ -11,7 +11,7 @@
  limitations under the License.
  */
 
-const MapObject = require('./MapObject');
+import MapObject from './MapObject';
 
 /**
  * Requires Google maps library
@@ -95,4 +95,4 @@ class MapLine extends MapObject {
   }
 }
 
-module.exports = MapLine;
+export default MapLine;

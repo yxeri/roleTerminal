@@ -14,20 +14,19 @@
  limitations under the License.
  */
 
+import List from './List';
+import BaseDialog from '../views/dialogs/BaseDialog';
+
 import elementCreator from '../../ElementCreator';
+import dataHandler from '../../data/DataHandler';
+import userComposer from '../../data/composers/UserComposer';
+import labelHandler from '../../labels/LabelHandler';
+import accessCentral from '../../AccessCentral';
+import walletComposer from '../../data/composers/WalletComposer';
+import viewSwitcher from '../../ViewSwitcher';
+import aliasComposer from '../../data/composers/AliasComposer';
 
-const List = require('./List');
-const BaseDialog = require('../views/dialogs/BaseDialog');
-
-const dataHandler = require('../../data/DataHandler');
-const userComposer = require('../../data/composers/UserComposer');
-const labelHandler = require('../../labels/LabelHandler');
-const accessCentral = require('../../AccessCentral');
-const walletComposer = require('../../data/composers/WalletComposer');
-const viewSwitcher = require('../../ViewSwitcher');
-const aliasComposer = require('../../data/composers/AliasComposer');
-
-class AdminUserList extends List {
+export default class AdminUserList extends List {
   constructor({
     effect,
     shouldToggle,
@@ -416,5 +415,3 @@ class AdminUserList extends List {
     });
   }
 }
-
-module.exports = AdminUserList;

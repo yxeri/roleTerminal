@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseView from './BaseView';
+
 import elementCreator from '../../ElementCreator';
-
-const BaseView = require('./BaseView');
-
-const userComposer = require('../../data/composers/UserComposer');
-const eventCentral = require('../../EventCentral');
-const teamComposer = require('../../data/composers/TeamComposer');
+import userComposer from '../../data/composers/UserComposer';
+import eventCentral from '../../EventCentral';
+import teamComposer from '../../data/composers/TeamComposer';
 
 class TeamInfo extends BaseView {
   constructor() {
@@ -91,4 +90,4 @@ class TeamInfo extends BaseView {
   }
 }
 
-module.exports = TeamInfo;
+export default TeamInfo;

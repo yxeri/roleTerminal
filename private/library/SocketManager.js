@@ -14,10 +14,70 @@
  limitations under the License.
  */
 
-const storageManager = require('./StorageManager');
-const eventCentral = require('./EventCentral');
-const textTools = require('./TextTools');
-const notificationManager = require('./NotificationManager');
+import storageManager from './StorageManager';
+import eventCentral from './EventCentral';
+import textTools from './TextTools';
+import notificationManager from './NotificationManager';
+
+export const EmitTypes = {
+  FORUM: 'forum',
+  FORUMTHREAD: 'forumThread',
+  FORUMPOST: 'forumPost',
+  FOLLOW: 'followRoom',
+  USER: 'user',
+  CHATMSG: 'chatMsg',
+  DEVICE: 'device',
+  DOCFILE: 'docFile',
+  WHISPER: 'whisper',
+  BROADCAST: 'broadcast',
+  GAMECODE: 'gameCode',
+  ALIAS: 'alias',
+  CREATEPOSITION: 'createPosition',
+  POSITION: 'position',
+  ROOM: 'room',
+  FOLLOWER: 'follower',
+  TEAM: 'team',
+  INVITATION: 'invitation',
+  TEAMMEMBER: 'team member',
+  LOGOUT: 'logout',
+  BAN: 'ban',
+  WALLET: 'wallet',
+  TRANSACTION: 'transaction',
+  TEAMSCORING: 'teamScoring',
+  DISCONNECT: 'disconnect',
+  RECONNECT: 'reconnect',
+  TERMINATE: 'terminate',
+  STARTUP: 'startup',
+  SENDMSG: 'sendMessage',
+  UPDATEPOSITION: 'updatePosition',
+  UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
+  UNLOCKDOCFILE: 'unlockDocFile',
+  GETROOMMSGS: 'getMessagesByRoom',
+  BANUSER: 'banUser',
+  UNBANUSER: 'unbanUser',
+  VERIFYUSER: 'verifyUser',
+  CHANGEPASSWORD: 'changePassword',
+  UPDATEUSER: 'updateUser',
+  UPDATEWALLET: 'updateWallet',
+  UNFOLLOW: 'unfollowRoom',
+  CREATETRANSACTION: 'createTransaction',
+  INVITETEAM: 'inviteToTeam',
+  LEAVETEAM: 'leaveTeam',
+  SIMPLEMSG: 'simpleMsg',
+  INVITEROOM: 'inviteToRoom',
+  DECLINEINVITE: 'decline',
+  ACCEPTTEAM: 'acceptTeamInvitation',
+  ACCEPTROOM: 'acceptRoomInvitation',
+  SENDROOMINVITE: 'sendInvitationToRoom',
+  GETUSERBYCODE: 'getUserByCode',
+  USEGAMECODE: 'useGameCode',
+  CONNECTUSER: 'connectUser',
+};
+export const ChangeTypes = {
+  UPDATE: 'update',
+  CREATE: 'create',
+  REMOVE: 'remove',
+};
 
 class SocketManager {
   constructor() {
@@ -29,68 +89,8 @@ class SocketManager {
     this.hasConnected = false;
     this.isOnline = false;
 
-    this.EmitTypes = {
-      FORUM: 'forum',
-      FORUMTHREAD: 'forumThread',
-      FORUMPOST: 'forumPost',
-      FOLLOW: 'followRoom',
-      USER: 'user',
-      CHATMSG: 'chatMsg',
-      DEVICE: 'device',
-      DOCFILE: 'docFile',
-      WHISPER: 'whisper',
-      BROADCAST: 'broadcast',
-      GAMECODE: 'gameCode',
-      ALIAS: 'alias',
-      CREATEPOSITION: 'createPosition',
-      POSITION: 'position',
-      ROOM: 'room',
-      FOLLOWER: 'follower',
-      TEAM: 'team',
-      INVITATION: 'invitation',
-      TEAMMEMBER: 'team member',
-      LOGOUT: 'logout',
-      BAN: 'ban',
-      WALLET: 'wallet',
-      TRANSACTION: 'transaction',
-      TEAMSCORING: 'teamScoring',
-      DISCONNECT: 'disconnect',
-      RECONNECT: 'reconnect',
-      TERMINATE: 'terminate',
-      STARTUP: 'startup',
-      SENDMSG: 'sendMessage',
-      UPDATEPOSITION: 'updatePosition',
-      UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
-      UNLOCKDOCFILE: 'unlockDocFile',
-      GETROOMMSGS: 'getMessagesByRoom',
-      BANUSER: 'banUser',
-      UNBANUSER: 'unbanUser',
-      VERIFYUSER: 'verifyUser',
-      CHANGEPASSWORD: 'changePassword',
-      UPDATEUSER: 'updateUser',
-      UPDATEWALLET: 'updateWallet',
-      UNFOLLOW: 'unfollowRoom',
-      CREATETRANSACTION: 'createTransaction',
-      INVITETEAM: 'inviteToTeam',
-      LEAVETEAM: 'leaveTeam',
-      SIMPLEMSG: 'simpleMsg',
-      INVITEROOM: 'inviteToRoom',
-      DECLINEINVITE: 'decline',
-      ACCEPTTEAM: 'acceptTeamInvitation',
-      ACCEPTROOM: 'acceptRoomInvitation',
-      SENDROOMINVITE: 'sendInvitationToRoom',
-      GETUSERBYCODE: 'getUserByCode',
-      USEGAMECODE: 'useGameCode',
-      CONNECTUSER: 'connectUser',
-    };
-    this.ChangeTypes = {
-      UPDATE: 'update',
-      CREATE: 'create',
-      REMOVE: 'remove',
-    };
-
     this.addEvents([{
-      event: this.EmitTypes.STARTUP,
+      event: EmitTypes.STARTUP,
       func: ({ data }) => {
         const {
           publicRoomId,
@@ -154,7 +154,7 @@ class SocketManager {
         }
       },
     }, {
-      event: this.EmitTypes.RECONNECT,
+      event: EmitTypes.RECONNECT,
       func: () => {
         this.updateId(() => {
           this.reconnectDone();
@@ -171,7 +171,7 @@ class SocketManager {
         });
       },
     }, {
-      event: this.EmitTypes.DISCONNECT,
+      event: EmitTypes.DISCONNECT,
       func: () => {
         this.isOnline = false;
 
@@ -181,7 +181,7 @@ class SocketManager {
         });
       },
     }, {
-      event: this.EmitTypes.BAN,
+      event: EmitTypes.BAN,
       func: () => {
         this.logout({ callback: () => {} });
       },
@@ -352,4 +352,4 @@ class SocketManager {
 
 const socketManager = new SocketManager();
 
-module.exports = socketManager;
+export default socketManager;

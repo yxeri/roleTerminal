@@ -11,10 +11,10 @@
  limitations under the License.
  */
 
-const MapCircle = require('./MapCircle');
-const MapObject = require('./MapObject');
-const userComposer = require('../../data/composers/UserComposer');
-const positionComposer = require('../../data/composers/PositionComposer');
+import MapCircle from './MapCircle';
+import MapObject from './MapObject';
+import userComposer from '../../data/composers/UserComposer';
+import positionComposer from '../../data/composers/PositionComposer';
 
 /**
  * Requires Google maps library
@@ -135,4 +135,4 @@ class MapMarker extends MapObject {
   }
 }
 
-module.exports = MapMarker;
+export default MapMarker;

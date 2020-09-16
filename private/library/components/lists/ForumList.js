@@ -14,13 +14,13 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
 
-class ForumList extends List {
+export default class ForumList extends List {
   constructor({
     effect,
     classes = [],
@@ -53,5 +53,3 @@ class ForumList extends List {
     });
   }
 }
-
-module.exports = ForumList;

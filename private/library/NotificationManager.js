@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-const storageManager = require('./StorageManager');
-const userComposer = require('./data/composers/UserComposer');
+import storageManager from './StorageManager';
+import userComposer from './data/composers/UserComposer';
 
 class NotificationManager {
   constructor() {
@@ -139,4 +139,4 @@ class NotificationManager {
 
 const notificationManager = new NotificationManager();
 
-module.exports = notificationManager;
+export default notificationManager;

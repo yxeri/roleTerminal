@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import VerifyDialog from './VerifyDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const VerifyDialog = require('./VerifyDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const messageComposer = require('../../../data/composers/MessageComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import messageComposer from '../../../data/composers/MessageComposer';
 
 const ids = {
   TITLE: 'title',
@@ -148,4 +147,4 @@ class MessageDialog extends BaseDialog {
   }
 }
 
-module.exports = MessageDialog;
+export default MessageDialog;

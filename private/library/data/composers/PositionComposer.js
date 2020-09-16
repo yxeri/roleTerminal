@@ -1,8 +1,8 @@
-const BaseComposer = require('./BaseComposer');
+import BaseComposer from './BaseComposer';
 
-const eventHandler = require('../../EventCentral');
-const dataHandler = require('../DataHandler');
-const storageManager = require('../../StorageManager');
+import eventHandler from '../../EventCentral';
+import dataHandler from '../DataHandler';
+import storageManager from '../../StorageManager';
 
 class PositionComposer extends BaseComposer {
   constructor() {
@@ -131,4 +131,4 @@ class PositionComposer extends BaseComposer {
 
 const positionComposer = new PositionComposer();
 
-module.exports = positionComposer;
+export default positionComposer;

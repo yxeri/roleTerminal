@@ -14,9 +14,9 @@
  limitations under the License.
  */
 
-const Tools = require('./Tools');
+import Tools from './Tools';
 
-class ViewTools {
+export default class ViewTools {
   /**
    * Is the element inside the view or close to the end of the views?
    * @static
@@ -62,5 +62,3 @@ class ViewTools {
     return window.innerWidth > window.innerHeight && window.innerWidth > 768;
   }
 }
-
-module.exports = ViewTools;

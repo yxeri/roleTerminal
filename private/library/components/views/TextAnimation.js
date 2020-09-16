@@ -16,7 +16,7 @@
 
 import elementCreator from '../../ElementCreator';
 
-const BaseView = require('./BaseView');
+import BaseView from './BaseView';
 
 class TextAnimation extends BaseView {
   constructor({
@@ -98,4 +98,4 @@ class TextAnimation extends BaseView {
   }
 }
 
-module.exports = TextAnimation;
+export default TextAnimation;

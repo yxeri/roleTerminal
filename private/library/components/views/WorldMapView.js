@@ -14,9 +14,9 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const PositionList = require('../lists/PositionList');
-const WorldMapPage = require('./pages/WorldMapPage');
+import ViewWrapper from '../ViewWrapper';
+import PositionList from '../lists/PositionList';
+import WorldMapPage from './pages/WorldMapPage';
 
 class WorldMapView extends ViewWrapper {
   constructor({
@@ -97,4 +97,4 @@ class WorldMapView extends ViewWrapper {
   }
 }
 
-module.exports = WorldMapView;
+export default WorldMapView;

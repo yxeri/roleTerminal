@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseView from '../BaseView';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-
-const keyHandler = require('../../../KeyHandler');
-const viewSwitcher = require('../../../ViewSwitcher');
-const voiceCommander = require('../../../VoiceCommander');
+import keyHandler from '../../../KeyHandler';
+import viewSwitcher from '../../../ViewSwitcher';
+import voiceCommander from '../../../VoiceCommander';
 
 const ids = {
   UPPERTEXT: 'upperText',
@@ -252,4 +251,4 @@ class BaseDialog extends BaseView {
   }
 }
 
-module.exports = BaseDialog;
+export default BaseDialog;

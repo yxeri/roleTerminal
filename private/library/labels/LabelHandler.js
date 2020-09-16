@@ -1,5 +1,5 @@
-const storageManager = require('../StorageManager');
-const labels = require('./labels');
+import storageManager from '../StorageManager';
+import labels from './labels';
 
 class LabelHandler {
   static getLabel({
@@ -41,4 +41,4 @@ class LabelHandler {
   }
 }
 
-module.exports = LabelHandler;
+export default LabelHandler;

@@ -1,9 +1,9 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const storageManager = require('../../StorageManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
+import storageManager from '../../StorageManager';
 
 class DocFileComposer extends DataComposer {
   constructor() {
@@ -92,4 +92,4 @@ class DocFileComposer extends DataComposer {
 
 const docFileComposer = new DocFileComposer();
 
-module.exports = docFileComposer;
+export default docFileComposer;

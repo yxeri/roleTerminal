@@ -1,9 +1,9 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const storageManager = require('../../StorageManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
+import storageManager from '../../StorageManager';
 
 class InvitationComposer extends DataComposer {
   constructor() {
@@ -117,4 +117,4 @@ class InvitationComposer extends DataComposer {
 
 const invitationComposer = new InvitationComposer();
 
-module.exports = invitationComposer;
+export default invitationComposer;

@@ -11,7 +11,7 @@
  limitations under the License.
  */
 
-const MapObject = require('./MapObject');
+import MapObject from './MapObject';
 
 /**
  * Requires Google maps library
@@ -98,4 +98,4 @@ class MapCircle extends MapObject {
   }
 }
 
-module.exports = MapCircle;
+export default MapCircle;

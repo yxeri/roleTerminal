@@ -14,26 +14,25 @@
  limitations under the License.
  */
 
+import BaseView from '../BaseView';
+import EditForumThreadDialog from '../dialogs/EditForumThreadDialog';
+import EditForumPostDialog from '../dialogs/EditForumPostDialog';
+import ForumThreadDialog from '../dialogs/ForumThreadDialog';
+import ForumPostDialog from '../dialogs/ForumPostDialog';
+import EditForumDialog from '../dialogs/EditForumDialog';
+import UserDialog from '../dialogs/UserDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-const EditForumThreadDialog = require('../dialogs/EditForumThreadDialog');
-const EditForumPostDialog = require('../dialogs/EditForumPostDialog');
-const ForumThreadDialog = require('../dialogs/ForumThreadDialog');
-const ForumPostDialog = require('../dialogs/ForumPostDialog');
-const EditForumDialog = require('../dialogs/EditForumDialog');
-const UserDialog = require('../dialogs/UserDialog');
-
-const eventCentral = require('../../../EventCentral');
-const socketManager = require('../../../SocketManager');
-const labelHandler = require('../../../labels/LabelHandler');
-const storageManager = require('../../../StorageManager');
-const textTools = require('../../../TextTools');
-const forumComposer = require('../../../data/composers/ForumComposer');
-const dataHandler = require('../../../data/DataHandler');
-const accessCentral = require('../../../AccessCentral');
-const userComposer = require('../../../data/composers/UserComposer');
-const viewSwitcher = require('../../../ViewSwitcher');
+import eventCentral from '../../../EventCentral';
+import socketManager from '../../../SocketManager';
+import labelHandler from '../../../labels/LabelHandler';
+import storageManager from '../../../StorageManager';
+import textTools from '../../../TextTools';
+import forumComposer from '../../../data/composers/ForumComposer';
+import dataHandler from '../../../data/DataHandler';
+import accessCentral from '../../../AccessCentral';
+import userComposer from '../../../data/composers/UserComposer';
+import viewSwitcher from '../../../ViewSwitcher';
 
 const cssClasses = {
   subPost: 'subPost',
@@ -888,4 +887,4 @@ class ForumView extends BaseView {
   }
 }
 
-module.exports = ForumView;
+export default ForumView;

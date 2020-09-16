@@ -56,4 +56,4 @@ class DeviceChecker {
 
 const deviceChecker = new DeviceChecker();
 
-module.exports = deviceChecker;
+export default deviceChecker;

@@ -925,4 +925,4 @@ Object.keys(override).forEach((baseKey) => {
   }
 });
 
-module.exports = labels;
+export default labels;

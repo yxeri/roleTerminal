@@ -14,13 +14,12 @@
  limitations under the License.
  */
 
+import BaseView from '../BaseView';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-
-const userComposer = require('../../../data/composers/UserComposer');
-const tools = require('../../../Tools');
-const labelHandler = require('../../../labels/LabelHandler');
+import userComposer from '../../../data/composers/UserComposer';
+import tools from '../../../Tools';
+import labelHandler from '../../../labels/LabelHandler';
 
 class PersonPage extends BaseView {
   constructor({
@@ -115,4 +114,4 @@ class PersonPage extends BaseView {
   }
 }
 
-module.exports = PersonPage;
+export default PersonPage;

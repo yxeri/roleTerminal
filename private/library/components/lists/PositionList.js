@@ -14,13 +14,13 @@
  limitations under the License.
  */
 
-const List = require('./List');
+import List from './List';
 
-const dataHandler = require('../../data/DataHandler');
-const eventCentral = require('../../EventCentral');
-const positionComposer = require('../../data/composers/PositionComposer');
+import dataHandler from '../../data/DataHandler';
+import eventCentral from '../../EventCentral';
+import positionComposer from '../../data/composers/PositionComposer';
 
-class PositionList extends List {
+export default class PositionList extends List {
   constructor(params) {
     const listParams = params;
     listParams.sorting = {
@@ -112,5 +112,3 @@ class PositionList extends List {
     });
   }
 }
-
-module.exports = PositionList;

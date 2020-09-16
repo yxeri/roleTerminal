@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-class Converters {
+export default class Converters {
   /**
    * Convert string representation to object
    * @static
@@ -83,5 +83,3 @@ class Converters {
     return JSON.stringify(value);
   }
 }
-
-module.exports = Converters;

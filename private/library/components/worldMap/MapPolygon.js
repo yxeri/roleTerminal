@@ -11,7 +11,7 @@
  limitations under the License.
  */
 
-const MapObject = require('./MapObject');
+import MapObject from './MapObject';
 
 /**
  * Requires Google maps library
@@ -138,4 +138,4 @@ class MapPolygon extends MapObject {
   }
 }
 
-module.exports = MapPolygon;
+export default MapPolygon;

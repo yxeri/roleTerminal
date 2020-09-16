@@ -15,8 +15,7 @@
  */
 
 import elementCreator from '../../ElementCreator';
-
-const accessCentral = require('../../AccessCentral');
+import accessCentral from '../../AccessCentral';
 
 const cssClasses = {
   focusElement: 'focusElement',
@@ -211,4 +210,4 @@ class BaseView {
   }
 }
 
-module.exports = BaseView;
+export default BaseView;

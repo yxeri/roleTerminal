@@ -14,22 +14,22 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const MessageList = require('../lists/MessageList');
-const RoomList = require('../lists/RoomList');
-const InputArea = require('./inputs/InputArea');
-const UserList = require('../lists/UserList');
-const WhisperRoomList = require('../lists/WhisperRoomList');
-const RoomFollowingList = require('../lists/RoomFollowingList');
-const RoomInfo = require('./RoomInfo');
+import ViewWrapper from '../ViewWrapper';
+import MessageList from '../lists/MessageList';
+import RoomList from '../lists/RoomList';
+import InputArea from './inputs/InputArea';
+import UserList from '../lists/UserList';
+import WhisperRoomList from '../lists/WhisperRoomList';
+import RoomFollowingList from '../lists/RoomFollowingList';
+import RoomInfo from './RoomInfo';
 
-const messageComposer = require('../../data/composers/MessageComposer');
-const accessCentral = require('../../AccessCentral');
-const roomComposer = require('../../data/composers/RoomComposer');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const textTools = require('../../TextTools');
-const viewSwitcher = require('../../ViewSwitcher');
+import messageComposer from '../../data/composers/MessageComposer';
+import accessCentral from '../../AccessCentral';
+import roomComposer from '../../data/composers/RoomComposer';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import textTools from '../../TextTools';
+import viewSwitcher from '../../ViewSwitcher';
 
 class ChatView extends ViewWrapper {
   constructor({
@@ -308,4 +308,4 @@ class ChatView extends ViewWrapper {
   }
 }
 
-module.exports = ChatView;
+export default ChatView;

@@ -14,12 +14,11 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const forumComposer = require('../../../data/composers/ForumComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import forumComposer from '../../../data/composers/ForumComposer';
 
 const ids = {
   TEXT: 'text',
@@ -124,4 +123,4 @@ class ForumPostDialog extends BaseDialog {
   }
 }
 
-module.exports = ForumPostDialog;
+export default ForumPostDialog;

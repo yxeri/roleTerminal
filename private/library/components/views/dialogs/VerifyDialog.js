@@ -14,11 +14,10 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
+import labelHandler from '../../../labels/LabelHandler';
 
 class VerifyDialog extends BaseDialog {
   constructor({
@@ -58,4 +57,4 @@ class VerifyDialog extends BaseDialog {
   }
 }
 
-module.exports = VerifyDialog;
+export default VerifyDialog;

@@ -1,9 +1,9 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const socketManager = require('../../SocketManager');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import socketManager from '../../SocketManager';
 
 class MessageComposer extends DataComposer {
   constructor() {
@@ -108,4 +108,4 @@ class MessageComposer extends DataComposer {
 
 const messageComposer = new MessageComposer();
 
-module.exports = messageComposer;
+export default messageComposer;

@@ -14,15 +14,14 @@
  limitations under the License.
  */
 
+import BaseDialog from './BaseDialog';
+import TemporaryDialog from './TemporaryDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseDialog = require('./BaseDialog');
-const TemporaryDialog = require('./TemporaryDialog');
-
-const labelHandler = require('../../../labels/LabelHandler');
-const gameCodeComposer = require('../../../data/composers/GameCodeComposer');
-const userComposer = require('../../../data/composers/UserComposer');
-const teamComposer = require('../../../data/composers/TeamComposer');
+import labelHandler from '../../../labels/LabelHandler';
+import gameCodeComposer from '../../../data/composers/GameCodeComposer';
+import userComposer from '../../../data/composers/UserComposer';
+import teamComposer from '../../../data/composers/TeamComposer';
 
 const ids = {
   TARGET: 'target',
@@ -118,4 +117,4 @@ class TargetDialog extends BaseDialog {
   }
 }
 
-module.exports = TargetDialog;
+export default TargetDialog;

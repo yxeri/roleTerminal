@@ -14,10 +14,10 @@
  limitations under the License.
  */
 
-const ViewWrapper = require('../ViewWrapper');
-const TerminalPage = require('./pages/TerminalPage');
+import ViewWrapper from '../ViewWrapper';
+import TerminalPage from './pages/TerminalPage';
 
-const eventCentral = require('../../EventCentral');
+import eventCentral from '../../EventCentral';
 
 class TerminalView extends ViewWrapper {
   constructor({
@@ -68,4 +68,4 @@ class TerminalView extends ViewWrapper {
   }
 }
 
-module.exports = TerminalView;
+export default TerminalView;

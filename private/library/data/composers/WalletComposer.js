@@ -1,10 +1,10 @@
-const DataComposer = require('./BaseComposer');
+import DataComposer from './BaseComposer';
 
-const dataHandler = require('../DataHandler');
-const eventCentral = require('../../EventCentral');
-const socketManager = require('../../SocketManager');
-const userComposer = require('./UserComposer');
-const teamComposer = require('./TeamComposer');
+import dataHandler from '../DataHandler';
+import eventCentral from '../../EventCentral';
+import socketManager from '../../SocketManager';
+import userComposer from './UserComposer';
+import teamComposer from './TeamComposer';
 
 class WalletComposer extends DataComposer {
   constructor() {
@@ -92,4 +92,4 @@ class WalletComposer extends DataComposer {
 
 const walletComposer = new WalletComposer();
 
-module.exports = walletComposer;
+export default walletComposer;

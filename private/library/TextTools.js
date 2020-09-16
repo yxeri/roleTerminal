@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-const storageManager = require('./StorageManager');
+import storageManager from './StorageManager';
 
 /**
  * Characters used when generating random text
@@ -45,7 +45,7 @@ const allowedRegex = /^[\w\d\såäöÅÄÖ-]+$/;
 const internationalRegex = /^[\w\d]+$/;
 const glitchSigns = ['░', '▒', '▓', '█'];
 
-class TextTools {
+export default class TextTools {
   /**
    * Beautifies number by adding a 0 before the number if it is lower than 10
    * @static
@@ -350,5 +350,3 @@ class TextTools {
     }
   }
 }
-
-module.exports = TextTools;

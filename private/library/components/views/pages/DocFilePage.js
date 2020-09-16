@@ -14,18 +14,17 @@
  limitations under the License.
  */
 
+import BaseView from '../BaseView';
+import LockedDocFileDialog from '../dialogs/LockedDocFileDialog';
+import EditDocFileDialog from '../dialogs/EditDocFileDialog';
+
 import elementCreator from '../../../ElementCreator';
-
-const BaseView = require('../BaseView');
-const LockedDocFileDialog = require('../dialogs/LockedDocFileDialog');
-const EditDocFileDialog = require('../dialogs/EditDocFileDialog');
-
-const eventCentral = require('../../../EventCentral');
-const userComposer = require('../../../data/composers/UserComposer');
-const accessCentral = require('../../../AccessCentral');
-const labelHandler = require('../../../labels/LabelHandler');
-const socketManager = require('../../../SocketManager');
-const viewSwitcher = require('../../../ViewSwitcher');
+import eventCentral from '../../../EventCentral';
+import userComposer from '../../../data/composers/UserComposer';
+import accessCentral from '../../../AccessCentral';
+import labelHandler from '../../../labels/LabelHandler';
+import socketManager from '../../../SocketManager';
+import viewSwitcher from '../../../ViewSwitcher';
 
 /**
  * Create fragment with admin buttons for the document.
@@ -223,4 +222,4 @@ class DocFilePage extends BaseView {
   }
 }
 
-module.exports = DocFilePage;
+export default DocFilePage;

@@ -14,16 +14,15 @@
  limitations under the License.
  */
 
+import BaseView from './BaseView';
+import EditRoomDialog from './dialogs/EditRoomDialog';
+
 import elementCreator from '../../ElementCreator';
-
-const BaseView = require('./BaseView');
-const EditRoomDialog = require('./dialogs/EditRoomDialog');
-
-const roomComposer = require('../../data/composers/RoomComposer');
-const userComposer = require('../../data/composers/UserComposer');
-const eventCentral = require('../../EventCentral');
-const storageManager = require('../../StorageManager');
-const accessCentral = require('../../AccessCentral');
+import roomComposer from '../../data/composers/RoomComposer';
+import userComposer from '../../data/composers/UserComposer';
+import eventCentral from '../../EventCentral';
+import storageManager from '../../StorageManager';
+import accessCentral from '../../AccessCentral';
 
 class RoomInfo extends BaseView {
   constructor({
@@ -128,4 +127,4 @@ class RoomInfo extends BaseView {
   }
 }
 
-module.exports = RoomInfo;
+export default RoomInfo;

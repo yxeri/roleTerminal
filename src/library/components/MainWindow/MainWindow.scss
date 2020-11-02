@@ -1,0 +1,13 @@
+@import "../../../common";
+
+#main {
+  position: relative; /* Needed for react-draggable. It will assume main is the parent */
+  background-color: $background-color;
+  height: calc(100% - 2.2em);
+  width: 100%;
+}
+
+button {
+  border: $border;
+  border-radius: $border-radius;
+}

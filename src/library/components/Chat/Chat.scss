@@ -1,0 +1,12 @@
+@import "../../../common";
+
+.messages {
+  display: flex;
+  flex-direction: column;
+
+  .inputArea {
+    .buttonBox {
+      height: 2em;
+    }
+  }
+}

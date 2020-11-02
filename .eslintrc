@@ -1,0 +1,13 @@
+{
+  "extends": ["airbnb", "airbnb/hooks"],
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "import/prefer-default-export": 0,
+    "react-hooks/exhaustive-deps": 0,
+    "max-len": 0,
+    "jsx-a11y/no-noninteractive-element-to-interactive-role": 0,
+    "class-methods-use-this": 0
+  }
+}

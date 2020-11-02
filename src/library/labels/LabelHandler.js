@@ -1,4 +1,4 @@
-import storageManager from '../react/StorageManager';
+import storageManager from '../StorageManager';
 import labels from './labels';
 
 class LabelHandler {

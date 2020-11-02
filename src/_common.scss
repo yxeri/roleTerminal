@@ -1,0 +1,16 @@
+$color: #ff00e9;
+$second-color: #00f6ff;
+$border: 1px solid $color;
+$background-color: #13002d;
+$second-background-color: #25004b;
+$light-background-color: #370087;
+$margin: .2em;
+$padding: $margin;
+$min-width: 320px;
+$min-width-calc: calc(#{$min-width} - #{$margin * 2});
+$shadow: 0 0 8px 0 rgba(255, 0, 241, 0.54);
+$dark-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.71);
+$text-shadow: 1px 1px 4px rgba(255, 0, 241, 0.54);
+$border-radius: 3px;
+$menu-bar-height: calc(1em + #{$margin * 4});
+$warning-background-color: #b40000;

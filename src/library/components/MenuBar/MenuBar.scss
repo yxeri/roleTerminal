@@ -1,0 +1,30 @@
+@import "../../../common";
+
+#menuBar {
+  display: flex;
+  flex-direction: row;
+  padding-top: #{$padding / 2};
+  padding-left: $padding;
+  padding-right: $padding;
+  color: $second-color;
+  min-height: $menu-bar-height;
+  border-bottom: $border;
+  background-color: $light-background-color;
+  box-sizing: border-box;
+  margin-bottom: $margin;
+  align-items: baseline;
+  box-shadow: $shadow;
+  z-index: 10;
+
+  .list {
+    z-index: 11;
+  }
+
+  > * {
+    margin-right: $margin * 2;
+  }
+}
+
+.warning {
+  background-color: $warning-background-color !important;
+}

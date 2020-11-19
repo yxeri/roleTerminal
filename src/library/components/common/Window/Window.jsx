@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
 import { Rnd } from 'react-rnd';
+import {
+  arrayOf,
+  func,
+  string,
+  node,
+  number,
+} from 'prop-types';
 
 import './Window.scss';
 import { useSelector } from 'react-redux';
 import { getRoom } from '../../../redux/selectors/rooms';
+import TopBar from './TopBar/TopBar';
 
-const Window = ({
+export default function Window({
   onClick,
   children,
   order,
+  menu,
   title = 'app',
   classNames = [],
   done = () => {},
-}) => {
+}) {
   const room = useSelector((state) => getRoom)
   const [size, setSize] = useState({ width: 320, height: 220 });
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -54,25 +63,44 @@ const Window = ({
       onResizeStop={() => setFull(false)}
     >
       <div
+        role="complementary"
         onClick={onClick}
         className={`window ${classNames.join(' ')}`}
       >
-        <div
+        <TopBar
+          done={done}
+          title={title}
           onDoubleClick={() => setFull(!full)}
-          className="topBar"
-        >
-          <span>{title}</span>
-          <div className="buttons">
-            <button type="button" onClick={() => setFull(!full)}>[]</button>
-            <button type="button" onClick={done}>X</button>
-          </div>
-        </div>
+        />
         <div className="windowBox">
+          {
+            menu
+            && (
+              <div className="menu">
+                {menu}
+              </div>
+            )
+          }
           {children}
         </div>
       </div>
     </Rnd>
   );
+}
+
+Window.propTypes = {
+  order: number.isRequired,
+  onClick: func.isRequired,
+  children: node.isRequired,
+  menu: node,
+  title: string,
+  classNames: arrayOf(string),
+  done: func,
 };
 
-export default Window;
+Window.defaultProps = {
+  done: () => {},
+  classNames: [],
+  title: 'app',
+  menu: undefined,
+};

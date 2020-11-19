@@ -1,6 +1,6 @@
 import React from 'react';
 import { func, number } from 'prop-types';
-import Window from '../common/views/Window';
+import Window from '../common/Window/Window';
 import MapView from './views/MapView';
 import Positions from './views/Positions';
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { func } from 'prop-types';
-import Dialog from './Dialog';
+import Dialog from './Dialog/Dialog';
 import { emitSocketEvent, login } from '../../../SocketManager';
 import Select from '../sub-components/Select';
 import Input from '../sub-components/Input';
 import Textarea from '../sub-components/Textarea';
 import { getRequireOffName } from '../../../redux/selectors/config';
+import Button from '../sub-components/Button/Button';
 
 export default function RegisterDialog({ done }) {
   const [offName, setOffName] = useState();
@@ -18,6 +19,34 @@ export default function RegisterDialog({ done }) {
   const [image, setImage] = useState();
   const [error, setError] = useState();
   const requireOffName = useSelector(getRequireOffName);
+
+  const onSubmit = () => {
+    if ((requireOffName && !offName) || !username || !password || !repeatPassword || !pronouns) {
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      return;
+    }
+
+    emitSocketEvent('register', params, ({ error: registerError }) => {
+      if (registerError) {
+        setError(registerError);
+
+        return;
+      }
+
+      // TODO If no auto-login, Notification: User registered
+
+      login(username, password, ({ error: loginError }) => {
+        if (loginError) {
+          setError(loginError);
+        }
+
+        // TODO Notification: You are logged in as user
+      });
+    });
+  };
 
   const params = {
     image,
@@ -38,13 +67,12 @@ export default function RegisterDialog({ done }) {
     >
       {
         requireOffName
-          ? (
+          && (
             <Input
               placeholder="Out-of-game name"
               onChange={setOffName}
             />
           )
-          : <></>
       }
       <Input
         placeholder="Username"
@@ -75,38 +103,12 @@ export default function RegisterDialog({ done }) {
         placeholder="Description"
         onChange={setDescription}
       />
-      <button
+      <Button
         type="submit"
-        onClick={() => {
-          if ((requireOffName && !offName) || !username || !password || !repeatPassword || !pronouns) {
-            return;
-          }
-
-          if (password !== repeatPassword) {
-            return;
-          }
-
-          emitSocketEvent('register', params, ({ error: registerError }) => {
-            if (registerError) {
-              setError(registerError);
-
-              return;
-            }
-
-            // TODO If no auto-login, Notification: User registered
-
-            login(username, password, ({ error: loginError }) => {
-              if (loginError) {
-                setError(loginError);
-              }
-
-              // TODO Notification: You are logged in as user
-            });
-          });
-        }}
+        onClick={onSubmit}
       >
         Register
-      </button>
+      </Button>
     </Dialog>
   );
 }

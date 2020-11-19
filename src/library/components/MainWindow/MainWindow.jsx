@@ -23,12 +23,14 @@ export default function MainWindow() {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const content = [];
   const onClick = (type) => {
-    const set = new Set(order);
+    if ([...order.values()].indexOf(type) !== 0) {
+      const set = new Set(order);
 
-    set.delete(type);
-    set.add(type);
+      set.delete(type);
+      set.add(type);
 
-    setOrder(set);
+      setOrder(set);
+    }
   };
 
   if (accessLevel >= AccessLevels.STANDARD) {

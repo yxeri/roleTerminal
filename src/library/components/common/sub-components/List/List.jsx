@@ -3,9 +3,9 @@ import {
   element,
   string,
   arrayOf,
-  bool,
   shape,
   func,
+  bool,
 } from 'prop-types';
 
 import './List.scss';
@@ -13,14 +13,32 @@ import './List.scss';
 export default function List({
   children,
   title,
+  dropdown = false,
   items = [],
   classNames = [],
-  large = false,
-  hideOnClick = true,
 }) {
   const [hidden, setHidden] = useState(typeof title !== 'undefined');
   const content = [];
+  const listClasses = [];
   const classes = classNames;
+
+  const itemMapper = () => items.map((item) => (
+    <li
+      role="button"
+      tabIndex={0}
+      key={item.key}
+      onKeyPress={() => {}}
+      onClick={() => {
+        if (dropdown) {
+          setHidden(true);
+        }
+
+        item.onClick();
+      }}
+    >
+      {item.value}
+    </li>
+  ));
 
   if (title) {
     content.push(
@@ -29,11 +47,7 @@ export default function List({
         tabIndex={0}
         key="listHeader"
         className="toggle clickable"
-        onClick={() => {
-          if (title) {
-            setHidden(!hidden);
-          }
-        }}
+        onClick={() => setHidden(!hidden)}
       >
         {title}
       </header>,
@@ -42,55 +56,28 @@ export default function List({
 
   classes.push('list');
 
-  if (large) {
-    classes.push('largeList');
-  }
-
   if (!hidden) {
     classes.push('expanded');
+  } else {
+    listClasses.push('hide');
+  }
+
+  if (dropdown) {
+    listClasses.push('dropdown');
   }
 
   content.push(
     <ul
       key="listElem"
-      className={hidden ? 'hide' : ''}
+      className={`${listClasses.join(' ')}`}
+      onClick={() => {
+        if (dropdown) {
+          setHidden(true);
+        }
+      }}
     >
-      {
-        children
-          ? children.map((child) => {
-            const modifiedChild = child;
-
-            modifiedChild.onClick = () => {
-              if (hideOnClick) {
-                setHidden(true);
-              }
-
-              child.onClick();
-            };
-
-            return modifiedChild;
-          })
-          : <></>
-      }
-      {
-        items.map((item) => (
-          <li
-            role="button"
-            tabIndex={0}
-            key={item.key}
-            onKeyPress={() => {}}
-            onClick={() => {
-              if (hideOnClick) {
-                setHidden(true);
-              }
-
-              item.onClick();
-            }}
-          >
-            {item.value}
-          </li>
-        ))
-      }
+      {children}
+      {itemMapper()}
     </ul>,
   );
 
@@ -113,6 +100,7 @@ List.propTypes = {
     onClick: func,
   })),
   classNames: arrayOf(string),
+  dropdown: bool,
 };
 
 List.defaultProps = {
@@ -120,4 +108,5 @@ List.defaultProps = {
   children: undefined,
   title: undefined,
   items: [],
+  dropdown: false,
 };

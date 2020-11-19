@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number, bool } from 'prop-types';
 
-import ImageUpload from '../../common/ImageUpload/ImageUpload';
+import ImageUpload from '../../../common/ImageUpload/ImageUpload';
 
-import keyHandler from '../../../KeyHandler';
-import { AccessLevels } from '../../../AccessCentral';
-import { isOnline } from '../../../redux/selectors/online';
-import { getCurrentAccessLevel } from '../../../redux/selectors/users';
+import keyHandler from '../../../../KeyHandler';
+import { AccessLevels } from '../../../../AccessCentral';
+import { isOnline } from '../../../../redux/selectors/online';
+import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
 
 export default function InputArea({
   triggerCallback,
@@ -48,13 +48,12 @@ export default function InputArea({
       >
         {
           allowImages
-            ? (
+            && (
               <ImageUpload
                 previewImage={image}
                 onChange={setImage}
               />
             )
-            : <></>
         }
       </div>,
     );

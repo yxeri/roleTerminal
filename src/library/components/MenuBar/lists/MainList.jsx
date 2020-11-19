@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import List from '../../common/sub-components/List';
+import List from '../../common/sub-components/List/List';
 import { AccessLevels } from '../../../AccessCentral';
 import LoginDialog from '../../common/dialogs/LoginDialog';
 import RegisterDialog from '../../common/dialogs/RegisterDialog';
@@ -46,6 +46,7 @@ export default function MainList() {
   return (
     <>
       <List
+        dropdown
         title="Main"
         items={items}
       />

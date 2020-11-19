@@ -1,7 +1,7 @@
 import React from 'react';
 import { arrayOf, string } from 'prop-types';
 import { useSelector } from 'react-redux';
-import List from '../../common/sub-components/List';
+import List from '../../common/sub-components/List/List';
 import { getTransactionsByWallets } from '../../../redux/selectors/transactions';
 import { getIdentitiesByIds } from '../../../redux/selectors/users';
 import { getWalletByIds } from '../../../redux/selectors/wallets';

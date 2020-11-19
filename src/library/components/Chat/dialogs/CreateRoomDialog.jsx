@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { func } from 'prop-types';
-import Dialog from '../../common/dialogs/Dialog';
+import Dialog from '../../common/dialogs/Dialog/Dialog';
 import Input from '../../common/sub-components/Input';
 import { emitSocketEvent } from '../../../SocketManager';
 
@@ -10,6 +10,34 @@ export default function CreateRoomDialog({ done }) {
   const [repeatPassword, setRepeatPassword] = useState();
   const [topic, setTopic] = useState();
   const [error, setError] = useState();
+
+  const onSubmit = () => {
+    if (!roomName) {
+      return;
+    }
+
+    if (password && password !== repeatPassword) {
+      return;
+    }
+
+    const room = {
+      roomName,
+      password,
+      topic,
+    };
+
+    emitSocketEvent('createRoom', { room }, ({ error: roomError }) => {
+      if (roomError) {
+        setError(roomError);
+
+        return;
+      }
+
+      // TODO Notification: Room created
+
+      done();
+    });
+  };
 
   return (
     <Dialog
@@ -38,33 +66,7 @@ export default function CreateRoomDialog({ done }) {
       />
       <button
         type="submit"
-        onClick={() => {
-          if (!roomName) {
-            return;
-          }
-
-          if (password && password !== repeatPassword) {
-            return;
-          }
-
-          const room = {
-            roomName,
-            password,
-            topic,
-          };
-
-          emitSocketEvent('createRoom', { room }, ({ error: roomError }) => {
-            if (roomError) {
-              setError(roomError);
-
-              return;
-            }
-
-            // TODO Notification: Room created
-
-            done();
-          });
-        }}
+        onClick={onSubmit}
       >
         Create
       </button>

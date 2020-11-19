@@ -2,7 +2,7 @@ import React from 'react';
 import { func, number } from 'prop-types';
 import { useSelector } from 'react-redux';
 
-import Window from '../common/views/Window';
+import Window from '../common/Window/Window';
 import TransactionList from './lists/TransactionList';
 import { getCurrentUser } from '../../redux/selectors/users';
 import { getWalletByOwners } from '../../redux/selectors/wallets';

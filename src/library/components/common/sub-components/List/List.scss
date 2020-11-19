@@ -1,0 +1,45 @@
+@import "../../../../../common";
+
+.list {
+  header {
+    user-select: none;
+    padding: $padding;
+    border: $border;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    background-color: $light-background-color;
+  }
+}
+
+.dropdown {
+  box-shadow: $shadow;
+  background-color: $light-background-color;
+  position: absolute;
+  list-style: none;
+  max-width: $min-width-calc;
+  padding: $padding;
+  border: $border;
+  border-radius: $border-radius;
+  border-top-left-radius: 0;
+  user-select: none;
+
+  li {
+    margin-bottom: $margin;
+  }
+
+  li:first-child {
+    margin-top: $margin;
+  }
+}
+
+.expanded {
+  header {
+    border-bottom: none;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .dropdown {
+    border-top-left-radius: 0;
+  }
+}

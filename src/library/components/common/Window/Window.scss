@@ -18,43 +18,15 @@
   text-shadow: $text-shadow;
   border-radius: $border-radius;
 
-  .topBar {
-    border-bottom: $border;
-    background-color: $color;
-    color: $background-color;
-    font-weight: bold;
-    text-transform: uppercase;
-    padding: $padding / 2;
-    cursor: move;
-    height: 1em;
-    text-shadow: $text-shadow;
-
-    .buttons {
-      float: right;
-    }
-
-    button {
-      background-color: $color;
-      border: none;
-      box-shadow: none;
-    }
-  }
-
   .windowBox {
     display: flex;
     flex-direction: column;
     padding: $padding;
     height: calc(100% - 1em - #{$margin * 4});
     width: calc(100% - #{$margin * 2});
-    overflow-y: auto;
+    overflow: hidden;
 
-    > * {
-      height: 100%;
-      flex-grow: 10;
-    }
-
-    .lists {
-      height: 1em;
+    .menu {
       display: flex;
       flex-direction: row;
       margin-bottom: $margin;
@@ -71,7 +43,7 @@
   .windowBox {
     flex-direction: row;
 
-    .lists {
+    .menu {
       flex-direction: column;
       height: 100%;
       margin-right: $margin;

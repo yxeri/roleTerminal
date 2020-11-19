@@ -2,8 +2,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
 import { AccessLevels } from '../../../AccessCentral';
-import InputArea from '../sub-components/InputArea';
-import MessagesList from '../lists/MessageList';
+import InputArea from '../sub-components/InputArea/InputArea';
+import MessagesList from '../lists/MessageList/MessageList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 
 export default function Messages({ roomId }) {

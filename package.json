@@ -22,7 +22,7 @@
     "rolehaven": "git://github.com/yxeri/roleHaven.git#develop"
   },
   "scripts": {
-    "dev": "NODE_ENV=development CHOKIDAR_USEPOLLING=true node app & react-scripts start",
+    "dev": "NODE_ENV=development MODE=dev JSONKEY=dev USERVERIFY=false CHOKIDAR_USEPOLLING=true node app & react-scripts start",
     "start": "node app",
     "build": "react-scripts build",
     "test": "eslint ./ && react-scripts test",

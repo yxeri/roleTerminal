@@ -1,0 +1,23 @@
+@import "../../../../../common";
+
+.topBar {
+  border-bottom: $border;
+  background-color: $color;
+  color: $background-color;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: $padding / 2;
+  cursor: move;
+  height: 1em;
+  text-shadow: $text-shadow;
+
+  .buttons {
+    float: right;
+  }
+
+  button {
+    background-color: $color;
+    border: none;
+    box-shadow: none;
+  }
+}

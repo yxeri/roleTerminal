@@ -6,7 +6,7 @@ import {
   string,
   shape,
 } from 'prop-types';
-import Window from '../views/Window';
+import Window from '../../Window/Window';
 
 import './Dialog.scss';
 
@@ -27,13 +27,11 @@ export default function Dialog({
       <div className="inputs">
         {
           error
-            ? <div>{error.type}</div>
-            : <></>
+            && <div>{error.type}</div>
         }
         {
           text
-            ? <div>{text}</div>
-            : <></>
+            && <div>{text}</div>
         }
         {children}
       </div>

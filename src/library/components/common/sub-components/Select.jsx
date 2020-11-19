@@ -17,7 +17,7 @@ export default function Select({
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
-  function checkEmpty(event) {
+  const checkEmpty = (event) => {
     const selectedOptions = Array
       .from(event.target.selectedOptions)
       .filter((option) => option.value !== '');
@@ -27,18 +27,20 @@ export default function Select({
     }
   }
 
+  const onChangeFunc = (event) => {
+    checkEmpty(event);
+    onChange(Array
+      .from(event.target.selectedOptions)
+      .map((option) => option.value)
+      .filter((value) => value !== ''));
+  };
+
   return (
     <select
       className={isEmpty ? 'empty' : ''}
       onFocus={() => setHasFocus(true)}
       onBlur={checkEmpty}
-      onChange={(event) => {
-        checkEmpty(event);
-        onChange(Array
-          .from(event.target.selectedOptions)
-          .map((option) => option.value)
-          .filter((value) => value !== ''));
-      }}
+      onChange={onChangeFunc}
       placeholder={placeholder}
       multiple={multiple}
     >

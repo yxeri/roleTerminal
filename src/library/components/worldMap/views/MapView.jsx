@@ -1,9 +1,10 @@
-import React, { createRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import './MapView.scss';
 
 const MapView = () => {
-  const mapRef = createRef();
+  const [map, setMap] = useState();
+  const mapRef = useRef();
 
   function createMap() {
     if (typeof window.google === 'undefined' || typeof window.MarkerClusterer === 'undefined' || typeof window.MapLabel === 'undefined') {
@@ -69,6 +70,8 @@ const MapView = () => {
         ],
       }],
     });
+
+    setMap(worldMap);
   }
 
   useEffect(() => {

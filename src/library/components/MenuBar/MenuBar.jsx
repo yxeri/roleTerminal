@@ -9,10 +9,15 @@ import './MenuBar.scss';
 const MenuBar = () => {
   const online = useSelector(isOnline);
   const content = [];
+  const classes = [];
+
+  if (!online) {
+    classes.push('warning');
+  }
 
   return (
     <div
-      className={`${!online ? 'warning' : ''}`}
+      className={`${classes.join(' ')}`}
       id="menuBar"
     >
       <MainList />

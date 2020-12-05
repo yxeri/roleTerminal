@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
   arrayOf,
@@ -9,8 +9,6 @@ import {
 } from 'prop-types';
 
 import './Window.scss';
-import { useSelector } from 'react-redux';
-import { getRoom } from '../../../redux/selectors/rooms';
 import TopBar from './TopBar/TopBar';
 
 export default function Window({
@@ -22,29 +20,29 @@ export default function Window({
   classNames = [],
   done = () => {},
 }) {
-  const room = useSelector((state) => getRoom)
-  const [size, setSize] = useState({ width: 320, height: 220 });
+  const defaultSize = { width: 320, height: 220 };
+  const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
-  const [zIndex, setZIndex] = useState(order);
-  const [full, setFull] = useState(false);
+  const rndClasses = ['rnd'];
+  const windowClasses = ['window'].concat(classNames);
 
-  const { width, height } = size;
-  const { x, y } = coordinates;
+  const toggleFullscreen = () => {
+    if (size.width === '100%' && size.height === '100%') {
+      setSize(defaultSize);
+    } else {
+      setCoordinates({ x: 0, y: 0 });
+      setSize({ width: '100%', height: '100%' });
+    }
+  };
 
   return (
     <Rnd
-      className={`rnd ${full ? 'full' : ''}`}
+      className={`${rndClasses.join(' ')}`}
       style={{ zIndex: order }}
-      default={{
-        x,
-        y,
-        width,
-        height,
-      }}
-      minWidth={320}
-      minHeight={210}
-      resizeGrid={[20, 20]}
-      dragGrid={[20, 20]}
+      position={coordinates}
+      size={size}
+      minWidth={640}
+      minHeight={480}
       bounds="parent"
       cancel="windowBox"
       dragHandleClassName="topBar"
@@ -52,25 +50,56 @@ export default function Window({
         top: false,
         right: true,
         bottom: true,
-        left: false,
+        left: true,
         topRight: false,
         bottomRight: true,
-        bottomLeft: false,
+        bottomLeft: true,
         topLeft: false,
       }}
       onDragStart={onClick}
+      onDragStop={(event, { node: element, x: newX, y: newY }) => {
+        if (newX === coordinates.x && newY === coordinates.y) {
+          return;
+        }
+
+        if (newX === 0 && newY === 0 && size.height !== '100%') { // Upper left
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: 0, y: 0 });
+        } else if (newX === 0 && (newY + element.offsetHeight + 35) >= window.innerHeight && size.height !== '100%') { // Lower left
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: 0, y: ((window.innerHeight - 36) / 2) });
+        } else if (newY === 0 && newX + element.offsetWidth >= window.innerWidth && size.height !== '100%') { // Upper right
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: window.innerWidth / 2, y: 0 });
+        } else if (newX + element.offsetWidth >= window.innerWidth && newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Lower right
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
+        } else if (newX === 0 && newY > 0) { // Left
+          setSize({ width: '50%', height: '100%' });
+          setCoordinates({ x: 0, y: 0 });
+        } else if (newX + element.offsetWidth >= window.innerWidth && newY > 0) { // Right
+          setSize({ width: '50%', height: '100%' });
+          setCoordinates({ x: window.innerWidth / 2, y: 0 });
+        } else {
+          setCoordinates({ x: newX, y: newY });
+        }
+      }}
       onResize={onClick}
-      onResizeStop={() => setFull(false)}
+      onResizeStop={(event, direction, element) => {
+        setSize({ width: element.offsetWidth, height: element.offsetHeight });
+      }}
     >
       <div
         role="complementary"
         onClick={onClick}
-        className={`window ${classNames.join(' ')}`}
+        className={`${windowClasses.join(' ')}`}
       >
         <TopBar
           done={done}
           title={title}
-          onDoubleClick={() => setFull(!full)}
+          onDoubleClick={() => {
+            toggleFullscreen();
+          }}
         />
         <div className="windowBox">
           {

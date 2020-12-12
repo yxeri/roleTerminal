@@ -24,7 +24,8 @@
     padding: $padding;
     height: calc(100% - 1em - #{$margin * 4});
     width: calc(100% - #{$margin * 2});
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     .menu {
       display: flex;

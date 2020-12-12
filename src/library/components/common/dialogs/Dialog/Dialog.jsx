@@ -23,6 +23,7 @@ export default function Dialog({
       order={10}
       title={title}
       classNames={['dialog']}
+      onClick={() => {}}
     >
       <div className="inputs">
         {

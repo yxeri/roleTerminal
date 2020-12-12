@@ -64,12 +64,14 @@ export default function CreateRoomDialog({ done }) {
         type="password"
         placeholder="Repeat password"
       />
-      <button
-        type="submit"
-        onClick={onSubmit}
-      >
-        Create
-      </button>
+      <div className="buttons">
+        <button
+          type="submit"
+          onClick={onSubmit}
+        >
+          Create
+        </button>
+      </div>
     </Dialog>
   );
 }

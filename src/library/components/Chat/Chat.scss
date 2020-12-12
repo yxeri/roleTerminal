@@ -1,10 +1,11 @@
 @import "../../../common";
 
 .messages {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto fit-content(0);
   width: 100%;
 }
 
 .menu {
+
 }

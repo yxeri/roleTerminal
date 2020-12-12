@@ -12,9 +12,12 @@ export default function MessageList({ roomId }) {
   const messages = useSelector((state) => getMessages(state, { roomId }));
 
   const messageMapper = () => messages.map((message) => (
-    <ListItem key={message.objectId}>
+    <ListItem
+      key={message.objectId}
+    >
       <MessageInfo message={message} />
-      {message.text.map((line) => <p>{line}</p>)}
+      {/* eslint-disable-next-line react/no-array-index-key */}
+      {message.text.map((line, index) => <p key={index}>{line}</p>)}
     </ListItem>
   ));
 

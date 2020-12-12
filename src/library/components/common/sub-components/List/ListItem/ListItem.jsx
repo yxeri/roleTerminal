@@ -1,11 +1,12 @@
 import React from 'react';
-import { node } from 'prop-types';
+import { func, node } from 'prop-types';
 
 export default function ListItem({
   children,
+  onClick = () => {},
 }) {
   return (
-    <li>
+    <li onClick={onClick}>
       {children}
     </li>
   );
@@ -13,4 +14,9 @@ export default function ListItem({
 
 ListItem.propTypes = {
   children: node.isRequired,
+  onClick: func,
+};
+
+ListItem.defaultProps = {
+  onClick: () => {},
 };

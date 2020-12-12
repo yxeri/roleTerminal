@@ -1,8 +1,8 @@
 import { TOKEN } from '../actionTypes';
 
-const initialState = undefined;
+const initialState = null;
 
-export default function userIdReducer(state = initialState, action) {
+export default function tokenReducer(state = initialState, action) {
   if (action.type === TOKEN) {
     const { payload } = action;
     const { reset, token } = payload;

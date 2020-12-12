@@ -1,33 +1,26 @@
 import React from 'react';
-import { arrayOf, string, shape } from 'prop-types';
+import { node } from 'prop-types';
 import List from '../sub-components/List/List';
+import ListItem from '../sub-components/List/ListItem/ListItem';
 
-export default function FileMenu({ items }) {
-  const allItems = items;
-
-  allItems.push({
-    key: 'quit',
-    value: 'Quit',
-    onClick: () => { console.log('quit'); },
-  });
-
+export default function FileMenu({ children }) {
   return (
     <List
       dropdown
       classNames={['fileMenu']}
       title="File"
-      items={allItems}
-    />
+    >
+      {children}
+      <ListItem
+        key="quit"
+        onClick={() => { console.log('quit'); }}
+      >
+        Quit
+      </ListItem>
+    </List>
   );
 }
 
 FileMenu.propTypes = {
-  items: arrayOf(shape({
-    key: string,
-    value: string,
-  })),
-};
-
-FileMenu.defaultProps = {
-  items: undefined,
+  children: node.isRequired,
 };

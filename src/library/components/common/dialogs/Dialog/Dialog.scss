@@ -24,5 +24,10 @@
       color: $second-color;
       border: $border;
     }
+
+    .buttons {
+      position: sticky;
+      bottom: 0;
+    }
   }
 }

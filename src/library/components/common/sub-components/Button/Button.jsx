@@ -1,8 +1,7 @@
 import React from 'react';
 import {
   func,
-  element,
-  arrayOf,
+  node,
   oneOf,
 } from 'prop-types';
 
@@ -25,11 +24,10 @@ export default function Button({
 
 Button.propTypes = {
   onClick: func.isRequired,
-  children: arrayOf(element),
+  children: node.isRequired,
   type: oneOf(['button', 'submit']),
 };
 
 Button.defaultProps = {
-  children: undefined,
   type: 'button',
 };

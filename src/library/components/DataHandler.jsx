@@ -17,19 +17,13 @@ import {
   USERS,
   WALLETS,
   DEVICES,
-  CONFIG,
-  ONLINE,
 } from '../redux/actionTypes';
 import {
   emitSocketEvent,
-  addSocketListener,
   GetEvents,
-  EmitTypes,
-  reconnect,
 } from '../SocketManager';
 import { ChangeTypes } from '../redux/reducers/root';
 import { getUserId } from '../redux/selectors/userId';
-import { Status } from '../redux/reducers/online';
 
 export default function DataHandler({ children }) {
   const dispatch = useDispatch();
@@ -52,25 +46,23 @@ export default function DataHandler({ children }) {
       { type: TRANSACTIONS, event: GetEvents.TRANSACTIONS },
       { type: WALLETS, event: GetEvents.WALLETS },
       { type: DEVICES, event: GetEvents.DEVICES },
-    ].forEach((getter) => {
+    ].forEach(async (getter) => {
       const { event, type } = getter;
 
-      emitSocketEvent(event, {}, ({ error, data }) => {
-        if (error) {
+      emitSocketEvent(event, {})
+        .then((result) => {
+          dispatch({
+            type,
+            payload: {
+              reset,
+              changeType: ChangeTypes.CREATE,
+              [type]: result[type],
+            },
+          });
+        })
+        .catch((error) => {
           console.log(error);
-
-          return;
-        }
-
-        dispatch({
-          type,
-          payload: {
-            reset,
-            changeType: ChangeTypes.CREATE,
-            [type]: data[type],
-          },
         });
-      });
     });
   }
 

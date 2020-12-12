@@ -2,12 +2,14 @@ import store from './redux/store';
 import { getToken } from './redux/selectors/token';
 import { isOnline, isReconnecting } from './redux/selectors/online';
 import {
-  CONFIG,
-  ONLINE,
-  TOKEN,
-  USERID,
-} from './redux/actionTypes';
-import { Status } from './redux/reducers/online';
+  login as loginAction,
+  logout as logoutAction,
+} from './redux/actions/auth';
+import {
+  online,
+  offline,
+  startup,
+} from './redux/actions/online';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -128,97 +130,70 @@ export function reconnect() {
  * Emit event through socket.io.
  * @param {string} event Event to emit.
  * @param {Object} [params] Parameters to send in the emit.
- * @param {Function} [callback] Callback.
  */
-export function emitSocketEvent(event, params = {}, callback = () => {}) {
-  const paramsToSend = params;
-  paramsToSend.token = getToken(store.getState());
+export async function emitSocketEvent(event, params = {}) {
+  return new Promise((resolve, reject) => {
+    const paramsToSend = params;
+    paramsToSend.token = getToken(store.getState());
 
-  if (!isOnline(store.getState())) {
-    reconnect();
-  }
-
-  socket.emit(event, paramsToSend, callback);
-}
-
-export function login(username, password, callback) {
-  emitSocketEvent('login', { user: { username, password } }, ({ error, data }) => {
-    if (error) {
-      callback({ error });
-
-      return;
+    if (!isOnline(store.getState())) {
+      reconnect();
     }
 
-    const { user, token } = data;
-
-    store.dispatch({
-      type: USERID,
-      payload: { userId: user.objectId },
+    socket.emit(event, paramsToSend, ({ error, data }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(data);
+      }
     });
-    store.dispatch({
-      type: TOKEN,
-      payload: { token },
-    });
-
-    callback({ data });
   });
+}
+
+export async function login(username, password) {
+  const result = await emitSocketEvent('login', { user: { username, password } });
+
+  const { user, token } = result;
+
+  store.dispatch(loginAction({ userId: user.objectId, token }));
+
+  return result;
 }
 
 export function logout() {
-  store.dispatch({
-    type: TOKEN,
-    payload: { reset: true },
-  });
-  store.dispatch({
-    type: USERID,
-    payload: { reset: true },
-  });
+  store.dispatch(logoutAction());
 }
 
 if (process.env.NODE_ENV === 'development') {
-  setInterval(() => { emitSocketEvent('ping'); }, 1000);
+  setInterval(() => {
+    emitSocketEvent('ping').catch(() => {
+      console.log('ping failed');
+    });
+  }, 1000);
 }
 
 addSocketListener(EmitTypes.RECONNECT, () => {
   if (!getToken(store.getState())) {
-    store.dispatch({
-      type: ONLINE,
-      payload: { online: Status.ONLINE },
-    });
+    store.dispatch(online());
 
     return;
   }
 
-  emitSocketEvent('updateId', {}, ({ error }) => {
-    if (error) {
-      // Banana
-    }
-
-    store.dispatch({
-      type: ONLINE,
-      payload: { online: Status.ONLINE },
+  emitSocketEvent('updateId', {})
+    .then(() => {
+      store.dispatch(online());
+    })
+    .catch((error) => {
+      console.log(error);
     });
-  });
 });
 
 addSocketListener(EmitTypes.STARTUP, ({ data }) => {
-  store.dispatch({
-    type: CONFIG,
-    payload: {
-      entries: Object.entries(data),
-    },
-  });
-  store.dispatch({
-    type: ONLINE,
-    payload: { online: Status.ONLINE },
-  });
+  store.dispatch(startup(data));
 });
 
 addSocketListener(EmitTypes.DISCONNECT, () => {
-  store.dispatch({
-    type: ONLINE,
-    payload: { online: Status.OFFLINE },
-  });
+  store.dispatch(offline());
 
   reconnect();
 });

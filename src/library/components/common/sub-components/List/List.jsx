@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import {
-  element,
   string,
   arrayOf,
-  shape,
-  func,
-  bool,
+  bool, node,
 } from 'prop-types';
 
 import './List.scss';
@@ -14,31 +11,12 @@ export default function List({
   children,
   title,
   dropdown = false,
-  items = [],
   classNames = [],
 }) {
   const [hidden, setHidden] = useState(typeof title !== 'undefined');
   const content = [];
   const listClasses = [];
   const classes = classNames;
-
-  const itemMapper = () => items.map((item) => (
-    <li
-      role="button"
-      tabIndex={0}
-      key={item.key}
-      onKeyPress={() => {}}
-      onClick={() => {
-        if (dropdown) {
-          setHidden(true);
-        }
-
-        item.onClick();
-      }}
-    >
-      {item.value}
-    </li>
-  ));
 
   if (title) {
     content.push(
@@ -77,7 +55,6 @@ export default function List({
       }}
     >
       {children}
-      {itemMapper()}
     </ul>,
   );
 
@@ -92,13 +69,8 @@ export default function List({
 }
 
 List.propTypes = {
-  children: arrayOf(element),
+  children: node,
   title: string,
-  items: arrayOf(shape({
-    key: string,
-    value: string,
-    onClick: func,
-  })),
   classNames: arrayOf(string),
   dropdown: bool,
 };
@@ -107,6 +79,5 @@ List.defaultProps = {
   classNames: [],
   children: undefined,
   title: undefined,
-  items: [],
   dropdown: false,
 };

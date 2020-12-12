@@ -29,7 +29,7 @@ export default function MessageInfo({ message }) {
 MessageInfo.propTypes = {
   message: shape({
     ownerId: string.isRequired,
-    timeCreated: number.isRequired,
+    timeCreated: string.isRequired,
     ownerAliasId: string,
     customTimeCreated: number,
   }).isRequired,

@@ -14,16 +14,16 @@ export default function Rooms({ onChange }) {
 
   if (accessLevel >= AccessLevels.STANDARD) {
     content.push(
-      <FollowingList onChange={onChange} />,
-      <WhisperList onChange={onChange} />,
-      <RoomList onChange={onChange} />,
+      <FollowingList key="followingList" onChange={onChange} />,
+      <WhisperList key="whisperList" onChange={onChange} />,
+      <RoomList key="roomList" onChange={onChange} />,
     );
   }
 
   return (
     <>
       {content}
-      <UserList />
+      <UserList key="userList" />
     </>
   );
 }

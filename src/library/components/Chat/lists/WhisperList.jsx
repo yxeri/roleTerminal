@@ -5,6 +5,7 @@ import { getChatRooms, RoomTypes } from '../../../redux/selectors/rooms';
 import List from '../../common/sub-components/List/List';
 import { getAllIdentities } from '../../../redux/selectors/users';
 import { getUserId } from '../../../redux/selectors/userId';
+import ListItem from '../../common/sub-components/List/ListItem/ListItem';
 
 export default function WhisperList({ onChange }) {
   const rooms = useSelector((state) => getChatRooms(state, { roomType: RoomTypes.WHISPER }));
@@ -19,20 +20,24 @@ export default function WhisperList({ onChange }) {
       ? `${participant.username || participant.aliasName} <-> ${secondParticipant.username || participant.aliasName}`
       : `${secondParticipant.username || participant.aliasName} <-> ${participant.username || participant.aliasName}`;
 
-    return {
-      key: room.objectId,
-      value: name,
-      onClick: () => {
-        onChange(room.objectId);
-      },
-    };
+    return (
+      <ListItem
+        key={room.objectId}
+        onClick={() => {
+          onChange(room.objectId);
+        }}
+      >
+        {name}
+      </ListItem>
+    );
   });
 
   return (
     <List
       title="PM"
-      items={roomMapper()}
-    />
+    >
+      {roomMapper()}
+    </List>
   );
 }
 

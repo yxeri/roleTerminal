@@ -9,13 +9,14 @@ import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 export default function Messages({ roomId }) {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const content = [
-    <MessagesList roomId={roomId} />,
+    <MessagesList key="messagesList" roomId={roomId} />,
   ];
 
   if (accessLevel >= AccessLevels.STANDARD) {
     content.push(
       <InputArea
-        triggerCallback={({ text }) => {
+        key="inputArea"
+        onSubmit={async ({ text }) => {
 
         }}
       />,

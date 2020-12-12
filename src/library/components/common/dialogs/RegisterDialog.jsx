@@ -103,12 +103,14 @@ export default function RegisterDialog({ done }) {
         placeholder="Description"
         onChange={setDescription}
       />
-      <Button
-        type="submit"
-        onClick={onSubmit}
-      >
-        Register
-      </Button>
+      <div className="buttons">
+        <Button
+          type="submit"
+          onClick={onSubmit}
+        >
+          Register
+        </Button>
+      </div>
     </Dialog>
   );
 }

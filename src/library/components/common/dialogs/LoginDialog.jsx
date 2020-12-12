@@ -10,18 +10,15 @@ export default function LoginDialog({ done }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState();
 
-  const onSubmit = () => {
-    login(username, password, ({ error: loginError }) => {
-      if (loginError) {
+  const onSubmit = async () => {
+    login(username, password)
+      .then(() => {
+        // TODO Notification: You are logged in
+        done();
+      })
+      .catch((loginError) => {
         setError(loginError);
-
-        return;
-      }
-
-      // TODO Notification: You are logged in
-
-      done();
-    });
+      });
   };
 
   return (

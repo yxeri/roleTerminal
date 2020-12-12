@@ -10,7 +10,7 @@ import { isOnline } from '../../../../redux/selectors/online';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
 
 export default function InputArea({
-  triggerCallback,
+  onSubmit,
   minAccessLevel = AccessLevels.STANDARD,
   allowImages = true,
 }) {
@@ -22,14 +22,12 @@ export default function InputArea({
   const content = [];
   const textareaClasses = [];
 
-  /**
-   * Call callback with the input text and reset state
-   */
-  function submit() {
-    triggerCallback({
+  async function submit() {
+    await onSubmit({
       image,
       text: text.split('\n'),
     });
+
     setText('');
     setImage(undefined);
   }
@@ -73,7 +71,7 @@ export default function InputArea({
         onBlur={() => setIsFocused(false)}
       />
       <button
-        disabled={online}
+        disabled={!online}
         key="send"
         type="submit"
         className="sendButton"
@@ -86,7 +84,7 @@ export default function InputArea({
 }
 
 InputArea.propTypes = {
-  triggerCallback: func.isRequired,
+  onSubmit: func.isRequired,
   minAccessLevel: number,
   allowImages: bool,
 };

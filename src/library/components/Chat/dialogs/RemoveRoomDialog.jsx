@@ -3,7 +3,7 @@ import { func, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import { getRoom } from '../../../redux/selectors/rooms';
-import { emitSocketEvent } from '../../../SocketManager';
+import { emitSocketEvent } from '../../../socket/SocketManager';
 
 export default function RemoveRoomDialog({ done, roomId }) {
   const [error, setError] = useState();

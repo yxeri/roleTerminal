@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { func } from 'prop-types';
 import Dialog from './Dialog/Dialog';
-import { emitSocketEvent, login } from '../../../SocketManager';
+import { login } from '../../../socket/actions/auth';
 import Select from '../sub-components/Select';
 import Input from '../sub-components/Input';
 import Textarea from '../sub-components/Textarea';
 import { getRequireOffName } from '../../../redux/selectors/config';
 import Button from '../sub-components/Button/Button';
+import { createUser } from '../../../socket/actions/users';
 
 export default function RegisterDialog({ done }) {
   const [offName, setOffName] = useState();
@@ -20,7 +21,7 @@ export default function RegisterDialog({ done }) {
   const [error, setError] = useState();
   const requireOffName = useSelector(getRequireOffName);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if ((requireOffName && !offName) || !username || !password || !repeatPassword || !pronouns) {
       return;
     }
@@ -29,34 +30,30 @@ export default function RegisterDialog({ done }) {
       return;
     }
 
-    emitSocketEvent('register', params, ({ error: registerError }) => {
-      if (registerError) {
-        setError(registerError);
+    const params = {
+      image,
+      user: {
+        offName,
+        username,
+        password,
+        description,
+        pronouns,
+      },
+    };
 
-        return;
-      }
+    try {
+      await createUser(params);
 
       // TODO If no auto-login, Notification: User registered
 
-      login(username, password, ({ error: loginError }) => {
-        if (loginError) {
-          setError(loginError);
-        }
+      await login(username, password);
 
-        // TODO Notification: You are logged in as user
-      });
-    });
-  };
+      // TODO Notification: You are logged in as user
 
-  const params = {
-    image,
-    user: {
-      offName,
-      username,
-      password,
-      description,
-      pronouns,
-    },
+      done();
+    } catch (registerError) {
+      setError(registerError);
+    }
   };
 
   return (

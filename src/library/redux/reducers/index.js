@@ -11,6 +11,7 @@ import userId from './userId';
 import wallets from './wallets';
 import config from './config';
 import token from './token';
+import aliasId from './aliasId';
 
 export default combineReducers({
   users,
@@ -24,4 +25,5 @@ export default combineReducers({
   wallets,
   config,
   token,
+  aliasId,
 });

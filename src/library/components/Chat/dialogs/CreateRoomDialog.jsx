@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { func } from 'prop-types';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import Input from '../../common/sub-components/Input';
-import { emitSocketEvent } from '../../../SocketManager';
+import { emitSocketEvent } from '../../../socket/SocketManager';
 
 export default function CreateRoomDialog({ done }) {
   const [roomName, setRoomName] = useState();

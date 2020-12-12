@@ -5,6 +5,7 @@ import { AccessLevels } from '../../../AccessCentral';
 import InputArea from '../sub-components/InputArea/InputArea';
 import MessagesList from '../lists/MessageList/MessageList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
+import { sendMessage } from '../../../socket/actions/messages';
 
 export default function Messages({ roomId }) {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -16,9 +17,12 @@ export default function Messages({ roomId }) {
     content.push(
       <InputArea
         key="inputArea"
-        onSubmit={async ({ text }) => {
-
-        }}
+        onSubmit={
+          async ({ text }) => sendMessage({
+            text,
+            roomId,
+          })
+        }
       />,
     );
   }

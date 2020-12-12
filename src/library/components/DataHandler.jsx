@@ -21,7 +21,7 @@ import {
 import {
   emitSocketEvent,
   GetEvents,
-} from '../SocketManager';
+} from '../socket/SocketManager';
 import { ChangeTypes } from '../redux/reducers/root';
 import { getUserId } from '../redux/selectors/userId';
 

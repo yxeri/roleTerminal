@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number, bool } from 'prop-types';
 
 import ImageUpload from '../../../common/ImageUpload/ImageUpload';
 
-import keyHandler from '../../../../KeyHandler';
+import { addKey, removeKey } from '../../../../KeyHandler';
 import { AccessLevels } from '../../../../AccessCentral';
 import { isOnline } from '../../../../redux/selectors/online';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
@@ -22,17 +22,17 @@ export default function InputArea({
   const content = [];
   const textareaClasses = [];
 
-  async function submit() {
-    await onSubmit({
+  const submit = () => {
+    onSubmit({
       image,
       text: text.split('\n'),
+    }).then(() => {
+      setText('');
+      setImage(undefined);
+    }).catch((error) => {
+      console.log(error);
     });
-
-    setText('');
-    setImage(undefined);
-  }
-
-  useEffect(() => () => { keyHandler.removeKey(13); });
+  };
 
   if (isFocused) {
     textareaClasses.push('focused');
@@ -57,12 +57,18 @@ export default function InputArea({
     );
   }
 
-  keyHandler.addKey(13, () => submit());
-
   return (
     <div className="inputArea">
       {content}
       <textarea
+        onKeyDown={(event) => {
+          const { key, altKey } = event;
+
+          if (altKey && key === 'Enter') {
+            submit();
+          }
+        }}
+        value={text}
         placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
         key="textarea"
         className={textareaClasses.join(' ')}

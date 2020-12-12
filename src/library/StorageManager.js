@@ -19,9 +19,7 @@ const removeLocalValue = (name) => localStorage.removeItem(name);
 
 const removeToken = () => removeLocalValue(StorageType.TOKEN);
 
-export const resetUser = () => {
-  removeToken();
-};
+export const resetUser = () => removeToken();
 
 export const getDeviceId = () => getLocalValue(StorageType.DEVICEID);
 

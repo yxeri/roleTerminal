@@ -4,7 +4,7 @@ import List from '../../common/sub-components/List/List';
 import { AccessLevels } from '../../../AccessCentral';
 import LoginDialog from '../../common/dialogs/LoginDialog';
 import RegisterDialog from '../../common/dialogs/RegisterDialog';
-import { logout } from '../../../SocketManager';
+import { logout } from '../../../socket/actions/auth';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 import { createDialog } from '../../helper';
 import ListItem from '../../common/sub-components/List/ListItem/ListItem';

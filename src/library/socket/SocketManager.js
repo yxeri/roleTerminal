@@ -1,15 +1,16 @@
-import store from './redux/store';
-import { getToken } from './redux/selectors/token';
-import { isOnline, isReconnecting } from './redux/selectors/online';
+import store from '../redux/store';
+import { getToken } from '../redux/selectors/token';
+import { isOnline, isReconnecting } from '../redux/selectors/online';
 import {
   login as loginAction,
   logout as logoutAction,
-} from './redux/actions/auth';
+} from '../redux/actions/auth';
 import {
   online,
   offline,
   startup,
-} from './redux/actions/online';
+} from '../redux/actions/online';
+import { getDeviceId, setDeviceId } from '../StorageManager';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -25,7 +26,7 @@ const socket = (() => {
   return window.io(socketUri, { forceNew: true });
 })();
 
-export const createEvents = {
+export const CreateEvents = {
   ALIAS: 'createAlias',
   USER: 'createUser',
   MESSAGE: 'sendMessage',
@@ -58,6 +59,10 @@ export const GetEvents = {
   TRANSACTIONS: 'getTransactions',
   WALLETS: 'getWallets',
   DEVICES: 'getDevices',
+};
+
+export const ActionEvents = {
+  LOGIN: 'login',
 };
 
 export const EmitTypes = {
@@ -150,20 +155,6 @@ export async function emitSocketEvent(event, params = {}) {
   });
 }
 
-export async function login(username, password) {
-  const result = await emitSocketEvent('login', { user: { username, password } });
-
-  const { user, token } = result;
-
-  store.dispatch(loginAction({ userId: user.objectId, token }));
-
-  return result;
-}
-
-export function logout() {
-  store.dispatch(logoutAction());
-}
-
 if (process.env.NODE_ENV === 'development') {
   setInterval(() => {
     emitSocketEvent('ping').catch(() => {
@@ -189,6 +180,10 @@ addSocketListener(EmitTypes.RECONNECT, () => {
 });
 
 addSocketListener(EmitTypes.STARTUP, ({ data }) => {
+  if (!getDeviceId()) {
+    setDeviceId('1234567890123456');
+  }
+
   store.dispatch(startup(data));
 });
 

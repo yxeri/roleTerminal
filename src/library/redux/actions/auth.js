@@ -1,4 +1,4 @@
-import { TOKEN, USERID } from '../actionTypes';
+import { ALIASID, TOKEN, USERID } from '../actionTypes';
 import { resetUser, setToken } from '../../StorageManager';
 
 export const login = ({ userId, token }) => {
@@ -28,6 +28,11 @@ export const logout = () => {
 
     dispatch({
       type: USERID,
+      payload: { reset: true },
+    });
+
+    dispatch({
+      type: ALIASID,
       payload: { reset: true },
     });
   };

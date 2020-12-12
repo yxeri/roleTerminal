@@ -12,10 +12,12 @@ import { createDialog } from '../helper';
 
 import './Chat.scss';
 import ListItem from '../common/sub-components/List/ListItem/ListItem';
+import { getPublicRoomId } from '../../redux/selectors/config';
+import store from '../../redux/store';
 
 export default function Chat({ onClick, order }) {
   const [dialog, setDialog] = useState();
-  const [roomId, setRoomId] = useState();
+  const [roomId, setRoomId] = useState(getPublicRoomId(store.getState()));
   const room = useSelector((state) => getRoom(state, { roomId }));
 
   return (

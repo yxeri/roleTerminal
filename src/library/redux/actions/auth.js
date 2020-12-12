@@ -1,19 +1,13 @@
-import { ALIASID, TOKEN, USERID } from '../actionTypes';
-import { resetUser, setToken } from '../../StorageManager';
+import { ALIASID, USERID } from '../actionTypes';
+import { resetUser, setToken, setUserId } from '../../StorageManager';
 
 export const login = ({ userId, token }) => {
   setToken(token);
+  setUserId(userId);
 
-  return (dispatch) => {
-    dispatch({
-      type: USERID,
-      payload: { userId },
-    });
-
-    dispatch({
-      type: TOKEN,
-      payload: { token },
-    });
+  return {
+    type: USERID,
+    payload: { userId },
   };
 };
 
@@ -21,11 +15,6 @@ export const logout = () => {
   resetUser();
 
   return (dispatch) => {
-    dispatch({
-      type: TOKEN,
-      payload: { reset: true },
-    });
-
     dispatch({
       type: USERID,
       payload: { reset: true },

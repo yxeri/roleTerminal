@@ -38,5 +38,4 @@ export const USERID = 'userId';
 export const ROOMID = 'roomId';
 export const CONFIG = 'config';
 export const ONLINE = 'online';
-export const TOKEN = 'token';
 export const ALIASID = 'aliasId';

@@ -1,16 +1,21 @@
 import store from '../redux/store';
-import { getToken } from '../redux/selectors/token';
 import { isOnline, isReconnecting } from '../redux/selectors/online';
 import {
-  login as loginAction,
-  logout as logoutAction,
-} from '../redux/actions/auth';
-import {
-  online,
   offline,
+  online,
   startup,
 } from '../redux/actions/online';
-import { getDeviceId, setDeviceId } from '../StorageManager';
+import {
+  getDeviceId,
+  setDeviceId,
+  getToken as getStoredToken,
+  getUserId as getStoredUserId,
+} from '../StorageManager';
+import {
+  logout as logoutAction,
+  login as loginAction,
+} from '../redux/actions/auth';
+import { getUserId } from '../redux/selectors/userId';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -139,7 +144,7 @@ export function reconnect() {
 export async function emitSocketEvent(event, params = {}) {
   return new Promise((resolve, reject) => {
     const paramsToSend = params;
-    paramsToSend.token = getToken(store.getState());
+    paramsToSend.token = getStoredToken();
 
     if (!isOnline(store.getState())) {
       reconnect();
@@ -164,27 +169,45 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 addSocketListener(EmitTypes.RECONNECT, () => {
-  if (!getToken(store.getState())) {
-    store.dispatch(online());
-
-    return;
+  if (getUserId(store.getState)) {
+    emitSocketEvent('updateId', {})
+      .then(() => {
+        store.dispatch(online());
+      })
+      .catch((error) => {
+        console.log(error);
+        store.dispatch(logoutAction());
+      });
   }
-
-  emitSocketEvent('updateId', {})
-    .then(() => {
-      store.dispatch(online());
-    })
-    .catch((error) => {
-      console.log(error);
-    });
 });
 
 addSocketListener(EmitTypes.STARTUP, ({ data }) => {
+  const userId = getStoredUserId();
+  const token = getStoredToken();
+
+  if (userId && token) {
+    store.dispatch(loginAction({
+      userId,
+      token,
+    }));
+  }
+
   if (!getDeviceId()) {
     setDeviceId('1234567890123456');
   }
 
   store.dispatch(startup(data));
+
+  if (userId) {
+    emitSocketEvent('updateId', {})
+      .then(() => {
+        store.dispatch(online());
+      })
+      .catch((error) => {
+        console.log(error);
+        store.dispatch(logoutAction());
+      });
+  }
 });
 
 addSocketListener(EmitTypes.DISCONNECT, () => {

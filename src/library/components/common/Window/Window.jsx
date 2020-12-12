@@ -20,7 +20,7 @@ export default function Window({
   classNames = [],
   done = () => {},
 }) {
-  const defaultSize = { width: 320, height: 220 };
+  const defaultSize = { width: 640, height: 460 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const rndClasses = ['rnd'];
@@ -41,8 +41,8 @@ export default function Window({
       style={{ zIndex: order }}
       position={coordinates}
       size={size}
-      minWidth={640}
-      minHeight={480}
+      minWidth={320}
+      minHeight={220}
       bounds="parent"
       cancel="windowBox"
       dragHandleClassName="topBar"

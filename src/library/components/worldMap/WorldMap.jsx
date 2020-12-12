@@ -12,8 +12,12 @@ export default function WorldMap({ onClick, order }) {
       order={order}
       title="map"
       onClick={onClick}
+      menu={(
+        <>
+          <Positions />
+        </>
+      )}
     >
-      <Positions />
       <MapView />
     </Window>
   );

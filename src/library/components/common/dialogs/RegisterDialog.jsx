@@ -10,7 +10,7 @@ import { getRequireOffName } from '../../../redux/selectors/config';
 import Button from '../sub-components/Button/Button';
 import { createUser } from '../../../socket/actions/users';
 
-export default function RegisterDialog({ done }) {
+const RegisterDialog = ({ done }) => {
   const [offName, setOffName] = useState();
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
@@ -110,7 +110,9 @@ export default function RegisterDialog({ done }) {
       </div>
     </Dialog>
   );
-}
+};
+
+export default React.memo(RegisterDialog);
 
 RegisterDialog.propTypes = {
   done: func.isRequired,

@@ -1,0 +1,7 @@
+@import "../../../../../common";
+
+.Messages {
+  display: grid;
+  grid-template-rows: auto fit-content(0);
+  width: 100%;
+}

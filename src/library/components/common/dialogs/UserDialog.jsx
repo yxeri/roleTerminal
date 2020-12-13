@@ -5,7 +5,7 @@ import Dialog from './Dialog/Dialog';
 import { getIdentity } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
 
-export default function UserDialog({ userId, done }) {
+const UserDialog = ({ userId, done }) => {
   const user = useSelector((state) => getIdentity(state, { identityId: userId }));
 
   return (
@@ -22,7 +22,9 @@ export default function UserDialog({ userId, done }) {
       </Button>
     </Dialog>
   );
-}
+};
+
+export default React.memo(UserDialog);
 
 UserDialog.propTypes = {
   done: func.isRequired,

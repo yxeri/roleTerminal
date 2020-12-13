@@ -7,7 +7,7 @@ import { getAllIdentities } from '../../../redux/selectors/users';
 import { getUserId } from '../../../redux/selectors/userId';
 import ListItem from '../../common/sub-components/List/ListItem/ListItem';
 
-export default function WhisperList({ onChange }) {
+const WhisperList = ({ onChange }) => {
   const rooms = useSelector((state) => getChatRooms(state, { roomType: RoomTypes.WHISPER }));
   const users = useSelector((state) => getAllIdentities(state, { getMap: true }));
   const userId = useSelector(getUserId);
@@ -34,12 +34,16 @@ export default function WhisperList({ onChange }) {
 
   return (
     <List
+      dropdown
+      classNames={['WhisperList']}
       title="PM"
     >
       {roomMapper()}
     </List>
   );
-}
+};
+
+export default React.memo(WhisperList);
 
 WhisperList.propTypes = {
   onChange: func.isRequired,

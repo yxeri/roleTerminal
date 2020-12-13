@@ -1,22 +1,29 @@
 import React from 'react';
-import { string } from 'prop-types';
+import { arrayOf, string } from 'prop-types';
 
-export default function Image({ image, altText = '' } = {}) {
-  return (
-    <div className="imageBox">
-      <img
-        src={image}
-        alt={altText}
-      />
-    </div>
-  );
-}
+const Image = React.forwardRef(({
+  image,
+  classNames = [],
+  altText = '',
+} = {}, ref) => (
+  <div className={`${['Image'].concat(classNames).join(' ')}`}>
+    <img
+      ref={ref}
+      src={image}
+      alt={altText}
+    />
+  </div>
+));
+
+export default Image;
 
 Image.propTypes = {
   image: string.isRequired,
   altText: string,
+  classNames: arrayOf(string),
 };
 
 Image.defaultProps = {
   altText: '',
+  classNames: [],
 };

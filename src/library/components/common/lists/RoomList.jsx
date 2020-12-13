@@ -5,7 +5,7 @@ import List from '../sub-components/List/List';
 import { getChatRooms, SortBy } from '../../../redux/selectors/rooms';
 import ListItem from '../sub-components/List/ListItem/ListItem';
 
-export default function RoomList({ onChange }) {
+const RoomList = ({ onChange }) => {
   const rooms = useSelector((state) => getChatRooms(state, { sortBy: SortBy.NAME }));
 
   const roomMapper = () => rooms.map((room) => (
@@ -21,13 +21,15 @@ export default function RoomList({ onChange }) {
 
   return (
     <List
-      classNames={['roomList']}
+      classNames={['RoomList']}
       title="Rooms"
     >
       {roomMapper()}
     </List>
   );
-}
+};
+
+export default RoomList;
 
 RoomList.propTypes = {
   onChange: func.isRequired,

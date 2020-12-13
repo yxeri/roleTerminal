@@ -3,4 +3,9 @@
 .Button {
   border: $border;
   border-radius: $border-radius;
+  padding: $padding;
+  box-sizing: border-box;
+  background-color: $light-background-color;
+  color: $second-color;
+  box-shadow: $shadow;
 }

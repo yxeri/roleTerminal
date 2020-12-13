@@ -14,7 +14,7 @@ export const WindowTypes = {
   WORLDMAP: 'worldMap',
 };
 
-export default function MainWindow() {
+const MainWindow = () => {
   const [order, setOrder] = useState(new Set([
     WindowTypes.WALLET,
     WindowTypes.WORLDMAP,
@@ -23,7 +23,9 @@ export default function MainWindow() {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const content = [];
   const onClick = (type) => {
-    if ([...order.values()].indexOf(type) !== 0) {
+    const values = [...order.values()];
+
+    if ([...order.values()].indexOf(type) !== values.length - 1) {
       const set = new Set(order);
 
       set.delete(type);
@@ -53,8 +55,10 @@ export default function MainWindow() {
   />);
 
   return (
-    <div id="main">
+    <div id="MainWindow">
       {content}
     </div>
   );
-}
+};
+
+export default MainWindow;

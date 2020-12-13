@@ -4,6 +4,7 @@ export const getRequireOffName = (state) => state.config.get('requireOffName');
 export const getPublicRoomId = (state) => state.config.get('publicRoomId');
 export const getBroadcastId = (state) => state.config.get('broadcastId');
 export const getAnonymousUser = (state) => state.config.get('anonymousUser');
+export const getAllowedImages = (state) => state.config.get('allowedImages');
 
 /**
  * Takes date and returns shorter human-readable time.

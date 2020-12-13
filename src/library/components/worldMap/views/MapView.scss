@@ -1,3 +1,10 @@
-a, .gmnoprint, .gm-style-cc {
-  display: none !important;
+@import "../../../../common";
+
+.MapView {
+  height: 100%;
+  width: 100%;
+
+  a, .gmnoprint, .gm-style-cc {
+    display: none !important;
+  }
 }

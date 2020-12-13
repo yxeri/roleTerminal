@@ -1,35 +1,35 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
+
 import { getMessages } from '../../../../redux/selectors/messages';
-import MessageInfo from '../../sub-components/MessageInfo';
 import List from '../../../common/sub-components/List/List';
-import ListItem from '../../../common/sub-components/List/ListItem/ListItem';
+import MessageItem from './MessageItem/MessageItem';
 
 import './MessageList.scss';
 
-export default function MessageList({ roomId }) {
+const MessageList = ({ roomId }) => {
   const messages = useSelector((state) => getMessages(state, { roomId }));
 
   const messageMapper = () => messages.map((message) => (
-    <ListItem
-      key={message.objectId}
-    >
-      <MessageInfo message={message} />
-      {/* eslint-disable-next-line react/no-array-index-key */}
-      {message.text.map((line, index) => <p key={index}>{line}</p>)}
-    </ListItem>
+    <MessageItem key={message.objectId} message={message} />
   ));
 
   return (
     <List
       large
-      classNames={['messageList']}
+      scrollTo={{
+        buffer: true,
+        direction: 'bottom',
+      }}
+      classNames={['MessageList']}
     >
       {messageMapper()}
     </List>
   );
-}
+};
+
+export default React.memo(MessageList);
 
 MessageList.propTypes = {
   roomId: string,

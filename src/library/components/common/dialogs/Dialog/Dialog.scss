@@ -1,6 +1,6 @@
 @import "../../../../../common";
 
-.dialog {
+.Dialog {
   .inputs {
     display: flex;
     flex-direction: column;
@@ -16,13 +16,6 @@
     input, textarea {
       padding: $padding;
       border-radius: $border-radius;
-    }
-
-    button {
-      padding: $padding;
-      background-color: $light-background-color;
-      color: $second-color;
-      border: $border;
     }
 
     .buttons {

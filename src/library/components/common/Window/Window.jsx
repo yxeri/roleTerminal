@@ -11,7 +11,7 @@ import {
 import './Window.scss';
 import TopBar from './TopBar/TopBar';
 
-export default function Window({
+const Window = ({
   onClick,
   children,
   order,
@@ -19,12 +19,12 @@ export default function Window({
   title = 'app',
   classNames = [],
   done = () => {},
-}) {
+}) => {
   const defaultSize = { width: 640, height: 460 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const rndClasses = ['rnd'];
-  const windowClasses = ['window'].concat(classNames);
+  const windowClasses = ['Window'].concat(classNames);
 
   const toggleFullscreen = () => {
     if (size.width === '100%' && size.height === '100%') {
@@ -44,8 +44,7 @@ export default function Window({
       minWidth={320}
       minHeight={220}
       bounds="parent"
-      cancel="windowBox"
-      dragHandleClassName="topBar"
+      dragHandleClassName="TopBar"
       enableResizing={{
         top: false,
         right: true,
@@ -110,12 +109,16 @@ export default function Window({
               </div>
             )
           }
-          {children}
+          <div className="content">
+            {children}
+          </div>
         </div>
       </div>
     </Rnd>
   );
-}
+};
+
+export default Window;
 
 Window.propTypes = {
   order: number.isRequired,

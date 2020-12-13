@@ -3,8 +3,8 @@
  * @param {Number} number Number to be beautified
  * @returns {string} String with number or with 0 + number
  */
-export function beautifyNumber(number) {
-  return number > 9
-    ? `${number}`
-    : `0${number}`;
-}
+// TODO Use built-in padding
+export const beautifyNumber = (number) => (number > 9
+  ? `${number}`
+  : `0${number}`
+);

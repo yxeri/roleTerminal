@@ -1,22 +1,33 @@
 import React from 'react';
-import { func, node } from 'prop-types';
+import {
+  arrayOf,
+  func,
+  node,
+  string,
+} from 'prop-types';
 
-export default function ListItem({
+const ListItem = ({
   children,
+  classNames = [],
   onClick = () => {},
-}) {
-  return (
-    <li onClick={onClick}>
-      {children}
-    </li>
-  );
-}
+}) => (
+  <li
+    className={['ListItem'].concat(classNames).join(' ')}
+    onClick={onClick}
+  >
+    {children}
+  </li>
+);
+
+export default ListItem;
 
 ListItem.propTypes = {
   children: node.isRequired,
   onClick: func,
+  classNames: arrayOf(string),
 };
 
 ListItem.defaultProps = {
   onClick: () => {},
+  classNames: [],
 };

@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 import { string, bool, func } from 'prop-types';
 
-export default function Input({
+const Input = ({
   onChange,
   type = 'text',
   required = false,
   placeholder = '',
-}) {
+}) => {
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
-  function checkEmpty(event) {
+  const checkEmpty = (event) => {
     if (hasFocus && required) {
       setIsEmpty(event.target.value !== '');
     }
-  }
+  };
 
   return (
     <input
       type={type}
       defaultValue=""
-      className={isEmpty ? 'empty' : ''}
+      className={`Input ${isEmpty ? 'empty' : ''}`}
       onFocus={() => setHasFocus(true)}
       onBlur={checkEmpty}
       onChange={(event) => onChange(event.target.value)}
@@ -28,6 +28,8 @@ export default function Input({
     />
   );
 };
+
+export default Input;
 
 Input.propTypes = {
   onChange: func.isRequired,

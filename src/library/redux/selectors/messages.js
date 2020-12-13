@@ -4,6 +4,8 @@ export const SortBy = {
   DATE: 'date',
 };
 
+export const getMessage = (state, { id }) => state.messages.get(id);
+
 export const getAllMessages = (state) => [...state.messages.values()];
 
 export const getMessages = (state, { roomId = getPublicRoomId(state), sortBy = '' } = {}) => {

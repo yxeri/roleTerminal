@@ -3,8 +3,9 @@ import { func } from 'prop-types';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import Input from '../../common/sub-components/Input';
 import { emitSocketEvent } from '../../../socket/SocketManager';
+import Button from '../../common/sub-components/Button/Button';
 
-export default function CreateRoomDialog({ done }) {
+const CreateRoomDialog = ({ done }) => {
   const [roomName, setRoomName] = useState();
   const [password, setPassword] = useState();
   const [repeatPassword, setRepeatPassword] = useState();
@@ -41,6 +42,7 @@ export default function CreateRoomDialog({ done }) {
 
   return (
     <Dialog
+      classNames={['CreateRoomDialog']}
       done={done}
       error={error}
       title="New room"
@@ -65,16 +67,18 @@ export default function CreateRoomDialog({ done }) {
         placeholder="Repeat password"
       />
       <div className="buttons">
-        <button
+        <Button
           type="submit"
           onClick={onSubmit}
         >
           Create
-        </button>
+        </Button>
       </div>
     </Dialog>
   );
-}
+};
+
+export default React.memo(CreateRoomDialog);
 
 CreateRoomDialog.propTypes = {
   done: func.isRequired,

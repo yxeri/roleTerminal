@@ -1,0 +1,8 @@
+@import "../../../../../../common";
+
+.MessageItem {
+  .text {
+    max-width: $max-width;
+    word-wrap: break-word;
+  }
+}

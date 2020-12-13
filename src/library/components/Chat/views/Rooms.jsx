@@ -8,7 +8,7 @@ import WhisperList from '../lists/WhisperList';
 import FollowingList from '../lists/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 
-export default function Rooms({ onChange }) {
+const Rooms = ({ onChange }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const content = [];
 
@@ -26,7 +26,9 @@ export default function Rooms({ onChange }) {
       <UserList key="userList" />
     </>
   );
-}
+};
+
+export default Rooms;
 
 Rooms.propTypes = {
   onChange: func.isRequired,

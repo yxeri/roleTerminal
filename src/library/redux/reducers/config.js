@@ -15,7 +15,7 @@ defaultState.set('yearModification', 0);
 defaultState.set('dayModification', 0);
 defaultState.set('requireOffName', false);
 defaultState.set('activateTermination', false);
-defaultState.set('allowedImages', false);
+defaultState.set('allowedImages', { CHAT: false, PROFILE: false, DOCFILE: false });
 defaultState.set('permissions', {});
 defaultState.set('anonymousUser', {
   accessLevel: AccessLevels.ANONYMOUS,
@@ -31,7 +31,7 @@ export default function ConfigReducer(state = defaultState, action) {
     const { entries } = payload;
     const newState = new Map([...state]);
 
-    entries.forEach(({ key, value }) => newState.set(key, value));
+    entries.forEach((keyValue) => newState.set(keyValue[0], keyValue[1]));
 
     return newState;
   }

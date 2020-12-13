@@ -6,7 +6,7 @@ import List from '../../common/sub-components/List/List';
 import { getPositions } from '../../../redux/selectors/positions';
 import ListItem from '../../common/sub-components/List/ListItem/ListItem';
 
-export default function PositionsList({ title, positionType }) {
+const PositionList = ({ title, positionType }) => {
   const positions = useSelector((state) => getPositions(state, { positionType }));
 
   const positionMapper = () => positions.map((position) => (
@@ -21,7 +21,7 @@ export default function PositionsList({ title, positionType }) {
   return (
     <div
       key="positionsList"
-      className="positionsList"
+      className="PositionsList"
     >
       <List
         title={title}
@@ -30,13 +30,15 @@ export default function PositionsList({ title, positionType }) {
       </List>
     </div>
   );
-}
+};
 
-PositionsList.propTypes = {
+export default PositionList;
+
+PositionList.propTypes = {
   title: string,
   positionType: string.isRequired,
 };
 
-PositionsList.defaultProps = {
+PositionList.defaultProps = {
   title: undefined,
 };

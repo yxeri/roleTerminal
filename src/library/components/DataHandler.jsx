@@ -25,11 +25,11 @@ import {
 import { ChangeTypes } from '../redux/reducers/root';
 import { getUserId } from '../redux/selectors/userId';
 
-export default function DataHandler({ children }) {
+const DataHandler = ({ children }) => {
   const dispatch = useDispatch();
   const userId = useSelector(getUserId);
 
-  function retrieveAll({ reset } = {}) {
+  const retrieveAll = ({ reset } = {}) => {
     [
       { type: USERS, event: GetEvents.USERS },
       { type: ALIASES, event: GetEvents.ALIASES },
@@ -64,14 +64,16 @@ export default function DataHandler({ children }) {
           console.log(error);
         });
     });
-  }
+  };
 
   useEffect(() => {
     retrieveAll({ reset: true });
   }, [userId]);
 
   return (<>{children}</>);
-}
+};
+
+export default DataHandler;
 
 DataHandler.propTypes = {
   children: arrayOf(element).isRequired,

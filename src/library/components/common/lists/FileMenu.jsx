@@ -3,11 +3,11 @@ import { node } from 'prop-types';
 import List from '../sub-components/List/List';
 import ListItem from '../sub-components/List/ListItem/ListItem';
 
-export default function FileMenu({ children }) {
+const FileMenu = ({ children }) => {
   return (
     <List
       dropdown
-      classNames={['fileMenu']}
+      classNames={['FileMenu']}
       title="File"
     >
       {children}
@@ -19,7 +19,9 @@ export default function FileMenu({ children }) {
       </ListItem>
     </List>
   );
-}
+};
+
+export default FileMenu;
 
 FileMenu.propTypes = {
   children: node.isRequired,

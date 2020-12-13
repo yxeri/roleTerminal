@@ -6,7 +6,7 @@ const MapView = () => {
   const [map, setMap] = useState();
   const mapRef = useRef();
 
-  function createMap() {
+  const createMap = () => {
     if (typeof window.google === 'undefined' || typeof window.MarkerClusterer === 'undefined' || typeof window.MapLabel === 'undefined') {
       setTimeout(createMap, 1000);
 
@@ -72,7 +72,7 @@ const MapView = () => {
     });
 
     setMap(worldMap);
-  }
+  };
 
   useEffect(() => {
     createMap();
@@ -81,7 +81,7 @@ const MapView = () => {
   return (
     <div
       ref={mapRef}
-      className="mapView"
+      className="MapView"
     />
   );
 };

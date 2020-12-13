@@ -5,21 +5,21 @@ import {
   string,
 } from 'prop-types';
 
-export default function Textarea({
+const Textarea = ({
   onChange,
   required = false,
   placeholder = '',
-}) {
+}) => {
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
-  function checkEmpty(event) {
+  const checkEmpty = (event) => {
     const value = event.target.value.trim();
 
     if (hasFocus && required) {
       setIsEmpty(value !== '');
     }
-  }
+  };
 
   return (
     <input
@@ -31,7 +31,9 @@ export default function Textarea({
       placeholder={placeholder}
     />
   );
-}
+};
+
+export default Textarea;
 
 Textarea.propTypes = {
   placeholder: string,

@@ -7,13 +7,13 @@ import {
   string,
 } from 'prop-types';
 
-export default function Select({
+const Select = ({
   onChange,
   children,
   required = false,
   placeholder = '',
   multiple = false,
-}) {
+}) => {
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
@@ -25,7 +25,7 @@ export default function Select({
     if (hasFocus && required) {
       setIsEmpty(selectedOptions.length === 0);
     }
-  }
+  };
 
   const onChangeFunc = (event) => {
     checkEmpty(event);
@@ -37,7 +37,7 @@ export default function Select({
 
   return (
     <select
-      className={isEmpty ? 'empty' : ''}
+      className={`Select ${isEmpty ? 'empty' : ''}`}
       onFocus={() => setHasFocus(true)}
       onBlur={checkEmpty}
       onChange={onChangeFunc}
@@ -47,7 +47,9 @@ export default function Select({
       {children}
     </select>
   );
-}
+};
+
+export default Select;
 
 Select.propTypes = {
   multiple: bool,

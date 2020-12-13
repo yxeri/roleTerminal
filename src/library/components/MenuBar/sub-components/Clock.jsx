@@ -6,21 +6,21 @@ const Clock = () => {
   const [date, setDate] = useState(Date.now());
   const timestamp = useSelector((state) => getTimestamp(state, { date }));
 
-  function updateTime() {
+  const updateTime = () => {
     setTimeout(() => {
       setDate(Date.now());
       updateTime();
-    }, 100);
-  }
+    }, 400);
+  };
 
   useEffect(() => {
     updateTime();
-  }, [updateTime]);
+  }, []);
 
   return (
     <div
       key="clock"
-      className="clock"
+      className="Clock"
     >
       <span>{timestamp.halfTime}</span>
     </div>

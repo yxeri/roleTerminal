@@ -5,65 +5,72 @@
   animation: reveal;
   animation-iteration-count: 1;
   animation-duration: .8s;
-}
 
-.window {
-  display: flex;
-  flex-direction: column;
-  box-shadow: $shadow;
-  background-color: $second-background-color;
-  height: 100%;
-  border: $border;
-  color: $second-color;
-  text-shadow: $text-shadow;
-  border-radius: $border-radius;
-
-  .windowBox {
+  .Window {
     display: flex;
     flex-direction: column;
-    padding: $padding;
-    height: calc(100% - 1em - #{$margin * 4});
-    width: calc(100% - #{$margin * 2});
-    overflow-x: hidden;
-    overflow-y: auto;
+    box-shadow: $shadow;
+    background-color: $second-background-color;
+    height: 100%;
+    border: $border;
+    color: $second-color;
+    text-shadow: $text-shadow;
+    border-radius: $border-radius;
 
-    .menu {
-      display: flex;
-      flex-direction: row;
-      margin-bottom: $margin;
-      height: 1em + $margin * 2 + .1em;
+    .windowBox {
+      display: grid;
+      grid-template-rows: fit-content(0) auto;
+      padding: $padding;
+      height: calc(100% - 1em - #{$margin * 4});
+      width: calc(100% - #{$margin * 2});
 
-      > * {
-        margin-right: $margin * 2;
-      }
-    }
-  }
-}
+      .menu {
+        background-color: $second-background-color;
+        display: flex;
+        flex-direction: row;
+        margin-bottom: $margin;
+        height: 1em + $margin * 2 + .1em;
 
-.window[min-width~="600px"] {
-  .windowBox {
-    flex-direction: row;
-
-    .menu {
-      flex-direction: column;
-      height: 100%;
-      margin-right: $margin;
-      width: 10em;
-      overflow-y: auto;
-      scrollbar-width: none;
-
-      .list {
-        margin-bottom: $margin * 2;
-
-        ul {
-          position: relative;
-          box-shadow: none;
+        > * {
+          margin-right: $margin * 2;
         }
       }
 
-      .expanded {
-        ul {
-          border-top-right-radius: 0;
+      .content {
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        scrollbar-width: none;
+      }
+    }
+  }
+
+  .Window[min-width~="600px"] {
+    .windowBox {
+      display: flex;
+      flex-direction: row;
+
+      .menu {
+        flex-direction: column;
+        height: 100%;
+        margin-right: $margin;
+        width: 10em;
+        overflow-y: auto;
+        scrollbar-width: none;
+
+        .list {
+          margin-bottom: $margin * 2;
+
+          ul {
+            position: relative;
+            box-shadow: none;
+          }
+        }
+
+        .expanded {
+          ul {
+            border-top-right-radius: 0;
+          }
         }
       }
     }

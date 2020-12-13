@@ -6,9 +6,10 @@ import Positions from './views/Positions';
 
 import './WorldMap.scss';
 
-export default function WorldMap({ onClick, order }) {
+const WorldMap = ({ onClick, order }) => {
   return (
     <Window
+      classNames={['WorldMap']}
       order={order}
       title="map"
       onClick={onClick}
@@ -21,7 +22,9 @@ export default function WorldMap({ onClick, order }) {
       <MapView />
     </Window>
   );
-}
+};
+
+export default WorldMap;
 
 WorldMap.propTypes = {
   onClick: func.isRequired,

@@ -6,24 +6,24 @@ import {
 
 import './TopBar.scss';
 
-export default function TopBar({
+const TopBar = ({
   onDoubleClick,
   title,
   done,
-}) {
-  return (
-    <div
-      onDoubleClick={onDoubleClick}
-      className="topBar"
-    >
-      <span>{title}</span>
-      <div className="buttons">
-        <button type="button" onClick={onDoubleClick}>[]</button>
-        <button type="button" onClick={done}>X</button>
-      </div>
+}) => (
+  <div
+    onDoubleClick={onDoubleClick}
+    className="TopBar"
+  >
+    <span>{title}</span>
+    <div className="buttons">
+      <button type="button" onClick={onDoubleClick}>[]</button>
+      <button type="button" onClick={done}>X</button>
     </div>
-  );
-}
+  </div>
+);
+
+export default TopBar;
 
 TopBar.propTypes = {
   done: func.isRequired,

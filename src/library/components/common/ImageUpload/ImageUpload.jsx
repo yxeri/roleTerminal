@@ -1,13 +1,21 @@
-import React from 'react';
-import { func, string } from 'prop-types';
+import React, { useEffect, useRef, useState } from 'react';
+import { func } from 'prop-types';
 
 import Image from '../sub-components/Image';
-
-import imageIcon from './imageIcon.png';
 import Button from '../sub-components/Button/Button';
 
-export default function ImageUpload({ previewImage, onChange } = {}) {
-  const inputRef = React.createRef();
+import imageIcon from './imageIcon.png';
+
+import './ImageUpload.scss';
+
+const ImageUpload = ({ onChange } = {}) => {
+  const inputRef = useRef(null);
+  const previewRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState();
+
+  useEffect(() => {
+    onChange(previewImage);
+  }, [previewImage]);
 
   const onChangeFunc = ({ target }) => {
     const files = target.files || [];
@@ -18,9 +26,11 @@ export default function ImageUpload({ previewImage, onChange } = {}) {
 
       reader.addEventListener('load', () => {
         if (reader.result) {
-          onChange({
-            name: file.name,
-            src: reader.result.toString(),
+          setPreviewImage({
+            imageName: file.name,
+            source: reader.result,
+            width: previewRef.current.naturalWidth,
+            height: previewRef.current.naturalHeight,
           });
         }
       });
@@ -30,7 +40,7 @@ export default function ImageUpload({ previewImage, onChange } = {}) {
 
   return (
     <div
-      className="imageUpload"
+      className="ImageUpload"
     >
       <input
         key="uploadInput"
@@ -42,17 +52,14 @@ export default function ImageUpload({ previewImage, onChange } = {}) {
       />
       <Button
         type="button"
-        onClick={() => { inputRef.current.input.click(); }}
+        onClick={() => { inputRef.current.click(); }}
       >
-        {
-          previewImage
-            && (
-              <Image
-                image={previewImage}
-                altText="Image preview"
-              />
-            )
-        }
+        <Image
+          ref={previewRef}
+          classNames={['previewImage'].concat([!previewImage ? 'hide' : ''])}
+          image={previewImage ? previewImage.source : ''}
+          altText="Image preview"
+        />
         <Image
           image={imageIcon}
           altText="Upload image"
@@ -60,13 +67,13 @@ export default function ImageUpload({ previewImage, onChange } = {}) {
       </Button>
     </div>
   );
-}
+};
+
+export default React.memo(ImageUpload)
 
 ImageUpload.propTypes = {
   onChange: func.isRequired,
-  previewImage: string,
 };
 
 ImageUpload.defaultProps = {
-  previewImage: undefined,
 };

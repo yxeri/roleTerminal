@@ -9,7 +9,7 @@ import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 import { createDialog } from '../../helper';
 import ListItem from '../../common/sub-components/List/ListItem/ListItem';
 
-export default function MainList() {
+const MainList = () => {
   const [dialog, setDialog] = useState();
   const accessLevel = useSelector(getCurrentAccessLevel);
   const items = [];
@@ -59,4 +59,6 @@ export default function MainList() {
       {dialog}
     </>
   );
-}
+};
+
+export default MainList;

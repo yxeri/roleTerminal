@@ -125,23 +125,23 @@ export const EmitTypes = {
   CONNECTUSER: 'connectUser',
 };
 
-export function addSocketListener(event, callback) {
+export const addSocketListener = async (event, callback) => {
   socket.on(event, (params) => { console.log(event, params); callback(params); });
-}
+};
 
-export function reconnect() {
+export const reconnect = () => {
   if (!isReconnecting(store.getState())) {
     socket.disconnect();
     socket.connect();
   }
-}
+};
 
 /**
  * Emit event through socket.io.
  * @param {string} event Event to emit.
  * @param {Object} [params] Parameters to send in the emit.
  */
-export async function emitSocketEvent(event, params = {}) {
+export const emitSocketEvent = async (event, params = {}) => {
   return new Promise((resolve, reject) => {
     const paramsToSend = params;
     paramsToSend.token = getStoredToken();
@@ -158,7 +158,7 @@ export async function emitSocketEvent(event, params = {}) {
       }
     });
   });
-}
+};
 
 if (process.env.NODE_ENV === 'development') {
   setInterval(() => {
@@ -198,7 +198,7 @@ addSocketListener(EmitTypes.STARTUP, ({ data }) => {
 
   store.dispatch(startup(data));
 
-  if (userId) {
+  if (userId || token) {
     emitSocketEvent('updateId', {})
       .then(() => {
         store.dispatch(online());

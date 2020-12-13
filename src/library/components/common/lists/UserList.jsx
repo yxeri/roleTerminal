@@ -6,7 +6,7 @@ import UserDialog from '../dialogs/UserDialog';
 import { createDialog } from '../../helper';
 import ListItem from '../sub-components/List/ListItem/ListItem';
 
-export default function UserList() {
+const UserList = () => {
   const identities = useSelector((state) => getIdentities(state, { sortBy: SortBy.NAME }));
   const [dialog, setDialog] = useState();
 
@@ -25,7 +25,7 @@ export default function UserList() {
     <>
       <List
         dropdown
-        classNames={['userList']}
+        classNames={['UserList']}
         title="Users"
       >
         {userMapper()}
@@ -33,4 +33,6 @@ export default function UserList() {
       {dialog}
     </>
   );
-}
+};
+
+export default UserList;

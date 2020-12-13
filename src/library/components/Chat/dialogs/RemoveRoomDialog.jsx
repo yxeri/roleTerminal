@@ -4,8 +4,9 @@ import { useSelector } from 'react-redux';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import { getRoom } from '../../../redux/selectors/rooms';
 import { emitSocketEvent } from '../../../socket/SocketManager';
+import Button from '../../common/sub-components/Button/Button';
 
-export default function RemoveRoomDialog({ done, roomId }) {
+const RemoveRoomDialog = ({ done, roomId }) => {
   const [error, setError] = useState();
   const room = useSelector((state) => getRoom(state, { roomId }));
 
@@ -23,26 +24,29 @@ export default function RemoveRoomDialog({ done, roomId }) {
 
   return (
     <Dialog
+      classNames={['RemoveRoomDialog']}
       error={error}
       done={done}
       title={`Delete room ${room.roomName}`}
       text={`Are you sure you want to delete ${room.roomName}?`}
     >
-      <button
+      <Button
         type="button"
         onClick={() => done()}
       >
         No
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         onClick={onSubmit}
       >
         Yes
-      </button>
+      </Button>
     </Dialog>
   );
-}
+};
+
+export default React.memo(RemoveRoomDialog);
 
 RemoveRoomDialog.propTypes = {
   done: func.isRequired,

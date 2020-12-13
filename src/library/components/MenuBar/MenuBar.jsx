@@ -18,7 +18,7 @@ const MenuBar = () => {
   return (
     <div
       className={`${classes.join(' ')}`}
-      id="menuBar"
+      id="MenuBar"
     >
       <MainList />
       {content}

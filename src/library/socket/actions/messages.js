@@ -20,8 +20,6 @@ export const sendMessage = async ({ text, roomId, image }) => {
     roomId,
   };
 
-  console.log(message);
-
   if (room.isUser) {
     message.messageType = MessageType.WHISPER;
     participantIds.push(getIdentityId(store.getState()));

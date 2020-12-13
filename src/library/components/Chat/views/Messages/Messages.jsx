@@ -1,13 +1,15 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
-import { AccessLevels } from '../../../AccessCentral';
-import InputArea from '../sub-components/InputArea/InputArea';
-import MessagesList from '../lists/MessageList/MessageList';
-import { getCurrentAccessLevel } from '../../../redux/selectors/users';
-import { sendMessage } from '../../../socket/actions/messages';
+import { AccessLevels } from '../../../../AccessCentral';
+import InputArea from '../../sub-components/InputArea/InputArea';
+import MessagesList from '../../lists/MessageList/MessageList';
+import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
+import { sendMessage } from '../../../../socket/actions/messages';
 
-export default function Messages({ roomId }) {
+import './Messages.scss';
+
+const Messages = ({ roomId }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const content = [
     <MessagesList key="messagesList" roomId={roomId} />,
@@ -18,9 +20,10 @@ export default function Messages({ roomId }) {
       <InputArea
         key="inputArea"
         onSubmit={
-          async ({ text }) => sendMessage({
+          async ({ text, image }) => sendMessage({
             text,
             roomId,
+            image,
           })
         }
       />,
@@ -28,11 +31,13 @@ export default function Messages({ roomId }) {
   }
 
   return (
-    <div className="messages">
+    <div className="Messages">
       {content}
     </div>
   );
-}
+};
+
+export default React.memo(Messages);
 
 Messages.propTypes = {
   roomId: string,

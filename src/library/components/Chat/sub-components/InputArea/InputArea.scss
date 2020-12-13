@@ -1,7 +1,41 @@
 @import '../../../../../common';
 
-.inputArea {
+.InputArea {
+  position: sticky;
+  bottom: 0;
+  background-color: $second-background-color;
+
   .buttonBox {
-    height: 2em;
+    .Button {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      border-bottom: none;
+      vertical-align: bottom;
+      padding-bottom: 0;
+    }
+  }
+
+  .input {
+    display: flex;
+    width: 100%;
+    max-width: $max-width;
+
+    textarea {
+      box-shadow: $shadow;
+      background-color: $light-background-color;
+      color: $second-color;
+      border: $border;
+      padding: $padding;
+      flex-grow: 1;
+      border-radius: $border-radius;
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .Button {
+      border-left: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
   }
 }

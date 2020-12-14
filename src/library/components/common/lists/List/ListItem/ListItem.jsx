@@ -19,7 +19,7 @@ const ListItem = ({
   </li>
 );
 
-export default ListItem;
+export default React.memo(ListItem);
 
 ListItem.propTypes = {
   children: node.isRequired,

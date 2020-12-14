@@ -11,6 +11,8 @@
   }
 
   ul {
+    z-index: 9;
+
     li {
       word-wrap: break-word;
       padding: $padding 0;
@@ -23,12 +25,12 @@
   background-color: $light-background-color;
   position: absolute;
   list-style: none;
-  max-width: $min-width-calc;
   padding: $padding;
   border: $border;
   border-radius: $border-radius;
   border-top-left-radius: 0;
   user-select: none;
+  box-sizing: border-box;
 
   li {
     margin-bottom: $margin;
@@ -44,9 +46,11 @@
     border-bottom: none;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
+    border-color: $second-color;
   }
 
   .dropdown {
     border-top-left-radius: 0;
+    border-color: $second-color;
   }
 }

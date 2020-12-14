@@ -8,7 +8,7 @@ import Button from '../../common/sub-components/Button/Button';
 
 const RemoveRoomDialog = ({ done, roomId }) => {
   const [error, setError] = useState();
-  const room = useSelector((state) => getRoom(state, { roomId }));
+  const room = useSelector((state) => getRoom(state, roomId));
 
   const onSubmit = () => {
     emitSocketEvent('removeRoom', { roomId }, ({ error: roomError }) => {

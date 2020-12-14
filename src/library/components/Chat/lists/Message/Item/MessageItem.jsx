@@ -1,17 +1,27 @@
 import React from 'react';
-import { arrayOf, shape, string } from 'prop-types';
+import {
+  arrayOf,
+  func,
+  shape,
+  string,
+} from 'prop-types';
 
 import MessageInfo from '../../../sub-components/MessageInfo/MessageInfo';
-import ListItem from '../../../../common/sub-components/List/ListItem/ListItem';
+import ListItem from '../../../../common/lists/List/ListItem/ListItem';
 
 import './MessageItem.scss';
 
-const MessageItem = ({ message }) => (
+const MessageItem = ({ message, onDialog }) => (
   <ListItem
     classNames={['MessageItem']}
     key={message.objectId}
   >
-    <MessageInfo message={message} />
+
+    <MessageInfo
+      identityId={message.ownerAliasId || message.ownerId}
+      timeCreated={message.customTimeCreated || message.timeCreated}
+      onDialog={onDialog}
+    />
     <div className="text">
       {/* eslint-disable-next-line react/no-array-index-key */}
       {message.text.map((line, index) => <p key={index}>{line}</p>)}
@@ -26,4 +36,5 @@ MessageItem.propTypes = {
     objectId: string,
     text: arrayOf(string),
   }).isRequired,
+  onDialog: func.isRequired,
 };

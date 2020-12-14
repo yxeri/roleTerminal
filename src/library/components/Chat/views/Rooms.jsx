@@ -3,33 +3,45 @@ import { useSelector } from 'react-redux';
 import { func } from 'prop-types';
 import { AccessLevels } from '../../../AccessCentral';
 import UserList from '../../common/lists/UserList';
-import RoomList from '../../common/lists/RoomList';
-import WhisperList from '../lists/WhisperList';
+import RoomList from '../lists/Room/RoomList';
+import WhisperList from '../lists/Whisper/WhisperList';
 import FollowingList from '../lists/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 
-const Rooms = ({ onChange }) => {
+const Rooms = ({ onChange, onDialog }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
-  const content = [];
-
-  if (accessLevel >= AccessLevels.STANDARD) {
-    content.push(
-      <FollowingList key="followingList" onChange={onChange} />,
-      <WhisperList key="whisperList" onChange={onChange} />,
-      <RoomList key="roomList" onChange={onChange} />,
-    );
-  }
 
   return (
     <>
-      {content}
-      <UserList key="userList" />
+      {
+        accessLevel >= AccessLevels.STANDARD && (
+          <>
+            <FollowingList
+              key="following"
+              onChange={onChange}
+            />
+            <WhisperList
+              key="whisper"
+              onChange={onChange}
+            />
+            <RoomList
+              key="room"
+              onChange={onChange}
+            />
+          </>
+        )
+      }
+      <UserList
+        onDialog={onDialog}
+        key="user"
+      />
     </>
   );
 };
 
-export default Rooms;
+export default React.memo(Rooms);
 
 Rooms.propTypes = {
   onChange: func.isRequired,
+  onDialog: func.isRequired,
 };

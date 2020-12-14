@@ -8,7 +8,7 @@ import { getCurrentUser } from '../../redux/selectors/users';
 import { getWalletByOwners } from '../../redux/selectors/wallets';
 
 const Wallet = ({ onClick, order }) => {
-  const user = useSelector(getCurrentUser);
+  const user = useSelector((state) => getCurrentUser(state));
   const wallets = useSelector((state) => getWalletByOwners(state, {
     ownerIds: [user.objectId].concat(user.aliases),
   }));

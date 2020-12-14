@@ -1,27 +1,25 @@
 import React from 'react';
 import { node } from 'prop-types';
-import List from '../sub-components/List/List';
-import ListItem from '../sub-components/List/ListItem/ListItem';
+import List from './List/List';
+import ListItem from './List/ListItem/ListItem';
 
-const FileMenu = ({ children }) => {
-  return (
-    <List
-      dropdown
-      classNames={['FileMenu']}
-      title="File"
+const FileMenu = ({ children }) => (
+  <List
+    dropdown
+    classNames={['FileMenu']}
+    title="File"
+  >
+    {children}
+    <ListItem
+      key="quit"
+      onClick={() => { console.log('quit'); }}
     >
-      {children}
-      <ListItem
-        key="quit"
-        onClick={() => { console.log('quit'); }}
-      >
-        Quit
-      </ListItem>
-    </List>
-  );
-};
+      Quit
+    </ListItem>
+  </List>
+);
 
-export default FileMenu;
+export default React.memo(FileMenu);
 
 FileMenu.propTypes = {
   children: node.isRequired,

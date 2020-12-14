@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number } from 'prop-types';
 
@@ -16,14 +16,24 @@ const InputArea = ({
   onSubmit,
   minAccessLevel = AccessLevels.STANDARD,
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef(null);
   const [text, setText] = useState('');
   const [image, setImage] = useState();
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
-  const content = [];
   const textareaClasses = [];
+
+  useEffect(() => {
+    if (inputRef.current) {
+      const textarea = inputRef.current;
+
+      if (!textarea.style.height || (textarea.scrollHeight.toString() !== textarea.style.height.split('px')[0])) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    }
+  }, [text]);
 
   const submit = () => {
     onSubmit({
@@ -37,33 +47,28 @@ const InputArea = ({
     });
   };
 
-  if (isFocused) {
-    textareaClasses.push('focused');
-  }
-
-  if (accessLevel >= minAccessLevel) {
-    content.push(
-      <div
-        key="buttonBox"
-        className="buttonBox"
-      >
-        {
-          allowedImages.CHAT
+  return (
+    <div className="InputArea">
+      {accessLevel >= minAccessLevel && (
+        <div
+          key="buttonBox"
+          className="buttonBox"
+        >
+          {
+            allowedImages.CHAT
             && (
               <ImageUpload
                 onChange={setImage}
               />
             )
-        }
-      </div>,
-    );
-  }
-
-  return (
-    <div className="InputArea">
-      {content}
+          }
+        </div>
+      )}
       <div className="input">
         <textarea
+          key="input"
+          rows={1}
+          ref={inputRef}
           onKeyDown={(event) => {
             const { key, altKey } = event;
 
@@ -73,17 +78,14 @@ const InputArea = ({
           }}
           value={text}
           placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
-          key="textarea"
           className={textareaClasses.join(' ')}
           onChange={(event) => setText(event.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
         />
         <Button
           disabled={!online}
           key="send"
           type="submit"
-          className="sendButton"
+          classNames={['sendButton']}
           onClick={() => submit()}
         >
           Send

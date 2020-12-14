@@ -1,9 +1,3 @@
-export const getAllAliases = (state, { getMap = false } = {}) => {
-  if (getMap) {
-    return state.aliases;
-  }
+export const getAllAliases = (state) => state.aliases;
 
-  return [...state.aliases.values()];
-};
-
-export const getAlias = (state, { aliasId }) => state.aliases.get(aliasId);
+export const getAlias = (state, aliasId) => state.aliases.get(aliasId);

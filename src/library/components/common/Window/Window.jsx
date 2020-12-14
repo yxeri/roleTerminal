@@ -16,6 +16,7 @@ const Window = ({
   children,
   order,
   menu,
+  maxWidth,
   title = 'app',
   classNames = [],
   done = () => {},
@@ -43,6 +44,7 @@ const Window = ({
       size={size}
       minWidth={320}
       minHeight={220}
+      maxWidth={maxWidth}
       bounds="parent"
       dragHandleClassName="TopBar"
       enableResizing={{
@@ -128,6 +130,7 @@ Window.propTypes = {
   title: string,
   classNames: arrayOf(string),
   done: func,
+  maxWidth: number,
 };
 
 Window.defaultProps = {
@@ -135,4 +138,5 @@ Window.defaultProps = {
   classNames: [],
   title: 'app',
   menu: undefined,
+  maxWidth: undefined,
 };

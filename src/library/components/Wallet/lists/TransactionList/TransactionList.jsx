@@ -1,11 +1,11 @@
 import React from 'react';
 import { arrayOf, string } from 'prop-types';
 import { useSelector } from 'react-redux';
-import List from '../../../common/sub-components/List/List';
+import List from '../../../common/lists/List/List';
 import { getTransactionsByWallets } from '../../../../redux/selectors/transactions';
 import { getIdentitiesByIds } from '../../../../redux/selectors/users';
 import { getWalletByIds } from '../../../../redux/selectors/wallets';
-import ListItem from '../../../common/sub-components/List/ListItem/ListItem';
+import ListItem from '../../../common/lists/List/ListItem/ListItem';
 
 const TransactionList = ({ walletIds }) => {
   const transactions = useSelector((state) => getTransactionsByWallets(state, { walletIds }));

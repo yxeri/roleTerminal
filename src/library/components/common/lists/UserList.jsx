@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import List from '../sub-components/List/List';
-import { getIdentities, SortBy } from '../../../redux/selectors/users';
+import { func } from 'prop-types';
+import List from './List/List';
+import { getOthersIdentities } from '../../../redux/selectors/users';
 import UserDialog from '../dialogs/UserDialog';
 import { createDialog } from '../../helper';
-import ListItem from '../sub-components/List/ListItem/ListItem';
+import ListItem from './List/ListItem/ListItem';
 
-const UserList = () => {
-  const identities = useSelector((state) => getIdentities(state, { sortBy: SortBy.NAME }));
-  const [dialog, setDialog] = useState();
+const UserList = ({ onDialog }) => {
+  const identities = useSelector(getOthersIdentities);
 
   const userMapper = () => identities.map((identity) => (
     <ListItem
       key={identity.objectId}
       onClick={() => {
-        setDialog(createDialog(<UserDialog done={() => {}} userId={identity.objectId} />));
+        onDialog(createDialog(<UserDialog done={() => onDialog()} userId={identity.objectId} />));
       }}
     >
       {identity.username || identity.aliasName}
@@ -22,17 +22,18 @@ const UserList = () => {
   ));
 
   return (
-    <>
-      <List
-        dropdown
-        classNames={['UserList']}
-        title="Users"
-      >
-        {userMapper()}
-      </List>
-      {dialog}
-    </>
+    <List
+      dropdown
+      classNames={['UserList']}
+      title="Users"
+    >
+      {userMapper()}
+    </List>
   );
 };
 
-export default UserList;
+export default React.memo(UserList);
+
+UserList.propTypes = {
+  onDialog: func.isRequired,
+};

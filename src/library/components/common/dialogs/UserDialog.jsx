@@ -2,11 +2,11 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { func, string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
-import { getIdentity } from '../../../redux/selectors/users';
+import { getIdentityById } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
 
 const UserDialog = ({ userId, done }) => {
-  const user = useSelector((state) => getIdentity(state, { identityId: userId }));
+  const user = useSelector((state) => getIdentityById(state, { identityId: userId }));
 
   return (
     <Dialog

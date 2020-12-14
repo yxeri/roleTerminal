@@ -16,6 +16,9 @@ import {
   login as loginAction,
 } from '../redux/actions/auth';
 import { getUserId } from '../redux/selectors/userId';
+import { chatMessage, chatMessages } from './listeners/messages';
+import { room } from './listeners/rooms';
+import { user } from './listeners/users';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -23,7 +26,7 @@ const socket = (() => {
     : '/';
 
   if (process.env.NODE_ENV === 'development') {
-    socketUri = 'http://localhost:8888';
+    socketUri = `${window.location.hostname}:8888`;
   }
 
   console.log(socketUri);
@@ -31,7 +34,7 @@ const socket = (() => {
   return window.io(socketUri, { forceNew: true });
 })();
 
-export const CreateEvents = {
+export const SendEvents = {
   ALIAS: 'createAlias',
   USER: 'createUser',
   MESSAGE: 'sendMessage',
@@ -46,6 +49,7 @@ export const CreateEvents = {
   TEAM: 'createTeam',
   TRANSACTION: 'createTransaction',
   DEVICE: 'createDevice',
+  FOLLOW: 'followRoom',
 };
 
 export const GetEvents = {
@@ -70,62 +74,64 @@ export const ActionEvents = {
   LOGIN: 'login',
 };
 
-export const EmitTypes = {
-  FORUM: 'forum',
-  FORUMTHREAD: 'forumThread',
-  FORUMPOST: 'forumPost',
-  FOLLOW: 'followRoom',
-  USER: 'user',
-  CHATMSG: 'chatMsg',
-  DEVICE: 'device',
-  DOCFILE: 'docFile',
-  WHISPER: 'whisper',
-  BROADCAST: 'broadcast',
-  GAMECODE: 'gameCode',
-  ALIAS: 'alias',
-  CREATEPOSITION: 'createPosition',
-  POSITION: 'position',
-  ROOM: 'room',
-  FOLLOWER: 'follower',
-  TEAM: 'team',
-  INVITATION: 'invitation',
-  TEAMMEMBER: 'team member',
-  LOGOUT: 'logout',
-  BAN: 'ban',
-  WALLET: 'wallet',
-  TRANSACTION: 'transaction',
-  TEAMSCORING: 'teamScoring',
-  DISCONNECT: 'disconnect',
+export const ListenerEvents = {
   RECONNECT: 'reconnect',
-  TERMINATE: 'terminate',
   STARTUP: 'startup',
-  SENDMSG: 'sendMessage',
-  UPDATEPOSITION: 'updatePosition',
-  UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
-  UNLOCKDOCFILE: 'unlockDocFile',
-  GETROOMMSGS: 'getMessagesByRoom',
-  BANUSER: 'banUser',
-  UNBANUSER: 'unbanUser',
-  VERIFYUSER: 'verifyUser',
-  CHANGEPASSWORD: 'changePassword',
-  UPDATEUSER: 'updateUser',
-  UPDATEWALLET: 'updateWallet',
-  UNFOLLOW: 'unfollowRoom',
-  CREATETRANSACTION: 'createTransaction',
-  INVITETEAM: 'inviteToTeam',
-  LEAVETEAM: 'leaveTeam',
-  SIMPLEMSG: 'simpleMsg',
-  INVITEROOM: 'inviteToRoom',
-  DECLINEINVITE: 'decline',
-  ACCEPTTEAM: 'acceptTeamInvitation',
-  ACCEPTROOM: 'acceptRoomInvitation',
-  SENDROOMINVITE: 'sendInvitationToRoom',
-  GETUSERBYCODE: 'getUserByCode',
-  USEGAMECODE: 'useGameCode',
-  CONNECTUSER: 'connectUser',
+  DISCONNECT: 'disconnect',
+  MSGCHAT: 'chatMsg',
+  MSGWHISPER: 'whisper',
 };
 
-export const addSocketListener = async (event, callback) => {
+// export const EmitTypes = {
+//   FORUM: 'forum',
+//   FORUMTHREAD: 'forumThread',
+//   FORUMPOST: 'forumPost',
+
+//   DEVICE: 'device',
+//   DOCFILE: 'docFile',
+
+//   BROADCAST: 'broadcast',
+//   GAMECODE: 'gameCode',
+//   ALIAS: 'alias',
+//   CREATEPOSITION: 'createPosition',
+//   POSITION: 'position',
+
+//   TEAM: 'team',
+//   INVITATION: 'invitation',
+//   TEAMMEMBER: 'team member',
+//   LOGOUT: 'logout',
+//   BAN: 'ban',
+//   WALLET: 'wallet',
+//   TRANSACTION: 'transaction',
+//   TEAMSCORING: 'teamScoring',
+//   TERMINATE: 'terminate',
+//   SENDMSG: 'sendMessage',
+//   UPDATEPOSITION: 'updatePosition',
+//   UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
+//   UNLOCKDOCFILE: 'unlockDocFile',
+//   GETROOMMSGS: 'getMessagesByRoom',
+//   BANUSER: 'banUser',
+//   UNBANUSER: 'unbanUser',
+//   VERIFYUSER: 'verifyUser',
+//   CHANGEPASSWORD: 'changePassword',
+//   UPDATEUSER: 'updateUser',
+//   UPDATEWALLET: 'updateWallet',
+//   UNFOLLOW: 'unfollowRoom',
+//   CREATETRANSACTION: 'createTransaction',
+//   INVITETEAM: 'inviteToTeam',
+//   LEAVETEAM: 'leaveTeam',
+//   SIMPLEMSG: 'simpleMsg',
+//   INVITEROOM: 'inviteToRoom',
+//   DECLINEINVITE: 'decline',
+//   ACCEPTTEAM: 'acceptTeamInvitation',
+//   ACCEPTROOM: 'acceptRoomInvitation',
+//   SENDROOMINVITE: 'sendInvitationToRoom',
+//   GETUSERBYCODE: 'getUserByCode',
+//   USEGAMECODE: 'useGameCode',
+//   CONNECTUSER: 'connectUser',
+// };
+
+export const addSocketListener = async ({ event, callback }) => {
   socket.on(event, (params) => { console.log(event, params); callback(params); });
 };
 
@@ -168,50 +174,66 @@ if (process.env.NODE_ENV === 'development') {
   }, 1000);
 }
 
-addSocketListener(EmitTypes.RECONNECT, () => {
-  if (getUserId(store.getState)) {
-    emitSocketEvent('updateId', {})
-      .then(() => {
-        store.dispatch(online());
-      })
-      .catch((error) => {
-        console.log(error);
-        store.dispatch(logoutAction());
-      });
-  }
+addSocketListener({
+  event: ListenerEvents.RECONNECT,
+  callback: () => {
+    if (getUserId(store.getState)) {
+      emitSocketEvent('updateId', {})
+        .then(() => {
+          store.dispatch(online());
+        })
+        .catch((error) => {
+          console.log(error);
+          store.dispatch(logoutAction());
+        });
+    }
+  },
 });
 
-addSocketListener(EmitTypes.STARTUP, ({ data }) => {
-  const userId = getStoredUserId();
-  const token = getStoredToken();
+addSocketListener({
+  event: ListenerEvents.STARTUP,
+  callback: ({ data }) => {
+    const userId = getStoredUserId();
+    const token = getStoredToken();
 
-  if (userId && token) {
-    store.dispatch(loginAction({
-      userId,
-      token,
-    }));
-  }
+    if (userId && token) {
+      store.dispatch(loginAction({
+        userId,
+        token,
+      }));
+    }
 
-  if (!getDeviceId()) {
-    setDeviceId('1234567890123456');
-  }
+    if (!getDeviceId()) {
+      setDeviceId('1234567890123456');
+    }
 
-  store.dispatch(startup(data));
+    store.dispatch(startup(data));
 
-  if (userId || token) {
-    emitSocketEvent('updateId', {})
-      .then(() => {
-        store.dispatch(online());
-      })
-      .catch((error) => {
-        console.log(error);
-        store.dispatch(logoutAction());
-      });
-  }
+    if (userId || token) {
+      emitSocketEvent('updateId', {})
+        .then(() => {
+          store.dispatch(online());
+        })
+        .catch((error) => {
+          console.log(error);
+          store.dispatch(logoutAction());
+        });
+    }
+  },
 });
 
-addSocketListener(EmitTypes.DISCONNECT, () => {
-  store.dispatch(offline());
+addSocketListener({
+  event: ListenerEvents.DISCONNECT,
+  callback: () => {
+    store.dispatch(offline());
 
-  reconnect();
+    reconnect();
+  },
 });
+
+addSocketListener(chatMessage());
+addSocketListener(chatMessages());
+
+addSocketListener(room());
+
+addSocketListener(user());

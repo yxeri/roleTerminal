@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import List from '../../common/sub-components/List/List';
+import List from '../../common/lists/List/List';
 import { getCurrentUserIdentities } from '../../../redux/selectors/users';
 
 const Identities = () => {

@@ -16,8 +16,14 @@
   box-shadow: $shadow;
   z-index: 10;
 
-  .list {
+  .List {
     z-index: 11;
+
+    .dropdown {
+      max-height: calc(100vh - #{2em + $padding});
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
   }
 
   > * {

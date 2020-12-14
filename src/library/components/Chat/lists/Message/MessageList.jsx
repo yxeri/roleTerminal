@@ -1,18 +1,22 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { string } from 'prop-types';
+import { func, string } from 'prop-types';
 
-import { getMessages } from '../../../../redux/selectors/messages';
-import List from '../../../common/sub-components/List/List';
-import MessageItem from './MessageItem/MessageItem';
+import { getMessagesByRoom } from '../../../../redux/selectors/messages';
+import List from '../../../common/lists/List/List';
+import MessageItem from './Item/MessageItem';
 
 import './MessageList.scss';
 
-const MessageList = ({ roomId }) => {
-  const messages = useSelector((state) => getMessages(state, { roomId }));
+const MessageList = ({ roomId, onDialog }) => {
+  const messages = useSelector(getMessagesByRoom(roomId));
 
   const messageMapper = () => messages.map((message) => (
-    <MessageItem key={message.objectId} message={message} />
+    <MessageItem
+      key={message.objectId}
+      message={message}
+      onDialog={onDialog}
+    />
   ));
 
   return (
@@ -33,6 +37,7 @@ export default React.memo(MessageList);
 
 MessageList.propTypes = {
   roomId: string,
+  onDialog: func.isRequired,
 };
 
 MessageList.defaultProps = {

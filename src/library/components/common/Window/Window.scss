@@ -16,13 +16,14 @@
     color: $second-color;
     text-shadow: $text-shadow;
     border-radius: $border-radius;
+    box-sizing: border-box;
 
     .windowBox {
       display: grid;
       grid-template-rows: fit-content(0) auto;
+      grid-template-columns: 100%;
       padding: $padding;
       height: calc(100% - 1em - #{$margin * 4});
-      width: calc(100% - #{$margin * 2});
 
       .menu {
         background-color: $second-background-color;
@@ -30,9 +31,24 @@
         flex-direction: row;
         margin-bottom: $margin;
         height: 1em + $margin * 2 + .1em;
+        max-height: inherit;
+        position: relative;
 
-        > * {
-          margin-right: $margin * 2;
+        .List {
+          margin-right: $margin;
+          flex-grow: 1;
+
+          .dropdown {
+            left: 0;
+            width: 100%;
+            max-height: calc(100vh - #{6em - $padding * 2});
+            overflow-y: auto;
+            scrollbar-width: none;
+          }
+        }
+
+        .List:last-child {
+          margin-right: 0;
         }
       }
 
@@ -47,8 +63,8 @@
 
   .Window[min-width~="600px"] {
     .windowBox {
-      display: flex;
-      flex-direction: row;
+      grid-template-rows: 1fr;
+      grid-template-columns: fit-content(0) 1fr;
 
       .menu {
         flex-direction: column;
@@ -58,8 +74,15 @@
         overflow-y: auto;
         scrollbar-width: none;
 
-        .list {
+        .List {
+          flex-grow: inherit;
           margin-bottom: $margin * 2;
+          margin-right: 0;
+
+          .dropdown {
+            left: inherit;
+            width: inherit;
+          }
 
           ul {
             position: relative;

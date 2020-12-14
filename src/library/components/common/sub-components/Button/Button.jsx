@@ -13,6 +13,7 @@ const Button = ({
   onClick,
   children,
   disabled,
+  stopPropagation,
   classNames = [''],
   type = 'button',
 }) => (
@@ -20,7 +21,13 @@ const Button = ({
     className={`${['Button'].concat(classNames).join(' ')}`}
     disabled={disabled}
     type={type} /* eslint-disable-line react/button-has-type */
-    onClick={(event) => { onClick(event); }}
+    onClick={(event) => {
+      if (stopPropagation) {
+        event.stopPropagation();
+      }
+
+      onClick(event);
+    }}
   >
     {children}
   </button>
@@ -34,10 +41,12 @@ Button.propTypes = {
   type: oneOf(['button', 'submit']),
   disabled: bool,
   classNames: arrayOf(string),
+  stopPropagation: bool,
 };
 
 Button.defaultProps = {
   type: 'button',
   disabled: undefined,
   classNames: [],
+  stopPropagation: undefined,
 };

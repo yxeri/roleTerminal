@@ -4,7 +4,7 @@ import {
   arrayOf,
   bool,
   node,
-  shape,
+  shape, func,
 } from 'prop-types';
 
 import './List.scss';
@@ -17,10 +17,10 @@ const List = ({
   classNames = [],
 }) => {
   const listRef = useRef(null);
+  const windowRef = useRef(null);
   const [hidden, setHidden] = useState(typeof title !== 'undefined');
-  const content = [];
   const listClasses = [];
-  const classes = ['list'].concat(classNames);
+  const classes = ['List'].concat(classNames);
 
   useEffect(() => {
     if (scrollTo && listRef.current) {
@@ -29,20 +29,6 @@ const List = ({
       }
     }
   });
-
-  if (title) {
-    content.push(
-      <header
-        role="button"
-        tabIndex={0}
-        key="listHeader"
-        className="toggle clickable"
-        onClick={() => setHidden(!hidden)}
-      >
-        {title}
-      </header>,
-    );
-  }
 
   if (!hidden) {
     classes.push('expanded');
@@ -54,27 +40,42 @@ const List = ({
     listClasses.push('dropdown');
   }
 
-  content.push(
-    <ul
-      ref={listRef}
-      key="listElem"
-      className={`${listClasses.join(' ')}`}
-      onClick={() => {
-        if (dropdown) {
-          setHidden(true);
-        }
-      }}
-    >
-      {children}
-    </ul>,
-  );
-
   return (
     <div
       key="List"
       className={classes.join(' ')}
     >
-      {content}
+      { title && (
+        <header
+          role="button"
+          tabIndex={0}
+          key="listHeader"
+          className="toggle clickable"
+          onClick={() => {
+            setHidden(!hidden);
+          }}
+        >
+          {title}
+        </header>
+      )}
+      <ul
+        ref={(element) => {
+          listRef.current = element;
+
+          if (element) {
+            windowRef.current = element.closest('.Window');
+          }
+        }}
+        key="listElem"
+        className={`${listClasses.join(' ')}`}
+        onClick={() => {
+          if (dropdown && (!windowRef.current || windowRef.current.offsetWidth < 600)) {
+            setHidden(true);
+          }
+        }}
+      >
+        {children}
+      </ul>
     </div>
   );
 };

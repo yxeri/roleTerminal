@@ -23,10 +23,10 @@ const TopBar = ({
   </div>
 );
 
-export default TopBar;
+export default React.memo(TopBar);
 
 TopBar.propTypes = {
   done: func.isRequired,
   title: string.isRequired,
   onDoubleClick: func.isRequired,
-}
+};

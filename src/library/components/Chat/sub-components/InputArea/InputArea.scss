@@ -11,7 +11,6 @@
       border-bottom-left-radius: 0;
       border-bottom: none;
       vertical-align: bottom;
-      padding-bottom: 0;
     }
   }
 
@@ -30,6 +29,7 @@
       border-radius: $border-radius;
       border-bottom-right-radius: 0;
       border-top-right-radius: 0;
+      min-height: 3ch;
     }
 
     .Button {

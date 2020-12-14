@@ -1,64 +1,43 @@
+import { createSelector } from 'reselect';
+
 import { getAlias, getAllAliases } from './aliases';
 import { getUserId } from './userId';
 import { getAnonymousUser } from './config';
 
-export const SortBy = {
-  NAME: 'name',
-};
+export const getAllUsers = (state) => state.users;
 
-export const getAllUsers = (state) => [...state.users.values()];
+export const getUser = (state, userId) => state.users.get(userId);
 
 export const getCurrentUser = (state) => state.users.get(getUserId(state)) || getAnonymousUser(state);
 
-export const getCurrentAccessLevel = (state) => getCurrentUser(state).accessLevel;
+export const getCurrentAccessLevel = createSelector(
+  [getCurrentUser],
+  (user) => user.accessLevel,
+);
 
-export const getIdentity = (state, { identityId } = {}) => state.users.get(identityId) || getAlias(state, { aliasId: identityId });
+export const getIdentities = createSelector(
+  [getAllUsers, getAllAliases],
+  (users, aliases) => [...users.values(), ...aliases.values()],
+);
 
-export const getAllIdentities = (state, { getMap = false } = {}) => {
-  if (getMap) {
-    return new Map([...state.users, ...getAllAliases(state, { getMap: true })]);
-  }
+export const getIdentitiesByIds = (ids) => createSelector(
+  [getAllUsers, getAllAliases],
+  (users, aliases) => ids.map((id) => users.get(id) || aliases.get(id)),
+);
 
-  return [...state.users.values(), ...getAllAliases(state)];
-};
+export const getIdentityById = createSelector(
+  [getUser, getAlias],
+  (user, alias) => user || alias,
+);
 
-export const getOthersIdentities = (state) => {
-  const userId = getUserId(state);
+export const getOthersIdentities = createSelector(
+  [getIdentities, getUserId],
+  (identities, userId) => identities
+    .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId)),
+);
 
-  return getAllUsers(state)
-    .filter((user) => user.objectId !== userId)
-    .concat(getAllAliases(state).filter((alias) => userId !== alias.ownerId && !alias.userIds.includes(userId)));
-};
-
-export const getCurrentUserIdentities = (state) => {
-  const user = getCurrentUser(state);
-
-  return [user.objectId]
-    .concat(user.aliases)
-    .map((id) => state.users.get(id) || getAlias(state, { aliasId: id }));
-};
-
-export const getIdentitiesByIds = (state, { identityIds }) => identityIds
-  .map((identityId) => getIdentity(state, { identityId }));
-
-export const getIdentities = (state, { sortBy = '', excludeSelf = true } = {}) => {
-  const getFunc = excludeSelf
-    ? getOthersIdentities
-    : getAllIdentities;
-
-  switch (sortBy) {
-    case SortBy.NAME: {
-      return getFunc(state).sort((a, b) => {
-        const aParam = (a.username || a.aliasName).toLowerCase();
-        const bParam = (b.username || b.aliasName).toLowerCase();
-
-        return aParam < bParam
-          ? -1
-          : 1;
-      });
-    }
-    default: {
-      return getFunc(state);
-    }
-  }
-};
+export const getCurrentUserIdentities = createSelector(
+  [getIdentities, getUserId],
+  (identities, userId) => identities
+    .filter((identity) => identity.objectId === userId || identity.ownerId === userId || identity.userIds.includes(userId)),
+);

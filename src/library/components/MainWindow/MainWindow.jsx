@@ -21,7 +21,6 @@ const MainWindow = () => {
     WindowTypes.CHAT,
   ]));
   const accessLevel = useSelector(getCurrentAccessLevel);
-  const content = [];
   const onClick = (type) => {
     const values = [...order.values()];
 
@@ -35,28 +34,25 @@ const MainWindow = () => {
     }
   };
 
-  if (accessLevel >= AccessLevels.STANDARD) {
-    content.push(<Wallet
-      key={WindowTypes.WALLET}
-      order={[...order.values()].indexOf(WindowTypes.WALLET)}
-      onClick={() => onClick(WindowTypes.WALLET)}
-    />);
-  }
-
-  content.push(<WorldMap
-    key={WindowTypes.WORLDMAP}
-    order={[...order.values()].indexOf(WindowTypes.WORLDMAP)}
-    onClick={() => onClick(WindowTypes.WORLDMAP)}
-  />);
-  content.push(<Chat
-    key={WindowTypes.CHAT}
-    order={[...order.values()].indexOf(WindowTypes.CHAT)}
-    onClick={() => onClick(WindowTypes.CHAT)}
-  />);
-
   return (
     <div id="MainWindow">
-      {content}
+      { accessLevel >= AccessLevels.STANDARD && (
+        <Wallet
+          key={WindowTypes.WALLET}
+          order={[...order.values()].indexOf(WindowTypes.WALLET)}
+          onClick={() => onClick(WindowTypes.WALLET)}
+        />
+      )}
+      <WorldMap
+        key={WindowTypes.WORLDMAP}
+        order={[...order.values()].indexOf(WindowTypes.WORLDMAP)}
+        onClick={() => onClick(WindowTypes.WORLDMAP)}
+      />
+      <Chat
+        key={WindowTypes.CHAT}
+        order={[...order.values()].indexOf(WindowTypes.CHAT)}
+        onClick={() => onClick(WindowTypes.CHAT)}
+      />
     </div>
   );
 };

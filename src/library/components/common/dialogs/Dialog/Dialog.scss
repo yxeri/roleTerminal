@@ -1,26 +1,32 @@
 @import "../../../../../common";
 
-.Dialog {
-  .inputs {
-    display: flex;
-    flex-direction: column;
-
-    > * {
-      margin-bottom: $margin * 2;
+.rnd {
+  .Dialog {
+    .windowBox {
+      display: flex;
     }
 
-    :first-child {
-      margin-top: $margin;
-    }
+    .inputs {
+      display: flex;
+      flex-direction: column;
 
-    input, textarea {
-      padding: $padding;
-      border-radius: $border-radius;
-    }
+      > * {
+        margin-bottom: $margin * 2;
+      }
 
-    .buttons {
-      position: sticky;
-      bottom: 0;
+      :first-child {
+        margin-top: $margin;
+      }
+
+      input, textarea {
+        padding: $padding;
+        border-radius: $border-radius;
+      }
+
+      .buttons {
+        position: sticky;
+        bottom: 0;
+      }
     }
   }
 }

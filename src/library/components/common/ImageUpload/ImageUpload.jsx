@@ -55,6 +55,7 @@ const ImageUpload = ({ onChange } = {}) => {
         onClick={() => { inputRef.current.click(); }}
       >
         <Image
+          onRemove={() => setPreviewImage()}
           ref={previewRef}
           classNames={['previewImage'].concat([!previewImage ? 'hide' : ''])}
           image={previewImage ? previewImage.source : ''}
@@ -69,7 +70,7 @@ const ImageUpload = ({ onChange } = {}) => {
   );
 };
 
-export default React.memo(ImageUpload)
+export default React.memo(ImageUpload);
 
 ImageUpload.propTypes = {
   onChange: func.isRequired,

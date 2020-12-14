@@ -13,6 +13,5 @@ export const login = async (username, password) => {
 };
 
 export const logout = async () => {
-  console.log('logging out');
   store.dispatch(logoutAction());
 };

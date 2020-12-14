@@ -1,8 +1,9 @@
 @import "../../../common";
 
-#main {
+#MainWindow {
   position: relative; /* Needed for react-draggable. It will assume main is the parent */
   background-color: $background-color;
   height: calc(100% - 2.2em);
   width: 100%;
+  overflow: hidden;
 }

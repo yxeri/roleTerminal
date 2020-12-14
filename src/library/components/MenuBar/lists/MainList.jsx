@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import List from '../../common/sub-components/List/List';
+import List from '../../common/lists/List/List';
 import { AccessLevels } from '../../../AccessCentral';
 import LoginDialog from '../../common/dialogs/LoginDialog';
 import RegisterDialog from '../../common/dialogs/RegisterDialog';
 import { logout } from '../../../socket/actions/auth';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 import { createDialog } from '../../helper';
-import ListItem from '../../common/sub-components/List/ListItem/ListItem';
+import ListItem from '../../common/lists/List/ListItem/ListItem';
 
 const MainList = () => {
   const [dialog, setDialog] = useState();
@@ -49,15 +49,12 @@ const MainList = () => {
   }
 
   return (
-    <>
-      <List
-        dropdown
-        title="Main"
-      >
-        {items}
-      </List>
-      {dialog}
-    </>
+    <List
+      dropdown
+      title="Main"
+    >
+      {items}
+    </List>
   );
 };
 

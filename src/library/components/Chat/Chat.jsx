@@ -11,14 +11,14 @@ import { getRoom } from '../../redux/selectors/rooms';
 import { createDialog } from '../helper';
 
 import './Chat.scss';
-import ListItem from '../common/sub-components/List/ListItem/ListItem';
+import ListItem from '../common/lists/List/ListItem/ListItem';
 import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
 
 const Chat = ({ onClick, order }) => {
   const [dialog, setDialog] = useState();
   const [roomId, setRoomId] = useState(getPublicRoomId(store.getState()));
-  const room = useSelector((state) => getRoom(state, { roomId }));
+  const room = useSelector((state) => getRoom(state, roomId));
 
   return (
     <>
@@ -29,7 +29,7 @@ const Chat = ({ onClick, order }) => {
         onClick={onClick}
         menu={(
           <>
-            <FileMenu>
+            <FileMenu key="fileMenu">
               <ListItem
                 key="createRoom"
                 onClick={() => setDialog(createDialog(<CreateRoomDialog done={() => setDialog()} />))}
@@ -43,11 +43,11 @@ const Chat = ({ onClick, order }) => {
                 Delete room
               </ListItem>
             </FileMenu>
-            <Rooms onChange={setRoomId} />
+            <Rooms onChange={setRoomId} onDialog={setDialog} />
           </>
         )}
       >
-        <Messages roomId={roomId} />
+        <Messages roomId={roomId} onDialog={setDialog} />
       </Window>
       {dialog}
     </>

@@ -1,14 +1,26 @@
 @import "../../../../common";
 
 .ImageUpload {
-  .imageBox, img {
+  .Image, img {
     max-height: 1em;
     max-width: 1em;
   }
 
   .previewImage {
+    position: relative;
     max-height: 120px;
     max-width: 120px;
+
+    div {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding-right: 0;
+      padding-top: 0;
+      border: 0;
+      box-shadow: none;
+      background-color: $second-background-color;
+    }
 
     img {
       max-height: inherit;

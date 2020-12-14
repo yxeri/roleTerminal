@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { func } from 'prop-types';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import Input from '../../common/sub-components/Input';
-import { emitSocketEvent } from '../../../socket/SocketManager';
 import Button from '../../common/sub-components/Button/Button';
+import { createRoom } from '../../../socket/actions/rooms';
 
 const CreateRoomDialog = ({ done }) => {
   const [roomName, setRoomName] = useState();
@@ -27,17 +27,9 @@ const CreateRoomDialog = ({ done }) => {
       topic,
     };
 
-    emitSocketEvent('createRoom', { room }, ({ error: roomError }) => {
-      if (roomError) {
-        setError(roomError);
-
-        return;
-      }
-
-      // TODO Notification: Room created
-
-      done();
-    });
+    createRoom({ room })
+      .then(() => done())
+      .catch((createError) => setError(createError));
   };
 
   return (

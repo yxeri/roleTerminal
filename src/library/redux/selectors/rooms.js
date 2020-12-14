@@ -1,79 +1,26 @@
+import { createSelector } from 'reselect';
 import { getCurrentUser } from './users';
-import { getPublicRoomId } from './config';
 
-export const RoomTypes = {
-  FOLLOWED: 'followed',
-  UNFOLLOWED: 'unfollowed',
-  WHISPER: 'whisper',
-};
+export const getAllRooms = (state) => state.rooms;
 
-export const SortBy = {
-  NAME: 'name',
-};
+export const getRoom = (state, id) => state.rooms.get(id);
 
-export const getAllRooms = (state) => [...state.rooms.values()];
+const getRooms = createSelector(
+  [getAllRooms],
+  (rooms) => [...rooms.values()].filter((room) => !room.isWhisper && !room.isUser),
+);
 
-export const getRoom = (state, { roomId } = {}) => state.rooms.get(roomId || getPublicRoomId(state));
+export const getUnfollowedRooms = createSelector(
+  [getRooms, getCurrentUser],
+  (rooms, user) => [...rooms.values()].filter((room) => !user.followingRooms.includes(room.objectId)),
+);
 
-export const getUnfollowedRooms = (state) => {
-  const user = getCurrentUser(state);
+export const getFollowedRooms = createSelector(
+  [getRooms, getCurrentUser],
+  (rooms, user) => [...rooms.values()].filter((room) => user.followingRooms.includes(room.objectId)),
+);
 
-  return getAllRooms(state).filter((room) => !user.followingRooms.includes(room.objectId));
-};
-
-export const getFollowedRooms = (state) => {
-  const user = getCurrentUser(state);
-
-  return getAllRooms(state).filter((room) => user.followingRooms.includes(room.objectId));
-};
-
-export const getWhisperRooms = (state) => {
-  const user = getCurrentUser(state);
-
-  return user
-    ? getAllRooms(state).filter((room) => room.isWhisper)
-    : [];
-};
-
-export const getChatRooms = (state, { sortBy = '', roomType = RoomTypes.UNFOLLOWED } = {}) => {
-  let rooms;
-
-  switch (roomType) {
-    case RoomTypes.UNFOLLOWED: {
-      rooms = getUnfollowedRooms(state);
-
-      break;
-    }
-    case RoomTypes.FOLLOWED: {
-      rooms = getFollowedRooms(state);
-
-      break;
-    }
-    case RoomTypes.WHISPER: {
-      rooms = getWhisperRooms(state);
-
-      break;
-    }
-    default: {
-      rooms = getAllRooms(state);
-
-      break;
-    }
-  }
-
-  switch (sortBy) {
-    case SortBy.NAME: {
-      return rooms.filter((room) => !room.isWhisper && !room.isUser).sort((a, b) => {
-        const aParam = a.roomName.toLowerCase();
-        const bParam = b.roomName.toLowerCase();
-
-        return aParam < bParam
-          ? -1
-          : 1;
-      });
-    }
-    default: {
-      return rooms.filter((room) => !room.isWhisper && !room.isUser);
-    }
-  }
-};
+export const getWhisperRooms = createSelector(
+  [getAllRooms],
+  (rooms) => [...rooms.values()].filter((room) => room.isWhisper),
+);

@@ -1,41 +1,33 @@
+import { createSelector } from 'reselect';
+import { getWalletById, getWalletIdsByCurrentUser } from './wallets';
+
 export const SortBy = {
   DATE: 'date',
   AMOUNT: 'amount',
 };
 
-export const getAllTransactions = (state) => {
-  return [...state.transactions.values()];
+export const getAllTransactions = (state) => state.transactions;
+
+export const getTransactionById = (state, transactionId) => state.transaction.get(transactionId);
+
+export const getIdentityIdsByTransaction = (state, transactionId) => {
+  const transaction = getTransactionById(state, transactionId);
+  const toWallet = getWalletById(state, transaction.toWalletId);
+  const fromWallet = getWalletById(state, transaction.fromWalletId);
+
+  return ([fromWallet.ownerAliasId || fromWallet.ownerId, toWallet.ownerAliasId || toWallet.ownerId]);
 };
 
-export const getTransactionsByWallets = (state, { walletIds }) => getAllTransactions(state)
-  .filter((transaction) => walletIds
-    .some((id) => id === transaction.toWalletId || id === transaction.fromWalletId));
+export const getTransactionIdsByWallets = (walletIds) => createSelector(
+  [getAllTransactions],
+  (transactions) => [...transactions.values()]
+    .filter(({ fromWalletId, toWalletId }) => walletIds.includes(fromWalletId) || walletIds.includes(toWalletId))
+    .map(({ objectId }) => objectId),
+);
 
-export const getTransactions = (state, { walletIds, sortBy } = {}) => {
-  const transactions = walletIds
-    ? getTransactionsByWallets(state, { walletIds })
-    : getAllTransactions(state);
-
-  switch (sortBy) {
-    case SortBy.DATE: {
-      return transactions.sort((a, b) => {
-        const aParam = a.customTimeCreated || a.timeCreated;
-        const bParam = b.customTimeCreated || b.timeCreated;
-
-        return aParam < bParam
-          ? -1
-          : 1;
-      });
-    }
-    case SortBy.AMOUNT: {
-      return transactions.sort((a, b) => {
-        return a.amount < b.amount
-          ? -1
-          : 1;
-      });
-    }
-    default: {
-      return transactions;
-    }
-  }
-};
+export const getTransactionIdsByCurrentUser = createSelector(
+  [getAllTransactions, getWalletIdsByCurrentUser],
+  (transactions, walletIds) => [...transactions.values()]
+    .filter(({ fromWalletId, toWalletId }) => walletIds.includes(fromWalletId) || walletIds.includes(toWalletId))
+    .map(({ objectId }) => objectId),
+);

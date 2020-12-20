@@ -19,7 +19,6 @@ const Dialog = ({
   classNames = [],
 }) => (
   <Window
-    maxWidth={640}
     done={done}
     order={10}
     title={title}
@@ -40,7 +39,7 @@ const Dialog = ({
   </Window>
 );
 
-export default Dialog;
+export default React.memo(Dialog);
 
 Dialog.propTypes = {
   done: func.isRequired,

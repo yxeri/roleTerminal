@@ -16,14 +16,13 @@ const Window = ({
   children,
   order,
   menu,
-  maxWidth,
   title = 'app',
   classNames = [],
   done = () => {},
 }) => {
   const defaultSize = { width: 640, height: 460 };
   const [size, setSize] = useState(defaultSize);
-  const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
+  const [coordinates, setCoordinates] = useState();
   const rndClasses = ['rnd'];
   const windowClasses = ['Window'].concat(classNames);
 
@@ -38,13 +37,14 @@ const Window = ({
 
   return (
     <Rnd
+      position={coordinates}
       className={`${rndClasses.join(' ')}`}
       style={{ zIndex: order }}
-      position={coordinates}
       size={size}
       minWidth={320}
       minHeight={220}
-      maxWidth={maxWidth}
+      maxHeight="100%"
+      maxWidth="100%"
       bounds="parent"
       dragHandleClassName="TopBar"
       enableResizing={{
@@ -59,7 +59,7 @@ const Window = ({
       }}
       onDragStart={onClick}
       onDragStop={(event, { node: element, x: newX, y: newY }) => {
-        if (newX === coordinates.x && newY === coordinates.y) {
+        if (coordinates && newX === coordinates.x && newY === coordinates.y) {
           return;
         }
 
@@ -120,7 +120,7 @@ const Window = ({
   );
 };
 
-export default Window;
+export default React.memo(Window);
 
 Window.propTypes = {
   order: number.isRequired,
@@ -130,7 +130,6 @@ Window.propTypes = {
   title: string,
   classNames: arrayOf(string),
   done: func,
-  maxWidth: number,
 };
 
 Window.defaultProps = {
@@ -138,5 +137,4 @@ Window.defaultProps = {
   classNames: [],
   title: 'app',
   menu: undefined,
-  maxWidth: undefined,
 };

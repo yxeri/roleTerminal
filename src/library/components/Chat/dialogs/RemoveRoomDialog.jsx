@@ -3,23 +3,17 @@ import { func, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
 import { getRoom } from '../../../redux/selectors/rooms';
-import { emitSocketEvent } from '../../../socket/SocketManager';
 import Button from '../../common/sub-components/Button/Button';
+import { removeRoom } from '../../../socket/actions/rooms';
 
 const RemoveRoomDialog = ({ done, roomId }) => {
   const [error, setError] = useState();
-  const room = useSelector((state) => getRoom(state, roomId));
+  const room = useSelector((state) => getRoom(state, { id: roomId }));
 
   const onSubmit = () => {
-    emitSocketEvent('removeRoom', { roomId }, ({ error: roomError }) => {
-      if (roomError) {
-        setError(roomError);
-
-        return;
-      }
-
-      done();
-    });
+    removeRoom({ roomId })
+      .then(() => done())
+      .catch((removeError) => setError(removeError));
   };
 
   return (
@@ -27,8 +21,8 @@ const RemoveRoomDialog = ({ done, roomId }) => {
       classNames={['RemoveRoomDialog']}
       error={error}
       done={done}
-      title={`Delete room ${room.roomName}`}
-      text={`Are you sure you want to delete ${room.roomName}?`}
+      title={`Delete room ${room ? room.roomName : ''}`}
+      text={`Are you sure you want to delete ${room ? room.roomName : ''}?`}
     >
       <Button
         type="button"

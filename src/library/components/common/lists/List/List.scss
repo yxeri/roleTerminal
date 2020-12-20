@@ -12,36 +12,37 @@
 
   ul {
     z-index: 9;
+    display: grid;
+    grid-auto-rows: max-content;
+    grid-template-columns: 100%;
+    grid-gap: $margin;
+    padding: 0 $padding;
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: none;
+    box-sizing: border-box;
 
     li {
       word-wrap: break-word;
       padding: $padding 0;
     }
   }
-}
 
-.dropdown {
-  box-shadow: $shadow;
-  background-color: $light-background-color;
-  position: absolute;
-  list-style: none;
-  padding: $padding;
-  border: $border;
-  border-radius: $border-radius;
-  border-top-left-radius: 0;
-  user-select: none;
-  box-sizing: border-box;
-
-  li {
-    margin-bottom: $margin;
-  }
-
-  li:first-child {
-    margin-top: $margin;
+  .dropdown {
+    box-shadow: $shadow;
+    background-color: $light-background-color;
+    position: absolute;
+    list-style: none;
+    border: $border;
+    border-radius: $border-radius;
+    border-top-left-radius: 0;
+    user-select: none;
+    box-sizing: border-box;
+    height: inherit;
   }
 }
 
-.expanded {
+.List.expanded {
   header {
     border-bottom: none;
     border-bottom-right-radius: 0;

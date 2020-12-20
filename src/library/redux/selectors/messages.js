@@ -1,8 +1,9 @@
-import { createSelector } from 'reselect';
+import createCachedSelector from 're-reselect';
 
-export const getAllMessages = (state) => state.messages;
-
-export const getMessagesByRoom = (roomId) => createSelector(
-  [getAllMessages],
-  (messages) => [...messages.values()].filter((message) => message.roomId === roomId),
-);
+export const getMessagesByRoom = createCachedSelector(
+  [
+    (state) => state.messages,
+    (_, { roomId }) => roomId,
+  ],
+  (messages, roomId) => [...messages.values()].filter((message) => message.roomId === roomId),
+)((_, { roomId }) => roomId);

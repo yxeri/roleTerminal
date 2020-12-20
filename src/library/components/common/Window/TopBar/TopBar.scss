@@ -6,7 +6,7 @@
   color: $background-color;
   font-weight: bold;
   text-transform: uppercase;
-  padding: $padding / 2;
+  padding: #{$padding / 2} $padding;
   cursor: move;
   height: 1em;
   text-shadow: $text-shadow;

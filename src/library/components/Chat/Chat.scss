@@ -1,4 +1,9 @@
 @import "../../../common";
 
 .Chat {
+  .windowBox {
+    .content {
+      padding-bottom: 0;
+    }
+  }
 }

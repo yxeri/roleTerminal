@@ -1,17 +1,30 @@
 import { SendEvents, emitSocketEvent } from '../SocketManager';
 import store from '../../redux/store';
-import { createRooms, updateRooms } from '../../redux/actions/rooms';
+import { followRoom as followRoomAction, removeRooms } from '../../redux/actions/rooms';
+import { getMessagesByRoom } from './messages';
 
 export const createRoom = async ({ room }) => {
   const result = await emitSocketEvent(SendEvents.ROOM, { room });
 
-  store.dispatch(createRooms({ rooms: [result.room] }));
+  await store.dispatch(followRoomAction({ room: result.room, user: result.user }));
+
+  return { room: result.room };
 };
 
 export const followRoom = async ({ roomId, password }) => {
   const result = await emitSocketEvent(SendEvents.FOLLOW, { roomId, password });
 
-  console.log(result);
+  await getMessagesByRoom({ roomId });
 
-  store.dispatch(updateRooms({ rooms: [result.room] }));
+  await store.dispatch(followRoomAction({ room: result.room, user: result.user }));
+
+  return { room: result.room, user: result.user };
+};
+
+export const removeRoom = async ({ roomId }) => {
+  const result = await emitSocketEvent(SendEvents.REMOVEROOM, { roomId });
+
+  await store.dispatch(removeRooms({ rooms: [{ objectId: roomId }] }));
+
+  return { room: result.room };
 };

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { func, number } from 'prop-types';
+import { func, number, string } from 'prop-types';
+import { useForm } from 'react-hook-form';
 
 import ImageUpload from '../../../common/ImageUpload/ImageUpload';
 
@@ -11,20 +12,23 @@ import { getAllowedImages } from '../../../../redux/selectors/config';
 
 import './InputArea.scss';
 import Button from '../../../common/sub-components/Button/Button';
+import { sendMessage } from '../../../../socket/actions/messages';
 
 const InputArea = ({
-  onSubmit,
+  roomId,
+  onSend,
   minAccessLevel = AccessLevels.STANDARD,
 }) => {
+  const { register, handleSubmit, reset } = useForm();
   const inputRef = useRef(null);
-  const [text, setText] = useState('');
+  const buttonRef = useRef(null);
   const [image, setImage] = useState();
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
   const textareaClasses = [];
 
-  useEffect(() => {
+  const resize = () => {
     if (inputRef.current) {
       const textarea = inputRef.current;
 
@@ -33,15 +37,26 @@ const InputArea = ({
         textarea.style.height = `${textarea.scrollHeight}px`;
       }
     }
-  }, [text]);
+  };
 
-  const submit = () => {
-    onSubmit({
+  const submit = ({
+    text,
+  }) => {
+    sendMessage({
+      roomId,
       image,
-      text: text.split('\n'),
-    }).then(() => {
-      setText('');
-      setImage(undefined);
+      text,
+    }).then(({ message, switchRoom }) => {
+      if (image) {
+        setImage(undefined);
+      }
+
+      reset();
+      resize();
+
+      if (switchRoom) {
+        onSend({ roomId: message.roomId });
+      }
     }).catch((error) => {
       console.log(error);
     });
@@ -49,48 +64,55 @@ const InputArea = ({
 
   return (
     <div className="InputArea">
-      {accessLevel >= minAccessLevel && (
-        <div
-          key="buttonBox"
-          className="buttonBox"
-        >
-          {
-            allowedImages.CHAT
-            && (
-              <ImageUpload
-                onChange={setImage}
-              />
-            )
-          }
-        </div>
-      )}
-      <div className="input">
-        <textarea
-          key="input"
-          rows={1}
-          ref={inputRef}
-          onKeyDown={(event) => {
-            const { key, altKey } = event;
-
-            if (altKey && key === 'Enter') {
-              submit();
+      <form onSubmit={handleSubmit(submit)}>
+        {accessLevel >= minAccessLevel && (
+          <div
+            key="buttonBox"
+            className="buttonBox"
+          >
+            {
+              allowedImages.CHAT
+              && (
+                <ImageUpload
+                  onChange={setImage}
+                />
+              )
             }
-          }}
-          value={text}
-          placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
-          className={textareaClasses.join(' ')}
-          onChange={(event) => setText(event.target.value)}
-        />
-        <Button
-          disabled={!online}
-          key="send"
-          type="submit"
-          classNames={['sendButton']}
-          onClick={() => submit()}
-        >
-          Send
-        </Button>
-      </div>
+          </div>
+        )}
+        <div className="input">
+          <textarea
+            name="text"
+            key="input"
+            rows={1}
+            ref={(element) => {
+              register(element);
+
+              inputRef.current = element;
+            }}
+            onKeyDown={(event) => {
+              const { key, altKey } = event;
+
+              if (altKey && key === 'Enter' && buttonRef.current) {
+                buttonRef.current.click();
+              }
+            }}
+            placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
+            className={textareaClasses.join(' ')}
+            onChange={(event) => resize(event.target)}
+          />
+          <Button
+            ref={buttonRef}
+            disabled={!online}
+            key="send"
+            type="submit"
+            classNames={['sendButton']}
+            onClick={() => {}}
+          >
+            Send
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
@@ -98,8 +120,9 @@ const InputArea = ({
 export default React.memo(InputArea);
 
 InputArea.propTypes = {
-  onSubmit: func.isRequired,
   minAccessLevel: number,
+  roomId: string.isRequired,
+  onSend: func.isRequired,
 };
 
 InputArea.defaultProps = {

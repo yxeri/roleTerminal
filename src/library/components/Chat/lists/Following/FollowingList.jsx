@@ -1,16 +1,15 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { func } from 'prop-types';
-
 import List from '../../../common/lists/List/List';
-import { getUnfollowedRoomIds } from '../../../../redux/selectors/rooms';
-import RoomItem from './Item/RoomItem';
+import { getFollowedRoomsIds } from '../../../../redux/selectors/rooms';
+import FollowingItem from './Item/FollowingItem';
 
-const RoomList = ({ onChange }) => {
-  const roomIds = useSelector(getUnfollowedRoomIds);
+const FollowingList = ({ onChange }) => {
+  const roomIds = useSelector(getFollowedRoomsIds);
 
   const roomMapper = () => roomIds.map((roomId) => (
-    <RoomItem
+    <FollowingItem
       key={roomId}
       roomId={roomId}
       onChange={onChange}
@@ -20,17 +19,17 @@ const RoomList = ({ onChange }) => {
   return (
     <List
       dropdown
-      key="roomList"
-      classNames={['RoomList']}
-      title="Rooms"
+      key="followingList"
+      classNames={['FollowingList']}
+      title="Joined"
     >
       {roomMapper()}
     </List>
   );
 };
 
-export default React.memo(RoomList);
+export default React.memo(FollowingList);
 
-RoomList.propTypes = {
+FollowingList.propTypes = {
   onChange: func.isRequired,
 };

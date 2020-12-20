@@ -16,8 +16,8 @@ import {
   login as loginAction,
 } from '../redux/actions/auth';
 import { getUserId } from '../redux/selectors/userId';
-import { chatMessage, chatMessages } from './listeners/messages';
-import { room } from './listeners/rooms';
+import { chatMessage, chatMessages, whisperMessage } from './listeners/messages';
+import { follow, room } from './listeners/rooms';
 import { user } from './listeners/users';
 
 const socket = (() => {
@@ -50,6 +50,8 @@ export const SendEvents = {
   TRANSACTION: 'createTransaction',
   DEVICE: 'createDevice',
   FOLLOW: 'followRoom',
+  GETMSGBYROOM: 'getMessagesByRoom',
+  REMOVEROOM: 'removeRoom',
 };
 
 export const GetEvents = {
@@ -109,7 +111,6 @@ export const ListenerEvents = {
 //   UPDATEPOSITION: 'updatePosition',
 //   UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
 //   UNLOCKDOCFILE: 'unlockDocFile',
-//   GETROOMMSGS: 'getMessagesByRoom',
 //   BANUSER: 'banUser',
 //   UNBANUSER: 'unbanUser',
 //   VERIFYUSER: 'verifyUser',
@@ -147,24 +148,22 @@ export const reconnect = () => {
  * @param {string} event Event to emit.
  * @param {Object} [params] Parameters to send in the emit.
  */
-export const emitSocketEvent = async (event, params = {}) => {
-  return new Promise((resolve, reject) => {
-    const paramsToSend = params;
-    paramsToSend.token = getStoredToken();
+export const emitSocketEvent = async (event, params = {}) => new Promise((resolve, reject) => {
+  const paramsToSend = params;
+  paramsToSend.token = getStoredToken();
 
-    if (!isOnline(store.getState())) {
-      reconnect();
+  if (!isOnline(store.getState())) {
+    reconnect();
+  }
+
+  socket.emit(event, paramsToSend, ({ error, data }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(data);
     }
-
-    socket.emit(event, paramsToSend, ({ error, data }) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(data);
-      }
-    });
   });
-};
+});
 
 if (process.env.NODE_ENV === 'development') {
   setInterval(() => {
@@ -231,9 +230,13 @@ addSocketListener({
   },
 });
 
+// Messages
 addSocketListener(chatMessage());
-addSocketListener(chatMessages());
+addSocketListener(whisperMessage());
 
+// Rooms
 addSocketListener(room());
+addSocketListener(follow());
 
+// Users
 addSocketListener(user());

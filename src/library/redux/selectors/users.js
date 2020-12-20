@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import createCachedSelector from 're-reselect';
 
 import { getAlias, getAllAliases } from './aliases';
 import { getUserId } from './userId';
@@ -6,7 +7,7 @@ import { getAnonymousUser } from './config';
 
 export const getAllUsers = (state) => state.users;
 
-export const getUser = (state, userId) => state.users.get(userId);
+export const getUser = (state, { id }) => state.users.get(id);
 
 export const getCurrentUser = (state) => state.users.get(getUserId(state)) || getAnonymousUser(state);
 
@@ -20,10 +21,20 @@ export const getIdentities = createSelector(
   (users, aliases) => [...users.values(), ...aliases.values()],
 );
 
-export const getIdentitiesByIds = (ids) => createSelector(
-  [getAllUsers, getAllAliases],
-  (users, aliases) => ids.map((id) => users.get(id) || aliases.get(id)),
-);
+export const getIdentitiesByIds = createCachedSelector(
+  [
+    getAllUsers,
+    getAllAliases,
+    (_, { ids }) => ids,
+  ],
+  (users, aliases, ids) => {
+    const map = new Map();
+
+    ids.forEach((id) => map.set(id, users.get(id) || aliases.get(id)));
+
+    return map;
+  },
+)((_, { ids }) => `identities-${ids.join('')}`);
 
 export const getIdentityById = createSelector(
   [getUser, getAlias],

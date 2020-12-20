@@ -9,7 +9,7 @@ import MessageItem from './Item/MessageItem';
 import './MessageList.scss';
 
 const MessageList = ({ roomId, onDialog }) => {
-  const messages = useSelector(getMessagesByRoom(roomId));
+  const messages = useSelector((state) => getMessagesByRoom(state, { roomId }));
 
   const messageMapper = () => messages.map((message) => (
     <MessageItem

@@ -9,15 +9,16 @@ import {
 
 import './Button.scss';
 
-const Button = ({
+const Button = React.forwardRef(({
   onClick,
   children,
   disabled,
   stopPropagation,
   classNames = [''],
   type = 'button',
-}) => (
+}, ref) => (
   <button
+    ref={ref}
     className={`${['Button'].concat(classNames).join(' ')}`}
     disabled={disabled}
     type={type} /* eslint-disable-line react/button-has-type */
@@ -31,7 +32,7 @@ const Button = ({
   >
     {children}
   </button>
-);
+));
 
 export default Button;
 

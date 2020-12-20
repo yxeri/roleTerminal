@@ -5,7 +5,7 @@ import { AccessLevels } from '../../../AccessCentral';
 import UserList from '../../common/lists/UserList';
 import RoomList from '../lists/Room/RoomList';
 import WhisperList from '../lists/Whisper/WhisperList';
-import FollowingList from '../lists/FollowingList';
+import FollowingList from '../lists/Following/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 
 const Rooms = ({ onChange, onDialog }) => {
@@ -27,11 +27,13 @@ const Rooms = ({ onChange, onDialog }) => {
             <RoomList
               key="room"
               onChange={onChange}
+              onDialog={onDialog}
             />
           </>
         )
       }
       <UserList
+        onDone={onChange}
         onDialog={onDialog}
         key="user"
       />

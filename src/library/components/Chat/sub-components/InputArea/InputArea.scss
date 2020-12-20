@@ -4,6 +4,8 @@
   position: sticky;
   bottom: 0;
   background-color: $second-background-color;
+  min-height: calc(#{3em + $padding * 2} + 1px);
+  margin-top: $padding;
 
   .buttonBox {
     .Button {
@@ -18,18 +20,21 @@
     display: flex;
     width: 100%;
     max-width: $max-width;
+    overflow: visible;
 
     textarea {
       box-shadow: $shadow;
       background-color: $light-background-color;
       color: $second-color;
       border: $border;
-      padding: $padding;
+      padding: 0 $padding;
       flex-grow: 1;
       border-radius: $border-radius;
       border-bottom-right-radius: 0;
       border-top-right-radius: 0;
-      min-height: 3ch;
+      box-sizing: border-box;
+      scrollbar-width: none;
+      min-height: 2em;
     }
 
     .Button {

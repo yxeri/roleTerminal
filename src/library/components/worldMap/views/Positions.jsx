@@ -1,5 +1,5 @@
 import React from 'react';
-import PositionList from '../lists/PositionList';
+import PositionList from '../lists/Position/PositionList';
 
 const Positions = ({ positionTypes = [] }) => {
   const listMapper = () => positionTypes.map((positionType) => (

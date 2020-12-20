@@ -9,7 +9,7 @@ import './MessageInfo.scss';
 import UserDialog from '../../../common/dialogs/UserDialog';
 
 const MessageInfo = ({ identityId, timeCreated, onDialog }) => {
-  const identity = useSelector((state) => getIdentityById(state, identityId));
+  const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
   const timestamp = useSelector((state) => getTimestamp(state, { date: timeCreated }));
 
   return (
@@ -20,7 +20,7 @@ const MessageInfo = ({ identityId, timeCreated, onDialog }) => {
         className="clickable username"
         onClick={() => {
           if (identity) {
-            onDialog(createDialog(<UserDialog userId={identity.objectId} done={() => onDialog()} />));
+            onDialog(createDialog(<UserDialog identityId={identity.objectId} done={() => onDialog()} />));
           }
         }}
       >

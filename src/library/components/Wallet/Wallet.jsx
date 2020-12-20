@@ -3,15 +3,11 @@ import { func, number } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import Window from '../common/Window/Window';
-import TransactionList from './lists/TransactionList/TransactionList';
-import { getCurrentUser } from '../../redux/selectors/users';
-import { getWalletByOwners } from '../../redux/selectors/wallets';
+import TransactionList from './lists/Transaction/TransactionList';
+import { getWalletIdsByCurrentUser } from '../../redux/selectors/wallets';
 
 const Wallet = ({ onClick, order }) => {
-  const user = useSelector((state) => getCurrentUser(state));
-  const wallets = useSelector((state) => getWalletByOwners(state, {
-    ownerIds: [user.objectId].concat(user.aliases),
-  }));
+  const walletIds = useSelector(getWalletIdsByCurrentUser);
 
   return (
     <Window
@@ -20,7 +16,7 @@ const Wallet = ({ onClick, order }) => {
       title="wallet"
       onClick={onClick}
     >
-      <TransactionList walletIds={wallets.map((wallet) => wallet.objectId)} />
+      <TransactionList walletIds={walletIds} />
     </Window>
   );
 };

@@ -4,9 +4,13 @@ import { func, string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
 import { getIdentityById } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
+import { getRoom, getWhisperRoom } from '../../../redux/selectors/rooms';
+import store from '../../../redux/store';
+import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 
-const UserDialog = ({ userId, done }) => {
-  const user = useSelector((state) => getIdentityById(state, { identityId: userId }));
+const IdentityDialog = ({ identityId, done }) => {
+  const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
+  const currentIdentityId = useSelector(getCurrentIdentityId);
 
   return (
     <Dialog
@@ -15,7 +19,9 @@ const UserDialog = ({ userId, done }) => {
       <Button
         type="button"
         onClick={() => {
-          done();
+          const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId }) || getRoom(store.getState(), { id: identityId });
+
+          done({ roomId: room.objectId });
         }}
       >
         Message
@@ -24,9 +30,9 @@ const UserDialog = ({ userId, done }) => {
   );
 };
 
-export default React.memo(UserDialog);
+export default React.memo(IdentityDialog);
 
-UserDialog.propTypes = {
+IdentityDialog.propTypes = {
   done: func.isRequired,
-  userId: string.isRequired,
+  identityId: string.isRequired,
 };

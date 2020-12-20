@@ -1,7 +1,7 @@
 import { SendEvents, emitSocketEvent } from '../SocketManager';
 import { getRoom } from '../../redux/selectors/rooms';
 import store from '../../redux/store';
-import { getIdentityId } from '../../redux/selectors/userId';
+import { getCurrentIdentityId } from '../../redux/selectors/userId';
 import { createMessages } from '../../redux/actions/messages';
 
 const MessageType = {
@@ -12,18 +12,18 @@ const MessageType = {
 };
 
 export const sendMessage = async ({ text, roomId, image }) => {
-  const room = getRoom(store.getState(), roomId);
+  const room = getRoom(store.getState(), { id: roomId });
   const participantIds = room.isWhisper
     ? room.participantIds
     : [];
   const message = {
-    text,
     roomId,
+    text: text.split('\n'),
   };
 
   if (room.isUser) {
     message.messageType = MessageType.WHISPER;
-    participantIds.push(getIdentityId(store.getState()));
+    participantIds.push(getCurrentIdentityId(store.getState()));
     participantIds.push(roomId);
   } else if (room.isWhisper) {
     message.messageType = MessageType.WHISPER;
@@ -38,4 +38,14 @@ export const sendMessage = async ({ text, roomId, image }) => {
   });
 
   store.dispatch(createMessages({ messages: [result.message] }));
+
+  return { message: result.message, switchRoom: true };
+};
+
+export const getMessagesByRoom = async ({ roomId }) => {
+  const result = await emitSocketEvent(SendEvents.GETMSGBYROOM, { roomId });
+
+  store.dispatch(createMessages({ messages: result.messages }));
+
+  return true;
 };

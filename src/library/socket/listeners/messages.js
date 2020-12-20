@@ -9,26 +9,34 @@ const events = {
 
 export const chatMessage = () => ({
   event: events.MSGCHAT,
-  callback: ({ data }) => {
+  callback: ({ data, error }) => {
     if (data && data.message) {
       const { message, changeType } = data;
 
       if (changeType === ChangeTypes.CREATE) {
         store.dispatch(createMessages({ messages: [message] }));
       }
+
+      return;
     }
+
+    console.log(events.MSGCHAT, error, data);
   },
 });
 
-export const chatMessages = () => ({
-  event: events.MSGCHAT,
-  callback: ({ data }) => {
-    if (data && data.messages) {
-      const { messages, changeType } = data;
+export const whisperMessage = () => ({
+  event: events.MSGWHISPER,
+  callback: ({ data, error }) => {
+    if (data && data.message) {
+      const { message, changeType } = data;
 
       if (changeType === ChangeTypes.CREATE) {
-        store.dispatch(createMessages({ messages }));
+        store.dispatch(createMessages({ messages: [message] }));
       }
+
+      return;
     }
+
+    console.log(events.MSGWHISPER, error, data);
   },
 });

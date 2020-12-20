@@ -25,7 +25,7 @@ import {
 import { ChangeTypes } from '../redux/reducers/root';
 import { getUserId } from '../redux/selectors/userId';
 
-const DataHandler = ({ children }) => {
+const DataHandler = () => {
   const dispatch = useDispatch();
   const userId = useSelector(getUserId);
 
@@ -70,11 +70,7 @@ const DataHandler = ({ children }) => {
     retrieveAll({ reset: true });
   }, [userId]);
 
-  return (<>{children}</>);
+  return (<></>);
 };
 
 export default DataHandler;
-
-DataHandler.propTypes = {
-  children: arrayOf(element).isRequired,
-};

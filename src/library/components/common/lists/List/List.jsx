@@ -4,10 +4,13 @@ import {
   arrayOf,
   bool,
   node,
-  shape, func,
+  shape,
 } from 'prop-types';
 
 import './List.scss';
+
+// eslint-disable-next-line react/prop-types
+const ListItems = React.memo(({ items }) => (<>{items}</>));
 
 const List = ({
   children,
@@ -74,13 +77,13 @@ const List = ({
           }
         }}
       >
-        {children}
+        <ListItems items={children} />
       </ul>
     </div>
   );
 };
 
-export default List;
+export default React.memo(List);
 
 List.propTypes = {
   children: node,

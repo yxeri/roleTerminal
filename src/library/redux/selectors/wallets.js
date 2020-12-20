@@ -1,11 +1,17 @@
-export const getAllWallets = (state) => [...state.wallets.values()];
+import { createSelector } from 'reselect';
+import { getCurrentUser } from './users';
 
-export const getWalletById = (state, { walletId }) => state.wallets.get(walletId);
+export const getAllWallets = (state) => state.wallets;
 
-export const getWalletByIds = (state, { walletIds }) => walletIds
-  .map((walletId) => getWalletById(state, { walletId }));
+export const getWalletById = (state, walletId) => state.wallets.get(walletId);
 
-export const getWalletByOwners = (state, { ownerIds }) => {
-  return getAllWallets(state)
-    .filter((wallet) => ownerIds.some((id) => id === wallet.ownerAliasId || id === wallet.ownerId));
-};
+export const getWalletIdsByCurrentUser = createSelector(
+  [getAllWallets, getCurrentUser],
+  (wallets, currentUser) => [...wallets.values()]
+    .filter((wallet) => {
+      const ownerId = wallet.ownerAliasId || wallet.ownerId;
+
+      return ownerId === currentUser.objectId || currentUser.aliases.includes(ownerId);
+    })
+    .map(({ objectId }) => objectId),
+);

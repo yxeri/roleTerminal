@@ -18,7 +18,12 @@ export const rootReducerSingle = (state, action) => {
       return newState;
     }
     case ChangeTypes.UPDATE: {
-      newState.set(object.objectId, Object.assign(newState[object.objectId] || {}, object));
+      const existing = newState[object.objectId];
+      const updated = Object.assign(existing || {}, object);
+
+      if (existing !== updated) {
+        newState.set(object.objectId, updated);
+      }
 
       return newState;
     }
@@ -49,8 +54,14 @@ export const rootReducerMultiple = (state, action) => {
     }
     case ChangeTypes.UPDATE: {
       objects
-        .forEach((object) => newState
-          .set(object.objectId, Object.assign(newState[object.objectId] || {}, object)));
+        .forEach((object) => {
+          const existing = newState[object.objectId];
+          const updated = Object.assign(existing || {}, object);
+
+          if (existing !== updated) {
+            newState.set(object.objectId, updated);
+          }
+        });
 
       return newState;
     }

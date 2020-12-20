@@ -7,7 +7,7 @@ import {
 } from 'prop-types';
 
 import MessageInfo from '../../../sub-components/MessageInfo/MessageInfo';
-import ListItem from '../../../../common/lists/List/ListItem/ListItem';
+import ListItem from '../../../../common/lists/List/Item/ListItem';
 
 import './MessageItem.scss';
 

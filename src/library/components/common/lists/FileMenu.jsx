@@ -1,7 +1,7 @@
 import React from 'react';
 import { node } from 'prop-types';
 import List from './List/List';
-import ListItem from './List/ListItem/ListItem';
+import ListItem from './List/Item/ListItem';
 
 const FileMenu = ({ children }) => (
   <List

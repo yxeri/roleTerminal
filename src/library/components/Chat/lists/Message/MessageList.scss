@@ -1,6 +1,7 @@
 @import '../../../../../common';
 
 .MessageList {
-  overflow-y: auto;
+  height: 100%;
+  overflow: hidden;
   scrollbar-width: none;
 }

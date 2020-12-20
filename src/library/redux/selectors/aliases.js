@@ -1,3 +1,3 @@
 export const getAllAliases = (state) => state.aliases;
 
-export const getAlias = (state, aliasId) => state.aliases.get(aliasId);
+export const getAlias = (state, { id }) => state.aliases.get(id);

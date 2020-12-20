@@ -5,11 +5,10 @@ import { AccessLevels } from '../../../../AccessCentral';
 import InputArea from '../../sub-components/InputArea/InputArea';
 import MessagesList from '../../lists/Message/MessageList';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
-import { sendMessage } from '../../../../socket/actions/messages';
 
 import './Messages.scss';
 
-const Messages = ({ roomId, onDialog }) => {
+const Messages = ({ roomId, onDialog, onSend }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
 
   return (
@@ -21,14 +20,9 @@ const Messages = ({ roomId, onDialog }) => {
       />
       {accessLevel >= AccessLevels.STANDARD && (
         <InputArea
+          onSend={onSend}
+          roomId={roomId}
           key="inputArea"
-          onSubmit={
-            async ({ text, image }) => sendMessage({
-              text,
-              roomId,
-              image,
-            })
-          }
         />
       )}
     </div>

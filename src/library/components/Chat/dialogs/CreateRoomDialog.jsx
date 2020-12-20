@@ -28,7 +28,7 @@ const CreateRoomDialog = ({ done }) => {
     };
 
     createRoom({ room })
-      .then(() => done())
+      .then(({ newRoom }) => done({ roomId: newRoom.objectId }))
       .catch((createError) => setError(createError));
   };
 

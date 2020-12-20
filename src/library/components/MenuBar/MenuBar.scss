@@ -14,11 +14,9 @@
   margin-bottom: $margin;
   align-items: center;
   box-shadow: $shadow;
-  z-index: 10;
+  z-index: $menu-bar-z-index;
 
   .List {
-    z-index: 11;
-
     .dropdown {
       max-height: calc(100vh - #{2em + $padding});
       overflow-y: auto;

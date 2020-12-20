@@ -1,6 +1,8 @@
 @import "../../../../../common";
 
 .rnd {
+  z-index: $dialog-z-index;
+
   .Dialog {
     .windowBox {
       display: flex;

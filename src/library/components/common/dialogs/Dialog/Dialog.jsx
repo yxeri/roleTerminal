@@ -20,7 +20,6 @@ const Dialog = ({
 }) => (
   <Window
     done={done}
-    order={10}
     title={title}
     classNames={['Dialog'].concat(classNames)}
     onClick={() => {}}

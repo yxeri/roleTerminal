@@ -13,6 +13,7 @@ const Messages = ({ roomId, onDialog, onSend }) => {
 
   return (
     <div className="Messages">
+      <div className="spacer" />
       <MessagesList
         key="messagesList"
         roomId={roomId}
@@ -34,6 +35,7 @@ export default React.memo(Messages);
 Messages.propTypes = {
   roomId: string,
   onDialog: func.isRequired,
+  onSend: func.isRequired,
 };
 
 Messages.defaultProps = {

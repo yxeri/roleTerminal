@@ -24,10 +24,37 @@
       overflow-y: auto;
       scrollbar-width: none;
     }
+
+    header, .Button {
+      border-bottom: none;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
   }
 
   > * {
     margin-right: $margin * 2;
+  }
+
+  svg {
+    height: 16px;
+    width: 16px;
+    vertical-align: middle;
+  }
+
+  .Clock {
+    margin-left: auto
+  }
+
+  .OpenApps {
+    ul {
+      display: flex;
+      flex-direction: row;
+
+      > * {
+        margin-right: $margin * 2;
+      }
+    }
   }
 }
 

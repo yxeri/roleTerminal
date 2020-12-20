@@ -5,6 +5,7 @@ import MainList from './lists/MainList';
 import { isOnline } from '../../redux/selectors/online';
 
 import './MenuBar.scss';
+import OpenApps from './lists/OpenApps';
 
 const MenuBar = () => {
   const [dialog, setDialog] = useState();
@@ -22,6 +23,7 @@ const MenuBar = () => {
       id="MenuBar"
     >
       <MainList onDialog={setDialog} />
+      <OpenApps />
       {content}
       <Clock />
       {dialog}

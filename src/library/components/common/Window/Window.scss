@@ -4,7 +4,7 @@
   box-shadow: $dark-shadow;
   animation: reveal;
   animation-iteration-count: 1;
-  animation-duration: .8s;
+  animation-duration: 1s;
 
   .Window {
     display: flex;
@@ -22,7 +22,7 @@
       display: grid;
       grid-template-rows: fit-content(0) auto;
       grid-template-columns: 100%;
-      height: calc(100% - 1em - #{$margin * 2});
+      height: calc(100% - 1em - #{$margin * 2} - 1px);
       position: relative;
 
       .menu {
@@ -67,11 +67,11 @@
       grid-template-columns: minmax(0, 10em) minmax(min-content, 100%);
 
       .menu {
+        margin-bottom: 0;
         display: grid;
         grid-auto-rows: fit-content(100%);
-        grid-gap: #{$margin * 2};
+        grid-gap: $margin;
         height: 100%;
-        margin-right: $margin;
         scrollbar-width: none;
         overflow: hidden;
 
@@ -106,10 +106,10 @@
 
 @keyframes reveal {
   from {
-    opacity: 0;
+    outline: $lite-border;
   }
 
   to {
-    opacity: 1;
+    outline: none;
   }
 }

@@ -44,10 +44,10 @@
 
 .List.expanded {
   header {
-    border-bottom: none;
+    border-color: $second-color;
+    border-bottom-color: transparent;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-    border-color: $second-color;
   }
 
   .dropdown {

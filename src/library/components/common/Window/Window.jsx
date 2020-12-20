@@ -85,7 +85,7 @@ const Window = ({
           setCoordinates({ x: newX, y: newY });
         }
       }}
-      onResize={onClick}
+      onResizeStart={onClick}
       onResizeStop={(event, direction, element) => {
         setSize({ width: element.offsetWidth, height: element.offsetHeight });
       }}
@@ -123,7 +123,7 @@ const Window = ({
 export default React.memo(Window);
 
 Window.propTypes = {
-  order: number.isRequired,
+  order: number,
   onClick: func.isRequired,
   children: node.isRequired,
   menu: node,
@@ -137,4 +137,5 @@ Window.defaultProps = {
   classNames: [],
   title: 'app',
   menu: undefined,
+  order: undefined,
 };

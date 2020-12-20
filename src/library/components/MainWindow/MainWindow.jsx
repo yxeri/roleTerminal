@@ -1,60 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import { AccessLevels } from '../../AccessCentral';
 import Wallet from '../Wallet/Wallet';
 import WorldMap from '../WorldMap/WorldMap';
 import Chat from '../Chat/Chat';
-import { getCurrentAccessLevel } from '../../redux/selectors/users';
+import { getOrder } from '../../redux/selectors/windowOrder';
+import { WindowTypes } from '../../redux/reducers/windowOrder';
 
 import './MainWindow.scss';
 
-export const WindowTypes = {
-  WALLET: 'wallet',
-  CHAT: 'chat',
-  WORLDMAP: 'worldMap',
-};
-
 const MainWindow = () => {
-  const [order, setOrder] = useState(new Set([
-    WindowTypes.WALLET,
-    WindowTypes.WORLDMAP,
-    WindowTypes.CHAT,
-  ]));
-  const accessLevel = useSelector(getCurrentAccessLevel);
-  const onClick = (type) => {
-    const values = [...order.values()];
+  const order = useSelector(getOrder);
+  const windows = [];
 
-    if ([...order.values()].indexOf(type) !== values.length - 1) {
-      const set = new Set(order);
+  console.log(order);
 
-      set.delete(type);
-      set.add(type);
-
-      setOrder(set);
+  order.forEach((type, key) => {
+    if (type === WindowTypes.CHAT) {
+      windows.push(<Chat key={key} id={key} />);
+    } else if (type === WindowTypes.WALLET) {
+      windows.push(<Wallet key={key} id={key} />);
+    } else if (type === WindowTypes.WORLDMAP) {
+      windows.push(<WorldMap key={key} id={key} />);
     }
-  };
+  });
 
   return (
     <div id="MainWindow">
-      { accessLevel >= AccessLevels.STANDARD && (
-        <Wallet
-          key={WindowTypes.WALLET}
-          order={[...order.values()].indexOf(WindowTypes.WALLET)}
-          onClick={() => onClick(WindowTypes.WALLET)}
-        />
-      )}
-      <WorldMap
-        key={WindowTypes.WORLDMAP}
-        order={[...order.values()].indexOf(WindowTypes.WORLDMAP)}
-        onClick={() => onClick(WindowTypes.WORLDMAP)}
-      />
-      <Chat
-        key={WindowTypes.CHAT}
-        order={[...order.values()].indexOf(WindowTypes.CHAT)}
-        onClick={() => onClick(WindowTypes.CHAT)}
-      />
+      {windows}
     </div>
   );
 };
 
-export default MainWindow;
+export default React.memo(MainWindow);

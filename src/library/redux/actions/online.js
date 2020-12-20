@@ -1,3 +1,5 @@
+import { batch } from 'react-redux';
+
 import { CONFIG, ONLINE } from '../actionTypes';
 import { Status } from '../reducers/online';
 
@@ -12,11 +14,13 @@ export const offline = () => ({
 });
 
 export const startup = (config) => (dispatch) => {
-  dispatch({
-    type: CONFIG,
-    payload: {
-      entries: Object.entries(config),
-    },
+  batch(() => {
+    dispatch({
+      type: CONFIG,
+      payload: {
+        entries: Object.entries(config),
+      },
+    });
+    dispatch(online());
   });
-  dispatch(online());
 };

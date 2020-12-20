@@ -6,18 +6,37 @@
   color: $background-color;
   font-weight: bold;
   text-transform: uppercase;
-  padding: #{$padding / 2} $padding;
+  padding: $padding;
   cursor: move;
   height: 1em;
   text-shadow: $text-shadow;
+  display: flex;
+  align-items: center;
 
-  .buttons {
-    float: right;
-  }
-
-  button {
+  .Button {
     background-color: $color;
     border: none;
     box-shadow: none;
+    color: $background-color;
+    padding: 0;
+  }
+
+  svg {
+    height: 16px;
+    width: 16px;
+    fill: $background-color;
+    stroke-width: 3;
+  }
+
+  .buttons {
+    margin-left: auto;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1em;
+    grid-gap: #{$margin * 2};
+  }
+
+  .title {
+    margin-left: auto;
   }
 }

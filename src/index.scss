@@ -15,9 +15,13 @@ html, body {
   width: 100%;
   height: 100%;
   background-color: $background-color;
-  font-size: 1.2em;
+  font-size: 1.1em;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+}
+
+ul {
+  list-style: none;
 }
 
 #root {

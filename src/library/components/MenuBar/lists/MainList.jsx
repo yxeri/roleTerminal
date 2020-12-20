@@ -10,6 +10,7 @@ import { logout } from '../../../socket/actions/auth';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 import { createDialog } from '../../helper';
 import ListItem from '../../common/lists/List/Item/ListItem';
+import { ReactComponent as Menu } from '../../../icons/menu.svg';
 
 const MainList = ({ onDialog }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -52,7 +53,7 @@ const MainList = ({ onDialog }) => {
   return (
     <List
       dropdown
-      title="Main"
+      title={<Menu />}
     >
       {items}
     </List>

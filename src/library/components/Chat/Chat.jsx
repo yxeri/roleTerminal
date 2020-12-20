@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { func, number } from 'prop-types';
+import { string } from 'prop-types';
 import { useSelector } from 'react-redux';
 import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
@@ -16,18 +16,20 @@ import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
 import { getCurrentUser, getIdentityById } from '../../redux/selectors/users';
 import { hasAccessTo } from '../../AccessCentral';
+import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-const Chat = ({ onClick, order }) => {
+const Chat = ({ id }) => {
   const [dialog, setDialog] = useState();
   const [roomId, setRoomId] = useState(getPublicRoomId(store.getState()));
   const room = useSelector((state) => getRoom(state, { id: roomId }));
   const currentUser = useSelector(getCurrentUser);
 
   useEffect(() => {
-    if (!room && roomId !== getPublicRoomId(store.getState())) {
+    if ((!currentUser || currentUser.isAnonymous || !room) && roomId !== getPublicRoomId(store.getState())) {
       setRoomId(getPublicRoomId(store.getState()));
     }
-  }, [room]);
+  }, [room, currentUser]);
 
   const title = (() => {
     if (!room) {
@@ -73,11 +75,14 @@ const Chat = ({ onClick, order }) => {
     <RemoveRoomDialog roomId={roomId} done={() => setDialog()} />,
   )), [roomId]);
 
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.CHAT }] }));
+  }, []);
+
   return (
     <>
       <Window
         classNames={['Chat']}
-        order={order}
         title={title}
         onClick={onClick}
         menu={(
@@ -132,6 +137,5 @@ const Chat = ({ onClick, order }) => {
 export default React.memo(Chat);
 
 Chat.propTypes = {
-  onClick: func.isRequired,
-  order: number.isRequired,
+  id: string.isRequired,
 };

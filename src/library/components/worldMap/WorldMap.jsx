@@ -1,16 +1,22 @@
-import React from 'react';
-import { func, number } from 'prop-types';
+import React, { useCallback } from 'react';
+import { string } from 'prop-types';
 import Window from '../common/Window/Window';
 import MapView from './views/MapView';
 import Positions from './views/Positions';
 
 import './WorldMap.scss';
+import store from '../../redux/store';
+import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-const WorldMap = ({ onClick, order }) => {
+const WorldMap = ({ id }) => {
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.WORLDMAP }] }));
+  }, []);
+
   return (
     <Window
       classNames={['WorldMap']}
-      order={order}
       title="map"
       onClick={onClick}
       menu={(
@@ -24,9 +30,8 @@ const WorldMap = ({ onClick, order }) => {
   );
 };
 
-export default WorldMap;
+export default React.memo(WorldMap);
 
 WorldMap.propTypes = {
-  onClick: func.isRequired,
-  order: number.isRequired,
+  id: string.isRequired,
 };

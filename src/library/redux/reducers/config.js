@@ -21,6 +21,7 @@ defaultState.set('anonymousUser', {
   accessLevel: AccessLevels.ANONYMOUS,
   followingRooms: [],
   objectId: '-1',
+  isAnonymous: true,
 });
 // customUserFields
 // device id

@@ -21,13 +21,19 @@ export const rootReducerSingle = (state, action) => {
       const existing = newState[object.objectId];
       const updated = Object.assign(existing || {}, object);
 
-      if (existing !== updated) {
-        newState.set(object.objectId, updated);
+      if (existing === updated) {
+        return state;
       }
+
+      newState.set(object.objectId, updated);
 
       return newState;
     }
     case ChangeTypes.REMOVE: {
+      if (!newState.has(object.objectId)) {
+        return state;
+      }
+
       newState.delete(object.objectId);
 
       return newState;

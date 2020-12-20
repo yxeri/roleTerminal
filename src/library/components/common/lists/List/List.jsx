@@ -87,7 +87,7 @@ export default React.memo(List);
 
 List.propTypes = {
   children: node,
-  title: string,
+  title: node,
   classNames: arrayOf(string),
   dropdown: bool,
   scrollTo: shape({

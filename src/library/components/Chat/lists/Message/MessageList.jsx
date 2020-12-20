@@ -2,19 +2,19 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { func, string } from 'prop-types';
 
-import { getMessagesByRoom } from '../../../../redux/selectors/messages';
+import { getMessageIdsByRoom } from '../../../../redux/selectors/messages';
 import List from '../../../common/lists/List/List';
 import MessageItem from './Item/MessageItem';
 
 import './MessageList.scss';
 
 const MessageList = ({ roomId, onDialog }) => {
-  const messages = useSelector((state) => getMessagesByRoom(state, { roomId }));
+  const messageIds = useSelector((state) => getMessageIdsByRoom(state, { roomId }));
 
-  const messageMapper = () => messages.map((message) => (
+  const messageMapper = () => messageIds.map((messageId) => (
     <MessageItem
-      key={message.objectId}
-      message={message}
+      key={messageId}
+      messageId={messageId}
       onDialog={onDialog}
     />
   ));

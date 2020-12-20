@@ -39,3 +39,5 @@ export const ROOMID = 'roomId';
 export const CONFIG = 'config';
 export const ONLINE = 'online';
 export const ALIASID = 'aliasId';
+export const WINDOWORDER = 'windowOrder';
+export const WINDOWORDERS = 'windowOrders';

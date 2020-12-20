@@ -1,18 +1,24 @@
-import React from 'react';
-import { func, number } from 'prop-types';
+import React, { useCallback } from 'react';
+import { string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import Window from '../common/Window/Window';
 import TransactionList from './lists/Transaction/TransactionList';
 import { getWalletIdsByCurrentUser } from '../../redux/selectors/wallets';
+import store from '../../redux/store';
+import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-const Wallet = ({ onClick, order }) => {
+const Wallet = ({ id }) => {
   const walletIds = useSelector(getWalletIdsByCurrentUser);
+
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.WALLET }] }));
+  }, []);
 
   return (
     <Window
       classNames={['Wallet']}
-      order={order}
       title="wallet"
       onClick={onClick}
     >
@@ -24,6 +30,5 @@ const Wallet = ({ onClick, order }) => {
 export default React.memo(Wallet);
 
 Wallet.propTypes = {
-  onClick: func.isRequired,
-  order: number.isRequired,
+  id: string.isRequired,
 };

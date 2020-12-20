@@ -4,7 +4,11 @@ import {
   string,
 } from 'prop-types';
 
+import { ReactComponent as Maximize } from '../../../../icons/maximize.svg';
+import { ReactComponent as Close } from '../../../../icons/close.svg';
+
 import './TopBar.scss';
+import Button from '../../sub-components/Button/Button';
 
 const TopBar = ({
   onDoubleClick,
@@ -15,10 +19,10 @@ const TopBar = ({
     onDoubleClick={onDoubleClick}
     className="TopBar"
   >
-    <span>{title}</span>
+    <span className="title">{title}</span>
     <div className="buttons">
-      <button type="button" onClick={onDoubleClick}>[]</button>
-      <button type="button" onClick={done}>X</button>
+      <Button type="button" onClick={onDoubleClick}><Maximize /></Button>
+      <Button stopPropagation type="button" onClick={done}><Close /></Button>
     </div>
   </div>
 );

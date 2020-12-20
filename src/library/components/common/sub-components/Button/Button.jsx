@@ -34,7 +34,7 @@ const Button = React.forwardRef(({
   </button>
 ));
 
-export default Button;
+export default React.memo(Button);
 
 Button.propTypes = {
   onClick: func.isRequired,

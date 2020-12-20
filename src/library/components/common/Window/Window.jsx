@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
   arrayOf,
@@ -34,6 +34,10 @@ const Window = ({
       setSize({ width: '100%', height: '100%' });
     }
   };
+
+  const onDoubleClick = useCallback(() => {
+    toggleFullscreen();
+  }, []);
 
   return (
     <Rnd
@@ -98,9 +102,7 @@ const Window = ({
         <TopBar
           done={done}
           title={title}
-          onDoubleClick={() => {
-            toggleFullscreen();
-          }}
+          onDoubleClick={onDoubleClick}
         />
         <div className="windowBox">
           {

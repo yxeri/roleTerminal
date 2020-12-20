@@ -36,8 +36,8 @@ const RegisterDialog = ({ done }) => {
         offName,
         username,
         password,
-        description,
         pronouns,
+        description: description ? description.split('\n') : undefined,
       },
     };
 

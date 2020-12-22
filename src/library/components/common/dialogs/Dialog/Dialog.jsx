@@ -16,13 +16,14 @@ const Dialog = ({
   error,
   text,
   done,
+  onClick,
   classNames = [],
 }) => (
   <Window
     done={done}
     title={title}
     classNames={['Dialog'].concat(classNames)}
-    onClick={() => {}}
+    onClick={onClick}
   >
     <div className="inputs">
       {
@@ -50,6 +51,7 @@ Dialog.propTypes = {
   title: string,
   text: string,
   classNames: arrayOf(string),
+  onClick: func.isRequired,
 };
 
 Dialog.defaultProps = {

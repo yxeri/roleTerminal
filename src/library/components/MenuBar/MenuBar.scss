@@ -5,14 +5,13 @@
   flex-direction: row;
   padding-top: #{$padding / 2};
   padding-left: $padding;
-  padding-right: $padding;
   color: $second-color;
-  min-height: $menu-bar-height;
+  height: $menu-bar-height;
   border-bottom: $border;
   background-color: $light-background-color;
   box-sizing: border-box;
   margin-bottom: $margin;
-  align-items: center;
+  align-items: end;
   box-shadow: $shadow;
   z-index: $menu-bar-z-index;
 
@@ -31,7 +30,11 @@
   }
 
   > * {
-    margin-right: $margin * 2;
+    margin-right: $margin;
+  }
+
+  > *:last-child {
+    margin-right: 0;
   }
 
   svg {
@@ -40,8 +43,18 @@
     vertical-align: middle;
   }
 
+  .rightAligned {
+    margin-left: auto;
+  }
+
   .Clock {
-    margin-left: auto
+    .Button {
+      border-bottom: none;
+      border-right: none;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 0;
+    }
   }
 
   .OpenApps {
@@ -50,8 +63,12 @@
       flex-direction: row;
 
       > * {
-        margin-right: $margin * 2;
+        margin-right: $margin;
       }
+    }
+
+    .ListItem {
+      padding: 0;
     }
   }
 }

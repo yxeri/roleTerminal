@@ -60,7 +60,7 @@ const MainList = ({ onDialog }) => {
   );
 };
 
-export default MainList;
+export default React.memo(MainList);
 
 MainList.propTypes = {
   onDialog: func.isRequired,

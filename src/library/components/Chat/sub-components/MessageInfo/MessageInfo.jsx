@@ -6,7 +6,7 @@ import { getTimestamp } from '../../../../redux/selectors/config';
 import { createDialog } from '../../../helper';
 
 import './MessageInfo.scss';
-import UserDialog from '../../../common/dialogs/UserDialog';
+import UserDialog from '../../../common/dialogs/IdentityDialog';
 
 const MessageInfo = ({ identityId, timeCreated, onDialog }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));

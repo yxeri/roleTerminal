@@ -13,7 +13,7 @@ const Wallet = ({ id }) => {
   const walletIds = useSelector(getWalletIdsByCurrentUser);
 
   const onClick = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.WALLET }] }));
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.WALLET } }] }));
   }, []);
 
   return (

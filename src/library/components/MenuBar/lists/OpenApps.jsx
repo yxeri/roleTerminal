@@ -11,13 +11,13 @@ import store from '../../../redux/store';
 import { changeWindowOrder } from '../../../redux/actions/windowOrder';
 
 const OpenApps = () => {
-  const changeOrder = ({ id, type }) => store.dispatch(changeWindowOrder({ windows: [{ id, type }] }));
+  const changeOrder = ({ id, value }) => store.dispatch(changeWindowOrder({ windows: [{ id, value }] }));
 
   return (
     <List classNames={['OpenApps']}>
-      <ListItem key="wallet"><Button onClick={() => changeOrder({ id: WindowTypes.WALLET, type: WindowTypes.WALLET })}><Wallet /></Button></ListItem>
-      <ListItem key="map"><Button onClick={() => changeOrder({ id: WindowTypes.WORLDMAP, type: WindowTypes.WORLDMAP })}><Map /></Button></ListItem>
-      <ListItem key="chat"><Button onClick={() => changeOrder({ id: WindowTypes.CHAT, type: WindowTypes.CHAT })}><Chat /></Button></ListItem>
+      <ListItem key="wallet"><Button onClick={() => changeOrder({ id: WindowTypes.WALLET, value: { type: WindowTypes.WALLET } })}><Wallet /></Button></ListItem>
+      <ListItem key="map"><Button onClick={() => changeOrder({ id: WindowTypes.WORLDMAP, value: { type: WindowTypes.WORLDMAP } })}><Map /></Button></ListItem>
+      <ListItem key="chat"><Button onClick={() => changeOrder({ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT } })}><Chat /></Button></ListItem>
     </List>
   );
 };

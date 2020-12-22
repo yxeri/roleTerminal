@@ -7,21 +7,26 @@ import Button from '../sub-components/Button/Button';
 import { getRoom, getWhisperRoom } from '../../../redux/selectors/rooms';
 import store from '../../../redux/store';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
+import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../redux/reducers/windowOrder';
 
-const IdentityDialog = ({ identityId, done }) => {
+const IdentityDialog = ({ id, identityId }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
   const currentIdentityId = useSelector(getCurrentIdentityId);
 
   return (
     <Dialog
-      done={done}
+      onClick={() => {
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY } }] }));
+      }}
+      done={() => store.dispatch(removeWindow({ id }))}
     >
       <Button
         type="button"
         onClick={() => {
           const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId }) || getRoom(store.getState(), { id: identityId });
 
-          done({ roomId: room.objectId });
+          store.dispatch(removeWindow({ id }));
         }}
       >
         Message
@@ -33,6 +38,6 @@ const IdentityDialog = ({ identityId, done }) => {
 export default React.memo(IdentityDialog);
 
 IdentityDialog.propTypes = {
-  done: func.isRequired,
   identityId: string.isRequired,
+  id: string.isRequired,
 };

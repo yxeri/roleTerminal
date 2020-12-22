@@ -5,6 +5,8 @@
   animation: reveal;
   animation-iteration-count: 1;
   animation-duration: 1s;
+  overflow: hidden;
+  box-sizing: border-box;
 
   .Window {
     display: flex;
@@ -17,6 +19,7 @@
     text-shadow: $text-shadow;
     border-radius: $border-radius;
     box-sizing: border-box;
+    overflow: hidden;
 
     .windowBox {
       display: grid;

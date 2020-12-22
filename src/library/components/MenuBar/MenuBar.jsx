@@ -25,10 +25,12 @@ const MenuBar = () => {
       <MainList onDialog={setDialog} />
       <OpenApps />
       {content}
-      <Clock />
+      <div className="rightAligned">
+        <Clock />
+      </div>
       {dialog}
     </div>
   );
 };
 
-export default MenuBar;
+export default React.memo(MenuBar);

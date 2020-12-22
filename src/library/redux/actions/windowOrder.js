@@ -1,17 +1,33 @@
 import { WINDOWORDER, WINDOWORDERS } from '../actionTypes';
+import { ChangeTypes } from '../reducers/root';
 
 export const changeWindowOrder = ({ windows }) => {
   if (windows.length === 1) {
-    const [{ type, id }] = windows;
+    const [{ value, id }] = windows;
 
     return {
       type: WINDOWORDER,
-      payload: { id, type },
+      payload: {
+        id,
+        value,
+        changeType: ChangeTypes.UPDATE,
+      },
     };
   }
 
   return {
     type: WINDOWORDERS,
-    payload: { windows },
+    payload: {
+      windows,
+      changeType: ChangeTypes.UPDATE,
+    },
   };
 };
+
+export const removeWindow = ({ id }) => ({
+  type: WINDOWORDER,
+  payload: {
+    id,
+    changeTypes: ChangeTypes.REMOVE,
+  },
+});

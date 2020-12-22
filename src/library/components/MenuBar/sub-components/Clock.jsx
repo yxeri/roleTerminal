@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
 import { getTimestamp } from '../../../redux/selectors/config';
+import { ReactComponent as ClockSvg } from '../../../icons/clock.svg';
+import Button from '../../common/sub-components/Button/Button';
 
 const Clock = () => {
-  const [date, setDate] = useState(Date.now());
+  const [date, setDate] = useState(new Date());
+  const [showTime, setShowTime] = useState(false);
   const timestamp = useSelector((state) => getTimestamp(state, { date }));
 
   const updateTime = () => {
     setTimeout(() => {
-      setDate(Date.now());
+      setDate(new Date());
       updateTime();
-    }, 400);
+    }, 1000);
   };
 
   useEffect(() => {
     updateTime();
   }, []);
 
+  const onClick = useCallback(() => setShowTime(!showTime), [showTime]);
+
   return (
     <div
       key="clock"
       className="Clock"
     >
-      <span>{timestamp.halfTime}</span>
+      <Button onClick={onClick} classNames={[`${showTime ? 'hide' : ''}`]}><ClockSvg /></Button>
+      <Button onClick={onClick} classNames={[`${!showTime ? 'hide' : ''}`]}>{timestamp.halfTime}</Button>
     </div>
   );
 };
 
-export default Clock;
+export default React.memo(Clock);

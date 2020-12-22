@@ -11,7 +11,7 @@ import { WindowTypes } from '../../redux/reducers/windowOrder';
 
 const WorldMap = ({ id }) => {
   const onClick = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.WORLDMAP }] }));
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.WORLDMAP } }] }));
   }, []);
 
   return (

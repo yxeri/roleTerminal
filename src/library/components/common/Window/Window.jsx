@@ -45,8 +45,8 @@ const Window = ({
       className={`${rndClasses.join(' ')}`}
       style={{ zIndex: order }}
       size={size}
-      minWidth={320}
-      minHeight={220}
+      minWidth={260}
+      minHeight={170}
       maxHeight="100%"
       maxWidth="100%"
       bounds="parent"
@@ -60,6 +60,23 @@ const Window = ({
         bottomRight: true,
         bottomLeft: true,
         topLeft: false,
+      }}
+      resizeHandleStyles={{
+        left: { left: '0', width: '5px' },
+        right: { right: '0', width: '5px' },
+        bottom: { bottom: '0', width: '5px' },
+        bottomLeft: {
+          bottom: '0',
+          left: '0',
+          width: '5px',
+          height: '5px',
+        },
+        bottomRight: {
+          bottom: '0',
+          right: '0',
+          width: '5px',
+          height: '5px',
+        },
       }}
       onDragStart={onClick}
       onDragStop={(event, { node: element, x: newX, y: newY }) => {

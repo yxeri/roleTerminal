@@ -76,7 +76,7 @@ const Chat = ({ id }) => {
   )), [roomId]);
 
   const onClick = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id, type: WindowTypes.CHAT }] }));
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.CHAT } }] }));
   }, []);
 
   return (

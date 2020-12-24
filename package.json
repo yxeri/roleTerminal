@@ -22,7 +22,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
-    "rolehaven": "file:../roleHaven"
+    "rolehaven": "git://github.com/yxeri/roleHaven.git#develop"
   },
   "scripts": {
     "dev": "NODE_ENV=development MODE=dev JSONKEY=dev USERVERIFY=false CHOKIDAR_USEPOLLING=true node app & react-scripts start",

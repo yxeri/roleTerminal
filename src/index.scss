@@ -36,6 +36,14 @@ ul {
   display: none;
 }
 
+.clickable, .Button {
+  cursor: pointer;
+}
+
+.clickable {
+  text-decoration: underline;
+}
+
 .hide {
   display: none !important;
 }

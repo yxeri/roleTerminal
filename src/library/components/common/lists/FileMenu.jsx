@@ -1,21 +1,15 @@
 import React from 'react';
 import { node } from 'prop-types';
 import List from './List/List';
-import ListItem from './List/Item/ListItem';
 
 const FileMenu = ({ children }) => (
   <List
     dropdown
+    checkWidth
     classNames={['FileMenu']}
     title="File"
   >
     {children}
-    <ListItem
-      key="quit"
-      onClick={() => { console.log('quit'); }}
-    >
-      Quit
-    </ListItem>
   </List>
 );
 

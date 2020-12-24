@@ -40,8 +40,6 @@ export const follow = () => ({
         batch(() => {
           dispatch(updateRooms({ rooms: [data.room] }));
           dispatch(updateUsers({ users: [data.user] }));
-
-          console.log(store.getState());
         });
       });
 

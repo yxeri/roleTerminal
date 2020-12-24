@@ -23,11 +23,11 @@ const Button = React.forwardRef(({
     disabled={disabled}
     type={type} /* eslint-disable-line react/button-has-type */
     onClick={(event) => {
+      onClick(event);
+
       if (stopPropagation) {
         event.stopPropagation();
       }
-
-      onClick(event);
     }}
   >
     {children}

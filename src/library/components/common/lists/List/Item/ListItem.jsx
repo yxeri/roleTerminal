@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  arrayOf,
+  arrayOf, bool,
   func,
   node,
   string,
@@ -8,12 +8,26 @@ import {
 
 const ListItem = ({
   children,
+  onClick,
+  stopPropagation = false,
   classNames = [],
-  onClick = () => {},
 }) => (
   <li
-    className={['ListItem'].concat(classNames).join(' ')}
-    onClick={onClick}
+    className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
+    onClick={(event) => {
+      if (onClick) {
+        console.log('list item');
+        onClick(event);
+      }
+
+      if (event.target.parentElement.tagName === 'UL') {
+        event.target.parentElement.click();
+      }
+
+      if (stopPropagation) {
+        event.stopPropagation();
+      }
+    }}
   >
     {children}
   </li>
@@ -25,9 +39,11 @@ ListItem.propTypes = {
   children: node.isRequired,
   onClick: func,
   classNames: arrayOf(string),
+  stopPropagation: bool,
 };
 
 ListItem.defaultProps = {
-  onClick: () => {},
+  onClick: undefined,
   classNames: [],
+  stopPropagation: false,
 };

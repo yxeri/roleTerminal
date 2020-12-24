@@ -6,14 +6,17 @@ import {
   func,
   string,
 } from 'prop-types';
+import { useFormContext } from 'react-hook-form';
 
 const Select = ({
   onChange,
   children,
+  name,
   required = false,
   placeholder = '',
   multiple = false,
 }) => {
+  const { register } = useFormContext();
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
@@ -29,14 +32,20 @@ const Select = ({
 
   const onChangeFunc = (event) => {
     checkEmpty(event);
-    onChange(Array
-      .from(event.target.selectedOptions)
-      .map((option) => option.value)
-      .filter((value) => value !== ''));
+
+    if (onChange) {
+      onChange(Array
+        .from(event.target.selectedOptions)
+        .map((option) => option.value)
+        .filter((value) => value !== ''));
+    }
   };
 
   return (
     <select
+      required={required}
+      name={name}
+      ref={register}
       className={`Select ${isEmpty ? 'empty' : ''}`}
       onFocus={() => setHasFocus(true)}
       onBlur={checkEmpty}
@@ -55,8 +64,9 @@ Select.propTypes = {
   multiple: bool,
   children: arrayOf(element),
   placeholder: string,
-  onChange: func.isRequired,
+  onChange: func,
   required: bool,
+  name: string.isRequired,
 };
 
 Select.defaultProps = {
@@ -64,4 +74,5 @@ Select.defaultProps = {
   children: undefined,
   placeholder: '',
   required: false,
+  onChange: undefined,
 };

@@ -20,22 +20,21 @@ const Dialog = ({
   classNames = [],
 }) => (
   <Window
+    type="dialog"
     done={done}
     title={title}
     classNames={['Dialog'].concat(classNames)}
     onClick={onClick}
   >
-    <div className="inputs">
-      {
-        error
-          && <div>{error.type}</div>
-      }
-      {
-        text
-          && <div>{text}</div>
-      }
-      {children}
-    </div>
+    {
+      error
+        && <div>{error.type}</div>
+    }
+    {
+      text
+        && <div>{text}</div>
+    }
+    {children}
   </Window>
 );
 

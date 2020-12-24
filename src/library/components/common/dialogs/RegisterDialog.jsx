@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { func } from 'prop-types';
+import { string } from 'prop-types';
+import { useForm, FormProvider } from 'react-hook-form';
+
 import Dialog from './Dialog/Dialog';
 import { login } from '../../../socket/actions/auth';
 import Select from '../sub-components/Select';
@@ -9,19 +11,26 @@ import Textarea from '../sub-components/Textarea';
 import { getRequireOffName } from '../../../redux/selectors/config';
 import Button from '../sub-components/Button/Button';
 import { createUser } from '../../../socket/actions/users';
+import store from '../../../redux/store';
+import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../redux/reducers/windowOrder';
 
-const RegisterDialog = ({ done }) => {
-  const [offName, setOffName] = useState();
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
-  const [repeatPassword, setRepeatPassword] = useState();
-  const [description, setDescription] = useState();
-  const [pronouns, setPronouns] = useState();
+const RegisterDialog = ({ id }) => {
+  const formMethods = useForm();
   const [image, setImage] = useState();
   const [error, setError] = useState();
   const requireOffName = useSelector(getRequireOffName);
 
-  const onSubmit = async () => {
+  console.log(formMethods.errors);
+
+  const onSubmit = async ({
+    offName,
+    username,
+    password,
+    repeatPassword,
+    pronouns,
+    description,
+  }) => {
     if ((requireOffName && !offName) || !username || !password || !repeatPassword || !pronouns) {
       return;
     }
@@ -46,11 +55,13 @@ const RegisterDialog = ({ done }) => {
 
       // TODO If no auto-login, Notification: User registered
 
+      console.log(store.getState());
+
       await login(username, password);
 
       // TODO Notification: You are logged in as user
 
-      done();
+      store.dispatch(removeWindow({ id }));
     } catch (registerError) {
       setError(registerError);
     }
@@ -59,55 +70,66 @@ const RegisterDialog = ({ done }) => {
   return (
     <Dialog
       error={error}
-      done={done}
+      onClick={() => {
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGREGISTER } }] }));
+      }}
+      done={() => store.dispatch(removeWindow({ id }))}
       title="Register user"
     >
-      {
-        requireOffName
-          && (
-            <Input
-              placeholder="Out-of-game name"
-              onChange={setOffName}
-            />
-          )
-      }
-      <Input
-        placeholder="Username"
-        onChange={setUsername}
-      />
-      <Select
-        multiple
-        required
-        onChange={setPronouns}
-      >
-        <option value="">---Choose pronouns---</option>
-        <option value="they">They/Them</option>
-        <option value="she">She/Her</option>
-        <option value="he">He/Him</option>
-        <option value="it">It</option>
-      </Select>
-      <Input
-        placeholder="Password"
-        onChange={setPassword}
-        type="password"
-      />
-      <Input
-        placeholder="Repeat password"
-        onChange={setRepeatPassword}
-        type="password"
-      />
-      <Textarea
-        placeholder="Description"
-        onChange={setDescription}
-      />
-      <div className="buttons">
-        <Button
-          type="submit"
-          onClick={onSubmit}
-        >
-          Register
-        </Button>
-      </div>
+      <FormProvider {...formMethods}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+          {
+            requireOffName && (
+              <Input
+                required
+                name="offName"
+                placeholder="Out-of-game name"
+              />
+            )
+          }
+          <Input
+            required
+            name="username"
+            placeholder="Username"
+          />
+          <Select
+            multiple
+            required
+            name="pronouns"
+          >
+            <option value="">---Choose pronouns---</option>
+            <option value="they">They/Them</option>
+            <option value="she">She/Her</option>
+            <option value="he">He/Him</option>
+            <option value="it">It</option>
+          </Select>
+          <Input
+            required
+            name="password"
+            placeholder="Password"
+            type="password"
+          />
+          <Input
+            required
+            shouldEqual="password"
+            name="repeatPassword"
+            placeholder="Repeat password"
+            type="password"
+          />
+          <Textarea
+            name="description"
+            placeholder="Description"
+          />
+          <div className="buttons">
+            <Button
+              type="submit"
+              onClick={() => {}}
+            >
+              Register
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
     </Dialog>
   );
 };
@@ -115,5 +137,5 @@ const RegisterDialog = ({ done }) => {
 export default React.memo(RegisterDialog);
 
 RegisterDialog.propTypes = {
-  done: func.isRequired,
+  id: string.isRequired,
 };

@@ -2,6 +2,7 @@ import { batch } from 'react-redux';
 
 import { ROOM, ROOMS } from '../actionTypes';
 import { ChangeTypes } from '../reducers/root';
+// eslint-disable-next-line import/no-cycle
 import { updateUsers } from './users';
 
 export const createRooms = ({ rooms }) => {

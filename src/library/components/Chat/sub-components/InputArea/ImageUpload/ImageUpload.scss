@@ -1,15 +1,17 @@
-@import "../../../../common";
+@import "../../../../../../common";
 
 .ImageUpload {
-  .Image, img {
-    max-height: 1em;
-    max-width: 1em;
+  .Button {
+    position: relative;
   }
 
   .previewImage {
-    position: relative;
+    position: absolute;
     max-height: 120px;
     max-width: 120px;
+    bottom: 1em + $padding * 2;
+    border: $border;
+    left: -1px;
 
     div {
       position: absolute;
@@ -23,6 +25,7 @@
     }
 
     img {
+      opacity: 0.25;
       max-height: inherit;
       max-width: inherit;
     }

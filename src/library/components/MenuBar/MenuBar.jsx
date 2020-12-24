@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { useSelector } from 'react-redux';
 import Clock from './sub-components/Clock';
 import MainList from './lists/MainList';
@@ -6,9 +6,9 @@ import { isOnline } from '../../redux/selectors/online';
 
 import './MenuBar.scss';
 import OpenApps from './lists/OpenApps';
+import IdentityPicker from '../common/lists/IdentityPicker/IdentityPicker';
 
 const MenuBar = () => {
-  const [dialog, setDialog] = useState();
   const online = useSelector(isOnline);
   const content = [];
   const classes = [];
@@ -22,13 +22,13 @@ const MenuBar = () => {
       className={`${classes.join(' ')}`}
       id="MenuBar"
     >
-      <MainList onDialog={setDialog} />
+      <MainList />
       <OpenApps />
       {content}
       <div className="rightAligned">
+        <IdentityPicker useIcon />
         <Clock />
       </div>
-      {dialog}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { func } from 'prop-types';
 
-import Image from '../sub-components/Image';
-import Button from '../sub-components/Button/Button';
+import Image from '../../../../common/sub-components/Image';
+import Button from '../../../../common/sub-components/Button/Button';
 
 import imageIcon from './imageIcon.png';
 

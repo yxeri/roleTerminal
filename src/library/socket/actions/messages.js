@@ -3,6 +3,7 @@ import { getRoom } from '../../redux/selectors/rooms';
 import store from '../../redux/store';
 import { getCurrentIdentityId } from '../../redux/selectors/userId';
 import { createMessages } from '../../redux/actions/messages';
+import { getAliasId } from '../../redux/selectors/aliasId';
 
 const MessageType = {
   CHAT: 'chat',
@@ -18,6 +19,7 @@ export const sendMessage = async ({ text, roomId, image }) => {
     : [];
   const message = {
     roomId,
+    ownerAliasId: getAliasId(store.getState()) || undefined,
     text: text.split('\n'),
   };
 

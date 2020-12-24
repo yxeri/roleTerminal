@@ -5,6 +5,8 @@ export const getPublicRoomId = (state) => state.config.get('publicRoomId');
 export const getBroadcastId = (state) => state.config.get('broadcastId');
 export const getAnonymousUser = (state) => state.config.get('anonymousUser');
 export const getAllowedImages = (state) => state.config.get('allowedImages');
+export const getGpsTracking = (state) => state.config.get('gpsTracking');
+export const getPermissions = (state) => state.config.get('permissions');
 
 /**
  * Takes date and returns shorter human-readable time.
@@ -44,7 +46,7 @@ export const getTimestamp = (state, { date, offset, lockDate }) => {
   timestamp.fullTime = `${timestamp.halfTime}:${timestamp.seconds}`;
   timestamp.halfDate = `${timestamp.day}/${timestamp.month}`;
   timestamp.fullDate = `${timestamp.halfDate}/${timestamp.year}`;
-  timestamp.fullStamp = `${timestamp.fullTime} ${timestamp.fullDate}`;
+  timestamp.fullStamp = `${timestamp.halfTime} ${timestamp.fullDate}`;
 
   return timestamp;
 };

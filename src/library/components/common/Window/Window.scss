@@ -32,9 +32,6 @@
         background-color: $second-background-color;
         display: flex;
         flex-direction: row;
-        margin-bottom: #{$margin * 2};
-        height: #{1em + $margin * 2 + .1em};
-        max-height: inherit;
         padding: $padding;
         box-sizing: border-box;
 
@@ -45,7 +42,7 @@
           .dropdown {
             left: 0;
             width: 100%;
-            max-height: calc(100% - #{1em + $margin * 2 + .1em});
+            max-height: calc(100% - #{1em + $margin * 4});
           }
         }
 
@@ -77,6 +74,7 @@
         height: 100%;
         scrollbar-width: none;
         overflow: hidden;
+        padding-right: 0;
 
         .List {
           display: flex;

@@ -13,6 +13,7 @@ const WhisperList = ({ onChange }) => {
   return (
     <List
       dropdown
+      checkWidth
       key="whisperList"
       classNames={['WhisperList']}
       title="PM"

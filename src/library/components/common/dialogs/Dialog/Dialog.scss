@@ -4,28 +4,26 @@
   .Dialog {
     .windowBox {
       display: flex;
-    }
 
-    .inputs {
-      display: flex;
-      flex-direction: column;
+      .content {
+        form {
+          display: grid;
+          grid-gap: $padding;
 
-      > * {
-        margin-bottom: $margin * 2;
-      }
+          input, textarea {
+            padding: $padding;
+            border-radius: $border-radius;
+            max-width: $max-width;
+          }
+        }
 
-      :first-child {
-        margin-top: $margin;
-      }
-
-      input, textarea {
-        padding: $padding;
-        border-radius: $border-radius;
-      }
-
-      .buttons {
-        position: sticky;
-        bottom: 0;
+        .buttons {
+          display: grid;
+          grid-auto-flow: column;
+          grid-gap: $padding;
+          position: sticky;
+          bottom: 0;
+        }
       }
     }
   }

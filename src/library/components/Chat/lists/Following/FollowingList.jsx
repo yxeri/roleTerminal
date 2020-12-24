@@ -19,6 +19,7 @@ const FollowingList = ({ onChange }) => {
   return (
     <List
       dropdown
+      checkWidth
       key="followingList"
       classNames={['FollowingList']}
       title="Joined"

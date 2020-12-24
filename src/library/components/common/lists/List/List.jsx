@@ -16,6 +16,7 @@ const List = ({
   children,
   title,
   scrollTo,
+  checkWidth = false,
   dropdown = false,
   classNames = [],
 }) => {
@@ -25,6 +26,14 @@ const List = ({
   const listClasses = [];
   const classes = ['List'].concat(classNames);
 
+  const onClick = (event) => {
+    if (dropdown && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
+      if (event.target === listRef.current || !listRef.current.parentElement.contains(event.target)) {
+        setHidden(true);
+      }
+    }
+  };
+
   useEffect(() => {
     if (scrollTo && listRef.current) {
       if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
@@ -32,6 +41,16 @@ const List = ({
       }
     }
   });
+
+  useEffect(() => {
+    if (dropdown) {
+      if (!hidden) {
+        document.addEventListener('mousedown', onClick, false);
+      } else {
+        document.removeEventListener('mousedown', onClick, false);
+      }
+    }
+  }, [hidden]);
 
   if (!hidden) {
     classes.push('expanded');
@@ -71,9 +90,11 @@ const List = ({
         }}
         key="listElem"
         className={`${listClasses.join(' ')}`}
-        onClick={() => {
-          if (dropdown && (!windowRef.current || windowRef.current.offsetWidth < 600)) {
-            setHidden(true);
+        onClick={(event) => {
+          if (dropdown) {
+            onClick(event);
+
+            event.stopPropagation();
           }
         }}
       >
@@ -94,6 +115,7 @@ List.propTypes = {
     direction: string,
     buffer: bool,
   }),
+  checkWidth: bool,
 };
 
 List.defaultProps = {
@@ -102,4 +124,5 @@ List.defaultProps = {
   title: undefined,
   dropdown: false,
   scrollTo: undefined,
+  checkWidth: false,
 };

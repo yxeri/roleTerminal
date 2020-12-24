@@ -38,13 +38,16 @@
   }
 
   svg {
-    height: 16px;
-    width: 16px;
+    height: $icon-size;
+    width: $icon-size;
     vertical-align: middle;
   }
 
   .rightAligned {
     margin-left: auto;
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: $padding;
   }
 
   .Clock {
@@ -63,7 +66,6 @@
       flex-direction: row;
 
       > * {
-        margin-right: $margin;
       }
     }
 

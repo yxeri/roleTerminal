@@ -10,15 +10,17 @@ import {
   setDeviceId,
   getToken as getStoredToken,
   getUserId as getStoredUserId,
+  getAliasId as getStoredAliasId,
 } from '../StorageManager';
 import {
   logout as logoutAction,
   login as loginAction,
 } from '../redux/actions/auth';
 import { getUserId } from '../redux/selectors/userId';
-import { chatMessage, chatMessages, whisperMessage } from './listeners/messages';
+import { chatMessage, whisperMessage } from './listeners/messages';
 import { follow, room } from './listeners/rooms';
 import { user } from './listeners/users';
+import { changeAliasId } from '../redux/actions/aliasId';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -194,12 +196,17 @@ addSocketListener({
   callback: ({ data }) => {
     const userId = getStoredUserId();
     const token = getStoredToken();
+    const aliasId = getStoredAliasId();
 
     if (userId && token) {
       store.dispatch(loginAction({
         userId,
         token,
       }));
+    }
+
+    if (aliasId) {
+      store.dispatch(changeAliasId({ aliasId }));
     }
 
     if (!getDeviceId()) {

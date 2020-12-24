@@ -16,28 +16,25 @@ const Window = ({
   children,
   order,
   menu,
+  type = 'window',
   title = 'app',
   classNames = [],
-  done = () => {},
+  done,
 }) => {
-  const defaultSize = { width: 640, height: 460 };
+  const defaultSize = type === 'window' ? { width: 640, height: 460 } : { width: 440, height: 360 };
   const [size, setSize] = useState(defaultSize);
-  const [coordinates, setCoordinates] = useState();
+  const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const rndClasses = ['rnd'];
   const windowClasses = ['Window'].concat(classNames);
 
-  const toggleFullscreen = () => {
+  const onDoubleClick = useCallback(() => {
     if (size.width === '100%' && size.height === '100%') {
       setSize(defaultSize);
     } else {
       setCoordinates({ x: 0, y: 0 });
       setSize({ width: '100%', height: '100%' });
     }
-  };
-
-  const onDoubleClick = useCallback(() => {
-    toggleFullscreen();
-  }, []);
+  }, [size, coordinates]);
 
   return (
     <Rnd
@@ -45,26 +42,26 @@ const Window = ({
       className={`${rndClasses.join(' ')}`}
       style={{ zIndex: order }}
       size={size}
-      minWidth={260}
+      minWidth={320}
       minHeight={170}
       maxHeight="100%"
       maxWidth="100%"
       bounds="parent"
-      dragHandleClassName="TopBar"
+      dragHandleClassName="TopBarHandle"
       enableResizing={{
         top: false,
+        topRight: false,
+        topLeft: false,
         right: true,
         bottom: true,
         left: true,
-        topRight: false,
         bottomRight: true,
         bottomLeft: true,
-        topLeft: false,
       }}
       resizeHandleStyles={{
         left: { left: '0', width: '5px' },
         right: { right: '0', width: '5px' },
-        bottom: { bottom: '0', width: '5px' },
+        bottom: { bottom: '0', height: '5px' },
         bottomLeft: {
           bottom: '0',
           left: '0',
@@ -108,7 +105,9 @@ const Window = ({
       }}
       onResizeStart={onClick}
       onResizeStop={(event, direction, element) => {
-        setSize({ width: element.offsetWidth, height: element.offsetHeight });
+        if (element.offsetWidth !== size.width || element.offsetHeight !== size.height) {
+          setSize({ width: element.offsetWidth, height: element.offsetHeight });
+        }
       }}
     >
       <div
@@ -149,12 +148,14 @@ Window.propTypes = {
   title: string,
   classNames: arrayOf(string),
   done: func,
+  type: string,
 };
 
 Window.defaultProps = {
-  done: () => {},
+  done: undefined,
   classNames: [],
   title: 'app',
   menu: undefined,
   order: undefined,
+  type: 'window',
 };

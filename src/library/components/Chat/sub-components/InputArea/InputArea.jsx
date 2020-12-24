@@ -1,18 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number, string } from 'prop-types';
 import { useForm } from 'react-hook-form';
 
-import ImageUpload from '../../../common/ImageUpload/ImageUpload';
-
+import ImageUpload from './ImageUpload/ImageUpload';
 import { AccessLevels } from '../../../../AccessCentral';
 import { isOnline } from '../../../../redux/selectors/online';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
-import { getAllowedImages } from '../../../../redux/selectors/config';
-
-import './InputArea.scss';
+import { getAllowedImages, getGpsTracking } from '../../../../redux/selectors/config';
 import Button from '../../../common/sub-components/Button/Button';
 import { sendMessage } from '../../../../socket/actions/messages';
+import IdentityPicker from '../../../common/lists/IdentityPicker/IdentityPicker';
+
+import { ReactComponent as Pin } from '../../../../icons/pin.svg';
+import { ReactComponent as Tag } from '../../../../icons/tag.svg';
+import { ReactComponent as File } from '../../../../icons/file-plus.svg';
+
+import './InputArea.scss';
 
 const InputArea = ({
   roomId,
@@ -26,6 +30,7 @@ const InputArea = ({
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
+  const gpsTracking = useSelector(getGpsTracking);
   const textareaClasses = [];
 
   const resize = () => {
@@ -40,7 +45,7 @@ const InputArea = ({
     }
   };
 
-  const submit = ({
+  const onSubmit = ({
     text,
   }) => {
     sendMessage({
@@ -63,9 +68,11 @@ const InputArea = ({
     });
   };
 
+  const onSetImage = useCallback((newImage) => setImage(newImage), []);
+
   return (
     <div className="InputArea">
-      <form onSubmit={handleSubmit(submit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {accessLevel >= minAccessLevel && (
           <div
             key="buttonBox"
@@ -75,10 +82,19 @@ const InputArea = ({
               allowedImages.CHAT
               && (
                 <ImageUpload
-                  onChange={setImage}
+                  onChange={onSetImage}
                 />
               )
             }
+            <Button onClick={() => {}}><Tag /></Button>
+            <Button onClick={() => {}}><File /></Button>
+            {
+              gpsTracking
+              && (
+                <Button onClick={() => {}}><Pin /></Button>
+              )
+            }
+            <IdentityPicker />
           </div>
         )}
         <div className="input">

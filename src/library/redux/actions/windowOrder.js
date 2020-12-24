@@ -28,6 +28,6 @@ export const removeWindow = ({ id }) => ({
   type: WINDOWORDER,
   payload: {
     id,
-    changeTypes: ChangeTypes.REMOVE,
+    changeType: ChangeTypes.REMOVE,
   },
 });

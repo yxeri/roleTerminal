@@ -6,7 +6,7 @@ import Positions from './views/Positions';
 
 import './WorldMap.scss';
 import store from '../../redux/store';
-import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
 const WorldMap = ({ id }) => {
@@ -16,6 +16,7 @@ const WorldMap = ({ id }) => {
 
   return (
     <Window
+      done={() => store.dispatch(removeWindow({ id }))}
       classNames={['WorldMap']}
       title="map"
       onClick={onClick}

@@ -1,14 +1,16 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { func, string } from 'prop-types';
+import { batch, useSelector } from 'react-redux';
+import { string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
 import { getIdentityById } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
-import { getRoom, getWhisperRoom } from '../../../redux/selectors/rooms';
+import { getWhisperRoom } from '../../../redux/selectors/rooms';
 import store from '../../../redux/store';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
+import { ReactComponent as Wallet } from '../../../icons/wallet.svg';
+import { ReactComponent as Chat } from '../../../icons/chat.svg';
 
 const IdentityDialog = ({ id, identityId }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
@@ -16,21 +18,39 @@ const IdentityDialog = ({ id, identityId }) => {
 
   return (
     <Dialog
+      title={`User: ${identity.aliasName || identity.username}`}
       onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY } }] }));
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
     >
-      <Button
-        type="button"
-        onClick={() => {
-          const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId }) || getRoom(store.getState(), { id: identityId });
+      {currentIdentityId !== '-1' && (
+        <div className="buttons">
+          <Button
+            stopPropagation
+            type="button"
+            onClick={() => {}}
+          >
+            <Wallet />
+          </Button>
+          <Button
+            stopPropagation
+            type="button"
+            onClick={() => {
+              const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId });
 
-          store.dispatch(removeWindow({ id }));
-        }}
-      >
-        Message
-      </Button>
+              batch(() => {
+                store.dispatch(changeWindowOrder({
+                  windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId: room.objectId } }],
+                }));
+                store.dispatch(removeWindow({ id }));
+              });
+            }}
+          >
+            <Chat />
+          </Button>
+        </div>
+      )}
     </Dialog>
   );
 };

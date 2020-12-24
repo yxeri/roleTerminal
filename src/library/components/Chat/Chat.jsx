@@ -16,20 +16,25 @@ import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
 import { getCurrentUser, getIdentityById } from '../../redux/selectors/users';
 import { hasAccessTo } from '../../AccessCentral';
-import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-const Chat = ({ id }) => {
-  const [dialog, setDialog] = useState();
-  const [roomId, setRoomId] = useState(getPublicRoomId(store.getState()));
-  const room = useSelector((state) => getRoom(state, { id: roomId }));
+const Chat = ({ id, roomId }) => {
+  const [currentRoomId, setRoomId] = useState(roomId || getPublicRoomId(store.getState()));
+  const room = useSelector((state) => getRoom(state, { id: currentRoomId }));
   const currentUser = useSelector(getCurrentUser);
 
   useEffect(() => {
-    if ((!currentUser || currentUser.isAnonymous || !room) && roomId !== getPublicRoomId(store.getState())) {
+    if ((!currentUser || currentUser.isAnonymous || !room) && currentRoomId !== getPublicRoomId(store.getState())) {
       setRoomId(getPublicRoomId(store.getState()));
     }
   }, [room, currentUser]);
+
+  useEffect(() => {
+    if (roomId && currentRoomId !== roomId) {
+      setRoomId(roomId);
+    }
+  }, [roomId]);
 
   const title = (() => {
     if (!room) {
@@ -37,7 +42,7 @@ const Chat = ({ id }) => {
     }
 
     if (room.isUser) {
-      const identity = getIdentityById(store.getState(), { id: roomId });
+      const identity = getIdentityById(store.getState(), { id: currentRoomId });
 
       return `PM: ${identity.aliasName || identity.username}`;
     }
@@ -50,87 +55,72 @@ const Chat = ({ id }) => {
   })();
 
   const onChange = useCallback(({ roomId: newRoomId } = {}) => {
-    if (newRoomId) {
-      setRoomId(newRoomId);
-    }
+    setRoomId(newRoomId);
   }, []);
-
-  const onDialog = useCallback(setDialog, []);
-
-  const createRoomDialog = useCallback(() => setDialog(createDialog(
-    <CreateRoomDialog
-      done={
-        ({ roomId: newRoomId }) => {
-          setDialog();
-
-          if (newRoomId) {
-            setRoomId(newRoomId);
-          }
-        }
-      }
-    />,
-  )), []);
-
-  const createRemoveDialog = useCallback(() => setDialog(createDialog(
-    <RemoveRoomDialog roomId={roomId} done={() => setDialog()} />,
-  )), [roomId]);
 
   const onClick = useCallback(() => {
     store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.CHAT } }] }));
   }, []);
 
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
+  const onCreateRoom = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATEROOM, value: { type: WindowTypes.DIALOGCREATEROOM } }] })), []);
+
+  const { hasFullAccess } = hasAccessTo({
+    objectToAccess: room,
+    toAuth: currentUser,
+  });
+
   return (
-    <>
-      <Window
-        classNames={['Chat']}
-        title={title}
-        onClick={onClick}
-        menu={(
-          <>
+    <Window
+      done={onDone}
+      classNames={['Chat']}
+      title={title}
+      onClick={onClick}
+      menu={(
+        <>
+          {!currentUser.isAnonymous && (
             <FileMenu key="fileMenu">
               <ListItem
+                stopPropagation
                 key="createRoom"
-                onClick={createRoomDialog}
+                onClick={onCreateRoom}
               >
                 New room
               </ListItem>
-              {hasAccessTo({
-                objectToAccess: room,
-                toAuth: currentUser,
-              }).hasFullAccess && (
-                <>
-                  <ListItem
-                    key="configRoom"
-                    onClick={() => setDialog(createDialog(<RemoveRoomDialog roomId={roomId} done={() => setDialog()} />))}
-                  >
-                    Config room
-                  </ListItem>
-                  <ListItem
-                    key="removeRoom"
-                    onClick={createRemoveDialog}
-                  >
-                    Delete room
-                  </ListItem>
-                </>
+              {hasFullAccess && (
+                <ListItem
+                  stopPropagation
+                  key="configRoom"
+                  onClick={() => {}}
+                >
+                  Config room
+                </ListItem>
+              )}
+              {hasFullAccess && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
+                <ListItem
+                  stopPropagation
+                  key="removeRoom"
+                  onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGREMOVEROOM, value: { type: WindowTypes.DIALOGREMOVEROOM, roomId: currentRoomId } }] }))}
+                >
+                  Delete room
+                </ListItem>
               )}
             </FileMenu>
-            <Rooms
-              key="rooms"
-              onChange={onChange}
-              onDialog={onDialog}
-            />
-          </>
-        )}
-      >
-        <Messages
-          key="messages"
-          roomId={roomId}
-          onDialog={onDialog}
-          onSend={onChange}
-        />
-      </Window>
-      {dialog}
-    </>
+          )}
+          <Rooms
+            key="rooms"
+            onChange={onChange}
+          />
+        </>
+      )}
+    >
+      <Messages
+        key="messages"
+        roomId={currentRoomId}
+        onSend={onChange}
+      />
+    </Window>
   );
 };
 
@@ -138,4 +128,9 @@ export default React.memo(Chat);
 
 Chat.propTypes = {
   id: string.isRequired,
+  roomId: string,
+};
+
+Chat.defaultProps = {
+  roomId: undefined,
 };

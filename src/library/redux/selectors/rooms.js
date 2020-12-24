@@ -49,8 +49,10 @@ export const getWhisperRoom = createCachedSelector(
   [
     getWhisperRooms,
     (_, { identityId, currentIdentityId }) => ({ identityId, currentIdentityId }),
+    (state, { identityId }) => getRoom(state, { id: identityId }),
   ],
-  (rooms, { currentIdentityId, identityId }) => rooms.find((room) => room.participantIds.includes(currentIdentityId) && room.participantIds.includes(identityId)),
+  (rooms, { currentIdentityId, identityId }, identityRoom) => rooms
+    .find((room) => room.participantIds.includes(currentIdentityId) && room.participantIds.includes(identityId)) || identityRoom,
 )((_, { currentIdentityId, identityId }) => `whisper-${currentIdentityId}-${identityId}`);
 
 export const getWhisperRoomName = createCachedSelector(

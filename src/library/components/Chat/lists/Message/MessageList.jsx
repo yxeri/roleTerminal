@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { func, string } from 'prop-types';
+import { string } from 'prop-types';
 
 import { getMessageIdsByRoom } from '../../../../redux/selectors/messages';
 import List from '../../../common/lists/List/List';
@@ -8,20 +8,19 @@ import MessageItem from './Item/MessageItem';
 
 import './MessageList.scss';
 
-const MessageList = ({ roomId, onDialog }) => {
+const MessageList = ({ roomId }) => {
   const messageIds = useSelector((state) => getMessageIdsByRoom(state, { roomId }));
 
-  const messageMapper = () => messageIds.map((messageId) => (
+  const messageMapper = () => messageIds.map((messageId, index, array) => (
     <MessageItem
       key={messageId}
+      previousMessageId={array[index - 1]}
       messageId={messageId}
-      onDialog={onDialog}
     />
   ));
 
   return (
     <List
-      large
       scrollTo={{
         buffer: true,
         direction: 'bottom',
@@ -37,7 +36,6 @@ export default React.memo(MessageList);
 
 MessageList.propTypes = {
   roomId: string,
-  onDialog: func.isRequired,
 };
 
 MessageList.defaultProps = {

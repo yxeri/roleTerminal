@@ -16,7 +16,16 @@ defaultState.set('dayModification', 0);
 defaultState.set('requireOffName', false);
 defaultState.set('activateTermination', false);
 defaultState.set('allowedImages', { CHAT: false, PROFILE: false, DOCFILE: false });
-defaultState.set('permissions', {});
+defaultState.set('permissions', {
+  CreateAlias: {
+    name: 'CreateAlias',
+    accessLevel: AccessLevels.STANDARD,
+  },
+  CreateUser: {
+    name: 'CreateUser',
+    accessLevel: AccessLevels.ANONYMOUS,
+  },
+});
 defaultState.set('anonymousUser', {
   accessLevel: AccessLevels.ANONYMOUS,
   followingRooms: [],

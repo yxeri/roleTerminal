@@ -10,6 +10,7 @@ export const WindowTypes = {
   DIALOGREMOVEROOM: 'dialogRemoveRoom',
   DIALOGREGISTER: 'dialogRegister',
   DIALOGLOGIN: 'dialogLogin',
+  DIALOGCREATEALIAS: 'dialogCreateAlias',
 };
 
 const defaultState = new Map();
@@ -25,12 +26,8 @@ export default function WindowOrderReducer(state = defaultState, action) {
         return state;
       }
 
-      console.log(newState, id);
-
       newState.delete(id);
       newState.set(id, value);
-
-      console.log(newState, id);
 
       return newState;
     }

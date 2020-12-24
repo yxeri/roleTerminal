@@ -8,4 +8,18 @@
   background-color: $light-background-color;
   color: $second-color;
   box-shadow: $shadow;
+
+  > .Image {
+    > img {
+      max-height: $icon-size;
+      max-width: $icon-size;
+      vertical-align: middle;
+    }
+  }
+
+  > svg {
+    max-height: $icon-size;
+    max-width: $icon-size;
+    vertical-align: middle;
+  }
 }

@@ -19,7 +19,9 @@ const TopBar = ({
     onDoubleClick={onDoubleClick}
     className="TopBar"
   >
-    <span className="title">{title}</span>
+    <div className="TopBarHandle">
+      <span className="title">{title}</span>
+    </div>
     <div className="buttons">
       <Button type="button" onClick={onDoubleClick}><Maximize /></Button>
       <Button stopPropagation type="button" onClick={done}><Close /></Button>

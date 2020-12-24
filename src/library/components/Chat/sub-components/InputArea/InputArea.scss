@@ -8,11 +8,28 @@
   margin-top: $padding;
 
   .buttonBox {
-    .Button {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: fit-content(0);
+    grid-gap: $padding;
+
+    .Button, header {
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
       border-bottom: none;
       vertical-align: bottom;
+    }
+
+    .IdentityPicker {
+      position: relative;
+
+      ul {
+        bottom: 1em + $margin * 2;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: $border-radius;
+        max-height: 5em;
+      }
     }
   }
 
@@ -32,6 +49,7 @@
       border-radius: $border-radius;
       border-bottom-right-radius: 0;
       border-top-right-radius: 0;
+      border-top-left-radius: 0;
       box-sizing: border-box;
       scrollbar-width: none;
       min-height: 2em;

@@ -6,7 +6,7 @@ import Window from '../common/Window/Window';
 import TransactionList from './lists/Transaction/TransactionList';
 import { getWalletIdsByCurrentUser } from '../../redux/selectors/wallets';
 import store from '../../redux/store';
-import { changeWindowOrder } from '../../redux/actions/windowOrder';
+import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
 const Wallet = ({ id }) => {
@@ -18,6 +18,7 @@ const Wallet = ({ id }) => {
 
   return (
     <Window
+      done={() => store.dispatch(removeWindow({ id }))}
       classNames={['Wallet']}
       title="wallet"
       onClick={onClick}

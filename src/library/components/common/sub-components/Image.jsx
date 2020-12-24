@@ -13,9 +13,9 @@ const Image = React.forwardRef(({
         <div
           role="complementary"
           onClick={(event) => {
-            event.stopPropagation();
-
             onRemove();
+
+            event.stopPropagation();
           }}
         >
           X

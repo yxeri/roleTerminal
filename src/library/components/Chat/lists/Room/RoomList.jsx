@@ -20,6 +20,7 @@ const RoomList = ({ onChange }) => {
   return (
     <List
       dropdown
+      checkWidth
       key="roomList"
       classNames={['RoomList']}
       title="Rooms"

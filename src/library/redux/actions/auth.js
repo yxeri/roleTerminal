@@ -1,3 +1,5 @@
+import { batch } from 'react-redux';
+
 import { ALIASID, USERID } from '../actionTypes';
 import { resetUser, setToken, setUserId } from '../../StorageManager';
 
@@ -15,14 +17,16 @@ export const logout = () => {
   resetUser();
 
   return (dispatch) => {
-    dispatch({
-      type: USERID,
-      payload: { reset: true },
-    });
+    batch(() => {
+      dispatch({
+        type: USERID,
+        payload: { reset: true },
+      });
 
-    dispatch({
-      type: ALIASID,
-      payload: { reset: true },
+      dispatch({
+        type: ALIASID,
+        payload: { reset: true },
+      });
     });
   };
 };

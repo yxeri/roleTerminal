@@ -1,6 +1,10 @@
 @import "../../../../../common";
 
 .List {
+  .ListItem.clickable {
+    text-decoration: none;
+  }
+
   header {
     user-select: none;
     padding: $padding;
@@ -8,6 +12,7 @@
     border-radius: $border-radius;
     box-shadow: $shadow;
     background-color: $light-background-color;
+    text-decoration: none;
   }
 
   ul {

@@ -41,14 +41,15 @@ export const getIdentityById = createSelector(
   (user, alias) => user || alias,
 );
 
-export const getOthersIdentities = createSelector(
+export const getOthersIdentityIds = createCachedSelector(
   [getIdentities, getUserId],
   (identities, userId) => identities
-    .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId)),
-);
+    .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId))
+    .map((identity) => identity.objectId),
+)(() => 'other-identity-ids');
 
-export const getCurrentUserIdentities = createSelector(
+export const getCurrentUserIdentities = createCachedSelector(
   [getIdentities, getUserId],
   (identities, userId) => identities
     .filter((identity) => identity.objectId === userId || identity.ownerId === userId || identity.userIds.includes(userId)),
-);
+)(() => 'current-identities');

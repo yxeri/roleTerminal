@@ -2,14 +2,16 @@ import { ALIASID } from '../actionTypes';
 
 const initialState = null;
 
-export default function userIdReducer(state = initialState, action) {
+export default function aliasIdReducer(state = initialState, action) {
   if (action.type === ALIASID) {
     const { payload } = action;
-    const { reset, userId } = payload;
+    const { reset, aliasId } = payload;
+
+    console.log(action);
 
     return reset
       ? initialState
-      : userId;
+      : aliasId;
   }
 
   return state;

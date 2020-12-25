@@ -21,6 +21,7 @@ const IdentityPicker = ({ useIcon = false }) => {
 
     return filtered.map((identity) => (
       <ListItem
+        classNames={[`${identity.objectId === identityId ? 'selected' : ''}`]}
         key={identity.objectId}
         onClick={() => store.dispatch(changeAliasId({ aliasId: identity.aliasName ? identity.objectId : undefined }))}
       >

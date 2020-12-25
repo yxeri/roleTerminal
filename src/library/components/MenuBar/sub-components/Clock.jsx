@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { getTimestamp } from '../../../redux/selectors/config';
 import { ReactComponent as ClockSvg } from '../../../icons/clock.svg';
 import Button from '../../common/sub-components/Button/Button';
+import store from '../../../redux/store';
 
 const Clock = () => {
   const [date, setDate] = useState(new Date());
   const [showTime, setShowTime] = useState(false);
-  const timestamp = useSelector((state) => getTimestamp(state, { date }));
+  const timestamp = getTimestamp(store.getState(), { date });
 
   const updateTime = () => {
     setTimeout(() => {

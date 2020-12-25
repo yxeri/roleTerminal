@@ -1,6 +1,6 @@
-import store from '../../redux/store';
 import { batch } from 'react-redux';
 
+import store from '../../redux/store';
 import { createRooms, removeRooms, updateRooms } from '../../redux/actions/rooms';
 import { ChangeTypes } from '../../redux/reducers/root';
 import { updateUsers } from '../../redux/actions/users';
@@ -28,7 +28,7 @@ export const room = () => ({
       return;
     }
 
-    console.log('Error', events.ROOM, error, data);
+    console.log(events.ROOM, error, data);
   },
 });
 
@@ -46,6 +46,6 @@ export const follow = () => ({
       return;
     }
 
-    console.log('Error', events.FOLLOW, error, data);
+    console.log(events.FOLLOW, error, data);
   },
 });

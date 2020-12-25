@@ -5,10 +5,7 @@ import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
 import Window from '../common/Window/Window';
 import FileMenu from '../common/lists/FileMenu';
-import CreateRoomDialog from './dialogs/CreateRoomDialog';
-import RemoveRoomDialog from './dialogs/RemoveRoomDialog';
 import { getRoom, getWhisperRoomName } from '../../redux/selectors/rooms';
-import { createDialog } from '../helper';
 
 import './Chat.scss';
 import ListItem from '../common/lists/List/Item/ListItem';
@@ -109,6 +106,7 @@ const Chat = ({ id, roomId }) => {
             </FileMenu>
           )}
           <Rooms
+            roomId={currentRoomId}
             key="rooms"
             onChange={onChange}
           />

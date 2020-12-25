@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   bool,
-  func,
+  func, number,
   string,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
@@ -9,6 +9,7 @@ import { useFormContext } from 'react-hook-form';
 const Textarea = ({
   onChange,
   name,
+  maxLength,
   required = false,
   placeholder = '',
 }) => {
@@ -26,9 +27,12 @@ const Textarea = ({
 
   return (
     <textarea
+      maxLength={maxLength}
       required={required}
       name={name}
-      ref={register}
+      ref={register({
+        maxLength,
+      })}
       defaultValue=""
       className={isEmpty ? 'empty' : ''}
       onFocus={() => setHasFocus(true)}
@@ -50,10 +54,12 @@ Textarea.propTypes = {
   onChange: func,
   required: bool,
   name: string.isRequired,
+  maxLength: number,
 };
 
 Textarea.defaultProps = {
   placeholder: '',
   required: false,
   onChange: undefined,
+  maxLength: undefined,
 };

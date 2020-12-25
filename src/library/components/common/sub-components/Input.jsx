@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   string,
   bool,
-  func,
+  func, number,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -10,6 +10,7 @@ const Input = ({
   onChange,
   name,
   shouldEqual,
+  maxLength,
   type = 'text',
   required = false,
   placeholder = '',
@@ -26,9 +27,11 @@ const Input = ({
 
   return (
     <input
+      maxLength={maxLength}
       required={required}
       name={name}
       ref={register({
+        maxLength,
         validate: (value) => (!shouldEqual || value === getValues(shouldEqual)) || `Must match ${shouldEqual}`,
       })}
       type={type}
@@ -61,6 +64,7 @@ Input.propTypes = {
   type: string,
   name: string.isRequired,
   shouldEqual: string,
+  maxLength: number,
 };
 
 Input.defaultProps = {
@@ -69,4 +73,5 @@ Input.defaultProps = {
   type: 'text',
   onChange: undefined,
   shouldEqual: undefined,
+  maxLength: undefined,
 };

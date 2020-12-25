@@ -5,7 +5,6 @@ html, body, div, span, p, a, img, ul, li, video, textarea, button, input, fields
   padding: 0;
   border: 0;
   font: inherit;
-  font-size: 100%;
   vertical-align: baseline;
 }
 
@@ -15,13 +14,22 @@ html, body {
   height: 100%;
   background-color: $background-color;
   font-size: 1.1em;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 ul {
   list-style: none;
+}
+
+h1 {
+  font-size: 1.1em;
+  margin: 0;
+  padding: 0;
 }
 
 #root {

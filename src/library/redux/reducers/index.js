@@ -12,6 +12,8 @@ import wallets from './wallets';
 import config from './config';
 import aliasId from './aliasId';
 import windowOrder from './windowOrder';
+import teams from './teams';
+import docFiles from './docFiles';
 
 export default combineReducers({
   users,
@@ -26,4 +28,6 @@ export default combineReducers({
   config,
   aliasId,
   windowOrder,
+  teams,
+  docFiles,
 });

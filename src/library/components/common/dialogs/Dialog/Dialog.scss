@@ -6,14 +6,16 @@
       display: flex;
 
       .content {
+        overflow-y: auto;
+        max-width: $max-width;
+
         form {
           display: grid;
-          grid-gap: $padding;
+          grid-gap: $padding * 2;
 
           input, textarea {
             padding: $padding;
             border-radius: $border-radius;
-            max-width: $max-width;
           }
         }
 

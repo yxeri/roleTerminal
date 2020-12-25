@@ -21,6 +21,10 @@ import { chatMessage, whisperMessage } from './listeners/messages';
 import { follow, room } from './listeners/rooms';
 import { user } from './listeners/users';
 import { changeAliasId } from '../redux/actions/aliasId';
+import { alias } from './listeners/aliases';
+import { wallet } from './listeners/wallets';
+import { transaction } from './listeners/transactions';
+import { docFile } from './listeners/docFiles';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -30,8 +34,6 @@ const socket = (() => {
   if (process.env.NODE_ENV === 'development') {
     socketUri = `${window.location.hostname}:8888`;
   }
-
-  console.log(socketUri);
 
   return window.io(socketUri, { forceNew: true });
 })();
@@ -247,3 +249,15 @@ addSocketListener(follow());
 
 // Users
 addSocketListener(user());
+
+// Aliases
+addSocketListener(alias());
+
+// Wallets
+addSocketListener(wallet());
+
+// Transactions
+addSocketListener(transaction());
+
+// DocFiles
+addSocketListener(docFile());

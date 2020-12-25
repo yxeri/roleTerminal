@@ -5,12 +5,15 @@ export const WindowTypes = {
   WALLET: 'wallet',
   CHAT: 'chat',
   WORLDMAP: 'worldMap',
+  DOCFILE: 'docFile',
   DIALOGIDENTITY: 'dialogIdentity',
   DIALOGCREATEROOM: 'dialogCreateRoom',
   DIALOGREMOVEROOM: 'dialogRemoveRoom',
   DIALOGREGISTER: 'dialogRegister',
   DIALOGLOGIN: 'dialogLogin',
   DIALOGCREATEALIAS: 'dialogCreateAlias',
+  DIALOGCREATETRANSACTION: 'dialogCreateTransaction',
+  DIALOGCREATEDOCFILE: 'dialogCreateDocFile',
 };
 
 const defaultState = new Map();
@@ -23,7 +26,11 @@ export default function WindowOrderReducer(state = defaultState, action) {
 
     if (changeType === ChangeTypes.UPDATE) {
       if (newState.size > 0 && [...newState.keys()].indexOf(id) === newState.size - 1) {
-        return state;
+        const existing = newState.get(id);
+
+        if (Object.keys(value).length === Object.keys(existing).length && Object.keys(value).every((key) => existing[key] === value[key])) {
+          return state;
+        }
       }
 
       newState.delete(id);

@@ -29,7 +29,15 @@ const IdentityDialog = ({ id, identityId }) => {
           <Button
             stopPropagation
             type="button"
-            onClick={() => {}}
+            onClick={() => batch(() => {
+              store.dispatch(changeWindowOrder({
+                windows: [{
+                  id: `${WindowTypes.DIALOGCREATETRANSACTION}-${identityId}`,
+                  value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId: identityId },
+                }],
+              }));
+              store.dispatch(removeWindow({ id }));
+            })}
           >
             <Wallet />
           </Button>

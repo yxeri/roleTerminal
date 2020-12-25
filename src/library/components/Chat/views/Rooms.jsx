@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { func } from 'prop-types';
+import { func, string } from 'prop-types';
 import { AccessLevels } from '../../../AccessCentral';
 import UserList from '../../common/lists/IdentityList/IdentityList';
 import RoomList from '../lists/Room/RoomList';
@@ -8,7 +8,7 @@ import WhisperList from '../lists/Whisper/WhisperList';
 import FollowingList from '../lists/Following/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 
-const Rooms = ({ onChange }) => {
+const Rooms = ({ onChange, roomId }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
 
   return (
@@ -17,6 +17,7 @@ const Rooms = ({ onChange }) => {
         accessLevel >= AccessLevels.STANDARD && (
           <>
             <FollowingList
+              roomId={roomId}
               key="following"
               onChange={onChange}
             />
@@ -43,4 +44,5 @@ export default React.memo(Rooms);
 
 Rooms.propTypes = {
   onChange: func.isRequired,
+  roomId: string.isRequired,
 };

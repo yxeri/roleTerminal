@@ -12,6 +12,7 @@ const Select = ({
   onChange,
   children,
   name,
+  defaultValue,
   required = false,
   placeholder = '',
   multiple = false,
@@ -43,6 +44,7 @@ const Select = ({
 
   return (
     <select
+      defaultValue={defaultValue}
       required={required}
       name={name}
       ref={register}

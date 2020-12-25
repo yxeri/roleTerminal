@@ -1,4 +1,11 @@
 @import "../../../common";
 
-.WorldMap {
+.rnd {
+  .WorldMap {
+    .windowBox {
+      .content {
+        background-color: $second-background-color;
+      }
+    }
+  }
 }

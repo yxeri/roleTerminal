@@ -5,6 +5,10 @@
     text-decoration: none;
   }
 
+  .ListItem.selected {
+    background-color: $selected;
+  }
+
   header {
     user-select: none;
     padding: $padding;
@@ -20,15 +24,15 @@
     grid-auto-rows: max-content;
     grid-template-columns: 100%;
     grid-gap: $margin;
-    padding: 0 $padding;
     overflow-y: auto;
     height: 100%;
     scrollbar-width: none;
     box-sizing: border-box;
+    scroll-behavior: smooth;
 
     li {
       word-wrap: break-word;
-      padding: $padding 0;
+      padding: $padding $padding;
     }
   }
 

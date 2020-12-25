@@ -2,9 +2,6 @@
 
 .rnd {
   box-shadow: $dark-shadow;
-  animation: reveal;
-  animation-iteration-count: 1;
-  animation-duration: 1s;
   overflow: hidden;
   box-sizing: border-box;
 
@@ -57,6 +54,7 @@
         overflow: hidden;
         padding: $padding;
         box-sizing: border-box;
+        scrollbar-width: none;
       }
     }
   }
@@ -64,7 +62,7 @@
   .Window[min-width~="600px"] {
     .windowBox {
       grid-template-rows: 1fr;
-      grid-template-columns: minmax(0, 10em) minmax(min-content, 100%);
+      grid-template-columns: minmax(0, 10em) auto;
 
       .menu {
         margin-bottom: 0;
@@ -102,15 +100,5 @@
         }
       }
     }
-  }
-}
-
-@keyframes reveal {
-  from {
-    outline: $lite-border;
-  }
-
-  to {
-    outline: none;
   }
 }

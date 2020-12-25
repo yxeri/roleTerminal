@@ -16,7 +16,6 @@ const ListItem = ({
     className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
     onClick={(event) => {
       if (onClick) {
-        console.log('list item');
         onClick(event);
       }
 

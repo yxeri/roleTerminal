@@ -3,10 +3,4 @@
 .MessageList {
   height: 100%;
   overflow: hidden;
-  scrollbar-width: none;
-
-  .more {
-    position: sticky;
-    bottom: 1em;
-  }
 }

@@ -7,8 +7,6 @@ export default function aliasIdReducer(state = initialState, action) {
     const { payload } = action;
     const { reset, aliasId } = payload;
 
-    console.log(action);
-
     return reset
       ? initialState
       : aliasId;

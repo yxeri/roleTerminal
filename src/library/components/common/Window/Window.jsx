@@ -16,10 +16,10 @@ const Window = ({
   children,
   order,
   menu,
+  done,
   type = 'window',
   title = 'app',
   classNames = [],
-  done,
 }) => {
   const defaultSize = type === 'window' ? { width: 640, height: 460 } : { width: 440, height: 360 };
   const [size, setSize] = useState(defaultSize);
@@ -42,8 +42,6 @@ const Window = ({
       className={`${rndClasses.join(' ')}`}
       style={{ zIndex: order }}
       size={size}
-      minWidth={320}
-      minHeight={170}
       maxHeight="100%"
       maxWidth="100%"
       bounds="parent"

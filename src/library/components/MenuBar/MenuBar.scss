@@ -11,7 +11,7 @@
   background-color: $light-background-color;
   box-sizing: border-box;
   margin-bottom: $margin;
-  align-items: end;
+  align-items: flex-end;
   box-shadow: $shadow;
   z-index: $menu-bar-z-index;
 
@@ -30,7 +30,7 @@
   }
 
   > * {
-    margin-right: $margin;
+    margin-right: $margin * 2;
   }
 
   > *:last-child {
@@ -47,7 +47,7 @@
     margin-left: auto;
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding;
+    grid-gap: $padding * 2;
   }
 
   .Clock {
@@ -62,11 +62,9 @@
 
   .OpenApps {
     ul {
-      display: flex;
-      flex-direction: row;
-
-      > * {
-      }
+      grid-auto-flow: column;
+      grid-template-columns: unset;
+      grid-gap: $padding * 2;
     }
 
     .ListItem {

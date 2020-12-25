@@ -13,6 +13,9 @@ import RemoveRoomDialog from '../Chat/dialogs/RemoveRoomDialog';
 import LoginDialog from '../common/dialogs/LoginDialog';
 import RegisterDialog from '../common/dialogs/RegisterDialog';
 import CreateAliasDialog from '../common/dialogs/CreateAliasDialog';
+import CreateTransactionDialog from '../common/dialogs/CreateTransactionDialog';
+import DocFile from '../DocFile/DocFile';
+import CreateDocFileDialog from '../DocFile/dialogs/CreateDocFile/CreateDocFileDialog';
 
 const MainWindow = () => {
   const order = useSelector(getOrder);
@@ -27,6 +30,8 @@ const MainWindow = () => {
       windows.push(<Wallet key={key} id={key} />);
     } else if (type === WindowTypes.WORLDMAP) {
       windows.push(<WorldMap key={key} id={key} />);
+    } else if (type === WindowTypes.DOCFILE) {
+      windows.push(<DocFile key={key} id={key} docFileId={value.docFileId} />);
     } else if (type === WindowTypes.DIALOGIDENTITY) {
       windows.push(<IdentityDialog key={key} id={key} identityId={value.identityId} />);
     } else if (type === WindowTypes.DIALOGCREATEROOM) {
@@ -39,6 +44,10 @@ const MainWindow = () => {
       windows.push(<RemoveRoomDialog key={key} id={key} roomId={value.roomId} />);
     } else if (type === WindowTypes.DIALOGCREATEALIAS) {
       windows.push(<CreateAliasDialog key={key} id={key} />);
+    } else if (type === WindowTypes.DIALOGCREATETRANSACTION) {
+      windows.push(<CreateTransactionDialog key={key} id={key} toWalletId={value.toWalletId} />);
+    } else if (type === WindowTypes.DIALOGCREATEDOCFILE) {
+      windows.push(<CreateDocFileDialog key={key} id={key} />);
     }
   });
 

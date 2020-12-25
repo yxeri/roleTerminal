@@ -38,6 +38,8 @@ const List = ({
     if (scrollTo && listRef.current) {
       if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
         listRef.current.lastElementChild.scrollIntoView();
+      } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
+        listRef.current.firstElementChild.scrollIntoView();
       }
     }
   });

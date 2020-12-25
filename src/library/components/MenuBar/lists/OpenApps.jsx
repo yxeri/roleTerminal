@@ -13,6 +13,7 @@ import { AccessLevels } from '../../../AccessCentral';
 import { ReactComponent as Chat } from '../../../icons/chat.svg';
 import { ReactComponent as Map } from '../../../icons/map.svg';
 import { ReactComponent as Wallet } from '../../../icons/wallet.svg';
+import { ReactComponent as File } from '../../../icons/file.svg';
 
 const OpenApps = () => {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -22,6 +23,7 @@ const OpenApps = () => {
   return (
     <List classNames={['OpenApps']}>
       <ListItem key="chat"><Button onClick={() => changeOrder({ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT } })}><Chat /></Button></ListItem>
+      <ListItem key="docFile"><Button onClick={() => changeOrder({ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE } })}><File /></Button></ListItem>
       <ListItem key="map"><Button onClick={() => changeOrder({ id: WindowTypes.WORLDMAP, value: { type: WindowTypes.WORLDMAP } })}><Map /></Button></ListItem>
       {accessLevel >= AccessLevels.STANDARD && (
         <ListItem key="wallet"><Button onClick={() => changeOrder({ id: WindowTypes.WALLET, value: { type: WindowTypes.WALLET } })}><Wallet /></Button></ListItem>

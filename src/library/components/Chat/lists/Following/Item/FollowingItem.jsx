@@ -1,15 +1,16 @@
 import React from 'react';
-import { func, string } from 'prop-types';
+import { arrayOf, func, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getRoom } from '../../../../../redux/selectors/rooms';
 
-const FollowingItem = ({ roomId, onChange }) => {
+const FollowingItem = ({ roomId, onChange, classNames = [] }) => {
   const room = useSelector((state) => getRoom(state, { id: roomId }));
 
   return (
     <ListItem
+      classNames={['FollowingItem'].concat(classNames)}
       key={roomId}
       onClick={() => {
         onChange({ roomId });
@@ -25,4 +26,9 @@ export default React.memo(FollowingItem);
 FollowingItem.propTypes = {
   roomId: string.isRequired,
   onChange: func.isRequired,
+  classNames: arrayOf(string),
 };
+
+FollowingItem.defaultProps = {
+  classNames: [],
+}

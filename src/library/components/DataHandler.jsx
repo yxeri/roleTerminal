@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { arrayOf, element } from 'prop-types';
 import {
   ALIASES,
   DOCFILES,

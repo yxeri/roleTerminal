@@ -3,7 +3,7 @@ import { rootReducerSingle, rootReducerMultiple } from './root';
 
 export default function transactionsReducer(state = new Map(), action) {
   if (action.type === WALLET) {
-    rootReducerSingle(state, action);
+    return rootReducerSingle(state, action);
   }
 
   if (action.type === WALLETS) {

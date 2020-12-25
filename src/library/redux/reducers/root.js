@@ -18,8 +18,8 @@ export const rootReducerSingle = (state, action) => {
       return newState;
     }
     case ChangeTypes.UPDATE: {
-      const existing = newState.get(object.objectId);
-      const updated = Object.assign(existing || {}, object);
+      const existing = newState.get(object.objectId) || {};
+      const updated = { ...existing, ...object };
 
       if (existing === updated) {
         return state;
@@ -61,8 +61,8 @@ export const rootReducerMultiple = (state, action) => {
     case ChangeTypes.UPDATE: {
       objects
         .forEach((object) => {
-          const existing = newState.get(object.objectId);
-          const updated = Object.assign(existing || {}, object);
+          const existing = newState.get(object.objectId) || {};
+          const updated = { ...existing, ...object };
 
           if (existing !== updated) {
             newState.set(object.objectId, updated);

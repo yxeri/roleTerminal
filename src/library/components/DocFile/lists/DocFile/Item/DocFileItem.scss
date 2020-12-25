@@ -1,0 +1,17 @@
+@import "../../../../../../common";
+
+.DocFileItem {
+  position: relative;
+
+  .lock {
+    position: absolute;
+    right: 0;
+    top: $padding;
+    opacity: .50;
+
+    svg {
+      max-height: 1em;
+      max-width: 1em;
+    }
+  }
+}

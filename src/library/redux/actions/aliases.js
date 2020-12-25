@@ -4,8 +4,6 @@ import { ALIAS, ALIASES } from '../actionTypes';
 import { ChangeTypes } from '../reducers/root';
 import { createRooms } from './rooms';
 import { createWallets } from './wallets';
-import { createForums } from './forums';
-import { createGameCodes } from './gameCodes';
 
 export const updateAliases = ({ aliases }) => {
   if (aliases.length === 1) {

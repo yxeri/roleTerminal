@@ -11,7 +11,7 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: fit-content(0);
-    grid-gap: $padding;
+    grid-gap: $padding * 2;
 
     .Button, header {
       border-bottom-right-radius: 0;

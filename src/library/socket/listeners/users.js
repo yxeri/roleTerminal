@@ -8,17 +8,19 @@ const events = {
 
 export const user = () => ({
   event: events.USER,
-  callback: ({ data }) => {
+  callback: ({ error, data }) => {
     if (data && data.user) {
       const { user: sentUser, changeType } = data;
-
-      console.log(data);
 
       if (changeType === ChangeTypes.CREATE) {
         store.dispatch(createUsers({ users: [sentUser] }));
       } else if (changeType === ChangeTypes.UPDATE) {
         store.dispatch(updateUsers({ users: [sentUser] }));
       }
+
+      return;
     }
+
+    console.log(events.USER, error, data);
   },
 });

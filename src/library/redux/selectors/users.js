@@ -4,6 +4,7 @@ import createCachedSelector from 're-reselect';
 import { getAlias, getAllAliases } from './aliases';
 import { getUserId } from './userId';
 import { getAnonymousUser } from './config';
+import { getAllTeams, getTeamById } from './teams';
 
 export const getAllUsers = (state) => state.users;
 
@@ -16,10 +17,10 @@ export const getCurrentAccessLevel = createSelector(
   (user) => user.accessLevel,
 );
 
-export const getIdentities = createSelector(
+export const getIdentities = createCachedSelector(
   [getAllUsers, getAllAliases],
   (users, aliases) => [...users.values(), ...aliases.values()],
-);
+)(() => 'identities');
 
 export const getIdentitiesByIds = createCachedSelector(
   [
@@ -34,11 +35,35 @@ export const getIdentitiesByIds = createCachedSelector(
 
     return map;
   },
-)((_, { ids }) => `identities-${ids.join('')}`);
+)((_, { ids }) => `identities-${ids.join(' ')}`);
+
+export const getIdentitiesOrTeamsByIds = createCachedSelector(
+  [
+    getAllUsers,
+    getAllAliases,
+    getAllTeams,
+    (_, { ids }) => ids,
+  ],
+  (users, aliases, teams, ids) => {
+    const map = new Map();
+
+    ids.forEach((id) => map.set(id, teams.get(id) || users.get(id) || aliases.get(id)));
+
+    return map;
+  },
+)((_, { ids }) => {
+  console.log(`identities-teams-${ids.join(' ')}`);
+  return `identities-teams-${ids.join(' ')}`;
+});
 
 export const getIdentityById = createSelector(
   [getUser, getAlias],
   (user, alias) => user || alias,
+);
+
+export const getIdentityOrTeamById = createSelector(
+  [getUser, getAlias, getTeamById],
+  (user, alias, team) => team || alias || user,
 );
 
 export const getOthersIdentityIds = createCachedSelector(

@@ -6,15 +6,17 @@
   color: $background-color;
   font-weight: bold;
   text-transform: uppercase;
-  padding: $padding;
+  padding: 0 $padding;
   cursor: move;
-  height: 1em;
   text-shadow: $text-shadow;
-  display: flex;
+  display: grid;
   align-items: flex-end;
+  grid-template-columns: auto fit-content(100%);
 
   .TopBarHandle {
-    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .Button {
@@ -26,20 +28,23 @@
   }
 
   svg {
-    height: 16px;
-    width: 16px;
     fill: $background-color;
     stroke-width: 3;
   }
 
   .buttons {
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: 1em;
+    grid-template-columns: repeat(2, fit-content(0));
     grid-gap: #{$margin * 2};
+    justify-items: flex-end;
   }
 
   .title {
     margin-left: auto;
+  }
+
+  > * {
+    padding-top: $padding;
+    padding-bottom: $padding;
   }
 }

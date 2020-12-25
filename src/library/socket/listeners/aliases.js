@@ -1,24 +1,26 @@
 import { ChangeTypes } from '../../redux/reducers/root';
 import store from '../../redux/store';
-import { createUsers, updateUsers } from '../../redux/actions/users';
+import { createAliases, updateAliases } from '../../redux/actions/aliases';
 
 const events = {
   ALIAS: 'alias',
 };
 
-export const user = () => ({
+export const alias = () => ({
   event: events.ALIAS,
-  callback: ({ data }) => {
+  callback: ({ error, data }) => {
     if (data && data.alias) {
       const { alias: sentAlias, changeType } = data;
 
-      console.log(data);
-
       if (changeType === ChangeTypes.CREATE) {
-        store.dispatch(createAliases({ users: [sentAlias] }));
+        store.dispatch(createAliases({ aliases: [sentAlias] }));
       } else if (changeType === ChangeTypes.UPDATE) {
-        store.dispatch(updateUsers({ users: [sentAlias] }));
+        store.dispatch(updateAliases({ aliases: [sentAlias] }));
       }
+
+      return;
     }
+
+    console.log(events.ALIAS, error, data);
   },
 });

@@ -2,9 +2,14 @@ import { SendEvents, emitSocketEvent } from '../SocketManager';
 import store from '../../redux/store';
 import { followRoom as followRoomAction, removeRooms } from '../../redux/actions/rooms';
 import { getMessagesByRoom } from './messages';
+import { getAliasId } from '../../redux/selectors/aliasId';
 
 export const createRoom = async ({ room }) => {
-  const result = await emitSocketEvent(SendEvents.ROOM, { room });
+  const roomToCreate = {
+    ...room,
+    ownerAliasId: getAliasId(store.getState()) || undefined,
+  };
+  const result = await emitSocketEvent(SendEvents.ROOM, { room: roomToCreate });
 
   await store.dispatch(followRoomAction({ room: result.room, user: result.user }));
 

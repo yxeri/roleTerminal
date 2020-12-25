@@ -21,8 +21,6 @@ const RegisterDialog = ({ id }) => {
   const [error, setError] = useState();
   const requireOffName = useSelector(getRequireOffName);
 
-  console.log(formMethods.errors);
-
   const onSubmit = async ({
     offName,
     username,
@@ -54,8 +52,6 @@ const RegisterDialog = ({ id }) => {
       await createUser(params);
 
       // TODO If no auto-login, Notification: User registered
-
-      console.log(store.getState());
 
       await login(username, password);
 

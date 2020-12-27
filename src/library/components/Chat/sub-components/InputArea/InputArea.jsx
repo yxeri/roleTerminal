@@ -64,7 +64,7 @@ const InputArea = ({
         onSend({ roomId: message.roomId });
       }
     }).catch((error) => {
-      console.log(error);
+      console.log('error', error);
     });
   };
 

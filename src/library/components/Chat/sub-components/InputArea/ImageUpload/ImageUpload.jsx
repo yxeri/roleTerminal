@@ -14,7 +14,11 @@ const ImageUpload = ({ onChange } = {}) => {
   const [previewImage, setPreviewImage] = useState();
 
   useEffect(() => {
-    onChange(previewImage);
+    const image = { ...previewImage };
+    image.width = previewRef.current.naturalWidth;
+    image.height = previewRef.current.naturalHeight;
+
+    onChange(image);
   }, [previewImage]);
 
   const onChangeFunc = ({ target }) => {
@@ -29,8 +33,6 @@ const ImageUpload = ({ onChange } = {}) => {
           setPreviewImage({
             imageName: file.name,
             source: reader.result,
-            width: previewRef.current.naturalWidth,
-            height: previewRef.current.naturalHeight,
           });
         }
       });

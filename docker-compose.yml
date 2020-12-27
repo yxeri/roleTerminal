@@ -10,4 +10,4 @@ roleterminal:
     ports:
         - "8888:8888"
     volumes:
-        - /usr/src/app/build/upload/images
+        - images:/usr/src/app/build/upload/images

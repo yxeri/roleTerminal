@@ -1,6 +1,6 @@
 import React from 'react';
 import { batch, useSelector } from 'react-redux';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
 import { getIdentityById } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
@@ -12,12 +12,13 @@ import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import { ReactComponent as Wallet } from '../../../icons/wallet.svg';
 import { ReactComponent as Chat } from '../../../icons/chat.svg';
 
-const IdentityDialog = ({ id, identityId }) => {
+const IdentityDialog = ({ id, identityId, index }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
   const currentIdentityId = useSelector(getCurrentIdentityId);
 
   return (
     <Dialog
+      index={index}
       title={`User: ${identity.aliasName || identity.username}`}
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
@@ -68,4 +69,5 @@ export default React.memo(IdentityDialog);
 IdentityDialog.propTypes = {
   identityId: string.isRequired,
   id: string.isRequired,
+  index: number.isRequired,
 };

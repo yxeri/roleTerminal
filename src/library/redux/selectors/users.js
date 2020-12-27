@@ -51,10 +51,7 @@ export const getIdentitiesOrTeamsByIds = createCachedSelector(
 
     return map;
   },
-)((_, { ids }) => {
-  console.log(`identities-teams-${ids.join(' ')}`);
-  return `identities-teams-${ids.join(' ')}`;
-});
+)((_, { ids }) => `identities-teams-${ids.join(' ')}`);
 
 export const getIdentityById = createSelector(
   [getUser, getAlias],

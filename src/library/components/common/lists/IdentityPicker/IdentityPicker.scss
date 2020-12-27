@@ -1,0 +1,19 @@
+@import "../../../../../common";
+
+.IdentityPicker {
+  position: relative;
+  background-color: $light-background-color;
+
+  svg {
+    max-width: $icon-size;
+    max-height: $icon-size;
+  }
+
+  span {
+    margin-left: $padding;
+  }
+
+  header {
+    display: flex;
+  }
+}

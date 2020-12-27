@@ -1,5 +1,5 @@
 import React from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
@@ -15,7 +15,7 @@ import { getWalletIdsByCurrentUser } from '../../../redux/selectors/wallets';
 import { getIdentitiesOrTeamsByIds, getIdentityOrTeamById } from '../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 
-const CreateTransactionDialog = ({ id, toWalletId }) => {
+const CreateTransactionDialog = ({ id, toWalletId, index }) => {
   const formMethods = useForm();
   const identityId = useSelector(getCurrentIdentityId);
   const walletIds = useSelector(getWalletIdsByCurrentUser);
@@ -53,6 +53,7 @@ const CreateTransactionDialog = ({ id, toWalletId }) => {
 
   return (
     <Dialog
+      index={index}
       title={`Transfer to ${toIdentity.teamName || toIdentity.aliasName || toIdentity.username}`}
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId } }] }));
@@ -102,4 +103,5 @@ export default React.memo(CreateTransactionDialog);
 CreateTransactionDialog.propTypes = {
   id: string.isRequired,
   toWalletId: string.isRequired,
+  index: number.isRequired,
 };

@@ -4,8 +4,7 @@ import {
   arrayOf,
   func,
   string,
-  node,
-  number,
+  node, number,
 } from 'prop-types';
 
 import './Window.scss';
@@ -14,9 +13,9 @@ import TopBar from './TopBar/TopBar';
 const Window = ({
   onClick,
   children,
-  order,
   menu,
   done,
+  index,
   type = 'window',
   title = 'app',
   classNames = [],
@@ -24,7 +23,6 @@ const Window = ({
   const defaultSize = type === 'window' ? { width: 640, height: 460 } : { width: 440, height: 360 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
-  const rndClasses = ['rnd'];
   const windowClasses = ['Window'].concat(classNames);
 
   const onDoubleClick = useCallback(() => {
@@ -38,10 +36,13 @@ const Window = ({
 
   return (
     <Rnd
+      style={{ zIndex: index }}
+      onClick={onClick}
       position={coordinates}
-      className={`${rndClasses.join(' ')}`}
-      style={{ zIndex: order }}
+      className="rnd"
       size={size}
+      minWidth={300}
+      minHeight={200}
       maxHeight="100%"
       maxWidth="100%"
       bounds="parent"
@@ -79,19 +80,20 @@ const Window = ({
           return;
         }
 
-        if (newX === 0 && newY === 0 && size.height !== '100%') { // Upper left
-          setSize({ width: '50%', height: '50%' });
-          setCoordinates({ x: 0, y: 0 });
-        } else if (newX === 0 && (newY + element.offsetHeight + 35) >= window.innerHeight && size.height !== '100%') { // Lower left
-          setSize({ width: '50%', height: '50%' });
-          setCoordinates({ x: 0, y: ((window.innerHeight - 36) / 2) });
-        } else if (newY === 0 && newX + element.offsetWidth >= window.innerWidth && size.height !== '100%') { // Upper right
-          setSize({ width: '50%', height: '50%' });
-          setCoordinates({ x: window.innerWidth / 2, y: 0 });
-        } else if (newX + element.offsetWidth >= window.innerWidth && newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Lower right
-          setSize({ width: '50%', height: '50%' });
-          setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
-        } else if (newX === 0 && newY > 0) { // Left
+        // if (newX === 0 && newY === 0 && size.height !== '100%') { // Upper left
+        //   setSize({ width: '50%', height: '50%' });
+        //   setCoordinates({ x: 0, y: 0 });
+        // } else if (newX === 0 && (newY + element.offsetHeight + 35) >= window.innerHeight && size.height !== '100%') { // Lower left
+        //   setSize({ width: '50%', height: '50%' });
+        //   setCoordinates({ x: 0, y: ((window.innerHeight - 36) / 2) });
+        // } else if (newY === 0 && newX + element.offsetWidth >= window.innerWidth && size.height !== '100%') { // Upper right
+        //   setSize({ width: '50%', height: '50%' });
+        //   setCoordinates({ x: window.innerWidth / 2, y: 0 });
+        // } else if (newX + element.offsetWidth >= window.innerWidth && newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Lower right
+        //   setSize({ width: '50%', height: '50%' });
+        //   setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
+        // }
+        if (newX === 0 && newY > 0) { // Left
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: 0, y: 0 });
         } else if (newX + element.offsetWidth >= window.innerWidth && newY > 0) { // Right
@@ -109,8 +111,6 @@ const Window = ({
       }}
     >
       <div
-        role="complementary"
-        onClick={onClick}
         className={`${windowClasses.join(' ')}`}
       >
         <TopBar
@@ -139,7 +139,6 @@ const Window = ({
 export default React.memo(Window);
 
 Window.propTypes = {
-  order: number,
   onClick: func.isRequired,
   children: node.isRequired,
   menu: node,
@@ -147,6 +146,7 @@ Window.propTypes = {
   classNames: arrayOf(string),
   done: func,
   type: string,
+  index: number.isRequired,
 };
 
 Window.defaultProps = {
@@ -154,6 +154,5 @@ Window.defaultProps = {
   classNames: [],
   title: 'app',
   menu: undefined,
-  order: undefined,
   type: 'window',
 };

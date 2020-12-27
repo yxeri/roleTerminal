@@ -6,13 +6,17 @@ import {
   string,
 } from 'prop-types';
 
+import './ListItem.scss';
+
 const ListItem = ({
   children,
   onClick,
+  elementId,
   stopPropagation = false,
   classNames = [],
 }) => (
   <li
+    id={elementId}
     className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
     onClick={(event) => {
       if (onClick) {
@@ -39,10 +43,12 @@ ListItem.propTypes = {
   onClick: func,
   classNames: arrayOf(string),
   stopPropagation: bool,
+  elementId: string,
 };
 
 ListItem.defaultProps = {
   onClick: undefined,
   classNames: [],
   stopPropagation: false,
+  elementId: undefined,
 };

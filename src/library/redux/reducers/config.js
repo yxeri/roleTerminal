@@ -5,6 +5,7 @@ const defaultState = new Map();
 
 defaultState.set('broadcastId', '111111111111111111111116');
 defaultState.set('publicRoomId', '111111111111111111111110');
+defaultState.set('newsRoomId', '111111111111111111111114');
 defaultState.set('defaultForum', '111111111111111111111120');
 defaultState.set('defaultLanguage', 'en');
 defaultState.set('centerCoordinates', { longitude: 0, latitude: 0 });

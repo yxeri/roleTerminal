@@ -2,6 +2,20 @@
 
 .rnd {
   .Dialog {
+    .identity {
+      display: flex;
+      align-items: center;
+
+      > span {
+        margin-right: $padding;
+      }
+
+      svg {
+        max-height: $icon-size;
+        max-width: $icon-size;
+      }
+    }
+
     .windowBox {
       display: flex;
 
@@ -12,6 +26,7 @@
         form {
           display: grid;
           grid-gap: $padding * 2;
+          padding: $padding;
 
           input, textarea {
             padding: $padding;

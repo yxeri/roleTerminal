@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import Window from '../common/Window/Window';
@@ -14,7 +14,7 @@ import DocFileList from './lists/DocFile/DocFileList';
 import DocFileViewer from './Viewer/DocFileViewer';
 import { getDocFileById } from '../../redux/selectors/docFiles';
 
-const DocFile = ({ id, docFileId }) => {
+const DocFile = ({ id, docFileId, index }) => {
   const [currentDocFileId, setDocFileId] = useState();
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
 
@@ -36,6 +36,7 @@ const DocFile = ({ id, docFileId }) => {
 
   return (
     <Window
+      index={index}
       done={onDone}
       classNames={['DocFile']}
       title={`${docFile ? `Document: ${docFile.title}` : 'Documents'}`}
@@ -48,13 +49,16 @@ const DocFile = ({ id, docFileId }) => {
               onClick={onCreate}
               key="createDocFile"
             >
-              Create document
+              New document
             </ListItem>
           </FileMenu>
           <DocFileList onChange={onChange} />
         </>
       )}
     >
+      {!currentDocFileId && (
+        <div />
+      )}
       {currentDocFileId && (
         <DocFileViewer key="viewer" docFileId={currentDocFileId} />
       )}
@@ -67,6 +71,7 @@ export default React.memo(DocFile);
 DocFile.propTypes = {
   id: string.isRequired,
   docFileId: string,
+  index: number.isRequired,
 };
 
 DocFile.defaultProps = {

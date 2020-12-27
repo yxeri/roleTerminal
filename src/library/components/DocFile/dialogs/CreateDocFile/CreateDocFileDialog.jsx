@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 import { createDocFile } from '../../../../socket/actions/docFiles';
 import store from '../../../../redux/store';
@@ -13,7 +13,7 @@ import Button from '../../../common/sub-components/Button/Button';
 
 import './CreateDocFileDialog.scss';
 
-const CreateDocFileDialog = ({ id }) => {
+const CreateDocFileDialog = ({ id, index }) => {
   const formMethods = useForm();
   const [image, setImage] = useState();
 
@@ -40,8 +40,9 @@ const CreateDocFileDialog = ({ id }) => {
 
   return (
     <Dialog
+      index={index}
       classNames={['CreateDocFileDialog']}
-      title="Create document"
+      title="New document"
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEDOCFILE } }] }));
       }}
@@ -95,4 +96,5 @@ export default React.memo(CreateDocFileDialog);
 
 CreateDocFileDialog.propTypes = {
   id: string.isRequired,
+  index: number.isRequired,
 };

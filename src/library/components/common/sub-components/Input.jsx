@@ -11,6 +11,7 @@ const Input = ({
   name,
   shouldEqual,
   maxLength,
+  minLength,
   type = 'text',
   required = false,
   placeholder = '',
@@ -27,11 +28,13 @@ const Input = ({
 
   return (
     <input
+      minLength={minLength}
       maxLength={maxLength}
       required={required}
       name={name}
       ref={register({
         maxLength,
+        minLength,
         validate: (value) => (!shouldEqual || value === getValues(shouldEqual)) || `Must match ${shouldEqual}`,
       })}
       type={type}
@@ -65,6 +68,7 @@ Input.propTypes = {
   name: string.isRequired,
   shouldEqual: string,
   maxLength: number,
+  minLength: number,
 };
 
 Input.defaultProps = {
@@ -74,4 +78,5 @@ Input.defaultProps = {
   onChange: undefined,
   shouldEqual: undefined,
   maxLength: undefined,
+  minLength: undefined,
 };

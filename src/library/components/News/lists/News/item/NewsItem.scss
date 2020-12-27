@@ -1,0 +1,30 @@
+@import "../../../../../../common";
+
+.NewsItem {
+  padding: 0 $padding * 2 $padding * 2 $padding * 2;
+
+  .title {
+    padding-top: $padding * 2;
+  }
+
+  .info {
+    margin-top: $padding;
+    font-size: .9em;
+
+    svg {
+      margin-left: $padding;
+      max-height: $icon-size;
+      max-width: $icon-size;
+      vertical-align: text-top;
+    }
+  }
+
+  .text {
+    margin-top: $margin * 4;
+  }
+}
+
+.NewsItem.expanded {
+  background-color: $selected;
+  border-radius: $border-radius;
+}

@@ -1,19 +1,14 @@
 import { SendEvents, emitSocketEvent } from '../SocketManager';
-import { getRoom } from '../../redux/selectors/rooms';
+import { getRoomById } from '../../redux/selectors/rooms';
 import store from '../../redux/store';
 import { getCurrentIdentityId } from '../../redux/selectors/userId';
 import { createMessages } from '../../redux/actions/messages';
 import { getAliasId } from '../../redux/selectors/aliasId';
-
-const MessageType = {
-  CHAT: 'chat',
-  WHISPER: 'whisper',
-  BROADCAST: 'broadcast',
-  MESSAGE: 'message',
-};
+import { getNewsRoomId } from '../../redux/selectors/config';
+import { MessageType } from '../../redux/reducers/messages';
 
 export const sendMessage = async ({ text, roomId, image }) => {
-  const room = getRoom(store.getState(), { id: roomId });
+  const room = getRoomById(store.getState(), { id: roomId });
   const participantIds = room.isWhisper
     ? room.participantIds
     : [];
@@ -42,6 +37,23 @@ export const sendMessage = async ({ text, roomId, image }) => {
   store.dispatch(createMessages({ messages: [result.message] }));
 
   return { message: result.message, switchRoom: true };
+};
+
+export const sendNewsMessage = async ({ title, text, image }) => {
+  const message = {
+    messageType: MessageType.NEWS,
+    text: [title].concat(text.split('\n')),
+    roomId: getNewsRoomId(store.getState()),
+  };
+
+  const result = await emitSocketEvent(SendEvents.MESSAGE, {
+    message,
+    image,
+  });
+
+  store.dispatch(createMessages({ messages: [result.message] }));
+
+  return { message: result.message };
 };
 
 export const getMessagesByRoom = async ({ roomId }) => {

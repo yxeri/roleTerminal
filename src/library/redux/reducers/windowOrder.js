@@ -6,6 +6,7 @@ export const WindowTypes = {
   CHAT: 'chat',
   WORLDMAP: 'worldMap',
   DOCFILE: 'docFile',
+  NEWS: 'news',
   DIALOGIDENTITY: 'dialogIdentity',
   DIALOGCREATEROOM: 'dialogCreateRoom',
   DIALOGREMOVEROOM: 'dialogRemoveRoom',
@@ -14,6 +15,8 @@ export const WindowTypes = {
   DIALOGCREATEALIAS: 'dialogCreateAlias',
   DIALOGCREATETRANSACTION: 'dialogCreateTransaction',
   DIALOGCREATEDOCFILE: 'dialogCreateDocFile',
+  DIALOGCREATENEWS: 'dialogCreateNews',
+  DIALOGJOINROOM: 'dialogJoinRoom',
 };
 
 const defaultState = new Map();
@@ -33,13 +36,50 @@ export default function WindowOrderReducer(state = defaultState, action) {
         }
       }
 
-      newState.delete(id);
-      newState.set(id, value);
+      const windowValue = { ...value };
+
+      if (!newState.get(id)) {
+        windowValue.index = newState.size + 1;
+
+        newState.set(id, windowValue);
+      } else {
+        const sorted = [...newState.entries()]
+          .sort((a, b) => {
+            const valueA = a[1].index;
+            const valueB = b[1].index;
+
+            if (valueA > valueB) {
+              return 1;
+            }
+
+            if (valueA < valueB) {
+              return -1;
+            }
+
+            return 0;
+          });
+
+        const [window] = sorted.splice(sorted.findIndex(([key]) => key === id), 1);
+        window[1] = { ...windowValue };
+
+        sorted.push(window);
+
+        sorted.forEach(([key, entryValue], index) => {
+          const newValue = {
+            ...entryValue,
+            index: index + 1,
+          };
+
+          newState.set(key, newValue);
+        });
+      }
 
       return newState;
     }
 
     if (changeType === ChangeTypes.REMOVE) {
+      console.log(id);
+
       newState.delete(id);
 
       return newState;

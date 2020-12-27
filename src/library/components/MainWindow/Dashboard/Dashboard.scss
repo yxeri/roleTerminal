@@ -1,0 +1,39 @@
+@import "../../../../common";
+
+.Dashboard {
+  color: $second-color;
+  padding: $padding;
+  display: grid;
+  grid-gap: $padding * 2;
+  height: calc(100% - #{$padding * 2});
+  grid-auto-rows: fit-content(100%);
+  grid-template-columns: fit-content(#{$max-width});
+
+  .news {
+    overflow-y: auto;
+
+    svg {
+      margin-left: $padding;
+      max-height: $icon-size;
+      max-width: $icon-size;
+      vertical-align: bottom;
+    }
+
+    header {
+      background-color: $background-color;
+      border-bottom: $lite-border;
+      position: sticky;
+      top: 0;
+      box-shadow: $second-shadow;
+    }
+
+    ul {
+      border-left: $lite-border;
+      border-bottom: $lite-border;
+      border-right: $lite-border;
+      height: unset;
+      overflow: hidden;
+      background-color: $light-background-color;
+    }
+  }
+}

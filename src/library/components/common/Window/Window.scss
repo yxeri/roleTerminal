@@ -19,6 +19,7 @@
     overflow: hidden;
 
     .windowBox {
+      overflow: hidden;
       display: grid;
       grid-template-rows: fit-content(0) auto;
       grid-template-columns: 100%;
@@ -29,10 +30,11 @@
         background-color: $second-background-color;
         display: flex;
         flex-direction: row;
-        padding: $padding;
         box-sizing: border-box;
 
         .List {
+          margin-top: $margin;
+          margin-bottom: $margin;
           margin-right: $margin;
           flex-grow: 1;
 
@@ -43,8 +45,8 @@
           }
         }
 
-        .List:last-child {
-          margin-right: 0;
+        .List:first-child {
+          margin-left: $margin;
         }
       }
 
@@ -55,31 +57,38 @@
         padding: $padding;
         box-sizing: border-box;
         scrollbar-width: none;
+        scroll-behavior: smooth;
       }
     }
   }
+}
 
-  .Window[min-width~="600px"] {
+.rnd[min-width~="600px"] {
+  .Window {
     .windowBox {
       grid-template-rows: 1fr;
-      grid-template-columns: minmax(0, 10em) auto;
+      grid-template-columns: fit-content(100%) auto;
 
       .menu {
-        margin-bottom: 0;
         display: grid;
         grid-auto-rows: fit-content(100%);
         grid-gap: $margin;
         height: 100%;
         scrollbar-width: none;
         overflow: hidden;
-        padding-right: 0;
 
         .List {
+          margin: 0;
           display: flex;
           flex-direction: column;
           flex-grow: inherit;
-          margin-right: 0;
           overflow: hidden;
+          width: 10em;
+          padding-left: $padding;
+
+          .List {
+            padding: 0 $padding;
+          }
 
           .dropdown {
             left: inherit;
@@ -91,6 +100,14 @@
             position: relative;
             box-shadow: none;
           }
+        }
+
+        .List:first-child {
+          margin-top: $margin;
+        }
+
+        .List:last-child {
+          margin-bottom: $margin;
         }
 
         .expanded {

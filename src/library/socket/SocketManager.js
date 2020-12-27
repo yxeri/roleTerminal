@@ -56,6 +56,7 @@ export const SendEvents = {
   FOLLOW: 'followRoom',
   GETMSGBYROOM: 'getMessagesByRoom',
   REMOVEROOM: 'removeRoom',
+  UNLOCKDOCFILE: 'unlockDocFile',
 };
 
 export const GetEvents = {
@@ -114,7 +115,7 @@ export const ListenerEvents = {
 //   SENDMSG: 'sendMessage',
 //   UPDATEPOSITION: 'updatePosition',
 //   UPDATEPOSITIONCOORDINATES: 'updatePositionCoordinates',
-//   UNLOCKDOCFILE: 'unlockDocFile',
+//   ,
 //   BANUSER: 'banUser',
 //   UNBANUSER: 'unbanUser',
 //   VERIFYUSER: 'verifyUser',
@@ -247,7 +248,7 @@ addSocketListener(whisperMessage());
 addSocketListener(room());
 addSocketListener(follow());
 
-// Users
+// User
 addSocketListener(user());
 
 // Aliases

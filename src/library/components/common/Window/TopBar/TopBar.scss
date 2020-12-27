@@ -1,7 +1,6 @@
 @import "../../../../../common";
 
 .TopBar {
-  border-bottom: $border;
   background-color: $color;
   color: $background-color;
   font-weight: bold;
@@ -17,6 +16,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    text-align: center;
   }
 
   .Button {
@@ -37,10 +37,6 @@
     grid-template-columns: repeat(2, fit-content(0));
     grid-gap: #{$margin * 2};
     justify-items: flex-end;
-  }
-
-  .title {
-    margin-left: auto;
   }
 
   > * {

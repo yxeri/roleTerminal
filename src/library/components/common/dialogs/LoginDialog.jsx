@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from './Dialog/Dialog';
@@ -10,7 +10,7 @@ import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 
-const LoginDialog = ({ id }) => {
+const LoginDialog = ({ id, index }) => {
   const methods = useForm();
   const [error, setError] = useState();
 
@@ -30,6 +30,7 @@ const LoginDialog = ({ id }) => {
 
   return (
     <Dialog
+      index={index}
       classNames={['LoginDialog']}
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGLOGIN } }] }));
@@ -67,4 +68,5 @@ export default React.memo(LoginDialog);
 
 LoginDialog.propTypes = {
   id: string.isRequired,
+  index: number.isRequired,
 };

@@ -9,7 +9,9 @@ import ListItem from '../List/Item/ListItem';
 import store from '../../../../redux/store';
 import { changeAliasId } from '../../../../redux/actions/aliasId';
 
-import { ReactComponent as Users } from '../../../../icons/users.svg';
+import { ReactComponent as User } from '../../../../icons/user.svg';
+
+import './IdentityPicker.scss';
 
 const IdentityPicker = ({ useIcon = false }) => {
   const identities = useSelector(getCurrentUserIdentities);
@@ -36,7 +38,14 @@ const IdentityPicker = ({ useIcon = false }) => {
     <List
       dropdown
       classNames={['IdentityPicker']}
-      title={useIcon ? <Users /> : title}
+      title={useIcon
+        ? <User />
+        : (
+          <>
+            <User />
+            <span>{title}</span>
+          </>
+        )}
     >
       {itemMapper()}
     </List>

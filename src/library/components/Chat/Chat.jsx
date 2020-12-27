@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
 import Window from '../common/Window/Window';
 import FileMenu from '../common/lists/FileMenu';
-import { getRoom, getWhisperRoomName } from '../../redux/selectors/rooms';
+import { getRoomById, getWhisperRoomName } from '../../redux/selectors/rooms';
 
 import './Chat.scss';
 import ListItem from '../common/lists/List/Item/ListItem';
@@ -16,9 +16,9 @@ import { hasAccessTo } from '../../AccessCentral';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-const Chat = ({ id, roomId }) => {
+const Chat = ({ id, roomId, index }) => {
   const [currentRoomId, setRoomId] = useState(roomId || getPublicRoomId(store.getState()));
-  const room = useSelector((state) => getRoom(state, { id: currentRoomId }));
+  const room = useSelector((state) => getRoomById(state, { id: currentRoomId }));
   const currentUser = useSelector(getCurrentUser);
 
   useEffect(() => {
@@ -70,6 +70,7 @@ const Chat = ({ id, roomId }) => {
 
   return (
     <Window
+      index={index}
       done={onDone}
       classNames={['Chat']}
       title={title}
@@ -127,6 +128,7 @@ export default React.memo(Chat);
 Chat.propTypes = {
   id: string.isRequired,
   roomId: string,
+  index: number.isRequired
 };
 
 Chat.defaultProps = {

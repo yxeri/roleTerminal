@@ -1,0 +1,8 @@
+@import "../../../../../common";
+
+.NewsList {
+  ul {
+    overflow: hidden;
+    grid-gap: $padding * 4;
+  }
+}

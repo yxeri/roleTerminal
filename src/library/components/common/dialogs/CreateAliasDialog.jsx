@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from './Dialog/Dialog';
@@ -12,7 +12,7 @@ import Select from '../sub-components/Select';
 import Textarea from '../sub-components/Textarea';
 import { createAlias } from '../../../socket/actions/aliases';
 
-const CreateAliasDialog = ({ id }) => {
+const CreateAliasDialog = ({ id, index }) => {
   const formMethods = useForm();
   const [image, setImage] = useState();
 
@@ -37,7 +37,8 @@ const CreateAliasDialog = ({ id }) => {
 
   return (
     <Dialog
-      title="Create alias"
+      index={index}
+      title="New alias"
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEALIAS } }] }));
       }}
@@ -84,4 +85,5 @@ export default React.memo(CreateAliasDialog);
 
 CreateAliasDialog.propTypes = {
   id: string.isRequired,
+  index: number.isRequired,
 };

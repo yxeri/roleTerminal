@@ -24,6 +24,7 @@ html, body {
 
 ul {
   list-style: none;
+  scroll-behavior: smooth;
 }
 
 h1 {
@@ -54,4 +55,14 @@ h1 {
 
 .hide {
   display: none !important;
+}
+
+.error {
+  background-color: $warning-background-color;
+  padding: $padding;
+  position: sticky;
+  top: 0;
+  border: $warning-border;
+  box-shadow: $warning-shadow;
+  text-shadow: $warning-text-shadow;
 }

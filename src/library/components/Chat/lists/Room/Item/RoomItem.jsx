@@ -1,24 +1,30 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { func, string } from 'prop-types';
+import { string } from 'prop-types';
 
-import { followRoom } from '../../../../../socket/actions/rooms';
 import ListItem from '../../../../common/lists/List/Item/ListItem';
-import { getRoom } from '../../../../../redux/selectors/rooms';
+import { getRoomById } from '../../../../../redux/selectors/rooms';
 
-const RoomItem = ({ roomId, onChange }) => {
-  const room = useSelector((state) => getRoom(state, { id: roomId }));
+import { ReactComponent as Lock } from '../../../../../icons/lock.svg';
+
+import './RoomItem.scss';
+import store from '../../../../../redux/store';
+import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
+
+const RoomItem = ({ roomId }) => {
+  const room = useSelector((state) => getRoomById(state, { id: roomId }));
 
   return (
     <ListItem
+      classNames={['RoomItem']}
       key={roomId}
-      onClick={() => {
-        followRoom({ roomId: room.objectId })
-          .then(() => onChange({ roomId: room.objectId }))
-          .catch((followError) => console.log(followError));
-      }}
+      onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGJOINROOM}-${roomId}`, value: { type: WindowTypes.DIALOGJOINROOM, roomId } }] }))}
     >
       {room.roomName}
+      {room.isLocked && (
+        <div className="lock"><Lock /></div>
+      )}
     </ListItem>
   );
 };
@@ -27,5 +33,4 @@ export default React.memo(RoomItem);
 
 RoomItem.propTypes = {
   roomId: string.isRequired,
-  onChange: func.isRequired,
 };

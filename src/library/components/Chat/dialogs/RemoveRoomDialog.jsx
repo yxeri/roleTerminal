@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import { batch, useSelector } from 'react-redux';
 import Dialog from '../../common/dialogs/Dialog/Dialog';
-import { getRoom } from '../../../redux/selectors/rooms';
+import { getRoomById } from '../../../redux/selectors/rooms';
 import Button from '../../common/sub-components/Button/Button';
 import { removeRoom } from '../../../socket/actions/rooms';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 
-const RemoveRoomDialog = ({ id, roomId }) => {
+const RemoveRoomDialog = ({ id, roomId, index }) => {
   const [error, setError] = useState();
-  const room = useSelector((state) => getRoom(state, { id: roomId }));
+  const room = useSelector((state) => getRoomById(state, { id: roomId }));
 
   const onSubmit = () => {
     removeRoom({ roomId })
@@ -26,6 +26,7 @@ const RemoveRoomDialog = ({ id, roomId }) => {
 
   return (
     <Dialog
+      index={index}
       classNames={['RemoveRoomDialog']}
       error={error}
       onClick={() => {
@@ -56,4 +57,5 @@ export default React.memo(RemoveRoomDialog);
 RemoveRoomDialog.propTypes = {
   id: string.isRequired,
   roomId: string.isRequired,
+  index: number.isRequired,
 };

@@ -7,6 +7,7 @@ export const getAnonymousUser = (state) => state.config.get('anonymousUser');
 export const getAllowedImages = (state) => state.config.get('allowedImages');
 export const getGpsTracking = (state) => state.config.get('gpsTracking');
 export const getPermissions = (state) => state.config.get('permissions');
+export const getNewsRoomId = (state) => state.config.get('newsRoomId');
 
 /**
  * Takes date and returns shorter human-readable time.

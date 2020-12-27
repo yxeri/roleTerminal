@@ -9,7 +9,7 @@
     position: absolute;
     max-height: 120px;
     max-width: 120px;
-    bottom: 1em + $padding * 2;
+    bottom: 1em + $padding * 3;
     border: $border;
     left: -1px;
 
@@ -25,7 +25,6 @@
     }
 
     img {
-      opacity: 0.25;
       max-height: inherit;
       max-width: inherit;
     }

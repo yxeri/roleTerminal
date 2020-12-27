@@ -7,11 +7,11 @@ import { useSelector } from 'react-redux';
 import MessageInfo from './MessageInfo/MessageInfo';
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getMessageById } from '../../../../../redux/selectors/messages';
-
-import './MessageItem.scss';
 import { hasAccessTo } from '../../../../../AccessCentral';
 import { getCurrentUser } from '../../../../../redux/selectors/users';
 import store from '../../../../../redux/store';
+
+import './MessageItem.scss';
 
 const MessageItem = ({ previousMessageId, messageId }) => {
   const previousMessage = useSelector((state) => getMessageById(state, { id: previousMessageId }));

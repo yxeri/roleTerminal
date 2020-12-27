@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getDocFileById } from '../../../../../redux/selectors/docFiles';
+import store from '../../../../../redux/store';
+import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 
 import { ReactComponent as Lock } from '../../../../../icons/lock.svg';
 
 import './DocFileItem.scss';
-import store from '../../../../../redux/store';
-import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
-import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 
 const DocFileItem = ({ docFileId }) => {
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));

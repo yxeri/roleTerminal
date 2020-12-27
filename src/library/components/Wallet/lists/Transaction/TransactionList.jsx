@@ -8,7 +8,7 @@ import { getTransactionIdsByWallets } from '../../../../redux/selectors/transact
 const TransactionList = ({ walletIds }) => {
   const transactionIds = useSelector((state) => getTransactionIdsByWallets(state, { ids: walletIds }));
 
-  const transactionMapper = () => [...transactionIds].reverse().map((transactionId) => <TransactionItem key={transactionId} transactionId={transactionId} />);
+  const transactionMapper = () => transactionIds.map((transactionId) => <TransactionItem key={transactionId} transactionId={transactionId} />);
 
   return (
     <List
@@ -16,7 +16,6 @@ const TransactionList = ({ walletIds }) => {
         buffer: true,
         direction: 'top',
       }}
-      classNames={['TransactionList']}
     >
       {transactionMapper()}
     </List>

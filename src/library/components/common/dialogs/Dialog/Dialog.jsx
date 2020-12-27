@@ -4,7 +4,7 @@ import {
   arrayOf,
   string,
   shape,
-  node,
+  node, number,
 } from 'prop-types';
 import Window from '../../Window/Window';
 
@@ -17,23 +17,25 @@ const Dialog = ({
   text,
   done,
   onClick,
+  index,
   classNames = [],
 }) => (
   <Window
+    index={index}
     type="dialog"
     done={done}
     title={title}
     classNames={['Dialog'].concat(classNames)}
     onClick={onClick}
   >
-    {
-      error
-        && <div>{error.type}</div>
-    }
-    {
-      text
-        && <div>{text}</div>
-    }
+    {error && (
+      <div className="error">
+        <span>{error.message}</span>
+      </div>
+    )}
+    {text && (
+      <div>{text}</div>
+    )}
     {children}
   </Window>
 );
@@ -51,6 +53,7 @@ Dialog.propTypes = {
   text: string,
   classNames: arrayOf(string),
   onClick: func.isRequired,
+  index: number.isRequired,
 };
 
 Dialog.defaultProps = {

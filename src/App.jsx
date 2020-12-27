@@ -7,9 +7,11 @@ import MainWindow from './library/components/MainWindow/MainWindow';
 function App() {
   return (
     <>
-      <DataHandler />
-      <MenuBar />
-      <MainWindow />
+      <React.StrictMode>
+        <DataHandler />
+        <MenuBar />
+        <MainWindow />
+      </React.StrictMode>
     </>
   );
 }

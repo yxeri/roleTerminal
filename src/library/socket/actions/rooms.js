@@ -17,7 +17,13 @@ export const createRoom = async ({ room }) => {
 };
 
 export const followRoom = async ({ roomId, password }) => {
-  const result = await emitSocketEvent(SendEvents.FOLLOW, { roomId, password });
+  const params = {
+    roomId,
+    password,
+    aliasId: getAliasId(store.getState()) || undefined,
+  };
+
+  const result = await emitSocketEvent(SendEvents.FOLLOW, params);
 
   await getMessagesByRoom({ roomId });
 

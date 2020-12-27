@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { string } from 'prop-types';
+import React, { useCallback, useMemo, useState } from 'react';
+import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import Window from '../common/Window/Window';
@@ -10,14 +10,17 @@ import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 import IdentityList from '../common/lists/IdentityList/IdentityList';
 import WalletList from './lists/Wallet/WalletList';
-import { getIdentityOrTeamById } from '../../redux/selectors/users';
+import { getCurrentAccessLevel, getIdentityOrTeamById } from '../../redux/selectors/users';
+import { AccessLevels } from '../../AccessCentral';
+import AdminWalletList from './lists/AdminWallet/AdminWalletList';
 
 import './Wallet.scss';
 
-const Wallet = ({ id }) => {
+const Wallet = ({ id, index }) => {
   const [walletId, setWalletId] = useState('showAll');
   const currentWalletIds = useSelector(getWalletIdsByCurrentUser);
   const identity = useSelector((state) => getIdentityOrTeamById(state, { id: walletId }));
+  const accessLevel = useSelector(getCurrentAccessLevel);
 
   const onClick = useCallback(() => {
     store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.WALLET } }] }));
@@ -27,18 +30,24 @@ const Wallet = ({ id }) => {
 
   const onChange = useCallback((newWalletId) => setWalletId(newWalletId), []);
 
+  const menu = useMemo(() => (
+    <>
+      <WalletList key="walletList" onChange={onChange} walletId={walletId} />
+      <IdentityList key="identityList" />
+      {accessLevel >= AccessLevels.ADMIN && (
+        <AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} />
+      )}
+    </>
+  ), [onChange, walletId]);
+
   return (
     <Window
-      done={onDone}
       classNames={['Wallet']}
+      index={index}
+      done={onDone}
       title={`Wallet${identity ? `: ${identity.teamName || identity.aliasName || identity.username}` : 's'}`}
       onClick={onClick}
-      menu={(
-        <>
-          <WalletList key="walletList" onChange={onChange} />
-          <IdentityList key="identityList" />
-        </>
-      )}
+      menu={menu}
     >
       <TransactionList
         key="transactionList"
@@ -52,4 +61,5 @@ export default React.memo(Wallet);
 
 Wallet.propTypes = {
   id: string.isRequired,
+  index: number.isRequired,
 };

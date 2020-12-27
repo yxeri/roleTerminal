@@ -3,10 +3,10 @@ import { arrayOf, func, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
-import { getRoom } from '../../../../../redux/selectors/rooms';
+import { getRoomById } from '../../../../../redux/selectors/rooms';
 
 const FollowingItem = ({ roomId, onChange, classNames = [] }) => {
-  const room = useSelector((state) => getRoom(state, { id: roomId }));
+  const room = useSelector((state) => getRoomById(state, { id: roomId }));
 
   return (
     <ListItem

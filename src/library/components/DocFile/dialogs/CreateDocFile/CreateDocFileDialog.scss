@@ -1,15 +1,6 @@
 @import "../../../../../common";
 
 .CreateDocFileDialog {
-  .identity {
-    display: flex;
-    align-items: center;
-
-    > span {
-      margin-right: $padding;
-    }
-  }
-
   .public {
     > span {
       margin-left: $padding;

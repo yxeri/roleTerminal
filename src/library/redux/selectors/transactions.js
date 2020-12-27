@@ -16,5 +16,6 @@ export const getTransactionIdsByWallets = createCachedSelector(
   ],
   (transactions, walletIds) => [...transactions.values()]
     .filter(({ fromWalletId, toWalletId }) => walletIds.includes(fromWalletId) || walletIds.includes(toWalletId))
-    .map(({ objectId }) => objectId),
+    .map(({ objectId }) => objectId)
+    .reverse(),
 )((_, { ids }) => `transaction-ids-${ids.join(' ')}`);

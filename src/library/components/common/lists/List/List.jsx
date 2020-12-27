@@ -9,20 +9,18 @@ import {
 
 import './List.scss';
 
-// eslint-disable-next-line react/prop-types
-const ListItems = React.memo(({ items }) => (<>{items}</>));
-
-const List = ({
+const List = React.forwardRef(({
   children,
   title,
   scrollTo,
+  alwaysExpanded = false,
   checkWidth = false,
   dropdown = false,
   classNames = [],
-}) => {
+}, ref) => {
   const listRef = useRef(null);
   const windowRef = useRef(null);
-  const [hidden, setHidden] = useState(typeof title !== 'undefined');
+  const [hidden, setHidden] = useState(!alwaysExpanded && typeof title !== 'undefined');
   const listClasses = [];
   const classes = ['List'].concat(classNames);
 
@@ -37,9 +35,9 @@ const List = ({
   useEffect(() => {
     if (scrollTo && listRef.current) {
       if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
-        listRef.current.lastElementChild.scrollIntoView();
+        listRef.current.lastElementChild.scrollIntoView(false);
       } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
-        listRef.current.firstElementChild.scrollIntoView();
+        listRef.current.firstElementChild.scrollIntoView(false);
       }
     }
   });
@@ -74,9 +72,11 @@ const List = ({
           role="button"
           tabIndex={0}
           key="listHeader"
-          className="toggle clickable"
+          className={`toggle ${!alwaysExpanded ? 'clickable' : ''}`}
           onClick={() => {
-            setHidden(!hidden);
+            if (!alwaysExpanded) {
+              setHidden(!hidden);
+            }
           }}
         >
           {title}
@@ -85,6 +85,10 @@ const List = ({
       <ul
         ref={(element) => {
           listRef.current = element;
+
+          if (ref) {
+            ref.current = element;
+          }
 
           if (element) {
             windowRef.current = element.closest('.Window');
@@ -100,11 +104,11 @@ const List = ({
           }
         }}
       >
-        <ListItems items={children} />
+        {children}
       </ul>
     </div>
   );
-};
+});
 
 export default React.memo(List);
 
@@ -118,6 +122,7 @@ List.propTypes = {
     buffer: bool,
   }),
   checkWidth: bool,
+  alwaysExpanded: bool,
 };
 
 List.defaultProps = {
@@ -127,4 +132,5 @@ List.defaultProps = {
   dropdown: false,
   scrollTo: undefined,
   checkWidth: false,
+  alwaysExpanded: false,
 };

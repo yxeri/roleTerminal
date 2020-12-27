@@ -3,7 +3,7 @@ import { getCurrentUser, getCurrentUserIdentities, getIdentitiesByIds } from './
 
 export const getAllRooms = (state) => state.rooms;
 
-export const getRoom = (state, { id }) => state.rooms.get(id);
+export const getRoomById = (state, { id }) => state.rooms.get(id);
 
 const getRooms = createCachedSelector(
   [getAllRooms],
@@ -49,7 +49,7 @@ export const getWhisperRoom = createCachedSelector(
   [
     getWhisperRooms,
     (_, { identityId, currentIdentityId }) => ({ identityId, currentIdentityId }),
-    (state, { identityId }) => getRoom(state, { id: identityId }),
+    (state, { identityId }) => getRoomById(state, { id: identityId }),
   ],
   (rooms, { currentIdentityId, identityId }, identityRoom) => rooms
     .find((room) => room.participantIds.includes(currentIdentityId) && room.participantIds.includes(identityId)) || identityRoom,

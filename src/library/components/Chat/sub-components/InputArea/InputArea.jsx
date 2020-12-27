@@ -99,6 +99,7 @@ const InputArea = ({
         )}
         <div className="input">
           <textarea
+            maxLength={600}
             name="text"
             key="input"
             rows={1}

@@ -1,6 +1,12 @@
 @import '../../../../../common';
 
 .Button {
+  display: grid;
+  grid-auto-columns: fit-content(100%);
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
+  grid-gap: $padding;
   border: $border;
   border-radius: $border-radius;
   padding: $padding;

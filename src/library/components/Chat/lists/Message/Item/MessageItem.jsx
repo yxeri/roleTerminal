@@ -52,8 +52,8 @@ const MessageItem = ({ previousMessageId, messageId }) => {
       <div className="text">
         {/* eslint-disable-next-line react/no-array-index-key */}
         {message.text.map((line, index) => <p key={index}>{line}</p>)}
-        {message.image && (
-          <span>{`${message.image.fileName} ${message.image.imageName}`}</span>
+        {message.image && message.image.thumbFileName && (
+          <img src={`/upload/images/imgThumb-${message.image.fileName}`} alt="pic" width={message.image.thumbWidth} height={message.image.thumbHeight} />
         )}
       </div>
     </ListItem>

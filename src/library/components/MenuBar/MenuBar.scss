@@ -3,14 +3,12 @@
 #MenuBar {
   display: flex;
   flex-direction: row;
-  padding-top: #{$padding / 2};
   padding-left: $padding;
   color: $second-color;
   height: $menu-bar-height;
   border-bottom: $border;
   background-color: $background-color;
   box-sizing: border-box;
-  margin-bottom: $margin;
   align-items: flex-end;
   box-shadow: $shadow;
   z-index: $menu-bar-z-index;
@@ -27,6 +25,15 @@
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
     }
+
+    header {
+      height: 1em;
+
+      svg {
+        max-height: $icon-size;
+        max-width: $icon-size;
+      }
+    }
   }
 
   > * {
@@ -35,12 +42,6 @@
 
   > *:last-child {
     margin-right: 0;
-  }
-
-  svg {
-    height: $icon-size;
-    width: $icon-size;
-    vertical-align: middle;
   }
 
   .rightAligned {

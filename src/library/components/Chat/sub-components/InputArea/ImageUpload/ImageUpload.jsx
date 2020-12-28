@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { func } from 'prop-types';
+import { useFormContext } from 'react-hook-form';
 
 import Image from '../../../../common/sub-components/Image';
 import Button from '../../../../common/sub-components/Button/Button';
@@ -8,18 +8,34 @@ import imageIcon from './imageIcon.png';
 
 import './ImageUpload.scss';
 
-const ImageUpload = ({ onChange } = {}) => {
+const ImageUpload = () => {
+  const { setValue, register, watch } = useFormContext();
   const inputRef = useRef(null);
   const previewRef = useRef(null);
   const [previewImage, setPreviewImage] = useState();
+  const watchImage = watch('image');
 
   useEffect(() => {
-    const image = { ...previewImage };
-    image.width = previewRef.current.naturalWidth;
-    image.height = previewRef.current.naturalHeight;
+    if (previewImage) {
+      const image = { ...previewImage };
+      image.width = previewRef.current.naturalWidth;
+      image.height = previewRef.current.naturalHeight;
 
-    onChange(image);
+      setValue('image', image);
+    } else {
+      setValue('image', undefined);
+    }
   }, [previewImage]);
+
+  useEffect(() => {
+    register('image');
+  }, []);
+
+  useEffect(() => {
+    if (!watchImage && previewImage) {
+      setPreviewImage();
+    }
+  }, [watchImage]);
 
   const onChangeFunc = ({ target }) => {
     const files = target.files || [];
@@ -73,10 +89,3 @@ const ImageUpload = ({ onChange } = {}) => {
 };
 
 export default React.memo(ImageUpload);
-
-ImageUpload.propTypes = {
-  onChange: func.isRequired,
-};
-
-ImageUpload.defaultProps = {
-};

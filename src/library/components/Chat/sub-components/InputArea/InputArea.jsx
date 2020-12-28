@@ -1,7 +1,7 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number, string } from 'prop-types';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 
 import ImageUpload from './ImageUpload/ImageUpload';
 import { AccessLevels } from '../../../../AccessCentral';
@@ -23,10 +23,9 @@ const InputArea = ({
   onSend,
   minAccessLevel = AccessLevels.STANDARD,
 }) => {
-  const { register, handleSubmit, reset } = useForm();
+  const formMethods = useForm();
   const inputRef = useRef(null);
   const buttonRef = useRef(null);
-  const [image, setImage] = useState();
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
@@ -47,17 +46,14 @@ const InputArea = ({
 
   const onSubmit = ({
     text,
+    image,
   }) => {
     sendMessage({
       roomId,
       image,
       text,
     }).then(({ message, switchRoom }) => {
-      if (image) {
-        setImage(undefined);
-      }
-
-      reset();
+      formMethods.reset();
       resize();
 
       if (switchRoom) {
@@ -68,69 +64,67 @@ const InputArea = ({
     });
   };
 
-  const onSetImage = useCallback((newImage) => setImage(newImage), []);
-
   return (
     <div className="InputArea">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {accessLevel >= minAccessLevel && (
-          <div
-            key="buttonBox"
-            className="buttonBox"
-          >
-            {
-              allowedImages.CHAT
-              && (
-                <ImageUpload
-                  onChange={onSetImage}
-                />
-              )
-            }
-            <Button onClick={() => {}}><Tag /></Button>
-            <Button onClick={() => {}}><File /></Button>
-            {
-              gpsTracking
-              && (
-                <Button onClick={() => {}}><Pin /></Button>
-              )
-            }
-            <IdentityPicker />
-          </div>
-        )}
-        <div className="input">
-          <textarea
-            maxLength={600}
-            name="text"
-            key="input"
-            rows={1}
-            ref={(element) => {
-              register(element);
-
-              inputRef.current = element;
-            }}
-            onKeyDown={(event) => {
-              const { key, altKey } = event;
-
-              if (altKey && key === 'Enter' && buttonRef.current) {
-                buttonRef.current.click();
+      <FormProvider {...formMethods}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+          {accessLevel >= minAccessLevel && (
+            <div
+              key="buttonBox"
+              className="buttonBox"
+            >
+              {
+                allowedImages.CHAT
+                && (
+                  <ImageUpload />
+                )
               }
-            }}
-            placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
-            className={textareaClasses.join(' ')}
-            onChange={(event) => resize(event.target)}
-          />
-          <Button
-            ref={buttonRef}
-            disabled={!online}
-            key="send"
-            type="submit"
-            classNames={['sendButton']}
-            onClick={() => {}}
-          >
-            Send
-          </Button>
-        </div>
-      </form>
+              <Button onClick={() => {}}><Tag /></Button>
+              <Button onClick={() => {}}><File /></Button>
+              {
+                gpsTracking
+                && (
+                  <Button onClick={() => {}}><Pin /></Button>
+                )
+              }
+              <IdentityPicker />
+            </div>
+          )}
+          <div className="input">
+            <textarea
+              maxLength={600}
+              name="text"
+              key="input"
+              rows={1}
+              ref={(element) => {
+                formMethods.register(element);
+
+                inputRef.current = element;
+              }}
+              onKeyDown={(event) => {
+                const { key, altKey } = event;
+
+                if (altKey && key === 'Enter' && buttonRef.current) {
+                  buttonRef.current.click();
+                }
+              }}
+              placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
+              className={textareaClasses.join(' ')}
+              onChange={(event) => resize(event.target)}
+            />
+            <Button
+              ref={buttonRef}
+              disabled={!online}
+              key="send"
+              type="submit"
+              classNames={['sendButton']}
+              onClick={() => {}}
+            >
+              Send
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
     </div>
   );
 };

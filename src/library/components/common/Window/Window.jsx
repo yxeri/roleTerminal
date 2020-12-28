@@ -106,7 +106,6 @@ const Window = ({
         //   setSize({ width: '50%', height: '50%' });
         //   setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
         // }
-        console.log(newY + element.offsetHeight, window.innerHeight);
 
         if (newX === 0 && size.width !== '100%') { // Left
           setSize({ width: '50%', height: '100%' });
@@ -114,15 +113,16 @@ const Window = ({
         } else if (newX + element.offsetWidth >= window.innerWidth && size.width !== '100%') { // Right
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: window.innerWidth / 2, y: 0 });
-        } else if (newY === 0 && size.height !== '100%') { // Up
-          setSize({ height: '50%', width: '100%' });
-          setCoordinates({ y: 0, x: 0 });
-        } else if (newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Down
-          setSize({ height: '50%', width: '100%' });
-          setCoordinates({ x: 0, y: window.innerHeight / 2 });
         } else {
           setCoordinates({ x: newX, y: newY });
         }
+        // else if (newY === 0 && size.height !== '100%') { // Up
+        //   setSize({ height: '50%', width: '100%' });
+        //   setCoordinates({ y: 0, x: 0 });
+        // } else if (newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Down
+        //   setSize({ height: '50%', width: '100%' });
+        //   setCoordinates({ x: 0, y: window.innerHeight / 2 });
+        // }
       }}
       onResizeStart={onClick}
       onResizeStop={(event, direction, element, _, position) => {

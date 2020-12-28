@@ -7,6 +7,7 @@
   min-height: calc(#{3em + $padding * 2} + 1px);
   margin-top: $padding;
 
+
   .buttonBox {
     display: grid;
     grid-auto-flow: column;
@@ -23,6 +24,16 @@
       vertical-align: bottom;
       box-shadow: $shadow-upwards;
       background-color: $light-background-color;
+    }
+
+    .ImageUpload {
+      .previewImage {
+        position: absolute;
+        max-height: 120px;
+        max-width: 120px;
+        bottom: 1em + $padding * 3;
+        border: $border;
+      }
     }
 
     .IdentityPicker {

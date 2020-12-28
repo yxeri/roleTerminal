@@ -12,9 +12,10 @@ import Textarea from '../../../../common/sub-components/Textarea';
 import { sendNewsMessage } from '../../../../../socket/actions/messages';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 import IdentityPicker from '../../../../common/lists/IdentityPicker/IdentityPicker';
+import ImageUpload from '../../../../common/sub-components/ImageUpload/ImageUpload';
 
 const CreateNewsDialog = ({ id, index }) => {
-  const methods = useForm();
+  const formMethods = useForm();
   const [error, setError] = useState();
 
   const onSubmit = ({
@@ -22,6 +23,12 @@ const CreateNewsDialog = ({ id, index }) => {
     text,
     image,
   }) => {
+    console.log(title, text, image);
+
+    if (!image) {
+      return;
+    }
+
     sendNewsMessage({ title, text, image })
       .then(({ message }) => {
         batch(() => {
@@ -43,8 +50,8 @@ const CreateNewsDialog = ({ id, index }) => {
       error={error}
       title="New news article"
     >
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
+      <FormProvider {...formMethods}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <div className="identity">
             <span>You are:</span>
             <IdentityPicker />
@@ -55,6 +62,7 @@ const CreateNewsDialog = ({ id, index }) => {
             name="title"
             placeholder="Title"
           />
+          <ImageUpload />
           <Textarea
             required
             maxLength={550}

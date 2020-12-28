@@ -12,6 +12,7 @@ import { getCurrentUser } from '../../../../../redux/selectors/users';
 import store from '../../../../../redux/store';
 
 import './MessageItem.scss';
+import Image from '../../../../common/sub-components/Image/Image';
 
 const MessageItem = ({ previousMessageId, messageId }) => {
   const previousMessage = useSelector((state) => getMessageById(state, { id: previousMessageId }));
@@ -53,7 +54,15 @@ const MessageItem = ({ previousMessageId, messageId }) => {
         {/* eslint-disable-next-line react/no-array-index-key */}
         {message.text.map((line, index) => <p key={index}>{line}</p>)}
         {message.image && message.image.thumbFileName && (
-          <img src={`/upload/images/imgThumb-${message.image.fileName}`} alt="pic" width={message.image.thumbWidth} height={message.image.thumbHeight} />
+          <Image
+            image={`/upload/images/${message.image.thumbFileName}`}
+            altText="pic"
+            width={message.image.thumbWidth}
+            height={message.image.thumbHeight}
+            fullImage={`/upload/images/${message.image.fileName}`}
+            fullWidth={message.image.width}
+            fullHeight={message.image.height}
+          />
         )}
       </div>
     </ListItem>

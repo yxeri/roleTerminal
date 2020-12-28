@@ -17,6 +17,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     text-align: center;
+    display: flex;
+    justify-content: center;
   }
 
   .Button {
@@ -27,16 +29,18 @@
     padding: 0;
   }
 
-  svg {
-    fill: $background-color;
-    stroke-width: 3;
-  }
-
   .buttons {
     display: grid;
-    grid-template-columns: repeat(2, fit-content(0));
+    grid-auto-columns: fit-content(0);
+    grid-auto-flow: column;
     grid-gap: #{$margin * 2};
     justify-items: flex-end;
+
+    .settings {
+      svg {
+        stroke-width: 2;
+      }
+    }
   }
 
   > * {

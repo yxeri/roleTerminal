@@ -1,0 +1,9 @@
+@import "../../../../../common";
+
+.ImageUpload {
+  svg {
+    max-width: $icon-size;
+    max-height: $icon-size;
+    vertical-align: middle;
+  }
+}

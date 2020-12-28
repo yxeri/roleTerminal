@@ -20,7 +20,7 @@ const Window = ({
   title = 'app',
   classNames = [],
 }) => {
-  const defaultSize = type === 'window' ? { width: 640, height: 460 } : { width: 440, height: 360 };
+  const defaultSize = type === 'window' ? { width: 640, height: 480 } : { width: 640, height: 480 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const windowClasses = ['Window'].concat(classNames);
@@ -48,9 +48,9 @@ const Window = ({
       bounds="parent"
       dragHandleClassName="TopBarHandle"
       enableResizing={{
-        top: false,
-        topRight: false,
-        topLeft: false,
+        top: true,
+        topRight: true,
+        topLeft: true,
         right: true,
         bottom: true,
         left: true,
@@ -58,20 +58,33 @@ const Window = ({
         bottomLeft: true,
       }}
       resizeHandleStyles={{
+        top: { top: '0', width: '5px' },
         left: { left: '0', width: '5px' },
         right: { right: '0', width: '5px' },
         bottom: { bottom: '0', height: '5px' },
         bottomLeft: {
           bottom: '0',
           left: '0',
-          width: '5px',
-          height: '5px',
+          width: '10px',
+          height: '10px',
         },
         bottomRight: {
           bottom: '0',
           right: '0',
-          width: '5px',
-          height: '5px',
+          width: '10px',
+          height: '10px',
+        },
+        topRight: {
+          right: '0',
+          top: '0',
+          width: '10px',
+          height: '10px',
+        },
+        topLeft: {
+          left: '0',
+          top: '0',
+          width: '10px',
+          height: '10px',
         },
       }}
       onDragStart={onClick}
@@ -93,20 +106,29 @@ const Window = ({
         //   setSize({ width: '50%', height: '50%' });
         //   setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
         // }
-        if (newX === 0 && newY > 0) { // Left
+        console.log(newY + element.offsetHeight, window.innerHeight);
+
+        if (newX === 0 && size.width !== '100%') { // Left
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: 0, y: 0 });
-        } else if (newX + element.offsetWidth >= window.innerWidth && newY > 0) { // Right
+        } else if (newX + element.offsetWidth >= window.innerWidth && size.width !== '100%') { // Right
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: window.innerWidth / 2, y: 0 });
+        } else if (newY === 0 && size.height !== '100%') { // Up
+          setSize({ height: '50%', width: '100%' });
+          setCoordinates({ y: 0, x: 0 });
+        } else if (newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Down
+          setSize({ height: '50%', width: '100%' });
+          setCoordinates({ x: 0, y: window.innerHeight / 2 });
         } else {
           setCoordinates({ x: newX, y: newY });
         }
       }}
       onResizeStart={onClick}
-      onResizeStop={(event, direction, element) => {
+      onResizeStop={(event, direction, element, _, position) => {
         if (element.offsetWidth !== size.width || element.offsetHeight !== size.height) {
           setSize({ width: element.offsetWidth, height: element.offsetHeight });
+          setCoordinates(position);
         }
       }}
     >

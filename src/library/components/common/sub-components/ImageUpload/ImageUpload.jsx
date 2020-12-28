@@ -1,38 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
-import Image from '../../../../common/sub-components/Image';
-import Button from '../../../../common/sub-components/Button/Button';
+import Image from '../Image/Image';
+import Button from '../Button/Button';
 
-import imageIcon from './imageIcon.png';
+import { ReactComponent as ImageIcon } from '../../../../icons/image.svg';
 
 import './ImageUpload.scss';
 
-const ImageUpload = () => {
-  const { setValue, register, watch } = useFormContext();
+const ImageUpload = ({ useIcon = false }) => {
+  const { register, setValue } = useFormContext();
   const inputRef = useRef(null);
-  const previewRef = useRef(null);
   const [previewImage, setPreviewImage] = useState();
-  const watchImage = watch('image');
-
-  useEffect(() => {
-    if (previewImage) {
-      const image = { ...previewImage };
-      image.width = previewRef.current.naturalWidth;
-      image.height = previewRef.current.naturalHeight;
-
-      setValue('image', image);
-    } else {
-      setValue('image', undefined);
-    }
-  }, [previewImage]);
+  const watchImage = useWatch({ name: 'image' });
 
   useEffect(() => {
     register('image');
   }, []);
 
   useEffect(() => {
-    if (!watchImage && previewImage) {
+    if (previewImage) {
+      setValue('image', previewImage);
+    } else {
+      setValue('image', undefined);
+    }
+  }, [previewImage]);
+
+  useEffect(() => {
+    console.log(watchImage);
+
+    if (!watchImage) {
       setPreviewImage();
     }
   }, [watchImage]);
@@ -46,10 +43,12 @@ const ImageUpload = () => {
 
       reader.addEventListener('load', () => {
         if (reader.result) {
-          setPreviewImage({
+          const image = {
             imageName: file.name,
             source: reader.result,
-          });
+          };
+
+          setPreviewImage(image);
         }
       });
       reader.readAsDataURL(file);
@@ -68,21 +67,18 @@ const ImageUpload = () => {
         accept="image/png, image/jpeg, image/pjpeg"
         onChange={onChangeFunc}
       />
+      <Image
+        onRemove={() => setPreviewImage()}
+        classNames={['previewImage'].concat([!previewImage ? 'hide' : ''])}
+        image={previewImage ? previewImage.source : ''}
+        altText="Image preview"
+      />
       <Button
         type="button"
         onClick={() => { inputRef.current.click(); }}
       >
-        <Image
-          onRemove={() => setPreviewImage()}
-          ref={previewRef}
-          classNames={['previewImage'].concat([!previewImage ? 'hide' : ''])}
-          image={previewImage ? previewImage.source : ''}
-          altText="Image preview"
-        />
-        <Image
-          image={imageIcon}
-          altText="Upload image"
-        />
+        <ImageIcon />
+        {!useIcon && (<span>Upload image</span>)}
       </Button>
     </div>
   );

@@ -14,6 +14,7 @@ import './NewsItem.scss';
 import { getTimestamp } from '../../../../../redux/selectors/config';
 import store from '../../../../../redux/store';
 import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
+import Image from '../../../../common/sub-components/Image/Image';
 
 const NewsItem = ({
   messageId,
@@ -56,9 +57,22 @@ const NewsItem = ({
           {showText && <ChevronUp />}
         </p>
       </div>
-      <div className={`text ${!showText ? 'hide' : ''}`}>
-        {message.text.slice(1).map((line, index) => <p key={index}>{line}</p>)}
-      </div>
+      {showText && message.image && message.image.thumbFileName && (
+        <Image
+          image={`/upload/images/${message.image.thumbFileName}`}
+          fullImage={`/upload/images/${message.image.fileName}`}
+          altText="pic"
+          width={message.image.thumbWidth}
+          height={message.image.thumbHeight}
+          fullWidth={message.image.width}
+          fullHeight={message.image.height}
+        />
+      )}
+      {showText && (
+        <div className="text">
+          {message.text.slice(1).map((line, index) => <p key={index}>{line}</p>)}
+        </div>
+      )}
     </ListItem>
   );
 };

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { func, number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 
-import ImageUpload from './ImageUpload/ImageUpload';
+import ImageUpload from '../../../common/sub-components/ImageUpload/ImageUpload';
 import { AccessLevels } from '../../../../AccessCentral';
 import { isOnline } from '../../../../redux/selectors/online';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
@@ -53,7 +53,8 @@ const InputArea = ({
       image,
       text,
     }).then(({ message, switchRoom }) => {
-      formMethods.reset();
+      formMethods.setValue('text', '');
+      formMethods.setValue('image', undefined);
       resize();
 
       if (switchRoom) {
@@ -76,7 +77,7 @@ const InputArea = ({
               {
                 allowedImages.CHAT
                 && (
-                  <ImageUpload />
+                  <ImageUpload useIcon />
                 )
               }
               <Button onClick={() => {}}><Tag /></Button>

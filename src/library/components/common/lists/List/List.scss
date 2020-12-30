@@ -1,14 +1,6 @@
 @import "../../../../../common";
 
 .List {
-  .ListItem.clickable {
-    text-decoration: none;
-  }
-
-  .ListItem.selected {
-    background-color: $selected;
-  }
-
   header {
     user-select: none;
     padding: $padding;
@@ -42,6 +34,29 @@
     box-sizing: border-box;
     height: inherit;
     z-index: $dropdown-z-index;
+  }
+
+  .upper, .lower {
+    position: sticky;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
+    float: right;
+    opacity: .5;
+
+    svg {
+      max-width: $icon-size + .2em;
+      max-height: $icon-size + .2em;
+    }
+  }
+
+  .lower {
+    bottom: 0;
+  }
+
+  .upper {
+    top: 0;
   }
 }
 

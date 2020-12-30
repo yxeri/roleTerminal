@@ -7,17 +7,24 @@ import {
   shape,
 } from 'prop-types';
 
+import { ReactComponent as ArrowUp } from '../../../../icons/arrow-up-circle.svg';
+import { ReactComponent as ArrowDown } from '../../../../icons/arrow-down-circle.svg';
+
 import './List.scss';
+import Button from '../../sub-components/Button/Button';
 
 const List = React.forwardRef(({
   children,
   title,
   scrollTo,
+  observe,
   alwaysExpanded = false,
   checkWidth = false,
   dropdown = false,
   classNames = [],
 }, ref) => {
+  const observeHelper = useRef();
+  const renderDone = useRef(false);
   const listRef = useRef(null);
   const windowRef = useRef(null);
   const [hidden, setHidden] = useState(!alwaysExpanded && typeof title !== 'undefined');
@@ -32,15 +39,71 @@ const List = React.forwardRef(({
     }
   };
 
-  useEffect(() => {
-    if (scrollTo && listRef.current) {
+  const scroll = () => {
+    if (scrollTo && renderDone.current && listRef.current && !hidden) {
       if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
-        listRef.current.lastElementChild.scrollIntoView(false);
+        console.log('should scroll to bottom');
+        listRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
       } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
-        listRef.current.firstElementChild.scrollIntoView(false);
+        listRef.current.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log('should scroll to top');
       }
     }
-  });
+  };
+
+  useEffect(() => {
+    scroll();
+
+    renderDone.current = true;
+  }, [children]);
+
+  useEffect(() => {
+    if (scrollTo && !scrollTo.skipFirstRender && listRef.current && !hidden) {
+      if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
+        listRef.current.lastElementChild.scrollIntoView({ behavior: 'auto', block: 'end' });
+        console.log('should scroll to bottom');
+      } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
+        listRef.current.firstElementChild.scrollIntoView({ behavior: 'auto', block: 'start' });
+        console.log('should scroll to top');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    let observer;
+
+    if (listRef.current && observe) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('hiding');
+            observeHelper.current.classList.add('hide');
+          } else {
+            console.log('showing');
+            observeHelper.current.classList.remove('hide');
+          }
+        });
+      }, {
+        root: listRef.current,
+        rootMargin: '50px',
+        threshold: 1,
+      });
+
+      if (observe === 'upper' && listRef.current.firstElementChild) {
+        observer.observe(listRef.current.firstElementChild);
+      }
+
+      if (observe === 'lower' && listRef.current.lastElementChild) {
+        observer.observe(listRef.current.lastElementChild);
+      }
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (dropdown) {
@@ -82,6 +145,7 @@ const List = React.forwardRef(({
           {title}
         </header>
       )}
+      {observe && observe === 'upper' && <Button key="upper" classNames={['upper']} ref={observeHelper} onClick={() => scroll()}><ArrowUp /></Button>}
       <ul
         ref={(element) => {
           listRef.current = element;
@@ -106,11 +170,21 @@ const List = React.forwardRef(({
       >
         {children}
       </ul>
+      {observe && observe === 'lower' && <Button key="lower" classNames={['lower']} ref={observeHelper} onClick={() => scroll()}><ArrowDown /></Button>}
     </div>
   );
 });
 
-export default React.memo(List);
+export default React.memo(List, (prevProps, newProps) => {
+  const prevChildren = prevProps.children;
+  const newChildren = newProps.children;
+
+  if (Array.isArray(prevChildren) && Array.isArray(newChildren) && newChildren.every((child, index) => prevChildren[index] && prevChildren[index].key === child.key)) {
+    return true;
+  }
+
+  return false;
+});
 
 List.propTypes = {
   children: node,
@@ -123,6 +197,7 @@ List.propTypes = {
   }),
   checkWidth: bool,
   alwaysExpanded: bool,
+  observe: string,
 };
 
 List.defaultProps = {
@@ -133,4 +208,5 @@ List.defaultProps = {
   scrollTo: undefined,
   checkWidth: false,
   alwaysExpanded: false,
+  observe: undefined,
 };

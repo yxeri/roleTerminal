@@ -3,4 +3,13 @@
 .ListItem {
   word-wrap: break-word;
   padding: $padding $padding;
+  box-sizing: border-box;
+}
+
+.ListItem.clickable {
+  text-decoration: none;
+}
+
+.ListItem.selected {
+  background-color: $selected;
 }

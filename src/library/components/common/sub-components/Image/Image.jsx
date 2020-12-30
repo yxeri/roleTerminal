@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  arrayOf,
+  arrayOf, bool,
   func,
   number,
   string,
@@ -16,6 +16,7 @@ const Image = React.forwardRef(({
   onRemove,
   width,
   height,
+  scrollTo = false,
   classNames = [],
   altText = '',
   fullImage,
@@ -26,8 +27,8 @@ const Image = React.forwardRef(({
   const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
-    if (!showFull && containerRef.current) {
-      containerRef.current.scrollIntoView();
+    if (scrollTo && !showFull && containerRef.current) {
+      containerRef.current.scrollIntoView({ block: 'nearest' });
     }
   }, [showFull]);
 
@@ -48,7 +49,7 @@ const Image = React.forwardRef(({
     >
       {onRemove && (
         <div
-          className="clickable"
+          className="remove clickable"
           role="complementary"
           onClick={(event) => {
             onRemove();
@@ -62,7 +63,7 @@ const Image = React.forwardRef(({
       {fullImage && (
         <div
           onClick={onClick}
-          className="clickable"
+          className="zoom clickable"
           role="complementary"
         >
           {showFull ? <Minimize /> : <Maximize />}
@@ -93,6 +94,7 @@ Image.propTypes = {
   fullImage: string,
   fullWidth: number,
   fullHeight: number,
+  scrollTo: bool,
 };
 
 Image.defaultProps = {
@@ -104,4 +106,5 @@ Image.defaultProps = {
   fullImage: undefined,
   fullWidth: undefined,
   fullHeight: undefined,
+  scrollTo: false,
 };

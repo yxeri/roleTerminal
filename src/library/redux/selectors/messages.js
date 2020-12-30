@@ -15,12 +15,16 @@ export const getMessagesByRoom = createCachedSelector(
 
 export const getNews = createCachedSelector(
   [getAllMessages],
-  (messages) => [...messages.values()].filter((message) => message.messageType === MessageType.NEWS),
+  (messages) => [...messages.values()]
+    .filter((message) => message.messageType === MessageType.NEWS)
+    .reverse(),
 )(() => 'news');
 
 export const getNewsIdsPoints = createCachedSelector(
   [getNews],
-  (messages) => messages.map(({ objectId, points }) => ({ objectId, points })),
+  (messages) => messages
+    .map(({ objectId, points }) => ({ objectId, points }))
+    .reverse(),
 )(() => 'news-ids');
 
 export const getMessageIdsByRoom = createCachedSelector(

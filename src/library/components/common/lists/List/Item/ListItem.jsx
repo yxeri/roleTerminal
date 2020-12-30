@@ -8,14 +8,15 @@ import {
 
 import './ListItem.scss';
 
-const ListItem = ({
+const ListItem = React.forwardRef(({
   children,
   onClick,
   elementId,
   stopPropagation = false,
   classNames = [],
-}) => (
+}, ref) => (
   <li
+    ref={ref}
     id={elementId}
     className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
     onClick={(event) => {
@@ -34,12 +35,12 @@ const ListItem = ({
   >
     {children}
   </li>
-);
+));
 
 export default React.memo(ListItem);
 
 ListItem.propTypes = {
-  children: node.isRequired,
+  children: node,
   onClick: func,
   classNames: arrayOf(string),
   stopPropagation: bool,
@@ -51,4 +52,5 @@ ListItem.defaultProps = {
   classNames: [],
   stopPropagation: false,
   elementId: undefined,
+  children: undefined,
 };

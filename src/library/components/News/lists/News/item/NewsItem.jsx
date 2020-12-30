@@ -1,28 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   arrayOf, bool,
   string,
 } from 'prop-types';
 import { useSelector } from 'react-redux';
+
 import { getMessageById } from '../../../../../redux/selectors/messages';
 import ListItem from '../../../../common/lists/List/Item/ListItem';
+import { getTimestamp } from '../../../../../redux/selectors/config';
+import store from '../../../../../redux/store';
+import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
+import Image from '../../../../common/sub-components/Image/Image';
 
 import { ReactComponent as ChevronDown } from '../../../../../icons/chevron-down.svg';
 import { ReactComponent as ChevronUp } from '../../../../../icons/chevron-up.svg';
 
 import './NewsItem.scss';
-import { getTimestamp } from '../../../../../redux/selectors/config';
-import store from '../../../../../redux/store';
-import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
-import Image from '../../../../common/sub-components/Image/Image';
 
 const NewsItem = ({
   messageId,
   expand = false,
   classNames = [],
 }) => {
-  const titleRef = useRef(null);
-  const [showText, setShowText] = useState(expand);
+  const itemRef = useRef();
+  const [showText, setShowText] = useState(false);
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
   const identity = useSelector((state) => getIdentityOrTeamById(state, { id: message.teamId || message.ownerAliasId || message.ownerId }));
 
@@ -30,22 +36,21 @@ const NewsItem = ({
     setShowText(expand);
   }, [expand]);
 
-  useEffect(() => {
-    if (showText && titleRef.current) {
-      titleRef.current.scrollIntoView();
+  useLayoutEffect(() => {
+    if (showText && itemRef.current) {
+      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
     }
   }, [showText]);
 
   return (
     <ListItem
+      ref={itemRef}
       elementId={`news-${messageId}`}
       onClick={() => setShowText(!showText)}
       classNames={['NewsItem'].concat(classNames, [showText ? 'expanded' : ''])}
     >
-      <div
-        ref={titleRef}
-        className="title"
-      >
+      <div className="title">
         <p>{message.text[0]}</p>
         <p className="info">
           <span>

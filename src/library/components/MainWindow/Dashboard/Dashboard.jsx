@@ -9,10 +9,6 @@ import List from '../../common/lists/List/List';
 import ListItem from '../../common/lists/List/Item/ListItem';
 import { getTimestamp } from '../../../redux/selectors/config';
 import store from '../../../redux/store';
-import { changeWindowOrder } from '../../../redux/actions/windowOrder';
-import { WindowTypes } from '../../../redux/reducers/windowOrder';
-
-import { ReactComponent as Arrow } from '../../../icons/arrow-right.svg';
 import NewsItem from './Item/NewsItem';
 
 const Dashboard = () => {
@@ -26,7 +22,6 @@ const Dashboard = () => {
     }
 
     return [...news]
-      .reverse()
       .sort((a, b) => {
         const valueA = a.points;
         const valueB = b.points;

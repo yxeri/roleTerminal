@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  bool,
   string,
 } from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -10,13 +11,21 @@ import { getMessageById } from '../../../../../redux/selectors/messages';
 import { hasAccessTo } from '../../../../../AccessCentral';
 import { getCurrentUser } from '../../../../../redux/selectors/users';
 import store from '../../../../../redux/store';
-
-import './MessageItem.scss';
 import Image from '../../../../common/sub-components/Image/Image';
 
-const MessageItem = ({ previousMessageId, messageId }) => {
+import './MessageItem.scss';
+
+const MessageItem = ({ previousMessageId, messageId, selected = false }) => {
+  const itemRef = useRef();
   const previousMessage = useSelector((state) => getMessageById(state, { id: previousMessageId }));
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
+
+  useEffect(() => {
+    if (selected && itemRef.current) {
+      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
+    }
+  }, [selected]);
 
   const { hasFullAccess } = hasAccessTo({
     objectToAccess: message,
@@ -41,6 +50,7 @@ const MessageItem = ({ previousMessageId, messageId }) => {
 
   return (
     <ListItem
+      ref={itemRef}
       classNames={['MessageItem', `${hasFullAccess ? 'clickable' : ''}`]}
       key={messageId}
     >
@@ -55,6 +65,7 @@ const MessageItem = ({ previousMessageId, messageId }) => {
         {message.text.map((line, index) => <p key={index}>{line}</p>)}
         {message.image && message.image.thumbFileName && (
           <Image
+            scrollTo
             image={`/upload/images/${message.image.thumbFileName}`}
             altText="pic"
             width={message.image.thumbWidth}
@@ -74,8 +85,10 @@ export default React.memo(MessageItem);
 MessageItem.propTypes = {
   previousMessageId: string,
   messageId: string.isRequired,
+  selected: bool,
 };
 
 MessageItem.defaultProps = {
   previousMessageId: undefined,
+  selected: false,
 };

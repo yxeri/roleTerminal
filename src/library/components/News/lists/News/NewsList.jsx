@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
 
@@ -13,18 +13,7 @@ const NewsList = ({ messageId }) => {
   const listRef = useRef(null);
   const news = useSelector(getNewsIdsPoints);
 
-  useEffect(() => {
-    if (messageId && listRef.current) {
-      const listItem = listRef.current.querySelector(`#news-${messageId}`);
-
-      if (listItem) {
-        listItem.scrollIntoView();
-      }
-    }
-  }, [messageId]);
-
   const itemMapper = () => [...news]
-    .reverse()
     .map((newsMessage) => (
       <NewsItem
         expand={newsMessage.objectId === messageId}
@@ -33,7 +22,6 @@ const NewsList = ({ messageId }) => {
       />
     ));
   const topMapper = () => [...news]
-    .reverse()
     .filter((message) => message.points && message.points > 0)
     .sort((a, b) => {
       const valueA = a.points;
@@ -60,10 +48,13 @@ const NewsList = ({ messageId }) => {
 
   return (
     <List
+      observe="upper"
+      itemId={messageId ? `news-${messageId}` : undefined}
       ref={listRef}
       scrollTo={{
         buffer: true,
         direction: 'top',
+        skipFirstRender: typeof messageId === 'string',
       }}
       classNames={['NewsList']}
     >

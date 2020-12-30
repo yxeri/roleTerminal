@@ -8,22 +8,26 @@ import MessageItem from './Item/MessageItem';
 
 import './MessageList.scss';
 
-const MessageList = ({ roomId }) => {
+const MessageList = ({ roomId, messageId }) => {
   const messageIds = useSelector((state) => getMessageIdsByRoom(state, { roomId }));
 
-  const messageMapper = () => messageIds.map((messageId, index, array) => (
+  const messageMapper = () => messageIds.map((id, index, array) => (
     <MessageItem
-      key={messageId}
+      selected={messageId && messageId === id}
+      key={id}
       previousMessageId={array[index - 1]}
-      messageId={messageId}
+      messageId={id}
     />
   ));
 
   return (
     <List
+      observe="lower"
+      key="messageList"
       scrollTo={{
         buffer: true,
         direction: 'bottom',
+        skipFirstRender: typeof messageId === 'string',
       }}
       classNames={['MessageList']}
     >
@@ -36,8 +40,10 @@ export default React.memo(MessageList);
 
 MessageList.propTypes = {
   roomId: string,
+  messageId: string,
 };
 
 MessageList.defaultProps = {
   roomId: undefined,
+  messageId: undefined,
 };

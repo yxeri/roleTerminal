@@ -3,6 +3,14 @@
 .NewsItem {
   padding: 0 $padding * 2 $padding * 2 $padding * 2;
 
+  .Image {
+    margin-top: $padding * 2;
+  }
+
+  .Image.full {
+    margin-top: 0;
+  }
+
   .title {
     padding-top: $padding * 2;
   }
@@ -20,7 +28,7 @@
   }
 
   .text {
-    margin-top: $margin * 4;
+    margin-top: $margin * 2;
   }
 }
 

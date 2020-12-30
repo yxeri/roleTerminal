@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { func, number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -15,6 +15,7 @@ import IdentityPicker from '../../../common/lists/IdentityPicker/IdentityPicker'
 import { ReactComponent as Pin } from '../../../../icons/pin.svg';
 import { ReactComponent as Tag } from '../../../../icons/tag.svg';
 import { ReactComponent as File } from '../../../../icons/file-plus.svg';
+import { ReactComponent as CloudOff } from '../../../../icons/cloud-off.svg';
 
 import './InputArea.scss';
 
@@ -23,6 +24,7 @@ const InputArea = ({
   onSend,
   minAccessLevel = AccessLevels.STANDARD,
 }) => {
+  const [isSending, setIsSending] = useState(false);
   const formMethods = useForm();
   const inputRef = useRef(null);
   const buttonRef = useRef(null);
@@ -48,6 +50,8 @@ const InputArea = ({
     text,
     image,
   }) => {
+    setIsSending(true);
+
     sendMessage({
       roomId,
       image,
@@ -60,8 +64,12 @@ const InputArea = ({
       if (switchRoom) {
         onSend({ roomId: message.roomId });
       }
+
+      setIsSending(false);
     }).catch((error) => {
       console.log('error', error);
+
+      setIsSending(false);
     });
   };
 
@@ -115,13 +123,19 @@ const InputArea = ({
             />
             <Button
               ref={buttonRef}
-              disabled={!online}
+              disabled={!online || isSending}
               key="send"
               type="submit"
               classNames={['sendButton']}
               onClick={() => {}}
             >
-              Send
+              {online
+                ? (
+                  <span>Send</span>
+                )
+                : (
+                  <CloudOff />
+                )}
             </Button>
           </div>
         </form>

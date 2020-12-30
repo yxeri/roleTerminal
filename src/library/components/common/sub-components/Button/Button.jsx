@@ -23,6 +23,8 @@ const Button = React.forwardRef(({
     disabled={disabled}
     type={type} /* eslint-disable-line react/button-has-type */
     onClick={(event) => {
+      console.log('click');
+
       onClick(event);
 
       if (stopPropagation) {

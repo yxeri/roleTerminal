@@ -4,7 +4,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from './Dialog/Dialog';
 import { login } from '../../../socket/actions/auth';
-import Input from '../sub-components/Input';
+import Input from '../sub-components/Input/Input';
 import Button from '../sub-components/Button/Button';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';

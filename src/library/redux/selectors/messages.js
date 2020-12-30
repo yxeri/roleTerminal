@@ -23,8 +23,7 @@ export const getNews = createCachedSelector(
 export const getNewsIdsPoints = createCachedSelector(
   [getNews],
   (messages) => messages
-    .map(({ objectId, points }) => ({ objectId, points }))
-    .reverse(),
+    .map(({ objectId, points }) => ({ objectId, points })),
 )(() => 'news-ids');
 
 export const getMessageIdsByRoom = createCachedSelector(

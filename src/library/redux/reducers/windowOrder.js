@@ -28,7 +28,7 @@ export default function WindowOrderReducer(state = defaultState, action) {
     const newState = new Map([...state]);
 
     if (changeType === ChangeTypes.UPDATE) {
-      if (newState.size > 0 && [...newState.keys()].indexOf(id) === newState.size - 1) {
+      if (newState.size > 0 && newState.get(id) && newState.get(id).index === newState.size) {
         const existing = newState.get(id);
 
         if (Object.keys(value).length === Object.keys(existing).length && Object.keys(value).every((key) => existing[key] === value[key])) {
@@ -64,6 +64,8 @@ export default function WindowOrderReducer(state = defaultState, action) {
 
         sorted.push(window);
 
+        console.log(sorted);
+
         sorted.forEach(([key, entryValue], index) => {
           const newValue = {
             ...entryValue,
@@ -78,8 +80,6 @@ export default function WindowOrderReducer(state = defaultState, action) {
     }
 
     if (changeType === ChangeTypes.REMOVE) {
-      console.log(id);
-
       newState.delete(id);
 
       return newState;

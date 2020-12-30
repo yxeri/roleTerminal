@@ -1,6 +1,5 @@
 import React, {
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -36,15 +35,9 @@ const NewsItem = ({
     setShowText(expand);
   }, [expand]);
 
-  useLayoutEffect(() => {
-    if (showText && itemRef.current) {
-      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
-    }
-  }, [showText]);
-
   return (
     <ListItem
+      scrollTo={showText}
       ref={itemRef}
       elementId={`news-${messageId}`}
       onClick={() => setShowText(!showText)}

@@ -5,9 +5,9 @@ import { string } from 'prop-types';
 import List from '../../../common/lists/List/List';
 import { getNewsIdsPoints } from '../../../../redux/selectors/messages';
 import NewsItem from './item/NewsItem';
-import ListItem from '../../../common/lists/List/Item/ListItem';
 
 import './NewsList.scss';
+import ListItem from '../../../common/lists/List/Item/ListItem';
 
 const NewsList = ({ messageId }) => {
   const listRef = useRef(null);
@@ -49,20 +49,13 @@ const NewsList = ({ messageId }) => {
   return (
     <List
       observe="upper"
-      itemId={messageId ? `news-${messageId}` : undefined}
       ref={listRef}
-      scrollTo={{
-        buffer: true,
-        direction: 'top',
-        skipFirstRender: typeof messageId === 'string',
-      }}
       classNames={['NewsList']}
     >
       {news.length === 0 && (
-        <ListItem key="noNews"><p>There are no news</p></ListItem>
+        [<ListItem key="noNews"><p>There are no news</p></ListItem>]
       )}
-      {topMapper()}
-      {itemMapper()}
+      {topMapper().concat(itemMapper())}
     </List>
   );
 };

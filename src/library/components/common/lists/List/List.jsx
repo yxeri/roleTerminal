@@ -16,15 +16,14 @@ import Button from '../../sub-components/Button/Button';
 const List = React.forwardRef(({
   children,
   title,
-  scrollTo,
   observe,
   alwaysExpanded = false,
   checkWidth = false,
   dropdown = false,
   classNames = [],
 }, ref) => {
+  const observer = useRef();
   const observeHelper = useRef();
-  const renderDone = useRef(false);
   const listRef = useRef(null);
   const windowRef = useRef(null);
   const [hidden, setHidden] = useState(!alwaysExpanded && typeof title !== 'undefined');
@@ -39,47 +38,42 @@ const List = React.forwardRef(({
     }
   };
 
-  const scroll = () => {
-    if (scrollTo && renderDone.current && listRef.current && !hidden) {
-      if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
-        console.log('should scroll to bottom');
-        listRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
-        listRef.current.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        console.log('should scroll to top');
-      }
+  const scroll = ({ direction }) => {
+    if (direction === 'bottom' && listRef.current.lastElementChild) {
+      console.log('should scroll to bottom');
+      listRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else if (direction === 'top' && listRef.current.firstElementChild) {
+      listRef.current.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      console.log('should scroll to top');
     }
   };
 
+  // useEffect(() => {
+  //   scroll();
+  //
+  //   renderDone.current = true;
+  // }, [children]);
+  //
+  // useEffect(() => {
+  //   if (scrollTo && !scrollTo.skipFirstRender && listRef.current && !hidden) {
+  //     if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
+  //       listRef.current.lastElementChild.scrollIntoView({ behavior: 'auto', block: 'end' });
+  //       console.log('should scroll to bottom');
+  //     } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
+  //       listRef.current.firstElementChild.scrollIntoView({ behavior: 'auto', block: 'start' });
+  //       console.log('should scroll to top');
+  //     }
+  //   }
+  // }, []);
+  //
+
   useEffect(() => {
-    scroll();
-
-    renderDone.current = true;
-  }, [children]);
-
-  useEffect(() => {
-    if (scrollTo && !scrollTo.skipFirstRender && listRef.current && !hidden) {
-      if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
-        listRef.current.lastElementChild.scrollIntoView({ behavior: 'auto', block: 'end' });
-        console.log('should scroll to bottom');
-      } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
-        listRef.current.firstElementChild.scrollIntoView({ behavior: 'auto', block: 'start' });
-        console.log('should scroll to top');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    let observer;
-
     if (listRef.current && observe) {
-      observer = new IntersectionObserver((entries) => {
+      observer.current = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log('hiding');
             observeHelper.current.classList.add('hide');
           } else {
-            console.log('showing');
             observeHelper.current.classList.remove('hide');
           }
         });
@@ -90,20 +84,34 @@ const List = React.forwardRef(({
       });
 
       if (observe === 'upper' && listRef.current.firstElementChild) {
-        observer.observe(listRef.current.firstElementChild);
+        observer.current.observe(listRef.current.firstElementChild);
       }
 
       if (observe === 'lower' && listRef.current.lastElementChild) {
-        observer.observe(listRef.current.lastElementChild);
+        observer.current.observe(listRef.current.lastElementChild);
       }
     }
 
     return () => {
-      if (observer) {
-        observer.disconnect();
+      if (observer.current) {
+        observer.current.disconnect();
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (observer.current) {
+      observer.current.disconnect();
+
+      if (observe === 'upper' && listRef.current.firstElementChild) {
+        observer.current.observe(listRef.current.firstElementChild);
+      }
+
+      if (observe === 'lower' && listRef.current.lastElementChild) {
+        observer.current.observe(listRef.current.lastElementChild);
+      }
+    }
+  }, [children]);
 
   useEffect(() => {
     if (dropdown) {
@@ -145,7 +153,7 @@ const List = React.forwardRef(({
           {title}
         </header>
       )}
-      {observe && observe === 'upper' && <Button key="upper" classNames={['upper']} ref={observeHelper} onClick={() => scroll()}><ArrowUp /></Button>}
+      {observe && observe === 'upper' && <Button key="upper" classNames={['upper', 'hide']} ref={observeHelper} onClick={() => scroll({ direction: 'top' })}><ArrowUp /></Button>}
       <ul
         ref={(element) => {
           listRef.current = element;
@@ -170,31 +178,18 @@ const List = React.forwardRef(({
       >
         {children}
       </ul>
-      {observe && observe === 'lower' && <Button key="lower" classNames={['lower']} ref={observeHelper} onClick={() => scroll()}><ArrowDown /></Button>}
+      {observe && observe === 'lower' && <Button key="lower" classNames={['lower', 'hide']} ref={observeHelper} onClick={() => scroll({ direction: 'bottom' })}><ArrowDown /></Button>}
     </div>
   );
 });
 
-export default React.memo(List, (prevProps, newProps) => {
-  const prevChildren = prevProps.children;
-  const newChildren = newProps.children;
-
-  if (Array.isArray(prevChildren) && Array.isArray(newChildren) && newChildren.every((child, index) => prevChildren[index] && prevChildren[index].key === child.key)) {
-    return true;
-  }
-
-  return false;
-});
+export default React.memo(List);
 
 List.propTypes = {
   children: node,
   title: node,
   classNames: arrayOf(string),
   dropdown: bool,
-  scrollTo: shape({
-    direction: string,
-    buffer: bool,
-  }),
   checkWidth: bool,
   alwaysExpanded: bool,
   observe: string,

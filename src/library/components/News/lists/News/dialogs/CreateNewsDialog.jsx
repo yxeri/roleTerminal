@@ -4,7 +4,7 @@ import { batch } from 'react-redux';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from '../../../../common/dialogs/Dialog/Dialog';
-import Input from '../../../../common/sub-components/Input';
+import Input from '../../../../common/sub-components/Input/Input';
 import Button from '../../../../common/sub-components/Button/Button';
 import store from '../../../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../../../redux/actions/windowOrder';
@@ -23,12 +23,6 @@ const CreateNewsDialog = ({ id, index }) => {
     text,
     image,
   }) => {
-    console.log(title, text, image);
-
-    if (!image) {
-      return;
-    }
-
     sendNewsMessage({ title, text, image })
       .then(({ message }) => {
         batch(() => {

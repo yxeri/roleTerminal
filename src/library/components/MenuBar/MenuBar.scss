@@ -60,18 +60,6 @@
       border-top-right-radius: 0;
     }
   }
-
-  .OpenApps {
-    ul {
-      grid-auto-flow: column;
-      grid-template-columns: unset;
-      grid-gap: $padding * 2;
-    }
-
-    .ListItem {
-      padding: 0;
-    }
-  }
 }
 
 .warning {

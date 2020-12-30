@@ -63,11 +63,11 @@ export const getIdentityOrTeamById = createSelector(
   (user, alias, team) => team || alias || user,
 );
 
-export const getOthersIdentityIds = createCachedSelector(
+export const getOthersIdentities = createCachedSelector(
   [getIdentities, getUserId],
   (identities, userId) => identities
     .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId))
-    .map((identity) => identity.objectId),
+    .map((identity) => ({ objectId: identity.objectId, name: identity.aliasName || identity.username })),
 )(() => 'other-identity-ids');
 
 export const getCurrentUserIdentities = createCachedSelector(

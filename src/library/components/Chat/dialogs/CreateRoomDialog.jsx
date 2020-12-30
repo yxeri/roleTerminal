@@ -4,7 +4,7 @@ import { batch } from 'react-redux';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from '../../common/dialogs/Dialog/Dialog';
-import Input from '../../common/sub-components/Input';
+import Input from '../../common/sub-components/Input/Input';
 import Button from '../../common/sub-components/Button/Button';
 import { createRoom } from '../../../socket/actions/rooms';
 import store from '../../../redux/store';

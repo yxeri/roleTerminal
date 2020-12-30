@@ -8,7 +8,7 @@ import Button from '../sub-components/Button/Button';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
-import Input from '../sub-components/Input';
+import Input from '../sub-components/Input/Input';
 import Select from '../sub-components/Select';
 import { createTransaction } from '../../../socket/actions/transactions';
 import { getWalletIdsByCurrentUser } from '../../../redux/selectors/wallets';

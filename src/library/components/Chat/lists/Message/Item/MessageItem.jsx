@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   bool,
   string,
@@ -15,17 +15,15 @@ import Image from '../../../../common/sub-components/Image/Image';
 
 import './MessageItem.scss';
 
-const MessageItem = ({ previousMessageId, messageId, selected = false }) => {
+const MessageItem = ({
+  previousMessageId,
+  messageId,
+  isLatest = false,
+  selected = false,
+}) => {
   const itemRef = useRef();
   const previousMessage = useSelector((state) => getMessageById(state, { id: previousMessageId }));
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
-
-  useEffect(() => {
-    if (selected && itemRef.current) {
-      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
-    }
-  }, [selected]);
 
   const { hasFullAccess } = hasAccessTo({
     objectToAccess: message,
@@ -50,6 +48,7 @@ const MessageItem = ({ previousMessageId, messageId, selected = false }) => {
 
   return (
     <ListItem
+      scrollTo={selected || isLatest}
       ref={itemRef}
       classNames={['MessageItem', `${hasFullAccess ? 'clickable' : ''}`]}
       key={messageId}
@@ -86,9 +85,11 @@ MessageItem.propTypes = {
   previousMessageId: string,
   messageId: string.isRequired,
   selected: bool,
+  isLatest: bool,
 };
 
 MessageItem.defaultProps = {
   previousMessageId: undefined,
   selected: false,
+  isLatest: false,
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import {
   arrayOf, bool,
   func,
@@ -12,30 +12,49 @@ const ListItem = React.forwardRef(({
   children,
   onClick,
   elementId,
+  scrollTo,
   stopPropagation = false,
   classNames = [],
-}, ref) => (
-  <li
-    ref={ref}
-    id={elementId}
-    className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
-    onClick={(event) => {
-      if (onClick) {
-        onClick(event);
-      }
+}, ref) => {
+  const itemRef = useRef(null);
 
-      if (event.target.parentElement.tagName === 'UL') {
-        event.target.parentElement.click();
-      }
+  useLayoutEffect(() => {
+    if (scrollTo && itemRef.current) {
+      itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
+    }
+  }, [scrollTo]);
 
-      if (stopPropagation) {
-        event.stopPropagation();
-      }
-    }}
-  >
-    {children}
-  </li>
-));
+  return (
+    <li
+      ref={(element) => {
+        if (ref) {
+          // eslint-disable-next-line no-param-reassign
+          ref.current = element;
+        }
+
+        itemRef.current = element;
+      }}
+      id={elementId}
+      className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
+      onClick={(event) => {
+        if (onClick) {
+          onClick(event);
+        }
+
+        if (event.target.parentElement.tagName === 'UL') {
+          event.target.parentElement.click();
+        }
+
+        if (stopPropagation) {
+          event.stopPropagation();
+        }
+      }}
+    >
+      {children}
+    </li>
+  );
+});
 
 export default React.memo(ListItem);
 
@@ -45,6 +64,7 @@ ListItem.propTypes = {
   classNames: arrayOf(string),
   stopPropagation: bool,
   elementId: string,
+  scrollTo: bool,
 };
 
 ListItem.defaultProps = {
@@ -53,4 +73,5 @@ ListItem.defaultProps = {
   stopPropagation: false,
   elementId: undefined,
   children: undefined,
+  scrollTo: false,
 };

@@ -41,7 +41,6 @@
     border: none;
     background-color: transparent;
     box-shadow: none;
-    padding: 0;
     float: right;
     opacity: .5;
 
@@ -61,14 +60,14 @@
 }
 
 .List.expanded {
-  header {
+  > header {
     border-color: $second-color;
     border-bottom-color: transparent;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
 
-  .dropdown {
+  > .dropdown {
     border-top-left-radius: 0;
     border-color: $second-color;
   }

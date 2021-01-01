@@ -8,6 +8,8 @@ export const getAllowedImages = (state) => state.config.get('allowedImages');
 export const getGpsTracking = (state) => state.config.get('gpsTracking');
 export const getPermissions = (state) => state.config.get('permissions');
 export const getNewsRoomId = (state) => state.config.get('newsRoomId');
+export const getNewsCost = (state) => state.config.get('newsCost');
+export const getSystemUser = (state) => state.config.get('systemUser');
 
 /**
  * Takes date and returns shorter human-readable time.

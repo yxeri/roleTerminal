@@ -9,6 +9,9 @@ import {
 import Window from '../../Window/Window';
 
 import './Dialog.scss';
+import Button from '../../sub-components/Button/Button';
+import store from '../../../../redux/store';
+import { removeWindow } from '../../../../redux/actions/windowOrder';
 
 const Dialog = ({
   children,
@@ -18,14 +21,17 @@ const Dialog = ({
   done,
   onClick,
   index,
-  classNames = [],
+  id,
+  buttons,
+  className = '',
 }) => (
   <Window
+    id={id}
     index={index}
     type="dialog"
     done={done}
     title={title}
-    classNames={['Dialog'].concat(classNames)}
+    className={`Dialog ${className}`}
     onClick={onClick}
   >
     {error && (
@@ -37,6 +43,14 @@ const Dialog = ({
       <div>{text}</div>
     )}
     {children}
+    {buttons.length > 0 && (
+      <div className="buttons">
+        <Button stopPropagation type="button" onClick={() => store.dispatch(removeWindow({ id }))}>
+          Cancel
+        </Button>
+        {buttons}
+      </div>
+    )}
   </Window>
 );
 
@@ -51,9 +65,11 @@ Dialog.propTypes = {
   }),
   title: string,
   text: string,
-  classNames: arrayOf(string),
+  className: string,
   onClick: func.isRequired,
   index: number.isRequired,
+  id: string.isRequired,
+  buttons: arrayOf(node),
 };
 
 Dialog.defaultProps = {
@@ -61,5 +77,6 @@ Dialog.defaultProps = {
   error: undefined,
   title: undefined,
   text: undefined,
-  classNames: [],
+  className: '',
+  buttons: undefined,
 };

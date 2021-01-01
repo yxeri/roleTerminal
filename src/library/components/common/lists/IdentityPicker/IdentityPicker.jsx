@@ -23,7 +23,7 @@ const IdentityPicker = ({ useIcon = false }) => {
 
     return filtered.map((identity) => (
       <ListItem
-        classNames={[`${identity.objectId === identityId ? 'selected' : ''}`]}
+        className={identity.objectId === identityId ? 'selected' : ''}
         key={identity.objectId}
         onClick={() => store.dispatch(changeAliasId({ aliasId: identity.aliasName ? identity.objectId : undefined }))}
       >
@@ -37,7 +37,7 @@ const IdentityPicker = ({ useIcon = false }) => {
   return (
     <List
       dropdown
-      classNames={['IdentityPicker']}
+      className="IdentityPicker"
       title={useIcon
         ? <User />
         : (

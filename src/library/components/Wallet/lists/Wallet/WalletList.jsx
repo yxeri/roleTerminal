@@ -14,7 +14,7 @@ const WalletList = ({ onChange, walletId }) => {
       key={id}
       walletId={id}
       onChange={onChange}
-      classNames={[walletId === id ? 'selected' : '']}
+      className={walletId === id ? 'selected' : ''}
     />
   ));
 
@@ -23,10 +23,10 @@ const WalletList = ({ onChange, walletId }) => {
       dropdown
       checkWidth
       title="Wallets"
-      classNames={['WalletList']}
+      className="WalletList"
     >
       <WalletItem
-        classNames={[walletId === 'showAll' ? 'selected' : '']}
+        className={walletId === 'showAll' ? 'selected' : ''}
         key="showAll"
         onChange={onChange}
         walletId="showAll"

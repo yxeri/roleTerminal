@@ -17,6 +17,7 @@ defaultState.set('dayModification', 0);
 defaultState.set('requireOffName', false);
 defaultState.set('activateTermination', false);
 defaultState.set('allowedImages', { CHAT: false, PROFILE: false, DOCFILE: false });
+defaultState.set('newsCost', 0);
 defaultState.set('permissions', {
   CreateAlias: {
     name: 'CreateAlias',
@@ -29,9 +30,15 @@ defaultState.set('permissions', {
 });
 defaultState.set('anonymousUser', {
   accessLevel: AccessLevels.ANONYMOUS,
-  followingRooms: [],
+  followingRooms: ['111111111111111111111110'],
   objectId: '-1',
   isAnonymous: true,
+  systemConfig: {},
+  aliases: [],
+});
+defaultState.set('systemUser', {
+  objectId: '222222222222222222222220',
+  username: 'system',
 });
 // customUserFields
 // device id

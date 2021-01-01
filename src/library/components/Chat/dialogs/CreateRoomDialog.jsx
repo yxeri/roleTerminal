@@ -42,13 +42,22 @@ const CreateRoomDialog = ({ id, index }) => {
 
   return (
     <Dialog
+      id={id}
       index={index}
-      classNames={['CreateRoomDialog']}
+      className="CreateRoomDialog"
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEROOM } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       title="New room"
+      buttons={[
+        <Button
+          type="submit"
+          onClick={() => methods.handleSubmit(onSubmit)()}
+        >
+          Create
+        </Button>,
+      ]}
     >
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -82,14 +91,6 @@ const CreateRoomDialog = ({ id, index }) => {
             type="password"
             placeholder={`${methods.errors.repeatPassword ? 'Error. Passwords must match!' : '(opt) Repeat password'}`}
           />
-          <div className="buttons">
-            <Button
-              type="submit"
-              onClick={() => {}}
-            >
-              Create
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

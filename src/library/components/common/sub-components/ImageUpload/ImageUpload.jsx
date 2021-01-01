@@ -27,8 +27,6 @@ const ImageUpload = ({ useIcon = false }) => {
   }, [previewImage]);
 
   useEffect(() => {
-    console.log(watchImage);
-
     if (!watchImage) {
       setPreviewImage();
     }
@@ -69,7 +67,7 @@ const ImageUpload = ({ useIcon = false }) => {
       />
       <Image
         onRemove={() => setPreviewImage()}
-        classNames={['previewImage'].concat([!previewImage ? 'hide' : ''])}
+        className={`previewImage ${!previewImage ? 'hide' : ''}`}
         image={previewImage ? previewImage.source : ''}
         altText="Image preview"
       />

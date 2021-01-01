@@ -2,19 +2,19 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { func, string } from 'prop-types';
 
-import { getAllWallets } from '../../../../redux/selectors/wallets';
+import { getWalletIds } from '../../../../redux/selectors/wallets';
 import WalletItem from '../Wallet/Item/WalletItem';
 import List from '../../../common/lists/List/List';
 
 const AdminWalletList = ({ onChange, walletId }) => {
-  const wallets = useSelector(getAllWallets);
+  const walletIds = useSelector(getWalletIds);
 
-  const itemMapper = () => [...wallets.values()].map(({ objectId }) => (
+  const itemMapper = () => walletIds.map((id) => (
     <WalletItem
-      key={objectId}
-      walletId={objectId}
+      key={id}
+      walletId={id}
       onChange={onChange}
-      classNames={[walletId === objectId ? 'selected' : '']}
+      className={walletId === id ? 'selected' : ''}
     />
   ));
 
@@ -23,7 +23,7 @@ const AdminWalletList = ({ onChange, walletId }) => {
       dropdown
       checkWidth
       title="[ADMIN]"
-      classNames={['WalletList']}
+      className="WalletList"
     >
       {itemMapper()}
     </List>

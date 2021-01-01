@@ -4,6 +4,10 @@
   position: relative;
   background-color: $light-background-color;
 
+  .dropdown {
+    min-width: 100%;
+  }
+
   svg {
     max-width: $icon-size;
     max-height: $icon-size;

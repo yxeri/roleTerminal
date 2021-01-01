@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -28,16 +28,32 @@ const LoginDialog = ({ id, index }) => {
       });
   };
 
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGLOGIN } }] }));
+  }, [id]);
+
+  const onSubmitCall = useCallback(() => methods.handleSubmit(onSubmit)(), []);
+
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
   return (
     <Dialog
+      id={id}
       index={index}
-      classNames={['LoginDialog']}
-      onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGLOGIN } }] }));
-      }}
-      done={() => store.dispatch(removeWindow({ id }))}
+      className="LoginDialog"
+      onClick={onClick}
+      done={onDone}
       error={error}
       title="Login"
+      buttons={[
+        <Button
+          key="submit"
+          type="submit"
+          onClick={onSubmitCall}
+        >
+          Login
+        </Button>,
+      ]}
     >
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -50,14 +66,6 @@ const LoginDialog = ({ id, index }) => {
             placeholder="Password"
             type="password"
           />
-          <div className="buttons">
-            <Button
-              type="submit"
-              onClick={() => {}}
-            >
-              Login
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

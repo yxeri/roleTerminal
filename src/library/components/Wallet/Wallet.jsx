@@ -42,10 +42,11 @@ const Wallet = ({ id, index }) => {
 
   return (
     <Window
-      classNames={['Wallet']}
+      id={id}
+      className="Wallet"
       index={index}
       done={onDone}
-      title={`Wallet${identity ? `: ${identity.teamName || identity.aliasName || identity.username}` : 's'}`}
+      title={`Wallet${identity ? `: ${identity.teamName || identity.aliasName || identity.username}` : ''}`}
       onClick={onClick}
       menu={menu}
     >

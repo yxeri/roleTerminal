@@ -14,6 +14,7 @@ const Input = ({
   shouldEqual,
   maxLength,
   minLength,
+  checked,
   type = 'text',
   required = false,
   placeholder = '',
@@ -30,6 +31,7 @@ const Input = ({
 
   return (
     <input
+      defaultChecked={checked}
       minLength={minLength}
       maxLength={maxLength}
       required={required}
@@ -71,6 +73,7 @@ Input.propTypes = {
   shouldEqual: string,
   maxLength: number,
   minLength: number,
+  checked: bool,
 };
 
 Input.defaultProps = {
@@ -81,4 +84,5 @@ Input.defaultProps = {
   shouldEqual: undefined,
   maxLength: undefined,
   minLength: undefined,
+  checked: undefined,
 };

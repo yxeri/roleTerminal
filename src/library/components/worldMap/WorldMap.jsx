@@ -16,9 +16,10 @@ const WorldMap = ({ id, index }) => {
 
   return (
     <Window
+      id={id}
       index={index}
       done={() => store.dispatch(removeWindow({ id }))}
-      classNames={['WorldMap']}
+      className="WorldMap"
       title="map"
       onClick={onClick}
       menu={(

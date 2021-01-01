@@ -1,0 +1,16 @@
+@import "../../../../../common";
+
+.ConfigSystemDialog {
+  .content {
+    form div {
+      display: flex;
+      border-bottom: $border;
+      border-top: $border;
+      padding: $padding * 2 0;
+
+      .Input, .Select {
+        margin-left: auto;
+      }
+    }
+  }
+}

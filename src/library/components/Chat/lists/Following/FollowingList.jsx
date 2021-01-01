@@ -10,7 +10,7 @@ const FollowingList = ({ onChange, roomId }) => {
 
   const roomMapper = () => roomIds.map((id) => (
     <FollowingItem
-      classNames={[`${id === roomId ? 'selected' : ''}`]}
+      className={`${id === roomId ? 'selected' : ''}`}
       key={id}
       roomId={id}
       onChange={onChange}
@@ -22,7 +22,7 @@ const FollowingList = ({ onChange, roomId }) => {
       dropdown
       checkWidth
       key="followingList"
-      classNames={['FollowingList']}
+      className="FollowingList"
       title="Joined"
     >
       {roomMapper()}

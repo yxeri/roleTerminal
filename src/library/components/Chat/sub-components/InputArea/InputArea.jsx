@@ -32,7 +32,6 @@ const InputArea = ({
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
   const gpsTracking = useSelector(getGpsTracking);
-  const textareaClasses = [];
 
   const resize = () => {
     if (inputRef.current) {
@@ -118,7 +117,6 @@ const InputArea = ({
                 }
               }}
               placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
-              className={textareaClasses.join(' ')}
               onChange={(event) => resize(event.target)}
             />
             <Button
@@ -126,7 +124,7 @@ const InputArea = ({
               disabled={!online || isSending}
               key="send"
               type="submit"
-              classNames={['sendButton']}
+              className="sendButton"
               onClick={() => {}}
             >
               {online

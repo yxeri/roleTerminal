@@ -1,33 +1,30 @@
 import React from 'react';
-import { string } from 'prop-types';
+import { func, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getDocFileById } from '../../../../../redux/selectors/docFiles';
-import store from '../../../../../redux/store';
-import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
-import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 
 import { ReactComponent as Lock } from '../../../../../icons/lock.svg';
 
 import './DocFileItem.scss';
 
-const DocFileItem = ({ docFileId }) => {
+const DocFileItem = ({ docFileId, onChange }) => {
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
 
   return (
     <ListItem
       stopPropagation
-      classNames={['DocFileItem']}
+      className="DocFileItem"
       key={docFile.objectId}
       onClick={() => {
         if (docFile.isLocked) {
-          console.log('clocked');
+          console.log('locked');
 
           return;
         }
 
-        store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE, docFileId } }] }));
+        onChange(docFileId);
       }}
     >
       {docFile.title}
@@ -42,4 +39,5 @@ export default React.memo(DocFileItem);
 
 DocFileItem.propTypes = {
   docFileId: string.isRequired,
+  onChange: func.isRequired,
 };

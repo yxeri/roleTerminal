@@ -69,6 +69,7 @@ Select.propTypes = {
   onChange: func,
   required: bool,
   name: string.isRequired,
+  defaultValue: string,
 };
 
 Select.defaultProps = {
@@ -77,4 +78,5 @@ Select.defaultProps = {
   placeholder: '',
   required: false,
   onChange: undefined,
+  defaultValue: undefined,
 };

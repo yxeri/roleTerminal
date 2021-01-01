@@ -13,10 +13,11 @@
     overflow-y: auto;
 
     svg {
-      margin-left: $padding;
-      max-height: $icon-size;
-      max-width: $icon-size;
+      margin-left: $padding * 2;
+      max-width: $icon-size - .2em;
+      max-height: $icon-size - .2em;
       vertical-align: bottom;
+      float: right;
     }
 
     header {

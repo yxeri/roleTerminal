@@ -51,7 +51,7 @@ const Dashboard = () => {
           <List
             alwaysExpanded
             title="Top News"
-            classNames={['news']}
+            className="news"
           >
             {newsMapper()}
           </List>
@@ -67,7 +67,7 @@ const Dashboard = () => {
           <List
             alwaysExpanded
             title="News"
-            classNames={['news']}
+            className="news"
           >
             {newsMapper()}
           </List>

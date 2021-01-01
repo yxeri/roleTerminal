@@ -1,6 +1,8 @@
 @import "../../../../../common";
 
 .List {
+  box-sizing: border-box;
+
   header {
     user-select: none;
     padding: $padding;
@@ -30,6 +32,7 @@
     border: $border;
     border-radius: $border-radius;
     border-top-left-radius: 0;
+    border-top-right-radius: 0;
     user-select: none;
     box-sizing: border-box;
     height: inherit;

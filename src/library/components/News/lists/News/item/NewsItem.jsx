@@ -24,7 +24,7 @@ import './NewsItem.scss';
 const NewsItem = ({
   messageId,
   expand = false,
-  classNames = [],
+  className = '',
 }) => {
   const itemRef = useRef();
   const [showText, setShowText] = useState(false);
@@ -41,7 +41,7 @@ const NewsItem = ({
       ref={itemRef}
       elementId={`news-${messageId}`}
       onClick={() => setShowText(!showText)}
-      classNames={['NewsItem'].concat(classNames, [showText ? 'expanded' : ''])}
+      className={`NewsItem ${showText ? 'expanded' : ''} ${className}`}
     >
       <div className="title">
         <p>{message.text[0]}</p>
@@ -55,20 +55,22 @@ const NewsItem = ({
           {showText && <ChevronUp />}
         </p>
       </div>
-      {showText && message.image && message.image.thumbFileName && (
-        <Image
-          image={`/upload/images/${message.image.thumbFileName}`}
-          fullImage={`/upload/images/${message.image.fileName}`}
-          altText="pic"
-          width={message.image.thumbWidth}
-          height={message.image.thumbHeight}
-          fullWidth={message.image.width}
-          fullHeight={message.image.height}
-        />
-      )}
       {showText && (
-        <div className="text">
-          {message.text.slice(1).map((line, index) => <p key={index}>{line}</p>)}
+        <div className="newsContent">
+          {message.image && message.image.thumbFileName && (
+            <Image
+              image={`/upload/images/${message.image.thumbFileName}`}
+              fullImage={`/upload/images/${message.image.fileName}`}
+              altText="pic"
+              width={message.image.thumbWidth}
+              height={message.image.thumbHeight}
+              fullWidth={message.image.width}
+              fullHeight={message.image.height}
+            />
+          )}
+          <div className="text">
+            {message.text.slice(1).map((line, index) => <p key={index}>{line}</p>)}
+          </div>
         </div>
       )}
     </ListItem>
@@ -78,12 +80,12 @@ const NewsItem = ({
 export default React.memo(NewsItem);
 
 NewsItem.propTypes = {
-  classNames: arrayOf(string),
+  className: string,
   messageId: string.isRequired,
   expand: bool,
 };
 
 NewsItem.defaultProps = {
-  classNames: [],
+  className: '',
   expand: false,
 };

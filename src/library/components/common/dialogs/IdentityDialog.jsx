@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { batch, useSelector } from 'react-redux';
 import { number, string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
@@ -11,55 +11,90 @@ import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOr
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import { ReactComponent as Wallet } from '../../../icons/wallet.svg';
 import { ReactComponent as Chat } from '../../../icons/chat.svg';
+import { ReactComponent as Pin } from '../../../icons/pin.svg';
+import { getTeamsByIds } from '../../../redux/selectors/teams';
+import Image from '../sub-components/Image/Image';
 
 const IdentityDialog = ({ id, identityId, index }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
   const currentIdentityId = useSelector(getCurrentIdentityId);
+  const teams = useSelector((state) => getTeamsByIds(state, { ids: identity.partOfTeams }));
+
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
+  }, [id, identityId]);
+
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
+  const transferCall = useCallback(() => batch(() => {
+    store.dispatch(changeWindowOrder({
+      windows: [{
+        id: `${WindowTypes.DIALOGCREATETRANSACTION}-${identityId}`,
+        value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId: identityId },
+      }],
+    }));
+    store.dispatch(removeWindow({ id }));
+  }), [identityId, id]);
+
+  const whisperCall = useCallback(() => {
+    const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId });
+
+    batch(() => {
+      store.dispatch(changeWindowOrder({
+        windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId: room.objectId } }],
+      }));
+      store.dispatch(removeWindow({ id }));
+    });
+  }, [identityId, currentIdentityId, id]);
 
   return (
     <Dialog
+      id={id}
       index={index}
       title={`User: ${identity.aliasName || identity.username}`}
-      onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
-      }}
-      done={() => store.dispatch(removeWindow({ id }))}
+      onClick={onClick}
+      done={onDone}
+      buttons={currentIdentityId !== '-1' && [
+        <Button
+          stopPropagation
+          key="transfer"
+          type="button"
+          onClick={transferCall}
+        >
+          <Wallet />
+        </Button>,
+        <Button
+          stopPropagation
+          key="whisper"
+          type="button"
+          onClick={whisperCall}
+        >
+          <Chat />
+        </Button>,
+        <Button
+          stopPropagation
+          key="gps"
+          type="button"
+          onClick={() => {}}
+        >
+          <Pin />
+        </Button>,
+      ]}
     >
-      {currentIdentityId !== '-1' && (
-        <div className="buttons">
-          <Button
-            stopPropagation
-            type="button"
-            onClick={() => batch(() => {
-              store.dispatch(changeWindowOrder({
-                windows: [{
-                  id: `${WindowTypes.DIALOGCREATETRANSACTION}-${identityId}`,
-                  value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId: identityId },
-                }],
-              }));
-              store.dispatch(removeWindow({ id }));
-            })}
-          >
-            <Wallet />
-          </Button>
-          <Button
-            stopPropagation
-            type="button"
-            onClick={() => {
-              const room = getWhisperRoom(store.getState(), { identityId, currentIdentityId });
-
-              batch(() => {
-                store.dispatch(changeWindowOrder({
-                  windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId: room.objectId } }],
-                }));
-                store.dispatch(removeWindow({ id }));
-              });
-            }}
-          >
-            <Chat />
-          </Button>
-        </div>
+      {identity.image && (
+        <Image
+          scrollTo
+          image={`/upload/images/${identity.image.thumbFileName}`}
+          altText="pic"
+          width={identity.image.thumbWidth}
+          height={identity.image.thumbHeight}
+          fullImage={`/upload/images/${identity.image.fileName}`}
+          fullWidth={identity.image.width}
+          fullHeight={identity.image.height}
+        />
       )}
+      <p>{`Name: ${identity.aliasName || identity.username}`}</p>
+      {teams.size > 0 && (<p>{`Affiliations: ${[...teams.values()].map((team) => team.teamName).join(', ')}`}</p>)}
     </Dialog>
   );
 };

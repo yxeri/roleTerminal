@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { bool } from 'prop-types';
@@ -57,18 +57,20 @@ const IdentityList = ({
     }
   };
 
+  const onReset = useCallback(() => formMethods.reset(), []);
+
   return (
     <List
       dropdown
       checkWidth
-      classNames={['IdentityList']}
+      className="IdentityList"
       title="Users"
     >
-      <ListItem classNames={['userSearch']}>
+      <ListItem className="userSearch">
         <FormProvider {...formMethods}>
           <form onSubmit={formMethods.handleSubmit(onSubmit)}>
             <Input name="partialName" placeholder="Find user" />
-            <Button stopPropagation onClick={() => formMethods.reset()}><Close /></Button>
+            <Button stopPropagation onClick={onReset}><Close /></Button>
           </form>
         </FormProvider>
       </ListItem>

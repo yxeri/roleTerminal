@@ -57,6 +57,7 @@ export const SendEvents = {
   GETMSGBYROOM: 'getMessagesByRoom',
   REMOVEROOM: 'removeRoom',
   UNLOCKDOCFILE: 'unlockDocFile',
+  UPDATEUSER: 'updateUser',
 };
 
 export const GetEvents = {
@@ -120,7 +121,7 @@ export const ListenerEvents = {
 //   UNBANUSER: 'unbanUser',
 //   VERIFYUSER: 'verifyUser',
 //   CHANGEPASSWORD: 'changePassword',
-//   UPDATEUSER: 'updateUser',
+//
 //   UPDATEWALLET: 'updateWallet',
 //   UNFOLLOW: 'unfollowRoom',
 //   CREATETRANSACTION: 'createTransaction',

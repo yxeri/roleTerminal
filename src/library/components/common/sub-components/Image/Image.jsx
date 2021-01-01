@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  arrayOf, bool,
+  bool,
   func,
   number,
   string,
@@ -17,7 +17,7 @@ const Image = React.forwardRef(({
   width,
   height,
   scrollTo = false,
-  classNames = [],
+  className = '',
   altText = '',
   fullImage,
   fullWidth,
@@ -44,7 +44,7 @@ const Image = React.forwardRef(({
     <div
       role="complementary"
       ref={containerRef}
-      className={`${['Image', showFull ? 'full' : ''].concat(classNames).join(' ')}`}
+      className={`Image ${showFull ? 'full' : ''} ${className}`}
       onClick={onClick}
     >
       {onRemove && (
@@ -87,7 +87,7 @@ export default Image;
 Image.propTypes = {
   image: string.isRequired,
   altText: string,
-  classNames: arrayOf(string),
+  className: string,
   onRemove: func,
   width: number,
   height: number,
@@ -99,7 +99,7 @@ Image.propTypes = {
 
 Image.defaultProps = {
   altText: '',
-  classNames: [],
+  className: '',
   onRemove: undefined,
   width: undefined,
   height: undefined,

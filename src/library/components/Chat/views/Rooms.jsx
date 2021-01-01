@@ -13,15 +13,16 @@ const Rooms = ({ onChange, roomId }) => {
 
   return (
     <>
+      <FollowingList
+        roomId={roomId}
+        key="following"
+        onChange={onChange}
+      />
       {
         accessLevel >= AccessLevels.STANDARD && (
           <>
-            <FollowingList
-              roomId={roomId}
-              key="following"
-              onChange={onChange}
-            />
             <WhisperList
+              roomId={roomId}
               key="whisper"
               onChange={onChange}
             />

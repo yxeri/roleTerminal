@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -63,15 +63,30 @@ const RegisterDialog = ({ id, index }) => {
     }
   };
 
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGREGISTER } }] }));
+  }, [id]);
+
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
+  const onSubmitCall = useCallback(() => formMethods.handleSubmit(onSubmit)(), []);
+
   return (
     <Dialog
+      id={id}
       index={index}
       error={error}
-      onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGREGISTER } }] }));
-      }}
-      done={() => store.dispatch(removeWindow({ id }))}
+      onClick={onClick}
+      done={onDone}
       title="Register user"
+      buttons={[
+        <Button
+          type="submit"
+          onClick={onSubmitCall}
+        >
+          Register
+        </Button>,
+      ]}
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
@@ -117,14 +132,6 @@ const RegisterDialog = ({ id, index }) => {
             name="description"
             placeholder="Description"
           />
-          <div className="buttons">
-            <Button
-              type="submit"
-              onClick={() => {}}
-            >
-              Register
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

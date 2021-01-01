@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
   arrayOf,
@@ -6,9 +6,12 @@ import {
   string,
   node, number,
 } from 'prop-types';
+import { useSelector } from 'react-redux';
+
+import TopBar from './TopBar/TopBar';
+import { getCurrentUser } from '../../../redux/selectors/users';
 
 import './Window.scss';
-import TopBar from './TopBar/TopBar';
 
 const Window = ({
   onClick,
@@ -16,27 +19,49 @@ const Window = ({
   menu,
   done,
   index,
+  id,
   type = 'window',
   title = 'app',
-  classNames = [],
+  className = '',
 }) => {
+  const { systemConfig = {} } = useSelector(getCurrentUser);
   const defaultSize = type === 'window' ? { width: 640, height: 480 } : { width: 640, height: 480 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
-  const windowClasses = ['Window'].concat(classNames);
+  const resizing = {
+    top: true,
+    topRight: true,
+    topLeft: true,
+    right: true,
+    bottom: true,
+    left: true,
+    bottomRight: true,
+    bottomLeft: true,
+  };
+  const style = { zIndex: index };
+
+  const maximize = useCallback(() => {
+    setCoordinates({ x: 0, y: 0 });
+    setSize({ width: '100%', height: '100%' });
+  }, []);
 
   const onDoubleClick = useCallback(() => {
     if (size.width === '100%' && size.height === '100%') {
       setSize(defaultSize);
     } else {
-      setCoordinates({ x: 0, y: 0 });
-      setSize({ width: '100%', height: '100%' });
+      maximize();
     }
   }, [size, coordinates]);
 
+  useEffect(() => {
+    if (systemConfig.hideTopBar || systemConfig.alwaysMaximized) {
+      maximize();
+    }
+  }, [systemConfig]);
+
   return (
     <Rnd
-      style={{ zIndex: index }}
+      style={style}
       onClick={onClick}
       position={coordinates}
       className="rnd"
@@ -47,16 +72,7 @@ const Window = ({
       maxWidth="100%"
       bounds="parent"
       dragHandleClassName="TopBarHandle"
-      enableResizing={{
-        top: true,
-        topRight: true,
-        topLeft: true,
-        right: true,
-        bottom: true,
-        left: true,
-        bottomRight: true,
-        bottomLeft: true,
-      }}
+      enableResizing={resizing}
       resizeHandleStyles={{
         top: { top: '0', width: '5px' },
         left: { left: '0', width: '5px' },
@@ -133,13 +149,20 @@ const Window = ({
       }}
     >
       <div
-        className={`${windowClasses.join(' ')}`}
+        className={`Window ${className}`}
       >
-        <TopBar
-          done={done}
-          title={title}
-          onDoubleClick={onDoubleClick}
-        />
+        {
+          !systemConfig.hideTopBar
+            ? (
+              <TopBar
+                id={id}
+                done={done}
+                title={title}
+                onDoubleClick={onDoubleClick}
+              />
+            )
+            : (<div />)
+        }
         <div className="windowBox">
           {
             menu
@@ -165,15 +188,16 @@ Window.propTypes = {
   children: node.isRequired,
   menu: node,
   title: string,
-  classNames: arrayOf(string),
+  className: string,
   done: func,
   type: string,
   index: number.isRequired,
+  id: string.isRequired,
 };
 
 Window.defaultProps = {
   done: undefined,
-  classNames: [],
+  className: undefined,
   title: 'app',
   menu: undefined,
   type: 'window',

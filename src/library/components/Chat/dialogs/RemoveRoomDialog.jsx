@@ -26,8 +26,9 @@ const RemoveRoomDialog = ({ id, roomId, index }) => {
 
   return (
     <Dialog
+      id={id}
       index={index}
-      classNames={['RemoveRoomDialog']}
+      className="RemoveRoomDialog"
       error={error}
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGREMOVEROOM, roomId } }] }));
@@ -35,20 +36,15 @@ const RemoveRoomDialog = ({ id, roomId, index }) => {
       done={() => store.dispatch(removeWindow({ id }))}
       title={`Delete room ${room ? room.roomName : ''}`}
       text={`Are you sure you want to delete ${room ? room.roomName : ''}?`}
-    >
-      <Button
-        type="button"
-        onClick={() => store.dispatch(removeWindow({ id }))}
-      >
-        No
-      </Button>
-      <Button
-        type="submit"
-        onClick={onSubmit}
-      >
-        Yes
-      </Button>
-    </Dialog>
+      buttons={[
+        <Button
+          type="submit"
+          onClick={onSubmit}
+        >
+          Yes
+        </Button>,
+      ]}
+    />
   );
 };
 

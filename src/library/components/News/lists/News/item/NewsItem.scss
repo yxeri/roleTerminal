@@ -3,12 +3,18 @@
 .NewsItem {
   padding: 0 $padding * 2 $padding * 2 $padding * 2;
 
+  p {
+    max-width: $max-width;
+  }
+
   .Image {
     margin-top: $padding * 2;
+    margin-right: $padding * 2;
   }
 
   .Image.full {
     margin-top: 0;
+    margin-right: 0;
   }
 
   .title {
@@ -29,6 +35,11 @@
 
   .text {
     margin-top: $margin * 2;
+  }
+
+  .newsContent {
+    display: flex;
+    flex-wrap: wrap;
   }
 }
 

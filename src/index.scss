@@ -31,6 +31,12 @@ h1 {
   padding: 0;
 }
 
+svg {
+  max-width: $icon-size;
+  max-height: $icon-size;
+  vertical-align: middle;
+}
+
 #root {
   height: 100%;
   width: 100%;
@@ -63,4 +69,54 @@ h1 {
   border: $warning-border;
   box-shadow: $warning-shadow;
   text-shadow: $warning-text-shadow;
+}
+
+.helpOverlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: $padding;
+  background-color: $modal-color;
+  color: white;
+  overflow-y: auto;
+  box-sizing: border-box;
+  scrollbar-width: none;
+
+  span, p {
+    text-shadow: $dark-text-shadow;
+  }
+
+  svg {
+    filter: drop-shadow($dark-text-shadow);
+  }
+
+  ul {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: $padding * 3;
+    max-width: $max-width;
+
+    li {
+      p {
+        margin-bottom: $padding;
+      }
+
+      > * {
+        margin-right: $padding;
+      }
+    }
+  }
+}
+
+.helpButton {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.helpButton.active {
+  border-color: $second-color;
 }

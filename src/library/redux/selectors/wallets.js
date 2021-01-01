@@ -6,6 +6,11 @@ export const getAllWallets = (state) => state.wallets;
 
 export const getWalletById = (state, { id }) => state.wallets.get(id);
 
+export const getWalletIds = createCachedSelector(
+  [getAllWallets],
+  (wallets) => [...wallets.values()].map((wallet) => wallet.objectId),
+)(() => 'wallet-ids');
+
 export const getWalletIdsByCurrentUser = createCachedSelector(
   [getAllWallets, getCurrentUser],
   (wallets, currentUser) => [...wallets.values()]

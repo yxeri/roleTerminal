@@ -36,14 +36,15 @@ const DocFile = ({ id, docFileId, index }) => {
 
   return (
     <Window
+      id={id}
       index={index}
       done={onDone}
-      classNames={['DocFile']}
+      className="DocFile"
       title={`${docFile ? `Document: ${docFile.title}` : 'Documents'}`}
       onClick={onClick}
       menu={(
         <>
-          <FileMenu>
+          <FileMenu id={id}>
             <ListItem
               stopPropagation
               onClick={onCreate}

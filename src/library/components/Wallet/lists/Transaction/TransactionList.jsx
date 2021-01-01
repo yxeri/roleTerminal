@@ -11,12 +11,7 @@ const TransactionList = ({ walletIds }) => {
   const transactionMapper = () => transactionIds.map((transactionId) => <TransactionItem key={transactionId} transactionId={transactionId} />);
 
   return (
-    <List
-      scrollTo={{
-        buffer: true,
-        direction: 'top',
-      }}
-    >
+    <List>
       {transactionMapper()}
     </List>
   );

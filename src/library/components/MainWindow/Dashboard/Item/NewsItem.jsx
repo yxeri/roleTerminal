@@ -7,8 +7,11 @@ import { WindowTypes } from '../../../../redux/reducers/windowOrder';
 import { ReactComponent as Arrow } from '../../../../icons/arrow-right.svg';
 import ListItem from '../../../common/lists/List/Item/ListItem';
 
+import './NewsItem.scss';
+
 const NewsItem = ({ message }) => (
   <ListItem
+    className="DashNewsItem"
     key={message.objectId}
     onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.NEWS, value: { type: WindowTypes.NEWS, messageId: message.objectId } }] }))}
   >

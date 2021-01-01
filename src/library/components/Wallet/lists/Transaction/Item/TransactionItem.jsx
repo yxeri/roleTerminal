@@ -6,17 +6,17 @@ import { getTransactionById } from '../../../../../redux/selectors/transactions'
 import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
 
 import './TransactionItem.scss';
-import { getTimestamp } from '../../../../../redux/selectors/config';
+import { getSystemUser, getTimestamp } from '../../../../../redux/selectors/config';
 import store from '../../../../../redux/store';
 
 const TransactionItem = ({ transactionId }) => {
   const transaction = useSelector((state) => getTransactionById(state, { id: transactionId }));
   const from = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.fromWalletId }));
-  const to = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.toWalletId }));
+  const to = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.toWalletId })) || getSystemUser(store.getState());
 
   return (
     <ListItem
-      classNames={['TransactionItem']}
+      className="TransactionItem"
     >
       <p>{getTimestamp(store.getState(), { date: new Date(transaction.customTimeCreated || transaction.timeCreated) }).fullStamp}</p>
       <p>

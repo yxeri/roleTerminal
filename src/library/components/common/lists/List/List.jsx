@@ -4,31 +4,31 @@ import {
   arrayOf,
   bool,
   node,
-  shape,
 } from 'prop-types';
 
 import { ReactComponent as ArrowUp } from '../../../../icons/arrow-up-circle.svg';
 import { ReactComponent as ArrowDown } from '../../../../icons/arrow-down-circle.svg';
+import Button from '../../sub-components/Button/Button';
 
 import './List.scss';
-import Button from '../../sub-components/Button/Button';
 
 const List = React.forwardRef(({
   children,
   title,
   observe,
+  startRevealed = false,
   alwaysExpanded = false,
   checkWidth = false,
   dropdown = false,
-  classNames = [],
+  className = '',
 }, ref) => {
   const observer = useRef();
   const observeHelper = useRef();
   const listRef = useRef(null);
   const windowRef = useRef(null);
-  const [hidden, setHidden] = useState(!alwaysExpanded && typeof title !== 'undefined');
+  const [hidden, setHidden] = useState(!startRevealed && !alwaysExpanded && typeof title !== 'undefined');
   const listClasses = [];
-  const classes = ['List'].concat(classNames);
+  const classes = ['List'].concat([className]);
 
   const onClick = (event) => {
     if (dropdown && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
@@ -40,32 +40,11 @@ const List = React.forwardRef(({
 
   const scroll = ({ direction }) => {
     if (direction === 'bottom' && listRef.current.lastElementChild) {
-      console.log('should scroll to bottom');
       listRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } else if (direction === 'top' && listRef.current.firstElementChild) {
       listRef.current.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      console.log('should scroll to top');
     }
   };
-
-  // useEffect(() => {
-  //   scroll();
-  //
-  //   renderDone.current = true;
-  // }, [children]);
-  //
-  // useEffect(() => {
-  //   if (scrollTo && !scrollTo.skipFirstRender && listRef.current && !hidden) {
-  //     if (scrollTo.direction === 'bottom' && listRef.current.lastElementChild) {
-  //       listRef.current.lastElementChild.scrollIntoView({ behavior: 'auto', block: 'end' });
-  //       console.log('should scroll to bottom');
-  //     } else if (scrollTo.direction === 'top' && listRef.current.firstElementChild) {
-  //       listRef.current.firstElementChild.scrollIntoView({ behavior: 'auto', block: 'start' });
-  //       console.log('should scroll to top');
-  //     }
-  //   }
-  // }, []);
-  //
 
   useEffect(() => {
     if (listRef.current && observe) {
@@ -153,7 +132,7 @@ const List = React.forwardRef(({
           {title}
         </header>
       )}
-      {observe && observe === 'upper' && <Button key="upper" classNames={['upper', 'hide']} ref={observeHelper} onClick={() => scroll({ direction: 'top' })}><ArrowUp /></Button>}
+      {observe && observe === 'upper' && <Button key="upper" className="upper hide" ref={observeHelper} onClick={() => scroll({ direction: 'top' })}><ArrowUp /></Button>}
       <ul
         ref={(element) => {
           listRef.current = element;
@@ -178,7 +157,7 @@ const List = React.forwardRef(({
       >
         {children}
       </ul>
-      {observe && observe === 'lower' && <Button key="lower" classNames={['lower', 'hide']} ref={observeHelper} onClick={() => scroll({ direction: 'bottom' })}><ArrowDown /></Button>}
+      {observe && observe === 'lower' && <Button key="lower" className="lower hide" ref={observeHelper} onClick={() => scroll({ direction: 'bottom' })}><ArrowDown /></Button>}
     </div>
   );
 });
@@ -188,20 +167,21 @@ export default React.memo(List);
 List.propTypes = {
   children: node,
   title: node,
-  classNames: arrayOf(string),
+  className: string,
   dropdown: bool,
   checkWidth: bool,
   alwaysExpanded: bool,
   observe: string,
+  startRevealed: bool,
 };
 
 List.defaultProps = {
-  classNames: [],
+  className: '',
   children: undefined,
   title: undefined,
   dropdown: false,
-  scrollTo: undefined,
   checkWidth: false,
   alwaysExpanded: false,
   observe: undefined,
+  startRevealed: undefined,
 };

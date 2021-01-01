@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -35,14 +35,30 @@ const CreateAliasDialog = ({ id, index }) => {
       .catch((error) => console.log(error));
   };
 
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEALIAS } }] }));
+  }, [id]);
+
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
+  const onSubmitCall = useCallback(() => formMethods.handleSubmit(onSubmit)(), []);
+
   return (
     <Dialog
+      id={id}
       index={index}
       title="New alias"
-      onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEALIAS } }] }));
-      }}
-      done={() => store.dispatch(removeWindow({ id }))}
+      onClick={onClick}
+      done={onDone}
+      buttons={[
+        <Button
+          stopPropagation
+          type="submit"
+          onClick={onSubmitCall}
+        >
+          Create
+        </Button>,
+      ]}
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
@@ -66,15 +82,6 @@ const CreateAliasDialog = ({ id, index }) => {
             name="description"
             placeholder="Description"
           />
-          <div className="buttons">
-            <Button
-              stopPropagation
-              type="submit"
-              onClick={() => {}}
-            >
-              Create
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

@@ -55,14 +55,27 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
 
   return (
     <Dialog
+      id={id}
       error={error}
       index={index}
-      classNames={['JoinRoomDialog']}
+      className="JoinRoomDialog"
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGJOINROOM, roomId } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       title={!hasAccess ? `Unlock room ${room.roomName}` : `Join room ${room.roomName}`}
+      buttons={[
+        <Button
+          stopPropagation
+          type="submit"
+          onClick={() => methods.handleSubmit(onSubmit)()}
+        >
+          {!hasAccess && (
+            <Unlock />
+          )}
+          <span>{!hasAccess ? 'Unlock' : 'Join'}</span>
+        </Button>,
+      ]}
     >
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -94,25 +107,6 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
               placeholder="Password"
             />
           )}
-          <div className="buttons">
-            <Button
-              stopPropagation
-              type="button"
-              onClick={() => store.dispatch(removeWindow({ id }))}
-            >
-              {!hasAccess ? 'Cancel' : 'No'}
-            </Button>
-            <Button
-              stopPropagation
-              type="submit"
-              onClick={() => {}}
-            >
-              {!hasAccess && (
-                <Unlock />
-              )}
-              <span>{!hasAccess ? 'Unlock' : 'Join'}</span>
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

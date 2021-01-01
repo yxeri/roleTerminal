@@ -27,15 +27,16 @@ const News = ({ id, messageId, index }) => {
 
   return (
     <Window
+      id={id}
       index={index}
       done={onDone}
-      classNames={['News']}
+      className="News"
       title="News"
       onClick={onClick}
       menu={(
         <>
           {newsRoom && (
-            <FileMenu>
+            <FileMenu id={id}>
               <ListItem
                 stopPropagation
                 key="createNews"

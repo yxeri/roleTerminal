@@ -22,7 +22,7 @@ const RoomList = ({ onChange }) => {
       dropdown
       checkWidth
       key="roomList"
-      classNames={['RoomList']}
+      className="RoomList"
       title="Rooms"
     >
       {roomMapper()}

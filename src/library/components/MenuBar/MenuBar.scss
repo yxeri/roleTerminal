@@ -12,6 +12,7 @@
   align-items: flex-end;
   box-shadow: $shadow;
   z-index: $menu-bar-z-index;
+  margin-bottom: $padding / 2;
 
   .List {
     .dropdown {
@@ -40,26 +41,48 @@
     margin-right: $margin * 2;
   }
 
-  > *:last-child {
-    margin-right: 0;
-  }
-
   .rightAligned {
     margin-left: auto;
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding * 2;
-  }
+    grid-gap: $padding;
+    margin-right: 0;
 
-  .Clock {
-    .Button {
+    > .Button {
       border-bottom: none;
-      border-right: none;
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
-      border-top-right-radius: 0;
     }
   }
+
+  .helpOverlay {
+    top: $menu-bar-height;
+    height: calc(100% - #{$menu-bar-height});
+  }
+}
+
+.miniMenu {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: $dropdown-z-index;
+  opacity: .7;
+
+  .Button {
+    padding: 0;
+    border: none;
+
+    svg {
+      max-width: $icon-size - .2em;
+      max-height: $icon-size - .2em;
+    }
+  }
+}
+
+.miniMenu.minimize {
+  top: $menu-bar-height;
+  z-index: 1;
+  opacity: .5;
 }
 
 .warning {

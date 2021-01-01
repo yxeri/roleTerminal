@@ -6,11 +6,11 @@
   box-sizing: border-box;
 
   .Window {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: fit-content(0) auto;
     box-shadow: $shadow;
     background-color: $second-background-color;
-    height: 100%;
+    height: calc(100% - 1px);
     border: $border;
     color: $second-color;
     text-shadow: $text-shadow;
@@ -23,7 +23,7 @@
       display: grid;
       grid-template-rows: fit-content(0) auto;
       grid-template-columns: 100%;
-      height: calc(100% - 1em - #{$margin * 2} - 1px);
+      height: 100%;
       position: relative;
 
       .menu {
@@ -68,6 +68,7 @@
     .windowBox {
       grid-template-rows: 1fr;
       grid-template-columns: fit-content(100%) auto;
+      grid-gap: $padding;
 
       .menu {
         display: grid;
@@ -84,6 +85,7 @@
           flex-grow: inherit;
           overflow: hidden;
           width: 10em;
+          max-width: 100%;
           padding-left: $padding;
 
           .List {
@@ -92,7 +94,7 @@
 
           .dropdown {
             left: inherit;
-            width: inherit;
+            width: initial;
             max-height: 100%;
           }
 

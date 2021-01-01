@@ -19,14 +19,8 @@
     text-align: center;
     display: flex;
     justify-content: center;
-  }
-
-  .Button {
-    background-color: $color;
-    border: none;
-    box-shadow: none;
-    color: $background-color;
-    padding: 0;
+    align-items: flex-end;
+    height: 100%;
   }
 
   .buttons {
@@ -36,15 +30,23 @@
     grid-gap: #{$margin * 2};
     justify-items: flex-end;
 
-    .settings {
+    > .Button {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      color: $background-color;
+    }
+
+    .close {
       svg {
-        stroke-width: 2;
+        max-height: $icon-size + .1em;
+        max-width: $icon-size + .1em;
       }
     }
   }
 
   > * {
-    padding-top: $padding;
     padding-bottom: $padding;
   }
 }

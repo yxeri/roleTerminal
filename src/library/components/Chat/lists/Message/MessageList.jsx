@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
 
@@ -30,12 +30,7 @@ const MessageList = ({ roomId, messageId }) => {
     <List
       observe="lower"
       key="messageList"
-      scrollTo={{
-        buffer: true,
-        direction: 'bottom',
-        skipFirstRender: typeof messageId === 'string',
-      }}
-      classNames={['MessageList']}
+      className="MessageList"
     >
       {messageMapper()}
     </List>

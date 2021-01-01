@@ -14,6 +14,7 @@ import aliasId from './aliasId';
 import windowOrder from './windowOrder';
 import teams from './teams';
 import docFiles from './docFiles';
+import mode from './mode';
 
 export default combineReducers({
   users,
@@ -30,4 +31,5 @@ export default combineReducers({
   windowOrder,
   teams,
   docFiles,
+  mode,
 });

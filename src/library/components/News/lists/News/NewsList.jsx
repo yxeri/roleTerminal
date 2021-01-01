@@ -42,7 +42,7 @@ const NewsList = ({ messageId }) => {
       <NewsItem
         key={`top-${newsMessage.objectId}`}
         messageId={newsMessage.objectId}
-        classNames={['topNews']}
+        className="topNews"
       />
     ));
 
@@ -50,7 +50,7 @@ const NewsList = ({ messageId }) => {
     <List
       observe="upper"
       ref={listRef}
-      classNames={['NewsList']}
+      className="NewsList"
     >
       {news.length === 0 && (
         [<ListItem key="noNews"><p>There are no news</p></ListItem>]

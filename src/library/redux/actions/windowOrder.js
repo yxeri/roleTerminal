@@ -1,17 +1,35 @@
+import { batch } from 'react-redux';
+
 import { WINDOWORDER, WINDOWORDERS } from '../actionTypes';
 import { ChangeTypes } from '../reducers/root';
+import { getMode } from '../selectors/mode';
+import store from '../store';
+import { Modes } from '../reducers/mode';
+import { changeTarget } from './mode';
 
 export const changeWindowOrder = ({ windows }) => {
   if (windows.length === 1) {
     const [{ value, id }] = windows;
 
-    return {
-      type: WINDOWORDER,
-      payload: {
-        id,
-        value,
-        changeType: ChangeTypes.UPDATE,
-      },
+    return (dispatch) => {
+      batch(() => {
+        console.log('changing order', windows);
+
+        if (getMode(store.getState()).mode === Modes.HELP) {
+          console.log('changing target', id);
+
+          dispatch(changeTarget({ target: id }));
+        }
+
+        dispatch({
+          type: WINDOWORDER,
+          payload: {
+            id,
+            value,
+            changeType: ChangeTypes.UPDATE,
+          },
+        });
+      });
     };
   }
 

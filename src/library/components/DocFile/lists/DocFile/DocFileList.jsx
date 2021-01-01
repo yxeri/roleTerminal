@@ -1,11 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { func } from 'prop-types';
 
 import List from '../../../common/lists/List/List';
 import { getDocFileIdsNames } from '../../../../redux/selectors/docFiles';
 import DocFileItem from './Item/DocFileItem';
 
-const DocFileList = () => {
+const DocFileList = ({ onChange }) => {
   const docFile = useSelector(getDocFileIdsNames);
 
   const itemMapper = () => docFile
@@ -23,7 +24,7 @@ const DocFileList = () => {
 
       return 0;
     })
-    .map(({ objectId }) => <DocFileItem key={objectId} docFileId={objectId} />);
+    .map(({ objectId }) => <DocFileItem key={objectId} docFileId={objectId} onChange={onChange} />);
 
   return (
     <List
@@ -37,3 +38,7 @@ const DocFileList = () => {
 };
 
 export default React.memo(DocFileList);
+
+DocFileList.propTypes = {
+  onChange: func.isRequired,
+};

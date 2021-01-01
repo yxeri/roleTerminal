@@ -50,11 +50,12 @@ const MessageItem = ({
     <ListItem
       scrollTo={selected || isLatest}
       ref={itemRef}
-      classNames={['MessageItem', `${hasFullAccess ? 'clickable' : ''}`]}
+      className={`MessageItem ${hasFullAccess ? 'clickable' : ''}`}
       key={messageId}
     >
       {!shouldCollapse() && (
         <MessageInfo
+          key="msgInfo"
           identityId={message.ownerAliasId || message.ownerId}
           timeCreated={message.customTimeCreated || message.timeCreated}
         />
@@ -65,6 +66,7 @@ const MessageItem = ({
         {message.image && message.image.thumbFileName && (
           <Image
             scrollTo
+            key={message.image.thumbFileName}
             image={`/upload/images/${message.image.thumbFileName}`}
             altText="pic"
             width={message.image.thumbWidth}

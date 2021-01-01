@@ -57,6 +57,15 @@ const MainList = () => {
     items.push(
       <ListItem
         stopPropagation
+        key="settings"
+        onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCONFIGSYSTEM, value: { type: WindowTypes.DIALOGCONFIGSYSTEM } }] }))}
+      >
+        Settings
+      </ListItem>,
+    );
+    items.push(
+      <ListItem
+        stopPropagation
         key="logout"
         onClick={() => {
           logout();

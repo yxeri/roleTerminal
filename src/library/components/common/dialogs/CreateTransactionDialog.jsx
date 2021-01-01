@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { number, string } from 'prop-types';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useSelector } from 'react-redux';
@@ -51,14 +51,31 @@ const CreateTransactionDialog = ({ id, toWalletId, index }) => {
     ));
   });
 
+  const onClick = useCallback(() => {
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId } }] }));
+  }, [id, toWalletId]);
+
+  const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
+
+  const onSubmitCall = useCallback(() => formMethods.handleSubmit(onSubmit)(), []);
+
   return (
     <Dialog
+      id={id}
       index={index}
       title={`Transfer to ${toIdentity.teamName || toIdentity.aliasName || toIdentity.username}`}
-      onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId } }] }));
-      }}
-      done={() => store.dispatch(removeWindow({ id }))}
+      onClick={onClick}
+      done={onDone}
+      buttons={[
+        <Button
+          stopPropagation
+          key="submit"
+          type="submit"
+          onClick={onSubmitCall}
+        >
+          Transfer
+        </Button>,
+      ]}
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
@@ -83,15 +100,6 @@ const CreateTransactionDialog = ({ id, toWalletId, index }) => {
             name="note"
             placeholder="Note"
           />
-          <div className="buttons">
-            <Button
-              stopPropagation
-              type="submit"
-              onClick={() => {}}
-            >
-              Transfer
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

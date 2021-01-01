@@ -4,7 +4,7 @@ import {
 } from '../SocketManager';
 import { getDeviceId } from '../../StorageManager';
 import store from '../../redux/store';
-import { createNewUser } from '../../redux/actions/users';
+import { createNewUser, updateUsers } from '../../redux/actions/users';
 
 export const createUser = async (params) => {
   const paramsToSend = params;
@@ -13,6 +13,14 @@ export const createUser = async (params) => {
   const result = await emitSocketEvent(SendEvents.USER, paramsToSend);
 
   await store.dispatch(createNewUser(result));
+
+  return result;
+};
+
+export const updateUser = async ({ userId, user }) => {
+  const result = await emitSocketEvent(SendEvents.UPDATEUSER, { userId, user });
+
+  await store.dispatch(updateUsers({ users: [result.user] }));
 
   return result;
 };

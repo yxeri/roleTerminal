@@ -2,21 +2,22 @@ import { WINDOWORDER, WINDOWORDERS } from '../actionTypes';
 import { ChangeTypes } from './root';
 
 export const WindowTypes = {
-  WALLET: 'wallet',
-  CHAT: 'chat',
-  WORLDMAP: 'worldMap',
-  DOCFILE: 'docFile',
-  NEWS: 'news',
-  DIALOGIDENTITY: 'dialogIdentity',
-  DIALOGCREATEROOM: 'dialogCreateRoom',
-  DIALOGREMOVEROOM: 'dialogRemoveRoom',
-  DIALOGREGISTER: 'dialogRegister',
-  DIALOGLOGIN: 'dialogLogin',
-  DIALOGCREATEALIAS: 'dialogCreateAlias',
-  DIALOGCREATETRANSACTION: 'dialogCreateTransaction',
-  DIALOGCREATEDOCFILE: 'dialogCreateDocFile',
-  DIALOGCREATENEWS: 'dialogCreateNews',
-  DIALOGJOINROOM: 'dialogJoinRoom',
+  WALLET: 'Wallet',
+  CHAT: 'Chat',
+  WORLDMAP: 'Map',
+  DOCFILE: 'Files',
+  NEWS: 'News',
+  DIALOGIDENTITY: 'User',
+  DIALOGCREATEROOM: 'New room',
+  DIALOGREMOVEROOM: 'Remove room',
+  DIALOGREGISTER: 'Register',
+  DIALOGLOGIN: 'Login',
+  DIALOGCREATEALIAS: 'New alias',
+  DIALOGCREATETRANSACTION: 'Transfer',
+  DIALOGCREATEDOCFILE: 'New file',
+  DIALOGCREATENEWS: 'New article',
+  DIALOGJOINROOM: 'Join room',
+  DIALOGCONFIGSYSTEM: 'Config system',
 };
 
 const defaultState = new Map();
@@ -31,7 +32,7 @@ export default function WindowOrderReducer(state = defaultState, action) {
       if (newState.size > 0 && newState.get(id) && newState.get(id).index === newState.size) {
         const existing = newState.get(id);
 
-        if (Object.keys(value).length === Object.keys(existing).length && Object.keys(value).every((key) => existing[key] === value[key])) {
+        if (Object.keys(value).length === Object.keys(existing).length - 1 && Object.keys(value).every((key) => existing[key] === value[key])) {
           return state;
         }
       }

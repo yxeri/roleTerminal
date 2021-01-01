@@ -34,3 +34,8 @@
   text-shadow: $warning-text-shadow;
   background-color: $warning-background-color;
 }
+
+.Button.active {
+  border-color: $second-color !important;
+  color: $second-color !important;
+}

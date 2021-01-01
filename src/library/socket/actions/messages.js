@@ -2,7 +2,7 @@ import { SendEvents, emitSocketEvent } from '../SocketManager';
 import { getRoomById } from '../../redux/selectors/rooms';
 import store from '../../redux/store';
 import { getCurrentIdentityId } from '../../redux/selectors/userId';
-import { createMessages } from '../../redux/actions/messages';
+import { createMessages, createNewsMessage } from '../../redux/actions/messages';
 import { getAliasId } from '../../redux/selectors/aliasId';
 import { getNewsRoomId } from '../../redux/selectors/config';
 import { MessageType } from '../../redux/reducers/messages';
@@ -44,6 +44,7 @@ export const sendNewsMessage = async ({ title, text, image }) => {
     messageType: MessageType.NEWS,
     text: [title].concat(text.split('\n')),
     roomId: getNewsRoomId(store.getState()),
+    ownerAliasId: getAliasId(store.getState()) || undefined,
   };
 
   const result = await emitSocketEvent(SendEvents.MESSAGE, {
@@ -51,7 +52,7 @@ export const sendNewsMessage = async ({ title, text, image }) => {
     image,
   });
 
-  store.dispatch(createMessages({ messages: [result.message] }));
+  store.dispatch(createNewsMessage(result));
 
   return { message: result.message };
 };

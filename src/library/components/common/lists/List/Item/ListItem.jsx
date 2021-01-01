@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import {
-  arrayOf, bool,
+  bool,
   func,
   node,
   string,
@@ -14,7 +14,7 @@ const ListItem = React.forwardRef(({
   elementId,
   scrollTo,
   stopPropagation = false,
-  classNames = [],
+  className = '',
 }, ref) => {
   const itemRef = useRef(null);
 
@@ -24,6 +24,20 @@ const ListItem = React.forwardRef(({
       setTimeout(() => itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
     }
   }, [scrollTo]);
+
+  const onClickCall = useCallback((event) => {
+    if (onClick) {
+      onClick(event);
+    }
+
+    if (event.target.parentElement.tagName === 'UL') {
+      event.target.parentElement.click();
+    }
+
+    if (stopPropagation) {
+      event.stopPropagation();
+    }
+  }, []);
 
   return (
     <li
@@ -36,20 +50,8 @@ const ListItem = React.forwardRef(({
         itemRef.current = element;
       }}
       id={elementId}
-      className={['ListItem', `${onClick ? 'clickable' : ''}`].concat(classNames).join(' ')}
-      onClick={(event) => {
-        if (onClick) {
-          onClick(event);
-        }
-
-        if (event.target.parentElement.tagName === 'UL') {
-          event.target.parentElement.click();
-        }
-
-        if (stopPropagation) {
-          event.stopPropagation();
-        }
-      }}
+      className={`ListItem ${onClick ? 'clickable' : ''} ${className}`}
+      onClick={onClickCall}
     >
       {children}
     </li>
@@ -61,7 +63,7 @@ export default React.memo(ListItem);
 ListItem.propTypes = {
   children: node,
   onClick: func,
-  classNames: arrayOf(string),
+  className: string,
   stopPropagation: bool,
   elementId: string,
   scrollTo: bool,
@@ -69,7 +71,7 @@ ListItem.propTypes = {
 
 ListItem.defaultProps = {
   onClick: undefined,
-  classNames: [],
+  className: '',
   stopPropagation: false,
   elementId: undefined,
   children: undefined,

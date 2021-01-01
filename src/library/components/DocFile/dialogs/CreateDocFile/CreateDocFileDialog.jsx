@@ -40,13 +40,23 @@ const CreateDocFileDialog = ({ id, index }) => {
 
   return (
     <Dialog
+      id={id}
       index={index}
-      classNames={['CreateDocFileDialog']}
+      className="CreateDocFileDialog"
       title="New document"
       onClick={() => {
         store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATEDOCFILE } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
+      buttons={[
+        <Button
+          stopPropagation
+          type="submit"
+          onClick={() => formMethods.handleSubmit(onSubmit)()}
+        >
+          Create
+        </Button>,
+      ]}
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
@@ -77,15 +87,6 @@ const CreateDocFileDialog = ({ id, index }) => {
             name="text"
             placeholder="Text"
           />
-          <div className="buttons">
-            <Button
-              stopPropagation
-              type="submit"
-              onClick={() => {}}
-            >
-              Create
-            </Button>
-          </div>
         </form>
       </FormProvider>
     </Dialog>

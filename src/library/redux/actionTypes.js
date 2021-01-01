@@ -41,3 +41,4 @@ export const ONLINE = 'online';
 export const ALIASID = 'aliasId';
 export const WINDOWORDER = 'windowOrder';
 export const WINDOWORDERS = 'windowOrders';
+export const MODE = 'mode';

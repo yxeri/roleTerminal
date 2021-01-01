@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  arrayOf,
   bool,
   func,
   node,
@@ -14,17 +13,15 @@ const Button = React.forwardRef(({
   children,
   disabled,
   stopPropagation,
-  classNames = [''],
+  className = '',
   type = 'button',
 }, ref) => (
   <button
     ref={ref}
-    className={`${['Button'].concat(classNames).join(' ')}`}
+    className={`Button ${className}`}
     disabled={disabled}
     type={type} /* eslint-disable-line react/button-has-type */
     onClick={(event) => {
-      console.log('click');
-
       onClick(event);
 
       if (stopPropagation) {
@@ -43,13 +40,13 @@ Button.propTypes = {
   children: node.isRequired,
   type: oneOf(['button', 'submit']),
   disabled: bool,
-  classNames: arrayOf(string),
+  className: string,
   stopPropagation: bool,
 };
 
 Button.defaultProps = {
   type: 'button',
   disabled: undefined,
-  classNames: [],
+  className: '',
   stopPropagation: undefined,
 };

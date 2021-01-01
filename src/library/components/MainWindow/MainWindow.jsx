@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Wallet from '../Wallet/Wallet';
 import WorldMap from '../WorldMap/WorldMap';
 import Chat from '../Chat/Chat';
 import { getOrder } from '../../redux/selectors/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
-
-import './MainWindow.scss';
 import IdentityDialog from '../common/dialogs/IdentityDialog';
 import CreateRoomDialog from '../Chat/dialogs/CreateRoomDialog';
 import RemoveRoomDialog from '../Chat/dialogs/RemoveRoomDialog';
@@ -18,12 +16,25 @@ import DocFile from '../DocFile/DocFile';
 import CreateDocFileDialog from '../DocFile/dialogs/CreateDocFile/CreateDocFileDialog';
 import Dashboard from './Dashboard/Dashboard';
 import News from '../News/News';
-import CreateNewsDialog from '../News/lists/News/dialogs/CreateNewsDialog';
+import CreateNewsDialog from '../News/dialogs/CreateNewsDialog';
 import JoinRoomDialog from '../Chat/dialogs/JoinRoomDialog';
+import ConfigSystemDialog from '../common/dialogs/ConfigSystem/ConfigSystemDialog';
+import { getCurrentUser } from '../../redux/selectors/users';
+
+import './MainWindow.scss';
+import store from '../../redux/store';
+import { changeWindowOrder } from '../../redux/actions/windowOrder';
 
 const MainWindow = () => {
+  const { systemConfig = {} } = useSelector(getCurrentUser);
   const order = useSelector(getOrder);
   const windows = [];
+
+  useEffect(() => {
+    if (systemConfig.openApp) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: systemConfig.openApp, value: { type: systemConfig.openApp } }] }));
+    }
+  }, [systemConfig.openApp]);
 
   order.forEach((value, key) => {
     const { type } = value;
@@ -58,11 +69,16 @@ const MainWindow = () => {
       windows.push(<CreateNewsDialog key={key} id={key} index={value.index} />);
     } else if (type === WindowTypes.DIALOGJOINROOM) {
       windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} />);
+    } else if (type === WindowTypes.DIALOGCONFIGSYSTEM) {
+      windows.push(<ConfigSystemDialog key={key} id={key} index={value.index} />);
     }
   });
 
   return (
-    <div id="MainWindow">
+    <div
+      key="mainWindow"
+      id="MainWindow"
+    >
       <Dashboard />
       {windows}
     </div>

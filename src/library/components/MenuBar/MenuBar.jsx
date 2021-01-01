@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Clock from './sub-components/Clock/Clock';
 import MainList from './lists/MainList';
@@ -20,19 +20,24 @@ import { ReactComponent as Layers } from '../../icons/layers.svg';
 import { ReactComponent as ClockIcon } from '../../icons/clock.svg';
 import { ReactComponent as ChevronLeft } from '../../icons/chevron-left.svg';
 import { ReactComponent as ChevronRight } from '../../icons/chevron-right.svg';
-import { getCurrentUser } from '../../redux/selectors/users';
+import { ReactComponent as Grid } from '../../icons/grid.svg';
+import { getCurrentAccessLevel, getSystemConfig } from '../../redux/selectors/users';
+import { AccessLevels } from '../../AccessCentral';
+import { getHideMenu } from '../../redux/selectors/interfaceConfig';
+import { reconnect } from '../../socket/SocketManager';
 
 import './MenuBar.scss';
-import { AccessLevels } from '../../AccessCentral';
+import { changeInterfaceConfig } from '../../redux/actions/interfaceConfig';
+import IdentityPicker from '../common/lists/IdentityPicker/IdentityPicker';
 
 const componentId = 'MenuBar';
 
 const MenuBar = () => {
-  const [hideMenu, setHideMenu] = useState(false);
-  const { accessLevel, systemConfig = {} } = useSelector(getCurrentUser);
+  const accessLevel = useSelector(getCurrentAccessLevel);
+  const systemConfig = useSelector(getSystemConfig);
+  const hideMenu = useSelector(getHideMenu);
   const mode = useSelector(getMode);
   const online = useSelector(isOnline);
-  const content = [];
   const classes = [];
 
   if (!online) {
@@ -41,9 +46,9 @@ const MenuBar = () => {
 
   useEffect(() => {
     if (systemConfig.hideMenuBar) {
-      setHideMenu(true);
+      store.dispatch(changeInterfaceConfig({ hideMenu: true }));
     } else {
-      setHideMenu(false);
+      store.dispatch(changeInterfaceConfig({ hideMenu: false }));
     }
   }, [systemConfig.hideMenuBar]);
 
@@ -57,7 +62,7 @@ const MenuBar = () => {
             <div className="miniMenu">
               <Button
                 type="button"
-                onClick={() => setHideMenu(!hideMenu)}
+                onClick={() => store.dispatch(changeInterfaceConfig({ toggleHideMenu: true }))}
               >
                 <ChevronLeft />
               </Button>
@@ -68,6 +73,10 @@ const MenuBar = () => {
               <div
                 key={componentId}
                 onClick={() => {
+                  if (!online) {
+                    reconnect();
+                  }
+
                   if (mode.mode === Modes.HELP) {
                     store.dispatch(changeTarget({ target: componentId }));
                   }
@@ -77,7 +86,6 @@ const MenuBar = () => {
               >
                 <MainList key="mainList" />
                 <OpenApps key="openApps" />
-                {content}
                 <div className="rightAligned">
                   {!systemConfig.hideHelp && (
                     <Button
@@ -87,6 +95,9 @@ const MenuBar = () => {
                     >
                       <Help />
                     </Button>
+                  )}
+                  {accessLevel >= AccessLevels.STANDARD && (
+                    <IdentityPicker useIcon />
                   )}
                   <Clock />
                 </div>
@@ -103,24 +114,28 @@ const MenuBar = () => {
                         </p>
                       </li>
                       <li>
+                        <Grid />
+                        <span>APPS Shows all apps.</span>
+                      </li>
+                      <li>
                         <Chat />
-                        <span>CHAT APP Read and send messages. You have access to read Public without logging in.</span>
+                        <span>CHAT Read and send messages. You have access to read Public without logging in.</span>
                       </li>
                       <li>
                         <News />
-                        <span>NEWS APP Read the latest news. You need access to be able to create news.</span>
+                        <span>NEWS Read the latest news. You need access to be able to create news.</span>
                       </li>
                       <li>
                         <File />
-                        <span>FILES APP Read and create documents. You have access to read documents without logging in.</span>
+                        <span>FILES Read and create documents. You have access to read documents without logging in.</span>
                       </li>
                       <li>
                         <Map />
-                        <span>MAP APP See the local, world map, track users and add new locations.</span>
+                        <span>MAP See the local, world map, track users and add new locations.</span>
                       </li>
                       <li>
                         <Wallet />
-                        <span>WALLET APP Send and receive currency. You need to login to access your wallet.</span>
+                        <span>WALLET Send and receive currency. You need to login to access your wallet.</span>
                       </li>
                       <li>
                         <Menu />
@@ -142,7 +157,7 @@ const MenuBar = () => {
                 <div className="miniMenu minimize">
                   <Button
                     type="button"
-                    onClick={() => setHideMenu(!hideMenu)}
+                    onClick={() => store.dispatch(changeInterfaceConfig({ toggleHideMenu: true }))}
                   >
                     <ChevronRight />
                   </Button>

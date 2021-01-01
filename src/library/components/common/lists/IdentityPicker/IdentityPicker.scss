@@ -15,9 +15,13 @@
 
   span {
     margin-left: $padding;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   header {
     display: flex;
+    max-width: 10em;
+    align-items: flex-end;
   }
 }

@@ -15,6 +15,7 @@ import windowOrder from './windowOrder';
 import teams from './teams';
 import docFiles from './docFiles';
 import mode from './mode';
+import interfaceConfig from './interfaceConfig';
 
 export default combineReducers({
   users,
@@ -32,4 +33,5 @@ export default combineReducers({
   teams,
   docFiles,
   mode,
+  interfaceConfig,
 });

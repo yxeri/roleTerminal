@@ -25,8 +25,13 @@ const News = ({ id, messageId, index }) => {
 
   const onCreateNews = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATENEWS, value: { type: WindowTypes.DIALOGCREATENEWS } }] })), []);
 
+  const onSettings = useCallback(() => {
+    store.dispatch(changeWindowOrder())
+  }, [id]);
+
   return (
     <Window
+      onSettings={onSettings}
       id={id}
       index={index}
       done={onDone}
@@ -35,8 +40,8 @@ const News = ({ id, messageId, index }) => {
       onClick={onClick}
       menu={(
         <>
-          {newsRoom && (
-            <FileMenu id={id}>
+          <FileMenu key="fileMenu" id={id}>
+            {newsRoom && (
               <ListItem
                 stopPropagation
                 key="createNews"
@@ -44,8 +49,8 @@ const News = ({ id, messageId, index }) => {
               >
                 New article
               </ListItem>
-            </FileMenu>
-          )}
+            )}
+          </FileMenu>
         </>
       )}
     >

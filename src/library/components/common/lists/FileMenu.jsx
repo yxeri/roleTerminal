@@ -44,6 +44,10 @@ const FileMenu = ({ id, children }) => {
 export default React.memo(FileMenu);
 
 FileMenu.propTypes = {
-  children: node.isRequired,
+  children: node,
   id: string.isRequired,
+};
+
+FileMenu.defaultProps = {
+  children: undefined,
 };

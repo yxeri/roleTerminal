@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getTimestamp } from '../../../../redux/selectors/config';
 import { ReactComponent as ClockSvg } from '../../../../icons/clock.svg';
@@ -8,12 +8,13 @@ import store from '../../../../redux/store';
 import './Clock.scss';
 
 const Clock = () => {
+  const timeoutRef = useRef();
   const [date, setDate] = useState(new Date());
   const [showTime, setShowTime] = useState(false);
   const timestamp = getTimestamp(store.getState(), { date });
 
   const updateTime = () => {
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setDate(new Date());
       updateTime();
     }, 1000);
@@ -21,6 +22,8 @@ const Clock = () => {
 
   useEffect(() => {
     updateTime();
+
+    return () => clearTimeout(timeoutRef.current);
   }, []);
 
   const onClick = useCallback(() => setShowTime(!showTime), [showTime]);

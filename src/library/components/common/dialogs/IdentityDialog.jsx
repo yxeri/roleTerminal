@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { batch, useSelector } from 'react-redux';
 import { number, string } from 'prop-types';
 import Dialog from './Dialog/Dialog';
-import { getIdentityById } from '../../../redux/selectors/users';
+import { getCurrentUser, getIdentityById } from '../../../redux/selectors/users';
 import Button from '../sub-components/Button/Button';
 import { getWhisperRoom } from '../../../redux/selectors/rooms';
 import store from '../../../redux/store';
@@ -14,11 +14,25 @@ import { ReactComponent as Chat } from '../../../icons/chat.svg';
 import { ReactComponent as Pin } from '../../../icons/pin.svg';
 import { getTeamsByIds } from '../../../redux/selectors/teams';
 import Image from '../sub-components/Image/Image';
+import { updateUser } from '../../../socket/actions/users';
 
 const IdentityDialog = ({ id, identityId, index }) => {
   const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
   const currentIdentityId = useSelector(getCurrentIdentityId);
+  const { objectId: userId, hasSeen = [], isAnonymous } = useSelector(getCurrentUser);
   const teams = useSelector((state) => getTeamsByIds(state, { ids: identity.partOfTeams }));
+
+  useEffect(() => {
+    if (!isAnonymous && !hasSeen.includes(identity.objectId)) {
+      updateUser({
+        userId,
+        user: {
+          hasSeen: hasSeen.concat([identity.objectId]),
+        },
+      })
+        .catch((error) => console.log(error));
+    }
+  }, [hasSeen, identity]);
 
   const onClick = useCallback(() => {
     store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));

@@ -4,7 +4,7 @@ import React, {
   useState,
 } from 'react';
 import {
-  arrayOf, bool,
+  bool,
   string,
 } from 'prop-types';
 import { useSelector } from 'react-redux';

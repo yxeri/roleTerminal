@@ -26,6 +26,7 @@ const ConfigSystemDialog = ({ id, index }) => {
     alwaysMaximized,
     hideMenuBar,
     openApp,
+    shortcuts,
   }) => {
     updateUser({
       userId: currentUser.objectId,
@@ -37,6 +38,7 @@ const ConfigSystemDialog = ({ id, index }) => {
           alwaysMaximized,
           hideMenuBar,
           openApp,
+          shortcuts: shortcuts.slice(0, 4),
         },
       },
     })
@@ -74,7 +76,16 @@ const ConfigSystemDialog = ({ id, index }) => {
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <div>
-            <span>Auto-open app?</span>
+            <span>Quick start shortcuts (max 4 to be shown in the main menu):</span>
+            <Select multiple name="shortcuts" defaultValue={[WindowTypes.CHAT, WindowTypes.WALLET]}>
+              <option value={WindowTypes.CHAT}>Chat</option>
+              <option value={WindowTypes.NEWS}>News</option>
+              <option value={WindowTypes.WALLET}>Wallet</option>
+              <option value={WindowTypes.WORLDMAP}>Map</option>
+              <option value={WindowTypes.DOCFILE}>Files</option>
+            </Select>
+          </div>
+          <div>
             <Select
               defaultValue={systemConfig.openApp}
               name="openApp"

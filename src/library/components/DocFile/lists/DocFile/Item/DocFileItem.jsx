@@ -4,13 +4,19 @@ import { useSelector } from 'react-redux';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getDocFileById } from '../../../../../redux/selectors/docFiles';
-
 import { ReactComponent as Lock } from '../../../../../icons/lock.svg';
+import store from '../../../../../redux/store';
+import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
+import { getCurrentAccessLevel } from '../../../../../redux/selectors/users';
+import { AccessLevels } from '../../../../../AccessCentral';
+import { unlockDocFile } from '../../../../../socket/actions/docFiles';
 
 import './DocFileItem.scss';
 
 const DocFileItem = ({ docFileId, onChange }) => {
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
+  const accessLevel = useSelector(getCurrentAccessLevel);
 
   return (
     <ListItem
@@ -18,13 +24,23 @@ const DocFileItem = ({ docFileId, onChange }) => {
       className="DocFileItem"
       key={docFile.objectId}
       onClick={() => {
-        if (docFile.isLocked) {
-          console.log('locked');
+        if (docFile.isLocked && accessLevel < AccessLevels.ADMIN) {
+          store.dispatch(changeWindowOrder({
+            windows: [{
+              id: `${WindowTypes.DIALOGUNLOCKROOM}-${docFileId}`,
+              value: {
+                docFileId,
+                type: WindowTypes.DIALOGUNLOCKROOM,
+              },
+            }],
+          }));
 
           return;
         }
 
-        onChange(docFileId);
+        unlockDocFile({ docFileId })
+          .then(() => onChange(docFileId))
+          .catch((error) => console.log(error));
       }}
     >
       {docFile.title}

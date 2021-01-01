@@ -8,7 +8,6 @@ import List from '../List/List';
 import ListItem from '../List/Item/ListItem';
 import store from '../../../../redux/store';
 import { changeAliasId } from '../../../../redux/actions/aliasId';
-
 import { ReactComponent as User } from '../../../../icons/user.svg';
 
 import './IdentityPicker.scss';

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
-  arrayOf,
   func,
   string,
   node, number,
@@ -9,7 +8,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import TopBar from './TopBar/TopBar';
-import { getCurrentUser } from '../../../redux/selectors/users';
+import { getSystemConfig } from '../../../redux/selectors/users';
 
 import './Window.scss';
 
@@ -20,11 +19,12 @@ const Window = ({
   done,
   index,
   id,
+  onSettings,
   type = 'window',
   title = 'app',
   className = '',
 }) => {
-  const { systemConfig = {} } = useSelector(getCurrentUser);
+  const systemConfig = useSelector(getSystemConfig);
   const defaultSize = type === 'window' ? { width: 640, height: 480 } : { width: 640, height: 480 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -155,6 +155,7 @@ const Window = ({
           !systemConfig.hideTopBar
             ? (
               <TopBar
+                onSettings={onSettings}
                 id={id}
                 done={done}
                 title={title}
@@ -193,6 +194,7 @@ Window.propTypes = {
   type: string,
   index: number.isRequired,
   id: string.isRequired,
+  onSettings: func,
 };
 
 Window.defaultProps = {
@@ -201,4 +203,5 @@ Window.defaultProps = {
   title: 'app',
   menu: undefined,
   type: 'window',
+  onSettings: undefined,
 };

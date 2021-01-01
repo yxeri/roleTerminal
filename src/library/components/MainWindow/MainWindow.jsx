@@ -19,14 +19,15 @@ import News from '../News/News';
 import CreateNewsDialog from '../News/dialogs/CreateNewsDialog';
 import JoinRoomDialog from '../Chat/dialogs/JoinRoomDialog';
 import ConfigSystemDialog from '../common/dialogs/ConfigSystem/ConfigSystemDialog';
-import { getCurrentUser } from '../../redux/selectors/users';
-
-import './MainWindow.scss';
+import { getSystemConfig } from '../../redux/selectors/users';
 import store from '../../redux/store';
 import { changeWindowOrder } from '../../redux/actions/windowOrder';
 
+import './MainWindow.scss';
+import UnlockDocFileDialog from '../DocFile/dialogs/UnlockDocFileDialog';
+
 const MainWindow = () => {
-  const { systemConfig = {} } = useSelector(getCurrentUser);
+  const systemConfig = useSelector(getSystemConfig);
   const order = useSelector(getOrder);
   const windows = [];
 
@@ -71,6 +72,8 @@ const MainWindow = () => {
       windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} />);
     } else if (type === WindowTypes.DIALOGCONFIGSYSTEM) {
       windows.push(<ConfigSystemDialog key={key} id={key} index={value.index} />);
+    } else if (type === WindowTypes.DIALOGUNLOCKROOM) {
+      windows.push(<UnlockDocFileDialog key={key} id={key} index={value.index} docFileId={value.docFileId} />);
     }
   });
 

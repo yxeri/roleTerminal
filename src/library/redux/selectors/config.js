@@ -10,6 +10,8 @@ export const getPermissions = (state) => state.config.get('permissions');
 export const getNewsRoomId = (state) => state.config.get('newsRoomId');
 export const getNewsCost = (state) => state.config.get('newsCost');
 export const getSystemUser = (state) => state.config.get('systemUser');
+export const getOnlySeen = (state) => state.config.get('onlySeen');
+export const getAllowPartialSearch = (state) => state.config.get('allowPartialSearch');
 
 /**
  * Takes date and returns shorter human-readable time.

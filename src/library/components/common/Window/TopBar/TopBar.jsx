@@ -13,7 +13,7 @@ import Button from '../../sub-components/Button/Button';
 import store from '../../../../redux/store';
 import { changeMode, changeTarget } from '../../../../redux/actions/mode';
 import { Modes } from '../../../../redux/reducers/mode';
-import { getCurrentUser } from '../../../../redux/selectors/users';
+import { getCurrentAccessLevel, getSystemConfig } from '../../../../redux/selectors/users';
 import { AccessLevels } from '../../../../AccessCentral';
 import { getMode } from '../../../../redux/selectors/mode';
 
@@ -24,10 +24,11 @@ const TopBar = ({
   title,
   done,
   id,
+  onSettings,
 }) => {
-  const currentUser = useSelector(getCurrentUser);
+  const accessLevel = useSelector(getCurrentAccessLevel);
+  const systemConfig = useSelector(getSystemConfig);
   const mode = useSelector(getMode);
-  const { systemConfig = {} } = currentUser;
 
   const onHelp = useCallback(() => {
     if (mode.mode === Modes.HELP && mode.target !== id) {
@@ -36,8 +37,6 @@ const TopBar = ({
       store.dispatch(changeMode({ mode: Modes.HELP, target: id }));
     }
   }, [mode, id]);
-
-  const onSettings = useCallback(() => {}, []);
 
   return (
     <div
@@ -59,7 +58,7 @@ const TopBar = ({
             <Help />
           </Button>
         )}
-        {currentUser.accessLevel >= AccessLevels.STANDARD && (
+        {accessLevel >= AccessLevels.STANDARD && onSettings && (
           <Button key="settings" className="settings" stopPropagation type="button" onClick={onSettings}><Settings /></Button>
         )}
         {!systemConfig.alwaysMaximized && (
@@ -78,4 +77,9 @@ TopBar.propTypes = {
   title: string.isRequired,
   onDoubleClick: func.isRequired,
   id: string.isRequired,
+  onSettings: func,
+};
+
+TopBar.defaultProps = {
+  onSettings: undefined,
 };

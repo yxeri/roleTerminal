@@ -64,6 +64,11 @@ export const getWhisperRoomName = createCachedSelector(
   (identities, currentIdentities, participantIds) => {
     const participant = identities.get(participantIds[0]);
     const secondParticipant = identities.get(participantIds[1]);
+
+    if (!participant || !secondParticipant) {
+      return '';
+    }
+
     const name = currentIdentities
       .find(({ objectId }) => participant.objectId === objectId || participant.ownerId === objectId || participant.userIds.includes(objectId))
       ? `${participant.username || participant.aliasName} > ${secondParticipant.username || participant.aliasName}`

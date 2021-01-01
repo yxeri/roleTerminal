@@ -16,6 +16,7 @@ import { ReactComponent as Wallet } from '../../../../icons/wallet.svg';
 import { ReactComponent as File } from '../../../../icons/file.svg';
 import { ReactComponent as News } from '../../../../icons/news.svg';
 import { ReactComponent as Layers } from '../../../../icons/layers.svg';
+import { ReactComponent as Grid } from '../../../../icons/grid.svg';
 import { getOrder } from '../../../../redux/selectors/windowOrder';
 
 import './OpenApps.scss';
@@ -32,7 +33,6 @@ const OpenApps = () => {
       otherWindows.push(
         <ListItem key={key}>
           <Button
-            stopPropagation
             onClick={() => changeOrder({ id: key, value })}
           >
             {key}
@@ -43,59 +43,56 @@ const OpenApps = () => {
   });
 
   return (
-    <List className="OpenApps">
-      <ListItem key="chat">
-        <Button
-          stopPropagation
-          key="chat"
-          className={`${order.get(WindowTypes.CHAT) && order.get(WindowTypes.CHAT).index === order.size ? 'active' : ''}`}
-          onClick={() => changeOrder({ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT } })}
-        >
-          <Chat />
-        </Button>
-      </ListItem>
-      <ListItem key="news">
-        <Button
-          stopPropagation
-          key="news"
-          className={`${order.get(WindowTypes.NEWS) && order.get(WindowTypes.NEWS).index === order.size ? 'active' : ''}`}
-          onClick={() => changeOrder({ id: WindowTypes.NEWS, value: { type: WindowTypes.NEWS } })}
-        >
-          <News />
-        </Button>
-      </ListItem>
-      <ListItem key="docFile">
-        <Button
-          stopPropagation
-          key="docFile"
-          className={`${order.get(WindowTypes.DOCFILE) && order.get(WindowTypes.DOCFILE).index === order.size ? 'active' : ''}`}
-          onClick={() => changeOrder({ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE } })}
-        >
-          <File />
-        </Button>
-      </ListItem>
-      <ListItem key="worldMap">
-        <Button
-          stopPropagation
-          key="worldMap"
-          className={`${order.get(WindowTypes.WORLDMAP) && order.get(WindowTypes.WORLDMAP).index === order.size ? 'active' : ''}`}
-          onClick={() => changeOrder({ id: WindowTypes.WORLDMAP, value: { type: WindowTypes.WORLDMAP } })}
-        >
-          <Map />
-        </Button>
-      </ListItem>
-      {accessLevel >= AccessLevels.STANDARD && (
-        <ListItem key="wallet">
+    <div className="OpenApps">
+      <List dropdown className="apps" title={<Grid />}>
+        <ListItem key="chat">
           <Button
-            stopPropagation
-            key="wallet"
-            className={`${order.get(WindowTypes.WALLET) && order.get(WindowTypes.WALLET).index === order.size ? 'active' : ''}`}
-            onClick={() => changeOrder({ id: WindowTypes.WALLET, value: { type: WindowTypes.WALLET } })}
+            key="chat"
+            className={`${order.get(WindowTypes.CHAT) && order.get(WindowTypes.CHAT).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT } })}
           >
-            <Wallet />
+            <Chat />
           </Button>
         </ListItem>
-      )}
+        <ListItem key="news">
+          <Button
+            key="news"
+            className={`${order.get(WindowTypes.NEWS) && order.get(WindowTypes.NEWS).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.NEWS, value: { type: WindowTypes.NEWS } })}
+          >
+            <News />
+          </Button>
+        </ListItem>
+        <ListItem key="docFile">
+          <Button
+            key="docFile"
+            className={`${order.get(WindowTypes.DOCFILE) && order.get(WindowTypes.DOCFILE).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE } })}
+          >
+            <File />
+          </Button>
+        </ListItem>
+        <ListItem key="worldMap">
+          <Button
+            key="worldMap"
+            className={`${order.get(WindowTypes.WORLDMAP) && order.get(WindowTypes.WORLDMAP).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.WORLDMAP, value: { type: WindowTypes.WORLDMAP } })}
+          >
+            <Map />
+          </Button>
+        </ListItem>
+        {accessLevel >= AccessLevels.STANDARD && (
+          <ListItem key="wallet">
+            <Button
+              key="wallet"
+              className={`${order.get(WindowTypes.WALLET) && order.get(WindowTypes.WALLET).index === order.size ? 'active' : ''}`}
+              onClick={() => changeOrder({ id: WindowTypes.WALLET, value: { type: WindowTypes.WALLET } })}
+            >
+              <Wallet />
+            </Button>
+          </ListItem>
+        )}
+      </List>
       {otherWindows.length > 0 && (
         <List
           dropdown
@@ -105,7 +102,7 @@ const OpenApps = () => {
           {otherWindows}
         </List>
       )}
-    </List>
+    </div>
   );
 };
 

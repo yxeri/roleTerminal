@@ -20,7 +20,6 @@ const MainList = () => {
   if (accessLevel === permissions.CreateUser.accessLevel) {
     items.push(
       <ListItem
-        stopPropagation
         key="register"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGREGISTER, value: { type: WindowTypes.DIALOGREGISTER } }] }))}
       >
@@ -32,7 +31,6 @@ const MainList = () => {
   if (accessLevel === AccessLevels.ANONYMOUS) {
     items.push(
       <ListItem
-        stopPropagation
         key="login"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGLOGIN, value: { type: WindowTypes.DIALOGLOGIN } }] }))}
       >
@@ -44,7 +42,6 @@ const MainList = () => {
   if (accessLevel >= permissions.CreateAlias.accessLevel) {
     items.push(
       <ListItem
-        stopPropagation
         key="alias"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATEALIAS, value: { type: WindowTypes.DIALOGCREATEALIAS } }] }))}
       >
@@ -56,7 +53,6 @@ const MainList = () => {
   if (accessLevel >= AccessLevels.STANDARD) {
     items.push(
       <ListItem
-        stopPropagation
         key="settings"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCONFIGSYSTEM, value: { type: WindowTypes.DIALOGCONFIGSYSTEM } }] }))}
       >
@@ -65,7 +61,6 @@ const MainList = () => {
     );
     items.push(
       <ListItem
-        stopPropagation
         key="logout"
         onClick={() => {
           logout();
@@ -79,6 +74,7 @@ const MainList = () => {
   return (
     <List
       dropdown
+      className="MainList"
       title={<Menu />}
     >
       {items}

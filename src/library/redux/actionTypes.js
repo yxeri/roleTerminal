@@ -42,3 +42,4 @@ export const ALIASID = 'aliasId';
 export const WINDOWORDER = 'windowOrder';
 export const WINDOWORDERS = 'windowOrders';
 export const MODE = 'mode';
+export const INTERFACECONFIG = 'interfaceConfiog';

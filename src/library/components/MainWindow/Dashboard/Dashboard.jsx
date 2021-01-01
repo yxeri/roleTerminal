@@ -10,11 +10,16 @@ import ListItem from '../../common/lists/List/Item/ListItem';
 import { getTimestamp } from '../../../redux/selectors/config';
 import store from '../../../redux/store';
 import NewsItem from './Item/NewsItem';
+import { getHideMenu } from '../../../redux/selectors/interfaceConfig';
+import OpenApps from '../../MenuBar/lists/OpenApps/OpenApps';
+import MainList from '../../MenuBar/lists/MainList';
+import Clock from '../../MenuBar/sub-components/Clock/Clock';
 
 const Dashboard = () => {
   const user = useSelector(getCurrentUser);
   const wallet = useSelector((state) => getWalletById(state, { id: user.objectId }));
   const news = useSelector(getNews);
+  const hideMenu = useSelector(getHideMenu);
 
   const newsMapper = () => {
     if (!news || news.length === 0) {
@@ -44,6 +49,13 @@ const Dashboard = () => {
 
   return (
     <div className="Dashboard">
+      {hideMenu && (
+        <div className="nav">
+          <MainList />
+          <OpenApps />
+          <Clock />
+        </div>
+      )}
       {user.isAnonymous && (
         <>
           <p>Welcome!</p>

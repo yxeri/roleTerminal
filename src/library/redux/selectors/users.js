@@ -17,6 +17,11 @@ export const getCurrentAccessLevel = createSelector(
   (user) => user.accessLevel,
 );
 
+export const getSystemConfig = createCachedSelector(
+  [getCurrentUser],
+  (user) => user.systemConfig || {},
+)(() => 'current-system-config');
+
 export const getIdentities = createCachedSelector(
   [getAllUsers, getAllAliases],
   (users, aliases) => [...users.values(), ...aliases.values()],
@@ -67,7 +72,7 @@ export const getOthersIdentities = createCachedSelector(
   [getIdentities, getUserId],
   (identities, userId) => identities
     .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId))
-    .map((identity) => ({ objectId: identity.objectId, name: identity.aliasName || identity.username })),
+    .map((identity) => ({ objectId: identity.objectId, name: identity.aliasName || identity.username, partOfTeams: identity.partOfTeams })),
 )(() => 'other-identity-ids');
 
 export const getCurrentUserIdentities = createCachedSelector(

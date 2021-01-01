@@ -37,4 +37,23 @@
       background-color: $light-background-color;
     }
   }
+
+  .nav {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: fit-content(100%);
+    grid-gap: $padding * 2;
+
+    .Clock {
+      .icon {
+        border: $border;
+        border-radius: $border-radius;
+      }
+
+      .time {
+        right: unset;
+        border: $border;
+      }
+    }
+  }
 }

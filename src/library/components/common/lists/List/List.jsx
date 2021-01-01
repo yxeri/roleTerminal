@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   string,
-  arrayOf,
   bool,
   node,
 } from 'prop-types';
@@ -31,8 +30,10 @@ const List = React.forwardRef(({
   const classes = ['List'].concat([className]);
 
   const onClick = (event) => {
-    if (dropdown && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
-      if (event.target === listRef.current || !listRef.current.parentElement.contains(event.target)) {
+    if (dropdown && !hidden && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
+      console.log(event.target, event.currentTarget);
+
+      if (!listRef.current.parentElement.contains(event.target) || (event.target !== listRef.current && event.currentTarget === listRef.current)) {
         setHidden(true);
       }
     }
@@ -45,6 +46,20 @@ const List = React.forwardRef(({
       listRef.current.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  useEffect(() => {
+    if (!hidden && dropdown && listRef.current) {
+      const bounds = listRef.current.getBoundingClientRect();
+
+      if (bounds.right > window.innerWidth) {
+        listRef.current.style.right = 0;
+      }
+
+      if (bounds.bottom > window.innerHeight) {
+        listRef.current.style.bottom = 0;
+      }
+    }
+  }, [hidden, dropdown]);
 
   useEffect(() => {
     if (listRef.current && observe) {
@@ -126,6 +141,7 @@ const List = React.forwardRef(({
           onClick={() => {
             if (!alwaysExpanded) {
               setHidden(!hidden);
+
             }
           }}
         >

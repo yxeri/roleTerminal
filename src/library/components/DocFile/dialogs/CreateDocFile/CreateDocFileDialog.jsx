@@ -51,6 +51,7 @@ const CreateDocFileDialog = ({ id, index }) => {
       buttons={[
         <Button
           stopPropagation
+          key="submit"
           type="submit"
           onClick={() => formMethods.handleSubmit(onSubmit)()}
         >

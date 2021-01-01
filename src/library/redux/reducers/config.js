@@ -18,6 +18,8 @@ defaultState.set('requireOffName', false);
 defaultState.set('activateTermination', false);
 defaultState.set('allowedImages', { CHAT: false, PROFILE: false, DOCFILE: false });
 defaultState.set('newsCost', 0);
+defaultState.set('onlySeen', false);
+defaultState.set('allowPartialSearch', true);
 defaultState.set('permissions', {
   CreateAlias: {
     name: 'CreateAlias',
@@ -35,10 +37,12 @@ defaultState.set('anonymousUser', {
   isAnonymous: true,
   systemConfig: {},
   aliases: [],
+  hasSeen: [],
+  partOfTeams: [],
 });
 defaultState.set('systemUser', {
   objectId: '222222222222222222222220',
-  username: 'system',
+  username: 'SYSTEM',
 });
 // customUserFields
 // device id

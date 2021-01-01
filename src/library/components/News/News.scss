@@ -1,10 +1,10 @@
 @import "../../../common";
 
-.rnd {
+.rnd[min-width~="600px"] {
   .News {
-    .windowBox {
-      .content {
-        overflow-y: auto;
+    .NewsList {
+      .upper {
+        top: $padding;
       }
     }
   }

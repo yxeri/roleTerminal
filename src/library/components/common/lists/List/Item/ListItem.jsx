@@ -25,20 +25,6 @@ const ListItem = React.forwardRef(({
     }
   }, [scrollTo]);
 
-  const onClickCall = useCallback((event) => {
-    if (onClick) {
-      onClick(event);
-    }
-
-    if (event.target.parentElement.tagName === 'UL') {
-      event.target.parentElement.click();
-    }
-
-    if (stopPropagation) {
-      event.stopPropagation();
-    }
-  }, []);
-
   return (
     <li
       ref={(element) => {
@@ -51,7 +37,19 @@ const ListItem = React.forwardRef(({
       }}
       id={elementId}
       className={`ListItem ${onClick ? 'clickable' : ''} ${className}`}
-      onClick={onClickCall}
+      onClick={(event) => {
+        if (onClick) {
+          onClick(event);
+        }
+
+        if (event.target.parentElement.tagName === 'UL') {
+          event.target.parentElement.click();
+        }
+
+        if (stopPropagation) {
+          event.stopPropagation();
+        }
+      }}
     >
       {children}
     </li>

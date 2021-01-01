@@ -8,13 +8,15 @@
   }
 
   .Image {
-    margin-top: $padding * 2;
+    max-width: 120px;
     margin-right: $padding * 2;
+    float: left;
   }
 
   .Image.full {
-    margin-top: 0;
+    max-width: unset;
     margin-right: 0;
+    float: unset;
   }
 
   .title {
@@ -38,8 +40,6 @@
   }
 
   .newsContent {
-    display: flex;
-    flex-wrap: wrap;
   }
 }
 

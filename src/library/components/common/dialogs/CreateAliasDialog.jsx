@@ -53,6 +53,7 @@ const CreateAliasDialog = ({ id, index }) => {
       buttons={[
         <Button
           stopPropagation
+          key="submit"
           type="submit"
           onClick={onSubmitCall}
         >

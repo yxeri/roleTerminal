@@ -18,6 +18,7 @@ export const WindowTypes = {
   DIALOGCREATENEWS: 'New article',
   DIALOGJOINROOM: 'Join room',
   DIALOGCONFIGSYSTEM: 'Config system',
+  DIALOGUNLOCKROOM: 'Unlock room',
 };
 
 const defaultState = new Map();

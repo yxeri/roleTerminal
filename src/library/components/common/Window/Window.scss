@@ -33,10 +33,15 @@
         box-sizing: border-box;
 
         .List {
-          margin-top: $margin;
           margin-bottom: $margin;
           margin-right: $margin;
           flex-grow: 1;
+
+          header {
+            border-top-right-radius: 0;
+            border-top-left-radius: 0;
+            border-top: 0;
+          }
 
           .dropdown {
             left: 0;
@@ -45,8 +50,8 @@
           }
         }
 
-        .List:first-child {
-          margin-left: $margin;
+        .List:last-child {
+          margin-right: 0;
         }
       }
 
@@ -87,6 +92,12 @@
           width: 10em;
           max-width: 100%;
           padding-left: $padding;
+
+          header {
+            border-top-left-radius: $border-radius;
+            border-top-right-radius: $border-radius;
+            border-top: $border;
+          }
 
           .List {
             padding: 0 $padding;

@@ -3,7 +3,6 @@
 #MenuBar {
   display: flex;
   flex-direction: row;
-  padding-left: $padding;
   color: $second-color;
   height: $menu-bar-height;
   border-bottom: $border;
@@ -14,20 +13,26 @@
   z-index: $menu-bar-z-index;
   margin-bottom: $padding / 2;
 
-  .List {
+  .MainList {
+    header {
+      border-left: none;
+    }
+  }
+
+  .MainList, .OpenApps > div, .rightAligned > div {
     .dropdown {
       max-height: calc(100vh - #{2em + $padding});
       overflow-y: auto;
       scrollbar-width: none;
     }
 
-    header, .Button {
+    > header, > .Button {
       border-bottom: none;
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
     }
 
-    header {
+    > header {
       height: $icon-size;
 
       svg {
@@ -45,8 +50,14 @@
     margin-left: auto;
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding;
+    grid-gap: $padding * 2;
     margin-right: 0;
+
+    .Clock {
+      .icon {
+        padding-right: 0;
+      }
+    }
 
     > .Button {
       border-bottom: none;
@@ -66,11 +77,10 @@
   right: 0;
   top: 0;
   z-index: $dropdown-z-index;
-  opacity: .7;
+  opacity: 1;
 
   .Button {
     padding: 0;
-    border: none;
 
     svg {
       max-width: $icon-size - .2em;
@@ -83,6 +93,10 @@
   top: $menu-bar-height;
   z-index: 1;
   opacity: .5;
+
+  .Button {
+    border: none;
+  }
 }
 
 .warning {

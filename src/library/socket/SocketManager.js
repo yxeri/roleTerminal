@@ -25,6 +25,19 @@ import { alias } from './listeners/aliases';
 import { wallet } from './listeners/wallets';
 import { transaction } from './listeners/transactions';
 import { docFile } from './listeners/docFiles';
+import { batch } from 'react-redux';
+import {
+  ALIASES, DEVICES,
+  DOCFILES, FORUMPOSTS,
+  FORUMS,
+  FORUMTHREADS, GAMECODES,
+  INVITATIONS,
+  MESSAGES,
+  ROOMS, SIMPLEMSGS,
+  TEAMS, TRANSACTIONS,
+  USERS, WALLETS
+} from '../redux/actionTypes';
+import { ChangeTypes } from '../redux/reducers/root';
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef
@@ -171,26 +184,60 @@ export const emitSocketEvent = async (event, params = {}) => new Promise((resolv
   });
 });
 
-if (process.env.NODE_ENV === 'development') {
-  setInterval(() => {
-    emitSocketEvent('ping').catch(() => {
-      console.log('ping failed');
-    });
-  }, 1000);
-}
+export const retrieveAll = async ({ reset } = {}) => {
+  [
+    { type: USERS, event: GetEvents.USERS },
+    { type: ALIASES, event: GetEvents.ALIASES },
+    { type: TEAMS, event: GetEvents.TEAMS },
+    { type: ROOMS, event: GetEvents.ROOMS },
+    { type: MESSAGES, event: GetEvents.MESSAGES },
+    { type: INVITATIONS, event: GetEvents.INVITATIONS },
+    { type: DOCFILES, event: GetEvents.DOCFILES },
+    { type: FORUMS, event: GetEvents.FORUMS },
+    { type: FORUMTHREADS, event: GetEvents.FORUMTHREADS },
+    { type: FORUMPOSTS, event: GetEvents.FORUMPOSTS },
+    { type: GAMECODES, event: GetEvents.GAMECODES },
+    { type: SIMPLEMSGS, event: GetEvents.SIMPLEMSGS },
+    { type: WALLETS, event: GetEvents.WALLETS },
+    { type: TRANSACTIONS, event: GetEvents.TRANSACTIONS },
+    { type: DEVICES, event: GetEvents.DEVICES },
+  ].forEach((getter) => {
+    const { event, type } = getter;
+
+    emitSocketEvent(event, {})
+      .then((result) => {
+        console.log(event, result);
+
+        store.dispatch({
+          type,
+          payload: {
+            reset,
+            changeType: ChangeTypes.CREATE,
+            [type]: result[type],
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+};
 
 addSocketListener({
   event: ListenerEvents.RECONNECT,
   callback: () => {
-    if (getUserId(store.getState)) {
+    if (getUserId(store.getState())) {
       emitSocketEvent('updateId', {})
         .then(() => {
           store.dispatch(online());
+          retrieveAll();
         })
         .catch((error) => {
           console.log(error);
-          store.dispatch(logoutAction());
+          store.dispatch(logoutAction(retrieveAll));
         });
+    } else {
+      retrieveAll();
     }
   },
 });
@@ -202,17 +249,6 @@ addSocketListener({
     const token = getStoredToken();
     const aliasId = getStoredAliasId();
 
-    if (userId && token) {
-      store.dispatch(loginAction({
-        userId,
-        token,
-      }));
-    }
-
-    if (aliasId) {
-      store.dispatch(changeAliasId({ aliasId }));
-    }
-
     if (!getDeviceId()) {
       setDeviceId('1234567890123456');
     }
@@ -222,12 +258,24 @@ addSocketListener({
     if (userId || token) {
       emitSocketEvent('updateId', {})
         .then(() => {
-          store.dispatch(online());
+          batch(() => {
+            if (aliasId) {
+              store.dispatch(changeAliasId({ aliasId }));
+            }
+
+            store.dispatch(loginAction({
+              userId,
+              token,
+              retrieveAll,
+            }));
+          });
         })
         .catch((error) => {
           console.log(error);
-          store.dispatch(logoutAction());
+          store.dispatch(logoutAction(retrieveAll));
         });
+    } else {
+      retrieveAll({ reset: true });
     }
   },
 });

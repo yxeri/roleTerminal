@@ -13,11 +13,7 @@ export const changeWindowOrder = ({ windows }) => {
 
     return (dispatch) => {
       batch(() => {
-        console.log('changing order', windows);
-
         if (getMode(store.getState()).mode === Modes.HELP) {
-          console.log('changing target', id);
-
           dispatch(changeTarget({ target: id }));
         }
 

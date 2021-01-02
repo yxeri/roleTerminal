@@ -11,16 +11,14 @@ import { useSelector } from 'react-redux';
 
 import { getMessageById } from '../../../../../redux/selectors/messages';
 import ListItem from '../../../../common/lists/List/Item/ListItem';
-import store from '../../../../../redux/store';
-import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
+import { getIdentityName } from '../../../../../redux/selectors/users';
 import Image from '../../../../common/sub-components/Image/Image';
-
 import { ReactComponent as ChevronDown } from '../../../../../icons/chevron-down.svg';
 import { ReactComponent as ChevronUp } from '../../../../../icons/chevron-up.svg';
-
-import './NewsItem.scss';
 import { getDayModification, getYearModification } from '../../../../../redux/selectors/config';
 import { getTimestamp } from '../../../../../TextTools';
+
+import './NewsItem.scss';
 
 const NewsItem = ({
   messageId,
@@ -30,7 +28,7 @@ const NewsItem = ({
   const itemRef = useRef();
   const [showText, setShowText] = useState(false);
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
-  const identity = useSelector((state) => getIdentityOrTeamById(state, { id: message.teamId || message.ownerAliasId || message.ownerId }));
+  const name = useSelector((state) => getIdentityName(state, { id: message.ownerAliasId || message.ownerId }));
   const dayModification = useSelector(getDayModification);
   const yearModification = useSelector(getYearModification);
   const timestamp = getTimestamp({ date: message.customTimeCreated || message.timeCreated, dayModification, yearModification });
@@ -54,7 +52,7 @@ const NewsItem = ({
             {`${timestamp.halfDate} `}
             {timestamp.halfTime}
           </span>
-          <span>{` By: ${identity.teamName || identity.aliasName || identity.username}`}</span>
+          <span>{` By: ${name}`}</span>
           {!showText && <ChevronDown />}
           {showText && <ChevronUp />}
         </p>

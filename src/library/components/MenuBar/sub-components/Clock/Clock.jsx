@@ -38,7 +38,7 @@ const Clock = () => {
       className="Clock"
     >
       <Button className={`icon ${showTime ? 'active' : ''}`} onClick={onClick}><ClockSvg /></Button>
-      <Button onClick={onClick} className={`time ${!showTime ? 'hide' : ''}`}>{timestamp.halfTime}</Button>
+      <Button onClick={onClick} className={`time ${!showTime ? 'hide' : ''}`}>{timestamp.fullTime}</Button>
     </div>
   );
 };

@@ -8,7 +8,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import TopBar from './TopBar/TopBar';
-import { getSystemConfig } from '../../../redux/selectors/users';
+import { getAlwaysMaximized, getHideTopBar } from '../../../redux/selectors/users';
 
 import './Window.scss';
 
@@ -24,7 +24,8 @@ const Window = ({
   title = 'app',
   className = '',
 }) => {
-  const systemConfig = useSelector(getSystemConfig);
+  const hideTopBar = useSelector(getHideTopBar);
+  const alwaysMaximized = useSelector(getAlwaysMaximized);
   const defaultSize = type === 'window' ? { width: 640, height: 480 } : { width: 640, height: 480 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -46,7 +47,7 @@ const Window = ({
   }, []);
 
   const onDoubleClick = useCallback(() => {
-    if (size.width === '100%' && size.height === '100%') {
+    if (size.width === '100%' || size.height === '100%') {
       setSize(defaultSize);
     } else {
       maximize();
@@ -54,10 +55,10 @@ const Window = ({
   }, [size, coordinates]);
 
   useEffect(() => {
-    if (systemConfig.hideTopBar || systemConfig.alwaysMaximized) {
+    if (hideTopBar || alwaysMaximized) {
       maximize();
     }
-  }, [systemConfig]);
+  }, [hideTopBar, alwaysMaximized]);
 
   return (
     <Rnd
@@ -152,9 +153,10 @@ const Window = ({
         className={`Window ${className}`}
       >
         {
-          !systemConfig.hideTopBar
+          !hideTopBar
             ? (
               <TopBar
+                maximized={size.height === '100%' || size.width === '100%'}
                 onSettings={onSettings}
                 id={id}
                 done={done}

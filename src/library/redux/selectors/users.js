@@ -1,30 +1,91 @@
-import { createSelector } from 'reselect';
+import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect';
 import createCachedSelector from 're-reselect';
 
-import { getAlias, getAllAliases } from './aliases';
+import { getAliasById, getAllAliases } from './aliases';
 import { getUserId } from './userId';
 import { getAnonymousUser } from './config';
 import { getAllTeams, getTeamById } from './teams';
 
 export const getAllUsers = (state) => state.users;
 
-export const getUser = (state, { id }) => state.users.get(id);
+export const getUserById = (state, { id }) => state.users.get(id);
 
-export const getCurrentUser = (state) => state.users.get(getUserId(state)) || getAnonymousUser(state);
+export const getCurrentUser = createCachedSelector(
+  [
+    (state) => getUserById(state, { id: getUserId(state) }),
+    getAnonymousUser,
+  ],
+  (user, anonymous) => user || anonymous,
+)(() => 'current-user');
+
+export const getIsAnonymous = createCachedSelector(
+  [getCurrentUser],
+  (user) => user.isAnonymous,
+)(() => 'is-anonymous');
+
+export const getCurrentUserRooms = createCachedSelector(
+  [getCurrentUser],
+  (user) => user.followingRooms,
+)({
+  keySelector: () => 'current-user-rooms',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => a.followingRooms.length === b.followingRooms.length && a.followingRooms.every((roomId) => b.followingRooms.includes(roomId)),
+  ),
+});
 
 export const getCurrentAccessLevel = createSelector(
   [getCurrentUser],
   (user) => user.accessLevel,
 );
 
+export const getCurrentHasSeen = createCachedSelector(
+  [getCurrentUser],
+  (user) => user.hasSeen || [],
+)({
+  keySelector: () => 'current-user-hasSeen',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => a.hasSeen && b.hasSeen && a.hasSeen.length === b.hasSeen.length && a.hasSeen.every((seen) => b.hasSeen.includes(seen)),
+  ),
+});
+
+export const getCurrentPartOfTeams = createCachedSelector(
+  [getCurrentUser],
+  (user) => user.partOfTeams,
+)({
+  keySelector: () => 'current-user-partOfTeams',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => {
+      console.log('team', a.partOfTeams.length !== b.partOfTeams.length, b.partOfTeams.every((teamId) => a.partOfTeams.includes(teamId)));
+      if (a.partOfTeams.length !== b.partOfTeams.length) {
+        return false;
+      }
+
+      return b.partOfTeams.every((teamId) => a.partOfTeams.includes(teamId));
+    },
+  ),
+});
+
 export const getSystemConfig = createCachedSelector(
   [getCurrentUser],
   (user) => user.systemConfig || {},
 )(() => 'current-system-config');
 
+export const getHideTopBar = createCachedSelector(
+  [getSystemConfig],
+  (systemConfig) => systemConfig.hideTopBar,
+)(() => 'current-hideTopBar');
+
+export const getAlwaysMaximized = createCachedSelector(
+  [getSystemConfig],
+  (systemConfig) => systemConfig.alwaysMaximized,
+)(() => 'current-alwaysMaximized');
+
 export const getIdentities = createCachedSelector(
   [getAllUsers, getAllAliases],
-  (users, aliases) => [...users.values(), ...aliases.values()],
+  (users, aliases) => new Map([...users.entries(), ...aliases.entries()]),
 )(() => 'identities');
 
 export const getIdentitiesByIds = createCachedSelector(
@@ -58,25 +119,74 @@ export const getIdentitiesOrTeamsByIds = createCachedSelector(
   },
 )((_, { ids }) => `identities-teams-${ids.join(' ')}`);
 
-export const getIdentityById = createSelector(
-  [getUser, getAlias],
-  (user, alias) => user || alias,
-);
+export const getIdentityById = createCachedSelector(
+  [getUserById, getAliasById],
+  (user, alias) => alias || user,
+)((_, { id }) => `identity-${id}`);
+
+export const getIdentityName = createCachedSelector(
+  [getIdentityById],
+  ({ aliasName, username } = {}) => aliasName || username || '',
+)((_, { id }) => `identity-${id}-name`);
 
 export const getIdentityOrTeamById = createSelector(
-  [getUser, getAlias, getTeamById],
+  [getUserById, getAliasById, getTeamById],
   (user, alias, team) => team || alias || user,
 );
 
-export const getOthersIdentities = createCachedSelector(
+export const getOtherIdentities = createCachedSelector(
   [getIdentities, getUserId],
-  (identities, userId) => identities
+  (identities, userId) => [...identities.values()]
     .filter((identity) => identity.objectId !== userId && identity.ownerId !== userId && !identity.userIds.includes(userId))
-    .map((identity) => ({ objectId: identity.objectId, name: identity.aliasName || identity.username, partOfTeams: identity.partOfTeams })),
-)(() => 'other-identity-ids');
+    .map((identity) => ({ objectId: identity.objectId, partOfTeams: identity.partOfTeams, name: identity.aliasName || identity.username })),
+)({
+  keySelector: () => 'other-identity-ids',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => {
+      if (typeof a === 'string' && typeof b === 'string') {
+        return a === b;
+      }
+
+      if (a.size !== b.size) {
+        return false;
+      }
+
+      return [...b.values()].every((identity) => {
+        const otherIdentity = a.get(identity.objectId);
+
+        if (!otherIdentity) {
+          return false;
+        }
+
+        if ((identity.aliasName || identity.username) !== (otherIdentity.aliasName || otherIdentity.username)) {
+          return false;
+        }
+
+        return identity.partOfTeams.length === otherIdentity.partOfTeams.length && identity.partOfTeams.every((teamId) => otherIdentity.partOfTeams.includes(teamId));
+      });
+    },
+  ),
+});
 
 export const getCurrentUserIdentities = createCachedSelector(
   [getIdentities, getUserId],
-  (identities, userId) => identities
+  (identities, userId) => [...identities.values()]
     .filter((identity) => identity.objectId === userId || identity.ownerId === userId || identity.userIds.includes(userId)),
 )(() => 'current-identities');
+
+export const getCurrentUserIdentitiesNames = createCachedSelector(
+  [getCurrentUserIdentities],
+  (identities) => identities
+    .map((identity) => ({ objectId: identity.objectId, name: identity.aliasName || identity.username })),
+)({
+  keySelector: () => 'current-identities-names',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => a.length === b.length && b.every((identity) => {
+      const otherIdentity = a.find((aIdentity) => identity.objectId === aIdentity.objectId);
+
+      return otherIdentity && (otherIdentity.aliasName || otherIdentity.username) === (identity.aliasName || identity.username);
+    }),
+  ),
+});

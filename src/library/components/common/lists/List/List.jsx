@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   string,
   bool,
@@ -29,15 +29,17 @@ const List = React.forwardRef(({
   const listClasses = [];
   const classes = ['List'].concat([className]);
 
-  const onClick = (event) => {
+  const onClick = useCallback((event) => {
+    console.log(className, hidden, dropdown, checkWidth, listRef.current, windowRef.current);
+
     if (dropdown && !hidden && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
       console.log(event.target, event.currentTarget);
 
-      if (!listRef.current.parentElement.contains(event.target) || (event.target !== listRef.current && event.currentTarget === listRef.current)) {
+      if (event.target !== 'INPUT' && (!listRef.current.parentElement.contains(event.target) || (event.target !== listRef.current && event.currentTarget === listRef.current))) {
         setHidden(true);
       }
     }
-  };
+  }, [hidden]);
 
   const scroll = ({ direction }) => {
     if (direction === 'bottom' && listRef.current.lastElementChild) {
@@ -52,14 +54,18 @@ const List = React.forwardRef(({
       const bounds = listRef.current.getBoundingClientRect();
 
       if (bounds.right > window.innerWidth) {
-        listRef.current.style.right = 0;
+        listRef.current.classList.add('right');
+      } else {
+        listRef.current.classList.remove('right');
       }
 
       if (bounds.bottom > window.innerHeight) {
-        listRef.current.style.bottom = 0;
+        listRef.current.classList.add('bottom');
+      } else {
+        listRef.current.classList.remove('bottom');
       }
     }
-  }, [hidden, dropdown]);
+  }, [hidden]);
 
   useEffect(() => {
     if (listRef.current && observe) {
@@ -110,11 +116,13 @@ const List = React.forwardRef(({
   useEffect(() => {
     if (dropdown) {
       if (!hidden) {
-        document.addEventListener('mousedown', onClick, false);
+        document.addEventListener('mousedown', onClick);
       } else {
-        document.removeEventListener('mousedown', onClick, false);
+        document.removeEventListener('mousedown', onClick);
       }
     }
+
+    return () => document.removeEventListener('mousedown', onClick);
   }, [hidden]);
 
   if (!hidden) {

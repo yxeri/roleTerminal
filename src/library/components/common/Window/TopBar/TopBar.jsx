@@ -1,11 +1,13 @@
 import React, { useCallback } from 'react';
 import {
+  bool,
   func,
   string,
 } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import { ReactComponent as Maximize } from '../../../../icons/maximize.svg';
+import { ReactComponent as Minimize } from '../../../../icons/minimize.svg';
 import { ReactComponent as Close } from '../../../../icons/close.svg';
 import { ReactComponent as Settings } from '../../../../icons/settings.svg';
 import { ReactComponent as Help } from '../../../../icons/help.svg';
@@ -25,6 +27,7 @@ const TopBar = ({
   done,
   id,
   onSettings,
+  maximized,
 }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
   const systemConfig = useSelector(getSystemConfig);
@@ -62,7 +65,13 @@ const TopBar = ({
           <Button key="settings" className="settings" stopPropagation type="button" onClick={onSettings}><Settings /></Button>
         )}
         {!systemConfig.alwaysMaximized && (
-          <Button type="button" onClick={onDoubleClick}><Maximize /></Button>
+          <Button type="button" onClick={onDoubleClick}>
+            {
+              maximized
+                ? <Minimize />
+                : <Maximize />
+            }
+          </Button>
         )}
         <Button className="close" stopPropagation type="button" onClick={done}><Close /></Button>
       </div>
@@ -78,8 +87,10 @@ TopBar.propTypes = {
   onDoubleClick: func.isRequired,
   id: string.isRequired,
   onSettings: func,
+  maximized: bool,
 };
 
 TopBar.defaultProps = {
   onSettings: undefined,
+  maximized: undefined,
 };

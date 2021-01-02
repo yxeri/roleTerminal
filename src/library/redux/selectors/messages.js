@@ -1,5 +1,6 @@
 import createCachedSelector from 're-reselect';
 import { MessageType } from '../reducers/messages';
+import { createSelectorCreator, defaultMemoize } from 'reselect';
 
 export const getMessageById = (state, { id }) => state.messages.get(id);
 
@@ -20,13 +21,23 @@ export const getNews = createCachedSelector(
     .reverse(),
 )(() => 'news');
 
-export const getNewsIdsPoints = createCachedSelector(
-  [getNews],
-  (messages) => messages
-    .map(({ objectId, points }) => ({ objectId, points })),
-)(() => 'news-ids');
-
 export const getMessageIdsByRoom = createCachedSelector(
   [getMessagesByRoom],
   (messages) => messages.map(({ objectId }) => objectId),
 )((_, { roomId }) => `id-${roomId}`);
+
+export const getNewsIdsPoints = createCachedSelector(
+[getNews],
+(messages) => messages
+  .map(({ objectId, points }) => ({ objectId, points })),
+)({
+  keySelector: () => 'news-ids',
+  selectorCreator: createSelectorCreator(
+    defaultMemoize,
+    (a, b) => a.length === b.length && b.every((message, index) => {
+      const otherMessage = a[index];
+
+      return otherMessage && otherMessage.objectId === message.objectId;
+    }),
+  ),
+});

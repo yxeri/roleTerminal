@@ -1,11 +1,10 @@
 @import "../../../../../common";
 
 .IdentityPicker {
-  position: relative;
   background-color: $light-background-color;
 
   .dropdown {
-    min-width: 100%;
+    max-width: 100%;
   }
 
   svg {

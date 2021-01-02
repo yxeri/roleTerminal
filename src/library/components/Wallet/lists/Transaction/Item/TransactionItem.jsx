@@ -6,19 +6,23 @@ import { getTransactionById } from '../../../../../redux/selectors/transactions'
 import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
 
 import './TransactionItem.scss';
-import { getSystemUser, getTimestamp } from '../../../../../redux/selectors/config';
+import { getDayModification, getSystemUser, getYearModification } from '../../../../../redux/selectors/config';
 import store from '../../../../../redux/store';
+import { getTimestamp } from '../../../../../TextTools';
 
 const TransactionItem = ({ transactionId }) => {
   const transaction = useSelector((state) => getTransactionById(state, { id: transactionId }));
   const from = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.fromWalletId }));
   const to = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.toWalletId })) || getSystemUser(store.getState());
+  const dayModification = useSelector(getDayModification);
+  const yearModification = useSelector(getYearModification);
+  const timestamp = getTimestamp({ date: transaction.customTimeCreated || transaction.timeCreated, dayModification, yearModification });
 
   return (
     <ListItem
       className="TransactionItem"
     >
-      <p>{getTimestamp(store.getState(), { date: new Date(transaction.customTimeCreated || transaction.timeCreated) }).fullStamp}</p>
+      <p>{timestamp.fullStamp}</p>
       <p>
         {`${from.teamName || from.aliasName || from.username} -> ${to.teamName || to.aliasName || to.username}`}
       </p>

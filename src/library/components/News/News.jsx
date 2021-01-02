@@ -26,7 +26,7 @@ const News = ({ id, messageId, index }) => {
   const onCreateNews = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATENEWS, value: { type: WindowTypes.DIALOGCREATENEWS } }] })), []);
 
   const onSettings = useCallback(() => {
-    store.dispatch(changeWindowOrder())
+    store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGSETTINGSNEWS, value: { type: WindowTypes.DIALOGSETTINGSNEWS } }] }));
   }, [id]);
 
   return (

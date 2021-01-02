@@ -6,11 +6,6 @@
   grid-gap: $padding * 2;
 
   .apps {
-    svg {
-      max-width: $icon-size + .3em;
-      max-height: $icon-size + .3em;
-    }
-
     header {
       width: 1em + $padding;
     }
@@ -18,8 +13,21 @@
     > ul {
       padding: $padding * 2;
       grid-auto-flow: row;
-      grid-template-columns: repeat(4, fit-content(100%));
-      grid-gap: $padding * 2;
+      grid-template-columns: repeat(4, 4em);
+      grid-column-gap: $padding * 2;
+      grid-row-gap: $padding * 4;
+      justify-items: center;
+
+      svg {
+        max-width: $icon-size + .3em;
+        max-height: $icon-size + .3em;
+      }
+    }
+
+    .ListItem {
+      display: grid;
+      grid-gap: $padding;
+      justify-items: center;
     }
   }
 

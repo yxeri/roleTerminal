@@ -53,6 +53,7 @@ const OpenApps = () => {
           >
             <Chat />
           </Button>
+          <span>Chat</span>
         </ListItem>
         <ListItem key="news">
           <Button
@@ -62,6 +63,7 @@ const OpenApps = () => {
           >
             <News />
           </Button>
+          <span>News</span>
         </ListItem>
         <ListItem key="docFile">
           <Button
@@ -71,6 +73,7 @@ const OpenApps = () => {
           >
             <File />
           </Button>
+          <span>Files</span>
         </ListItem>
         <ListItem key="worldMap">
           <Button
@@ -80,6 +83,7 @@ const OpenApps = () => {
           >
             <Map />
           </Button>
+          <span>Map</span>
         </ListItem>
         {accessLevel >= AccessLevels.STANDARD && (
           <ListItem key="wallet">
@@ -90,6 +94,7 @@ const OpenApps = () => {
             >
               <Wallet />
             </Button>
+            <span>Wallet</span>
           </ListItem>
         )}
       </List>

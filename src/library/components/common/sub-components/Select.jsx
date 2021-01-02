@@ -3,7 +3,7 @@ import {
   arrayOf,
   bool,
   element,
-  func,
+  func, oneOfType,
   string,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
@@ -69,7 +69,7 @@ Select.propTypes = {
   onChange: func,
   required: bool,
   name: string.isRequired,
-  defaultValue: string,
+  defaultValue: oneOfType([string, arrayOf(string)]),
 };
 
 Select.defaultProps = {

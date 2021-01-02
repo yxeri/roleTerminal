@@ -1,17 +1,21 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
-import { getIdentityById } from '../../../../../../redux/selectors/users';
-import { getTimestamp } from '../../../../../../redux/selectors/config';
 
-import './MessageInfo.scss';
+import { getIdentityName } from '../../../../../../redux/selectors/users';
+import { getDayModification, getYearModification } from '../../../../../../redux/selectors/config';
 import store from '../../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../../redux/reducers/windowOrder';
+import { getTimestamp } from '../../../../../../TextTools';
+
+import './MessageInfo.scss';
 
 const MessageInfo = ({ identityId, timeCreated }) => {
-  const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
-  const timestamp = useSelector((state) => getTimestamp(state, { date: timeCreated }));
+  const name = useSelector((state) => getIdentityName(state, { id: identityId }));
+  const dayModification = useSelector(getDayModification);
+  const yearModification = useSelector(getYearModification);
+  const timestamp = getTimestamp({ date: timeCreated, dayModification, yearModification });
 
   return (
     <p className="MessageInfo">
@@ -20,12 +24,12 @@ const MessageInfo = ({ identityId, timeCreated }) => {
         tabIndex={0}
         className="clickable username"
         onClick={(event) => {
-          if (identity) {
+          if (name) {
             store.dispatch(changeWindowOrder({
               windows: [{
-                id: `${WindowTypes.DIALOGIDENTITY}-${identity.objectId}`,
+                id: `${WindowTypes.DIALOGIDENTITY}-${identityId}`,
                 value: {
-                  identityId: identity.objectId,
+                  identityId,
                   type: WindowTypes.DIALOGIDENTITY,
                 },
               }],
@@ -35,7 +39,7 @@ const MessageInfo = ({ identityId, timeCreated }) => {
           event.stopPropagation();
         }}
       >
-        {identity ? identity.username || identity.aliasName : '-'}
+        {name || '-'}
       </span>
       <span className="time">
         {timestamp.fullStamp}

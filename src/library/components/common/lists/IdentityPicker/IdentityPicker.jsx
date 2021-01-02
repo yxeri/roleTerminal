@@ -2,36 +2,37 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { bool } from 'prop-types';
 
-import { getCurrentUserIdentities } from '../../../../redux/selectors/users';
+import { getCurrentUserIdentitiesNames } from '../../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../../redux/selectors/userId';
 import List from '../List/List';
 import ListItem from '../List/Item/ListItem';
 import store from '../../../../redux/store';
 import { changeAliasId } from '../../../../redux/actions/aliasId';
 import { ReactComponent as User } from '../../../../icons/user.svg';
+import { getAliasById } from '../../../../redux/selectors/aliases';
 
 import './IdentityPicker.scss';
 
 const IdentityPicker = ({ useIcon = false }) => {
-  const identities = useSelector(getCurrentUserIdentities);
+  const identities = useSelector(getCurrentUserIdentitiesNames);
   const identityId = useSelector(getCurrentIdentityId);
   const currentIdentity = identities.find((identity) => identity.objectId === identityId);
 
-  const itemMapper = () => {
+  const items = (() => {
     const filtered = useIcon ? identities : identities.filter((identity) => identity.objectId !== identityId);
 
     return filtered.map((identity) => (
       <ListItem
         className={identity.objectId === identityId ? 'selected' : ''}
         key={identity.objectId}
-        onClick={() => store.dispatch(changeAliasId({ aliasId: identity.aliasName ? identity.objectId : undefined }))}
+        onClick={() => store.dispatch(changeAliasId({ aliasId: getAliasById(store.getState(), { id: identity.objectId }) ? identity.objectId : undefined }))}
       >
-        {identity.aliasName || identity.username}
+        {identity.name}
       </ListItem>
     ));
-  };
+  })();
 
-  const title = currentIdentity ? currentIdentity.aliasName || currentIdentity.username : '---';
+  const title = currentIdentity ? currentIdentity.name : '---';
 
   return (
     <List
@@ -46,7 +47,7 @@ const IdentityPicker = ({ useIcon = false }) => {
           </>
         )}
     >
-      {itemMapper()}
+      {items}
     </List>
   );
 };

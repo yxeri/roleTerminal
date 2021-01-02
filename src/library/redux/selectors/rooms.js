@@ -1,5 +1,5 @@
 import createCachedSelector from 're-reselect';
-import { getCurrentUser, getCurrentUserIdentities, getIdentitiesByIds } from './users';
+import { getCurrentUserIdentities, getCurrentUserRooms, getIdentitiesByIds } from './users';
 
 export const getAllRooms = (state) => state.rooms;
 
@@ -18,9 +18,9 @@ export const getWhisperRooms = createCachedSelector(
 )(() => 'whisperRooms');
 
 export const getUnfollowedRoomIds = createCachedSelector(
-  [getRooms, getCurrentUser],
-  (rooms, user) => rooms
-    .filter((room) => !user.followingRooms.includes(room.objectId)).map(({ roomName, objectId }) => ({ roomName, objectId }))
+  [getRooms, getCurrentUserRooms],
+  (rooms, followingRooms) => rooms
+    .filter((room) => !followingRooms.includes(room.objectId)).map(({ roomName, objectId }) => ({ roomName, objectId }))
     .sort((roomA, roomB) => {
       const a = roomA.roomName.toLowerCase();
       const b = roomB.roomName.toLowerCase();
@@ -39,9 +39,9 @@ export const getUnfollowedRoomIds = createCachedSelector(
 )(() => 'unfollowedRooms');
 
 export const getFollowedRoomsIds = createCachedSelector(
-  [getRooms, getCurrentUser],
-  (rooms, user) => rooms
-    .filter((room) => user.followingRooms.includes(room.objectId))
+  [getRooms, getCurrentUserRooms],
+  (rooms, followingRooms) => rooms
+    .filter((room) => followingRooms.includes(room.objectId))
     .map(({ objectId }) => objectId),
 )(() => 'followedRooms');
 

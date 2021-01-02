@@ -4,7 +4,12 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { bool } from 'prop-types';
 
 import List from '../List/List';
-import { getCurrentUser, getOthersIdentities } from '../../../../redux/selectors/users';
+import {
+  getCurrentAccessLevel,
+  getCurrentHasSeen, getCurrentPartOfTeams,
+  getCurrentUser,
+  getOtherIdentities
+} from '../../../../redux/selectors/users';
 import IdentityItem from './Item/IdentityItem';
 import ListItem from '../List/Item/ListItem';
 import Input from '../../sub-components/Input/Input';
@@ -14,16 +19,18 @@ import { WindowTypes } from '../../../../redux/reducers/windowOrder';
 import Button from '../../sub-components/Button/Button';
 import { ReactComponent as Close } from '../../../../icons/close.svg';
 import { getAllowPartialSearch, getOnlySeen } from '../../../../redux/selectors/config';
+import { AccessLevels } from '../../../../AccessCentral';
 
 import './IdentityList.scss';
-import { AccessLevels } from '../../../../AccessCentral';
 
 const IdentityList = () => {
   const formMethods = useForm();
   const partialName = useWatch({ control: formMethods.control, name: 'partialName' });
   const onlySeen = useSelector(getOnlySeen);
-  const currentUser = useSelector(getCurrentUser);
-  const identities = useSelector(getOthersIdentities);
+  const accessLevel = useSelector(getCurrentAccessLevel);
+  const hasSeen = useSelector(getCurrentHasSeen);
+  const partOfTeams = useSelector(getCurrentPartOfTeams);
+  const identities = useSelector(getOtherIdentities);
   const allowPartialSearch = useSelector(getAllowPartialSearch);
 
   const onClick = useCallback(() => {
@@ -34,21 +41,17 @@ const IdentityList = () => {
     let filtered = identities;
 
     if (partialName && partialName.length > 0) {
-      const hasSeen = currentUser.hasSeen || [];
-
       filtered = filtered
         .filter((identity) => {
-          if (allowPartialSearch || currentUser.accessLevel >= AccessLevels.ADMIN || hasSeen.includes(identity.objectId) || currentUser.partOfTeams.some((teamId) => identity.partOfTeams.includes(teamId))) {
+          if (allowPartialSearch || accessLevel >= AccessLevels.ADMIN || hasSeen.includes(identity.objectId) || partOfTeams.some((teamId) => identity.partOfTeams.includes(teamId))) {
             return identity.name.toLowerCase().includes(partialName.toLowerCase());
           }
 
           return identity.name.toLowerCase() === partialName.toLowerCase();
         });
-    } else if (onlySeen && currentUser.accessLevel < AccessLevels.ADMIN) {
-      const hasSeen = currentUser.hasSeen || [];
-
+    } else if (onlySeen && accessLevel < AccessLevels.ADMIN) {
       filtered = filtered
-        .filter((identity) => hasSeen.includes(identity.objectId) || currentUser.partOfTeams.some((teamId) => identity.partOfTeams.includes(teamId)));
+        .filter((identity) => hasSeen.includes(identity.objectId) || partOfTeams.some((teamId) => identity.partOfTeams.includes(teamId)));
     }
 
     return filtered.map(({ objectId: identityId }) => <IdentityItem key={identityId} identityId={identityId} onClick={onClick} />);

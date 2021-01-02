@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { number, string } from 'prop-types';
-import { batch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from '../../common/dialogs/Dialog/Dialog';
@@ -9,43 +9,47 @@ import Button from '../../common/sub-components/Button/Button';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import Textarea from '../../common/sub-components/Textarea';
-import { sendNewsMessage } from '../../../socket/actions/messages';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';
 import ImageUpload from '../../common/sub-components/ImageUpload/ImageUpload';
-import { getWalletById } from '../../../redux/selectors/wallets';
-import { getCurrentIdentityId } from '../../../redux/selectors/userId';
-import { getNewsCost } from '../../../redux/selectors/config';
+import { updateUser } from '../../../socket/actions/users';
+import { getCurrentUser } from '../../../redux/selectors/users';
+import Select from '../../common/sub-components/Select';
 
 const SettingsNewsDialog = ({ id, index }) => {
-  const newsCost = useSelector(getNewsCost);
-  const identityId = useSelector(getCurrentIdentityId);
-  const wallet = useSelector((state) => getWalletById(state, { id: identityId }));
+  const currentUser = useSelector(getCurrentUser);
   const formMethods = useForm();
   const [error, setError] = useState();
+  const { systemConfig = { [WindowTypes.NEWS]: {} } } = currentUser;
 
   const onSubmit = ({
-    title,
-    text,
-    image,
+    expand,
+    hideTopBar,
   }) => {
-    sendNewsMessage({ title, text, image })
-      .then(({ message }) => {
-        batch(() => {
-          store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.NEWS, value: { type: WindowTypes.NEWS, messageId: message.objectId } }] }));
-          store.dispatch(removeWindow({ id }));
-        });
-      })
-      .catch((createError) => console.log(createError));
+    updateUser({
+      userId: currentUser.objectId,
+      user: {
+        systemConfig: {
+          ...systemConfig,
+          [WindowTypes.NEWS]: {
+            ...systemConfig[WindowTypes.NEWS],
+            expand,
+            hideTopBar,
+          },
+        },
+      },
+    })
+      .then(() => store.dispatch(removeWindow({ id })))
+      .catch((updateError) => console.log(updateError));
   };
 
   return (
     <Dialog
       id={id}
       index={index}
-      className="SettingsNewsDialog"
+      className="SettingsNewsDialog configDialog"
       onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGCREATENEWS } }] }));
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGSETTINGSNEWS } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       error={error}
@@ -56,33 +60,28 @@ const SettingsNewsDialog = ({ id, index }) => {
           type="submit"
           onClick={() => formMethods.handleSubmit(onSubmit)()}
         >
-          Create
+          Update
         </Button>,
       ]}
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <div className="identity">
-            <span>You are:</span>
-            <IdentityPicker />
+          <div>
+            <span>Hide top row? (Window will be auto-maximized. You can close and change settings for the window under File)?</span>
+            <Input type="checkbox" name="hideTopBar" checked={systemConfig.hideTopBar} />
           </div>
           <div>
-            <p>{`The article fee is: ${newsCost}`}</p>
-            <p>{`You have ${wallet.amount} in your wallet`}</p>
+            <span>Automatically expand and place window?</span>
+            <Select
+              defaultValue={systemConfig[WindowTypes.NEWS].expand}
+              name="expand"
+            >
+              <option value="">No</option>
+              <option value="maximize">Maximize</option>
+              <option value="left">Left half</option>
+              <option value="right">Right half</option>
+            </Select>
           </div>
-          <Input
-            required
-            maxLength={200}
-            name="title"
-            placeholder="Title"
-          />
-          <ImageUpload />
-          <Textarea
-            required
-            maxLength={800}
-            name="text"
-            placeholder="Text"
-          />
         </form>
       </FormProvider>
     </Dialog>

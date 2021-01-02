@@ -25,6 +25,7 @@ import { changeWindowOrder } from '../../redux/actions/windowOrder';
 
 import './MainWindow.scss';
 import UnlockDocFileDialog from '../DocFile/dialogs/UnlockDocFileDialog';
+import SettingsNewsDialog from '../News/dialogs/SettingsNewsDialog';
 
 const MainWindow = () => {
   const systemConfig = useSelector(getSystemConfig);
@@ -74,6 +75,8 @@ const MainWindow = () => {
       windows.push(<ConfigSystemDialog key={key} id={key} index={value.index} />);
     } else if (type === WindowTypes.DIALOGUNLOCKROOM) {
       windows.push(<UnlockDocFileDialog key={key} id={key} index={value.index} docFileId={value.docFileId} />);
+    } else if (type === WindowTypes.DIALOGSETTINGSNEWS) {
+      windows.push(<SettingsNewsDialog key={key} id={key} index={value.index} />);
     }
   });
 

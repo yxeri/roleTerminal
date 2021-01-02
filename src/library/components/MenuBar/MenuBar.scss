@@ -12,12 +12,7 @@
   box-shadow: $shadow;
   z-index: $menu-bar-z-index;
   margin-bottom: $padding / 2;
-
-  .MainList {
-    header {
-      border-left: none;
-    }
-  }
+  padding: 0 $padding;
 
   .MainList, .OpenApps > div, .rightAligned > div {
     .dropdown {
@@ -26,7 +21,7 @@
       scrollbar-width: none;
     }
 
-    > header, > .Button {
+    > header, > .Button:first-child {
       border-bottom: none;
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
@@ -53,12 +48,6 @@
     grid-gap: $padding * 2;
     margin-right: 0;
 
-    .Clock {
-      .icon {
-        padding-right: 0;
-      }
-    }
-
     > .Button {
       border-bottom: none;
       border-bottom-right-radius: 0;
@@ -75,7 +64,7 @@
 .miniMenu {
   position: absolute;
   right: 0;
-  top: 0;
+  top: $menu-bar-height;
   z-index: $dropdown-z-index;
   opacity: 1;
 

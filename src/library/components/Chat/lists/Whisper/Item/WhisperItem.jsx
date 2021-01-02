@@ -13,7 +13,7 @@ const WhisperItem = ({ room, onChange, className }) => {
   const roomName = useSelector((state) => getWhisperRoomName(state, { ids: room.participantIds }));
 
   const onClick = useCallback(() => {
-    onChange({ roomId: room.objectId, roomName });
+    onChange({ roomId: room.objectId });
   }, [room]);
 
   return (

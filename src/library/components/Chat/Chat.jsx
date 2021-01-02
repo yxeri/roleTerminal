@@ -5,18 +5,14 @@ import { useSelector } from 'react-redux';
 import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
 import Window from '../common/Window/Window';
-import FileMenu from '../common/lists/FileMenu';
 import { getRoomById, getWhisperRoomName } from '../../redux/selectors/rooms';
-import ListItem from '../common/lists/List/Item/ListItem';
 import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
-import { getCurrentUser, getIdentityById } from '../../redux/selectors/users';
-import { hasAccessTo } from '../../AccessCentral';
+import { getIdentityById, getIsAnonymous } from '../../redux/selectors/users';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 import { getMode } from '../../redux/selectors/mode';
 import { Modes } from '../../redux/reducers/mode';
-
 import { ReactComponent as Close } from '../../icons/close.svg';
 import { ReactComponent as Maximize } from '../../icons/maximize.svg';
 import { ReactComponent as Settings } from '../../icons/settings.svg';
@@ -24,20 +20,21 @@ import { ReactComponent as Image } from '../../icons/image.svg';
 import { ReactComponent as User } from '../../icons/user.svg';
 import { ReactComponent as Lock } from '../../icons/lock.svg';
 import { ReactComponent as ChatIcon } from '../../icons/chat.svg';
+import ChatFileMenu from './lists/FileMenu/ChatFileMenu';
 
 import './Chat.scss';
 
-const Chat = ({ id, roomId, index }) => {
+const Chat = ({ id, index, roomId }) => {
   const mode = useSelector(getMode);
   const [currentRoomId, setRoomId] = useState(roomId || getPublicRoomId(store.getState()));
   const room = useSelector((state) => getRoomById(state, { id: currentRoomId }));
-  const currentUser = useSelector(getCurrentUser);
+  const isAnonymous = useSelector(getIsAnonymous);
 
   useEffect(() => {
-    if ((!currentUser || currentUser.isAnonymous || !room) && currentRoomId !== getPublicRoomId(store.getState())) {
+    if ((isAnonymous || !room) && currentRoomId !== getPublicRoomId(store.getState())) {
       setRoomId(getPublicRoomId(store.getState()));
     }
-  }, [room, currentUser]);
+  }, [room, isAnonymous]);
 
   useEffect(() => {
     if (roomId && currentRoomId !== roomId) {
@@ -73,13 +70,6 @@ const Chat = ({ id, roomId, index }) => {
 
   const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
 
-  const onCreateRoom = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATEROOM, value: { type: WindowTypes.DIALOGCREATEROOM } }] })), []);
-
-  const { hasFullAccess } = hasAccessTo({
-    objectToAccess: room,
-    toAuth: currentUser,
-  });
-
   return (
     <Window
       id={id}
@@ -90,35 +80,7 @@ const Chat = ({ id, roomId, index }) => {
       onClick={onClick}
       menu={(
         <>
-          {!currentUser.isAnonymous && (
-            <FileMenu key="fileMenu" id={id}>
-              <ListItem
-                stopPropagation
-                key="createRoom"
-                onClick={onCreateRoom}
-              >
-                New room
-              </ListItem>
-              {hasFullAccess && (
-                <ListItem
-                  stopPropagation
-                  key="configRoom"
-                  onClick={() => {}}
-                >
-                  Config room
-                </ListItem>
-              )}
-              {hasFullAccess && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
-                <ListItem
-                  stopPropagation
-                  key="removeRoom"
-                  onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGREMOVEROOM, value: { type: WindowTypes.DIALOGREMOVEROOM, roomId: currentRoomId } }] }))}
-                >
-                  Delete room
-                </ListItem>
-              )}
-            </FileMenu>
-          )}
+          <ChatFileMenu roomId={currentRoomId} id={id} />
           <Rooms
             roomId={currentRoomId}
             key="rooms"

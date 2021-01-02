@@ -6,10 +6,10 @@ import store from '../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 import ListItem from '../../List/Item/ListItem';
-import { getIdentityById } from '../../../../../redux/selectors/users';
+import { getIdentityName } from '../../../../../redux/selectors/users';
 
 const IdentityItem = ({ identityId, onClick }) => {
-  const identity = useSelector((state) => getIdentityById(state, { id: identityId }));
+  const name = useSelector((state) => getIdentityName(state, { id: identityId }));
 
   const onClickCall = useCallback(() => {
     if (onClick) {
@@ -18,22 +18,22 @@ const IdentityItem = ({ identityId, onClick }) => {
 
     store.dispatch(changeWindowOrder({
       windows: [{
-        id: `${WindowTypes.DIALOGIDENTITY}-${identity.objectId}`,
+        id: `${WindowTypes.DIALOGIDENTITY}-${identityId}`,
         value: {
-          identityId: identity.objectId,
+          identityId,
           type: WindowTypes.DIALOGIDENTITY,
         },
       }],
     }));
-  }, [identity.objectId]);
+  }, [identityId]);
 
   return (
     <ListItem
       stopPropagation
-      key={identity.objectId}
+      key={identityId}
       onClick={onClickCall}
     >
-      {identity.username || identity.aliasName}
+      {name || '-'}
     </ListItem>
   );
 };

@@ -56,7 +56,7 @@ const ConfigSystemDialog = ({ id, index }) => {
 
   return (
     <Dialog
-      className="ConfigSystemDialog"
+      className="ConfigSystemDialog configDialog"
       id={id}
       index={index}
       title={`System config: ${currentUser.username}`}

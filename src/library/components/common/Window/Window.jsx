@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
   func,
@@ -11,6 +11,9 @@ import TopBar from './TopBar/TopBar';
 import { getAlwaysMaximized, getHideTopBar } from '../../../redux/selectors/users';
 
 import './Window.scss';
+import { getOrder } from '../../../redux/selectors/windowOrder';
+import store from '../../../redux/store';
+import { getHideMenu } from '../../../redux/selectors/interfaceConfig';
 
 const Window = ({
   onClick,
@@ -24,15 +27,13 @@ const Window = ({
   title = 'app',
   className = '',
 }) => {
+  const rndRef = useRef();
   const hideTopBar = useSelector(getHideTopBar);
   const alwaysMaximized = useSelector(getAlwaysMaximized);
-  const defaultSize = type === 'window' ? { width: 640, height: 480 } : { width: 640, height: 480 };
+  const defaultSize = type === 'window' ? { width: 380, height: 340 } : { width: 380, height: 340 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const resizing = {
-    top: true,
-    topRight: true,
-    topLeft: true,
     right: true,
     bottom: true,
     left: true,
@@ -47,7 +48,7 @@ const Window = ({
   }, []);
 
   const onDoubleClick = useCallback(() => {
-    if (size.width === '100%' || size.height === '100%') {
+    if (size.width === '100%' || size.height === '100%' || size.width === '50%' || size.height === '50%') {
       setSize(defaultSize);
     } else {
       maximize();
@@ -62,46 +63,34 @@ const Window = ({
 
   return (
     <Rnd
+      ref={rndRef}
       style={style}
       onClick={onClick}
       position={coordinates}
       className="rnd"
       size={size}
-      minWidth={300}
-      minHeight={200}
-      maxHeight="100%"
+      minWidth={260}
+      minHeight={220}
       maxWidth="100%"
-      bounds="parent"
+      maxHeight="calc(100%)"
+      bounds="#MainWindow"
       dragHandleClassName="TopBarHandle"
       enableResizing={resizing}
       resizeHandleStyles={{
-        top: { top: '0', width: '5px' },
-        left: { left: '0', width: '5px' },
-        right: { right: '0', width: '5px' },
-        bottom: { bottom: '0', height: '5px' },
+        left: { left: 0, width: '10px' },
+        right: { right: 0, width: '10px' },
+        bottom: { bottom: 0, height: '5px' },
         bottomLeft: {
-          bottom: '0',
-          left: '0',
-          width: '10px',
-          height: '10px',
+          bottom: 0,
+          left: 0,
+          width: '20px',
+          height: '15px',
         },
         bottomRight: {
-          bottom: '0',
-          right: '0',
-          width: '10px',
-          height: '10px',
-        },
-        topRight: {
-          right: '0',
-          top: '0',
-          width: '10px',
-          height: '10px',
-        },
-        topLeft: {
-          left: '0',
-          top: '0',
-          width: '10px',
-          height: '10px',
+          bottom: 0,
+          right: 0,
+          width: '20px',
+          height: '15px',
         },
       }}
       onDragStart={onClick}
@@ -110,38 +99,44 @@ const Window = ({
           return;
         }
 
-        // if (newX === 0 && newY === 0 && size.height !== '100%') { // Upper left
-        //   setSize({ width: '50%', height: '50%' });
-        //   setCoordinates({ x: 0, y: 0 });
-        // } else if (newX === 0 && (newY + element.offsetHeight + 35) >= window.innerHeight && size.height !== '100%') { // Lower left
-        //   setSize({ width: '50%', height: '50%' });
-        //   setCoordinates({ x: 0, y: ((window.innerHeight - 36) / 2) });
-        // } else if (newY === 0 && newX + element.offsetWidth >= window.innerWidth && size.height !== '100%') { // Upper right
-        //   setSize({ width: '50%', height: '50%' });
-        //   setCoordinates({ x: window.innerWidth / 2, y: 0 });
-        // } else if (newX + element.offsetWidth >= window.innerWidth && newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Lower right
-        //   setSize({ width: '50%', height: '50%' });
-        //   setCoordinates({ x: window.innerWidth / 2, y: ((window.innerHeight - 36) / 2) });
-        // }
+        const right = newX + element.offsetWidth >= window.innerWidth;
+        const left = newX === 0;
+        const up = newY === 0;
+        const down = newY + element.offsetHeight + 35 >= window.innerHeight;
+        const smallHeight = window.innerHeight < 600;
+        const smallWidth = window.innerWidth < 500;
+        const windowBounds = rndRef.current.resizableElement.current.parentElement.getBoundingClientRect();
 
-        if (newX === 0 && size.width !== '100%') { // Left
+        if (!smallHeight && !smallWidth && up && left && !right && !down) {
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: 0, y: 0 });
+        } else if (!smallHeight && !smallWidth && up && right && !left && !down) {
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: windowBounds.width / 2, y: 0 });
+        } else if (!smallHeight && !smallWidth && down && left && !right && !up) {
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: 0, y: ((windowBounds.height - 36) / 2) });
+        } else if (!smallHeight && !smallWidth && down && right && !left && !up) {
+          setSize({ width: '50%', height: '50%' });
+          setCoordinates({ x: windowBounds.width / 2, y: ((windowBounds.height - 36) / 2) });
+        } else if (!smallWidth && left && !right) { // Left
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: 0, y: 0 });
-        } else if (newX + element.offsetWidth >= window.innerWidth && size.width !== '100%') { // Right
+        } else if (!smallWidth && right && !left) { // Right
           setSize({ width: '50%', height: '100%' });
-          setCoordinates({ x: window.innerWidth / 2, y: 0 });
+          setCoordinates({ x: windowBounds.width / 2, y: 0 });
+        } else if (!smallHeight && up && !down) { // Up
+          setSize({ height: '50%', width: '100%' });
+          setCoordinates({ y: 0, x: 0 });
+        } else if (!smallHeight && down && !up) { // Down
+          setSize({ height: '50%', width: '100%' });
+          setCoordinates({ x: 0, y: windowBounds.height / 2 });
         } else {
           setCoordinates({ x: newX, y: newY });
         }
-        // else if (newY === 0 && size.height !== '100%') { // Up
-        //   setSize({ height: '50%', width: '100%' });
-        //   setCoordinates({ y: 0, x: 0 });
-        // } else if (newY + element.offsetHeight + 35 >= window.innerHeight && size.height !== '100%') { // Down
-        //   setSize({ height: '50%', width: '100%' });
-        //   setCoordinates({ x: 0, y: window.innerHeight / 2 });
-        // }
       }}
-      onResizeStart={onClick}
+      onResizeStart={() => {
+      }}
       onResizeStop={(event, direction, element, _, position) => {
         if (element.offsetWidth !== size.width || element.offsetHeight !== size.height) {
           setSize({ width: element.offsetWidth, height: element.offsetHeight });

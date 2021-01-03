@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   string,
   bool,
@@ -30,12 +35,8 @@ const List = React.forwardRef(({
   const classes = ['List'].concat([className]);
 
   const onClick = useCallback((event) => {
-    console.log(className, hidden, dropdown, checkWidth, listRef.current, windowRef.current);
-
     if (dropdown && !hidden && listRef.current && (!checkWidth || !windowRef.current || windowRef.current.offsetWidth < 600)) {
-      console.log(event.target, event.currentTarget);
-
-      if (event.target !== 'INPUT' && (!listRef.current.parentElement.contains(event.target) || (event.target !== listRef.current && event.currentTarget === listRef.current))) {
+      if (event.target.tagName !== 'INPUT' && (!listRef.current.parentElement.contains(event.target) || (event.target !== listRef.current && event.currentTarget === listRef.current))) {
         setHidden(true);
       }
     }

@@ -18,6 +18,7 @@ import { ReactComponent as File } from '../../../../icons/file-plus.svg';
 import { ReactComponent as CloudOff } from '../../../../icons/cloud-off.svg';
 
 import './InputArea.scss';
+import Textarea from '../../../common/sub-components/Textarea/Textarea';
 
 const InputArea = ({
   roomId,
@@ -26,24 +27,11 @@ const InputArea = ({
 }) => {
   const [isSending, setIsSending] = useState(false);
   const formMethods = useForm();
-  const inputRef = useRef(null);
   const buttonRef = useRef(null);
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
   const gpsTracking = useSelector(getGpsTracking);
-
-  const resize = () => {
-    if (inputRef.current) {
-      const textarea = inputRef.current;
-
-      if (!textarea.style.height || (textarea.scrollHeight.toString() !== textarea.style.height.split('px')[0])) {
-        textarea.style.height = 'auto';
-        textarea.style.height = `${textarea.scrollHeight}px`;
-        inputRef.current.scrollIntoView();
-      }
-    }
-  };
 
   const onSubmit = ({
     text,
@@ -58,7 +46,6 @@ const InputArea = ({
     }).then(({ message, switchRoom }) => {
       formMethods.setValue('text', '');
       formMethods.setValue('image', undefined);
-      resize();
 
       if (switchRoom) {
         onSend({ roomId: message.roomId });
@@ -99,16 +86,9 @@ const InputArea = ({
             </div>
           )}
           <div className="input">
-            <textarea
-              maxLength={600}
-              name="text"
+            <Textarea
               key="input"
-              rows={1}
-              ref={(element) => {
-                formMethods.register(element);
-
-                inputRef.current = element;
-              }}
+              name="text"
               onKeyDown={(event) => {
                 const { key, altKey } = event;
 
@@ -117,7 +97,6 @@ const InputArea = ({
                 }
               }}
               placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
-              onChange={(event) => resize(event.target)}
             />
             <Button
               ref={buttonRef}

@@ -22,10 +22,10 @@ import ConfigSystemDialog from '../common/dialogs/ConfigSystem/ConfigSystemDialo
 import { getSystemConfig } from '../../redux/selectors/users';
 import store from '../../redux/store';
 import { changeWindowOrder } from '../../redux/actions/windowOrder';
-
-import './MainWindow.scss';
 import UnlockDocFileDialog from '../DocFile/dialogs/UnlockDocFileDialog';
 import SettingsNewsDialog from '../News/dialogs/SettingsNewsDialog';
+
+import './MainWindow.scss';
 
 const MainWindow = () => {
   const systemConfig = useSelector(getSystemConfig);
@@ -37,6 +37,20 @@ const MainWindow = () => {
       store.dispatch(changeWindowOrder({ windows: [{ id: systemConfig.openApp, value: { type: systemConfig.openApp } }] }));
     }
   }, [systemConfig.openApp]);
+
+  useEffect(() => {
+    document.addEventListener('click', () => {
+      const element = document.documentElement;
+
+      if (element.requestFullscreen) {
+        element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    });
+  }, []);
 
   order.forEach((value, key) => {
     const { type } = value;

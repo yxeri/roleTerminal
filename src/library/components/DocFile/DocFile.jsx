@@ -53,15 +53,12 @@ const DocFile = ({ id, docFileId, index }) => {
               New document
             </ListItem>
           </FileMenu>
-          <DocFileList onChange={onChange} />
         </>
       )}
     >
-      {!currentDocFileId && (
-        <div />
-      )}
+      <DocFileList onChange={onChange} />
       {currentDocFileId && (
-        <DocFileViewer key="viewer" docFileId={currentDocFileId} />
+        <DocFileViewer key="viewer" docFileId={currentDocFileId} onChange={onChange} />
       )}
     </Window>
   );

@@ -1,3 +1,5 @@
+import { batch } from 'react-redux';
+
 import store from '../redux/store';
 import { isOnline, isReconnecting } from '../redux/selectors/online';
 import {
@@ -25,7 +27,6 @@ import { alias } from './listeners/aliases';
 import { wallet } from './listeners/wallets';
 import { transaction } from './listeners/transactions';
 import { docFile } from './listeners/docFiles';
-import { batch } from 'react-redux';
 import {
   ALIASES, DEVICES,
   DOCFILES, FORUMPOSTS,
@@ -35,9 +36,11 @@ import {
   MESSAGES,
   ROOMS, SIMPLEMSGS,
   TEAMS, TRANSACTIONS,
-  USERS, WALLETS
+  USERS, WALLETS,
 } from '../redux/actionTypes';
 import { ChangeTypes } from '../redux/reducers/root';
+
+let startupDone = false;
 
 const socket = (() => {
   let socketUri = typeof ioUri !== 'undefined' // eslint-disable-line no-undef

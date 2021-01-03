@@ -5,9 +5,9 @@ import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from './Dialog/Dialog';
 import { login } from '../../../socket/actions/auth';
-import Select from '../sub-components/Select';
+import Select from '../sub-components/Select/Select';
 import Input from '../sub-components/Input/Input';
-import Textarea from '../sub-components/Textarea';
+import Textarea from '../sub-components/Textarea/Textarea';
 import { getRequireOffName } from '../../../redux/selectors/config';
 import Button from '../sub-components/Button/Button';
 import { createUser } from '../../../socket/actions/users';

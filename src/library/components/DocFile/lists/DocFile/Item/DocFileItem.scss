@@ -2,16 +2,4 @@
 
 .DocFileItem {
   position: relative;
-
-  .lock {
-    position: absolute;
-    right: $padding;
-    top: $padding;
-    opacity: .50;
-
-    svg {
-      max-height: 1em;
-      max-width: 1em;
-    }
-  }
 }

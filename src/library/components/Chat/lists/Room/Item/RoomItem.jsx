@@ -15,7 +15,7 @@ const RoomItem = ({ roomId }) => {
   const room = useSelector((state) => getRoomById(state, { id: roomId }));
 
   const onClick = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGJOINROOM}-${roomId}`, value: { type: WindowTypes.DIALOGJOINROOM, roomId } }] }))
+    store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGJOINROOM}-${roomId}`, value: { type: WindowTypes.DIALOGJOINROOM, roomId } }] }));
   }, [roomId]);
 
   return (

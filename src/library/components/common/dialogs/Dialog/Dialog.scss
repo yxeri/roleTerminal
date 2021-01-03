@@ -40,6 +40,7 @@
           grid-gap: $padding;
           position: sticky;
           bottom: 0;
+          margin-top: $padding * 2;
         }
       }
     }
@@ -59,6 +60,11 @@
         border-bottom: $border;
         border-top: $border;
         padding: $padding * 2 0;
+        align-items: center;
+
+        span {
+          margin-right: $padding;
+        }
 
         .Input, .Select {
           margin-left: auto;

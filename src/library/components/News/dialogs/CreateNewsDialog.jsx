@@ -8,7 +8,7 @@ import Input from '../../common/sub-components/Input/Input';
 import Button from '../../common/sub-components/Button/Button';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
-import Textarea from '../../common/sub-components/Textarea';
+import Textarea from '../../common/sub-components/Textarea/Textarea';
 import { sendNewsMessage } from '../../../socket/actions/messages';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';

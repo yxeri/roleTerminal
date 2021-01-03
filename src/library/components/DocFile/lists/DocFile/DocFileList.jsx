@@ -1,19 +1,17 @@
-import React, { useCallback } from 'react';
+import React, { useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { func, string } from 'prop-types';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { func } from 'prop-types';
+import { useForm, useWatch } from 'react-hook-form';
 
 import List from '../../../common/lists/List/List';
 import { getDocFileIdsNames } from '../../../../redux/selectors/docFiles';
 import DocFileItem from './Item/DocFileItem';
-import Input from '../../../common/sub-components/Input/Input';
-import Button from '../../../common/sub-components/Button/Button';
-import { ReactComponent as Close } from '../../../../icons/close.svg';
-import ListItem from '../../../common/lists/List/Item/ListItem';
+import SearchItem from '../../../common/lists/List/Search/SearchItem';
 
-const DocFileList = ({ onChange, docFileId }) => {
+const DocFileList = ({ onChange }) => {
+  const listRef = useRef();
   const formMethods = useForm();
-  const partial = useWatch({ control: formMethods.control, name: 'partial' });
+  const partial = useWatch({ control: formMethods.control, name: 'search' });
   const docFiles = useSelector(getDocFileIdsNames);
 
   const items = (() => {
@@ -44,28 +42,22 @@ const DocFileList = ({ onChange, docFileId }) => {
     if (items.length === 0) {
       formMethods.reset();
     } else if (items.length === 1) {
-      onChange(items[0].click());
+      const docFileItem = listRef.current.querySelector(`#docFile-${items[0].key}`);
 
-      formMethods.reset();
+      if (docFileItem) {
+        docFileItem.click();
+
+        formMethods.reset();
+      }
     }
   };
 
-  const onReset = useCallback(() => formMethods.reset(), []);
-
   return (
     <List
-      dropdown
-      checkWidth
-      title="Documents"
+      alwaysExpanded
+      ref={listRef}
     >
-      <ListItem className="search">
-        <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <Input name="partial" placeholder="Find document" />
-            <Button stopPropagation onClick={onReset}><Close /></Button>
-          </form>
-        </FormProvider>
-      </ListItem>
+      <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by tile/tags" />
       {items}
     </List>
   );
@@ -74,10 +66,5 @@ const DocFileList = ({ onChange, docFileId }) => {
 export default React.memo(DocFileList);
 
 DocFileList.propTypes = {
-  docFileId: string,
   onChange: func.isRequired,
-};
-
-DocFileList.defaultProps = {
-  docFileId: undefined,
 };

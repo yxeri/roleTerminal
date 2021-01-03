@@ -1,9 +1,9 @@
 @import "../../../../../common";
 
-.Input {
-  padding: $padding;
-  box-sizing: border-box;
+.Select {
+  min-width: 7em;
   background-color: $input-background-color;
-  color: $input-color;
+  color: $background-color;
+  scrollbar-width: none;
   border: $border;
 }

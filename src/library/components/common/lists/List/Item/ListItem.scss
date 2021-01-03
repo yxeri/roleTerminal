@@ -4,6 +4,22 @@
   word-wrap: break-word;
   padding: $padding $padding;
   box-sizing: border-box;
+
+  .spy, .lock {
+    position: absolute;
+    right: $padding;
+    top: $padding;
+
+    svg {
+      opacity: .50;
+      max-height: 1em;
+      max-width: 1em;
+    }
+  }
+
+  .spy {
+    opacity: .25;
+  }
 }
 
 .ListItem.clickable {

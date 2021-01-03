@@ -4,7 +4,18 @@
   .DocFile {
     .windowBox {
       .content {
-        overflow-y: auto;
+        padding: 0;
+        position: relative;
+
+        .DocFileViewer {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 100%;
+          background-color: $second-background-color;
+          padding: $padding * 3;
+        }
       }
     }
   }

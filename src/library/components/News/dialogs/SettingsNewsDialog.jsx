@@ -8,13 +8,13 @@ import Input from '../../common/sub-components/Input/Input';
 import Button from '../../common/sub-components/Button/Button';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
-import Textarea from '../../common/sub-components/Textarea';
+import Textarea from '../../common/sub-components/Textarea/Textarea';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';
 import ImageUpload from '../../common/sub-components/ImageUpload/ImageUpload';
 import { updateUser } from '../../../socket/actions/users';
 import { getCurrentUser } from '../../../redux/selectors/users';
-import Select from '../../common/sub-components/Select';
+import Select from '../../common/sub-components/Select/Select';
 
 const SettingsNewsDialog = ({ id, index }) => {
   const currentUser = useSelector(getCurrentUser);

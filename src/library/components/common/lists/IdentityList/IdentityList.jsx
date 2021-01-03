@@ -1,31 +1,29 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
-import { bool } from 'prop-types';
+import { useForm, useWatch } from 'react-hook-form';
 
 import List from '../List/List';
 import {
   getCurrentAccessLevel,
-  getCurrentHasSeen, getCurrentPartOfTeams,
-  getCurrentUser,
-  getOtherIdentities
+  getCurrentHasSeen,
+  getCurrentPartOfTeams,
+  getOtherIdentities,
 } from '../../../../redux/selectors/users';
 import IdentityItem from './Item/IdentityItem';
 import ListItem from '../List/Item/ListItem';
-import Input from '../../sub-components/Input/Input';
 import store from '../../../../redux/store';
 import { changeWindowOrder } from '../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../redux/reducers/windowOrder';
-import Button from '../../sub-components/Button/Button';
-import { ReactComponent as Close } from '../../../../icons/close.svg';
 import { getAllowPartialSearch, getOnlySeen } from '../../../../redux/selectors/config';
 import { AccessLevels } from '../../../../AccessCentral';
+import SearchItem from '../List/Search/SearchItem';
+import { ReactComponent as Users } from '../../../../icons/users.svg';
 
 import './IdentityList.scss';
 
 const IdentityList = () => {
   const formMethods = useForm();
-  const partialName = useWatch({ control: formMethods.control, name: 'partialName' });
+  const partialName = useWatch({ control: formMethods.control, name: 'search' });
   const onlySeen = useSelector(getOnlySeen);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const hasSeen = useSelector(getCurrentHasSeen);
@@ -75,23 +73,14 @@ const IdentityList = () => {
     }
   };
 
-  const onReset = useCallback(() => formMethods.reset(), []);
-
   return (
     <List
       dropdown
       checkWidth
       className="IdentityList"
-      title="Users"
+      title={<Users />}
     >
-      <ListItem className="search">
-        <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <Input name="partialName" placeholder="Find user" />
-            <Button stopPropagation onClick={onReset}><Close /></Button>
-          </form>
-        </FormProvider>
-      </ListItem>
+      <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by name" />
       {
         partialName && userItems.length === 0
           ? ([<ListItem key="noMatch">No match found</ListItem>])

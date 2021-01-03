@@ -11,9 +11,12 @@ const getRooms = createCachedSelector(
 )(() => 'normalRooms');
 
 export const getWhisperRooms = createCachedSelector(
-  [getAllRooms],
-  (rooms) => [...rooms.values()]
-    .filter((room) => room.isWhisper)
+  [
+    getAllRooms,
+    (_, { spyMode }) => spyMode,
+  ],
+  (rooms, spyMode) => [...rooms.values()]
+    .filter((room) => room.isWhisper && ((typeof room.spyMode !== 'boolean' && !spyMode) || spyMode === room.spyMode))
     .map(({ objectId, participantIds }) => ({ objectId, participantIds })),
 )(() => 'whisperRooms');
 

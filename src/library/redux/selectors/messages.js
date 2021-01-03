@@ -1,6 +1,7 @@
 import createCachedSelector from 're-reselect';
-import { MessageType } from '../reducers/messages';
 import { createSelectorCreator, defaultMemoize } from 'reselect';
+
+import { MessageType } from '../reducers/messages';
 
 export const getMessageById = (state, { id }) => state.messages.get(id);
 
@@ -27,9 +28,9 @@ export const getMessageIdsByRoom = createCachedSelector(
 )((_, { roomId }) => `id-${roomId}`);
 
 export const getNewsIdsPoints = createCachedSelector(
-[getNews],
-(messages) => messages
-  .map(({ objectId, points }) => ({ objectId, points })),
+  [getNews],
+  (messages) => messages
+    .map(({ objectId, points }) => ({ objectId, points })),
 )({
   keySelector: () => 'news-ids',
   selectorCreator: createSelectorCreator(

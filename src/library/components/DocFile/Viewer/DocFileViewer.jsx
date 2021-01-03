@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
 import { getDocFileById } from '../../../redux/selectors/docFiles';
 import { getIdentityOrTeamById } from '../../../redux/selectors/users';
+import { ReactComponent as Close } from '../../../icons/close.svg';
 
 import './DocFileViewer.scss';
 
@@ -12,6 +13,7 @@ const DocFileViewer = ({ docFileId }) => {
 
   return (
     <div className="DocFileViewer">
+      <div className="close"></div>
       <h1 className="title">{docFile.title}</h1>
       <div className="info">
         <p className="author">{`Author: ${identity.teamName || identity.aliasName || identity.username}`}</p>

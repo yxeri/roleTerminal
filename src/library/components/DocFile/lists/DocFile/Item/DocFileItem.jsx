@@ -21,6 +21,7 @@ const DocFileItem = ({ docFileId, onChange }) => {
   return (
     <ListItem
       stopPropagation
+      elementId={`docFile-${docFileId}`}
       className="DocFileItem"
       key={docFile.objectId}
       onClick={() => {

@@ -64,9 +64,9 @@
 .miniMenu {
   position: absolute;
   right: 0;
-  top: $menu-bar-height;
+  top: $menu-bar-height + $menu-bar-height / 2;
   z-index: $dropdown-z-index;
-  opacity: 1;
+  opacity: .75;
 
   .Button {
     padding: 0;

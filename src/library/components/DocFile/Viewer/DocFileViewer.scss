@@ -2,10 +2,13 @@
 
 .DocFileViewer {
   padding: $padding;
-  max-width: $max-width;
   word-wrap: break-word;
 
   .title, .info {
     margin-bottom: $padding * 2;
+  }
+
+  p, h1 {
+    max-width: $max-width;
   }
 }

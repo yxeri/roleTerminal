@@ -8,7 +8,7 @@ import Dialog from '../../../common/dialogs/Dialog/Dialog';
 import { WindowTypes } from '../../../../redux/reducers/windowOrder';
 import Input from '../../../common/sub-components/Input/Input';
 import IdentityPicker from '../../../common/lists/IdentityPicker/IdentityPicker';
-import Textarea from '../../../common/sub-components/Textarea';
+import Textarea from '../../../common/sub-components/Textarea/Textarea';
 import Button from '../../../common/sub-components/Button/Button';
 
 import './CreateDocFileDialog.scss';

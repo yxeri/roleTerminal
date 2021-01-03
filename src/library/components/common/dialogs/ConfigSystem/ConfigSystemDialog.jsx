@@ -11,7 +11,7 @@ import { getCurrentUser } from '../../../../redux/selectors/users';
 import Input from '../../sub-components/Input/Input';
 import { updateUser } from '../../../../socket/actions/users';
 import Button from '../../sub-components/Button/Button';
-import Select from '../../sub-components/Select';
+import Select from '../../sub-components/Select/Select';
 
 import './ConfigSystemDialog.scss';
 
@@ -25,8 +25,7 @@ const ConfigSystemDialog = ({ id, index }) => {
     hideTopBar,
     alwaysMaximized,
     hideMenuBar,
-    openApp,
-    shortcuts,
+    openApps,
   }) => {
     updateUser({
       userId: currentUser.objectId,
@@ -37,8 +36,7 @@ const ConfigSystemDialog = ({ id, index }) => {
           hideTopBar,
           alwaysMaximized,
           hideMenuBar,
-          openApp,
-          shortcuts: shortcuts.slice(0, 4),
+          openApps,
         },
       },
     })
@@ -76,21 +74,13 @@ const ConfigSystemDialog = ({ id, index }) => {
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <div>
-            <span>Quick start shortcuts (max 4 to be shown in the main menu):</span>
-            <Select multiple name="shortcuts" defaultValue={[WindowTypes.CHAT, WindowTypes.WALLET]}>
-              <option value={WindowTypes.CHAT}>Chat</option>
-              <option value={WindowTypes.NEWS}>News</option>
-              <option value={WindowTypes.WALLET}>Wallet</option>
-              <option value={WindowTypes.WORLDMAP}>Map</option>
-              <option value={WindowTypes.DOCFILE}>Files</option>
-            </Select>
-          </div>
-          <div>
+            <span>Select up to 2 apps that will auto-open when you log in (you can choose how they are expanded and placed in Settings for each app):</span>
             <Select
-              defaultValue={systemConfig.openApp}
-              name="openApp"
+              multiple
+              defaultValue={systemConfig.openApps}
+              name="openApps"
             >
-              <option value="">---No app---</option>
+              <option value="">No app</option>
               <option value={WindowTypes.CHAT}>Chat</option>
               <option value={WindowTypes.WALLET}>Wallet</option>
               <option value={WindowTypes.WORLDMAP}>Map</option>
@@ -103,7 +93,7 @@ const ConfigSystemDialog = ({ id, index }) => {
             <Input type="checkbox" name="hideHelp" checked={systemConfig.hideHelp} />
           </div>
           <div>
-            <span>Hide top row in windows? (Windows will be auto-maximized. You can close and change settings on a window under File)?</span>
+            <span>Hide top row in windows? (Windows will be auto-maximized)?</span>
             <Input type="checkbox" name="hideTopBar" checked={systemConfig.hideTopBar} />
           </div>
           <div>

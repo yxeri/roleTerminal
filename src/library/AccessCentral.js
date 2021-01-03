@@ -18,7 +18,7 @@ export const AccessLevels = {
 export const hasAccessTo = ({
   objectToAccess,
   toAuth,
-  skipAdminLevel = false,
+  adminLevel = AccessLevels.ADMIN,
 }) => {
   if (!objectToAccess || !toAuth) {
     return {
@@ -57,11 +57,12 @@ export const hasAccessTo = ({
   const userHasAdminAccess = userAdminIds.includes(authUserId);
   const aliasHasAdminAccess = foundOwnerAlias || aliases.find((aliasId) => userAdminIds.includes(aliasId));
   const teamHasAdminAccess = partOfTeam || teamAdminIds.find((adminId) => authTeamIds.includes(adminId));
-  const isAdmin = ownerId === authUserId || hasFullAccess || !skipAdminLevel ? accessLevel >= AccessLevels.ADMIN : false;
+  const isAdmin = ownerId === authUserId || hasFullAccess || accessLevel >= adminLevel;
 
   return {
     canSee: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess || accessLevel >= visibility,
     hasAccess: isAdmin || isPublic || userHasAccess || teamHasAccess || aliasHasAccess,
     hasFullAccess: isAdmin || userHasAdminAccess || teamHasAdminAccess || aliasHasAdminAccess,
+    adminAccess: !isPublic && !userHasAccess && !teamHasAccess && !aliasHasAccess && isAdmin,
   };
 };

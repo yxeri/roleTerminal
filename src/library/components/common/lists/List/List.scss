@@ -2,6 +2,7 @@
 
 .List {
   box-sizing: border-box;
+  overscroll-behavior-y: contain;
 
   header {
     user-select: none;
@@ -22,26 +23,7 @@
     height: 100%;
     scrollbar-width: none;
     box-sizing: border-box;
-  }
-
-  .search {
-    position: sticky;
-    top: 0;
-    background-color: inherit;
-
-    .Input {
-      width: 100%;
-    }
-
-    .Button {
-      position: absolute;
-      right: 0;
-      top: $padding / 2;
-      border: none;
-      background-color: transparent;
-      box-shadow: none;
-      color: $background-color;
-    }
+    overscroll-behavior-y: contain;
   }
 
   .dropdown {

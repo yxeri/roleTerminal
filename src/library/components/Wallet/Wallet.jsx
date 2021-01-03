@@ -34,7 +34,7 @@ const Wallet = ({ id, index }) => {
     <>
       <WalletList key="walletList" onChange={onChange} walletId={walletId} />
       <IdentityList key="identityList" />
-      {accessLevel >= AccessLevels.ADMIN && (
+      {accessLevel >= AccessLevels.MODERATOR && (
         <AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} />
       )}
     </>

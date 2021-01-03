@@ -7,6 +7,7 @@ import ListItem from './List/Item/ListItem';
 import store from '../../../redux/store';
 import { getCurrentUser } from '../../../redux/selectors/users';
 import { removeWindow } from '../../../redux/actions/windowOrder';
+import { ReactComponent as Menu } from '../../../icons/menu.svg';
 
 const FileMenu = ({ id, children }) => {
   const { systemConfig = {} } = useSelector(getCurrentUser);
@@ -16,7 +17,7 @@ const FileMenu = ({ id, children }) => {
       dropdown
       checkWidth
       className="FileMenu"
-      title="File"
+      title={<Menu />}
     >
       {children}
       {!systemConfig.hideTopRow && (

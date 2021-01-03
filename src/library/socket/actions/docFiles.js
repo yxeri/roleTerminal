@@ -37,8 +37,7 @@ export const unlockDocFile = async ({ docFileId, code }) => {
     return { docFile: storedDocFile };
   }
 
-  const { hasAccess } = hasAccessTo({
-    skipAdminLevel: true,
+  const { hasAccess, adminAccess } = hasAccessTo({
     toAuth: currentUser,
     objectToAccess: {
       ...storedDocFile,
@@ -46,15 +45,11 @@ export const unlockDocFile = async ({ docFileId, code }) => {
     },
   });
 
-  console.log(hasAccess, storedDocFile);
-
-  if (hasAccess) {
+  if (hasAccess && !adminAccess) {
     return { docFile: storedDocFile };
   }
 
   const result = await emitSocketEvent(SendEvents.UNLOCKDOCFILE, data);
-
-  console.log();
 
   await store.dispatch(updateDocFiles({ docFiles: [result.docFile] }));
 

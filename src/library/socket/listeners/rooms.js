@@ -4,6 +4,8 @@ import store from '../../redux/store';
 import { createRooms, removeRooms, updateRooms } from '../../redux/actions/rooms';
 import { ChangeTypes } from '../../redux/reducers/root';
 import { updateUsers } from '../../redux/actions/users';
+import { getCurrentUser } from '../../redux/selectors/users';
+import { hasAccessTo } from '../../AccessCentral';
 
 const events = {
   ROOM: 'room',
@@ -16,6 +18,19 @@ export const room = () => ({
   callback: ({ error, data }) => {
     if (data && data.room) {
       const { room: sentRoom, changeType } = data;
+
+      if (sentRoom.isWhisper && sentRoom.spyMode) {
+        const currentUser = getCurrentUser(store.getState());
+
+        const { adminAccess } = hasAccessTo({
+          objectToAccess: sentRoom,
+          toAuth: currentUser,
+        });
+
+        if (!adminAccess) {
+          return;
+        }
+      }
 
       if (changeType === ChangeTypes.CREATE) {
         store.dispatch(createRooms({ rooms: [sentRoom] }));

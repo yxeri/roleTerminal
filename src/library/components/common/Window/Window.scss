@@ -2,8 +2,8 @@
 
 .rnd {
   box-shadow: $dark-shadow;
-  overflow: hidden;
   box-sizing: border-box;
+  overscroll-behavior-y: none;
 
   .Window {
     display: grid;
@@ -46,6 +46,11 @@
             border-top-right-radius: 0;
             border-top-left-radius: 0;
             border-top: 0;
+
+            svg {
+              max-width: $icon-size - .2em;
+              max-height: $icon-size - .2em;
+            }
           }
 
           .dropdown {
@@ -74,7 +79,7 @@
 }
 
 .rnd[min-width~="600px"] {
-  .Window {
+  .Chat, .Wallet, .WorldMap {
     .windowBox {
       grid-template-rows: 1fr;
       grid-template-columns: fit-content(100%) auto;
@@ -99,7 +104,7 @@
           flex-direction: column;
           flex-grow: inherit;
           overflow: hidden;
-          width: 10em;
+          width: 11em;
           max-width: 100%;
           padding-left: $padding;
 

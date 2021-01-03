@@ -22,7 +22,7 @@ const AdminWalletList = ({ onChange, walletId }) => {
     <List
       dropdown
       checkWidth
-      title="[ADMIN]"
+      title="[ADMIN: WALLETS]"
       className="WalletList"
     >
       {itemMapper()}

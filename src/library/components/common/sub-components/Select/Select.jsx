@@ -8,6 +8,8 @@ import {
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
 
+import './Select.scss';
+
 const Select = ({
   onChange,
   children,

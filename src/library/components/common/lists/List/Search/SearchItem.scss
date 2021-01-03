@@ -1,0 +1,27 @@
+@import "../../../../../../common";
+
+.SearchItem {
+  position: sticky;
+  top: 0;
+  background-color: inherit;
+
+  .Input {
+    width: 100%;
+  }
+
+  .Button {
+    position: absolute;
+    right: $padding;
+    top: $padding / 2;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    color: $background-color;
+
+    svg {
+      max-width: $icon-size - .2em;
+      max-height: $icon-size - .2em;
+      opacity: .75;
+    }
+  }
+}

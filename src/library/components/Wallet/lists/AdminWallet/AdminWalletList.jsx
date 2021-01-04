@@ -5,6 +5,7 @@ import { func, string } from 'prop-types';
 import { getWalletIds } from '../../../../redux/selectors/wallets';
 import WalletItem from '../Wallet/Item/WalletItem';
 import List from '../../../common/lists/List/List';
+import { ReactComponent as Admin } from '../../../../icons/admin.svg';
 
 const AdminWalletList = ({ onChange, walletId }) => {
   const walletIds = useSelector(getWalletIds);
@@ -22,7 +23,12 @@ const AdminWalletList = ({ onChange, walletId }) => {
     <List
       dropdown
       checkWidth
-      title="[ADMIN: WALLETS]"
+      title={(
+        <span>
+          <Admin />
+          WALLETS
+        </span>
+      )}
       className="WalletList"
     >
       {itemMapper()}

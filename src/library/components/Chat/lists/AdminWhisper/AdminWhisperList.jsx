@@ -4,6 +4,7 @@ import { func, string } from 'prop-types';
 import { getWhisperRooms } from '../../../../redux/selectors/rooms';
 import List from '../../../common/lists/List/List';
 import WhisperItem from '../Whisper/Item/WhisperItem';
+import { ReactComponent as Admin } from '../../../../icons/admin.svg';
 
 const WhisperList = ({ onChange, roomId }) => {
   const whisperRooms = useSelector((state) => getWhisperRooms(state, { spyMode: true }));
@@ -20,7 +21,12 @@ const WhisperList = ({ onChange, roomId }) => {
       checkWidth
       key="whisperList"
       className="WhisperList"
-      title="[ADMIN: PM]"
+      title={(
+        <span>
+          <Admin />
+          PM
+        </span>
+      )}
     >
       {rooms}
     </List>

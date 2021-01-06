@@ -8,6 +8,8 @@
   }
 
   svg {
+    min-width: $icon-size;
+    min-height: $icon-size;
     max-width: $icon-size;
     max-height: $icon-size;
   }
@@ -20,7 +22,7 @@
 
   header {
     display: flex;
-    max-width: 10em;
+    max-width: 8em;
     align-items: flex-end;
   }
 }

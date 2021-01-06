@@ -12,6 +12,8 @@
     box-shadow: $shadow;
     background-color: $light-background-color;
     text-decoration: none;
+    display: flex;
+    justify-content: center;
   }
 
   ul {
@@ -48,8 +50,8 @@
     opacity: .5;
 
     svg {
-      max-width: $icon-size + .2em;
-      max-height: $icon-size + .2em;
+      max-width: $icon-size + .1em;
+      max-height: $icon-size + .1em;
     }
   }
 

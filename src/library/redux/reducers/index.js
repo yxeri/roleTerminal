@@ -16,6 +16,7 @@ import teams from './teams';
 import docFiles from './docFiles';
 import mode from './mode';
 import interfaceConfig from './interfaceConfig';
+import devices from './devices';
 
 export default combineReducers({
   users,
@@ -34,4 +35,5 @@ export default combineReducers({
   docFiles,
   mode,
   interfaceConfig,
+  devices,
 });

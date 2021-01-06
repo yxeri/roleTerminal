@@ -39,6 +39,7 @@ import {
   USERS, WALLETS,
 } from '../redux/actionTypes';
 import { ChangeTypes } from '../redux/reducers/root';
+import { createDevices } from '../redux/actions/devices';
 
 let startupDone = false;
 
@@ -239,9 +240,11 @@ addSocketListener({
           console.log(error);
           store.dispatch(logoutAction(retrieveAll));
         });
-    } else {
-      retrieveAll();
+
+      return;
     }
+
+    retrieveAll();
   },
 });
 
@@ -252,8 +255,14 @@ addSocketListener({
     const token = getStoredToken();
     const aliasId = getStoredAliasId();
 
-    if (!getDeviceId()) {
-      setDeviceId('1234567890123456');
+    if (!getDeviceId() || getDeviceId() === '1234567890123456') {
+      console.log(getDeviceId());
+      emitSocketEvent('createDevice', { device: {}, firstStartup: true })
+        .then(({ device }) => {
+          setDeviceId(device.objectId);
+          store.dispatch(createDevices({ devices: [device] }));
+        })
+        .catch((error) => console.log('device create', error));
     }
 
     store.dispatch(startup(data));
@@ -277,9 +286,11 @@ addSocketListener({
           console.log(error);
           store.dispatch(logoutAction(retrieveAll));
         });
-    } else {
-      retrieveAll({ reset: true });
+
+      return;
     }
+
+    retrieveAll({ reset: true });
   },
 });
 

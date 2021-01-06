@@ -33,24 +33,10 @@ const MainWindow = () => {
   const windows = [];
 
   useEffect(() => {
-    if (systemConfig.openApp) {
-      store.dispatch(changeWindowOrder({ windows: [{ id: systemConfig.openApp, value: { type: systemConfig.openApp } }] }));
+    if (systemConfig.openApps && systemConfig.openApps.length > 0) {
+      store.dispatch(changeWindowOrder({ windows: systemConfig.openApps.map(({ id, value }) => ({ id, value })) }));
     }
-  }, [systemConfig.openApp]);
-
-  useEffect(() => {
-    document.addEventListener('click', () => {
-      const element = document.documentElement;
-
-      if (element.requestFullscreen) {
-        element.requestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-      } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-      } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      }
-    });
-  }, []);
+  }, [systemConfig.openApps]);
 
   order.forEach((value, key) => {
     const { type } = value;

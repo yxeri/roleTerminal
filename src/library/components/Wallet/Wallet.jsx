@@ -30,16 +30,6 @@ const Wallet = ({ id, index }) => {
 
   const onChange = useCallback((newWalletId) => setWalletId(newWalletId), []);
 
-  const menu = useMemo(() => (
-    <>
-      <WalletList key="walletList" onChange={onChange} walletId={walletId} />
-      <IdentityList key="identityList" />
-      {accessLevel >= AccessLevels.MODERATOR && (
-        <AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} />
-      )}
-    </>
-  ), [onChange, walletId]);
-
   return (
     <Window
       id={id}
@@ -48,7 +38,15 @@ const Wallet = ({ id, index }) => {
       done={onDone}
       title={`Wallet${identity ? `: ${identity.teamName || identity.aliasName || identity.username}` : ''}`}
       onClick={onClick}
-      menu={menu}
+      menu={(
+        <>
+          <WalletList key="walletList" onChange={onChange} walletId={walletId} />
+          <IdentityList key="identityList" />
+          {accessLevel >= AccessLevels.MODERATOR && (
+            <AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} />
+          )}
+        </>
+      )}
     >
       <TransactionList
         key="transactionList"

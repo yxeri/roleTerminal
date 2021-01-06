@@ -5,6 +5,7 @@ import { getAliasById, getAllAliases } from './aliases';
 import { getUserId } from './userId';
 import { getAnonymousUser } from './config';
 import { getAllTeams, getTeamById } from './teams';
+import { getDeviceId } from '../../StorageManager';
 
 export const getAllUsers = (state) => state.users;
 
@@ -58,7 +59,6 @@ export const getCurrentPartOfTeams = createCachedSelector(
   selectorCreator: createSelectorCreator(
     defaultMemoize,
     (a, b) => {
-      console.log('team', a.partOfTeams.length !== b.partOfTeams.length, b.partOfTeams.every((teamId) => a.partOfTeams.includes(teamId)));
       if (a.partOfTeams.length !== b.partOfTeams.length) {
         return false;
       }
@@ -69,8 +69,13 @@ export const getCurrentPartOfTeams = createCachedSelector(
 });
 
 export const getSystemConfig = createCachedSelector(
-  [getCurrentUser],
-  (user) => user.systemConfig || {},
+  [
+    getCurrentUser,
+    () => getDeviceId(),
+  ],
+  (user, deviceId) => (user.systemConfig
+    ? (user.systemConfig[deviceId] || user.systemConfig)
+    : {}),
 )(() => 'current-system-config');
 
 export const getHideTopBar = createCachedSelector(

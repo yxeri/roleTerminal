@@ -88,67 +88,65 @@ const Chat = ({ id, index, roomId }) => {
           />
         </>
       )}
+      help={(
+        <ul>
+          <li>
+            <p>
+              <ChatIcon />
+              <span>CHAT APP Read and send messages, to users or rooms.</span>
+            </p>
+            <p>You can only read the Public chat without logging in.</p>
+            <p>Menus are on the left (or top in smaller windows). Messages from the current room are to the right (or below).</p>
+            <p>Your current room is shown in the title (CHAT: public) and in JOINED.</p>
+          </li>
+          <li>
+            <p>SEND The message input is shown on the bottom when you are logged in. You can send the message with either alt+Enter or clicking Send.</p>
+            <p>
+              <Image />
+              <span>IMAGE Attach an image. You can send a message with just an image.</span>
+            </p>
+            <p>
+              <User />
+              <span>YOU Your name. Click it to switch identities.</span>
+            </p>
+          </li>
+          <li>
+            <p>
+              FILE You can create a room, change settings (like changing password or name) or remove the room you are in.
+            </p>
+            <p>JOINED Shows you the rooms you joined. Click one to switch to it.</p>
+            <p>PM All private conversations are shown here. It always shows your name on the left.</p>
+            <p>
+              <span>{'ROOMS All available rooms that you haven\'t joined yet.'}</span>
+              <Lock />
+              <span> means that the room is password-protected.</span>
+            </p>
+            <p>
+              <span>USERS All users. Send a private message to a user by clicking them and choosing </span>
+              <ChatIcon />
+              <span> in the pop-up.</span>
+            </p>
+          </li>
+          <li>
+            <Settings />
+            <span>APP SETTINGS Change settings for this app. You have to be logged in to access it.</span>
+          </li>
+          <li>
+            <Maximize />
+            <span>MAXIMIZE Make the window expand and take up all available space. Clicking it again will shrink the window.</span>
+          </li>
+          <li>
+            <Close />
+            <span>CLOSE Close the window</span>
+          </li>
+        </ul>
+      )}
     >
       <Messages
         key="messages"
         roomId={currentRoomId}
         onSend={onChange}
       />
-      {mode.mode === Modes.HELP && mode.target === id && (
-        <div className="helpOverlay">
-          <ul>
-            <li>
-              <p>
-                <ChatIcon />
-                <span>CHAT APP Read and send messages, to users or rooms.</span>
-              </p>
-              <p>You can only read the Public chat without logging in.</p>
-              <p>Menus are on the left (or top in smaller windows). Messages from the current room are to the right (or below).</p>
-              <p>Your current room is shown in the title (CHAT: public) and in JOINED.</p>
-            </li>
-            <li>
-              <p>SEND The message input is shown on the bottom when you are logged in. You can send the message with either alt+Enter or clicking Send.</p>
-              <p>
-                <Image />
-                <span>IMAGE Attach an image. You can send a message with just an image.</span>
-              </p>
-              <p>
-                <User />
-                <span>YOU Your name. Click it to switch identities.</span>
-              </p>
-            </li>
-            <li>
-              <p>
-                FILE You can create a room, change settings (like changing password or name) or remove the room you are in.
-              </p>
-              <p>JOINED Shows you the rooms you joined. Click one to switch to it.</p>
-              <p>PM All private conversations are shown here. It always shows your name on the left.</p>
-              <p>
-                <span>{'ROOMS All available rooms that you haven\'t joined yet.'}</span>
-                <Lock />
-                <span> means that the room is password-protected.</span>
-              </p>
-              <p>
-                <span>USERS All users. Send a private message to a user by clicking them and choosing </span>
-                <ChatIcon />
-                <span> in the pop-up.</span>
-              </p>
-            </li>
-            <li>
-              <Settings />
-              <span>APP SETTINGS Change settings for this app. You have to be logged in to access it.</span>
-            </li>
-            <li>
-              <Maximize />
-              <span>MAXIMIZE Make the window expand and take up all available space. Clicking it again will shrink the window.</span>
-            </li>
-            <li>
-              <Close />
-              <span>CLOSE Close the window</span>
-            </li>
-          </ul>
-        </div>
-      )}
     </Window>
   );
 };

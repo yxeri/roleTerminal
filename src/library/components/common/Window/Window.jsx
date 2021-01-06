@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Rnd } from 'react-rnd';
 import {
   func,
@@ -9,6 +14,7 @@ import { useSelector } from 'react-redux';
 
 import TopBar from './TopBar/TopBar';
 import { getAlwaysMaximized, getHideTopBar } from '../../../redux/selectors/users';
+import Help from '../sub-components/Help/Help';
 
 import './Window.scss';
 
@@ -20,6 +26,7 @@ const Window = ({
   index,
   id,
   onSettings,
+  help,
   type = 'window',
   title = 'app',
   className = '',
@@ -146,6 +153,7 @@ const Window = ({
         const smallHeight = window.innerHeight < 450;
         const smallWidth = window.innerWidth < 450;
         const windowBounds = rndRef.current.resizableElement.current.parentElement.getBoundingClientRect();
+        const wider = windowBounds.width > windowBounds.height;
 
         if (!smallHeight && !smallWidth && up && left && !right && !down) {
           setSize({ width: '50%', height: '50%' });
@@ -165,10 +173,10 @@ const Window = ({
         } else if (!smallWidth && right && !left) { // Right
           setSize({ width: '50%', height: '100%' });
           setCoordinates({ x: windowBounds.width / 2, y: 0 });
-        } else if (!smallHeight && up && !down) { // Up
+        } else if (!smallHeight && up && !wider && !down) { // Up
           setSize({ height: '50%', width: '100%' });
           setCoordinates({ y: 0, x: 0 });
-        } else if (!smallHeight && down && !up) { // Down
+        } else if (!smallHeight && down && !wider && !up) { // Down
           setSize({ height: '50%', width: '100%' });
           setCoordinates({ x: 0, y: windowBounds.height / 2 });
         } else {
@@ -211,6 +219,7 @@ const Window = ({
           }
           <div className="content">
             {children}
+            {help && (<Help id={id}>{help}</Help>)}
           </div>
         </div>
       </div>
@@ -231,6 +240,7 @@ Window.propTypes = {
   index: number.isRequired,
   id: string.isRequired,
   onSettings: func,
+  help: node,
 };
 
 Window.defaultProps = {
@@ -240,4 +250,5 @@ Window.defaultProps = {
   menu: undefined,
   type: 'window',
   onSettings: undefined,
+  help: undefined,
 };

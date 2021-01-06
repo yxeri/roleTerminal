@@ -67,8 +67,6 @@ export default function WindowOrderReducer(state = defaultState, action) {
 
         sorted.push(window);
 
-        console.log(sorted);
-
         sorted.forEach(([key, entryValue], index) => {
           const newValue = {
             ...entryValue,
@@ -96,7 +94,14 @@ export default function WindowOrderReducer(state = defaultState, action) {
     const { windows } = payload;
     const newState = new Map([...state]);
 
-    windows.forEach(({ id, value }) => newState.set(id, value));
+    windows.forEach(({ id, value }) => {
+      const newValue = {
+        ...value,
+        index: newState.size + 1,
+      };
+
+      newState.set(id, newValue);
+    });
 
     return newState;
   }

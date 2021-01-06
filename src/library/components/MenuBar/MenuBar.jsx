@@ -97,7 +97,7 @@ const MenuBar = () => {
                     </Button>
                   )}
                   {accessLevel >= AccessLevels.STANDARD && (
-                    <IdentityPicker useIcon />
+                    <IdentityPicker />
                   )}
                   <Clock />
                 </div>
@@ -154,7 +154,7 @@ const MenuBar = () => {
                 )}
               </div>
               {accessLevel >= AccessLevels.STANDARD && (
-                <div className="miniMenu minimize">
+                <div className={`miniMenu minimize ${systemConfig.hideMenuBar ? 'hideOn' : ''}`}>
                   <Button
                     type="button"
                     onClick={() => store.dispatch(changeInterfaceConfig({ toggleHideMenu: true }))}

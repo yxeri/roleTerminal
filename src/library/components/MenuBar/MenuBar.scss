@@ -91,3 +91,17 @@
 .warning {
   background-color: $warning-background-color !important;
 }
+
+//@media (orientation: landscape) {
+//  #MenuBar {
+//    flex-direction: column;
+//    border-bottom: none;
+//    border-right: $border;
+//    height: 100%;
+//    width: $menu-bar-height;
+//
+//    .rightAligned {
+//      grid-auto-flow: row;
+//    }
+//  }
+//}

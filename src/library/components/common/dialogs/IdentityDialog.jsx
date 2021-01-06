@@ -109,6 +109,11 @@ const IdentityDialog = ({ id, identityId, index }) => {
       )}
       <p>{`Name: ${identity.aliasName || identity.username}`}</p>
       {teams.size > 0 && (<p>{`Affiliations: ${[...teams.values()].map((team) => team.teamName).join(', ')}`}</p>)}
+      {identity.description && identity.description.length > 0 && (
+        <div className="description">
+          {identity.description.map((line, lineIndex) => <p key={lineIndex}>{line}</p>)}
+        </div>
+      )}
     </Dialog>
   );
 };

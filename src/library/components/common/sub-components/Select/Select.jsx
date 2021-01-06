@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   arrayOf,
   bool,
@@ -19,7 +19,7 @@ const Select = ({
   placeholder = '',
   multiple = false,
 }) => {
-  const { register } = useFormContext();
+  const { register, unregister } = useFormContext();
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
@@ -43,6 +43,8 @@ const Select = ({
         .filter((value) => value !== ''));
     }
   };
+
+  useEffect(() => () => unregister(name), []);
 
   return (
     <select

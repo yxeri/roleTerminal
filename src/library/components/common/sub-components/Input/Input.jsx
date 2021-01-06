@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   string,
   bool,
@@ -19,7 +19,7 @@ const Input = ({
   required = false,
   placeholder = '',
 }) => {
-  const { register, getValues } = useFormContext();
+  const { register, getValues, unregister } = useFormContext();
   const [hasFocus, setHasFocus] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
@@ -28,6 +28,8 @@ const Input = ({
       setIsEmpty(!event.target.value || event.target.value === '');
     }
   };
+
+  useEffect(() => () => unregister(name), []);
 
   return (
     <input

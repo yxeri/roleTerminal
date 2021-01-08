@@ -42,34 +42,42 @@ const onMessage = ({ message }) => {
   alert(JSON.stringify(message));
 };
 
-document.addEventListener('message', (event) => {
-  const { type, data } = JSON.parse(event.nativeEvent.data);
+const onMessageListener = (event) => {
+  alert(JSON.stringify(event.data));
 
-  switch (type) {
-    case MessageTypes.NOTIFICATION: {
-      onNotification(data);
+  if (event.data) {
+    const { type, data } = JSON.parse(event.data);
 
-      break;
-    }
-    case MessageTypes.WINDOW: {
-      onWindow(data);
+    switch (type) {
+      case MessageTypes.NOTIFICATION: {
+        onNotification(data);
 
-      break;
-    }
-    case MessageTypes.PUSHTOKEN: {
-      onPushToken(data);
+        break;
+      }
+      case MessageTypes.WINDOW: {
+        onWindow(data);
 
-      break;
-    }
-    case MessageTypes.MESSAGE: {
-      onMessage(data);
+        break;
+      }
+      case MessageTypes.PUSHTOKEN: {
+        onPushToken(data);
 
-      break;
-    }
-    default: {
-      console.log('Unknown message', event.nativeEvent.data);
+        break;
+      }
+      case MessageTypes.MESSAGE: {
+        onMessage(data);
 
-      break;
+        break;
+      }
+      default: {
+        console.log('Unknown message', event.nativeEvent.data);
+
+        break;
+      }
     }
   }
-});
+};
+
+window.addEventListener('message', onMessageListener);
+
+document.addEventListener('message', onMessageListener);

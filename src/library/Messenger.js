@@ -43,8 +43,6 @@ const onMessage = ({ message }) => {
 };
 
 const onMessageListener = (event) => {
-  alert(JSON.stringify(event.data));
-
   if (event.data) {
     const { type, data } = JSON.parse(event.data);
 
@@ -78,6 +76,8 @@ const onMessageListener = (event) => {
   }
 };
 
-window.addEventListener('message', onMessageListener);
+if (window.ReactNativeWebView) {
+  window.addEventListener('message', onMessageListener);
 
-document.addEventListener('message', onMessageListener);
+  document.addEventListener('message', onMessageListener);
+}

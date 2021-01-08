@@ -11,8 +11,6 @@ import store from '../../redux/store';
 import { getIdentityById, getIsAnonymous } from '../../redux/selectors/users';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
-import { getMode } from '../../redux/selectors/mode';
-import { Modes } from '../../redux/reducers/mode';
 import { ReactComponent as Close } from '../../icons/close.svg';
 import { ReactComponent as Maximize } from '../../icons/maximize.svg';
 import { ReactComponent as Settings } from '../../icons/settings.svg';
@@ -24,8 +22,7 @@ import ChatFileMenu from './lists/FileMenu/ChatFileMenu';
 
 import './Chat.scss';
 
-const Chat = ({ id, index, roomId }) => {
-  const mode = useSelector(getMode);
+const Chat = ({ id, index, roomId, messageId }) => {
   const [currentRoomId, setRoomId] = useState(roomId || getPublicRoomId(store.getState()));
   const room = useSelector((state) => getRoomById(state, { id: currentRoomId }));
   const isAnonymous = useSelector(getIsAnonymous);
@@ -144,6 +141,7 @@ const Chat = ({ id, index, roomId }) => {
     >
       <Messages
         key="messages"
+        messageId={messageId}
         roomId={currentRoomId}
         onSend={onChange}
       />
@@ -157,8 +155,10 @@ Chat.propTypes = {
   id: string.isRequired,
   roomId: string,
   index: number.isRequired,
+  messageId: string,
 };
 
 Chat.defaultProps = {
   roomId: undefined,
+  messageId: undefined,
 };

@@ -8,7 +8,7 @@ import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
 
 import './Messages.scss';
 
-const Messages = ({ roomId, onSend }) => {
+const Messages = ({ roomId, onSend, messageId }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
 
   return (
@@ -17,6 +17,7 @@ const Messages = ({ roomId, onSend }) => {
       <MessagesList
         key="messagesList"
         roomId={roomId}
+        messageId={messageId}
       />
       {accessLevel >= AccessLevels.STANDARD && (
         <InputArea
@@ -34,8 +35,10 @@ export default React.memo(Messages);
 Messages.propTypes = {
   roomId: string,
   onSend: func.isRequired,
+  messageId: string,
 };
 
 Messages.defaultProps = {
   roomId: undefined,
+  messageId: undefined,
 };

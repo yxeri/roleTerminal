@@ -20,7 +20,7 @@ const ConfigSystemDialog = ({ id, index }) => {
   const formMethods = useForm();
   const currentUser = useSelector(getCurrentUser);
   const onDevice = useWatch({ control: formMethods.control, name: 'onDevice', defaultValue: '' });
-  const systemConfig = onDevice === 'this' ? (currentUser.systemConfig[getDeviceId()] || {}) : currentUser.systemConfig;
+  const systemConfig = onDevice === 'this' && currentUser.systemConfig ? (currentUser.systemConfig[getDeviceId()] || {}) : currentUser.systemConfig || {};
 
   console.log(onDevice);
 

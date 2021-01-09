@@ -10,6 +10,8 @@ export const MessageTypes = {
   MESSAGE: 'message',
   LOGIN: 'login',
   LOGOUT: 'logout',
+  QR: 'qr',
+  QUIT: 'quit',
 };
 
 export const postMessage = ({ type, data }) => {
@@ -29,7 +31,7 @@ const onWindow = ({ windowType, value }) => {
 const onPushToken = ({ token }) => {
   const currentUser = getCurrentUser(store.getState());
 
-  if (!currentUser.isAnonymous) {
+  if (!currentUser.isAnonymous && token !== currentUser.pushToken) {
     updateUser({
       userId: currentUser.objectId,
       user: { pushToken: token },
@@ -40,6 +42,10 @@ const onPushToken = ({ token }) => {
 
 const onMessage = ({ message }) => {
   alert(JSON.stringify(message));
+};
+
+const onQr = (data) => {
+  alert(JSON.stringify(data));
 };
 
 const onMessageListener = (event) => {
@@ -64,6 +70,11 @@ const onMessageListener = (event) => {
       }
       case MessageTypes.MESSAGE: {
         onMessage(data);
+
+        break;
+      }
+      case MessageTypes.QR: {
+        onQr(data);
 
         break;
       }

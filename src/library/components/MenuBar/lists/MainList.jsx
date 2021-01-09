@@ -11,6 +11,7 @@ import store from '../../../redux/store';
 import { changeWindowOrder } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import { getPermissions } from '../../../redux/selectors/config';
+import { MessageTypes, postMessage } from '../../../Messenger';
 
 const MainList = () => {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -67,6 +68,19 @@ const MainList = () => {
         }}
       >
         Logout
+      </ListItem>,
+    );
+  }
+
+  if (window.ReactNativeWebView) {
+    items.push(
+      <ListItem
+        key="quit"
+        onClick={() => {
+          postMessage({ type: MessageTypes.QUIT, data: {} });
+        }}
+      >
+        Quit
       </ListItem>,
     );
   }

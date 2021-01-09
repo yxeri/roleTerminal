@@ -21,6 +21,7 @@ import { ReactComponent as ClockIcon } from '../../icons/clock.svg';
 import { ReactComponent as ChevronLeft } from '../../icons/chevron-left.svg';
 import { ReactComponent as ChevronRight } from '../../icons/chevron-right.svg';
 import { ReactComponent as Grid } from '../../icons/grid.svg';
+import { ReactComponent as Camera } from '../../icons/camera.svg';
 import { getCurrentAccessLevel, getSystemConfig } from '../../redux/selectors/users';
 import { AccessLevels } from '../../AccessCentral';
 import { getHideMenu } from '../../redux/selectors/interfaceConfig';
@@ -29,6 +30,7 @@ import { reconnect } from '../../socket/SocketManager';
 import './MenuBar.scss';
 import { changeInterfaceConfig } from '../../redux/actions/interfaceConfig';
 import IdentityPicker from '../common/lists/IdentityPicker/IdentityPicker';
+import { MessageTypes, postMessage } from '../../Messenger';
 
 const componentId = 'MenuBar';
 
@@ -96,6 +98,12 @@ const MenuBar = () => {
                       <Help />
                     </Button>
                   )}
+                  <Button
+                    type="button"
+                    onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
+                  >
+                    <Camera />
+                  </Button>
                   {accessLevel >= AccessLevels.STANDARD && (
                     <IdentityPicker />
                   )}

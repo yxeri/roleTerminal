@@ -15,6 +15,7 @@ const Input = ({
   maxLength,
   minLength,
   checked,
+  defaultValue,
   type = 'text',
   required = false,
   placeholder = '',
@@ -44,7 +45,7 @@ const Input = ({
         validate: (value) => (!shouldEqual || value === getValues(shouldEqual)) || `Must match ${shouldEqual}`,
       })}
       type={type}
-      defaultValue=""
+      defaultValue={defaultValue || ''}
       className={`Input ${isEmpty ? 'empty' : ''}`}
       onFocus={() => {
         if (!hasFocus) {
@@ -76,6 +77,7 @@ Input.propTypes = {
   maxLength: number,
   minLength: number,
   checked: bool,
+  amount: number,
 };
 
 Input.defaultProps = {
@@ -87,4 +89,5 @@ Input.defaultProps = {
   maxLength: undefined,
   minLength: undefined,
   checked: undefined,
+  amount: undefined,
 };

@@ -15,7 +15,7 @@ import { getWalletIdsByCurrentUser } from '../../../redux/selectors/wallets';
 import { getIdentitiesOrTeamsByIds, getIdentityOrTeamById } from '../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 
-const CreateTransactionDialog = ({ id, toWalletId, index }) => {
+const CreateTransactionDialog = ({ id, toWalletId, amount, index }) => {
   const formMethods = useForm();
   const identityId = useSelector(getCurrentIdentityId);
   const walletIds = useSelector(getWalletIdsByCurrentUser);
@@ -25,14 +25,14 @@ const CreateTransactionDialog = ({ id, toWalletId, index }) => {
 
   const onSubmit = async ({
     note,
-    amount,
     fromWalletId,
+    amount: chosenAmount,
   }) => {
     const transaction = {
       note,
-      amount,
       fromWalletId,
       toWalletId,
+      amount: chosenAmount,
     };
 
     createTransaction({ transaction })
@@ -93,6 +93,7 @@ const CreateTransactionDialog = ({ id, toWalletId, index }) => {
           </div>
           <Input
             required
+            defaultValue={amount}
             name="amount"
             placeholder="Amount"
           />

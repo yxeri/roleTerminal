@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a71d1b72638ef4d01128e99a06cee689",
+    "revision": "13e810695c8b6728b039d24b2ebfc825",
     "url": "/index.html"
   },
   {
-    "revision": "6be3bf3d11b7473bfc9e",
+    "revision": "585bb4201d8c7a79fe49",
     "url": "/static/css/main.ea247de8.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/2.93ec2097.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "6be3bf3d11b7473bfc9e",
-    "url": "/static/js/main.93ff9eb0.chunk.js"
+    "revision": "585bb4201d8c7a79fe49",
+    "url": "/static/js/main.3f9b093b.chunk.js"
   },
   {
     "revision": "5fab9e9fb4ba457dbcbf",
@@ -38,6 +38,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "1095b4b3631a4ce65311ff757c0797d7",
     "url": "/static/media/arrow-up-circle.1095b4b3.svg"
+  },
+  {
+    "revision": "d27e0e327606c83cd1b72a15bb2abf3c",
+    "url": "/static/media/camera.d27e0e32.svg"
   },
   {
     "revision": "20a18654accacdb484a4497380f5d55a",

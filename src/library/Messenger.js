@@ -1,7 +1,9 @@
 import store from './redux/store';
 import { changeWindowOrder } from './redux/actions/windowOrder';
 import { updateUser } from './socket/actions/users';
-import { getCurrentUser } from './redux/selectors/users';
+import { getCurrentUser, getCurrentUserRooms } from './redux/selectors/users';
+import { getNewsRoomId } from './redux/selectors/config';
+import { WindowTypes } from './redux/reducers/windowOrder';
 
 export const MessageTypes = {
   NOTIFICATION: 'notification',
@@ -45,7 +47,66 @@ const onMessage = ({ message }) => {
 };
 
 const onQr = (data) => {
-  alert(JSON.stringify(data));
+  if (typeof data !== 'object') {
+    alert('Incorrect data');
+
+    return;
+  }
+
+  try {
+    const {
+      rI: roomId,
+      rP: password,
+      mI: messageId,
+
+      wI: toWalletId,
+      a: amount,
+
+      m: message,
+
+      dI: docFileId,
+      c: code,
+
+      tI: teamId,
+
+      iI: identityId,
+    } = data;
+    const newsRoomId = getNewsRoomId(store.getState());
+
+    if (roomId && messageId && roomId === newsRoomId) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.NEWS, value: { type: WindowTypes.NEWS, messageId } }] }));
+    } else if (roomId) {
+      const roomIds = getCurrentUserRooms(store.getState());
+
+      if (roomIds.includes(roomId)) {
+        store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId, messageId } }] }));
+      } else {
+        store.dispatch(changeWindowOrder({
+          windows: [{
+            id: `${WindowTypes.DIALOGJOINROOM}-${roomId}`,
+            value: {
+              roomId,
+              messageId,
+              password,
+              type: WindowTypes.DIALOGJOINROOM,
+            },
+          }],
+        }));
+      }
+    } else if (toWalletId) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGCREATETRANSACTION}-${toWalletId}`, value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId, amount } }] }));
+    } else if (docFileId) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE, docFileId, code } }] }));
+    } else if (teamId) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.TEAMS, value: { type: WindowTypes.TEAMS, teamId } }] }));
+    } else if (identityId) {
+      store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGIDENTITY}-${identityId}`, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
+    } else if (message) {
+      alert(message);
+    }
+  } catch (error) {
+    alert(JSON.stringify(error));
+  }
 };
 
 const onMessageListener = (event) => {

@@ -98,12 +98,14 @@ const MenuBar = () => {
                       <Help />
                     </Button>
                   )}
-                  <Button
-                    type="button"
-                    onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
-                  >
-                    <Camera />
-                  </Button>
+                  {window.ReactNativeWebView && (
+                    <Button
+                      type="button"
+                      onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
+                    >
+                      <Camera />
+                    </Button>
+                  )}
                   {accessLevel >= AccessLevels.STANDARD && (
                     <IdentityPicker />
                   )}

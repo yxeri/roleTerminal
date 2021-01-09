@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   string,
   bool,
-  func, number,
+  func, number, oneOfType,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -77,7 +77,7 @@ Input.propTypes = {
   maxLength: number,
   minLength: number,
   checked: bool,
-  amount: number,
+  defaultValue: oneOfType([string, number]),
 };
 
 Input.defaultProps = {
@@ -89,5 +89,5 @@ Input.defaultProps = {
   maxLength: undefined,
   minLength: undefined,
   checked: undefined,
-  amount: undefined,
+  defaultValue: undefined,
 };

@@ -7,6 +7,7 @@ export const WindowTypes = {
   WORLDMAP: 'Map',
   DOCFILE: 'Files',
   NEWS: 'News',
+  TEAMS: 'Teams',
   DIALOGIDENTITY: 'User',
   DIALOGCREATEROOM: 'New room',
   DIALOGREMOVEROOM: 'Remove room',

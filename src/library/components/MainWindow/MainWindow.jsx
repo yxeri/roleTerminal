@@ -44,7 +44,7 @@ const MainWindow = () => {
 
     switch (type) {
       case WindowTypes.CHAT: {
-        windows.push(<Chat key={key} id={key} roomId={value.roomId} messageId={value.messageId} index={value.index} />);
+        windows.push(<Chat key={key} id={key} roomId={value.roomId} messageId={value.messageId} password={value.password} index={value.index} />);
 
         break;
       }
@@ -59,7 +59,7 @@ const MainWindow = () => {
         break;
       }
       case WindowTypes.DOCFILE: {
-        windows.push(<DocFile key={key} id={key} docFileId={value.docFileId} index={value.index} />);
+        windows.push(<DocFile key={key} id={key} docFileId={value.docFileId} code={value.code} index={value.index} />);
 
         break;
       }
@@ -114,7 +114,7 @@ const MainWindow = () => {
         break;
       }
       case WindowTypes.DIALOGJOINROOM: {
-        windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} />);
+        windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} messageId={value.messsageId} password={value.password} auto={value.auto} />);
 
         break;
       }

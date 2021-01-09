@@ -12,12 +12,17 @@ import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOr
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import { getRoomById } from '../../../redux/selectors/rooms';
 import { getCurrentUser } from '../../../redux/selectors/users';
-import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';
 import { hasAccessTo } from '../../../AccessCentral';
 
 import { ReactComponent as Unlock } from '../../../icons/unlock.svg';
 
-const JoinRoomDialog = ({ roomId, id, index }) => {
+const JoinRoomDialog = ({
+  roomId,
+  id,
+  index,
+  password,
+  messageId,
+}) => {
   const [error, setError] = useState();
   const room = useSelector((state) => getRoomById(state, { id: roomId }));
   const user = useSelector(getCurrentUser);
@@ -29,12 +34,12 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
   });
 
   const onSubmit = ({
-    password,
+    password: submittedPassword,
   } = {}) => {
-    followRoom({ roomId, password })
+    followRoom({ roomId, password: submittedPassword })
       .then(() => {
         batch(() => {
-          store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId } }] }));
+          store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.CHAT, value: { type: WindowTypes.CHAT, roomId, messageId } }] }));
           store.dispatch(removeWindow({ id }));
         });
       })
@@ -60,7 +65,17 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
       index={index}
       className="JoinRoomDialog"
       onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGJOINROOM, roomId } }] }));
+        store.dispatch(changeWindowOrder({
+          windows: [{
+            id,
+            value: {
+              roomId,
+              password,
+              messageId,
+              type: WindowTypes.DIALOGJOINROOM,
+            },
+          }],
+        }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       title={!hasAccess ? `Unlock room ${room.roomName}` : `Join room ${room.roomName}`}
@@ -79,10 +94,6 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
     >
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
-          <div className="identity">
-            <span>You are: </span>
-            <IdentityPicker />
-          </div>
           <div>
             {hasAccess && (
               <p>{`Do you want to join room ${room.roomName}?`}</p>
@@ -99,6 +110,7 @@ const JoinRoomDialog = ({ roomId, id, index }) => {
           </div>
           {!hasAccess && (
             <Input
+              defaultValue={password}
               required={!hasAccess}
               minLength={4}
               maxLength={100}
@@ -119,4 +131,11 @@ JoinRoomDialog.propTypes = {
   id: string.isRequired,
   index: number.isRequired,
   roomId: string.isRequired,
+  password: string,
+  messageId: string,
+};
+
+JoinRoomDialog.defaultProps = {
+  password: undefined,
+  messageId: undefined,
 };

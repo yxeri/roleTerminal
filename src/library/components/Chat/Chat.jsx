@@ -22,7 +22,12 @@ import ChatFileMenu from './lists/FileMenu/ChatFileMenu';
 
 import './Chat.scss';
 
-const Chat = ({ id, index, roomId, messageId }) => {
+const Chat = ({
+  id,
+  index,
+  roomId,
+  messageId,
+}) => {
   const [currentRoomId, setRoomId] = useState(roomId || getPublicRoomId(store.getState()));
   const room = useSelector((state) => getRoomById(state, { id: currentRoomId }));
   const isAnonymous = useSelector(getIsAnonymous);

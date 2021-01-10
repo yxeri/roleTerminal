@@ -47,12 +47,6 @@ const onMessage = ({ message }) => {
 };
 
 const onQr = (data) => {
-  if (typeof data !== 'object') {
-    alert('Incorrect data');
-
-    return;
-  }
-
   try {
     const {
       rI: roomId,
@@ -105,7 +99,7 @@ const onQr = (data) => {
       alert(message);
     }
   } catch (error) {
-    alert(JSON.stringify(error));
+    alert(`Invalid data ${data}`);
   }
 };
 

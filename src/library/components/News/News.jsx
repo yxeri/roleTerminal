@@ -31,7 +31,6 @@ const News = ({ id, messageId, index }) => {
 
   return (
     <Window
-      onSettings={onSettings}
       id={id}
       index={index}
       done={onDone}
@@ -40,7 +39,11 @@ const News = ({ id, messageId, index }) => {
       onClick={onClick}
       menu={(
         <>
-          <FileMenu key="fileMenu" id={id}>
+          <FileMenu
+            key="fileMenu"
+            id={id}
+            onSettings={onSettings}
+          >
             {newsRoom && (
               <ListItem
                 stopPropagation

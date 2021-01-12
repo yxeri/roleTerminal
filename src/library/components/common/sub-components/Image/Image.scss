@@ -22,7 +22,9 @@
   }
 
   .remove {
+    position: absolute;
     right: 0;
+    text-shadow: $dark-text-shadow;
   }
 
   img {

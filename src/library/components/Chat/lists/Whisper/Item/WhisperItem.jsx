@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { batch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import {
   arrayOf,
   func, shape,
@@ -12,6 +12,7 @@ import { ReactComponent as Eye } from '../../../../../icons/eye.svg';
 import { followRoom } from '../../../../../socket/actions/rooms';
 import { getCurrentUser } from '../../../../../redux/selectors/users';
 import store from '../../../../../redux/store';
+import { hasAccessTo } from '../../../../../AccessCentral';
 
 import './WhisperItem.scss';
 
@@ -22,13 +23,20 @@ const WhisperItem = ({ room, onChange, className }) => {
     const currentUser = getCurrentUser(store.getState());
 
     if (!room.participantIds.some((id) => currentUser.objectId === id || currentUser.aliases.includes(id))) {
-      followRoom({ roomId: room.objectId })
-        .then(() => {
-          onChange({ roomId: room.objectId, spyMode: room.spyMode });
-        })
-        .catch((followError) => console.log(followError));
+      const { hasAccess, adminAccess } = hasAccessTo({
+        toAuth: currentUser,
+        objectToAccess: room,
+      });
 
-      return;
+      if (!hasAccess && adminAccess) {
+        followRoom({ roomId: room.objectId })
+          .then(() => {
+            onChange({ roomId: room.objectId, spyMode: room.spyMode });
+          })
+          .catch((followError) => console.log(followError));
+
+        return;
+      }
     }
 
     onChange({ roomId: room.objectId, spyMode: room.spyMode });
@@ -36,7 +44,7 @@ const WhisperItem = ({ room, onChange, className }) => {
 
   return (
     <ListItem
-      className={className}
+      className={`WhisperItem ${className || ''}`}
       key={room.objectId}
       onClick={onClick}
     >

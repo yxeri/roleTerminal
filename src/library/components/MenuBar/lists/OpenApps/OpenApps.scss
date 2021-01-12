@@ -6,10 +6,6 @@
   grid-gap: $padding * 2;
 
   .apps {
-    header {
-      width: 1em + $padding;
-    }
-
     > ul {
       padding: $padding * 2;
       grid-auto-flow: row;

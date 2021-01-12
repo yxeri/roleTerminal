@@ -31,16 +31,24 @@ const ChatFileMenu = ({ id, roomId }) => {
       >
         New room
       </ListItem>
-      {hasFullAccess && (
+      {!currentUser.isAnonymous && (
         <ListItem
           stopPropagation
           key="configRoom"
           onClick={() => {}}
         >
-          Config room
+          Manage room
         </ListItem>
       )}
-      {hasFullAccess && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
+      {room && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
+        <ListItem
+          key="leaveRoom"
+          onClick={() => {}}
+        >
+          Leave room
+        </ListItem>
+      )}
+      {hasFullAccess && room && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
         <ListItem
           stopPropagation
           key="removeRoom"

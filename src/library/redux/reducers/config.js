@@ -20,6 +20,7 @@ defaultState.set('allowedImages', { CHAT: false, PROFILE: false, DOCFILE: false 
 defaultState.set('newsCost', 0);
 defaultState.set('onlySeen', false);
 defaultState.set('allowPartialSearch', true);
+defaultState.set('disallowProfileEdit', false);
 defaultState.set('permissions', {
   CreateAlias: {
     name: 'CreateAlias',

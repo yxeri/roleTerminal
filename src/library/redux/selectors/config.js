@@ -12,3 +12,4 @@ export const getOnlySeen = (state) => state.config.get('onlySeen');
 export const getAllowPartialSearch = (state) => state.config.get('allowPartialSearch');
 export const getYearModification = (state) => state.config.get('yearModification');
 export const getDayModification = (state) => state.config.get('dayModification');
+export const getDisallowProfileEdit = (state) => state.config.get('disallowProfileEdit');

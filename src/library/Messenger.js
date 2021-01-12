@@ -49,21 +49,21 @@ const onMessage = ({ message }) => {
 const onQr = (data) => {
   try {
     const {
-      rI: roomId,
-      rP: password,
-      mI: messageId,
+      ri: roomId,
+      rp: password,
+      mi: messageId,
 
-      wI: toWalletId,
+      wi: toWalletId,
       a: amount,
 
       m: message,
 
-      dI: docFileId,
+      di: docFileId,
       c: code,
 
-      tI: teamId,
+      ti: teamId,
 
-      iI: identityId,
+      ii: identityId,
     } = data;
     const newsRoomId = getNewsRoomId(store.getState());
 

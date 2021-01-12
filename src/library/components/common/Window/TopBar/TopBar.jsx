@@ -9,14 +9,12 @@ import { useSelector } from 'react-redux';
 import { ReactComponent as Maximize } from '../../../../icons/maximize.svg';
 import { ReactComponent as Minimize } from '../../../../icons/minimize.svg';
 import { ReactComponent as Close } from '../../../../icons/close.svg';
-import { ReactComponent as Settings } from '../../../../icons/settings.svg';
 import { ReactComponent as Help } from '../../../../icons/help.svg';
 import Button from '../../sub-components/Button/Button';
 import store from '../../../../redux/store';
 import { changeMode, changeTarget } from '../../../../redux/actions/mode';
 import { Modes } from '../../../../redux/reducers/mode';
-import { getCurrentAccessLevel, getSystemConfig } from '../../../../redux/selectors/users';
-import { AccessLevels } from '../../../../AccessCentral';
+import { getSystemConfig } from '../../../../redux/selectors/users';
 import { getMode } from '../../../../redux/selectors/mode';
 
 import './TopBar.scss';
@@ -26,10 +24,8 @@ const TopBar = ({
   title,
   done,
   id,
-  onSettings,
   maximized,
 }) => {
-  const accessLevel = useSelector(getCurrentAccessLevel);
   const systemConfig = useSelector(getSystemConfig);
   const mode = useSelector(getMode);
 
@@ -61,9 +57,6 @@ const TopBar = ({
             <Help />
           </Button>
         )}
-        {accessLevel >= AccessLevels.STANDARD && onSettings && (
-          <Button key="settings" className="settings" stopPropagation type="button" onClick={onSettings}><Settings /></Button>
-        )}
         {!systemConfig.alwaysMaximized && (
           <Button type="button" onClick={onDoubleClick}>
             {
@@ -86,7 +79,6 @@ TopBar.propTypes = {
   title: string.isRequired,
   onDoubleClick: func.isRequired,
   id: string.isRequired,
-  onSettings: func,
   maximized: bool,
 };
 

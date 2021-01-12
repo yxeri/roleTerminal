@@ -6,7 +6,7 @@ import List from '../../../common/lists/List/List';
 import WhisperItem from '../Whisper/Item/WhisperItem';
 import { ReactComponent as Admin } from '../../../../icons/admin.svg';
 
-const WhisperList = ({ onChange, roomId }) => {
+const AdminWhisperList = ({ onChange, roomId }) => {
   const whisperRooms = useSelector((state) => getWhisperRooms(state, { spyMode: true }));
 
   const rooms = (() => whisperRooms
@@ -33,13 +33,13 @@ const WhisperList = ({ onChange, roomId }) => {
   );
 };
 
-export default React.memo(WhisperList);
+export default React.memo(AdminWhisperList);
 
-WhisperList.propTypes = {
+AdminWhisperList.propTypes = {
   onChange: func.isRequired,
   roomId: string,
 };
 
-WhisperList.defaultProps = {
+AdminWhisperList.defaultProps = {
   roomId: undefined,
 };

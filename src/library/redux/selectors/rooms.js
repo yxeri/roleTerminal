@@ -17,8 +17,8 @@ export const getWhisperRooms = createCachedSelector(
   ],
   (rooms, spyMode) => [...rooms.values()]
     .filter((room) => room.isWhisper && ((typeof room.spyMode !== 'boolean' && !spyMode) || spyMode === room.spyMode))
-    .map(({ objectId, participantIds }) => ({ objectId, participantIds })),
-)(() => 'whisperRooms');
+    .map(({ objectId, participantIds }) => ({ objectId, participantIds, spyMode })),
+)((_, { spyMode }) => `whisperRooms-spy-${spyMode}`);
 
 export const getUnfollowedRoomIds = createCachedSelector(
   [getRooms, getCurrentUserRooms],

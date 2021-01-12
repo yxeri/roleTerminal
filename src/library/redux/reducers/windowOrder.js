@@ -21,6 +21,7 @@ export const WindowTypes = {
   DIALOGCONFIGSYSTEM: 'Config system',
   DIALOGUNLOCKROOM: 'Unlock room',
   DIALOGSETTINGSNEWS: 'News settings',
+  DIALOGPROFILE: 'Profile',
 };
 
 const defaultState = new Map();

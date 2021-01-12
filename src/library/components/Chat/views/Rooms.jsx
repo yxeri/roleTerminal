@@ -7,6 +7,7 @@ import RoomList from '../lists/Room/RoomList';
 import WhisperList from '../lists/Whisper/WhisperList';
 import FollowingList from '../lists/Following/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
+import AdminWhisperList from '../lists/AdminWhisper/AdminWhisperList';
 
 const Rooms = ({ onChange, roomId }) => {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -31,6 +32,15 @@ const Rooms = ({ onChange, roomId }) => {
               onChange={onChange}
             />
           </>
+        )
+      }
+      {
+        accessLevel >= AccessLevels.MODERATOR && (
+          <AdminWhisperList
+            roomId={roomId}
+            key="adminWhisper"
+            onChange={onChange}
+          />
         )
       }
       <UserList

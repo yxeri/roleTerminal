@@ -1,5 +1,5 @@
 import React from 'react';
-import { node, string } from 'prop-types';
+import { func, node, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import List from './List/List';
@@ -9,7 +9,7 @@ import { getCurrentUser } from '../../../redux/selectors/users';
 import { removeWindow } from '../../../redux/actions/windowOrder';
 import { ReactComponent as Menu } from '../../../icons/menu.svg';
 
-const FileMenu = ({ id, children }) => {
+const FileMenu = ({ id, children, onSettings }) => {
   const { systemConfig = {} } = useSelector(getCurrentUser);
 
   return (
@@ -22,13 +22,15 @@ const FileMenu = ({ id, children }) => {
       {children}
       {!systemConfig.hideTopRow && (
         <>
-          <ListItem
-            stopPropagation
-            key="settings"
-            onClick={() => {}}
-          >
-            Settings
-          </ListItem>
+          {onSettings && (
+            <ListItem
+              stopPropagation
+              key="settings"
+              onClick={onSettings}
+            >
+              Preferences
+            </ListItem>
+          )}
           <ListItem
             stopPropagation
             key="quit"
@@ -47,8 +49,10 @@ export default React.memo(FileMenu);
 FileMenu.propTypes = {
   children: node,
   id: string.isRequired,
+  onSettings: func,
 };
 
 FileMenu.defaultProps = {
   children: undefined,
+  onSettings: undefined,
 };

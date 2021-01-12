@@ -25,7 +25,6 @@ const Window = ({
   done,
   index,
   id,
-  onSettings,
   help,
   type = 'window',
   title = 'app',
@@ -199,7 +198,6 @@ const Window = ({
             ? (
               <TopBar
                 maximized={size.width === '100%' && size.height === '100%'}
-                onSettings={onSettings}
                 id={id}
                 done={done}
                 title={title}
@@ -239,7 +237,6 @@ Window.propTypes = {
   type: string,
   index: number.isRequired,
   id: string.isRequired,
-  onSettings: func,
   help: node,
 };
 
@@ -249,6 +246,5 @@ Window.defaultProps = {
   title: 'app',
   menu: undefined,
   type: 'window',
-  onSettings: undefined,
   help: undefined,
 };

@@ -16,7 +16,7 @@ const MessageList = ({ roomId, messageId }) => {
     latestMessageId.current = messageIds[messageIds.length - 1];
   }
 
-  const messageMapper = () => messageIds.map((id, index, array) => (
+  const items = messageIds.map((id, index, array) => (
     <MessageItem
       isLatest={id === latestMessageId.current}
       selected={messageId && messageId === id}
@@ -32,7 +32,7 @@ const MessageList = ({ roomId, messageId }) => {
       key="messageList"
       className="MessageList"
     >
-      {messageMapper()}
+      {items}
     </List>
   );
 };

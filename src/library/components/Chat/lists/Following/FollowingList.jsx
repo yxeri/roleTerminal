@@ -8,7 +8,7 @@ import FollowingItem from './Item/FollowingItem';
 const FollowingList = ({ onChange, roomId }) => {
   const roomIds = useSelector(getFollowedRoomsIds);
 
-  const roomMapper = () => roomIds.map((id) => (
+  const items = roomIds.map((id) => (
     <FollowingItem
       className={`${id === roomId ? 'selected' : ''}`}
       key={id}
@@ -25,7 +25,7 @@ const FollowingList = ({ onChange, roomId }) => {
       className="FollowingList"
       title="Joined"
     >
-      {roomMapper()}
+      {items}
     </List>
   );
 };

@@ -8,11 +8,10 @@ import WhisperItem from './Item/WhisperItem';
 const WhisperList = ({ onChange, roomId }) => {
   const whisperRooms = useSelector((state) => getWhisperRooms(state, { spyMode: false }));
 
-  const rooms = (() => whisperRooms
+  const items = whisperRooms
     .map((room) => (
       <WhisperItem key={room.objectId} room={room} onChange={onChange} className={`${room.objectId === roomId ? 'selected' : ''}`} />
-    ))
-  )();
+    ));
 
   return (
     <List
@@ -22,7 +21,7 @@ const WhisperList = ({ onChange, roomId }) => {
       className="WhisperList"
       title="PM"
     >
-      {rooms}
+      {items}
     </List>
   );
 };

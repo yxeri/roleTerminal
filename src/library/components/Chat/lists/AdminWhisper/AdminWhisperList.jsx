@@ -9,11 +9,10 @@ import { ReactComponent as Admin } from '../../../../icons/admin.svg';
 const AdminWhisperList = ({ onChange, roomId }) => {
   const whisperRooms = useSelector((state) => getWhisperRooms(state, { spyMode: true }));
 
-  const rooms = (() => whisperRooms
+  const items = whisperRooms
     .map((room) => (
       <WhisperItem key={room.objectId} room={room} onChange={onChange} className={`${room.objectId === roomId ? 'selected' : ''}`} />
-    ))
-  )();
+    ));
 
   return (
     <List
@@ -28,7 +27,7 @@ const AdminWhisperList = ({ onChange, roomId }) => {
         </span>
       )}
     >
-      {rooms}
+      {items}
     </List>
   );
 };

@@ -17,8 +17,20 @@ export const createUser = async (params) => {
   return result;
 };
 
-export const updateUser = async ({ userId, user }) => {
-  const result = await emitSocketEvent(SendEvents.UPDATEUSER, { userId, user });
+export const updateUser = async ({
+  userId,
+  user,
+  image,
+  resetImage,
+}) => {
+  const result = await emitSocketEvent(SendEvents.UPDATEUSER, {
+    userId,
+    user,
+    image,
+    options: { resetImage },
+  });
+
+  console.log(result);
 
   await store.dispatch(updateUsers({ users: [result.user] }));
 

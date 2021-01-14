@@ -54,6 +54,17 @@ const MainList = () => {
   if (accessLevel >= AccessLevels.STANDARD) {
     items.push(
       <ListItem
+        key="profile"
+        onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGPROFILE, value: { type: WindowTypes.DIALOGPROFILE } }] }))}
+      >
+        Your profile
+      </ListItem>,
+    );
+  }
+
+  if (accessLevel >= AccessLevels.STANDARD) {
+    items.push(
+      <ListItem
         key="settings"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCONFIGSYSTEM, value: { type: WindowTypes.DIALOGCONFIGSYSTEM } }] }))}
       >

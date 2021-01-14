@@ -14,7 +14,7 @@ import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';
 import ImageUpload from '../../common/sub-components/ImageUpload/ImageUpload';
 import { updateUser } from '../../../socket/actions/users';
 import { getCurrentUser } from '../../../redux/selectors/users';
-import Select from '../../common/sub-components/Select/Select';
+import Select from '../../common/sub-components/selects/Select/Select';
 
 const SettingsNewsDialog = ({ id, index }) => {
   const currentUser = useSelector(getCurrentUser);

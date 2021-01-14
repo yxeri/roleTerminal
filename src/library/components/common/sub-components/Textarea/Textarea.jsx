@@ -28,7 +28,7 @@ const Textarea = ({
       if (!textarea.style.height || (textarea.scrollHeight.toString() !== textarea.style.height.split('px')[0])) {
         textarea.style.height = 'auto';
         textarea.style.height = `${textarea.scrollHeight}px`;
-        inputRef.current.scrollIntoView();
+        inputRef.current.scrollIntoView({ block: 'nearest' });
       }
     }
   };

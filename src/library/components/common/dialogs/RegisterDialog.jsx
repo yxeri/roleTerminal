@@ -5,7 +5,6 @@ import { useForm, FormProvider } from 'react-hook-form';
 
 import Dialog from './Dialog/Dialog';
 import { login } from '../../../socket/actions/auth';
-import Select from '../sub-components/Select/Select';
 import Input from '../sub-components/Input/Input';
 import Textarea from '../sub-components/Textarea/Textarea';
 import { getRequireOffName } from '../../../redux/selectors/config';
@@ -14,10 +13,11 @@ import { createUser } from '../../../socket/actions/users';
 import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
+import PronounsSelect from '../sub-components/selects/PronounsSelect';
+import ImageUpload from '../sub-components/ImageUpload/ImageUpload';
 
 const RegisterDialog = ({ id, index }) => {
   const formMethods = useForm();
-  const [image, setImage] = useState();
   const [error, setError] = useState();
   const requireOffName = useSelector(getRequireOffName);
 
@@ -28,6 +28,7 @@ const RegisterDialog = ({ id, index }) => {
     repeatPassword,
     pronouns,
     description,
+    image,
   }) => {
     if ((requireOffName && !offName) || !username || !password || !repeatPassword || !pronouns) {
       return;
@@ -81,6 +82,7 @@ const RegisterDialog = ({ id, index }) => {
       title="Register user"
       buttons={[
         <Button
+          key="submit"
           type="submit"
           onClick={onSubmitCall}
         >
@@ -94,6 +96,8 @@ const RegisterDialog = ({ id, index }) => {
             requireOffName && (
               <Input
                 required
+                key="offName"
+                maxLength={100}
                 name="offName"
                 placeholder="Out-of-game name"
               />
@@ -101,37 +105,38 @@ const RegisterDialog = ({ id, index }) => {
           }
           <Input
             required
+            key="username"
+            maxLength={30}
             name="username"
             placeholder="Username"
           />
-          <Select
-            multiple
-            required
-            name="pronouns"
-          >
-            <option value="">---Choose pronouns---</option>
-            <option value="they">They/Them</option>
-            <option value="she">She/Her</option>
-            <option value="he">He/Him</option>
-            <option value="it">It</option>
-          </Select>
+          <PronounsSelect key="pronouns" />
           <Input
             required
+            key="password"
+            minLength={4}
+            maxLength={100}
             name="password"
             placeholder="Password"
             type="password"
           />
           <Input
             required
+            key="repeatPassword"
+            minLength={4}
+            maxLength={100}
             shouldEqual="password"
             name="repeatPassword"
             placeholder="Repeat password"
             type="password"
           />
           <Textarea
+            key="description"
+            maxLength={300}
             name="description"
             placeholder="Description"
           />
+          <ImageUpload key="imageUpload" />
         </form>
       </FormProvider>
     </Dialog>

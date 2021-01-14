@@ -21,6 +21,7 @@ defaultState.set('newsCost', 0);
 defaultState.set('onlySeen', false);
 defaultState.set('allowPartialSearch', true);
 defaultState.set('disallowProfileEdit', false);
+defaultState.set('gpsTracking', false);
 defaultState.set('permissions', {
   CreateAlias: {
     name: 'CreateAlias',

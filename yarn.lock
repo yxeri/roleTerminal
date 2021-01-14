@@ -11263,8 +11263,8 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     inherits "^2.0.1"
 
 "rolehaven@git://github.com/yxeri/roleHaven.git#develop":
-  version "1.5.22"
-  resolved "git://github.com/yxeri/roleHaven.git#3e7ea3fb11b9a6fb76d6782cea38c7ac79454760"
+  version "1.5.23"
+  resolved "git://github.com/yxeri/roleHaven.git#9df98514bf3a1998218a2b6109cb0d3ae35d8114"
   dependencies:
     "@babel/core" "^7.11.6"
     "@babel/preset-env" "^7.11.5"

@@ -21,6 +21,7 @@
     }
 
     header {
+      height: unset;
       background-color: $background-color;
       border-bottom: $lite-border;
       position: sticky;

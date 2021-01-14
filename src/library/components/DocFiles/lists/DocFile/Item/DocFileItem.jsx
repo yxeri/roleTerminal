@@ -8,15 +8,17 @@ import { ReactComponent as Lock } from '../../../../../icons/lock.svg';
 import store from '../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
-import { getCurrentAccessLevel } from '../../../../../redux/selectors/users';
+import { getCurrentAccessLevel, getIdentityName } from '../../../../../redux/selectors/users';
 import { AccessLevels } from '../../../../../AccessCentral';
 import { unlockDocFile } from '../../../../../socket/actions/docFiles';
+import { getTimestamp } from '../../../../../TextTools';
 
 import './DocFileItem.scss';
 
 const DocFileItem = ({ docFileId, onChange }) => {
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
   const accessLevel = useSelector(getCurrentAccessLevel);
+  const identityName = useSelector((state) => getIdentityName(state, { id: docFile.ownerAliasId || docFile.ownerId }));
 
   return (
     <ListItem
@@ -44,7 +46,7 @@ const DocFileItem = ({ docFileId, onChange }) => {
           .catch((error) => console.log(error));
       }}
     >
-      {docFile.title}
+      <span className="title">{docFile.title}</span>
       {docFile.isLocked && (
         <div className="lock"><Lock /></div>
       )}

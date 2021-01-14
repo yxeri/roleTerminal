@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
+import { bool } from 'prop-types';
 
 import List from '../List/List';
 import {
@@ -21,7 +22,7 @@ import { ReactComponent as Users } from '../../../../icons/users.svg';
 
 import './IdentityList.scss';
 
-const IdentityList = () => {
+const IdentityList = ({ dropdown = true }) => {
   const formMethods = useForm();
   const partialName = useWatch({ control: formMethods.control, name: 'search' });
   const onlySeen = useSelector(getOnlySeen);
@@ -75,8 +76,8 @@ const IdentityList = () => {
 
   return (
     <List
-      dropdown
-      checkWidth
+      dropdown={dropdown}
+      checkWidth={dropdown}
       className="IdentityList"
       title={<Users />}
     >
@@ -91,3 +92,12 @@ const IdentityList = () => {
 };
 
 export default React.memo(IdentityList);
+
+IdentityList.propTypes = {
+  dropdown: bool,
+};
+
+IdentityList.defaultProps = {
+  dropdown: true,
+};
+

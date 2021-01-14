@@ -8,9 +8,10 @@ import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import Input from '../sub-components/Input/Input';
-import Select from '../sub-components/Select/Select';
+import Select from '../sub-components/selects/Select/Select';
 import Textarea from '../sub-components/Textarea/Textarea';
 import { createAlias } from '../../../socket/actions/aliases';
+import ImageUpload from '../sub-components/ImageUpload/ImageUpload';
 
 const CreateAliasDialog = ({ id, index }) => {
   const formMethods = useForm();
@@ -26,7 +27,7 @@ const CreateAliasDialog = ({ id, index }) => {
       alias: {
         aliasName,
         pronouns,
-        description,
+        description: description ? description.split('\n') : undefined,
       },
     };
 
@@ -65,6 +66,7 @@ const CreateAliasDialog = ({ id, index }) => {
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <Input
             required
+            maxLength={30}
             name="aliasName"
             placeholder="Alias name"
           />
@@ -79,7 +81,9 @@ const CreateAliasDialog = ({ id, index }) => {
             <option value="he">He/Him</option>
             <option value="it">It</option>
           </Select>
+          <ImageUpload />
           <Textarea
+            maxLength={300}
             name="description"
             placeholder="Description"
           />

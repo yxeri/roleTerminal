@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { bool, string } from 'prop-types';
 
 import Image from '../Image/Image';
 import Button from '../Button/Button';
-
 import { ReactComponent as ImageIcon } from '../../../../icons/image.svg';
 
 import './ImageUpload.scss';
 
-const ImageUpload = ({ useIcon = false }) => {
+const ImageUpload = ({ useIcon = false, presetImage }) => {
   const { register, setValue } = useFormContext();
+  const previewRef = useRef(null);
   const inputRef = useRef(null);
-  const [previewImage, setPreviewImage] = useState();
+  const [previewImage, setPreviewImage] = useState(presetImage);
   const watchImage = useWatch({ name: 'image' });
 
   useEffect(() => {
@@ -29,6 +30,8 @@ const ImageUpload = ({ useIcon = false }) => {
   useEffect(() => {
     if (!watchImage) {
       setPreviewImage();
+    } else if (previewRef.current) {
+      previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [watchImage]);
 
@@ -66,6 +69,7 @@ const ImageUpload = ({ useIcon = false }) => {
         onChange={onChangeFunc}
       />
       <Image
+        ref={previewRef}
         onRemove={() => setPreviewImage()}
         className={`previewImage ${!previewImage ? 'hide' : ''}`}
         image={previewImage ? previewImage.source : ''}
@@ -76,10 +80,20 @@ const ImageUpload = ({ useIcon = false }) => {
         onClick={() => { inputRef.current.click(); }}
       >
         <ImageIcon />
-        {!useIcon && (<span>Upload image</span>)}
+        {!useIcon && (<span>{previewImage ? 'Change image' : 'Upload image'}</span>)}
       </Button>
     </div>
   );
 };
 
 export default React.memo(ImageUpload);
+
+ImageUpload.propTypes = {
+  useIcon: bool,
+  presetImage: string,
+};
+
+ImageUpload.defaultProps = {
+  useIcon: false,
+  presetImage: undefined,
+};

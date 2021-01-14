@@ -75,6 +75,7 @@ export const SendEvents = {
   REMOVEROOM: 'removeRoom',
   UNLOCKDOCFILE: 'unlockDocFile',
   UPDATEUSER: 'updateUser',
+  UPDATEALIAS: 'updateAlias',
 };
 
 export const GetEvents = {

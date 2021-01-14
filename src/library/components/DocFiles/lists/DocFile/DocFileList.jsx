@@ -7,6 +7,9 @@ import List from '../../../common/lists/List/List';
 import { getDocFileIdsNames } from '../../../../redux/selectors/docFiles';
 import DocFileItem from './Item/DocFileItem';
 import SearchItem from '../../../common/lists/List/Search/SearchItem';
+import ListItem from '../../../common/lists/List/Item/ListItem';
+
+import './DocFileList.scss';
 
 const DocFileList = ({ onChange }) => {
   const listRef = useRef();
@@ -55,9 +58,10 @@ const DocFileList = ({ onChange }) => {
   return (
     <List
       alwaysExpanded
+      className="DocFileList"
       ref={listRef}
     >
-      <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by tile/tags" />
+      <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by tile/tags/author" />
       {items}
     </List>
   );

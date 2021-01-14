@@ -17,6 +17,8 @@ import { ReactComponent as File } from '../../../../icons/file.svg';
 import { ReactComponent as News } from '../../../../icons/news.svg';
 import { ReactComponent as Layers } from '../../../../icons/layers.svg';
 import { ReactComponent as Grid } from '../../../../icons/grid.svg';
+import { ReactComponent as Users } from '../../../../icons/users.svg';
+import { ReactComponent as Team } from '../../../../icons/team.svg';
 import { getOrder } from '../../../../redux/selectors/windowOrder';
 
 import './OpenApps.scss';
@@ -84,6 +86,24 @@ const OpenApps = () => {
             <Map />
           </Button>
           <span>Map</span>
+        </ListItem>
+        <ListItem key="users">
+          <Button
+            key="users"
+            onClick={() => {}}
+          >
+            <Users />
+          </Button>
+          <span>Users</span>
+        </ListItem>
+        <ListItem key="teams">
+          <Button
+            key="Teams"
+            onClick={() => {}}
+          >
+            <Team />
+          </Button>
+          <span>Teams</span>
         </ListItem>
         {accessLevel >= AccessLevels.STANDARD && (
           <ListItem key="wallet">

@@ -13,8 +13,8 @@ import LoginDialog from '../common/dialogs/LoginDialog';
 import RegisterDialog from '../common/dialogs/RegisterDialog';
 import CreateAliasDialog from '../common/dialogs/CreateAliasDialog';
 import CreateTransactionDialog from '../common/dialogs/CreateTransactionDialog';
-import DocFile from '../DocFile/DocFile';
-import CreateDocFileDialog from '../DocFile/dialogs/CreateDocFile/CreateDocFileDialog';
+import DocFile from '../DocFiles/DocFile';
+import CreateDocFileDialog from '../DocFiles/dialogs/CreateDocFile/CreateDocFileDialog';
 import Dashboard from './Dashboard/Dashboard';
 import News from '../News/News';
 import CreateNewsDialog from '../News/dialogs/CreateNewsDialog';
@@ -23,10 +23,11 @@ import ConfigSystemDialog from '../common/dialogs/ConfigSystem/ConfigSystemDialo
 import { getSystemConfig } from '../../redux/selectors/users';
 import store from '../../redux/store';
 import { changeWindowOrder } from '../../redux/actions/windowOrder';
-import UnlockDocFileDialog from '../DocFile/dialogs/UnlockDocFileDialog';
+import UnlockDocFileDialog from '../DocFiles/dialogs/UnlockDocFileDialog';
 import SettingsNewsDialog from '../News/dialogs/SettingsNewsDialog';
 
 import './MainWindow.scss';
+import ProfileDialog from '../common/dialogs/ProfileDialog';
 
 const MainWindow = () => {
   const systemConfig = useSelector(getSystemConfig);
@@ -99,7 +100,7 @@ const MainWindow = () => {
         break;
       }
       case WindowTypes.DIALOGCREATETRANSACTION: {
-        windows.push(<CreateTransactionDialog key={key} id={key} toWalletId={value.toWalletId} index={value.index} />);
+        windows.push(<CreateTransactionDialog key={key} id={key} toWalletId={value.toWalletId} index={value.index} amount={value.amount} />);
 
         break;
       }
@@ -130,6 +131,11 @@ const MainWindow = () => {
       }
       case WindowTypes.DIALOGSETTINGSNEWS: {
         windows.push(<SettingsNewsDialog key={key} id={key} index={value.index} />);
+
+        break;
+      }
+      case WindowTypes.DIALOGPROFILE: {
+        windows.push(<ProfileDialog key={key} id={key} index={value.index} identityId={value.identityId} edit={value.edit} />);
 
         break;
       }

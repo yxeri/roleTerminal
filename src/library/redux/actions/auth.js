@@ -3,6 +3,8 @@ import { batch } from 'react-redux';
 import { ALIASID, USERID } from '../actionTypes';
 import { resetUser, setToken, setUserId } from '../../StorageManager';
 import { postMessage, MessageTypes } from '../../Messenger';
+import store from '../store';
+import { resetWindows } from './windowOrder';
 
 export const login = ({ userId, token, retrieveAll }) => {
   setToken(token);
@@ -19,8 +21,8 @@ export const login = ({ userId, token, retrieveAll }) => {
 };
 
 export const logout = (retrieveAll) => {
+  store.dispatch(resetWindows());
   resetUser();
-
   retrieveAll({ reset: true });
 
   return (dispatch) => {

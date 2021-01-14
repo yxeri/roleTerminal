@@ -9,13 +9,18 @@ import store from '../../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../redux/reducers/windowOrder';
 import Input from '../sub-components/Input/Input';
-import Select from '../sub-components/Select/Select';
+import Select from '../sub-components/selects/Select/Select';
 import { createTransaction } from '../../../socket/actions/transactions';
 import { getWalletIdsByCurrentUser } from '../../../redux/selectors/wallets';
 import { getIdentitiesOrTeamsByIds, getIdentityOrTeamById } from '../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 
-const CreateTransactionDialog = ({ id, toWalletId, amount, index }) => {
+const CreateTransactionDialog = ({
+  id,
+  toWalletId,
+  amount,
+  index,
+}) => {
   const formMethods = useForm();
   const identityId = useSelector(getCurrentIdentityId);
   const walletIds = useSelector(getWalletIdsByCurrentUser);
@@ -98,6 +103,7 @@ const CreateTransactionDialog = ({ id, toWalletId, amount, index }) => {
             placeholder="Amount"
           />
           <Input
+            maxLength={50}
             name="note"
             placeholder="Note"
           />
@@ -113,4 +119,9 @@ CreateTransactionDialog.propTypes = {
   id: string.isRequired,
   toWalletId: string.isRequired,
   index: number.isRequired,
+  amount: number,
+};
+
+CreateTransactionDialog.defaultProps = {
+  amount: undefined,
 };

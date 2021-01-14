@@ -93,8 +93,12 @@ export default function WindowOrderReducer(state = defaultState, action) {
 
   if (action.type === WINDOWORDERS) {
     const { payload } = action;
-    const { windows } = payload;
+    const { windows, reset } = payload;
     const newState = new Map([...state]);
+
+    if (reset) {
+      return defaultState;
+    }
 
     windows.forEach(({ id, value }) => {
       const newValue = {

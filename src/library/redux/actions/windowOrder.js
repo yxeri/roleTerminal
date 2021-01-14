@@ -38,6 +38,13 @@ export const changeWindowOrder = ({ windows }) => {
   };
 };
 
+export const resetWindows = () => ({
+  type: WINDOWORDERS,
+  payload: {
+    reset: true,
+  },
+});
+
 export const removeWindow = ({ id }) => ({
   type: WINDOWORDER,
   payload: {

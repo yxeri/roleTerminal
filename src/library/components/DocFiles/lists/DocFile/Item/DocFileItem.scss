@@ -1,0 +1,14 @@
+@import "../../../../../../common";
+
+.DocFileItem {
+  position: relative;
+}
+
+.DocFileItem.header {
+  text-decoration: underline;
+  position: sticky;
+  top: 3ch;
+  margin-top: -#{$padding * 2};
+  z-index: 1;
+  background-color: $second-background-color;
+}

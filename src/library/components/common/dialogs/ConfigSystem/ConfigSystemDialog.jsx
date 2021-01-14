@@ -11,7 +11,7 @@ import { getCurrentUser } from '../../../../redux/selectors/users';
 import Input from '../../sub-components/Input/Input';
 import { updateUser } from '../../../../socket/actions/users';
 import Button from '../../sub-components/Button/Button';
-import Select from '../../sub-components/Select/Select';
+import Select from '../../sub-components/selects/Select/Select';
 import { getDeviceId } from '../../../../StorageManager';
 
 import './ConfigSystemDialog.scss';

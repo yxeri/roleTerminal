@@ -1,0 +1,13 @@
+@import "../../../../../common";
+
+.DocFileList {
+  height: 100%;
+
+  .SearchItem {
+    background-color: $second-background-color;
+  }
+
+  .DocFileItem:nth-child(odd) {
+    background-color: $background-color;
+  }
+}

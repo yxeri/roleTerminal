@@ -27,6 +27,7 @@
     grid-template-columns: 100%;
     grid-gap: $margin;
     overflow-y: auto;
+    overflow-x: hidden;
     height: 100%;
     scrollbar-width: none;
     box-sizing: border-box;

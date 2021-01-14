@@ -4,6 +4,7 @@
   word-wrap: break-word;
   padding: $padding $padding;
   box-sizing: border-box;
+  overflow-x: hidden;
 
   .spy, .lock {
     position: absolute;

@@ -19,6 +19,9 @@ import { ReactComponent as Layers } from '../../../../icons/layers.svg';
 import { ReactComponent as Grid } from '../../../../icons/grid.svg';
 import { ReactComponent as Users } from '../../../../icons/users.svg';
 import { ReactComponent as Team } from '../../../../icons/team.svg';
+import { ReactComponent as Terminal } from '../../../../icons/terminal.svg';
+import { ReactComponent as Heart } from '../../../../icons/heart.svg';
+import { ReactComponent as Wrecking } from '../../../../icons/wrecking.svg';
 import { getOrder } from '../../../../redux/selectors/windowOrder';
 
 import './OpenApps.scss';
@@ -31,7 +34,7 @@ const OpenApps = () => {
   const changeOrder = useCallback(({ id, value }) => store.dispatch(changeWindowOrder({ windows: [{ id, value }] })), []);
 
   order.forEach((value, key) => {
-    if (![WindowTypes.CHAT, WindowTypes.NEWS, WindowTypes.DOCFILE, WindowTypes.WORLDMAP, WindowTypes.WALLET].includes(key)) {
+    if (![WindowTypes.CHAT, WindowTypes.NEWS, WindowTypes.DOCFILEDIR, WindowTypes.WORLDMAP, WindowTypes.WALLET].includes(key)) {
       otherWindows.push(
         <ListItem key={key}>
           <Button
@@ -70,8 +73,8 @@ const OpenApps = () => {
         <ListItem key="docFile">
           <Button
             key="docFile"
-            className={`${order.get(WindowTypes.DOCFILE) && order.get(WindowTypes.DOCFILE).index === order.size ? 'active' : ''}`}
-            onClick={() => changeOrder({ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE } })}
+            className={`${order.get(WindowTypes.DOCFILEDIR) && order.get(WindowTypes.DOCFILEDIR).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.DOCFILEDIR, value: { type: WindowTypes.DOCFILEDIR } })}
           >
             <File />
           </Button>
@@ -87,24 +90,6 @@ const OpenApps = () => {
           </Button>
           <span>Map</span>
         </ListItem>
-        <ListItem key="users">
-          <Button
-            key="users"
-            onClick={() => {}}
-          >
-            <Users />
-          </Button>
-          <span>Users</span>
-        </ListItem>
-        <ListItem key="teams">
-          <Button
-            key="Teams"
-            onClick={() => {}}
-          >
-            <Team />
-          </Button>
-          <span>Teams</span>
-        </ListItem>
         {accessLevel >= AccessLevels.STANDARD && (
           <ListItem key="wallet">
             <Button
@@ -117,6 +102,66 @@ const OpenApps = () => {
             <span>Wallet</span>
           </ListItem>
         )}
+        <ListItem
+          className="faded"
+          key="terminal"
+        >
+          <Button
+            key="terminal"
+            onClick={() => {}}
+          >
+            <Terminal />
+          </Button>
+          <span>Terminal</span>
+        </ListItem>
+        <ListItem
+          key="wrecking"
+          className="faded"
+        >
+          <Button
+            key="wrecking"
+            onClick={() => {}}
+          >
+            <Wrecking />
+          </Button>
+          <span>Wrecker Central</span>
+        </ListItem>
+        <ListItem
+          className="faded"
+          key="love"
+        >
+          <Button
+            key="love"
+            onClick={() => {}}
+          >
+            <Heart />
+          </Button>
+          <span>Love Bureau</span>
+        </ListItem>
+        <ListItem
+          className="faded"
+          key="users"
+        >
+          <Button
+            key="users"
+            onClick={() => {}}
+          >
+            <Users />
+          </Button>
+          <span>Users</span>
+        </ListItem>
+        <ListItem
+          className="faded"
+          key="teams"
+        >
+          <Button
+            key="Teams"
+            onClick={() => {}}
+          >
+            <Team />
+          </Button>
+          <span>Teams</span>
+        </ListItem>
       </List>
       {otherWindows.length > 0 && (
         <List

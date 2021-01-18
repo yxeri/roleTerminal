@@ -1,19 +1,19 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
+
 import ListItem from '../../../../common/lists/List/Item/ListItem';
 import { getTransactionById } from '../../../../../redux/selectors/transactions';
 import { getIdentityOrTeamById } from '../../../../../redux/selectors/users';
+import { getDayModification, getYearModification } from '../../../../../redux/selectors/config';
+import { getTimestamp } from '../../../../../TextTools';
 
 import './TransactionItem.scss';
-import { getDayModification, getSystemUser, getYearModification } from '../../../../../redux/selectors/config';
-import store from '../../../../../redux/store';
-import { getTimestamp } from '../../../../../TextTools';
 
 const TransactionItem = ({ transactionId }) => {
   const transaction = useSelector((state) => getTransactionById(state, { id: transactionId }));
   const from = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.fromWalletId }));
-  const to = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.toWalletId })) || getSystemUser(store.getState());
+  const to = useSelector((state) => getIdentityOrTeamById(state, { id: transaction.toWalletId }));
   const dayModification = useSelector(getDayModification);
   const yearModification = useSelector(getYearModification);
   const timestamp = getTimestamp({ date: transaction.customTimeCreated || transaction.timeCreated, dayModification, yearModification });

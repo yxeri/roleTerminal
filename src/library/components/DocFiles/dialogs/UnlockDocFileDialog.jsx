@@ -15,18 +15,23 @@ import { ReactComponent as Unlock } from '../../../icons/unlock.svg';
 import { getDocFileById } from '../../../redux/selectors/docFiles';
 import { unlockDocFile } from '../../../socket/actions/docFiles';
 
-const UnlockDocFileDialog = ({ docFileId, id, index }) => {
+const UnlockDocFileDialog = ({
+  docFileId,
+  id,
+  index,
+  code,
+}) => {
   const [error, setError] = useState();
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
   const formMethods = useForm();
 
   const onSubmit = ({
-    code,
+    code: submittedCode,
   } = {}) => {
-    unlockDocFile({ docFileId, code })
+    unlockDocFile({ docFileId, code: submittedCode })
       .then(() => {
         batch(() => {
-          store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE, docFileId } }] }));
+          store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILEVIEW, value: { type: WindowTypes.DOCFILEVIEW, docFileId } }] }));
           store.dispatch(removeWindow({ id }));
         });
       })
@@ -52,7 +57,7 @@ const UnlockDocFileDialog = ({ docFileId, id, index }) => {
       index={index}
       className="UnlockDocFileDialog"
       onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGUNLOCKROOM, docFileId } }] }));
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DIALOGUNLOCKFILE, docFileId } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       title={`Unlock file ${docFile.title}`}
@@ -80,6 +85,7 @@ const UnlockDocFileDialog = ({ docFileId, id, index }) => {
           </div>
           <Input
             required
+            defaultValue={code}
             name="code"
             type="text"
             placeholder="Code"
@@ -96,4 +102,9 @@ UnlockDocFileDialog.propTypes = {
   id: string.isRequired,
   index: number.isRequired,
   docFileId: string.isRequired,
+  code: string,
+};
+
+UnlockDocFileDialog.defaultProps = {
+  code: undefined,
 };

@@ -5,7 +5,8 @@ export const WindowTypes = {
   WALLET: 'Wallet',
   CHAT: 'Chat',
   WORLDMAP: 'Map',
-  DOCFILE: 'Files',
+  DOCFILEDIR: 'Files directory',
+  DOCFILEVIEW: 'File',
   NEWS: 'News',
   TEAMS: 'Teams',
   DIALOGIDENTITY: 'User',
@@ -19,9 +20,9 @@ export const WindowTypes = {
   DIALOGCREATENEWS: 'New article',
   DIALOGJOINROOM: 'Join room',
   DIALOGCONFIGSYSTEM: 'Config system',
-  DIALOGUNLOCKROOM: 'Unlock room',
   DIALOGSETTINGSNEWS: 'News settings',
   DIALOGPROFILE: 'Profile',
+  DIALOGUNLOCKFILE: 'Unlock file',
 };
 
 const defaultState = new Map();

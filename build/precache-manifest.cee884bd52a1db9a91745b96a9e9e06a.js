@@ -1,31 +1,31 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "197c9e1ca9abd423dee9d434cc27e96b",
+    "revision": "bb0a2a545811e4d0fe5b012777f202f1",
     "url": "/index.html"
   },
   {
-    "revision": "0de19a42836835f961e3",
-    "url": "/static/css/main.fea6d7f0.chunk.css"
+    "revision": "b6f3bc47abfe747e6ff9",
+    "url": "/static/css/main.192893a9.chunk.css"
   },
   {
-    "revision": "d2b08c4416b16d851a92",
-    "url": "/static/js/2.81fdeb78.chunk.js"
+    "revision": "0bae094b491a04724e79",
+    "url": "/static/js/2.162144db.chunk.js"
   },
   {
     "revision": "857d129e4a5f4f33c7a4a143bf79109c",
-    "url": "/static/js/2.81fdeb78.chunk.js.LICENSE.txt"
+    "url": "/static/js/2.162144db.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "0de19a42836835f961e3",
-    "url": "/static/js/main.d0f8fab0.chunk.js"
+    "revision": "b6f3bc47abfe747e6ff9",
+    "url": "/static/js/main.2191c471.chunk.js"
   },
   {
     "revision": "5fab9e9fb4ba457dbcbf",
     "url": "/static/js/runtime-main.0516f17b.js"
   },
   {
-    "revision": "dc5ca15eecde026e656657bde7e8e22f",
-    "url": "/static/media/admin.dc5ca15e.svg"
+    "revision": "e4ee82f07781aaa426390ca1464eb614",
+    "url": "/static/media/admin.e4ee82f0.svg"
   },
   {
     "revision": "c36635eea3a659eed333cffe89aec3c2",
@@ -96,6 +96,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/grid.c83c9593.svg"
   },
   {
+    "revision": "291402631ab52ee9014385008e854e4a",
+    "url": "/static/media/heart.29140263.svg"
+  },
+  {
     "revision": "fdcad0d27507f10db8dc76cc196057ad",
     "url": "/static/media/help.fdcad0d2.svg"
   },
@@ -148,6 +152,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/team.b708dac2.svg"
   },
   {
+    "revision": "50ca7fa969685e6671b45870c90eae5b",
+    "url": "/static/media/terminal.50ca7fa9.svg"
+  },
+  {
     "revision": "35f7faf12fa1ea14e7120b7b6ed0fe79",
     "url": "/static/media/unlock.35f7faf1.svg"
   },
@@ -162,5 +170,9 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "2f800c77de03dd9fa1038268fd04a1d8",
     "url": "/static/media/wallet.2f800c77.svg"
+  },
+  {
+    "revision": "cd85b5f8863f99e25ec2fb3ce02b38e4",
+    "url": "/static/media/wrecking.cd85b5f8.svg"
   }
 ]);

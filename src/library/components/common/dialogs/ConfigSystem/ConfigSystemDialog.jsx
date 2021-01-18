@@ -139,7 +139,7 @@ const ConfigSystemDialog = ({ id, index }) => {
               <option value={WindowTypes.CHAT}>Chat</option>
               <option value={WindowTypes.WALLET}>Wallet</option>
               <option value={WindowTypes.WORLDMAP}>Map</option>
-              <option value={WindowTypes.DOCFILE}>Files</option>
+              <option value={WindowTypes.DOCFILEDIR}>Files</option>
               <option value={WindowTypes.NEWS}>News</option>
             </Select>
           </div>

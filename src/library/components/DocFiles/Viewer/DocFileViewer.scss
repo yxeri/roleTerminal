@@ -2,7 +2,7 @@
 
 .DocFileViewer {
   padding: $padding;
-  word-wrap: break-word;
+  word-break: break-word;
 
   .title, .info {
     margin-bottom: $padding * 2;

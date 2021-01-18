@@ -13,7 +13,7 @@ import LoginDialog from '../common/dialogs/LoginDialog';
 import RegisterDialog from '../common/dialogs/RegisterDialog';
 import CreateAliasDialog from '../common/dialogs/CreateAliasDialog';
 import CreateTransactionDialog from '../common/dialogs/CreateTransactionDialog';
-import DocFile from '../DocFiles/DocFile';
+import DocFileDir from '../DocFiles/DocFileDir';
 import CreateDocFileDialog from '../DocFiles/dialogs/CreateDocFile/CreateDocFileDialog';
 import Dashboard from './Dashboard/Dashboard';
 import News from '../News/News';
@@ -28,6 +28,7 @@ import SettingsNewsDialog from '../News/dialogs/SettingsNewsDialog';
 
 import './MainWindow.scss';
 import ProfileDialog from '../common/dialogs/ProfileDialog';
+import DocFileView from '../DocFiles/DocFileView';
 
 const MainWindow = () => {
   const systemConfig = useSelector(getSystemConfig);
@@ -59,8 +60,13 @@ const MainWindow = () => {
 
         break;
       }
-      case WindowTypes.DOCFILE: {
-        windows.push(<DocFile key={key} id={key} docFileId={value.docFileId} code={value.code} index={value.index} />);
+      case WindowTypes.DOCFILEDIR: {
+        windows.push(<DocFileDir key={key} id={key} index={value.index} />);
+
+        break;
+      }
+      case WindowTypes.DOCFILEVIEW: {
+        windows.push(<DocFileView key={key} id={key} index={value.index} docFileId={value.docFileId} code={value.code} />);
 
         break;
       }
@@ -115,17 +121,12 @@ const MainWindow = () => {
         break;
       }
       case WindowTypes.DIALOGJOINROOM: {
-        windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} messageId={value.messsageId} password={value.password} auto={value.auto} />);
+        windows.push(<JoinRoomDialog key={key} id={key} roomId={value.roomId} index={value.index} messageId={value.messsageId} password={value.password} />);
 
         break;
       }
       case WindowTypes.DIALOGCONFIGSYSTEM: {
         windows.push(<ConfigSystemDialog key={key} id={key} index={value.index} />);
-
-        break;
-      }
-      case WindowTypes.DIALOGUNLOCKROOM: {
-        windows.push(<UnlockDocFileDialog key={key} id={key} index={value.index} docFileId={value.docFileId} />);
 
         break;
       }
@@ -136,6 +137,11 @@ const MainWindow = () => {
       }
       case WindowTypes.DIALOGPROFILE: {
         windows.push(<ProfileDialog key={key} id={key} index={value.index} identityId={value.identityId} edit={value.edit} />);
+
+        break;
+      }
+      case WindowTypes.DIALOGUNLOCKFILE: {
+        windows.push(<UnlockDocFileDialog key={key} id={key} index={value.index} docFileId={value.docFileId} code={value.code} auto={value.auto} />);
 
         break;
       }

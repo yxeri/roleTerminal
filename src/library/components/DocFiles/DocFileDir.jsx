@@ -1,36 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { number, string } from 'prop-types';
-import { useSelector } from 'react-redux';
 
 import Window from '../common/Window/Window';
 import store from '../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
-import './DocFile.scss';
+import './DocFileDir.scss';
 import FileMenu from '../common/lists/FileMenu';
 import ListItem from '../common/lists/List/Item/ListItem';
 import DocFileList from './lists/DocFile/DocFileList';
-import DocFileViewer from './Viewer/DocFileViewer';
-import { getDocFileById } from '../../redux/selectors/docFiles';
+import Button from '../common/sub-components/Button/Button';
 
-const DocFile = ({ id, docFileId, index }) => {
-  const [currentDocFileId, setDocFileId] = useState();
-  const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
-
-  useEffect(() => {
-    if (docFileId && currentDocFileId !== docFileId) {
-      setDocFileId(docFileId);
-    }
-  }, [docFileId]);
-
+const DocFileDir = ({ id, index }) => {
   const onClick = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DOCFILE } }] }));
+    store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: WindowTypes.DOCFILEDIR } }] }));
   }, []);
 
   const onDone = useCallback(() => store.dispatch(removeWindow({ id })), [id]);
-
-  const onChange = useCallback((newDocFileId) => setDocFileId(newDocFileId), []);
 
   const onCreate = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATEDOCFILE, value: { type: WindowTypes.DIALOGCREATEDOCFILE } }] })));
 
@@ -39,8 +26,8 @@ const DocFile = ({ id, docFileId, index }) => {
       id={id}
       index={index}
       done={onDone}
-      className="DocFile"
-      title={`${docFile ? `Document: ${docFile.title}` : 'Documents'}`}
+      className="DocFileDir"
+      title="Files"
       onClick={onClick}
       menu={(
         <>
@@ -56,22 +43,14 @@ const DocFile = ({ id, docFileId, index }) => {
         </>
       )}
     >
-      <DocFileList onChange={onChange} />
-      {currentDocFileId && (
-        <DocFileViewer key="viewer" docFileId={currentDocFileId} onChange={onChange} />
-      )}
+      <DocFileList />
     </Window>
   );
 };
 
-export default React.memo(DocFile);
+export default React.memo(DocFileDir);
 
-DocFile.propTypes = {
+DocFileDir.propTypes = {
   id: string.isRequired,
-  docFileId: string,
   index: number.isRequired,
 };
-
-DocFile.defaultProps = {
-  docFileId: undefined,
-}

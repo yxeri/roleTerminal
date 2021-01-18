@@ -3,7 +3,7 @@ import createCachedSelector from 're-reselect';
 
 import { getAliasById, getAllAliases } from './aliases';
 import { getUserId } from './userId';
-import { getAnonymousUser } from './config';
+import { getAnonymousUser, getSystemUser } from './config';
 import { getAllTeams, getTeamById } from './teams';
 import { getDeviceId } from '../../StorageManager';
 
@@ -129,15 +129,20 @@ export const getIdentityById = createCachedSelector(
   (user, alias) => alias || user,
 )((_, { id }) => `identity-${id}`);
 
+export const getIdentityImage = createCachedSelector(
+  [getIdentityById],
+  (identity) => identity.image,
+)((_, { id }) => `identity-${id}-image`);
+
 export const getIdentityName = createCachedSelector(
   [getIdentityById],
   ({ aliasName, username } = {}) => aliasName || username || '',
 )((_, { id }) => `identity-${id}-name`);
 
-export const getIdentityOrTeamById = createSelector(
-  [getUserById, getAliasById, getTeamById],
-  (user, alias, team) => team || alias || user,
-);
+export const getIdentityOrTeamById = createCachedSelector(
+  [getUserById, getAliasById, getTeamById, getSystemUser],
+  (user, alias, team, systemUser) => team || alias || user || systemUser,
+)((_, { id }) => `identity-team-${id}`);
 
 export const getOtherIdentities = createCachedSelector(
   [getIdentities, getUserId],

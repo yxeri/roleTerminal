@@ -3,7 +3,7 @@
 .MessageItem {
   .text {
     max-width: $max-width;
-    word-wrap: break-word;
+    word-break: break-word;
   }
 }
 

@@ -1,10 +1,9 @@
 @import "../../../../../../common";
 
 .ListItem {
-  word-wrap: break-word;
+  word-break: break-word;
   padding: $padding $padding;
   box-sizing: border-box;
-  overflow-x: hidden;
 
   .spy, .lock {
     position: absolute;

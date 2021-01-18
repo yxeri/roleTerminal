@@ -2,13 +2,50 @@
 
 .DocFileItem {
   position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: fit-content(100%) minmax(auto, 30em) fit-content(100%);
+  align-items: center;
+  grid-gap: $padding * 2;
+
+  .icon {
+    height: 40px;
+    width: 40px;
+  }
+
+  .by {
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+  }
+
+  svg {
+    height: 40px;
+    width: 40px;
+    max-height: unset;
+    max-width: unset;
+    stroke-width: 2;
+  }
 }
 
 .DocFileItem.header {
-  text-decoration: underline;
+  border-bottom: $border;
+  margin-top: -#{$padding};
   position: sticky;
-  top: 3ch;
-  margin-top: -#{$padding * 2};
-  z-index: 1;
+  top: calc(1.95em);
+  z-index: 2;
   background-color: $second-background-color;
+
+  .icon, .by, svg {
+    height: unset;
+  }
+
+  .by {
+    line-height: unset;
+  }
+
+  svg {
+    max-height: $icon-size - .1em;
+    max-width: $icon-size - .1em;
+  }
 }

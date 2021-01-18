@@ -14,7 +14,7 @@
   .Button {
     position: absolute;
     right: $padding;
-    top: $padding / 2;
+    top: $padding;
     border: none;
     background-color: transparent;
     box-shadow: none;
@@ -23,7 +23,7 @@
     svg {
       max-width: $icon-size - .2em;
       max-height: $icon-size - .2em;
-      opacity: .75;
+      opacity: .5;
     }
   }
 }

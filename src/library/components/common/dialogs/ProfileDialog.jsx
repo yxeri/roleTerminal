@@ -27,6 +27,7 @@ import Textarea from '../sub-components/Textarea/Textarea';
 import { updateUser } from '../../../socket/actions/users';
 import { updateAlias } from '../../../socket/actions/aliases';
 import { AccessLevels } from '../../../AccessCentral';
+import Select from '../sub-components/selects/Select/Select';
 
 const ProfileDialog = ({
   id,
@@ -130,6 +131,32 @@ const ProfileDialog = ({
   }
 
   if (editing) {
+    if (accessLevel >= AccessLevels.MODERATOR) {
+      if (!identity.isBanned) {
+        buttons.push((
+          <Button
+            stopPropagation
+            key="ban"
+            type="button"
+            onClick={() => {}}
+          >
+            Ban
+          </Button>
+        ));
+      } else {
+        buttons.push((
+          <Button
+            stopPropagation
+            key="unban"
+            type="button"
+            onClick={() => {}}
+          >
+            Unban
+          </Button>
+        ));
+      }
+    }
+
     buttons.push((
       <Button
         stopPropagation
@@ -212,6 +239,17 @@ const ProfileDialog = ({
               type="text"
               defaultValue={identity.aliasName || identity.username}
             />
+            {accessLevel >= AccessLevels.ADMIN && (
+              <Select
+                key="accessLevel"
+                name="accessLevel"
+                defaultValue={accessLevel}
+              >
+                {Object.keys(AccessLevels)
+                  .filter((key) => AccessLevels[key] >= AccessLevels.STANDARD && AccessLevels[key] <= AccessLevels.ADMIN)
+                  .map((key) => <option value={AccessLevels[key]}>{key}</option>)}
+              </Select>
+            )}
             <PronounsSelect preselected={identity.pronouns} />
             {accessLevel >= permissions.UpdateUserStatus.accessLevel && (
               <Input

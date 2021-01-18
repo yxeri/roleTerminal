@@ -4,6 +4,7 @@ import { updateUser } from './socket/actions/users';
 import { getCurrentUser, getCurrentUserRooms } from './redux/selectors/users';
 import { getNewsRoomId } from './redux/selectors/config';
 import { WindowTypes } from './redux/reducers/windowOrder';
+import { getDocFileById } from './redux/selectors/docFiles';
 
 export const MessageTypes = {
   NOTIFICATION: 'notification',
@@ -90,7 +91,13 @@ const onQr = (data) => {
     } else if (toWalletId) {
       store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGCREATETRANSACTION}-${toWalletId}`, value: { type: WindowTypes.DIALOGCREATETRANSACTION, toWalletId, amount } }] }));
     } else if (docFileId) {
-      store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILE, value: { type: WindowTypes.DOCFILE, docFileId, code } }] }));
+      const docFile = getDocFileById(store.getState(), { id: docFileId });
+
+      if (docFile.isLocked) {
+        store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGUNLOCKFILE, value: { type: WindowTypes.DIALOGUNLOCKFILE, docFileId, code } }] }));
+      } else {
+        store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DOCFILEVIEW, value: { type: WindowTypes.DOCFILEVIEW, docFileId } }] }));
+      }
     } else if (teamId) {
       store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.TEAMS, value: { type: WindowTypes.TEAMS, teamId } }] }));
     } else if (identityId) {

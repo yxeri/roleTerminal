@@ -12,16 +12,17 @@ import Textarea from '../../../common/sub-components/Textarea/Textarea';
 import Button from '../../../common/sub-components/Button/Button';
 
 import './CreateDocFileDialog.scss';
+import ImageUpload from '../../../common/sub-components/ImageUpload/ImageUpload';
 
 const CreateDocFileDialog = ({ id, index }) => {
   const formMethods = useForm();
-  const [image, setImage] = useState();
 
   const onSubmit = async ({
     title,
     text,
     code,
     isPublic,
+    image,
   }) => {
     const params = {
       images: image ? [image] : undefined,
@@ -79,6 +80,8 @@ const CreateDocFileDialog = ({ id, index }) => {
             placeholder="Title"
           />
           <Input
+            minLength={3}
+            maxLength={10}
             name="code"
             placeholder="Code"
           />
@@ -88,6 +91,7 @@ const CreateDocFileDialog = ({ id, index }) => {
             name="text"
             placeholder="Text"
           />
+          <ImageUpload />
         </form>
       </FormProvider>
     </Dialog>

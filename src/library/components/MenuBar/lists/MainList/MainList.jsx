@@ -1,17 +1,24 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import List from '../../common/lists/List/List';
-import { AccessLevels } from '../../../AccessCentral';
-import { logout } from '../../../socket/actions/auth';
-import { getCurrentAccessLevel } from '../../../redux/selectors/users';
-import ListItem from '../../common/lists/List/Item/ListItem';
-import { ReactComponent as Menu } from '../../../icons/menu.svg';
-import store from '../../../redux/store';
-import { changeWindowOrder } from '../../../redux/actions/windowOrder';
-import { WindowTypes } from '../../../redux/reducers/windowOrder';
-import { getPermissions } from '../../../redux/selectors/config';
-import { MessageTypes, postMessage } from '../../../Messenger';
+import List from '../../../common/lists/List/List';
+import { AccessLevels } from '../../../../AccessCentral';
+import { logout } from '../../../../socket/actions/auth';
+import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
+import ListItem from '../../../common/lists/List/Item/ListItem';
+import { ReactComponent as Menu } from '../../../../icons/menu.svg';
+import { ReactComponent as LogOut } from '../../../../icons/log-out.svg';
+import { ReactComponent as Settings } from '../../../../icons/settings.svg';
+import { ReactComponent as User } from '../../../../icons/user.svg';
+import { ReactComponent as LogIn } from '../../../../icons/log-in.svg';
+import { ReactComponent as Plus } from '../../../../icons/plus.svg';
+import store from '../../../../redux/store';
+import { changeWindowOrder } from '../../../../redux/actions/windowOrder';
+import { WindowTypes } from '../../../../redux/reducers/windowOrder';
+import { getPermissions } from '../../../../redux/selectors/config';
+import { MessageTypes, postMessage } from '../../../../Messenger';
+
+import './MainList.scss';
 
 const MainList = () => {
   const accessLevel = useSelector(getCurrentAccessLevel);
@@ -24,7 +31,8 @@ const MainList = () => {
         key="register"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGREGISTER, value: { type: WindowTypes.DIALOGREGISTER } }] }))}
       >
-        Create user
+        <Plus />
+        <span>Create user</span>
       </ListItem>,
     );
   }
@@ -35,7 +43,8 @@ const MainList = () => {
         key="login"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGLOGIN, value: { type: WindowTypes.DIALOGLOGIN } }] }))}
       >
-        Login
+        <LogIn />
+        <span>Login</span>
       </ListItem>,
     );
   }
@@ -46,7 +55,8 @@ const MainList = () => {
         key="alias"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATEALIAS, value: { type: WindowTypes.DIALOGCREATEALIAS } }] }))}
       >
-        Create alias
+        <Plus />
+        <span>Create alias</span>
       </ListItem>,
     );
   }
@@ -57,7 +67,8 @@ const MainList = () => {
         key="profile"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGPROFILE, value: { type: WindowTypes.DIALOGPROFILE } }] }))}
       >
-        Your profile
+        <User />
+        <span>Your profile</span>
       </ListItem>,
     );
   }
@@ -68,7 +79,8 @@ const MainList = () => {
         key="settings"
         onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCONFIGSYSTEM, value: { type: WindowTypes.DIALOGCONFIGSYSTEM } }] }))}
       >
-        Settings
+        <Settings />
+        <span>Settings</span>
       </ListItem>,
     );
     items.push(
@@ -78,7 +90,8 @@ const MainList = () => {
           logout();
         }}
       >
-        Logout
+        <LogOut />
+        <span>Logout</span>
       </ListItem>,
     );
   }
@@ -91,7 +104,7 @@ const MainList = () => {
           postMessage({ type: MessageTypes.QUIT, data: {} });
         }}
       >
-        Quit
+        <span>Shutdown</span>
       </ListItem>,
     );
   }

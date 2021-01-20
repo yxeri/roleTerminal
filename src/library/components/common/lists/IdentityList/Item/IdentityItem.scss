@@ -1,0 +1,6 @@
+@import "../../../../../../common";
+
+.IdentityItem {
+  @extend %listItem;
+  align-items: center;
+}

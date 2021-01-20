@@ -1,0 +1,7 @@
+@import "../../../../../common";
+
+.MainList {
+  .ListItem {
+    @extend %listItem;
+  }
+}

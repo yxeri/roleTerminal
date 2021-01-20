@@ -98,7 +98,7 @@ const DocFileList = () => {
           Title
           {sortBy === SortBy.TITLE && (<ChevronDown />)}
         </span>
-        <span className="by clickable" onClick={() => setSortBy(SortBy.CREATOR)}>
+        <span className="by icon clickable" onClick={() => setSortBy(SortBy.CREATOR)}>
           By
           {sortBy === SortBy.CREATOR && (<ChevronDown />)}
         </span>

@@ -15,7 +15,7 @@ const WalletItem = ({ walletId, onChange, className = '' }) => {
       className={`WalletItem ${className}`}
       onClick={() => onChange(walletId)}
     >
-      {identity ? `${identity.teamName || identity.aliasName || identity.username}: ${wallet.amount}` : 'Show all'}
+      {identity ? `${identity.teamName || identity.aliasName || identity.username}: ${wallet ? wallet.amount : '?'}` : 'Show all'}
     </ListItem>
   );
 };

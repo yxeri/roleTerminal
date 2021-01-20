@@ -6,10 +6,13 @@ import ListItem from '../../../common/lists/List/Item/ListItem';
 import store from '../../../../redux/store';
 import { changeWindowOrder } from '../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../redux/reducers/windowOrder';
-import FileMenu from '../../../common/lists/FileMenu';
+import FileMenu from '../../../common/lists/FileMenu/FileMenu';
 import { getRoomById } from '../../../../redux/selectors/rooms';
 import { getCurrentUser } from '../../../../redux/selectors/users';
 import { hasAccessTo } from '../../../../AccessCentral';
+import { ReactComponent as Edit } from '../../../../icons/edit.svg';
+import { ReactComponent as Plus } from '../../../../icons/plus.svg';
+import { ReactComponent as LogOut } from '../../../../icons/log-out.svg';
 
 const ChatFileMenu = ({ id, roomId }) => {
   const currentUser = useSelector(getCurrentUser);
@@ -29,6 +32,7 @@ const ChatFileMenu = ({ id, roomId }) => {
         key="createRoom"
         onClick={onCreateRoom}
       >
+        <Plus />
         New room
       </ListItem>
       {!currentUser.isAnonymous && (
@@ -37,6 +41,7 @@ const ChatFileMenu = ({ id, roomId }) => {
           key="configRoom"
           onClick={() => {}}
         >
+          <Edit />
           Manage room
         </ListItem>
       )}
@@ -45,6 +50,7 @@ const ChatFileMenu = ({ id, roomId }) => {
           key="leaveRoom"
           onClick={() => {}}
         >
+          <LogOut />
           Leave room
         </ListItem>
       )}

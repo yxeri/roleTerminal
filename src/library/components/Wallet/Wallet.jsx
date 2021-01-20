@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
 

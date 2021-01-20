@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Clock from './sub-components/Clock/Clock';
-import MainList from './lists/MainList';
+import MainList from './lists/MainList/MainList';
 import { isOnline } from '../../redux/selectors/online';
 import OpenApps from './lists/OpenApps/OpenApps';
 import Button from '../common/sub-components/Button/Button';

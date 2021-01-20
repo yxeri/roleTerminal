@@ -62,10 +62,10 @@ const IdentityList = ({ dropdown = true }) => {
     } else if (userItems.length === 1) {
       store.dispatch(changeWindowOrder({
         windows: [{
-          id: `${WindowTypes.DIALOGIDENTITY}-${userItems[0].key}`,
+          id: `${WindowTypes.DIALOGPROFILE}-${userItems[0].key}`,
           value: {
             identityId: userItems[0].key,
-            type: WindowTypes.DIALOGIDENTITY,
+            type: WindowTypes.DIALOGPROFILE,
           },
         }],
       }));

@@ -9,7 +9,7 @@ import ListItem from '../../common/lists/List/Item/ListItem';
 import NewsItem from './Item/NewsItem';
 import { getHideMenu } from '../../../redux/selectors/interfaceConfig';
 import OpenApps from '../../MenuBar/lists/OpenApps/OpenApps';
-import MainList from '../../MenuBar/lists/MainList';
+import MainList from '../../MenuBar/lists/MainList/MainList';
 import Clock from '../../MenuBar/sub-components/Clock/Clock';
 import { getTimestamp } from '../../../TextTools';
 import { getDayModification, getYearModification } from '../../../redux/selectors/config';

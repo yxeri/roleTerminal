@@ -67,7 +67,7 @@ const DocFileItem = ({ docFileId }) => {
     >
       <div className="icon">{icon}</div>
       <span className="title">{docFile.title}</span>
-      <span className="by">
+      <span className="by icon">
         {
           creatorImage
             ? <Image image={`/upload/images/${creatorImage.thumbFileName}`} />

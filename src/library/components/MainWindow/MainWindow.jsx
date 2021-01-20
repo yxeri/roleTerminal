@@ -6,7 +6,6 @@ import WorldMap from '../WorldMap/WorldMap';
 import Chat from '../Chat/Chat';
 import { getOrder } from '../../redux/selectors/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
-import IdentityDialog from '../common/dialogs/IdentityDialog';
 import CreateRoomDialog from '../Chat/dialogs/CreateRoomDialog';
 import RemoveRoomDialog from '../Chat/dialogs/RemoveRoomDialog';
 import LoginDialog from '../common/dialogs/LoginDialog';
@@ -25,10 +24,10 @@ import store from '../../redux/store';
 import { changeWindowOrder } from '../../redux/actions/windowOrder';
 import UnlockDocFileDialog from '../DocFiles/dialogs/UnlockDocFileDialog';
 import SettingsNewsDialog from '../News/dialogs/SettingsNewsDialog';
+import ProfileDialog from '../common/dialogs/Profile/ProfileDialog';
+import DocFileView from '../DocFiles/DocFileView';
 
 import './MainWindow.scss';
-import ProfileDialog from '../common/dialogs/ProfileDialog';
-import DocFileView from '../DocFiles/DocFileView';
 
 const MainWindow = () => {
   const systemConfig = useSelector(getSystemConfig);
@@ -72,11 +71,6 @@ const MainWindow = () => {
       }
       case WindowTypes.NEWS: {
         windows.push(<News key={key} id={key} messageId={value.messageId} index={value.index} />);
-
-        break;
-      }
-      case WindowTypes.DIALOGIDENTITY: {
-        windows.push(<IdentityDialog key={key} id={key} identityId={value.identityId} index={value.index} />);
 
         break;
       }

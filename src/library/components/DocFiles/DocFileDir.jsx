@@ -5,12 +5,12 @@ import Window from '../common/Window/Window';
 import store from '../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
-
-import './DocFileDir.scss';
-import FileMenu from '../common/lists/FileMenu';
+import FileMenu from '../common/lists/FileMenu/FileMenu';
 import ListItem from '../common/lists/List/Item/ListItem';
 import DocFileList from './lists/DocFile/DocFileList';
-import Button from '../common/sub-components/Button/Button';
+import { ReactComponent as Plus } from '../../icons/plus.svg';
+
+import './DocFileDir.scss';
 
 const DocFileDir = ({ id, index }) => {
   const onClick = useCallback(() => {
@@ -37,7 +37,8 @@ const DocFileDir = ({ id, index }) => {
               onClick={onCreate}
               key="createDocFile"
             >
-              New document
+              <Plus />
+              <span>New document</span>
             </ListItem>
           </FileMenu>
         </>

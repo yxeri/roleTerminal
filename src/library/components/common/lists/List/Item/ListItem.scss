@@ -16,6 +16,21 @@
       max-width: 1em;
     }
   }
+
+  .icon {
+    height: $item-icon-size;
+    width: $item-icon-size;
+    max-width: $item-icon-size;
+    max-height: $item-icon-size;
+
+    svg {
+      height: $item-icon-size;
+      width: $item-icon-size;
+      max-height: unset;
+      max-width: unset;
+      stroke-width: 2;
+    }
+  }
 }
 
 .ListItem.clickable {

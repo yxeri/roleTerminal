@@ -78,37 +78,39 @@ const JoinRoomDialog = ({
         }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
-      title={!hasAccess ? `Unlock room ${room.roomName}` : `Join room ${room.roomName}`}
+      title={hasAccess || !room.password ? `Join room ${room.roomName}` : `Unlock room ${room.roomName}`}
       buttons={[
         <Button
           stopPropagation
           type="submit"
           onClick={() => methods.handleSubmit(onSubmit)()}
         >
-          {!hasAccess && (
+          {!hasAccess && room.password && (
             <Unlock />
           )}
-          <span>{!hasAccess ? 'Unlock' : 'Join'}</span>
+          <span>{hasAccess || !room.password ? 'Join' : 'Unlock'}</span>
         </Button>,
       ]}
     >
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <div>
-            {hasAccess && (
-              <p>{`Do you want to join room ${room.roomName}?`}</p>
+            {(hasAccess || !room.password) && (
+              <>
+                <p>{`Do you want to join the room ${room.roomName}?`}</p>
+                {room.topic && (
+                  <p>{`Topic: ${room.topic}`}</p>
+                )}
+              </>
             )}
-            {hasAccess && room.topic && (
-              <p>{`Topic: ${room.topic}`}</p>
-            )}
-            {!hasAccess && (
+            {!hasAccess && room.password && (
               <>
                 <p>The room is locked.</p>
                 <p>Enter the password to continue:</p>
               </>
             )}
           </div>
-          {!hasAccess && (
+          {!hasAccess && room.password && (
             <Input
               defaultValue={password}
               required={!hasAccess}

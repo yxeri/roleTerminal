@@ -27,10 +27,10 @@ const MessageInfo = ({ identityId, timeCreated }) => {
           if (name) {
             store.dispatch(changeWindowOrder({
               windows: [{
-                id: `${WindowTypes.DIALOGIDENTITY}-${identityId}`,
+                id: `${WindowTypes.DIALOGPROFILE}-${identityId}`,
                 value: {
                   identityId,
-                  type: WindowTypes.DIALOGIDENTITY,
+                  type: WindowTypes.DIALOGPROFILE,
                 },
               }],
             }));

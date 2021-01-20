@@ -7,10 +7,11 @@ import store from '../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 import NewsList from './lists/News/NewsList';
-import FileMenu from '../common/lists/FileMenu';
+import FileMenu from '../common/lists/FileMenu/FileMenu';
 import { getRoomById } from '../../redux/selectors/rooms';
 import { getNewsRoomId } from '../../redux/selectors/config';
 import ListItem from '../common/lists/List/Item/ListItem';
+import { ReactComponent as Plus } from '../../icons/plus.svg';
 
 import './News.scss';
 
@@ -50,7 +51,8 @@ const News = ({ id, messageId, index }) => {
                 key="createNews"
                 onClick={onCreateNews}
               >
-                New article
+                <Plus />
+                <span>New article</span>
               </ListItem>
             )}
           </FileMenu>

@@ -8,23 +8,9 @@
   align-items: center;
   grid-gap: $padding * 2;
 
-  .icon {
-    height: 40px;
-    width: 40px;
-  }
-
   .by {
-    height: 40px;
-    width: 40px;
-    line-height: 40px;
-  }
-
-  svg {
-    height: 40px;
-    width: 40px;
-    max-height: unset;
-    max-width: unset;
-    stroke-width: 2;
+    line-height: $item-icon-size;
+    overflow: hidden;
   }
 }
 

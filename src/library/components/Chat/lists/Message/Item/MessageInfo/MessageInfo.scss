@@ -1,9 +1,10 @@
 @import "../../../../../../../common";
 
 .MessageInfo {
-  border-top: $second-border;
+  border-top: $dark-border;
   padding-top: $padding;
   padding-bottom: #{$padding * 2};
+  color: $color;
 
   > * {
     margin-right: #{$padding * 2};

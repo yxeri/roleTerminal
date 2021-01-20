@@ -29,8 +29,8 @@
 
     > header {
       svg {
-        max-height: $icon-size;
-        max-width: $icon-size;
+        max-height: $icon-size + .2em;
+        max-width: $icon-size + .2em;
       }
     }
   }

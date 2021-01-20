@@ -8,7 +8,7 @@ import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 
 import './DocFileDir.scss';
-import FileMenu from '../common/lists/FileMenu';
+import FileMenu from '../common/lists/FileMenu/FileMenu';
 import ListItem from '../common/lists/List/Item/ListItem';
 import DocFileViewer from './Viewer/DocFileViewer';
 import { getDocFileById } from '../../redux/selectors/docFiles';

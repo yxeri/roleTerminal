@@ -1,0 +1,11 @@
+@import "../../../../../common";
+
+.ProfileDialog {
+  .contentContainer {
+    > div {
+      > p:first-child {
+        color: $color;
+      }
+    }
+  }
+}

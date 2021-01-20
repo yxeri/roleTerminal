@@ -82,7 +82,7 @@ const ConfigSystemDialog = ({ id, index }) => {
 
   return (
     <Dialog
-      className="ConfigSystemDialog configDialog"
+      className="ConfigSystemDialog"
       id={id}
       index={index}
       title={`System config: ${currentUser.username}`}
@@ -128,7 +128,7 @@ const ConfigSystemDialog = ({ id, index }) => {
             </Select>
           </div>
           <div>
-            <span>Select apps to auto-open when you log in (you can choose how they are expanded and placed in Settings for each app):</span>
+            <span>Select apps to auto-open when you log in (you can choose how they are expanded and placed in Settings for each app)</span>
             <Select
               multiple
               key={`openApps-${onDevice}`}

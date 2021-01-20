@@ -1,0 +1,7 @@
+@import "../../../../../common";
+
+.FileMenu {
+  .ListItem {
+    @extend %listItem;
+  }
+}

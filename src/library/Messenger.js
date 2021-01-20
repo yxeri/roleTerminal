@@ -101,7 +101,7 @@ const onQr = (data) => {
     } else if (teamId) {
       store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.TEAMS, value: { type: WindowTypes.TEAMS, teamId } }] }));
     } else if (identityId) {
-      store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGIDENTITY}-${identityId}`, value: { type: WindowTypes.DIALOGIDENTITY, identityId } }] }));
+      store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGPROFILE}-${identityId}`, value: { type: WindowTypes.DIALOGPROFILE, identityId } }] }));
     } else if (message) {
       alert(message);
     }

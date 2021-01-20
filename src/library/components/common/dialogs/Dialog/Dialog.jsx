@@ -42,7 +42,9 @@ const Dialog = ({
     {text && (
       <div>{text}</div>
     )}
-    {children}
+    <div className="contentContainer">
+      {children}
+    </div>
     {buttons.length > 0 && (
       <div className="buttons">
         <Button stopPropagation type="button" onClick={() => store.dispatch(removeWindow({ id }))}>

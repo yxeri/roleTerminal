@@ -1,4 +1,16 @@
 @import "../../../../../common";
 
 .ConfigSystemDialog {
+  .contentContainer {
+    form {
+      > div {
+        border-bottom: $dark-border;
+        padding-bottom: $padding * 4;
+      }
+
+      > div:last-child {
+        border-bottom: none;
+      }
+    }
+  }
 }

@@ -25,7 +25,7 @@ const Textarea = ({
     if (inputRef.current) {
       const textarea = inputRef.current;
 
-      if (!textarea.style.height || (textarea.scrollHeight.toString() !== textarea.style.height.split('px')[0])) {
+      if (document.activeElement === textarea && (!textarea.style.height || (textarea.scrollHeight.toString() !== textarea.style.height.split('px')[0]))) {
         textarea.style.height = 'auto';
         textarea.style.height = `${textarea.scrollHeight}px`;
         inputRef.current.scrollIntoView({ block: 'nearest' });

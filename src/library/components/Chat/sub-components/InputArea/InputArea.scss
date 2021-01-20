@@ -11,7 +11,7 @@
   .buttonBox {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: fit-content(0);
+    grid-auto-columns: fit-content(100%);
     grid-gap: $padding * 2;
     margin-bottom: -1px;
     position: relative;

@@ -42,7 +42,7 @@ const FileMenu = ({ id, children, onSettings }) => {
             onClick={() => store.dispatch(removeWindow({ id }))}
           >
             <MinClose />
-            <span>Minimize window</span>
+            <span>Minimize app</span>
           </ListItem>
         </>
       )}

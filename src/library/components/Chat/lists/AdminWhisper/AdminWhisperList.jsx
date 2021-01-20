@@ -21,10 +21,10 @@ const AdminWhisperList = ({ onChange, roomId }) => {
       key="whisperList"
       className="WhisperList"
       title={(
-        <span>
+        <>
           <Admin />
-          PM
-        </span>
+          <span>PM</span>
+        </>
       )}
     >
       {items}

@@ -74,14 +74,14 @@ const InputArea = ({
                   <ImageUpload useIcon />
                 )
               }
-              <Button onClick={() => {}}><Tag /></Button>
-              <Button onClick={() => {}}><File /></Button>
-              {
-                gpsTracking
-                && (
-                  <Button onClick={() => {}}><Pin /></Button>
-                )
-              }
+              {/*<Button onClick={() => {}}><Tag /></Button>*/}
+              {/*<Button onClick={() => {}}><File /></Button>*/}
+              {/*{*/}
+              {/*  gpsTracking*/}
+              {/*  && (*/}
+              {/*    <Button onClick={() => {}}><Pin /></Button>*/}
+              {/*  )*/}
+              {/*}*/}
               <IdentityPicker />
             </div>
           )}

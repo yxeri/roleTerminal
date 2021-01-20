@@ -12,12 +12,12 @@
     box-shadow: $shadow;
     background-color: $light-background-color;
     text-decoration: none;
-    display: flex;
+    display: grid;
+    grid-gap: $padding;
+    grid-auto-flow: column;
     justify-content: center;
-    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    height: 100%;
     box-sizing: border-box;
   }
 

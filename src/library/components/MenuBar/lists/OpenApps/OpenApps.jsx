@@ -7,13 +7,14 @@ import Button from '../../../common/sub-components/Button/Button';
 import { WindowTypes } from '../../../../redux/reducers/windowOrder';
 import store from '../../../../redux/store';
 import { changeWindowOrder } from '../../../../redux/actions/windowOrder';
-import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
+import { getCurrentAccessLevel, getIdentityOrTeamName } from '../../../../redux/selectors/users';
 import { AccessLevels } from '../../../../AccessCentral';
 
 import { ReactComponent as Chat } from '../../../../icons/chat.svg';
 import { ReactComponent as Map } from '../../../../icons/map.svg';
 import { ReactComponent as Wallet } from '../../../../icons/wallet.svg';
 import { ReactComponent as File } from '../../../../icons/file.svg';
+import { ReactComponent as Files } from '../../../../icons/files.svg';
 import { ReactComponent as News } from '../../../../icons/news.svg';
 import { ReactComponent as Layers } from '../../../../icons/layers.svg';
 import { ReactComponent as Grid } from '../../../../icons/grid.svg';
@@ -22,7 +23,9 @@ import { ReactComponent as Team } from '../../../../icons/team.svg';
 import { ReactComponent as Terminal } from '../../../../icons/terminal.svg';
 import { ReactComponent as Heart } from '../../../../icons/heart.svg';
 import { ReactComponent as Wrecking } from '../../../../icons/wrecking.svg';
+import { ReactComponent as User } from '../../../../icons/user.svg';
 import { getOrder } from '../../../../redux/selectors/windowOrder';
+import { getDocFileById } from '../../../../redux/selectors/docFiles';
 
 import './OpenApps.scss';
 
@@ -35,13 +38,43 @@ const OpenApps = () => {
 
   order.forEach((value, key) => {
     if (![WindowTypes.CHAT, WindowTypes.NEWS, WindowTypes.DOCFILEDIR, WindowTypes.WORLDMAP, WindowTypes.WALLET].includes(key)) {
+      let title;
+      let icon;
+
+      switch (value.type) {
+        case WindowTypes.DIALOGPROFILE: {
+          icon = <User />;
+
+          if (!value.identityId) {
+            title = 'Your profile';
+          } else {
+            title = getIdentityOrTeamName(store.getState(), { id: value.identityId }).name;
+          }
+
+          break;
+        }
+        case WindowTypes.DOCFILEVIEW: {
+          icon = <File />;
+          title = getDocFileById(store.getState(), { id: value.docFileId }).title;
+
+          break;
+        }
+        default: {
+          icon = <Layers />;
+          title = key;
+
+          break;
+        }
+      }
+
       otherWindows.push(
         <ListItem key={key}>
           <Button
             onClick={() => changeOrder({ id: key, value })}
           >
-            {key}
+            {icon}
           </Button>
+          <span>{title}</span>
         </ListItem>,
       );
     }
@@ -76,7 +109,7 @@ const OpenApps = () => {
             className={`${order.get(WindowTypes.DOCFILEDIR) && order.get(WindowTypes.DOCFILEDIR).index === order.size ? 'active' : ''}`}
             onClick={() => changeOrder({ id: WindowTypes.DOCFILEDIR, value: { type: WindowTypes.DOCFILEDIR } })}
           >
-            <File />
+            <Files />
           </Button>
           <span>Files</span>
         </ListItem>
@@ -162,16 +195,8 @@ const OpenApps = () => {
           </Button>
           <span>Teams</span>
         </ListItem>
+        {otherWindows}
       </List>
-      {otherWindows.length > 0 && (
-        <List
-          dropdown
-          className="otherWindows"
-          title={<Layers />}
-        >
-          {otherWindows}
-        </List>
-      )}
     </div>
   );
 };

@@ -39,7 +39,7 @@ const Window = ({
   const resizing = {
     right: true,
     bottom: true,
-    left: true,
+    left: false,
     bottomRight: true,
     bottomLeft: true,
   };

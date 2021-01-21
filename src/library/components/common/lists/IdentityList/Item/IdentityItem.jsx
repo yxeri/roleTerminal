@@ -6,14 +6,14 @@ import store from '../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
 import ListItem from '../../List/Item/ListItem';
-import { getIdentityImage, getIdentityName } from '../../../../../redux/selectors/users';
+import { getIdentityImage, getIdentityOrTeamName } from '../../../../../redux/selectors/users';
 import Image from '../../../sub-components/Image/Image';
 import { ReactComponent as Square } from '../../../../../icons/square.svg';
 
 import './IdentityItem.scss';
 
 const IdentityItem = ({ identityId, onClick }) => {
-  const name = useSelector((state) => getIdentityName(state, { id: identityId }));
+  const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: identityId }));
   const image = useSelector((state) => getIdentityImage(state, { id: identityId }));
 
   const onClickCall = useCallback(() => {

@@ -5,14 +5,19 @@ import List from '../../../common/lists/List/List';
 import TransactionItem from './Item/TransactionItem';
 import { getTransactionIdsByWallets } from '../../../../redux/selectors/transactions';
 
-const TransactionList = ({ walletIds }) => {
-  const transactionIds = useSelector((state) => getTransactionIdsByWallets(state, { ids: walletIds }));
+import './TransactionList.scss';
 
-  const transactionMapper = () => transactionIds.map((transactionId) => <TransactionItem key={transactionId} transactionId={transactionId} />);
+const TransactionList = ({ walletIds }) => {
+  const transactions = useSelector((state) => getTransactionIdsByWallets(state, { ids: walletIds }));
+
+  const items = transactions.map(({ objectId, isSender }) => <TransactionItem key={objectId} transactionId={objectId} isSender={isSender} />);
 
   return (
-    <List>
-      {transactionMapper()}
+    <List
+      observe="upper"
+      className="TransactionList"
+    >
+      {items}
     </List>
   );
 };

@@ -1,0 +1,15 @@
+@import "../../../../../common";
+
+.Amount {
+  display: grid;
+  grid-auto-flow: column;
+  border: $border;
+  box-sizing: border-box;
+  padding: $padding * 2;
+  grid-gap: $padding * 2;
+  max-width: $max-width;
+
+  span:last-child {
+    justify-self: flex-end;
+  }
+}

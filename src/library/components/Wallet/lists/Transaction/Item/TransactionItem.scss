@@ -1,5 +1,69 @@
 @import "../../../../../../common";
 
 .TransactionItem {
-  border-top: $second-border;
+  display: grid;
+  padding: $padding * 2;
+  grid-gap: $padding * 2;
+  border: $lite-border;
+  margin-right: $padding * 2;
+  border-radius: $border-radius;
+  grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
+  grid-template-columns: fit-content(100%) fit-content(100%);
+
+  svg {
+    max-height: 1em;
+    max-width: 1em;
+  }
+
+  .other {
+    grid-template-columns: fit-content(100%) fit-content(100%) auto;
+
+    p:last-child {
+      justify-self: flex-end;
+    }
+  }
+
+  .other {
+    grid-row: 1;
+    grid-column: 1 / 4;
+  }
+
+  .note {
+    grid-row: 2;
+  }
+
+  .current {
+    grid-row: 3;
+    grid-auto-columns: fit-content(100%);
+  }
+
+  .other, .current {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: $padding;
+  }
+
+  .amount {
+    font-size: 1.4em;
+    grid-column: 3;
+    grid-row: 2 / 4;
+    justify-self: flex-end;
+    align-self: flex-end;
+  }
+
+  .negative {
+    color: $color;
+  }
+
+  .time {
+    span:last-child {
+      margin-left: $padding * 2;
+    }
+  }
+}
+
+.TransactionItem.sender {
+  border: $border;
+  margin-right: 0;
+  margin-left: $padding * 2;
 }

@@ -16,7 +16,7 @@ $margin: .2em;
 $padding: $margin;
 $min-width: 320px;
 $min-width-calc: calc(#{$min-width} - #{$margin * 2});
-$shadow: 0 0 8px 0 rgba(255, 0, 241, 0.54);
+$shadow: 0 0 10px 0 rgba(255, 0, 241, 0.54);
 $second-shadow: 0 0 8px 0 rgba(0, 246, 255, 0.54);
 $shadow-upwards: 1px -4px 8px 0 rgba(255, 0, 241, 0.15);
 $dark-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.71);

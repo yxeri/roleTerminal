@@ -134,14 +134,39 @@ export const getIdentityImage = createCachedSelector(
   (identity) => identity.image,
 )((_, { id }) => `identity-${id}-image`);
 
-export const getIdentityName = createCachedSelector(
-  [getIdentityById],
-  ({ aliasName, username } = {}) => aliasName || username || '',
+export const getIdentityOrTeamName = createCachedSelector(
+  [
+    getIdentityById,
+    getTeamById,
+    (state, { id }) => {
+      const systemUser = getSystemUser(state);
+
+      return systemUser.objectId === id ? systemUser.username : undefined;
+    },
+  ],
+  ({ aliasName, username } = {}, { teamName } = {}, systemName) => {
+    let type;
+
+    if (aliasName || username) {
+      type = 'identity';
+    } else if (teamName) {
+      type = 'team';
+    } else if (systemName) {
+      type = 'system';
+    } else {
+      type = 'fallback';
+    }
+
+    return {
+      type,
+      name: aliasName || username || teamName || systemName || '',
+    };
+  },
 )((_, { id }) => `identity-${id}-name`);
 
 export const getIdentityOrTeamById = createCachedSelector(
-  [getUserById, getAliasById, getTeamById, getSystemUser],
-  (user, alias, team, systemUser) => team || alias || user || systemUser,
+  [getUserById, getAliasById, getTeamById],
+  (user, alias, team) => team || alias || user,
 )((_, { id }) => `identity-team-${id}`);
 
 export const getOtherIdentities = createCachedSelector(

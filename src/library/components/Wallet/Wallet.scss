@@ -4,7 +4,8 @@
   .Wallet {
     .windowBox {
       .content {
-        overflow-y: auto;
+        display: grid;
+        grid-template-rows: auto fit-content(100%);
       }
     }
   }

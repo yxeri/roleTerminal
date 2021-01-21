@@ -24,10 +24,10 @@ const AdminWalletList = ({ onChange, walletId }) => {
       dropdown
       checkWidth
       title={(
-        <span>
+        <>
           <Admin />
-          WALLETS
-        </span>
+          <span>WALLETS</span>
+        </>
       )}
       className="WalletList"
     >

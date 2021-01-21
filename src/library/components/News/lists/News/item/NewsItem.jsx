@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 
 import { getMessageById } from '../../../../../redux/selectors/messages';
 import ListItem from '../../../../common/lists/List/Item/ListItem';
-import { getIdentityName } from '../../../../../redux/selectors/users';
+import { getIdentityOrTeamName } from '../../../../../redux/selectors/users';
 import Image from '../../../../common/sub-components/Image/Image';
 import { ReactComponent as ChevronDown } from '../../../../../icons/chevron-down.svg';
 import { ReactComponent as ChevronUp } from '../../../../../icons/chevron-up.svg';
@@ -28,7 +28,7 @@ const NewsItem = ({
   const itemRef = useRef();
   const [showText, setShowText] = useState(false);
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
-  const name = useSelector((state) => getIdentityName(state, { id: message.ownerAliasId || message.ownerId }));
+  const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: message.ownerAliasId || message.ownerId }));
   const dayModification = useSelector(getDayModification);
   const yearModification = useSelector(getYearModification);
   const timestamp = getTimestamp({ date: message.customTimeCreated || message.timeCreated, dayModification, yearModification });

@@ -14,6 +14,6 @@ export const getWalletIds = createCachedSelector(
 export const getWalletIdsByCurrentUser = createCachedSelector(
   [getAllWallets, getCurrentUser],
   (wallets, currentUser) => [...wallets.values()]
-    .filter((wallet) => wallet.ownerId === currentUser.objectId || currentUser.aliases.includes(wallet.ownerAliasId))
+    .filter((wallet) => wallet.ownerId === currentUser.objectId || currentUser.aliases.includes(wallet.ownerAliasId) || currentUser.partOfTeams.includes(wallet.objectId))
     .map((wallet) => wallet.objectId),
 )(() => 'wallet-ids-current-user');

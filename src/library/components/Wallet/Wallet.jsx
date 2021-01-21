@@ -10,16 +10,17 @@ import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 import IdentityList from '../common/lists/IdentityList/IdentityList';
 import WalletList from './lists/Wallet/WalletList';
-import { getCurrentAccessLevel, getIdentityOrTeamById } from '../../redux/selectors/users';
+import { getCurrentAccessLevel, getIdentityOrTeamName } from '../../redux/selectors/users';
 import { AccessLevels } from '../../AccessCentral';
 import AdminWalletList from './lists/AdminWallet/AdminWalletList';
+import Amount from './views/Amount/Amount';
 
 import './Wallet.scss';
 
 const Wallet = ({ id, index }) => {
   const [walletId, setWalletId] = useState('showAll');
   const currentWalletIds = useSelector(getWalletIdsByCurrentUser);
-  const identity = useSelector((state) => getIdentityOrTeamById(state, { id: walletId }));
+  const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: walletId }));
   const accessLevel = useSelector(getCurrentAccessLevel);
 
   const onClick = useCallback(() => {
@@ -36,7 +37,7 @@ const Wallet = ({ id, index }) => {
       className="Wallet"
       index={index}
       done={onDone}
-      title={`Wallet${identity ? `: ${identity.teamName || identity.aliasName || identity.username}` : ''}`}
+      title={`Wallet${name ? `: ${name}` : ': all'}`}
       onClick={onClick}
       menu={(
         <>
@@ -52,6 +53,7 @@ const Wallet = ({ id, index }) => {
         key="transactionList"
         walletIds={walletId !== 'showAll' ? [walletId] : currentWalletIds}
       />
+      <Amount walletId={walletId} />
     </Window>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { string } from 'prop-types';
 
-import { getIdentityName } from '../../../../../../redux/selectors/users';
+import { getIdentityOrTeamName } from '../../../../../../redux/selectors/users';
 import { getDayModification, getYearModification } from '../../../../../../redux/selectors/config';
 import store from '../../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../../redux/actions/windowOrder';
@@ -12,7 +12,7 @@ import { getTimestamp } from '../../../../../../TextTools';
 import './MessageInfo.scss';
 
 const MessageInfo = ({ identityId, timeCreated }) => {
-  const name = useSelector((state) => getIdentityName(state, { id: identityId }));
+  const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: identityId }));
   const dayModification = useSelector(getDayModification);
   const yearModification = useSelector(getYearModification);
   const timestamp = getTimestamp({ date: timeCreated, dayModification, yearModification });

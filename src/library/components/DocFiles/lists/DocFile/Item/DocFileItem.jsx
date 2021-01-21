@@ -9,7 +9,7 @@ import { ReactComponent as File } from '../../../../../icons/file.svg';
 import store from '../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
-import { getCurrentAccessLevel, getIdentityImage, getIdentityName } from '../../../../../redux/selectors/users';
+import { getCurrentAccessLevel, getIdentityImage, getIdentityOrTeamName } from '../../../../../redux/selectors/users';
 import { AccessLevels } from '../../../../../AccessCentral';
 import { unlockDocFile } from '../../../../../socket/actions/docFiles';
 import Image from '../../../../common/sub-components/Image/Image';
@@ -20,7 +20,7 @@ const DocFileItem = ({ docFileId }) => {
   const docFile = useSelector((state) => getDocFileById(state, { id: docFileId }));
   const accessLevel = useSelector(getCurrentAccessLevel);
   const creatorImage = useSelector((state) => getIdentityImage(state, { id: docFile.ownerAliasId || docFile.ownerId }));
-  const creatorName = useSelector((state) => getIdentityName(state, { id: docFile.ownerAliasId || docFile.ownerId }));
+  const { name: creatorName } = useSelector((state) => getIdentityOrTeamName(state, { id: docFile.ownerAliasId || docFile.ownerId }));
   let icon;
 
   if (docFile.isLocked) {

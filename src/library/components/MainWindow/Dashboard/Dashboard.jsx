@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useSelector } from 'react-redux';
-import { getIdentityName, getIsAnonymous } from '../../../redux/selectors/users';
+import { getIdentityOrTeamName, getIsAnonymous } from '../../../redux/selectors/users';
 import { getWalletById } from '../../../redux/selectors/wallets';
 import { getNews, getNewsIdsPoints } from '../../../redux/selectors/messages';
 import List from '../../common/lists/List/List';
@@ -20,7 +20,7 @@ import './Dashboard.scss';
 const Dashboard = () => {
   const identityId = useSelector(getCurrentIdentityId);
   const isAnonymous = useSelector(getIsAnonymous);
-  const name = useSelector((state) => getIdentityName(state, { id: identityId }));
+  const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: identityId }));
   const wallet = useSelector((state) => getWalletById(state, { id: identityId }));
   const news = useSelector(getNewsIdsPoints);
   const hideMenu = useSelector(getHideMenu);

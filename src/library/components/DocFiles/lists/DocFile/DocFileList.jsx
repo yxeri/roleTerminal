@@ -6,7 +6,7 @@ import List from '../../../common/lists/List/List';
 import { getDocFilesForList } from '../../../../redux/selectors/docFiles';
 import DocFileItem from './Item/DocFileItem';
 import SearchItem from '../../../common/lists/List/Search/SearchItem';
-import { getIdentityName } from '../../../../redux/selectors/users';
+import { getIdentityOrTeamName } from '../../../../redux/selectors/users';
 import store from '../../../../redux/store';
 import ListItem from '../../../common/lists/List/Item/ListItem';
 import { ReactComponent as ChevronDown } from '../../../../icons/chevron-down.svg';
@@ -36,8 +36,8 @@ const DocFileList = () => {
           valueA = a.title.toLowerCase();
           valueB = b.title.toLowerCase();
         } else if (sortBy === SortBy.CREATOR) {
-          valueA = getIdentityName(store.getState(), { id: a.ownerAliasId || a.ownerId });
-          valueB = getIdentityName(store.getState(), { id: b.ownerAliasId || b.ownerId });
+          valueA = getIdentityOrTeamName(store.getState(), { id: a.ownerAliasId || a.ownerId }).name;
+          valueB = getIdentityOrTeamName(store.getState(), { id: b.ownerAliasId || b.ownerId }).name;
         } else if (sortBy === SortBy.TYPE) {
           valueA = a.isLocked ? 1 : 0;
           valueB = b.isLocked ? 1 : 0;
@@ -56,7 +56,7 @@ const DocFileList = () => {
 
     if (partial && partial.length > 0) {
       files = files.filter((file) => {
-        const creatorName = getIdentityName(store.getState(), { id: file.ownerAliasId || file.ownerId });
+        const creatorName = getIdentityOrTeamName(store.getState(), { id: file.ownerAliasId || file.ownerId }).name;
         const partialSearch = partial.toLowerCase();
 
         return file.title.toLowerCase().includes(partialSearch)

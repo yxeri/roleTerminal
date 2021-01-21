@@ -7,18 +7,14 @@ import ImageUpload from '../../../common/sub-components/ImageUpload/ImageUpload'
 import { AccessLevels } from '../../../../AccessCentral';
 import { isOnline } from '../../../../redux/selectors/online';
 import { getCurrentAccessLevel } from '../../../../redux/selectors/users';
-import { getAllowedImages, getGpsTracking } from '../../../../redux/selectors/config';
+import { getAllowedImages } from '../../../../redux/selectors/config';
 import Button from '../../../common/sub-components/Button/Button';
 import { sendMessage } from '../../../../socket/actions/messages';
 import IdentityPicker from '../../../common/lists/IdentityPicker/IdentityPicker';
-
-import { ReactComponent as Pin } from '../../../../icons/pin.svg';
-import { ReactComponent as Tag } from '../../../../icons/tag.svg';
-import { ReactComponent as File } from '../../../../icons/file-plus.svg';
+import Textarea from '../../../common/sub-components/Textarea/Textarea';
 import { ReactComponent as CloudOff } from '../../../../icons/cloud-off.svg';
 
 import './InputArea.scss';
-import Textarea from '../../../common/sub-components/Textarea/Textarea';
 
 const InputArea = ({
   roomId,
@@ -31,7 +27,14 @@ const InputArea = ({
   const online = useSelector(isOnline);
   const accessLevel = useSelector(getCurrentAccessLevel);
   const allowedImages = useSelector(getAllowedImages);
-  const gpsTracking = useSelector(getGpsTracking);
+
+  const onChange = (event) => {
+    const { value } = event.target;
+
+    if (value.match(/.*\s@[a-z\S]+$/)) {
+      console.log('match');
+    }
+  };
 
   const onSubmit = ({
     text,
@@ -74,19 +77,12 @@ const InputArea = ({
                   <ImageUpload useIcon />
                 )
               }
-              {/*<Button onClick={() => {}}><Tag /></Button>*/}
-              {/*<Button onClick={() => {}}><File /></Button>*/}
-              {/*{*/}
-              {/*  gpsTracking*/}
-              {/*  && (*/}
-              {/*    <Button onClick={() => {}}><Pin /></Button>*/}
-              {/*  )*/}
-              {/*}*/}
               <IdentityPicker />
             </div>
           )}
           <div className="input">
             <Textarea
+              onChange={onChange}
               key="input"
               name="text"
               onKeyDown={(event) => {

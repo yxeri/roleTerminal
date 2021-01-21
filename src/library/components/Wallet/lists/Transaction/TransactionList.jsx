@@ -10,7 +10,7 @@ import './TransactionList.scss';
 const TransactionList = ({ walletIds }) => {
   const transactions = useSelector((state) => getTransactionIdsByWallets(state, { ids: walletIds }));
 
-  const items = transactions.map(({ objectId, isSender }) => <TransactionItem key={objectId} transactionId={objectId} isSender={isSender} />);
+  const items = transactions.map(({ objectId, isSender }) => <TransactionItem key={objectId} transactionId={objectId} isSender={isSender} singleWallet={walletIds.length === 1} />);
 
   return (
     <List

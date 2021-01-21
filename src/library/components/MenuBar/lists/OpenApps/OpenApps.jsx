@@ -68,7 +68,10 @@ const OpenApps = () => {
       }
 
       otherWindows.push(
-        <ListItem key={key}>
+        <ListItem
+          className="other"
+          key={key}
+        >
           <Button
             onClick={() => changeOrder({ id: key, value })}
           >

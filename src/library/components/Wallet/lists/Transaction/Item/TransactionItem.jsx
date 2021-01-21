@@ -10,11 +10,12 @@ import { getTimestamp } from '../../../../../TextTools';
 import { ReactComponent as User } from '../../../../../icons/user.svg';
 import { ReactComponent as Team } from '../../../../../icons/team.svg';
 import { ReactComponent as System } from '../../../../../icons/cpu.svg';
-
-import './TransactionItem.scss';
+import { ReactComponent as Wallet } from '../../../../../icons/wallet.svg';
 import store from '../../../../../redux/store';
 import { changeWindowOrder } from '../../../../../redux/actions/windowOrder';
 import { WindowTypes } from '../../../../../redux/reducers/windowOrder';
+
+import './TransactionItem.scss';
 
 const Icons = {
   identity: <User />,
@@ -22,7 +23,7 @@ const Icons = {
   system: <System />,
 };
 
-const TransactionItem = ({ transactionId, isSender }) => {
+const TransactionItem = ({ transactionId, isSender, singleWallet }) => {
   const transaction = useSelector((state) => getTransactionById(state, { id: transactionId }));
   const { name: fromName, type: fromType } = useSelector((state) => getIdentityOrTeamName(state, { id: transaction.fromWalletId }));
   const { name: toName, type: toType } = useSelector((state) => getIdentityOrTeamName(state, { id: transaction.toWalletId }));
@@ -63,10 +64,15 @@ const TransactionItem = ({ transactionId, isSender }) => {
           <p>{transaction.note}</p>
         </div>
       )}
-      <div className="current">
-        {Icons[currentType]}
-        <p>{isSender ? fromName : toName}</p>
-      </div>
+      {!singleWallet && (
+        <div className="current">
+          <p>
+            <Wallet />
+            <span>:</span>
+          </p>
+          <p>{isSender ? fromName : toName}</p>
+        </div>
+      )}
       <div className="amount">
         <p className={isSender ? 'negative' : ''}>{`${isSender ? '-' : '+'}${transaction.amount}`}</p>
       </div>
@@ -79,4 +85,5 @@ export default React.memo(TransactionItem);
 TransactionItem.propTypes = {
   transactionId: string.isRequired,
   isSender: bool.isRequired,
+  singleWallet: bool.isRequired,
 };

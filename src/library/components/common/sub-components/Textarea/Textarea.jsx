@@ -12,6 +12,7 @@ const Textarea = ({
   name,
   maxLength,
   onKeyDown,
+  onChange,
   required = false,
   placeholder = '',
 }) => {
@@ -47,6 +48,7 @@ const Textarea = ({
 
   return (
     <textarea
+      onChange={onChange}
       onKeyDown={onKeyDown}
       rows={1}
       maxLength={maxLength}
@@ -75,6 +77,7 @@ Textarea.propTypes = {
   name: string.isRequired,
   maxLength: number,
   onKeyDown: func,
+  onChange: func,
 };
 
 Textarea.defaultProps = {
@@ -82,4 +85,5 @@ Textarea.defaultProps = {
   required: false,
   maxLength: undefined,
   onKeyDown: undefined,
+  onChange: undefined,
 };

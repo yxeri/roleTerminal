@@ -1,0 +1,17 @@
+@import "../../../../common";
+
+.rooms {
+  > ul {
+    grid-gap: 0;
+  }
+
+  .ListItem {
+    header {
+      margin-bottom: $padding * 2;
+      background-color: $light-background-color;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+  }
+}

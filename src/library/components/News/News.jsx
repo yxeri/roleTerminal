@@ -12,6 +12,7 @@ import { getRoomById } from '../../redux/selectors/rooms';
 import { getNewsRoomId } from '../../redux/selectors/config';
 import ListItem from '../common/lists/List/Item/ListItem';
 import { ReactComponent as Plus } from '../../icons/plus.svg';
+import { ReactComponent as NewsIcon } from '../../icons/news.svg';
 
 import './News.scss';
 
@@ -36,7 +37,12 @@ const News = ({ id, messageId, index }) => {
       index={index}
       done={onDone}
       className="News"
-      title="News"
+      title={(
+        <>
+          <NewsIcon />
+          <span>News</span>
+        </>
+      )}
       onClick={onClick}
       menu={(
         <>

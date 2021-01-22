@@ -5,7 +5,16 @@
   grid-auto-flow: column;
   grid-gap: $padding * 2;
 
+  .Button {
+    border: none;
+    box-shadow: none;
+  }
+
   .apps {
+    header {
+      align-items: center;
+    }
+
     > ul {
       padding: $padding * 2;
       grid-auto-flow: row;
@@ -32,19 +41,6 @@
       span {
         font-size: .9em;
       }
-    }
-  }
-
-  .otherWindows {
-    .dropdown {
-      max-height: calc(100vh - #{2em + $padding});
-      overflow-y: auto;
-      scrollbar-width: none;
-    }
-
-    .Button {
-      border: none;
-      box-shadow: none;
     }
   }
 }

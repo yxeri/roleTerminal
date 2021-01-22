@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
 import Window from '../common/Window/Window';
-import { getRoomById, getWhisperRoomName } from '../../redux/selectors/rooms';
+import { getRoomById, getWhisperRoomNames } from '../../redux/selectors/rooms';
 import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
 import { getIdentityById, getIsAnonymous } from '../../redux/selectors/users';
@@ -55,7 +55,7 @@ const Chat = ({
     }
 
     if (room.isWhisper) {
-      return `PM: ${getWhisperRoomName(store.getState(), { ids: room.participantIds })}`;
+      return `PM: ${getWhisperRoomNames(store.getState(), { ids: room.participantIds })}`;
     }
 
     return `Chat: ${room.roomName}`;

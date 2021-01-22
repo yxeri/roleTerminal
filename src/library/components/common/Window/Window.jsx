@@ -231,7 +231,7 @@ Window.propTypes = {
   onClick: func.isRequired,
   children: node.isRequired,
   menu: node,
-  title: string,
+  title: node,
   className: string,
   done: func,
   type: string,

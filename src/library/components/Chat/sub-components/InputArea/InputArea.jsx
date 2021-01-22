@@ -13,6 +13,7 @@ import { sendMessage } from '../../../../socket/actions/messages';
 import IdentityPicker from '../../../common/lists/IdentityPicker/IdentityPicker';
 import Textarea from '../../../common/sub-components/Textarea/Textarea';
 import { ReactComponent as CloudOff } from '../../../../icons/cloud-off.svg';
+import { ReactComponent as Send } from '../../../../icons/send.svg';
 
 import './InputArea.scss';
 
@@ -66,21 +67,13 @@ const InputArea = ({
     <div className="InputArea">
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          {accessLevel >= minAccessLevel && (
-            <div
-              key="buttonBox"
-              className="buttonBox"
-            >
-              {
-                allowedImages.CHAT
-                && (
-                  <ImageUpload useIcon />
-                )
-              }
-              <IdentityPicker />
-            </div>
-          )}
           <div className="input">
+            {
+              allowedImages.CHAT
+              && (
+                <ImageUpload useIcon />
+              )
+            }
             <Textarea
               onChange={onChange}
               key="input"
@@ -104,7 +97,7 @@ const InputArea = ({
             >
               {online
                 ? (
-                  <span>Send</span>
+                  <Send />
                 )
                 : (
                   <CloudOff />

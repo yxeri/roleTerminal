@@ -24,10 +24,11 @@ const MessageItem = ({
   const itemRef = useRef();
   const previousMessage = useSelector((state) => getMessageById(state, { id: previousMessageId }));
   const message = useSelector((state) => getMessageById(state, { id: messageId }));
+  const currentUser = getCurrentUser(store.getState());
 
   const { hasFullAccess } = hasAccessTo({
     objectToAccess: message,
-    toAuth: getCurrentUser(store.getState()),
+    toAuth: currentUser,
   });
 
   const shouldCollapse = () => {
@@ -50,7 +51,7 @@ const MessageItem = ({
     <ListItem
       scrollTo={selected || isLatest}
       ref={itemRef}
-      className={`MessageItem ${hasFullAccess ? 'clickable' : ''}`}
+      className={`MessageItem ${hasFullAccess ? 'clickable' : ''} ${message.ownerId === currentUser.objectId || currentUser.aliases.includes(message.ownerAliasId) ? 'sender' : ''}`}
       key={messageId}
     >
       {!shouldCollapse() && (

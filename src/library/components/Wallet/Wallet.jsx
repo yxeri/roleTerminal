@@ -14,6 +14,7 @@ import { getCurrentAccessLevel, getIdentityOrTeamName } from '../../redux/select
 import { AccessLevels } from '../../AccessCentral';
 import AdminWalletList from './lists/AdminWallet/AdminWalletList';
 import Amount from './views/Amount/Amount';
+import { ReactComponent as WalletIcon } from '../../icons/wallet.svg';
 
 import './Wallet.scss';
 
@@ -37,7 +38,12 @@ const Wallet = ({ id, index }) => {
       className="Wallet"
       index={index}
       done={onDone}
-      title={`Wallet${name ? `: ${name}` : ': all'}`}
+      title={(
+        <>
+          <WalletIcon />
+          <span>{`${name ? `${name}` : 'all'}`}</span>
+        </>
+      )}
       onClick={onClick}
       menu={(
         <>

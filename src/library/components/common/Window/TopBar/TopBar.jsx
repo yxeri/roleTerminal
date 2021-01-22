@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import {
   bool,
-  func,
+  func, node,
   string,
 } from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -43,7 +43,7 @@ const TopBar = ({
       className="TopBar"
     >
       <div className="TopBarHandle">
-        <span className="title">{title}</span>
+        <div className="title">{title}</div>
       </div>
       <div className="buttons">
         {!systemConfig.hideHelp && (
@@ -76,13 +76,12 @@ export default React.memo(TopBar);
 
 TopBar.propTypes = {
   done: func.isRequired,
-  title: string.isRequired,
+  title: node.isRequired,
   onDoubleClick: func.isRequired,
   id: string.isRequired,
   maximized: bool,
 };
 
 TopBar.defaultProps = {
-  onSettings: undefined,
   maximized: undefined,
 };

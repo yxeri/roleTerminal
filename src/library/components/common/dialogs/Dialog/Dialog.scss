@@ -25,20 +25,6 @@
             padding: $padding;
             border-radius: $border-radius;
           }
-
-          .identity {
-            grid-auto-flow: column;
-            grid-auto-columns: fit-content(100%);
-
-            > span {
-              margin-right: $padding;
-            }
-
-            svg {
-              max-height: $icon-size;
-              max-width: $icon-size;
-            }
-          }
         }
 
         .buttons {

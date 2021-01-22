@@ -37,12 +37,12 @@
         box-sizing: border-box;
         padding: 0 $padding;
 
-        .List {
+        > .List {
           margin-bottom: $margin;
           margin-right: $margin;
           flex-grow: 1;
 
-          header {
+          > header {
             border-top-right-radius: 0;
             border-top-left-radius: 0;
             border-top: 0;
@@ -62,7 +62,7 @@
           }
         }
 
-        .List:last-child {
+        > .List:last-child {
           margin-right: 0;
         }
       }
@@ -100,7 +100,7 @@
         overflow: hidden;
         padding: 0;
 
-        .List {
+        > .List {
           margin: 0;
           display: flex;
           flex-direction: column;
@@ -110,15 +110,11 @@
           max-width: 100%;
           padding-left: $padding;
 
-          header {
+          > header {
             border-top-left-radius: $border-radius;
             border-top-right-radius: $border-radius;
             border-top: $border;
             justify-content: flex-start;
-          }
-
-          .List {
-            padding: 0 $padding;
           }
 
           .dropdown {
@@ -133,11 +129,11 @@
           }
         }
 
-        .List:first-child {
+        > .List:first-child {
           margin-top: $margin;
         }
 
-        .List:last-child {
+        > .List:last-child {
           margin-bottom: $margin;
         }
 

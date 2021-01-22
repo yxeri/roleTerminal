@@ -1,12 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { func } from 'prop-types';
+import { bool, func } from 'prop-types';
 
 import List from '../../../common/lists/List/List';
 import { getUnfollowedRoomIds } from '../../../../redux/selectors/rooms';
 import RoomItem from './Item/RoomItem';
 
-const RoomList = ({ onChange }) => {
+const RoomList = ({ onChange, alwaysExpanded }) => {
   const roomIds = useSelector(getUnfollowedRoomIds);
 
   const roomMapper = () => roomIds.map((roomId) => (
@@ -19,8 +19,7 @@ const RoomList = ({ onChange }) => {
 
   return (
     <List
-      dropdown
-      checkWidth
+      alwaysExpanded={alwaysExpanded}
       key="roomList"
       className="RoomList"
       title="Rooms"
@@ -34,4 +33,9 @@ export default React.memo(RoomList);
 
 RoomList.propTypes = {
   onChange: func.isRequired,
+  alwaysExpanded: bool,
+};
+
+RoomList.defaultProps = {
+  alwaysExpanded: undefined,
 };

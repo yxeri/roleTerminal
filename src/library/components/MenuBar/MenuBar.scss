@@ -6,7 +6,7 @@
   color: $second-color;
   height: $menu-bar-height;
   border-bottom: $border;
-  background-color: $background-color;
+  background-color: $light-background-color;
   box-sizing: border-box;
   align-items: flex-end;
   box-shadow: $shadow;
@@ -22,9 +22,9 @@
     }
 
     > header, > .Button:first-child {
-      border-bottom: none;
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
+      border: none;
+      box-shadow: none;
+      background-color: transparent;
     }
 
     > header {
@@ -46,10 +46,11 @@
     grid-gap: $padding * 2;
     margin-right: 0;
 
-    > .Button {
-      border-bottom: none;
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
+    .IdentityPicker {
+      header {
+        border: none;
+        box-shadow: none;
+      }
     }
   }
 

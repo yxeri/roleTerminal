@@ -1,10 +1,16 @@
 @import "../../../../../common";
 
 .IdentityPicker {
-  background-color: $light-background-color;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: fit-content(100%);
 
   .dropdown {
     max-width: 100%;
+  }
+
+  .List {
+    background-color: $light-background-color;
   }
 
   svg {
@@ -20,7 +26,7 @@
   }
 
   header {
-    max-width: 8em;
+    max-width: 6em;
     align-items: flex-end;
   }
 }

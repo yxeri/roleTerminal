@@ -10,3 +10,7 @@
 .MessageItem.clickable {
   text-decoration: none;
 }
+
+.MessageItem.sender {
+  background-color: $second-background-color;
+}

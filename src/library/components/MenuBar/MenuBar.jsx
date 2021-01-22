@@ -21,7 +21,7 @@ import { ReactComponent as ClockIcon } from '../../icons/clock.svg';
 import { ReactComponent as ChevronLeft } from '../../icons/chevron-left.svg';
 import { ReactComponent as ChevronRight } from '../../icons/chevron-right.svg';
 import { ReactComponent as Grid } from '../../icons/grid.svg';
-import { ReactComponent as Camera } from '../../icons/camera.svg';
+import { ReactComponent as QR } from '../../icons/qr-code.svg';
 import { getCurrentAccessLevel, getSystemConfig } from '../../redux/selectors/users';
 import { AccessLevels } from '../../AccessCentral';
 import { getHideMenu } from '../../redux/selectors/interfaceConfig';
@@ -89,6 +89,17 @@ const MenuBar = () => {
                 <MainList key="mainList" />
                 <OpenApps key="openApps" />
                 <div className="rightAligned">
+                  {window.ReactNativeWebView && (
+                    <Button
+                      type="button"
+                      onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
+                    >
+                      <QR />
+                    </Button>
+                  )}
+                  {accessLevel >= AccessLevels.STANDARD && (
+                    <IdentityPicker hideOnSingle={false} />
+                  )}
                   {!systemConfig.hideHelp && (
                     <Button
                       type="button"
@@ -97,17 +108,6 @@ const MenuBar = () => {
                     >
                       <Help />
                     </Button>
-                  )}
-                  {window.ReactNativeWebView && (
-                    <Button
-                      type="button"
-                      onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
-                    >
-                      <Camera />
-                    </Button>
-                  )}
-                  {accessLevel >= AccessLevels.STANDARD && (
-                    <IdentityPicker />
                   )}
                   <Clock />
                 </div>

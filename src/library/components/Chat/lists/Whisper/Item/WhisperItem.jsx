@@ -1,13 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
-  arrayOf,
+  arrayOf, bool,
   func, shape,
   string,
 } from 'prop-types';
 
 import ListItem from '../../../../common/lists/List/Item/ListItem';
-import { getWhisperRoomName } from '../../../../../redux/selectors/rooms';
+import { getWhisperRoomNames } from '../../../../../redux/selectors/rooms';
 import { ReactComponent as Eye } from '../../../../../icons/eye.svg';
 import { followRoom } from '../../../../../socket/actions/rooms';
 import { getCurrentUser } from '../../../../../redux/selectors/users';
@@ -16,8 +16,13 @@ import { hasAccessTo } from '../../../../../AccessCentral';
 
 import './WhisperItem.scss';
 
-const WhisperItem = ({ room, onChange, className }) => {
-  const roomName = useSelector((state) => getWhisperRoomName(state, { ids: room.participantIds }));
+const WhisperItem = ({
+  room,
+  onChange,
+  className,
+  singleUser,
+}) => {
+  const names = useSelector((state) => getWhisperRoomNames(state, { ids: room.participantIds }));
 
   const onClick = () => {
     const currentUser = getCurrentUser(store.getState());
@@ -48,7 +53,7 @@ const WhisperItem = ({ room, onChange, className }) => {
       key={room.objectId}
       onClick={onClick}
     >
-      {roomName}
+      {singleUser ? names[1] : `${names[0]} > ${names[1]}`}
       {room.spyMode && (<div className="spy"><Eye /></div>)}
     </ListItem>
   );
@@ -79,6 +84,7 @@ WhisperItem.propTypes = {
   }).isRequired,
   onChange: func.isRequired,
   className: string,
+  singleUser: bool.isRequired,
 };
 
 WhisperItem.defaultProps = {

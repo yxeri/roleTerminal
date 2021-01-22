@@ -5,6 +5,18 @@
   padding: $padding $padding;
   box-sizing: border-box;
 
+  .List {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+
+    header {
+      box-shadow: none;
+      border: none;
+      color: $color;
+    }
+  }
+
   .spy, .lock {
     position: absolute;
     right: $padding;

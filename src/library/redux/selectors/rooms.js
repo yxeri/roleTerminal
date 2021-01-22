@@ -58,7 +58,7 @@ export const getWhisperRoom = createCachedSelector(
     .find((room) => room.participantIds.includes(currentIdentityId) && room.participantIds.includes(identityId)) || identityRoom,
 )((_, { currentIdentityId, identityId }) => `whisper-${currentIdentityId}-${identityId}`);
 
-export const getWhisperRoomName = createCachedSelector(
+export const getWhisperRoomNames = createCachedSelector(
   [
     getIdentitiesByIds,
     getCurrentUserIdentities,
@@ -67,16 +67,26 @@ export const getWhisperRoomName = createCachedSelector(
   (identities, currentIdentities, participantIds) => {
     const participant = identities.get(participantIds[0]);
     const secondParticipant = identities.get(participantIds[1]);
+    const isFirst = currentIdentities
+      .find(({ objectId }) => participant.objectId === objectId || participant.ownerId === objectId || participant.userIds.includes(objectId));
+    const names = [];
 
     if (!participant || !secondParticipant) {
       return '';
     }
 
-    const name = currentIdentities
-      .find(({ objectId }) => participant.objectId === objectId || participant.ownerId === objectId || participant.userIds.includes(objectId))
-      ? `${participant.username || participant.aliasName} > ${secondParticipant.username || participant.aliasName}`
-      : `${secondParticipant.username || participant.aliasName} > ${participant.username || participant.aliasName}`;
+    if (isFirst) {
+      names.push(
+        participant.username || participant.aliasName,
+        secondParticipant.username || secondParticipant.aliasName,
+      );
+    } else {
+      names.push(
+        secondParticipant.username || secondParticipant.aliasName,
+        participant.username || participant.aliasName,
+      );
+    }
 
-    return name;
+    return names;
   },
 )((_, { ids }) => `w-name-${ids.join(' ')}`);

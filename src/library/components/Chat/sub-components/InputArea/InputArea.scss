@@ -1,51 +1,14 @@
 @import '../../../../../common';
 
 .InputArea {
+  display: grid;
+  grid-template-rows: fit-content(100%) auto;
   position: sticky;
   bottom: 0;
   background-color: $second-background-color;
-  min-height: calc(#{3.2em + $padding * 2} + 2px);
+  min-height: calc(#{1.2em + $padding * 2} + 1px);
   margin-top: $padding;
   padding-bottom: $padding / 2;
-
-  .buttonBox {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: fit-content(100%);
-    grid-gap: $padding * 2;
-    margin-bottom: -1px;
-    position: relative;
-    z-index: 2;
-
-    .Button, header {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-      border-bottom: none;
-      vertical-align: bottom;
-      box-shadow: $shadow-upwards;
-      background-color: $light-background-color;
-    }
-
-    .ImageUpload {
-      .previewImage {
-        position: absolute;
-        max-height: 120px;
-        max-width: 120px;
-        bottom: 1em + $padding * 3;
-        border: $border;
-      }
-    }
-
-    .IdentityPicker {
-      ul {
-        bottom: 1em + $margin * 2;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-top-left-radius: $border-radius;
-        max-height: 5em;
-      }
-    }
-  }
 
   .input {
     display: flex;
@@ -54,6 +17,7 @@
     overflow: visible;
 
     textarea {
+      border-bottom: none;
       box-shadow: $shadow;
       background-color: $light-background-color;
       color: $second-color;
@@ -62,15 +26,41 @@
       border-radius: 0;
       box-sizing: border-box;
       scrollbar-width: none;
-      min-height: 2em;
+      min-height: 100%;
     }
 
-    .Button {
+    .ImageUpload {
+      display: grid;
+      position: relative;
+
+      .Button {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .previewImage {
+        position: absolute;
+        max-height: 120px;
+        max-width: 120px;
+        bottom: 100%;
+        border: $border;
+      }
+    }
+
+    > .Button:last-child {
       border-left: 0;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
+      border-bottom: 0;
       z-index: 2;
+
+      svg {
+        stroke-width: 2;
+      }
     }
   }
 }

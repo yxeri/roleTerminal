@@ -3,11 +3,12 @@ import { number, string } from 'prop-types';
 import Window from '../common/Window/Window';
 import MapView from './views/MapView';
 import Positions from './views/Positions';
-
-import './WorldMap.scss';
 import store from '../../redux/store';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
+import { ReactComponent as Map } from '../../icons/map.svg';
+
+import './WorldMap.scss';
 
 const WorldMap = ({ id, index }) => {
   const onClick = useCallback(() => {
@@ -20,7 +21,12 @@ const WorldMap = ({ id, index }) => {
       index={index}
       done={() => store.dispatch(removeWindow({ id }))}
       className="WorldMap"
-      title="map"
+      title={(
+        <>
+          <Map />
+          <span>Map</span>
+        </>
+      )}
       onClick={onClick}
       menu={(
         <>

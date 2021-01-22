@@ -237,10 +237,7 @@ const ProfileDialog = ({
       {!editing && (
         <>
           {!identityId && (
-            <div className="identity">
-              <span>You are:</span>
-              <IdentityPicker />
-            </div>
+            <IdentityPicker label={<span>You are:</span>} />
           )}
           {identity.image && (
             <Image

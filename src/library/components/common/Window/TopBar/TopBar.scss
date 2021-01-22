@@ -12,6 +12,13 @@
   align-items: flex-end;
   grid-template-columns: auto fit-content(100%);
 
+  .title {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: $padding;
+    align-items: center;
+  }
+
   .TopBarHandle {
     overflow: hidden;
     white-space: nowrap;

@@ -9,6 +9,7 @@ import FileMenu from '../common/lists/FileMenu/FileMenu';
 import ListItem from '../common/lists/List/Item/ListItem';
 import DocFileList from './lists/DocFile/DocFileList';
 import { ReactComponent as Plus } from '../../icons/plus.svg';
+import { ReactComponent as Files } from '../../icons/files.svg';
 
 import './DocFileDir.scss';
 
@@ -27,7 +28,12 @@ const DocFileDir = ({ id, index }) => {
       index={index}
       done={onDone}
       className="DocFileDir"
-      title="Files"
+      title={(
+        <>
+          <Files />
+          <span>Directory</span>
+        </>
+      )}
       onClick={onClick}
       menu={(
         <>

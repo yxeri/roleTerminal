@@ -85,7 +85,16 @@ const OpenApps = () => {
 
   return (
     <div className="OpenApps">
-      <List dropdown className="apps" title={<Grid />}>
+      <List
+        dropdown
+        className="apps"
+        title={(
+          <>
+            <Grid />
+            <span>Apps</span>
+          </>
+        )}
+      >
         <ListItem key="chat">
           <Button
             key="chat"

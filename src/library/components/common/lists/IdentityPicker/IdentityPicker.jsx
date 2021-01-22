@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { bool } from 'prop-types';
+import { bool, node } from 'prop-types';
 
 import { getCurrentUserIdentitiesNames } from '../../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../../redux/selectors/userId';
@@ -13,7 +13,7 @@ import { getAliasById } from '../../../../redux/selectors/aliases';
 
 import './IdentityPicker.scss';
 
-const IdentityPicker = ({ useIcon = false }) => {
+const IdentityPicker = ({ useIcon = false, hideOnSingle = true, label }) => {
   const identities = useSelector(getCurrentUserIdentitiesNames);
   const identityId = useSelector(getCurrentIdentityId);
   const currentIdentity = identities.find((identity) => identity.objectId === identityId);
@@ -35,20 +35,22 @@ const IdentityPicker = ({ useIcon = false }) => {
   const title = currentIdentity ? currentIdentity.name : '---';
 
   return (
-    <List
-      dropdown
-      className="IdentityPicker"
-      title={useIcon
-        ? <User />
-        : (
-          <>
-            <User />
-            <span>{title}</span>
-          </>
-        )}
-    >
-      {items}
-    </List>
+    <div className={`IdentityPicker ${hideOnSingle && identities.length === 1 ? 'hide' : ''}`}>
+      {label}
+      <List
+        dropdown
+        title={useIcon
+          ? <User />
+          : (
+            <>
+              <User />
+              <span>{title}</span>
+            </>
+          )}
+      >
+        {items}
+      </List>
+    </div>
   );
 };
 
@@ -56,8 +58,12 @@ export default React.memo(IdentityPicker);
 
 IdentityPicker.propTypes = {
   useIcon: bool,
+  hideOnSingle: bool,
+  label: node,
 };
 
 IdentityPicker.defaultProps = {
   useIcon: undefined,
+  hideOnSingle: true,
+  label: undefined,
 };

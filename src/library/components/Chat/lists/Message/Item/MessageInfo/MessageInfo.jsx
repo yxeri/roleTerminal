@@ -19,6 +19,9 @@ const MessageInfo = ({ identityId, timeCreated }) => {
 
   return (
     <p className="MessageInfo">
+      <span className="time">
+        {timestamp.halfTime}
+      </span>
       <span
         role="button"
         tabIndex={0}
@@ -40,9 +43,6 @@ const MessageInfo = ({ identityId, timeCreated }) => {
         }}
       >
         {name || '-'}
-      </span>
-      <span className="time">
-        {timestamp.fullStamp}
       </span>
     </p>
   );

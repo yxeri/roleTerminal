@@ -5,10 +5,10 @@ import { useSelector } from 'react-redux';
 import Rooms from './views/Rooms';
 import Messages from './views/Messages/Messages';
 import Window from '../common/Window/Window';
-import { getRoomById, getWhisperRoomName } from '../../redux/selectors/rooms';
+import { getRoomById, getWhisperRoomNames } from '../../redux/selectors/rooms';
 import { getPublicRoomId } from '../../redux/selectors/config';
 import store from '../../redux/store';
-import { getIdentityById, getIsAnonymous } from '../../redux/selectors/users';
+import { getCurrentUserIdentitiesNames, getIdentityById, getIsAnonymous } from '../../redux/selectors/users';
 import { changeWindowOrder, removeWindow } from '../../redux/actions/windowOrder';
 import { WindowTypes } from '../../redux/reducers/windowOrder';
 import { ReactComponent as Close } from '../../icons/close.svg';
@@ -46,20 +46,23 @@ const Chat = ({
 
   const title = (() => {
     if (!room) {
-      return 'Chat';
+      return '';
     }
 
     if (room.isUser) {
       const identity = getIdentityById(store.getState(), { id: currentRoomId });
 
-      return `PM: ${identity.aliasName || identity.username}`;
+      return `${identity.aliasName || identity.username}`;
     }
 
     if (room.isWhisper) {
-      return `PM: ${getWhisperRoomName(store.getState(), { ids: room.participantIds })}`;
+      const identities = getCurrentUserIdentitiesNames(store.getState());
+      const names = getWhisperRoomNames(store.getState(), { ids: room.participantIds });
+
+      return identities.length === 1 ? names[1] : `${names[0] > names[1]}`;
     }
 
-    return `Chat: ${room.roomName}`;
+    return `${room.roomName}`;
   })();
 
   const onChange = useCallback(({ roomId: newRoomId } = {}) => {
@@ -78,7 +81,12 @@ const Chat = ({
       index={index}
       done={onDone}
       className="Chat"
-      title={title}
+      title={(
+        <>
+          <ChatIcon />
+          <span>{title}</span>
+        </>
+      )}
       onClick={onClick}
       menu={(
         <>

@@ -20,9 +20,9 @@ export const WindowTypes = {
   DIALOGCREATENEWS: 'New article',
   DIALOGJOINROOM: 'Join room',
   DIALOGCONFIGSYSTEM: 'Config system',
-  DIALOGSETTINGSNEWS: 'News settings',
   DIALOGPROFILE: 'Profile',
   DIALOGUNLOCKFILE: 'Unlock file',
+  DIALOGAPPSETTINGS: 'App settings',
 };
 
 const defaultState = new Map();

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { bool, string } from 'prop-types';
+import { bool, node, string } from 'prop-types';
 
 import Image from '../Image/Image';
 import Button from '../Button/Button';
@@ -8,7 +8,7 @@ import { ReactComponent as ImageIcon } from '../../../../icons/image.svg';
 
 import './ImageUpload.scss';
 
-const ImageUpload = ({ useIcon = false, presetImage }) => {
+const ImageUpload = ({ useIcon = false, presetImage, label }) => {
   const { register, setValue } = useFormContext();
   const previewRef = useRef(null);
   const inputRef = useRef(null);
@@ -80,7 +80,7 @@ const ImageUpload = ({ useIcon = false, presetImage }) => {
         onClick={() => { inputRef.current.click(); }}
       >
         <ImageIcon />
-        {!useIcon && (<span>{previewImage ? 'Change image' : 'Upload image'}</span>)}
+        {!useIcon && (<span>{previewImage ? 'Change image' : label || 'Upload image'}</span>)}
       </Button>
     </div>
   );
@@ -91,9 +91,11 @@ export default React.memo(ImageUpload);
 ImageUpload.propTypes = {
   useIcon: bool,
   presetImage: string,
+  label: node,
 };
 
 ImageUpload.defaultProps = {
   useIcon: false,
   presetImage: undefined,
+  label: undefined,
 };

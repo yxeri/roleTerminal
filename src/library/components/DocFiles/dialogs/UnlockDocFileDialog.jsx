@@ -75,16 +75,14 @@ const UnlockDocFileDialog = ({
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <div className="identity">
-            <span>You are: </span>
-            <IdentityPicker />
-          </div>
+          <IdentityPicker label={<span>You are: </span>} />
           <div>
             <p>The file is locked.</p>
             <p>Enter the code to continue:</p>
           </div>
           <Input
             required
+            label="Code"
             defaultValue={code}
             name="code"
             type="text"

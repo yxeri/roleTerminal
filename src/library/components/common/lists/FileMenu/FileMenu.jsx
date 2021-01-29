@@ -14,37 +14,35 @@ import { ReactComponent as MinClose } from '../../../../icons/minimize-close.svg
 import './FileMenu.scss';
 
 const FileMenu = ({ id, children, onSettings }) => {
-  const { systemConfig = {} } = useSelector(getCurrentUser);
+  const { isAnonymous, systemConfig = {} } = useSelector(getCurrentUser);
 
   return (
     <List
       dropdown
       checkWidth
-      className="FileMenu"
+      className={`FileMenu ${isAnonymous ? 'hide' : undefined}`}
       title={<Menu />}
     >
       {children}
-      {!systemConfig.hideTopRow && (
-        <>
-          {onSettings && (
-            <ListItem
-              stopPropagation
-              key="settings"
-              onClick={onSettings}
-            >
-              <Settings />
-              <span>Preferences</span>
-            </ListItem>
-          )}
-          <ListItem
-            stopPropagation
-            key="quit"
-            onClick={() => store.dispatch(removeWindow({ id }))}
-          >
-            <MinClose />
-            <span>Minimize app</span>
-          </ListItem>
-        </>
+      {onSettings && !isAnonymous && (
+        <ListItem
+          stopPropagation
+          key="settings"
+          onClick={onSettings}
+        >
+          <Settings />
+          <span>Preferences</span>
+        </ListItem>
+      )}
+      {systemConfig.hideTopRow && (
+        <ListItem
+          stopPropagation
+          key="quit"
+          onClick={() => store.dispatch(removeWindow({ id }))}
+        >
+          <MinClose />
+          <span>Minimize app</span>
+        </ListItem>
       )}
     </List>
   );

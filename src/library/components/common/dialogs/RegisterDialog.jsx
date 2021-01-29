@@ -96,6 +96,7 @@ const RegisterDialog = ({ id, index }) => {
             requireOffName && (
               <Input
                 required
+                label="Out-of-game name (willy only be visible to organisers)"
                 key="offName"
                 maxLength={100}
                 name="offName"
@@ -105,6 +106,7 @@ const RegisterDialog = ({ id, index }) => {
           }
           <Input
             required
+            label="Username/Name"
             key="username"
             maxLength={30}
             name="username"
@@ -113,6 +115,7 @@ const RegisterDialog = ({ id, index }) => {
           <PronounsSelect key="pronouns" />
           <Input
             required
+            label="Password"
             key="password"
             minLength={4}
             maxLength={100}
@@ -122,6 +125,7 @@ const RegisterDialog = ({ id, index }) => {
           />
           <Input
             required
+            label="Repeat password"
             key="repeatPassword"
             minLength={4}
             maxLength={100}
@@ -131,12 +135,13 @@ const RegisterDialog = ({ id, index }) => {
             type="password"
           />
           <Textarea
+            label="Description. Who are you?"
             key="description"
             maxLength={300}
             name="description"
             placeholder="Description"
           />
-          <ImageUpload key="imageUpload" />
+          <ImageUpload key="imageUpload" label="Upload profile image" />
         </form>
       </FormProvider>
     </Dialog>

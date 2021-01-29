@@ -3,7 +3,7 @@ import {
   arrayOf,
   bool,
   element,
-  func, number, oneOfType,
+  func, node, number, oneOfType,
   string,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
@@ -15,6 +15,7 @@ const Select = ({
   children,
   name,
   defaultValue,
+  label,
   required = false,
   placeholder = '',
   multiple = false,
@@ -47,20 +48,23 @@ const Select = ({
   useEffect(() => () => unregister(name), []);
 
   return (
-    <select
-      defaultValue={defaultValue}
-      required={required}
-      name={name}
-      ref={register}
-      className={`Select ${isEmpty ? 'empty' : ''}`}
-      onFocus={() => setHasFocus(true)}
-      onBlur={checkEmpty}
-      onChange={onChangeFunc}
-      placeholder={placeholder}
-      multiple={multiple}
-    >
-      {children}
-    </select>
+    <div>
+      {label && <span>{label}</span>}
+      <select
+        defaultValue={defaultValue}
+        required={required}
+        name={name}
+        ref={register}
+        className={`Select ${isEmpty ? 'empty' : ''}`}
+        onFocus={() => setHasFocus(true)}
+        onBlur={checkEmpty}
+        onChange={onChangeFunc}
+        placeholder={placeholder}
+        multiple={multiple}
+      >
+        {children}
+      </select>
+    </div>
   );
 };
 
@@ -74,6 +78,7 @@ Select.propTypes = {
   required: bool,
   name: string.isRequired,
   defaultValue: oneOfType([string, arrayOf(string), number]),
+  label: node,
 };
 
 Select.defaultProps = {
@@ -83,4 +88,5 @@ Select.defaultProps = {
   required: false,
   onChange: undefined,
   defaultValue: undefined,
+  label: undefined,
 };

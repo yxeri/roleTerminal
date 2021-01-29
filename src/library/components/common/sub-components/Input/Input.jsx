@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   string,
   bool,
-  func, number, oneOfType,
+  func, number, oneOfType, node,
 } from 'prop-types';
 import { useFormContext } from 'react-hook-form';
 
@@ -16,6 +16,7 @@ const Input = ({
   minLength,
   checked,
   defaultValue,
+  label,
   type = 'text',
   required = false,
   placeholder = '',
@@ -33,35 +34,38 @@ const Input = ({
   useEffect(() => () => unregister(name), []);
 
   return (
-    <input
-      defaultChecked={checked}
-      minLength={minLength}
-      maxLength={maxLength}
-      required={required}
-      name={name}
-      ref={register({
-        maxLength,
-        minLength,
-        validate: (value) => (!shouldEqual || value === getValues(shouldEqual)) || `Must match ${shouldEqual}`,
-      })}
-      type={type}
-      defaultValue={defaultValue || ''}
-      className={`Input ${isEmpty ? 'empty' : ''}`}
-      onFocus={() => {
-        if (!hasFocus) {
-          setHasFocus(true);
-        } else if (isEmpty) {
-          setIsEmpty(false);
-        }
-      }}
-      onBlur={checkEmpty}
-      onChange={(event) => {
-        if (onChange) {
-          onChange(event.target.value);
-        }
-      }}
-      placeholder={placeholder}
-    />
+    <div>
+      {label && <span>{label}</span>}
+      <input
+        defaultChecked={checked}
+        minLength={minLength}
+        maxLength={maxLength}
+        required={required}
+        name={name}
+        ref={register({
+          maxLength,
+          minLength,
+          validate: (value) => (!shouldEqual || value === getValues(shouldEqual)) || `Must match ${shouldEqual}`,
+        })}
+        type={type}
+        defaultValue={defaultValue || ''}
+        className={`Input ${isEmpty ? 'empty' : ''}`}
+        onFocus={() => {
+          if (!hasFocus) {
+            setHasFocus(true);
+          } else if (isEmpty) {
+            setIsEmpty(false);
+          }
+        }}
+        onBlur={checkEmpty}
+        onChange={(event) => {
+          if (onChange) {
+            onChange(event.target.value);
+          }
+        }}
+        placeholder={placeholder}
+      />
+    </div>
   );
 };
 
@@ -78,6 +82,7 @@ Input.propTypes = {
   minLength: number,
   checked: bool,
   defaultValue: oneOfType([string, number]),
+  label: node,
 };
 
 Input.defaultProps = {
@@ -90,4 +95,5 @@ Input.defaultProps = {
   minLength: undefined,
   checked: undefined,
   defaultValue: undefined,
+  label: undefined,
 };

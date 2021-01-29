@@ -67,29 +67,33 @@ const CreateRoomDialog = ({ id, index }) => {
           </div>
           <Input
             required
+            label="Name of the room"
             maxLength={20}
             name="roomName"
-            placeholder="Name of the room"
+            placeholder="Name"
           />
           <Input
+            label="Topic (shown when joining the room)"
             maxLength={300}
             name="topic"
-            placeholder="(opt) Topic (shown when joining the room)"
+            placeholder="Topic"
           />
           <Input
+            label="Optional password"
             minLength={4}
             maxLength={100}
             name="password"
             type="password"
-            placeholder="(opt) Password"
+            placeholder="Password"
           />
           <Input
+            label="Repeat password"
             minLength={4}
             maxLength={100}
             shouldEqual="password"
             name="repeatPassword"
             type="password"
-            placeholder={`${methods.errors.repeatPassword ? 'Error. Passwords must match!' : '(opt) Repeat password'}`}
+            placeholder={`${methods.errors.repeatPassword ? 'Error. Passwords must match!' : 'Repeat password'}`}
           />
         </form>
       </FormProvider>

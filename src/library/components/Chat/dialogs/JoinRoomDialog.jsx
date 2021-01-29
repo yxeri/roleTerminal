@@ -112,6 +112,7 @@ const JoinRoomDialog = ({
           </div>
           {!hasAccess && room.password && (
             <Input
+              label="Password"
               defaultValue={password}
               required={!hasAccess}
               minLength={4}

@@ -62,16 +62,14 @@ const CreateNewsDialog = ({ id, index }) => {
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <div className="identity">
-            <span>You are:</span>
-            <IdentityPicker />
-          </div>
+          <IdentityPicker label={<span>You are:</span>} />
           <div>
             <p>{`The article fee is: ${newsCost}`}</p>
             <p>{`You have ${wallet.amount} in your wallet`}</p>
           </div>
           <Input
             required
+            label="title"
             maxLength={200}
             name="title"
             placeholder="Title"
@@ -79,6 +77,7 @@ const CreateNewsDialog = ({ id, index }) => {
           <ImageUpload />
           <Textarea
             required
+            label="Text"
             maxLength={800}
             name="text"
             placeholder="Text"

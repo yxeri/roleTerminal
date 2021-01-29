@@ -58,10 +58,12 @@ const LoginDialog = ({ id, index }) => {
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <Input
+            label="Username"
             name="username"
             placeholder="Username"
           />
           <Input
+            label="Password"
             name="password"
             placeholder="Password"
             type="password"

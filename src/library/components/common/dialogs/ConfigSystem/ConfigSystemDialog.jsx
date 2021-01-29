@@ -114,71 +114,59 @@ const ConfigSystemDialog = ({ id, index }) => {
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <div>
-            <p>{`Changes made here will only affect your user (${currentUser.username}) and only when you are logged in.`}</p>
+            <p>Changes made here will affect your user and only when you are logged in.</p>
           </div>
-          <div>
-            <span>Do you want to change settings for when you login on any device or a specific device? The device specific settings will override any global settings</span>
-            <Select
-              key="onDevice"
-              name="onDevice"
-              defaultValue=""
-            >
-              <option value="">Any device (default)</option>
-              <option value="this">This device</option>
-            </Select>
-          </div>
-          <div>
-            <span>Select apps to auto-open when you log in (you can choose how they are expanded and placed in Settings for each app)</span>
-            <Select
-              multiple
-              key={`openApps-${onDevice}`}
-              defaultValue={(systemConfig.openApps || ['']).map((app) => (app.value ? app.value.type : ''))}
-              name="openApps"
-            >
-              <option value="">No app</option>
-              <option value={WindowTypes.CHAT}>Chat</option>
-              <option value={WindowTypes.WALLET}>Wallet</option>
-              <option value={WindowTypes.WORLDMAP}>Map</option>
-              <option value={WindowTypes.DOCFILEDIR}>Files</option>
-              <option value={WindowTypes.NEWS}>News</option>
-            </Select>
-          </div>
-          <div>
-            <span>Automatically maximize windows?</span>
-            <Input
-              key={`alwaysMaximized-${onDevice}`}
-              type="checkbox"
-              name="alwaysMaximized"
-              checked={systemConfig.alwaysMaximized}
-            />
-          </div>
-          <div>
-            <span>Minimize main menu?</span>
-            <Input
-              key={`hideMenuBar-${onDevice}`}
-              type="checkbox"
-              name="hideMenuBar"
-              checked={systemConfig.hideMenuBar}
-            />
-          </div>
-          <div>
-            <span>Hide top row in windows? (Windows will be auto-maximized)?</span>
-            <Input
-              key={`hideTopBar-${onDevice}`}
-              type="checkbox"
-              name="hideTopBar"
-              checked={systemConfig.hideTopBar}
-            />
-          </div>
-          <div>
-            <span>Hide help buttons?</span>
-            <Input
-              key={`hideHelp-${onDevice}`}
-              type="checkbox"
-              name="hideHelp"
-              checked={systemConfig.hideHelp}
-            />
-          </div>
+          <Select
+            label="Do you want to change settings for when you login on any device or a specific device? The device specific settings will override any global settings."
+            key="onDevice"
+            name="onDevice"
+            defaultValue=""
+          >
+            <option value="">Any device (default)</option>
+            <option value="this">This device</option>
+          </Select>
+          <Select
+            multiple
+            label="Select apps to auto-open when you log in (you can choose how they are expanded and placed in the settings for each app)."
+            key={`openApps-${onDevice}`}
+            defaultValue={(systemConfig.openApps || ['']).map((app) => (app.value ? app.value.type : ''))}
+            name="openApps"
+          >
+            <option value="">No app</option>
+            <option value={WindowTypes.CHAT}>Chat</option>
+            <option value={WindowTypes.WALLET}>Wallet</option>
+            <option value={WindowTypes.WORLDMAP}>Map</option>
+            <option value={WindowTypes.DOCFILEDIR}>Files</option>
+            <option value={WindowTypes.NEWS}>News</option>
+          </Select>
+          <Input
+            label="Automatically maximize windows?"
+            key={`alwaysMaximized-${onDevice}`}
+            type="checkbox"
+            name="alwaysMaximized"
+            checked={systemConfig.alwaysMaximized}
+          />
+          <Input
+            label="Minimize main menu?"
+            key={`hideMenuBar-${onDevice}`}
+            type="checkbox"
+            name="hideMenuBar"
+            checked={systemConfig.hideMenuBar}
+          />
+          <Input
+            label="Hide top row in windows? (Windows will be auto-maximized)?"
+            key={`hideTopBar-${onDevice}`}
+            type="checkbox"
+            name="hideTopBar"
+            checked={systemConfig.hideTopBar}
+          />
+          <Input
+            label="Hide help buttons?"
+            key={`hideHelp-${onDevice}`}
+            type="checkbox"
+            name="hideHelp"
+            checked={systemConfig.hideHelp}
+          />
         </form>
       </FormProvider>
     </Dialog>

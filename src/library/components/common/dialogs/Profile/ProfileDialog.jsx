@@ -306,73 +306,58 @@ const ProfileDialog = ({
         <FormProvider {...formMethods}>
           <form onSubmit={formMethods.handleSubmit(onSubmit)}>
             {!identityId && (
-              <div className="identity">
-                <span>You are</span>
-                <IdentityPicker />
-              </div>
+              <IdentityPicker label={<span>You are:</span>} />
             )}
             <ImageUpload
+              label="Upload profile image"
               image={identity.image ? { source: `/upload/images/${identity.image.fileName}` } : undefined}
             />
-            <div>
-              <span>Name</span>
-              <Input
-                required
-                name="name"
-                maxLength={30}
-                placeholder="Name"
-                type="text"
-                defaultValue={identity.aliasName || identity.username}
-              />
-            </div>
+            <Input
+              required
+              label="Name"
+              name="name"
+              maxLength={30}
+              placeholder="Name"
+              type="text"
+              defaultValue={identity.aliasName || identity.username}
+            />
             {accessLevel >= AccessLevels.ADMIN && !identity.aliasName && (
-              <div>
-                <span>Access level</span>
-                <Select
-                  key="accessLevel"
-                  name="accessLevel"
-                  defaultValue={identity.accessLevel}
-                >
-                  {Object.keys(AccessLevels)
-                    .filter((key) => AccessLevels[key] >= AccessLevels.STANDARD && AccessLevels[key] <= accessLevel)
-                    .map((key) => <option key={key} value={AccessLevels[key]}>{key}</option>)}
-                </Select>
-              </div>
+              <Select
+                label="Access level"
+                key="accessLevel"
+                name="accessLevel"
+                defaultValue={identity.accessLevel}
+              >
+                {Object.keys(AccessLevels)
+                  .filter((key) => AccessLevels[key] >= AccessLevels.STANDARD && AccessLevels[key] <= accessLevel)
+                  .map((key) => <option key={key} value={AccessLevels[key]}>{key}</option>)}
+              </Select>
             )}
-            <div>
-              <span>Pronouns</span>
-              <PronounsSelect preselected={identity.pronouns} />
-            </div>
+            <PronounsSelect preselected={identity.pronouns} />
             {accessLevel >= permissions.UpdateUserStatus.accessLevel && (
-              <div>
-                <span>Status</span>
-                <Input
-                  name="status"
-                  placeholder="Status"
-                  type="text"
-                  defaultValue={identity.status}
-                />
-              </div>
+              <Input
+                label="Status"
+                name="status"
+                placeholder="Status"
+                type="text"
+                defaultValue={identity.status}
+              />
             )}
             {accessLevel >= permissions.UpdateUserOccupation.accessLevel && (
-              <div>
-                <span>Occupation</span>
-                <Input
-                  name="occupation"
-                  placeholder="Occupation"
-                  type="text"
-                  defaultValue={identity.occupation}
-                />
-              </div>
-            )}
-            <div>
-              <span>Description</span>
-              <Textarea
-                name="description"
-                placeholder="Description"
-                maxLength={300}
+              <Input
+                label="Occupation"
+                name="occupation"
+                placeholder="Occupation"
+                type="text"
+                defaultValue={identity.occupation}
               />
-            </div>
+            )}
+            <Textarea
+              label="Description"
+              name="description"
+              placeholder="Description"
+              maxLength={300}
+            />
           </form>
         </FormProvider>
       )}

@@ -12,7 +12,10 @@ import Input from '../sub-components/Input/Input';
 import Select from '../sub-components/selects/Select/Select';
 import { createTransaction } from '../../../socket/actions/transactions';
 import { getWalletIdsByCurrentUser } from '../../../redux/selectors/wallets';
-import { getIdentitiesOrTeamsByIds, getIdentityOrTeamById } from '../../../redux/selectors/users';
+import {
+  getIdentitiesOrTeamsByIds,
+  getIdentityOrTeamName
+} from '../../../redux/selectors/users';
 import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 
 const CreateTransactionDialog = ({
@@ -25,7 +28,7 @@ const CreateTransactionDialog = ({
   const identityId = useSelector(getCurrentIdentityId);
   const walletIds = useSelector(getWalletIdsByCurrentUser);
   const identities = useSelector((state) => getIdentitiesOrTeamsByIds(state, { ids: walletIds }));
-  const toIdentity = useSelector((state) => getIdentityOrTeamById(state, { id: toWalletId }));
+  const toName = useSelector((state) => getIdentityOrTeamName(state, { id: toWalletId }));
   const walletOptions = [];
 
   const onSubmit = async ({
@@ -68,7 +71,7 @@ const CreateTransactionDialog = ({
     <Dialog
       id={id}
       index={index}
-      title={`Transfer to ${toIdentity.teamName || toIdentity.aliasName || toIdentity.username}`}
+      title={`Transfer to ${toName}`}
       onClick={onClick}
       done={onDone}
       buttons={[
@@ -84,25 +87,26 @@ const CreateTransactionDialog = ({
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <p>{`You are making a transfer to ${toIdentity.teamName || toIdentity.aliasName || toIdentity.username}`}</p>
-          <div>
-            <span>From your wallet: </span>
+          <p>{`You are making a transfer to ${toName}`}</p>
+          {walletOptions.length > 1 && (
             <Select
               required
+              label="From your wallet"
               defaultValue={identityId}
               name="fromWalletId"
             >
-              <option value="">---Choose wallet---</option>
               <>{walletOptions}</>
             </Select>
-          </div>
+          )}
           <Input
             required
+            label="Amount"
             defaultValue={amount}
             name="amount"
             placeholder="Amount"
           />
           <Input
+            label="Note"
             maxLength={50}
             name="note"
             placeholder="Note"

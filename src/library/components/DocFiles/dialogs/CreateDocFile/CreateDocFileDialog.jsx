@@ -62,24 +62,21 @@ const CreateDocFileDialog = ({ id, index }) => {
     >
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <div className="identity">
-            <span>You are:</span>
-            <IdentityPicker />
-          </div>
-          <div className="public">
-            <Input
-              type="checkbox"
-              name="isPublic"
-            />
-            <span>Do you want it to be available to the public? (A user with the right code can always access the document)</span>
-          </div>
+          <IdentityPicker label={<span>You are:</span>} />
+          <Input
+            label="Do you want it to be available to the public? (A user with the right code can always access the document)"
+            type="checkbox"
+            name="isPublic"
+          />
           <Input
             required
+            label="Title"
             maxLength={40}
             name="title"
             placeholder="Title"
           />
           <Input
+            label="Code"
             minLength={3}
             maxLength={10}
             name="code"

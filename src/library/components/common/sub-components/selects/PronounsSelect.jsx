@@ -1,4 +1,5 @@
 import React from 'react';
+import { arrayOf, string } from 'prop-types';
 
 import Select from './Select/Select';
 
@@ -10,18 +11,28 @@ export const Pronouns = {
 };
 
 const PronounsSelect = ({ preselected }) => (
-  <Select
-    multiple
-    required
-    defaultValue={preselected}
-    name="pronouns"
-  >
-    <option value="">---Choose pronouns---</option>
-    <option value="they">They/Them</option>
-    <option value="she">She/Her</option>
-    <option value="he">He/Him</option>
-    <option value="it">It</option>
-  </Select>
+  <div>
+    <span>Pronouns</span>
+    <Select
+      multiple
+      required
+      defaultValue={preselected}
+      name="pronouns"
+    >
+      <option value="they">They/Them</option>
+      <option value="she">She/Her</option>
+      <option value="he">He/Him</option>
+      <option value="it">It</option>
+    </Select>
+  </div>
 );
 
 export default PronounsSelect;
+
+PronounsSelect.propTypes = {
+  preselected: arrayOf(string),
+};
+
+PronounsSelect.defaultProps = {
+  preselected: undefined,
+};

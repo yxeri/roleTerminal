@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   bool,
-  func, number,
+  func, node, number,
   string,
 } from 'prop-types';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -13,6 +13,7 @@ const Textarea = ({
   maxLength,
   onKeyDown,
   onChange,
+  label,
   required = false,
   placeholder = '',
 }) => {
@@ -47,25 +48,28 @@ const Textarea = ({
   };
 
   return (
-    <textarea
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      rows={1}
-      maxLength={maxLength}
-      required={required}
-      name={name}
-      ref={(element) => {
-        inputRef.current = element;
-        register(element, {
-          maxLength,
-        });
-      }}
-      defaultValue=""
-      className={`Textarea ${isEmpty ? 'empty' : ''}`}
-      onFocus={() => setHasFocus(true)}
-      onBlur={checkEmpty}
-      placeholder={placeholder}
-    />
+    <div>
+      {label && <span>{label}</span>}
+      <textarea
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        rows={1}
+        maxLength={maxLength}
+        required={required}
+        name={name}
+        ref={(element) => {
+          inputRef.current = element;
+          register(element, {
+            maxLength,
+          });
+        }}
+        defaultValue=""
+        className={`Textarea ${isEmpty ? 'empty' : ''}`}
+        onFocus={() => setHasFocus(true)}
+        onBlur={checkEmpty}
+        placeholder={placeholder}
+      />
+    </div>
   );
 };
 
@@ -78,6 +82,7 @@ Textarea.propTypes = {
   maxLength: number,
   onKeyDown: func,
   onChange: func,
+  label: node,
 };
 
 Textarea.defaultProps = {
@@ -86,4 +91,5 @@ Textarea.defaultProps = {
   maxLength: undefined,
   onKeyDown: undefined,
   onChange: undefined,
+  label: undefined,
 };

@@ -12,6 +12,7 @@ import Select from '../sub-components/selects/Select/Select';
 import Textarea from '../sub-components/Textarea/Textarea';
 import { createAlias } from '../../../socket/actions/aliases';
 import ImageUpload from '../sub-components/ImageUpload/ImageUpload';
+import PronounsSelect from '../sub-components/selects/PronounsSelect';
 
 const CreateAliasDialog = ({ id, index }) => {
   const formMethods = useForm();
@@ -66,23 +67,15 @@ const CreateAliasDialog = ({ id, index }) => {
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <Input
             required
+            label="Alias name"
             maxLength={30}
             name="aliasName"
             placeholder="Alias name"
           />
-          <Select
-            multiple
-            required
-            name="pronouns"
-          >
-            <option value="">---Choose pronouns---</option>
-            <option value="they">They/Them</option>
-            <option value="she">She/Her</option>
-            <option value="he">He/Him</option>
-            <option value="it">It</option>
-          </Select>
-          <ImageUpload />
+          <PronounsSelect />
+          <ImageUpload label="Upload profile image" />
           <Textarea
+            label="Description"
             maxLength={300}
             name="description"
             placeholder="Description"

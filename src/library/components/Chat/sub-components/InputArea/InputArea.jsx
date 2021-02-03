@@ -83,9 +83,11 @@ const InputArea = ({
 
                 if (altKey && key === 'Enter' && buttonRef.current) {
                   buttonRef.current.click();
+
+                  event.preventDefault();
                 }
               }}
-              placeholder={online ? 'Alt+Enter to send message' : 'Offline. Reconnecting to server...'}
+              placeholder={online ? 'Alt+Enter to send' : 'Reconnecting...'}
             />
             <Button
               ref={buttonRef}

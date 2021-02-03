@@ -48,11 +48,6 @@
             border-top: 0;
             width: 100%;
             box-sizing: border-box;
-
-            svg {
-              max-width: $icon-size - .2em;
-              max-height: $icon-size - .2em;
-            }
           }
 
           .dropdown {

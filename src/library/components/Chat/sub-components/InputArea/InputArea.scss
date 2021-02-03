@@ -6,7 +6,7 @@
   position: sticky;
   bottom: 0;
   background-color: $second-background-color;
-  min-height: calc(#{1.2em + $padding * 2} + 1px);
+  min-height: calc(#{1.55em + $padding * 2});
   margin-top: $padding;
   padding-bottom: $padding / 2;
 
@@ -16,17 +16,22 @@
     max-width: $max-width;
     overflow: visible;
 
-    textarea {
-      border-bottom: none;
-      box-shadow: $shadow;
-      background-color: $light-background-color;
-      color: $second-color;
-      padding: $padding;
+    .Textarea {
       flex-grow: 1;
-      border-radius: 0;
-      box-sizing: border-box;
-      scrollbar-width: none;
-      min-height: 100%;
+
+      textarea {
+        border-bottom: none;
+        box-shadow: $shadow;
+        background-color: $light-background-color;
+        color: $second-color;
+        padding: $padding;
+        flex-grow: 1;
+        border-radius: 0;
+        box-sizing: border-box;
+        scrollbar-width: none;
+        min-height: 100%;
+        width: 100%;
+      }
     }
 
     .ImageUpload {

@@ -48,7 +48,7 @@ const Textarea = ({
   };
 
   return (
-    <div>
+    <div className="Textarea">
       {label && <span>{label}</span>}
       <textarea
         onChange={onChange}

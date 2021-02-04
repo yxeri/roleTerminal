@@ -2,11 +2,11 @@
 
 .TransactionItem {
   display: grid;
-  padding: $padding * 2;
-  grid-gap: $padding * 2;
-  border: $lite-border;
-  margin-right: $padding * 2;
-  border-radius: $border-radius;
+  padding: calc(var(--padding) * 2);
+  grid-gap: calc(var(--padding) * 2);
+  border: var(--lite-border);
+  margin-right: calc(var(--padding) * 2);
+  border-radius: var(--border-radius);
   grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
   grid-template-columns: fit-content(100%) fit-content(100%);
   word-break: unset;
@@ -46,7 +46,7 @@
   .other, .current {
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding * 2;
+    grid-gap: calc(var(--padding) * 2);
   }
 
   .amount {
@@ -58,18 +58,18 @@
   }
 
   .negative {
-    color: $color;
+    color: var(--color);
   }
 
   .time {
     span:last-child {
-      margin-left: $padding * 2;
+      margin-left: calc(var(--padding) * 2);
     }
   }
 }
 
 .TransactionItem.sender {
-  border: $border;
+  border: var(--border);
   margin-right: 0;
-  margin-left: $padding * 2;
+  margin-left: calc(var(--padding) * 2);
 }

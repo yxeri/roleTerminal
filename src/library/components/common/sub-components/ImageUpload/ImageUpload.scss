@@ -2,8 +2,8 @@
 
 .ImageUpload {
   svg {
-    max-width: $icon-size;
-    max-height: $icon-size;
+    max-width: var(--icon-size);
+    max-height: var(--icon-size);
     vertical-align: middle;
   }
 }

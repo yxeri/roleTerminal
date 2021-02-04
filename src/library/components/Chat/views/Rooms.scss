@@ -7,8 +7,8 @@
 
   .ListItem {
     header {
-      margin-bottom: $padding * 2;
-      background-color: $light-background-color;
+      margin-bottom: calc(var(--padding) * 2);
+      background-color: var(--light-background-color);
       position: sticky;
       top: 0;
       z-index: 1;

@@ -4,8 +4,8 @@
   .contentContainer {
     form {
       > div {
-        border-bottom: $dark-border;
-        padding-bottom: $padding * 4;
+        border-bottom: var(--dark-border);
+        padding-bottom: calc(var(--padding) * 4);
       }
 
       > div:last-child {

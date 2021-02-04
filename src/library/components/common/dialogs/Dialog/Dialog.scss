@@ -9,10 +9,10 @@
         overflow-y: auto;
 
         .contentContainer {
-          max-width: $max-width;
+          max-width: var(--max-width);
           display: grid;
-          grid-gap: $padding * 4;
-          padding: $padding;
+          grid-gap: calc(var(--padding) * 4);
+          padding: var(--padding);
           grid-auto-rows: fit-content(100%);
 
           > div, form > div {
@@ -22,18 +22,18 @@
           }
 
           input, textarea, select {
-            padding: $padding;
-            border-radius: $border-radius;
+            padding: var(--padding);
+            border-radius: var(--border-radius);
           }
         }
 
         .buttons {
           display: grid;
           grid-auto-flow: column;
-          grid-gap: $padding;
+          grid-gap: var(--padding);
           position: sticky;
           bottom: 0;
-          margin-top: $padding * 2;
+          margin-top: calc(var(--padding) * 2);
         }
       }
     }

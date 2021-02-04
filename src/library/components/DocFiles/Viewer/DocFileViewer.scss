@@ -1,14 +1,14 @@
 @import "../../../../common";
 
 .DocFileViewer {
-  padding: $padding;
+  padding: var(--padding);
   word-break: break-word;
 
   .title, .info {
-    margin-bottom: $padding * 2;
+    margin-bottom: calc(var(--padding) * 2);
   }
 
   p, h1 {
-    max-width: $max-width;
+    max-width: var(--max-width);
   }
 }

@@ -3,7 +3,7 @@
 .CreateDocFileDialog {
   .public {
     > span {
-      margin-left: $padding;
+      margin-left: var(--padding);
     }
   }
 }

@@ -1,12 +1,12 @@
 @import "../../../../../../../common";
 
 .MessageInfo {
-  border-top: $dark-border;
-  padding-top: $padding;
-  padding-bottom: #{$padding * 2};
-  color: $color;
+  border-top: var(--dark-border);
+  padding-top: var(--padding);
+  padding-bottom: calc(var(--padding) * 2);
+  color: var(--color);
 
   > * {
-    margin-right: #{$padding * 2};
+    margin-right: calc(var(--padding) * 2);
   }
 }

@@ -6,21 +6,21 @@
   grid-auto-flow: column;
   grid-template-columns: fit-content(100%) minmax(auto, 30em) fit-content(100%);
   align-items: center;
-  grid-gap: $padding * 2;
+  grid-gap: calc(var(--padding) * 2);
 
   .by {
-    line-height: $item-icon-size;
+    line-height: var(--item-icon-size);
     overflow: hidden;
   }
 }
 
 .DocFileItem.header {
-  border-bottom: $border;
-  margin-top: -#{$padding};
+  border-bottom: var(--border);
+  margin-top: -(var(--padding));
   position: sticky;
   top: calc(1.95em);
   z-index: 2;
-  background-color: $second-background-color;
+  background-color: var(--second-background-color);
 
   .icon, .by, svg {
     height: unset;
@@ -31,7 +31,7 @@
   }
 
   svg {
-    max-height: $icon-size - .1em;
-    max-width: $icon-size - .1em;
+    max-height: calc(var(--icon-size) - .1em);
+    max-width: calc(var(--icon-size) - .1em);
   }
 }

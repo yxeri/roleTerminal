@@ -3,11 +3,11 @@
 .Amount {
   display: grid;
   grid-auto-flow: column;
-  border: $border;
+  border: var(--border);
   box-sizing: border-box;
-  padding: $padding * 2;
-  grid-gap: $padding * 2;
-  max-width: $max-width;
+  padding: calc(var(--padding) * 2);
+  grid-gap: calc(var(--padding) * 2);
+  max-width: var(--max-width);
 
   span:last-child {
     justify-self: flex-end;

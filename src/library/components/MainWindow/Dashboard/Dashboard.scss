@@ -1,41 +1,41 @@
 @import "../../../../common";
 
 .Dashboard {
-  color: $second-color;
-  padding: $padding;
+  color: var(--second-color);
+  padding: var(--padding);
   display: grid;
-  grid-gap: $padding * 2;
-  height: calc(100% - #{$padding * 2});
+  grid-gap: calc(var(--padding) * 2);
+  height: calc(100% - var(--padding) * 2);
   grid-auto-rows: fit-content(100%);
-  grid-template-columns: fit-content(#{$max-width});
+  grid-template-columns: fit-content(var(--max-width));
 
   .news {
     overflow-y: auto;
 
     svg {
-      margin-left: $padding * 2;
-      max-width: $icon-size - .2em;
-      max-height: $icon-size - .2em;
+      margin-left: calc(var(--padding) * 2);
+      max-width: calc(var(--icon-size) - .2em);
+      max-height: calc(var(--icon-size) - .2em);
       vertical-align: bottom;
       float: right;
     }
 
     header {
       height: unset;
-      background-color: $background-color;
-      border-bottom: $lite-border;
+      background-color: var(--background-color);
+      border-bottom: var(--lite-border);
       position: sticky;
       top: 0;
-      box-shadow: $second-shadow;
+      box-shadow: var(--second-shadow);
     }
 
     ul {
-      border-left: $lite-border;
-      border-bottom: $lite-border;
-      border-right: $lite-border;
+      border-left: var(--lite-border);
+      border-bottom: var(--lite-border);
+      border-right: var(--lite-border);
       height: unset;
       overflow: hidden;
-      background-color: $light-background-color;
+      background-color: var(--light-background-color);
     }
   }
 
@@ -43,17 +43,17 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: fit-content(100%);
-    grid-gap: $padding * 2;
+    grid-gap: calc(var(--padding) * 2);
 
     .Clock {
       .icon {
-        border: $border;
-        border-radius: $border-radius;
+        border: var(--border);
+        border-radius: var(--border-radius);
       }
 
       .time {
         right: unset;
-        border: $border;
+        border: var(--border);
       }
     }
   }

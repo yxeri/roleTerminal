@@ -4,7 +4,7 @@
   .WorldMap {
     .windowBox {
       .content {
-        background-color: $second-background-color;
+        background-color: var(--second-background-color);
       }
     }
   }

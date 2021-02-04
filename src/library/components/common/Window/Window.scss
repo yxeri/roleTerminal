@@ -1,20 +1,20 @@
 @import "../../../../common";
 
 .rnd {
-  box-shadow: $dark-shadow;
+  box-shadow: var(--dark-shadow);
   box-sizing: border-box;
   overscroll-behavior-y: none;
 
   .Window {
     display: grid;
     grid-template-rows: fit-content(0) auto;
-    box-shadow: $shadow;
-    background-color: $second-background-color;
+    box-shadow: var(--shadow);
+    background-color: var(--second-background-color);
     height: calc(100% - 1px);
-    border: $border;
-    color: $second-color;
-    text-shadow: $text-shadow;
-    border-radius: $border-radius;
+    border: var(--border);
+    color: var(--second-color);
+    text-shadow: var(--text-shadow);
+    border-radius: var(--border-radius);
     box-sizing: border-box;
     overflow: hidden;
 
@@ -27,19 +27,19 @@
       position: relative;
 
       .InputArea {
-        padding: 0 $padding;
+        padding: 0 var(--padding);
       }
 
       .menu {
-        background-color: $second-background-color;
+        background-color: var(--second-background-color);
         display: flex;
         flex-direction: row;
         box-sizing: border-box;
-        padding: 0 $padding;
+        padding: 0 var(--padding);
 
         > .List {
-          margin-bottom: $margin;
-          margin-right: $margin;
+          margin-bottom: var(--margin);
+          margin-right: var(--margin);
           flex-grow: 1;
 
           > header {
@@ -53,7 +53,7 @@
           .dropdown {
             left: 0;
             width: 100%;
-            max-height: calc(100% - #{1em + $margin * 4});
+            max-height: calc(100% - 1em + var(--margin) * 4);
           }
         }
 
@@ -66,7 +66,7 @@
         height: 100%;
         width: 100%;
         overflow: hidden;
-        padding: $padding;
+        padding: var(--padding);
         box-sizing: border-box;
         scrollbar-width: none;
         scroll-behavior: smooth;
@@ -80,7 +80,7 @@
     .windowBox {
       grid-template-rows: 1fr;
       grid-template-columns: fit-content(100%) auto;
-      grid-gap: $padding;
+      grid-gap: var(--padding);
 
       .InputArea {
         padding-left: 0;
@@ -89,7 +89,7 @@
       .menu {
         display: grid;
         grid-auto-rows: fit-content(100%);
-        grid-gap: $margin;
+        grid-gap: var(--margin);
         height: 100%;
         scrollbar-width: none;
         overflow: hidden;
@@ -103,12 +103,12 @@
           overflow: hidden;
           width: 11em;
           max-width: 100%;
-          padding-left: $padding;
+          padding-left: var(--padding);
 
           > header {
-            border-top-left-radius: $border-radius;
-            border-top-right-radius: $border-radius;
-            border-top: $border;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            border-top: var(--border);
             justify-content: flex-start;
           }
 
@@ -125,11 +125,11 @@
         }
 
         > .List:first-child {
-          margin-top: $margin;
+          margin-top: var(--margin);
         }
 
         > .List:last-child {
-          margin-bottom: $margin;
+          margin-bottom: var(--margin);
         }
 
         .expanded {

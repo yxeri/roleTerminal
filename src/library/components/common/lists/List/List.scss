@@ -6,14 +6,14 @@
 
   header {
     user-select: none;
-    padding: $padding;
-    border: $border;
-    border-radius: $border-radius;
-    box-shadow: $shadow;
-    background-color: $light-background-color;
+    padding: var(--padding);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    background-color: var(--light-background-color);
     text-decoration: none;
     display: grid;
-    grid-gap: $padding;
+    grid-gap: var(--padding);
     grid-auto-flow: column;
     justify-content: center;
     white-space: nowrap;
@@ -25,7 +25,7 @@
     display: grid;
     grid-auto-rows: max-content;
     grid-template-columns: 100%;
-    grid-gap: $margin * 2;
+    grid-gap: calc(var(--margin) * 2);
     overflow-y: auto;
     overflow-x: hidden;
     height: 100%;
@@ -35,18 +35,18 @@
   }
 
   .dropdown {
-    box-shadow: $shadow;
-    background-color: $light-background-color;
+    box-shadow: var(--shadow);
+    background-color: var(--light-background-color);
     position: absolute;
     list-style: none;
-    border: $border;
-    border-radius: $border-radius;
+    border: var(--border);
+    border-radius: var(--border-radius);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     user-select: none;
     box-sizing: border-box;
     height: inherit;
-    z-index: $dropdown-z-index;
+    z-index: var(--dropdown-z-index);
   }
 
   .upper, .lower {
@@ -56,27 +56,27 @@
     opacity: .5;
 
     svg {
-      max-width: $icon-size + .2em;
-      max-height: $icon-size + .2em;
+      max-width: calc(var(--icon-size) + .2em);
+      max-height: calc(var(--icon-size) + .2em);
     }
   }
 
   .lower {
     float: right;
     position: sticky;
-    bottom: $padding;
+    bottom: var(--padding);
   }
 
   .upper {
-    right: $padding;
+    right: var(--padding);
     position: absolute;
-    top: 1em + $padding * 3;
+    top: calc(1em + var(--padding) * 3);
   }
 }
 
 .List.expanded {
   > header {
-    border-color: $second-color !important;
+    border-color: var(--second-color) !important;
     border-bottom-color: transparent !important;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
@@ -84,6 +84,6 @@
 
   > .dropdown {
     border-top-left-radius: 0;
-    border-color: $second-color;
+    border-color: var(--second-color);
   }
 }

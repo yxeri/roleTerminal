@@ -13,16 +13,16 @@
 
   .Button {
     position: absolute;
-    right: $padding;
-    top: $padding;
+    right: var(--padding);
+    top: var(--padding);
     border: none;
     background-color: transparent;
     box-shadow: none;
-    color: $background-color;
+    color: var(--background-color);
 
     svg {
-      max-width: $icon-size - .2em;
-      max-height: $icon-size - .2em;
+      max-width: var(--icon-size) - .2em;
+      max-height: var(--icon-size) - .2em;
       opacity: .5;
     }
   }

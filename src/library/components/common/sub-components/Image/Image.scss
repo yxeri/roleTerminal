@@ -15,8 +15,8 @@
     text-decoration: none;
 
     svg {
-      max-width: $icon-size;
-      max-height: $icon-size;
+      max-width: var(--icon-size);
+      max-height: var(--icon-size);
       vertical-align: middle;
     }
   }
@@ -24,7 +24,7 @@
   .remove {
     position: absolute;
     right: 0;
-    text-shadow: $dark-text-shadow;
+    text-shadow: var(--dark-text-shadow);
   }
 
   img {
@@ -42,11 +42,11 @@
   height: 100%;
   grid-template-columns: 100%;
   grid-template-rows: 100%;
-  background-color: $modal-color;
+  background-color: var(--modal-color);
   display: grid;
   justify-items: center;
   align-items: center;
-  z-index: $dropdown-z-index;
+  z-index: var(--dropdown-z-index);
 
   div {
     right: 0;

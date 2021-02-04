@@ -1,9 +1,9 @@
 @import "../../../../../common";
 
 .Input {
-  padding: $padding;
+  padding: var(--padding);
   box-sizing: border-box;
-  background-color: $input-background-color;
-  color: $input-color;
-  border: $border;
+  background-color: var(--input-background-color);
+  color: var(--input-color);
+  border: var(--border);
 }

@@ -10,14 +10,14 @@
   }
 
   .List {
-    background-color: $light-background-color;
+    background-color: var(--light-background-color);
   }
 
   svg {
-    min-width: $icon-size;
-    min-height: $icon-size;
-    max-width: $icon-size;
-    max-height: $icon-size;
+    min-width: var(--icon-size);
+    min-height: var(--icon-size);
+    max-width: var(--icon-size);
+    max-height: var(--icon-size);
   }
 
   span {

@@ -4,7 +4,7 @@
   .contentContainer {
     > div {
       > p:first-child {
-        color: $color;
+        color: var(--color);
       }
     }
   }

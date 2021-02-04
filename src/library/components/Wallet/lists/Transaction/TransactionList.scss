@@ -3,6 +3,6 @@
 .TransactionList {
   height: 100%;
   overflow-y: auto;
-  max-width: $max-width;
-  padding-bottom: $padding;
+  max-width: var(--max-width);
+  padding-bottom: var(--padding);
 }

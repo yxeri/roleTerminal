@@ -2,7 +2,7 @@
 
 .ListItem {
   word-break: break-word;
-  padding: $padding $padding;
+  padding: var(--padding) var(--padding);
   box-sizing: border-box;
 
   .List {
@@ -13,14 +13,14 @@
     header {
       box-shadow: none;
       border: none;
-      color: $color;
+      color: var(--color);
     }
   }
 
   .spy, .lock {
     position: absolute;
-    right: $padding;
-    top: $padding;
+    right: var(--padding);
+    top: var(--padding);
 
     svg {
       opacity: .50;
@@ -30,14 +30,14 @@
   }
 
   .icon {
-    height: $item-icon-size;
-    width: $item-icon-size;
-    max-width: $item-icon-size;
-    max-height: $item-icon-size;
+    height: var(--item-icon-size);
+    width: var(--item-icon-size);
+    max-width: var(--item-icon-size);
+    max-height: var(--item-icon-size);
 
     svg {
-      height: $item-icon-size;
-      width: $item-icon-size;
+      height: var(--item-icon-size);
+      width: var(--item-icon-size);
       max-height: unset;
       max-width: unset;
       stroke-width: 2;
@@ -50,5 +50,5 @@
 }
 
 .ListItem.selected {
-  background-color: $selected;
+  background-color: var(--selected);
 }

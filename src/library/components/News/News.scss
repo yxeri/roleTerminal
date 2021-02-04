@@ -4,7 +4,7 @@
   .News {
     .NewsList {
       .upper {
-        top: $padding;
+        top: var(--padding);
       }
     }
   }

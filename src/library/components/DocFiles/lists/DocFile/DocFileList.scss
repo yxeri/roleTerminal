@@ -4,10 +4,10 @@
   height: 100%;
 
   .SearchItem {
-    background-color: $second-background-color;
+    background-color: var(--second-background-color);
   }
 
   .DocFileItem:nth-child(odd) {
-    background-color: $background-color;
+    background-color: var(--background-color);
   }
 }

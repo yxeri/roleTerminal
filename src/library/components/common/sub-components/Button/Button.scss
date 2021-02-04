@@ -6,35 +6,35 @@
   grid-auto-flow: column;
   align-items: center;
   justify-items: center;
-  grid-gap: $padding;
-  border: $border;
-  border-radius: $border-radius;
-  padding: $padding;
+  grid-gap: var(--padding);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  padding: var(--padding);
   box-sizing: border-box;
-  background-color: $light-background-color;
-  color: $second-color;
-  box-shadow: $shadow;
+  background-color: var(--light-background-color);
+  color: var(--second-color);
+  box-shadow: var(--shadow);
 
   > .Image {
     > img {
-      max-height: $icon-size;
-      max-width: $icon-size;
+      max-height: var(--icon-size);
+      max-width: var(--icon-size);
       vertical-align: middle;
     }
   }
 
   > svg {
-    max-height: $icon-size;
-    max-width: $icon-size;
+    max-height: var(--icon-size);
+    max-width: var(--icon-size);
     vertical-align: middle;
   }
 }
 
 .Button:disabled {
-  text-shadow: $warning-text-shadow;
-  background-color: $warning-background-color;
+  text-shadow: var(--warning-text-shadow);
+  background-color: var(--warning-background-color);
 }
 
 .Button.active {
-  color: $second-color !important;
+  color: var(--second-color) !important;
 }

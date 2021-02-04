@@ -7,6 +7,6 @@
   ul {
     width: 100%;
     overflow-y: auto;
-    grid-gap: $padding * 4;
+    grid-gap: calc(var(--padding) * 4);
   }
 }

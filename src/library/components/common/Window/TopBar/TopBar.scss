@@ -1,13 +1,13 @@
 @import "../../../../../common";
 
 .TopBar {
-  background-color: $color;
-  color: $background-color;
+  background-color: var(--color);
+  color: var(--background-color);
   font-weight: bold;
   text-transform: uppercase;
-  padding: 0 $padding;
+  padding: 0 var(--padding);
   cursor: move;
-  text-shadow: $text-shadow;
+  text-shadow: var(--text-shadow);
   display: grid;
   align-items: flex-end;
   grid-template-columns: auto fit-content(100%);
@@ -15,7 +15,7 @@
   .title {
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding;
+    grid-gap: var(--padding);
     align-items: center;
   }
 
@@ -33,7 +33,7 @@
     display: grid;
     grid-auto-columns: fit-content(0);
     grid-auto-flow: column;
-    grid-gap: #{$margin * 2};
+    grid-gap: calc(var(--margin) * 2);
     justify-items: flex-end;
 
     > .Button {
@@ -41,18 +41,18 @@
       border: none;
       box-shadow: none;
       padding: 0;
-      color: $background-color;
+      color: var(--background-color);
     }
 
     .close {
       svg {
-        max-height: $icon-size + .2em;
-        max-width: $icon-size + .2em;
+        max-height: calc(var(--icon-size) + .2em);
+        max-width: calc(var(--icon-size) + .2em);
       }
     }
   }
 
   > * {
-    padding-bottom: $padding;
+    padding-bottom: var(--padding);
   }
 }

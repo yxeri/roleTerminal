@@ -2,9 +2,9 @@
 
 .Select {
   min-width: 7em;
-  background-color: $input-background-color;
-  color: $background-color;
+  background-color: var(--input-background-color);
+  color: var(--background-color);
   scrollbar-width: none;
-  border: $border;
+  border: var(--border);
   width: 100%;
 }

@@ -1,15 +1,16 @@
 @import "../../../../../../common";
 
 .NewsItem {
-  padding: 0 $padding * 2 $padding * 2 $padding * 2;
+  padding: calc(var(--padding) * 2);
+  padding-top: 0;
 
   p {
-    max-width: $max-width;
+    max-width: var(--max-width);
   }
 
   .Image {
     max-width: 120px;
-    margin-right: $padding * 2;
+    margin-right: calc(var(--padding) * 2);
     float: left;
   }
 
@@ -20,23 +21,23 @@
   }
 
   .title {
-    padding-top: $padding * 2;
+    padding-top: calc(var(--padding) * 2);
   }
 
   .info {
-    margin-top: $padding;
+    margin-top: var(--padding);
     font-size: .9em;
 
     svg {
-      margin-left: $padding;
-      max-height: $icon-size;
-      max-width: $icon-size;
+      margin-left: var(--padding);
+      max-height: var(--icon-size);
+      max-width: var(--icon-size);
       vertical-align: text-top;
     }
   }
 
   .text {
-    margin-top: $margin * 2;
+    margin-top: calc(var(--margin) * 2);
   }
 
   .newsContent {
@@ -44,6 +45,6 @@
 }
 
 .NewsItem.expanded {
-  background-color: $selected;
-  border-radius: $border-radius;
+  background-color: var(--selected);
+  border-radius: var(--border-radius);
 }

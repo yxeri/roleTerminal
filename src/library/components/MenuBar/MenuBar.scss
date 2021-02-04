@@ -3,20 +3,20 @@
 #MenuBar {
   display: flex;
   flex-direction: row;
-  color: $second-color;
-  height: $menu-bar-height;
-  border-bottom: $border;
-  background-color: $light-background-color;
+  color: var(--second-color);
+  height: var(--menu-bar-height);
+  border-bottom: var(--border);
+  background-color: var(--light-background-color);
   box-sizing: border-box;
   align-items: flex-end;
-  box-shadow: $shadow;
-  z-index: $menu-bar-z-index;
-  margin-bottom: $padding / 2;
-  padding: 0 $padding;
+  box-shadow: var(--shadow);
+  z-index: var(--menu-bar-z-index);
+  margin-bottom: calc(var(--padding) / 2);
+  padding: 0 var(--padding);
 
   .MainList, .OpenApps > div, .rightAligned > div {
     .dropdown {
-      max-height: calc(100vh - #{2em + $padding});
+      max-height: calc(100vh - 2em + var(--padding));
       overflow-y: auto;
       scrollbar-width: none;
     }
@@ -29,21 +29,21 @@
 
     > header {
       svg {
-        max-height: $icon-size + .2em;
-        max-width: $icon-size + .2em;
+        max-height: calc(var(--icon-size) + .2em);
+        max-width: calc(var(--icon-size) + .2em);
       }
     }
   }
 
   > * {
-    margin-right: $margin * 2;
+    margin-right: calc(var(--margin) * 2);
   }
 
   .rightAligned {
     margin-left: auto;
     display: grid;
     grid-auto-flow: column;
-    grid-gap: $padding * 2;
+    grid-gap: calc(var(--padding) * 2);
     margin-right: 0;
 
     .IdentityPicker {
@@ -55,30 +55,30 @@
   }
 
   .helpOverlay {
-    top: $menu-bar-height;
-    height: calc(100% - #{$menu-bar-height});
+    top: var(--menu-bar-height);
+    height: calc(100% - var(--menu-bar-height));
   }
 }
 
 .miniMenu {
   position: absolute;
   right: 0;
-  top: $menu-bar-height + $menu-bar-height / 2;
-  z-index: $dropdown-z-index;
+  top: calc(var(--menu-bar-height) + var(--menu-bar-height) / 2);
+  z-index: var(--dropdown-z-index);
   opacity: .75;
 
   .Button {
     padding: 0;
 
     svg {
-      max-width: $icon-size - .2em;
-      max-height: $icon-size - .2em;
+      max-width: calc(var(--icon-size) - .2em);
+      max-height: calc(var(--icon-size) - .2em);
     }
   }
 }
 
 .miniMenu.minimize {
-  top: $menu-bar-height;
+  top: var(--menu-bar-height);
   z-index: 1;
   opacity: .5;
 
@@ -88,16 +88,16 @@
 }
 
 .warning {
-  background-color: $warning-background-color !important;
+  background-color: var(--warning-background-color) !important;
 }
 
 //@media (orientation: landscape) {
 //  #MenuBar {
 //    flex-direction: column;
 //    border-bottom: none;
-//    border-right: $border;
+//    border-right: var(--border);
 //    height: 100%;
-//    width: $menu-bar-height;
+//    width: var(--menu-bar-height);
 //
 //    .rightAligned {
 //      grid-auto-flow: row;

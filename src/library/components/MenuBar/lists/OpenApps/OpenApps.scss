@@ -3,7 +3,7 @@
 .OpenApps {
   display: grid;
   grid-auto-flow: column;
-  grid-gap: $padding * 2;
+  grid-gap: calc(var(--padding) * 2);
 
   .Button {
     border: none;
@@ -16,25 +16,25 @@
     }
 
     > ul {
-      padding: $padding * 2;
+      padding: calc(var(--padding) * 2);
       grid-auto-flow: row;
       grid-template-columns: repeat(4, 1fr);
-      grid-column-gap: $padding * 2;
-      grid-row-gap: $padding * 4;
+      grid-column-gap: calc(var(--padding) * 2);
+      grid-row-gap: calc(var(--padding) * 4);
       justify-items: center;
       min-width: 20em;
       max-width: 30em;
 
       svg {
-        max-width: $icon-size + .3em;
-        max-height: $icon-size + .3em;
+        max-width: calc(var(--icon-size) + .3em);
+        max-height: calc(var(--icon-size) + .3em);
       }
     }
 
     .ListItem {
       display: grid;
       grid-auto-rows: fit-content(100%);
-      grid-gap: $padding;
+      grid-gap: var(--padding);
       justify-items: center;
       text-align: center;
 

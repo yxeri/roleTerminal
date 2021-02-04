@@ -5,15 +5,15 @@
   grid-template-rows: fit-content(100%) auto;
   position: sticky;
   bottom: 0;
-  background-color: $second-background-color;
-  min-height: calc(#{1.55em + $padding * 2});
-  margin-top: $padding;
-  padding-bottom: $padding / 2;
+  background-color: var(--second-background-color);
+  min-height: calc(1.55em + var(--padding) * 2);
+  margin-top: var(--padding);
+  padding-bottom: calc(var(--padding) / 2);
 
   .input {
     display: flex;
     width: 100%;
-    max-width: $max-width;
+    max-width: var(--max-width);
     overflow: visible;
 
     .Textarea {
@@ -21,10 +21,10 @@
 
       textarea {
         border-bottom: none;
-        box-shadow: $shadow;
-        background-color: $light-background-color;
-        color: $second-color;
-        padding: $padding;
+        box-shadow: var(--shadow);
+        background-color: var(--light-background-color);
+        color: var(--second-color);
+        padding: var(--padding);
         flex-grow: 1;
         border-radius: 0;
         box-sizing: border-box;
@@ -51,7 +51,7 @@
         max-height: 120px;
         max-width: 120px;
         bottom: 100%;
-        border: $border;
+        border: var(--border);
       }
     }
 

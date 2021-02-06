@@ -1,3 +1,4 @@
+import { bool } from 'prop-types';
 import React, {
   useCallback,
   useEffect,
@@ -11,7 +12,7 @@ import { getTimestamp } from '../../../../TextTools';
 
 import './Clock.scss';
 
-const Clock = () => {
+const Clock = ({ alwaysShow }) => {
   const timeoutRef = useRef();
   const [date, setDate] = useState(new Date());
   const [showTime, setShowTime] = useState(false);
@@ -37,10 +38,18 @@ const Clock = () => {
       key="clock"
       className="Clock"
     >
-      <Button className={`icon ${showTime ? 'active' : ''}`} onClick={onClick}><ClockSvg /></Button>
-      <Button onClick={onClick} className={`time ${!showTime ? 'hide' : ''}`}>{timestamp.fullTime}</Button>
+      {!alwaysShow && <Button className={`icon ${showTime ? 'active' : ''}`} onClick={onClick}><ClockSvg /></Button>}
+      <Button onClick={onClick} className={`time ${!showTime && !alwaysShow ? 'hide' : ''}`}>{timestamp.fullTime}</Button>
     </div>
   );
 };
 
 export default React.memo(Clock);
+
+Clock.propTypes = {
+  alwaysShow: bool,
+};
+
+Clock.defaultProps = {
+  alwaysShow: undefined,
+};

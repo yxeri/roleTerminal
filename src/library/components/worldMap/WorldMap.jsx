@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { number, string } from 'prop-types';
+import FileMenu from '../common/lists/FileMenu/FileMenu';
 import Window from '../common/Window/Window';
 import MapView from './views/MapView';
 import Positions from './views/Positions';
@@ -21,15 +22,14 @@ const WorldMap = ({ id, index }) => {
       index={index}
       done={() => store.dispatch(removeWindow({ id }))}
       className="WorldMap"
-      title={(
-        <>
-          <Map />
-          <span>Map</span>
-        </>
-      )}
+      title={<span>Map</span>}
       onClick={onClick}
       menu={(
         <>
+          <FileMenu
+            menuIcon={<Map />}
+            id={id}
+          />
           <Positions />
         </>
       )}

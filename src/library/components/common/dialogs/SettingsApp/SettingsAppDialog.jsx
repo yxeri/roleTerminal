@@ -23,7 +23,7 @@ const SettingsAppDialog = ({
   id,
   index,
   windowType,
-  inputs,
+  inputs = [],
 }) => {
   const currentUser = useSelector(getCurrentUser);
   const formMethods = useForm();
@@ -61,7 +61,7 @@ const SettingsAppDialog = ({
       index={index}
       className="SettingsAppDialog configDialog"
       onClick={() => {
-        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: `${WindowTypes.DIALOGAPPSETTINGS} ${windowType}` } }] }));
+        store.dispatch(changeWindowOrder({ windows: [{ id, value: { type: `${WindowTypes.DIALOGAPPSETTINGS}-${windowType}` } }] }));
       }}
       done={() => store.dispatch(removeWindow({ id }))}
       error={error}
@@ -134,5 +134,5 @@ SettingsAppDialog.propTypes = {
 };
 
 SettingsAppDialog.defaultProps = {
-  inputs: undefined,
+  inputs: [],
 };

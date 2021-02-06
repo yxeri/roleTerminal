@@ -17,7 +17,7 @@ import { ReactComponent as File } from '../../../../icons/file.svg';
 import { ReactComponent as Files } from '../../../../icons/files.svg';
 import { ReactComponent as News } from '../../../../icons/news.svg';
 import { ReactComponent as Layers } from '../../../../icons/layers.svg';
-import { ReactComponent as Grid } from '../../../../icons/grid.svg';
+import { ReactComponent as Apps } from '../../../../icons/apps.svg';
 import { ReactComponent as Users } from '../../../../icons/users.svg';
 import { ReactComponent as Team } from '../../../../icons/team.svg';
 import { ReactComponent as Terminal } from '../../../../icons/terminal.svg';
@@ -88,12 +88,7 @@ const OpenApps = () => {
       <List
         dropdown
         className="apps"
-        title={(
-          <>
-            <Grid />
-            <span>Apps</span>
-          </>
-        )}
+        title={<Apps />}
       >
         <ListItem key="chat">
           <Button

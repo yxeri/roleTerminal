@@ -1,58 +1,80 @@
 @import "../../../../../common";
 
 .TopBar {
-  background-color: var(--color);
-  color: var(--background-color);
+  color: var(--second-color);
   font-weight: bold;
-  text-transform: uppercase;
-  padding: 0 var(--padding);
+  padding-top: var(--padding);
+  padding-right: calc(var(--padding) * 2);
+  padding-left: calc(var(--padding) * 2);
   cursor: move;
   text-shadow: var(--text-shadow);
   display: grid;
   align-items: flex-end;
-  grid-template-columns: auto fit-content(100%);
+  grid-template-columns: fit-content(0) auto fit-content(0);
+  grid-gap: calc(var(--padding) * 2);
+  border-bottom: var(--dark-border);
+
+  .Button, header {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--background-color);
+  }
 
   .title {
     display: grid;
     grid-auto-flow: column;
     grid-gap: var(--padding);
     align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-transform: uppercase;
   }
 
-  .TopBarHandle {
+  .dragHandle {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     text-align: center;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     height: 100%;
   }
 
-  .buttons {
-    display: grid;
-    grid-auto-columns: fit-content(0);
-    grid-auto-flow: column;
-    grid-gap: calc(var(--margin) * 2);
-    justify-items: flex-end;
-
-    > .Button {
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0;
-      color: var(--background-color);
-    }
-
-    .close {
-      svg {
-        max-height: calc(var(--icon-size) + .2em);
-        max-width: calc(var(--icon-size) + .2em);
-      }
+  .buttons, .menu .List > header {
+    svg {
+      color: var(--second-color);
+      max-height: calc(var(--icon-size) + .2em);
+      max-width: calc(var(--icon-size) + .2em);
     }
   }
 
-  > * {
-    padding-bottom: var(--padding);
+  .menu, .buttons {
+    display: grid;
+    grid-auto-columns: fit-content(0);
+    grid-auto-flow: column;
+    grid-gap: calc(var(--padding) * 2);
+    justify-items: flex-end;
+  }
+
+  .menu {
+    grid-gap: calc(var(--padding) * 2);
+  }
+
+  .dropdown {
+    left: 0;
+    width: 100%;
+    max-height: calc(100% - 1em);
+  }
+
+  .close {
+    justify-content: center;
+    align-content: center;
+    padding: 0;
+
+    svg {
+      max-height: calc(var(--icon-size) + .4em);
+      max-width: calc(var(--icon-size) + .4em);
+    }
   }
 }

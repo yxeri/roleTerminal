@@ -35,6 +35,11 @@
     max-width: var(--item-icon-size);
     max-height: var(--item-icon-size);
 
+    img, svg {
+      height: var(--item-icon-size);
+      width: var(--item-icon-size);
+    }
+
     svg {
       height: var(--item-icon-size);
       width: var(--item-icon-size);

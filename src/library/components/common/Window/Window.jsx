@@ -120,7 +120,7 @@ const Window = ({
       maxWidth="100%"
       maxHeight="calc(100%)"
       bounds="#MainWindow"
-      dragHandleClassName="TopBarHandle"
+      dragHandleClassName="dragHandle"
       enableResizing={resizing}
       resizeHandleStyles={{
         left: { left: 0, width: '10px' },
@@ -194,27 +194,29 @@ const Window = ({
         className={`Window ${className}`}
       >
         {
-          !hideTopBar
+          !hideTopBar || type === 'dialog'
             ? (
               <TopBar
+                type={type}
                 maximized={size.width === '100%' && size.height === '100%'}
                 id={id}
                 done={done}
                 title={title}
                 onDoubleClick={onDoubleClick}
+                menu={menu}
               />
             )
             : (<div />)
         }
         <div className="windowBox">
-          {
-            menu
-            && (
-              <div className="menu">
-                {menu}
-              </div>
-            )
-          }
+          {/*{*/}
+          {/*  menu*/}
+          {/*  && (*/}
+          {/*    <div className="menu">*/}
+          {/*      {menu}*/}
+          {/*    </div>*/}
+          {/*  )*/}
+          {/*}*/}
           <div className="content">
             {children}
             {help && (<Help id={id}>{help}</Help>)}

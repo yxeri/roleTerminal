@@ -15,9 +15,10 @@
   --light-background-color: #370087;
   --input-background-color: #a2fffd;
   --input-color: #13002d;
-  --margin: .2em;
-  --padding: var(--margin);
-  --min-width: 320px;
+  --padding: .2em;
+  --padding-thick: calc(var(--padding) * 2);
+  --padding-thicker: calc(var(--padding) * 4);
+  --active-shadow: 0 0 10px 0 rgba(255, 255, 255, 1);
   --shadow: 0 0 10px 0 rgba(255, 0, 241, 0.54);
   --second-shadow: 0 0 8px 0 rgba(0, 246, 255, 0.54);
   --shadow-upwards: 1px -4px 8px 0 rgba(255, 0, 241, 0.15);
@@ -30,13 +31,15 @@
   --warning-shadow: 0 0 8px 0 rgba(124, 0, 0, 1);
   --warning-text-shadow: 0px 0px 4px rgb(0, 0, 0);
   --dark-text-shadow: 0px 0px 4px rgb(0, 0, 0);
-  --max-width: 80ch;
-  --dropdown-z-index: 22;
-  --dialog-z-index: 20;
-  --menu-bar-z-index: 21;
   --icon-size: 1.2em;
   --selected: rgba(0, 246, 255, 0.20);
   --item-icon-size: 30px;
+
+  --dropdown-z-index: 22;
+  --dialog-z-index: 20;
+  --menu-bar-z-index: 21;
+  --min-width: 320px;
+  --max-width: 80ch;
 }
 
 .cyber1 {
@@ -54,8 +57,6 @@
   --light-background-color: #220622;
   --input-background-color: #a2fffd;
   --input-color: #13002d;
-  --margin: .2em;
-  --padding: var(--margin);
   --min-width: 320px;
   --shadow: 0 0 4px 0 rgb(128, 94, 0);
   --second-shadow: 0 0 8px 0 rgba(0, 246, 255, 0.54);
@@ -69,7 +70,6 @@
   --warning-shadow: 0 0 8px 0 rgba(124, 0, 0, 1);
   --warning-text-shadow: 0px 0px 4px rgb(0, 0, 0);
   --dark-text-shadow: 0px 0px 4px rgb(0, 0, 0);
-  --max-width: 80ch;
   --dropdown-z-index: 22;
   --dialog-z-index: 20;
   --menu-bar-z-index: 21;

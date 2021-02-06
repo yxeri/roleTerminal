@@ -150,7 +150,6 @@ const List = React.forwardRef(({
           onClick={() => {
             if (!alwaysExpanded) {
               setHidden(!hidden);
-
             }
           }}
         >

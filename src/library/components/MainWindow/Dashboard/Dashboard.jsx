@@ -1,11 +1,23 @@
 import React from 'react';
 
 import { useSelector } from 'react-redux';
-import { getIdentityOrTeamName, getIsAnonymous } from '../../../redux/selectors/users';
+import { AccessLevels } from '../../../AccessCentral';
+import { ReactComponent as QR } from '../../../icons/qr-code.svg';
+import {
+  MessageTypes,
+  postMessage
+} from '../../../Messenger';
+import {
+  getCurrentAccessLevel,
+  getIdentityOrTeamName,
+  getIsAnonymous,
+} from '../../../redux/selectors/users';
 import { getWalletById } from '../../../redux/selectors/wallets';
-import { getNews, getNewsIdsPoints } from '../../../redux/selectors/messages';
+import { getNewsIdsPoints } from '../../../redux/selectors/messages';
+import IdentityPicker from '../../common/lists/IdentityPicker/IdentityPicker';
 import List from '../../common/lists/List/List';
 import ListItem from '../../common/lists/List/Item/ListItem';
+import Button from '../../common/sub-components/Button/Button';
 import NewsItem from './Item/NewsItem';
 import { getHideMenu } from '../../../redux/selectors/interfaceConfig';
 import OpenApps from '../../MenuBar/lists/OpenApps/OpenApps';
@@ -18,6 +30,7 @@ import { getCurrentIdentityId } from '../../../redux/selectors/userId';
 import './Dashboard.scss';
 
 const Dashboard = () => {
+  const accessLevel = useSelector(getCurrentAccessLevel);
   const identityId = useSelector(getCurrentIdentityId);
   const isAnonymous = useSelector(getIsAnonymous);
   const { name } = useSelector((state) => getIdentityOrTeamName(state, { id: identityId }));
@@ -60,6 +73,17 @@ const Dashboard = () => {
         <div className="nav">
           <MainList />
           <OpenApps />
+          {window.ReactNativeWebView && (
+            <Button
+              type="button"
+              onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
+            >
+              <QR />
+            </Button>
+          )}
+          {accessLevel >= AccessLevels.STANDARD && (
+            <IdentityPicker hideOnSingle={false} />
+          )}
           <Clock />
         </div>
       )}

@@ -1,6 +1,6 @@
 {
   "name": "roleterminal",
-  "version": "2.0.32",
+  "version": "2.0.33",
   "description": "In-game tool/game for use at larps.",
   "author": "Carmilla Mina Jankovic <carmillam@icloud.com>",
   "private": true,
@@ -23,8 +23,7 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "rolehaven": "git://github.com/yxeri/roleHaven.git#develop",
-    "seamless-scroll-polyfill": "^1.2.3",
-    "uuid": "^8.3.2"
+    "seamless-scroll-polyfill": "^1.2.3"
   },
   "scripts": {
     "dev": "NODE_ENV=development MODE=dev JSONKEY=dev USERVERIFY=false CHOKIDAR_USEPOLLING=true node app & react-scripts start",

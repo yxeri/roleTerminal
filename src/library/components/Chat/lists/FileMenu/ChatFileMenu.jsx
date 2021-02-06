@@ -10,9 +10,10 @@ import FileMenu from '../../../common/lists/FileMenu/FileMenu';
 import { getRoomById } from '../../../../redux/selectors/rooms';
 import { getCurrentUser } from '../../../../redux/selectors/users';
 import { hasAccessTo } from '../../../../AccessCentral';
-import { ReactComponent as Edit } from '../../../../icons/edit.svg';
+import { ReactComponent as Tool } from '../../../../icons/tool.svg';
 import { ReactComponent as Plus } from '../../../../icons/plus.svg';
 import { ReactComponent as LogOut } from '../../../../icons/log-out.svg';
+import { ReactComponent as ChatIcon } from '../../../../icons/chat.svg';
 
 const ChatFileMenu = ({ id, roomId }) => {
   const currentUser = useSelector(getCurrentUser);
@@ -26,24 +27,30 @@ const ChatFileMenu = ({ id, roomId }) => {
   });
 
   return (
-    <FileMenu key="fileMenu" id={id}>
-      <ListItem
-        stopPropagation
-        key="createRoom"
-        onClick={onCreateRoom}
-      >
-        <Plus />
-        New room
-      </ListItem>
+    <FileMenu
+      menuIcon={<ChatIcon />}
+      key="fileMenu"
+      id={id}
+    >
       {!currentUser.isAnonymous && (
-        <ListItem
-          stopPropagation
-          key="configRoom"
-          onClick={() => {}}
-        >
-          <Edit />
-          Manage room
-        </ListItem>
+        <>
+          <ListItem
+            stopPropagation
+            key="createRoom"
+            onClick={onCreateRoom}
+          >
+            <Plus />
+            New room
+          </ListItem>
+          <ListItem
+            stopPropagation
+            key="configRoom"
+            onClick={() => {}}
+          >
+            <Tool />
+            {`${room.roomName} settings`}
+          </ListItem>
+        </>
       )}
       {room && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
         <ListItem
@@ -51,7 +58,7 @@ const ChatFileMenu = ({ id, roomId }) => {
           onClick={() => {}}
         >
           <LogOut />
-          Leave room
+          {`Leave ${room.roomName}`}
         </ListItem>
       )}
       {hasFullAccess && room && !room.isWhisper && !room.isUser && !room.isSystemRoom && !room.isTeam && (
@@ -60,7 +67,7 @@ const ChatFileMenu = ({ id, roomId }) => {
           key="removeRoom"
           onClick={() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGREMOVEROOM, value: { type: WindowTypes.DIALOGREMOVEROOM, roomId } }] }))}
         >
-          Delete room
+          {`Delete ${room.roomName}`}
         </ListItem>
       )}
     </FileMenu>

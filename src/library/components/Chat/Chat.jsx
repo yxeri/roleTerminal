@@ -81,12 +81,7 @@ const Chat = ({
       index={index}
       done={onDone}
       className="Chat"
-      title={(
-        <>
-          <ChatIcon />
-          <span>{title}</span>
-        </>
-      )}
+      title={<span>{title}</span>}
       onClick={onClick}
       menu={(
         <>

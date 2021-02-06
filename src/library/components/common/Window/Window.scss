@@ -21,7 +21,7 @@
     .windowBox {
       overflow: hidden;
       display: grid;
-      grid-template-rows: fit-content(0) auto;
+      //grid-template-rows: fit-content(0) auto;
       grid-template-columns: 100%;
       height: 100%;
       position: relative;
@@ -38,8 +38,8 @@
         padding: 0 var(--padding);
 
         > .List {
-          margin-bottom: var(--margin);
-          margin-right: var(--margin);
+          margin-bottom: var(--padding);
+          margin-right: var(--padding);
           flex-grow: 1;
 
           > header {
@@ -53,7 +53,7 @@
           .dropdown {
             left: 0;
             width: 100%;
-            max-height: calc(100% - 1em + var(--margin) * 4);
+            max-height: calc(100% - 1em);
           }
         }
 
@@ -79,7 +79,7 @@
   .Chat, .Wallet, .WorldMap {
     .windowBox {
       grid-template-rows: 1fr;
-      grid-template-columns: fit-content(100%) auto;
+      // grid-template-columns: fit-content(100%) auto;
       grid-gap: var(--padding);
 
       .InputArea {
@@ -89,7 +89,7 @@
       .menu {
         display: grid;
         grid-auto-rows: fit-content(100%);
-        grid-gap: var(--margin);
+        grid-gap: var(--padding);
         height: 100%;
         scrollbar-width: none;
         overflow: hidden;
@@ -125,11 +125,11 @@
         }
 
         > .List:first-child {
-          margin-top: var(--margin);
+          margin-top: var(--padding);
         }
 
         > .List:last-child {
-          margin-bottom: var(--margin);
+          margin-bottom: var(--padding);
         }
 
         .expanded {

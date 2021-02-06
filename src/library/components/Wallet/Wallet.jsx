@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
+import FileMenu from '../common/lists/FileMenu/FileMenu';
 
 import Window from '../common/Window/Window';
 import TransactionList from './lists/Transaction/TransactionList';
@@ -38,15 +39,14 @@ const Wallet = ({ id, index }) => {
       className="Wallet"
       index={index}
       done={onDone}
-      title={(
-        <>
-          <WalletIcon />
-          <span>{`${name ? `${name}` : 'all'}`}</span>
-        </>
-      )}
+      title={<span>{`${name ? `${name}` : 'all'}`}</span>}
       onClick={onClick}
       menu={(
         <>
+          <FileMenu
+            menuIcon={<WalletIcon />}
+            id={id}
+          />
           <WalletList key="walletList" onChange={onChange} walletId={walletId} />
           <IdentityList key="identityList" />
           {accessLevel >= AccessLevels.MODERATOR && (

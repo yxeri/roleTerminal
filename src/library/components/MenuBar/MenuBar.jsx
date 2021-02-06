@@ -88,18 +88,18 @@ const MenuBar = () => {
               >
                 <MainList key="mainList" />
                 <OpenApps key="openApps" />
+                {window.ReactNativeWebView && (
+                  <Button
+                    type="button"
+                    onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
+                  >
+                    <QR />
+                  </Button>
+                )}
+                {accessLevel >= AccessLevels.STANDARD && (
+                  <IdentityPicker hideOnSingle={false} />
+                )}
                 <div className="rightAligned">
-                  {window.ReactNativeWebView && (
-                    <Button
-                      type="button"
-                      onClick={() => postMessage({ type: MessageTypes.QR, data: {} })}
-                    >
-                      <QR />
-                    </Button>
-                  )}
-                  {accessLevel >= AccessLevels.STANDARD && (
-                    <IdentityPicker hideOnSingle={false} />
-                  )}
                   {!systemConfig.hideHelp && (
                     <Button
                       type="button"
@@ -163,7 +163,7 @@ const MenuBar = () => {
                   </div>
                 )}
               </div>
-              {accessLevel >= AccessLevels.STANDARD && (
+              {systemConfig.hideMenuBar && accessLevel >= AccessLevels.STANDARD && (
                 <div className={`miniMenu minimize ${systemConfig.hideMenuBar ? 'hideOn' : ''}`}>
                   <Button
                     type="button"

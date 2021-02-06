@@ -28,7 +28,7 @@ const News = ({ id, messageId, index }) => {
   const onCreateNews = useCallback(() => store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGCREATENEWS, value: { type: WindowTypes.DIALOGCREATENEWS } }] })), []);
 
   const onSettings = useCallback(() => {
-    store.dispatch(changeWindowOrder({ windows: [{ id: WindowTypes.DIALOGSETTINGSNEWS, value: { type: WindowTypes.DIALOGSETTINGSNEWS } }] }));
+    store.dispatch(changeWindowOrder({ windows: [{ id: `${WindowTypes.DIALOGAPPSETTINGS}-${id}`, value: { type: `${WindowTypes.DIALOGAPPSETTINGS}-${id}` } }] }));
   }, [id]);
 
   return (
@@ -37,19 +37,15 @@ const News = ({ id, messageId, index }) => {
       index={index}
       done={onDone}
       className="News"
-      title={(
-        <>
-          <NewsIcon />
-          <span>News</span>
-        </>
-      )}
+      title={<span>News</span>}
       onClick={onClick}
       menu={(
         <>
           <FileMenu
+            menuIcon={<NewsIcon />}
             key="fileMenu"
             id={id}
-            onSettings={onSettings}
+            // onSettings={onSettings}
           >
             {newsRoom && (
               <ListItem

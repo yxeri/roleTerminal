@@ -21,7 +21,7 @@ import { getDisallowProfileEdit, getGpsTracking, getPermissions } from '../../..
 import { getPositionById } from '../../../../redux/selectors/positions';
 import { ReactComponent as Pin } from '../../../../icons/pin.svg';
 import { ReactComponent as Admin } from '../../../../icons/admin.svg';
-import { ReactComponent as Edit } from '../../../../icons/edit.svg';
+import { ReactComponent as Tool } from '../../../../icons/tool.svg';
 import ImageUpload from '../../sub-components/ImageUpload/ImageUpload';
 import Input from '../../sub-components/Input/Input';
 import PronounsSelect, { Pronouns } from '../../sub-components/selects/PronounsSelect';
@@ -156,7 +156,7 @@ const ProfileDialog = ({
         onClick={() => setEditing(true)}
       >
         {identityId && (<Admin />)}
-        {!identityId && (<Edit />)}
+        {!identityId && (<Tool />)}
         Edit
       </Button>
     ));

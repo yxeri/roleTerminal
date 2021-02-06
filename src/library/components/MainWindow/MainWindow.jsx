@@ -124,7 +124,7 @@ const MainWindow = () => {
 
         break;
       }
-      case WindowTypes.DIALOGSETTINGSNEWS: {
+      case `${WindowTypes.DIALOGAPPSETTINGS}-${WindowTypes.NEWS}`: {
         windows.push(<SettingsNewsDialog key={key} id={key} index={value.index} />);
 
         break;

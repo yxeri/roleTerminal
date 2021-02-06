@@ -1,7 +1,9 @@
 @import "../../../../../common";
 
 .Textarea {
-  background-color: var(--input-background-color);
-  color: var(--background-color);
-  border: var(--border);
+  textarea {
+    background-color: var(--input-background-color);
+    color: var(--background-color);
+    border: var(--border);
+  }
 }

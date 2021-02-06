@@ -10,7 +10,7 @@ import FollowingList from '../lists/Following/FollowingList';
 import { getCurrentAccessLevel } from '../../../redux/selectors/users';
 import AdminWhisperList from '../lists/AdminWhisper/AdminWhisperList';
 import List from '../../common/lists/List/List';
-import { ReactComponent as Chat } from '../../../icons/chat.svg';
+import { ReactComponent as Edit } from '../../../icons/edit.svg';
 
 import './Rooms.scss';
 import ListItem from '../../common/lists/List/Item/ListItem';
@@ -23,7 +23,7 @@ const Rooms = ({ onChange, roomId }) => {
       <List
         dropdown
         checkWidth
-        title={<Chat />}
+        title={<Edit />}
         className="rooms"
       >
         <ListItem>
@@ -53,14 +53,14 @@ const Rooms = ({ onChange, roomId }) => {
             />
           </ListItem>
         )}
+        {accessLevel >= AccessLevels.MODERATOR && (
+          <AdminWhisperList
+            roomId={roomId}
+            key="adminWhisper"
+            onChange={onChange}
+          />
+        )}
       </List>
-      {accessLevel >= AccessLevels.MODERATOR && (
-        <AdminWhisperList
-          roomId={roomId}
-          key="adminWhisper"
-          onChange={onChange}
-        />
-      )}
       <UserList
         onDone={onChange}
         key="user"

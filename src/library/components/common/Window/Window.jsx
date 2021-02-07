@@ -11,9 +11,14 @@ import {
   node, number,
 } from 'prop-types';
 import { useSelector } from 'react-redux';
+import { useResizeDetector } from 'react-resize-detector';
 
 import TopBar from './TopBar/TopBar';
-import { getAlwaysMaximized, getHideTopBar } from '../../../redux/selectors/users';
+import {
+  getAlwaysCompactMenu,
+  getAlwaysMaximized,
+  getHideTopBar,
+} from '../../../redux/selectors/users';
 import Help from '../sub-components/Help/Help';
 
 import './Window.scss';
@@ -30,9 +35,11 @@ const Window = ({
   title = 'app',
   className = '',
 }) => {
+  const { width, ref: resizeRef } = useResizeDetector();
   const rndRef = useRef();
   const hideTopBar = useSelector(getHideTopBar);
   const alwaysMaximized = useSelector(getAlwaysMaximized);
+  const alwaysCompactMenu = useSelector(getAlwaysCompactMenu)
   const defaultSize = type === 'window' ? { width: 380, height: 340 } : { width: 380, height: 340 };
   const [size, setSize] = useState(defaultSize);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -191,8 +198,14 @@ const Window = ({
       }}
     >
       <div
-        className={`Window ${className}`}
+        ref={resizeRef}
+        className={`Window ${className} ${!alwaysCompactMenu && width >= 600 ? 'wide' : ''} ${menu ? 'hasMenu' : ''}`}
       >
+        {menu && !alwaysCompactMenu && width >= 600 && (
+          <div className="menu">
+            {menu}
+          </div>
+        )}
         {
           !hideTopBar || type === 'dialog'
             ? (
@@ -204,19 +217,12 @@ const Window = ({
                 title={title}
                 onDoubleClick={onDoubleClick}
                 menu={menu}
+                isWide={!alwaysCompactMenu && width >= 600}
               />
             )
             : (<div />)
         }
         <div className="windowBox">
-          {/*{*/}
-          {/*  menu*/}
-          {/*  && (*/}
-          {/*    <div className="menu">*/}
-          {/*      {menu}*/}
-          {/*    </div>*/}
-          {/*  )*/}
-          {/*}*/}
           <div className="content">
             {children}
             {help && (<Help id={id}>{help}</Help>)}

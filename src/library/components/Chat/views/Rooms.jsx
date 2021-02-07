@@ -24,6 +24,7 @@ const Rooms = ({ onChange, roomId }) => {
         dropdown
         checkWidth
         title={<Edit />}
+        wideTitle="Rooms"
         className="rooms"
       >
         <ListItem>
@@ -54,11 +55,13 @@ const Rooms = ({ onChange, roomId }) => {
           </ListItem>
         )}
         {accessLevel >= AccessLevels.MODERATOR && (
-          <AdminWhisperList
-            roomId={roomId}
-            key="adminWhisper"
-            onChange={onChange}
-          />
+          <ListItem>
+            <AdminWhisperList
+              roomId={roomId}
+              key="adminWhisper"
+              onChange={onChange}
+            />
+          </ListItem>
         )}
       </List>
       <UserList

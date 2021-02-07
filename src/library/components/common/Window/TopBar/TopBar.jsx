@@ -29,6 +29,7 @@ const TopBar = ({
   menu,
   type,
   maximized,
+  isWide,
 }) => {
   const systemConfig = useSelector(getSystemConfig);
   const mode = useSelector(getMode);
@@ -50,7 +51,7 @@ const TopBar = ({
       className="TopBar"
     >
       <div className="menu">
-        {menu}
+        {!isWide && menu}
       </div>
       <div
         onDoubleClick={onDoubleClick}
@@ -94,6 +95,7 @@ TopBar.propTypes = {
   menu: node,
   type: string.isRequired,
   maximized: bool.isRequired,
+  isWide: bool.isRequired,
 };
 
 TopBar.defaultProps = {

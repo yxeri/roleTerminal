@@ -80,6 +80,7 @@ const IdentityList = ({ dropdown = true }) => {
       checkWidth={dropdown}
       className="IdentityList"
       title={<Users />}
+      wideTitle="Users"
     >
       <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by name" />
       {

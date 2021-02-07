@@ -23,7 +23,7 @@ const AdminWhisperList = ({ onChange, roomId }) => {
       title={(
         <>
           <Admin />
-          <span>PM</span>
+          <span>DM</span>
         </>
       )}
     >

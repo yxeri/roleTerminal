@@ -61,6 +61,14 @@
     grid-auto-flow: column;
     grid-gap: calc(var(--padding) * 2);
     margin-right: 0;
+
+    .Clock {
+      .time {
+        background-color: var(--light-background-color);
+        border-bottom: var(--border);
+        border-left: var(--border);
+      }
+    }
   }
 
   .helpOverlay {

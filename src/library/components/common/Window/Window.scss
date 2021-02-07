@@ -21,7 +21,6 @@
     .windowBox {
       overflow: hidden;
       display: grid;
-      //grid-template-rows: fit-content(0) auto;
       grid-template-columns: 100%;
       height: 100%;
       position: relative;
@@ -73,71 +72,130 @@
       }
     }
   }
-}
 
-.rnd[min-width~="600px"] {
-  .Chat, .Wallet, .WorldMap {
-    .windowBox {
-      grid-template-rows: 1fr;
-      // grid-template-columns: fit-content(100%) auto;
+  .Window.wide.hasMenu {
+    grid-template-columns: fit-content(100%) auto;
+    grid-column-gap: calc(var(--padding) * 2);
+
+    .menu {
+      display: grid;
+      grid-auto-rows: fit-content(100%);
       grid-gap: var(--padding);
+      height: 100%;
+      scrollbar-width: none;
+      overflow: hidden;
+      padding: 0;
+      grid-row: 1 / 3;
 
-      .InputArea {
-        padding-left: 0;
+      > .List {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        flex-grow: inherit;
+        overflow: hidden;
+        width: 11em;
+        max-width: 100%;
+        padding-left: var(--padding);
+
+        > header {
+          border-top-left-radius: var(--border-radius);
+          border-top-right-radius: var(--border-radius);
+          border-top: var(--border);
+          justify-content: flex-start;
+        }
+
+        .dropdown {
+          left: inherit;
+          width: initial;
+          max-height: 100%;
+        }
+
+        ul {
+          position: relative;
+          box-shadow: none;
+        }
       }
 
-      .menu {
-        display: grid;
-        grid-auto-rows: fit-content(100%);
-        grid-gap: var(--padding);
-        height: 100%;
-        scrollbar-width: none;
-        overflow: hidden;
-        padding: 0;
+      > .List:first-child {
+        margin-top: var(--padding);
+      }
 
-        > .List {
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          flex-grow: inherit;
-          overflow: hidden;
-          width: 11em;
-          max-width: 100%;
-          padding-left: var(--padding);
+      > .List:last-child {
+        margin-bottom: var(--padding);
+      }
 
-          > header {
-            border-top-left-radius: var(--border-radius);
-            border-top-right-radius: var(--border-radius);
-            border-top: var(--border);
-            justify-content: flex-start;
-          }
-
-          .dropdown {
-            left: inherit;
-            width: initial;
-            max-height: 100%;
-          }
-
-          ul {
-            position: relative;
-            box-shadow: none;
-          }
-        }
-
-        > .List:first-child {
-          margin-top: var(--padding);
-        }
-
-        > .List:last-child {
-          margin-bottom: var(--padding);
-        }
-
-        .expanded {
-          ul {
-            border-top-right-radius: 0;
-          }
+      .expanded {
+        ul {
+          border-top-right-radius: 0;
         }
       }
     }
   }
 }
+//
+//.rnd[min-width~="600px"] {
+//  .Chat, .Wallet, .WorldMap {
+//    .windowBox {
+//      grid-template-rows: 1fr;
+//      // grid-template-columns: fit-content(100%) auto;
+//      grid-gap: var(--padding);
+//
+//      .InputArea {
+//        padding-left: 0;
+//      }
+//
+//      .menu {
+//        display: grid;
+//        grid-auto-rows: fit-content(100%);
+//        grid-gap: var(--padding);
+//        height: 100%;
+//        scrollbar-width: none;
+//        overflow: hidden;
+//        padding: 0;
+//
+//        > .List {
+//          margin: 0;
+//          display: flex;
+//          flex-direction: column;
+//          flex-grow: inherit;
+//          overflow: hidden;
+//          width: 11em;
+//          max-width: 100%;
+//          padding-left: var(--padding);
+//
+//          > header {
+//            border-top-left-radius: var(--border-radius);
+//            border-top-right-radius: var(--border-radius);
+//            border-top: var(--border);
+//            justify-content: flex-start;
+//          }
+//
+//          .dropdown {
+//            left: inherit;
+//            width: initial;
+//            max-height: 100%;
+//          }
+//
+//          ul {
+//            position: relative;
+//            box-shadow: none;
+//          }
+//        }
+//
+//        > .List:first-child {
+//          margin-top: var(--padding);
+//        }
+//
+//        > .List:last-child {
+//          margin-bottom: var(--padding);
+//        }
+//
+//        .expanded {
+//          ul {
+//            border-top-right-radius: 0;
+//          }
+//        }
+//      }
+//    }
+//  }
+//}

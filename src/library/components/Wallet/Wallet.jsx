@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { number, string } from 'prop-types';
 import { useSelector } from 'react-redux';
+import { ReactComponent as Wallets } from '../../icons/wallets.svg';
 import FileMenu from '../common/lists/FileMenu/FileMenu';
+import ListItem from '../common/lists/List/Item/ListItem';
+import List from '../common/lists/List/List';
 
 import Window from '../common/Window/Window';
 import TransactionList from './lists/Transaction/TransactionList';
@@ -47,11 +50,19 @@ const Wallet = ({ id, index }) => {
             menuIcon={<WalletIcon />}
             id={id}
           />
-          <WalletList key="walletList" onChange={onChange} walletId={walletId} />
+          <List
+            dropdown
+            checkWidth
+            title={<Wallets />}
+            wideTitle="Wallets"
+            className="wallets"
+          >
+            <ListItem><WalletList key="walletList" onChange={onChange} walletId={walletId} /></ListItem>
+            {accessLevel >= AccessLevels.MODERATOR && (
+              <ListItem><AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} /></ListItem>
+            )}
+          </List>
           <IdentityList key="identityList" />
-          {accessLevel >= AccessLevels.MODERATOR && (
-            <AdminWalletList key="adminWalletList" onChange={onChange} walletId={walletId} />
-          )}
         </>
       )}
     >

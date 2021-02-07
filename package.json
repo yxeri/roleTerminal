@@ -1,6 +1,6 @@
 {
   "name": "roleterminal",
-  "version": "2.0.33",
+  "version": "2.0.34",
   "description": "In-game tool/game for use at larps.",
   "author": "Carmilla Mina Jankovic <carmillam@icloud.com>",
   "private": true,
@@ -16,6 +16,7 @@
     "react-dom": "^16.13.1",
     "react-hook-form": "^6.13.1",
     "react-redux": "^7.2.1",
+    "react-resize-detector": "^6.5.0",
     "react-rnd": "^10.2.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",

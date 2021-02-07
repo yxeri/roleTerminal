@@ -4,6 +4,10 @@
   box-sizing: border-box;
   overscroll-behavior-y: contain;
 
+  .wideTitle {
+    display: none;
+  }
+
   header {
     user-select: none;
     padding: var(--padding);
@@ -90,5 +94,13 @@
   > .dropdown {
     border-top-left-radius: 0;
     border-color: var(--second-color);
+  }
+}
+
+.Window.wide {
+  .List {
+    .wideTitle {
+      display: inherit;
+    }
   }
 }

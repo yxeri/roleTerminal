@@ -19,6 +19,7 @@ import './List.scss';
 const List = React.forwardRef(({
   children,
   title,
+  wideTitle,
   observe,
   startRevealed = false,
   alwaysExpanded = false,
@@ -154,6 +155,7 @@ const List = React.forwardRef(({
           }}
         >
           {title}
+          {wideTitle && <div className="wideTitle">{wideTitle}</div>}
         </header>
       )}
       {observe && observe === 'upper' && <Button key="upper" className="upper hide" ref={observeHelper} onClick={() => scroll({ direction: 'top' })}><ArrowUp /></Button>}
@@ -197,6 +199,7 @@ List.propTypes = {
   alwaysExpanded: bool,
   observe: string,
   startRevealed: bool,
+  wideTitle: node,
 };
 
 List.defaultProps = {
@@ -208,4 +211,5 @@ List.defaultProps = {
   alwaysExpanded: false,
   observe: undefined,
   startRevealed: undefined,
+  wideTitle: undefined,
 };

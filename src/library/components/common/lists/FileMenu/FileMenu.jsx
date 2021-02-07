@@ -25,6 +25,7 @@ const FileMenu = ({
     <List
       dropdown
       checkWidth
+      wideTitle="App menu"
       className="FileMenu"
       title={menuIcon || <Menu />}
     >

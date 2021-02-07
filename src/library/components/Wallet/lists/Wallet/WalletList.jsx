@@ -5,7 +5,6 @@ import { func, string } from 'prop-types';
 import List from '../../../common/lists/List/List';
 import { getWalletIdsByCurrentUser } from '../../../../redux/selectors/wallets';
 import WalletItem from './Item/WalletItem';
-import { ReactComponent as Wallet } from '../../../../icons/wallet.svg';
 
 const WalletList = ({ onChange, walletId }) => {
   const walletIds = useSelector(getWalletIdsByCurrentUser);
@@ -21,11 +20,8 @@ const WalletList = ({ onChange, walletId }) => {
 
   return (
     <List
-      dropdown
-      checkWidth
-      title={(
-        <Wallet />
-      )}
+      alwaysExpanded
+      title={<span>Wallets</span>}
       className="WalletList"
     >
       <WalletItem

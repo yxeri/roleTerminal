@@ -29,6 +29,7 @@ const ConfigSystemDialog = ({ id, index }) => {
     hideMenuBar,
     openApps,
     removeDeviceConfig,
+    alwaysCompactMenu,
   }) => {
     let config;
 
@@ -43,6 +44,7 @@ const ConfigSystemDialog = ({ id, index }) => {
             hideTopBar,
             alwaysMaximized,
             hideMenuBar,
+            alwaysCompactMenu,
             openApps: openApps.map((type) => ({ id: type, value: { type } })),
           },
         }
@@ -52,6 +54,7 @@ const ConfigSystemDialog = ({ id, index }) => {
           hideTopBar,
           alwaysMaximized,
           hideMenuBar,
+          alwaysCompactMenu,
           openApps: openApps.map((type) => ({ id: type, value: { type } })),
         };
     } else {
@@ -152,7 +155,7 @@ const ConfigSystemDialog = ({ id, index }) => {
             checked={systemConfig.hideMenuBar}
           />
           <Input
-            label="Hide top row in windows? (Windows will be auto-maximized)?"
+            label="Hide top row in windows? (Windows will be auto-maximized)"
             key={`hideTopBar-${onDevice}`}
             type="checkbox"
             name="hideTopBar"
@@ -164,6 +167,13 @@ const ConfigSystemDialog = ({ id, index }) => {
             type="checkbox"
             name="hideHelp"
             checked={systemConfig.hideHelp}
+          />
+          <Input
+            label="Keep the app menu compact? (The menu will stay at the top in wider windows)"
+            key={`alwaysCompactMenu-${onDevice}`}
+            type="checkbox"
+            name="alwaysCompactMenu"
+            checked={systemConfig.alwaysCompactMenu}
           />
         </form>
       </FormProvider>

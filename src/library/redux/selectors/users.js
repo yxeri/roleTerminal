@@ -88,6 +88,11 @@ export const getAlwaysMaximized = createCachedSelector(
   (systemConfig) => systemConfig.alwaysMaximized,
 )(() => 'current-alwaysMaximized');
 
+export const getAlwaysCompactMenu = createCachedSelector(
+  [getSystemConfig],
+  (systemConfig) => systemConfig.alwaysCompactMenu,
+)(() => 'current-alwaysCompactMenu');
+
 export const getIdentities = createCachedSelector(
   [getAllUsers, getAllAliases],
   (users, aliases) => new Map([...users.entries(), ...aliases.entries()]),

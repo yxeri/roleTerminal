@@ -142,6 +142,28 @@ const OpenApps = () => {
             <span>Wallet</span>
           </ListItem>
         )}
+        <ListItem key="identities">
+          <Button
+            key="identities"
+            className={`${order.get(WindowTypes.IDENTITIES) && order.get(WindowTypes.IDENTITIES).index === order.size ? 'active' : ''}`}
+            onClick={() => changeOrder({ id: WindowTypes.IDENTITIES, value: { type: WindowTypes.IDENTITIES } })}
+          >
+            <Users />
+          </Button>
+          <span>Users</span>
+        </ListItem>
+        <ListItem
+          className="faded"
+          key="teams"
+        >
+          <Button
+            key="Teams"
+            onClick={() => {}}
+          >
+            <Team />
+          </Button>
+          <span>Teams</span>
+        </ListItem>
         <ListItem
           className="faded"
           key="terminal"
@@ -177,30 +199,6 @@ const OpenApps = () => {
             <Heart />
           </Button>
           <span>Love Bureau</span>
-        </ListItem>
-        <ListItem
-          className="faded"
-          key="users"
-        >
-          <Button
-            key="users"
-            onClick={() => {}}
-          >
-            <Users />
-          </Button>
-          <span>Users</span>
-        </ListItem>
-        <ListItem
-          className="faded"
-          key="teams"
-        >
-          <Button
-            key="Teams"
-            onClick={() => {}}
-          >
-            <Team />
-          </Button>
-          <span>Teams</span>
         </ListItem>
         {otherWindows}
       </List>

@@ -1,14 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { bool, node, string } from 'prop-types';
+import ReactCrop from 'react-image-crop';
 
-import Image from '../Image/Image';
 import Button from '../Button/Button';
 import { ReactComponent as ImageIcon } from '../../../../icons/image.svg';
 
 import './ImageUpload.scss';
+import 'react-image-crop/lib/ReactCrop.scss';
+import Image from '../Image/Image';
 
-const ImageUpload = ({ useIcon = false, presetImage, label }) => {
+const ImageUpload = ({
+  croppable,
+  presetImage,
+  label,
+  useIcon = false,
+}) => {
+  const [crop, setCrop] = useState({ aspect: 1 / 1, width: 100, unit: '%' });
   const { register, setValue } = useFormContext();
   const previewRef = useRef(null);
   const inputRef = useRef(null);
@@ -29,7 +37,7 @@ const ImageUpload = ({ useIcon = false, presetImage, label }) => {
 
   useEffect(() => {
     if (!watchImage) {
-      setPreviewImage();
+      setPreviewImage(undefined);
     } else if (previewRef.current) {
       previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -68,13 +76,31 @@ const ImageUpload = ({ useIcon = false, presetImage, label }) => {
         accept="image/png, image/jpeg, image/pjpeg"
         onChange={onChangeFunc}
       />
-      <Image
-        ref={previewRef}
-        onRemove={() => setPreviewImage()}
-        className={`previewImage ${!previewImage ? 'hide' : ''}`}
-        image={previewImage ? previewImage.source : ''}
-        altText="Image preview"
-      />
+      {
+        croppable
+          ? (
+            <ReactCrop
+              crop={crop}
+              onChange={(newCrop) => setCrop(newCrop)}
+              src={previewImage ? previewImage.source : ''}
+              onComplete={(completeCrop, percentageCrop) => {
+                const updatedImage = previewImage;
+                updatedImage.crop = percentageCrop;
+
+                setPreviewImage(updatedImage);
+              }}
+            />
+          )
+          : (
+            <Image
+              ref={previewRef}
+              onRemove={() => setPreviewImage(undefined)}
+              className={`previewImage ${!previewImage ? 'hide' : ''}`}
+              image={previewImage ? previewImage.source : ''}
+              altText="Image preview"
+            />
+          )
+      }
       <Button
         type="button"
         onClick={() => { inputRef.current.click(); }}
@@ -92,10 +118,12 @@ ImageUpload.propTypes = {
   useIcon: bool,
   presetImage: string,
   label: node,
+  croppable: bool,
 };
 
 ImageUpload.defaultProps = {
   useIcon: false,
   presetImage: undefined,
   label: undefined,
+  croppable: undefined,
 };

@@ -9,6 +9,7 @@ export const WindowTypes = {
   DOCFILEVIEW: 'File',
   NEWS: 'News',
   TEAMS: 'Teams',
+  IDENTITIES: 'Users',
   DIALOGIDENTITY: 'User',
   DIALOGCREATEROOM: 'New room',
   DIALOGREMOVEROOM: 'Remove room',

@@ -1,6 +1,6 @@
 {
   "name": "roleterminal",
-  "version": "2.0.34",
+  "version": "2.0.35",
   "description": "In-game tool/game for use at larps.",
   "author": "Carmilla Mina Jankovic <carmillam@icloud.com>",
   "private": true,
@@ -15,6 +15,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hook-form": "^6.13.1",
+    "react-image-crop": "^8.6.6",
     "react-redux": "^7.2.1",
     "react-resize-detector": "^6.5.0",
     "react-rnd": "^10.2.3",
@@ -28,6 +29,8 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development MODE=dev JSONKEY=dev USERVERIFY=false CHOKIDAR_USEPOLLING=true node app & react-scripts start",
+    "dev-backend": "NODE_ENV=development MODE=dev JSONKEY=dev USERVERIFY=false CHOKIDAR_USEPOLLING=true node app",
+    "dev-frontend": "react-scripts start",
     "start": "node app",
     "build": "react-scripts build",
     "test": "eslint ./ && react-scripts test",

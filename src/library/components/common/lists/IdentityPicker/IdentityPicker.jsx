@@ -38,7 +38,7 @@ const IdentityPicker = ({ useIcon = false, hideOnSingle = true, label }) => {
     <div className={`IdentityPicker ${hideOnSingle && identities.length === 1 ? 'hide' : ''}`}>
       {label}
       <List
-        dropdown
+        dropdown={identities.length > 1}
         title={useIcon
           ? <User />
           : (

@@ -1,6 +1,10 @@
 @import "../../../../../common";
 
 .ImageUpload {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start !important;
+
   svg {
     max-width: var(--icon-size);
     max-height: var(--icon-size);

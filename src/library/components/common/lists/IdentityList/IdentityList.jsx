@@ -22,7 +22,11 @@ import { ReactComponent as Users } from '../../../../icons/users.svg';
 
 import './IdentityList.scss';
 
-const IdentityList = ({ dropdown = true }) => {
+const IdentityList = ({
+  alwaysExpanded,
+  hideTitle = false,
+  dropdown = true,
+}) => {
   const formMethods = useForm();
   const partialName = useWatch({ control: formMethods.control, name: 'search' });
   const onlySeen = useSelector(getOnlySeen);
@@ -76,10 +80,11 @@ const IdentityList = ({ dropdown = true }) => {
 
   return (
     <List
+      alwaysExpanded={alwaysExpanded}
       dropdown={dropdown}
       checkWidth={dropdown}
       className="IdentityList"
-      title={<Users />}
+      title={!hideTitle ? <Users /> : undefined}
       wideTitle="Users"
     >
       <SearchItem onSubmit={onSubmit} formMethods={formMethods} placeholder="Search by name" />
@@ -96,9 +101,12 @@ export default React.memo(IdentityList);
 
 IdentityList.propTypes = {
   dropdown: bool,
+  alwaysExpanded: bool,
+  hideTitle: bool,
 };
 
 IdentityList.defaultProps = {
   dropdown: true,
+  alwaysExpanded: undefined,
+  hideTitle: false,
 };
-

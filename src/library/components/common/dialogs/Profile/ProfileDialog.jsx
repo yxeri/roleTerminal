@@ -98,7 +98,7 @@ const ProfileDialog = ({
       pronouns,
       status,
       occupation,
-      accessLevel: newAccessLevel !== accessLevel ? newAccessLevel : undefined,
+      accessLevel: newAccessLevel && Number(newAccessLevel) !== identity.accessLevel ? Number(newAccessLevel) : undefined,
       description: description ? description.split('\n') : undefined,
       username: name !== identity.username ? name : undefined,
     };
@@ -163,8 +163,6 @@ const ProfileDialog = ({
   }
 
   if (currentIdentityId !== '-1' && identityId && identityId !== currentIdentityId && !editing) {
-    console.log(currentIdentityId, identityId, currentIdentityId, editing);
-
     buttons.push(
       <Button
         stopPropagation
@@ -309,6 +307,7 @@ const ProfileDialog = ({
               <IdentityPicker label={<span>You are:</span>} />
             )}
             <ImageUpload
+              croppable
               label="Upload profile image"
               image={identity.image ? { source: `/upload/images/${identity.image.fileName}` } : undefined}
             />

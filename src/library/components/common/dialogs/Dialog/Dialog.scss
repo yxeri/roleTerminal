@@ -11,6 +11,7 @@
         .contentContainer {
           max-width: var(--max-width);
           display: grid;
+          grid-auto-flow: row;
           grid-gap: calc(var(--padding) * 4);
           padding: var(--padding);
           grid-auto-rows: fit-content(100%);

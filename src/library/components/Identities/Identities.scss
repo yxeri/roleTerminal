@@ -1,5 +1,31 @@
 @import "../../../common";
 
 .Identities {
+  .IdentityList {
+    ul {
+      grid-template-columns: repeat(auto-fill, minmax(var(--profile-image-size), 1fr));
 
+      .SearchItem {
+        grid-column: 1 / -1;
+      }
+
+      .IdentityItem {
+        grid-template-columns: unset;
+        align-content: flex-start;
+        justify-items: center;
+
+        .icon {
+          height: unset;
+          width: unset;
+          max-height: unset;
+          max-width: unset;
+
+          img, svg {
+            height: var(--profile-image-size);
+            width: var(--profile-image-size);
+          }
+        }
+      }
+    }
+  }
 }

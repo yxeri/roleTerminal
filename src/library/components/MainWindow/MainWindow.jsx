@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import Identities from '../Identities/Identities';
 
 import Wallet from '../Wallet/Wallet';
 import WorldMap from '../WorldMap/WorldMap';
@@ -71,6 +72,11 @@ const MainWindow = () => {
       }
       case WindowTypes.NEWS: {
         windows.push(<News key={key} id={key} messageId={value.messageId} index={value.index} />);
+
+        break;
+      }
+      case WindowTypes.IDENTITIES: {
+        windows.push(<Identities key={key} id={key} index={value.index} />);
 
         break;
       }

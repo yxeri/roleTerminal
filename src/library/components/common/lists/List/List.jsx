@@ -164,6 +164,7 @@ const List = React.forwardRef(({
           listRef.current = element;
 
           if (ref) {
+            // eslint-disable-next-line no-param-reassign
             ref.current = element;
           }
 

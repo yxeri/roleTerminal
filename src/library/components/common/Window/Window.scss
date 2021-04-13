@@ -46,12 +46,14 @@
             border-top-left-radius: 0;
             border-top: 0;
             width: 100%;
+            max-width: var(--max-width);
             box-sizing: border-box;
           }
 
           .dropdown {
             left: 0;
             width: 100%;
+            max-width: var(--max-width);
             max-height: calc(100% - 1em);
           }
         }
